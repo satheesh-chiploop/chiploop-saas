@@ -231,6 +231,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
       method: "POST",
       body: formData,
     });
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const data = await res.json();
     addLog("✅ Workflow completed", "success");
     setOutput(JSON.stringify(data, null, 2));
@@ -256,9 +257,13 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
       const updated = [...customAgents, newAgent];
       setCustomAgents(updated);
       localStorage.setItem("custom_agents", JSON.stringify(updated));
-    } catch (err: any) {
-      addLog(`❌ Failed to create agent: ${err.message}`, "error");
-    }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+       addLog(`❌ Failed to create agent: ${err.message}`, "error");
+      } else {
+       addLog("❌ Failed to create agent: Unknown error", "error");
+     }
+   }
   };
 
   // ---- Save / Load / Delete Workflows ----
