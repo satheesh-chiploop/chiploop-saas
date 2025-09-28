@@ -22,8 +22,6 @@ type AgentData = {
   label: string;
   desc: string;
 };
-import { Node } from "reactflow";
-
 type AgentNode = Node<AgentData>;
 // ---------- Modal for Spec Input ----------
 // ---------- Modal for Spec Input ----------
