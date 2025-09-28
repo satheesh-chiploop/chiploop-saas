@@ -17,12 +17,13 @@ import ReactFlow, {
 } from "reactflow";
 
 import "reactflow/dist/style.css";
-import AgentNode from "./AgentNode";
+import AgentNodeComponent from "./AgentNode";
 type AgentData = {
   label: string;
   desc: string;
 };
 type AgentNode = Node<AgentData>;
+
 // ---------- Modal for Spec Input ----------
 // ---------- Modal for Spec Input ----------
 function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
@@ -149,7 +150,8 @@ type LogEntry = { text: string; type: "info" | "success" | "error" };
 
 export default function WorkflowPage() {
   // ---------- State ----------
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([]);
+  
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentData>[]>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
   const [statusLog, setStatusLog] = useState<LogEntry[]>([]);
   const [output, setOutput] = useState<string>("");
@@ -173,7 +175,7 @@ export default function WorkflowPage() {
 
   const addAgentNode = (agent: { label: string; desc?: string }) => {
     const newId = `${nodes.length + 1}`;
-    const newNode: Node = {
+    const newNode: Node<AgentData> = {
       id: newId,
       type: "agentNode",
       data: { label: agent.label, desc: agent.desc || "" },
@@ -515,7 +517,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
 
      {/* Canvas */}
         <div className="flex-1 relative">
-          <ReactFlow nodes={nodes} edges={edges} nodeTypes={{ agentNode: AgentNode }} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} fitView>
+          <ReactFlow nodes={nodes} edges={edges} nodeTypes={{ agentNode: AgentNodeComponent }} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} fitView>
             <MiniMap /><Controls /><Background color="#555" gap={16} />
           </ReactFlow>
 
