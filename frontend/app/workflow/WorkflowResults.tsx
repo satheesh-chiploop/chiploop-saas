@@ -31,7 +31,7 @@ export default function WorkflowResults({ results, state }: Props) {
         artifact = state?.rtl ? "backend/design.v" : undefined;
         artifact_log = "rtl_agent_compile.log";
       } else {
-        artifact_log = state?.artifact_log ? state.artifact_log : undefined;
+        artifact_log = state?.artifact_log ? String(state.artifact_log) : undefined;
       }
      return {
        label,
