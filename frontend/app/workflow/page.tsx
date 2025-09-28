@@ -151,7 +151,7 @@ type LogEntry = { text: string; type: "info" | "success" | "error" };
 export default function WorkflowPage() {
   // ---------- State ----------
   
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentData>[]>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<AgentData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
   const [statusLog, setStatusLog] = useState<LogEntry[]>([]);
   const [output, setOutput] = useState<string>("");
