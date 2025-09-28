@@ -33,15 +33,15 @@ export default function WorkflowResults({ results, state }: Props) {
       } else {
         artifact_log = state?.artifact_log ? state.artifact_log : undefined;
       }
-
-      return {
-        label,
-        status: msg,
-        artifact,
-        artifact_log,
-        log: state?.error_log || state?.lint_log,
-        code: state?.rtl,
-      };
+     return {
+       label,
+      status: String(msg ?? ""),                             // ensure string
+      artifact,
+      artifact_log,
+      log: String(state?.error_log ?? state?.lint_log ?? ""), // ensure string
+      code: state?.rtl ? String(state.rtl) : "",             // ensure string
+     };
+ 
     });
   };
 

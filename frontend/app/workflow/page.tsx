@@ -250,7 +250,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
       formData.append("agent_name", name);
       formData.append("description", desc);
       const res = await fetch("http://127.0.0.1:8000/create_agent", { method: "POST", body: formData });
-      const data = await res.json();
+      await res.json();
       addLog(`✅ Agent '${name}' created`, "success");
 
       const newAgent = { label: `✨ ${name} Agent`, desc };
