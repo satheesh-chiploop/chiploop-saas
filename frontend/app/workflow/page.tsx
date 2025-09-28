@@ -18,7 +18,13 @@ import ReactFlow, {
 
 import "reactflow/dist/style.css";
 import AgentNode from "./AgentNode";
+type AgentData = {
+  label: string;
+  desc: string;
+};
+import { Node } from "reactflow";
 
+type AgentNode = Node<AgentData>;
 // ---------- Modal for Spec Input ----------
 // ---------- Modal for Spec Input ----------
 function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
@@ -373,13 +379,13 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
         id: "1",
         type: "agentNode",
         position: { x: 250, y: 0 },
-        data: agentList.find((a) => a.type === "spec")!,
+        data: agentList.find((a) => a.type === "spec") as AgentData,
       },
       {
         id: "2",
         type: "agentNode",
         position: { x: 250, y: 120 },
-        data: agentList.find((a) => a.type === "rtl")!,
+        data: agentList.find((a) => a.type === "rtl") as AgentData,
       },
     ]);
     setEdges([{ id: "e1-2", source: "1", target: "2" }]);
@@ -401,19 +407,19 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
         id: "1",
         type: "agentNode",
         position: { x: 250, y: 0 },
-        data: agentList.find((a) => a.type === "spec")!,
+        data: agentList.find((a) => a.type === "spec") as AgentData,
       },
       {
         id: "2",
         type: "agentNode",
         position: { x: 250, y: 120 },
-        data: agentList.find((a) => a.type === "rtl")!,
+        data: agentList.find((a) => a.type === "rtl") as AgentData,
       },
       {
         id: "3",
         type: "agentNode",
         position: { x: 250, y: 240 },
-        data: agentList.find((a) => a.type === "opt")!,
+        data: agentList.find((a) => a.type === "opt") as AgentData,
       },
     ]);
     setEdges([
