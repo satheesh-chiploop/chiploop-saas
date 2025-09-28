@@ -192,7 +192,11 @@ export default function WorkflowPage() {
     setOutput("");
     addLog("🚀 Running Workflow...", "info");
 
-    const hasSpecAgent = nodes.some((n) => (n.data as any).label.includes("Spec Agent"));
+   const hasSpecAgent = nodes.some((n) => {
+       const data = n.data as { label?: string };
+       return data.label?.includes("Spec Agent") ?? false;
+    });
+
     if (hasSpecAgent) {
       setShowSpecModal(true);
       return;
@@ -205,7 +209,10 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
   addLog("⚡ Executing workflow agents...", "info");
 
   const graph = {
-    nodes: nodes.map((n) => ({ id: n.id, label: (n.data as any).label })),
+    nodes: nodes.map((n) => {
+       const data = n.data as { label?: string };
+       return { id: n.id, label: data.label ?? "" };
+    }),
     edges: edges.map((e) => ({ source: e.source, target: e.target })),
   };
 
@@ -227,9 +234,13 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
     const data = await res.json();
     addLog("✅ Workflow completed", "success");
     setOutput(JSON.stringify(data, null, 2));
-  } catch (err: any) {
+  } catch (err: unknown) {
+  if (err instanceof Error) {
     addLog(`❌ Workflow failed: ${err.message}`, "error");
+  } else {
+    addLog("❌ Workflow failed: Unknown error", "error");
   }
+}
 };
  // ---- Create Agent ----
   const createAgent = async (name: string, desc: string) => {

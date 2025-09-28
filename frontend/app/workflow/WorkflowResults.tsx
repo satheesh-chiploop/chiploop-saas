@@ -9,10 +9,9 @@ type AgentResult = {
   log?: string;
   code?: string;
 };
-
 type Props = {
-  results: Record<string, any>;
-  state: Record<string, any>;
+  results: Record<string, unknown>;
+  state: Record<string, unknown>;
 };
 
 export default function WorkflowResults({ results, state }: Props) {
