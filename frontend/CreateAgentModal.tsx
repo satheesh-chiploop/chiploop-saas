@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL as string;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL as string;
 
 export default function CreateAgentModal({ onClose, onCreated }: any) {
   const [name, setName] = useState("");
