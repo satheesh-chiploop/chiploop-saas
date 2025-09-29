@@ -1,18 +1,21 @@
-module sixteen_bit_counter (
+module four_bit_counter (
     input wire clk,
     input wire reset,
-    output reg [15:0] count
+    output reg [3:0] count
 );
 
-always @(posedge clk) begin
+always @(posedge clk or posedge reset) begin
     if (reset) begin
-        count <= 4'b0000; // Reset value
+        count <= 4'b0000;
     end else begin
-        count <= count + 1'b1; // Increment counter on positive edge of clock
+        count <= count + 1;
+    end
+end
+
+always @(posedge clk) begin
+    if (count >= 16'h10) begin
+        count <= 4'b0000;
     end
 end
 
 endmodule
-
-
-In this code, we have designed a 16-bit counter with a single always block that takes care of the synchronous reset and incrementing the counter on the rising edge of the clock signal. The reset value for the counter is set to `4'b0000`.

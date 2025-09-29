@@ -24,7 +24,8 @@ type AgentData = {
 };
 type AgentNode = Node<AgentData>;
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL as string;
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // ---------- Modal for Spec Input ----------
 // ---------- Modal for Spec Input ----------

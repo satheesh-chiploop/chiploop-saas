@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+openai
+requests
+python-multipart
+pydantic
+langchain-ollama
