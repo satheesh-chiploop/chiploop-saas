@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL as string;
 
 export default function CreateAgentModal({ onClose, onCreated }: any) {
   const [name, setName] = useState("");
@@ -8,7 +9,7 @@ export default function CreateAgentModal({ onClose, onCreated }: any) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    const res = await fetch("http://127.0.0.1:8000/create_agent", {
+    const res = await fetch(`${API_BASE}/create_agent`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, description: desc }),
