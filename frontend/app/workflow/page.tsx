@@ -231,9 +231,10 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
   if (file) {
     formData.append("file", file);
   }
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL!;
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/run_workflow", {
+      const res = await fetch(`${API_BASE}/run_workflow`, {
       method: "POST",
       body: formData,
     });
@@ -255,7 +256,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
       const formData = new FormData();
       formData.append("agent_name", name);
       formData.append("description", desc);
-      const res = await fetch("http://127.0.0.1:8000/create_agent", { method: "POST", body: formData });
+      const res = await fetch(`${API_BASE}/create_agent`, { method: "POST", body: formData });
       await res.json();
       addLog(`✅ Agent '${name}' created`, "success");
 
