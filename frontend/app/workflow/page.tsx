@@ -24,6 +24,8 @@ type AgentData = {
 };
 type AgentNode = Node<AgentData>;
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL as string;
+
 // ---------- Modal for Spec Input ----------
 // ---------- Modal for Spec Input ----------
 function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
@@ -231,8 +233,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
   if (file) {
     formData.append("file", file);
   }
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL!;
-
+  
   try {
       const res = await fetch(`${API_BASE}/run_workflow`, {
       method: "POST",
