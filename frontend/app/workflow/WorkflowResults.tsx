@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 type AgentResult = {
   label: string;
   status: string;
@@ -71,7 +71,7 @@ export default function WorkflowResults({ results, state }: Props) {
               <p className="text-cyan-400 text-xs mt-1">
                 ➤ Output:{" "}
                 <a
-                  href={`http://127.0.0.1:8000/artifact/${agent.artifact.split("/").pop()}`}
+                  href={`${API_BASE}/artifact/${agent.artifact.split("/").pop()}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline hover:text-cyan-300"
@@ -85,7 +85,7 @@ export default function WorkflowResults({ results, state }: Props) {
               <p className="text-cyan-400 text-xs mt-1">
                 ➤ Log:{" "}
                 <a
-                  href={`http://127.0.0.1:8000/artifact/${agent.artifact_log}`}
+                  href={`${API_BASE}/artifact/${agent.artifact_log}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline hover:text-cyan-300"
