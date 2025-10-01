@@ -7,10 +7,11 @@ from fastapi.responses import FileResponse
 import os
 import importlib.util
 import logging
-from langchain_ollama import OllamaLLM
+from openai import OpenAI
+client = OpenAI()
+
 from fastapi.responses import JSONResponse
 
-llm = OllamaLLM(model="mistral")
 
 from spec_agent import spec_agent
 from rtl_agent import rtl_agent
@@ -152,7 +153,11 @@ async def create_agent(agent_name: str = Form(...), description: str = Form(...)
         - Keep the implementation self-contained and runnable.
         """
 
-        generated_code = llm.invoke(prompt)
+        resp = client.chat.completions.create(
+               model="gpt-4o-mini",
+               messages=[{"role": "user", "content": prompt}],
+          )
+        generated_code = resp.choices[0].message.content
 
         with open(filename, "w", encoding="utf-8") as f:
             f.write(generated_code)
