@@ -240,6 +240,9 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
       method: "POST",
       body: formData,
     });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+    }
    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const data = await res.json();
     addLog("✅ Workflow completed", "success");
@@ -259,6 +262,9 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
       formData.append("agent_name", name);
       formData.append("description", desc);
       const res = await fetch(`${API_BASE}/create_agent`, { method: "POST", body: formData });
+      if (!res.ok) {
+         throw new Error(`HTTP ${res.status}`);
+      }
       await res.json();
       addLog(`✅ Agent '${name}' created`, "success");
 
