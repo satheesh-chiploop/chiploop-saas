@@ -3,6 +3,7 @@
 import React, { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import WorkflowResults from "./WorkflowResults";
+import { supabase } from '@/lib/supabaseClient'
 
 import ReactFlow, {
   addEdge,
@@ -165,14 +166,22 @@ export default function WorkflowPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const user = typeof window !== "undefined" ? localStorage.getItem("chiploop_user") : null;
-    if (!user) router.push("/login");
+  const checkSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      router.push("/login"); // not logged in → redirect
+      return;
+    }
 
     const savedAgents = JSON.parse(localStorage.getItem("custom_agents") || "[]");
     const savedWorkflows = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
     setCustomAgents(savedAgents);
     setCustomWorkflows(savedWorkflows.map((k) => k.replace("workflow_", "")));
-  }, [router]);
+  };
+
+  checkSession();
+ }, [router]);
 
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -319,11 +328,23 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
   return (
     <div className="flex flex-col h-[100vh] bg-gradient-to-br from-slate-900 via-slate-950 to-black text-slate-100">
       {/* Header */}
-      <header className="px-6 py-4 border-b border-slate-800 bg-black/70 backdrop-blur text-center">
-        <h1 className="text-3xl font-bold text-cyan-400">ChipLoop – Agentic AI Platform</h1>
-        <p className="text-sm text-slate-400">Build workflows by combining prebuilt/Custom AI agents</p>
-      </header>
 
+     <header className="flex justify-between items-center px-6 py-4 border-b border-slate-800 bg-black/70 backdrop-blur">
+        <div className="text-center flex-1">
+            <h1 className="text-3xl font-bold text-cyan-400">ChipLoop – Agentic AI Platform</h1>
+            <p className="text-sm text-slate-400">Build workflows by combining prebuilt/Custom AI agents</p>
+       </div>
+       <button
+            onClick={async () => {
+            await supabase.auth.signOut()
+            router.push('/login')
+            }}
+           className="ml-4 bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded"
+        >
+          Logout
+       </button>
+    </header>
+  
       <div className="flex flex-1">
         {/* Sidebar */}
         <div className="w-80 bg-slate-900/70 border-r border-slate-800 p-4 text-slate-200 overflow-y-auto">
