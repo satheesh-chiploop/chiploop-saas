@@ -23,13 +23,13 @@ type AgentData = {
   label: string;
   desc: string;
 };
-type AgentNode = Node<AgentData>;
+//type AgentNode = Node<AgentData>;
 
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 // --- Supabase workflow helpers ---
-async function saveWorkflowToDB(userId: string, name: string, nodes: any, edges: any) {
+async function saveWorkflowToDB(userId: string, name: string, nodes: unknown,edges: unknown) {
   const { error } = await supabase.from("workflows").insert([
     { user_id: userId, name, definition: { nodes, edges } }
   ]);
@@ -40,7 +40,7 @@ async function saveWorkflowToDB(userId: string, name: string, nodes: any, edges:
     alert("✅ Workflow saved to Supabase");
   }
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function loadWorkflowsFromDB(userId: string) {
   const { data, error } = await supabase.from("workflows").select("*").eq("user_id", userId);
   if (error) {
