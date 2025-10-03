@@ -256,42 +256,50 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
 
   const graph = {
     nodes: nodes.map((n) => {
-       const data = n.data as { label?: string };
-       return { id: n.id, label: data.label ?? "" };
+      const data = n.data as { label?: string };
+      return { id: n.id, label: data.label ?? "" };
     }),
     edges: edges.map((e) => ({ source: e.source, target: e.target })),
   };
 
   const formData = new FormData();
   formData.append("workflow", JSON.stringify(graph));
+  if (spec) formData.append("spec_text", spec);
+  if (file) formData.append("file", file);
 
-  if (spec) {
-    formData.append("spec_text", spec);   // ✅ match backend name
-  }
-  if (file) {
-    formData.append("file", file);
-  }
-  
   try {
-      const res = await fetch(`${API_BASE}/run_workflow`, {
+    // ✅ fetch Supabase token
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      addLog("❌ Not logged in", "error");
+      return;
+    }
+    const token = session.access_token;
+
+    const res = await fetch(`${API_BASE}/run_workflow`, {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,   // <-- add this
+      },
       body: formData,
     });
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
     }
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const data = await res.json();
     addLog("✅ Workflow completed", "success");
     setOutput(JSON.stringify(data, null, 2));
   } catch (err: unknown) {
-  if (err instanceof Error) {
-    addLog(`❌ Workflow failed: ${err.message}`, "error");
-  } else {
-    addLog("❌ Workflow failed: Unknown error", "error");
+    if (err instanceof Error) {
+      addLog(`❌ Workflow failed: ${err.message}`, "error");
+    } else {
+      addLog("❌ Workflow failed: Unknown error", "error");
+    }
   }
-}
 };
+
  // ---- Create Agent ----
   const createAgent = async (name: string, desc: string) => {
     try {
