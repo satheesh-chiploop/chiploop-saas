@@ -28,6 +28,34 @@ type AgentNode = Node<AgentData>;
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
+// --- Supabase workflow helpers ---
+async function saveWorkflowToDB(userId: string, name: string, nodes: any, edges: any) {
+  const { error } = await supabase.from("workflows").insert([
+    { user_id: userId, name, definition: { nodes, edges } }
+  ]);
+  if (error) {
+    console.error("❌ Save error:", error.message);
+    alert("Failed to save workflow");
+  } else {
+    alert("✅ Workflow saved to Supabase");
+  }
+}
+
+async function loadWorkflowsFromDB(userId: string) {
+  const { data, error } = await supabase.from("workflows").select("*").eq("user_id", userId);
+  if (error) {
+    console.error("❌ Load error:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+async function deleteWorkflowFromDB(userId: string, name: string) {
+  const { error } = await supabase.from("workflows").delete().eq("user_id", userId).eq("name", name);
+  if (error) console.error("❌ Delete error:", error.message);
+}
+
+
 // ---------- Modal for Spec Input ----------
 // ---------- Modal for Spec Input ----------
 function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
@@ -291,31 +319,46 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
   };
 
   // ---- Save / Load / Delete Workflows ----
-  const saveCurrentWorkflow = () => {
-    const name = prompt("Enter a name to save this workflow:");
-    if (!name) return;
-    const key = `workflow_${name}`;
-    localStorage.setItem(key, JSON.stringify({ nodes, edges }));
-    if (!customWorkflows.includes(name)) {
-      setCustomWorkflows((prev) => [...prev, name]);
-    }
+  const saveCurrentWorkflow = async () => {
+  const name = prompt("Enter a name to save this workflow:");
+  if (!name) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    alert("Not logged in");
+    return;
+  }
+  await saveWorkflowToDB(session.user.id, name, nodes, edges);
+  if (!customWorkflows.includes(name)) {
+    setCustomWorkflows((prev) => [...prev, name]);
+   }
   };
 
-  const loadWorkflowByName = (name: string) => {
-    const key = `workflow_${name}`;
-    const wfData = localStorage.getItem(key);
-    if (wfData) {
-      const { nodes: n, edges: e } = JSON.parse(wfData);
-      setNodes(n);
-      setEdges(e);
-      setStatusLog([]);
-      setOutput("");
-    }
+
+ const loadWorkflowByName = async (name: string) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+
+  const { data, error } = await supabase
+    .from("workflows")
+    .select("definition")
+    .eq("user_id", session.user.id)
+    .eq("name", name)
+    .single();
+
+  if (error || !data) return;
+
+  const { nodes: n, edges: e } = data.definition;
+  setNodes(n);
+  setEdges(e);
+  setStatusLog([]);
+  setOutput("");
   };
 
-  const deleteWorkflow = (name: string) => {
-    localStorage.removeItem(`workflow_${name}`);
-    setCustomWorkflows((prev) => prev.filter((w) => w !== name));
+  const deleteWorkflow = async (name: string) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+  await deleteWorkflowFromDB(session.user.id, name);
+  setCustomWorkflows((prev) => prev.filter((w) => w !== name));
   };
 
   const deleteAgent = (label: string) => {
