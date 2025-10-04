@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
+
+import React from "react";
+
 type AgentResult = {
   label: string;
   status: string;
@@ -9,69 +10,52 @@ type AgentResult = {
   log?: string;
   code?: string;
 };
+
 type Props = {
   results: Record<string, unknown>;
-  state: Record<string, unknown>;
+  artifacts: Record<string, any>;
 };
 
-export default function WorkflowResults({ results, state }: Props) {
-  const [expanded, setExpanded] = useState<string | null>(null);
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
-  const parseResults = (): AgentResult[] => {
-    return Object.keys(results).map((label) => {
-      const msg = results[label];
+export default function WorkflowResults({ results, artifacts }: Props) {
+  if (!results || Object.keys(results).length === 0) {
+    return (
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold mb-2">Workflow Results</h2>
+        <p>No results available.</p>
+      </div>
+    );
+  }
 
-      let artifact: string | undefined;
-      let artifact_log: string | undefined;
+  const parsed: AgentResult[] = Object.keys(results).map((label) => {
+    const msg = results[label];
+    const art = artifacts?.[label] || {};
 
-      if (label === "📘 Spec Agent") {
-        artifact = state?.rtl ? "backend/design.v" : undefined;
-        artifact_log = "spec_agent_compile.log";
-      } else if (label === "💻 RTL Agent") {
-        artifact = state?.rtl ? "backend/design.v" : undefined;
-        artifact_log = "rtl_agent_compile.log";
-      } else {
-        artifact_log = state?.artifact_log ? String(state.artifact_log) : undefined;
-      }
-     return {
-       label,
-      status: String(msg ?? ""),                             // ensure string
-      artifact,
-      artifact_log,
-      log: String(state?.error_log ?? state?.lint_log ?? ""), // ensure string
-      code: state?.rtl ? String(state.rtl) : "",             // ensure string
-     };
- 
-    });
-  };
-
-  const data = parseResults();
+    return {
+      label,
+      status: String(msg ?? ""),
+      artifact: art.artifact ? String(art.artifact) : undefined,
+      artifact_log: art.artifact_log ? String(art.artifact_log) : undefined,
+      log: art.log ? String(art.log) : "",
+      code: art.code ? String(art.code) : "",
+    };
+  });
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 max-h-72 overflow-y-auto bg-slate-900/95 border-t border-slate-700 p-4 text-sm text-slate-200">
-      <h3 className="text-lg font-bold mb-3">Workflow Results</h3>
-      <div className="space-y-3">
-        {data.map((agent) => (
-          <div
-            key={agent.label}
-            className="p-3 rounded-lg bg-slate-800 shadow border border-slate-700"
-          >
-            <div className="flex justify-between items-center">
-              <span className="font-semibold">{agent.label}</span>
-              <span>
-                {agent.status.startsWith("✅") && "✅"}
-                {agent.status.startsWith("❌") && "❌"}
-                {agent.status.startsWith("⚠") && "⚠"}
-              </span>
-            </div>
-
-            <p className="text-slate-300 mt-1">{agent.status}</p>
+    <div className="mt-6">
+      <h2 className="text-lg font-semibold mb-2">Workflow Results</h2>
+      <div className="space-y-4">
+        {parsed.map((agent) => (
+          <div key={agent.label} className="border rounded p-3 bg-gray-900 text-gray-100">
+            <h3 className="font-bold">{agent.label}</h3>
+            <p>Status: {agent.status}</p>
 
             {agent.artifact && (
               <p className="text-cyan-400 text-xs mt-1">
                 ➤ Output:{" "}
                 <a
-                  href={`${API_BASE}/artifact/${agent.artifact.split("/").pop()}`}
+                  href={`${API_BASE}${agent.artifact}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline hover:text-cyan-300"
@@ -85,7 +69,7 @@ export default function WorkflowResults({ results, state }: Props) {
               <p className="text-cyan-400 text-xs mt-1">
                 ➤ Log:{" "}
                 <a
-                  href={`${API_BASE}/artifact/${agent.artifact_log}`}
+                  href={`${API_BASE}${agent.artifact_log}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline hover:text-cyan-300"
@@ -96,19 +80,14 @@ export default function WorkflowResults({ results, state }: Props) {
             )}
 
             {agent.log && (
-              <button
-                onClick={() =>
-                  setExpanded(expanded === agent.label ? null : agent.label)
-                }
-                className="text-xs mt-2 text-indigo-400 underline"
-              >
-                {expanded === agent.label ? "Hide Details" : "View Details"}
-              </button>
+              <pre className="bg-gray-800 p-2 rounded text-xs mt-2 overflow-x-auto">
+                {agent.log}
+              </pre>
             )}
 
-            {expanded === agent.label && (
-              <pre className="mt-2 p-2 rounded bg-black text-green-300 text-xs overflow-x-auto max-h-40">
-                {agent.log || agent.code}
+            {agent.code && (
+              <pre className="bg-gray-800 p-2 rounded text-xs mt-2 overflow-x-auto">
+                {agent.code}
               </pre>
             )}
           </div>
