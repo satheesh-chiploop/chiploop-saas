@@ -13,9 +13,8 @@ type AgentResult = {
 
 type Props = {
   results: Record<string, unknown>;
-  artifacts: Record<string, any>;
+  artifacts: Record<string, Record<string, string>>;
 };
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export default function WorkflowResults({ results, artifacts }: Props) {
