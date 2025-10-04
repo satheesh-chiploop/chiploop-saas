@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react"; 
+
 
 export default function LandingPage() {
   const router = useRouter();
@@ -24,8 +26,9 @@ export default function LandingPage() {
   const portal = searchParams.get("portal");
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white px-6">
-      {portal === "success" && (
+    <Suspense fallback={<div className="text-center p-10">Loading...</div>}>
+     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white px-6">
+       {portal === "success" && (
         <div className="mb-6 p-3 rounded-lg bg-green-100 text-green-700 font-medium">
     🎉 Subscription updated successfully!
         </div>
@@ -141,6 +144,7 @@ export default function LandingPage() {
           ))}
         </div>
       </div>
-    </main>
+     </main>
+    </Suspense>
   );
 }
