@@ -663,3 +663,5 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
   />
 )}
 </div>   {/* closes flex flex-col h-[100vh] */}
+);        // ✅ closes return
+}         // ✅ closes component
