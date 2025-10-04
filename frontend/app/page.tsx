@@ -148,27 +148,41 @@ function LandingPageContent() {
               <p className="text-slate-300 mb-4">{plan.desc}</p>
               <p className="text-cyan-400 font-bold text-2xl mb-4">{getPrice(plan.price)}</p>
               <button
-                onClick={async () => {
-                  if (plan.price === 0) {
-                    router.push("/login");
-                  } else {
-                    const res = await fetch("/api/create-checkout-session", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ plan: plan.name }),
-                    });
-                    const { url } = await res.json();
-                    if (url) {
-                      window.location.href = url;
-                    } else {
-                      alert("❌ Failed to start checkout");
-                    }
-                  }
-                }}
-                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded"
-              >
-                Choose
-              </button>
+                  onClick={async () => {
+                      if (plan.price === 0) {
+                        router.push("/login");
+                      } else {
+                        try {
+                           const { data: { session } } = await supabase.auth.getSession();
+                           const userId = session?.user?.id || "unknown";
+
+                          const res = await fetch("/api/create-checkout-session", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                  plan: plan.name,
+                                  user_id: userId, // ✅ send user ID
+                              }),
+                          });
+
+                          const { url, error } = await res.json();
+                          if (url) {
+                             window.location.assign(url);
+                          } else {
+                             console.error("Checkout error:", error);
+                             alert("❌ Failed to start checkout");
+                          }
+                     } catch (err) {
+                       console.error("Checkout exception:", err);
+                       alert("❌ Checkout failed");
+                     }
+                   }
+              }}
+             className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded"
+           >
+             Choose
+         </button>
+
             </div>
           ))}
         </div>
