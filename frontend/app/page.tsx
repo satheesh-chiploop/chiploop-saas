@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -21,7 +22,14 @@ export default function LandingPage() {
   };
 
   return (
+     const searchParams = useSearchParams();
+     const portal = searchParams.get("portal");
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white px-6">
+      {portal === "success" && (
+        <div className="mb-6 p-3 rounded-lg bg-green-100 text-green-700 font-medium">
+    🎉 Subscription updated successfully!
+        </div>
+      )}
       {/* Hero */}
       <h1 className="text-5xl font-extrabold text-cyan-400 mb-6 text-center">
         Welcome to ChipLoop
