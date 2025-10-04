@@ -108,11 +108,27 @@ export default function LandingPage() {
                 {getPrice(plan.price)}
               </p>
               <button
-                onClick={() => router.push("/login")}
-                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded"
-              >
-                Choose
-              </button>
+                 onClick={async () => {
+                     if (plan.price === 0) {
+                       router.push("/login"); // Freemium → just login
+                     } else {
+                       const res = await fetch("/api/create-checkout-session", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ plan: plan.name }), // optional: send which plan
+                       });
+                      const { url } = await res.json();
+                      if (url) {
+                          window.location.href = url; // redirect to Stripe Checkout
+                      } else {
+                          alert("❌ Failed to start checkout");
+                      }
+                   }
+               }}
+               className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded"
+>
+               Choose
+             </button>
             </div>
           ))}
         </div>
