@@ -662,6 +662,6 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
     onSubmit={createAgent}
   />
 )}
-</div>   {/* closes flex flex-col h-[100vh] */}
-);        // ✅ closes return
-}         // ✅ closes component
+</div>   
+);        // closes return
+}         // closes component
