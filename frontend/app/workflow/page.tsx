@@ -609,7 +609,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
             </div>
           )}
 
-          {output && <WorkflowResults results={JSON.parse(output).workflow_results} state={JSON.parse(output).state} />}
+          {output && <WorkflowResults results={JSON.parse(output).workflow_results} artifacts={JSON.parse(output).artifacts} />}
         </div>
       </div>
 
