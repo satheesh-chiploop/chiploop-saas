@@ -597,24 +597,52 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
         </div>
 
      {/* Canvas */}
-        <div className="flex-1 relative">
-          <ReactFlow nodes={nodes} edges={edges} nodeTypes={{ agentNode: AgentNodeComponent }} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} fitView>
-            <MiniMap /><Controls /><Background color="#555" gap={16} />
-          </ReactFlow>
+<div className="flex-1 relative">
+  <ReactFlow
+    nodes={nodes}
+    edges={edges}
+    nodeTypes={{ agentNode: AgentNodeComponent }}
+    onNodesChange={onNodesChange}
+    onEdgesChange={onEdgesChange}
+    onConnect={onConnect}
+    fitView
+  >
+    <MiniMap />
+    <Controls />
+    <Background color="#555" gap={16} />
+  </ReactFlow>
 
-          {statusLog.length > 0 && (
-            <div className="absolute bottom-0 left-0 right-0 h-40 overflow-auto bg-black/80 text-sm p-3 border-t border-slate-700">
-              <h3 className="font-bold mb-2 text-cyan-400">Agent Execution Log</h3>
-              <ul className="space-y-1">{statusLog.map((e, i) => (<li key={i} className={e.type === "success" ? "text-green-400" : e.type === "error" ? "text-red-400" : "text-yellow-300"}>{e.text}</li>))}</ul>
-            </div>
-          )}
+  {(statusLog.length > 0 || output) && (
+    <div className="absolute bottom-0 left-0 right-0 h-64 overflow-auto bg-black/80 text-sm p-3 border-t border-slate-700">
+      <h3 className="font-bold mb-2 text-cyan-400">Agent Execution Log</h3>
 
-          {output && <WorkflowResults results={JSON.parse(output).workflow_results} artifacts={JSON.parse(output).artifacts} />}
+      {/* Status messages */}
+      <ul className="space-y-1">
+        {statusLog.map((e, i) => (
+          <li
+            key={i}
+            className={
+              e.type === "success"
+                ? "text-green-400"
+                : e.type === "error"
+                ? "text-red-400"
+                : "text-yellow-300"
+            }
+          >
+            {e.text}
+          </li>
+        ))}
+      </ul>
+
+      {/* ✅ Results now inside the log box */}
+      {output && (
+        <div className="mt-3 text-xs">
+          <WorkflowResults
+            results={JSON.parse(output).workflow_results}
+            artifacts={JSON.parse(output).artifacts}
+          />
         </div>
-      </div>
-
-      {showSpecModal && <SpecInputModal onClose={() => setShowSpecModal(false)} onSubmit={(t, f) => executeWorkflow({ spec: t, file: f })} />}
-      {showCreateAgentModal && <CreateAgentModal onClose={() => setShowCreateAgentModal(false)} onSubmit={createAgent} />}
+      )}
     </div>
-  );
-}
+  )}
+</div>
