@@ -597,6 +597,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
         </div>
 
      {/* Canvas */}
+{/* Canvas */}
 <div className="flex-1 relative">
   <ReactFlow
     nodes={nodes}
@@ -634,7 +635,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
         ))}
       </ul>
 
-      {/* ✅ Results now inside the log box */}
+      {/* ✅ Workflow Results now inside log box */}
       {output && (
         <div className="mt-3 text-xs">
           <WorkflowResults
@@ -645,4 +646,20 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
       )}
     </div>
   )}
-</div>
+</div>   {/* closes flex-1 relative (Canvas) */}
+</div>   {/* closes flex flex-1 (Sidebar + Canvas) */}
+
+{showSpecModal && (
+  <SpecInputModal
+    onClose={() => setShowSpecModal(false)}
+    onSubmit={(t, f) => executeWorkflow({ spec: t, file: f })}
+  />
+)}
+
+{showCreateAgentModal && (
+  <CreateAgentModal
+    onClose={() => setShowCreateAgentModal(false)}
+    onSubmit={createAgent}
+  />
+)}
+</div>   {/* closes flex flex-col h-[100vh] */}
