@@ -157,29 +157,30 @@ function LandingPageContent() {
                         router.push("/login");
                       } else {
                         try {
-                           const { data: { session } } = await supabase.auth.getSession();
-                           const userId = session?.user?.id || "unknown";
-
+                          const { data: { session } } = await supabase.auth.getSession();
+                          const token = session?.access_token;
+                          if (!token) {
+                             alert("⚠️ Please log in before subscribing.");
+                             return;
+                          }
                           const res = await fetch("/api/create-checkout-session", {
                               method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({
-                                  plan: plan.name,
-                                  user_id: userId, // ✅ send user ID
-                              }),
+                              headers: {
+                                   "Content-Type": "application/json",
+                                     Authorization: `Bearer ${token}`,
+                              },
+                             body: JSON.stringify({}),
                           });
-
-                          const { url, error } = await res.json();
-                          if (url) {
-                             window.location.assign(url);
+                          const data = await res.json();
+                          if (data.url) {
+                            window.location.href = data.url; // Redirect to Stripe checkout
                           } else {
-                             console.error("Checkout error:", error);
-                             alert("❌ Failed to start checkout");
+                            alert("❌ Failed to start checkout");
                           }
-                     } catch (err) {
-                       console.error("Checkout exception:", err);
-                       alert("❌ Checkout failed");
-                     }
+                        } catch (err) {
+                          console.error("Checkout error:", err);
+                          alert("❌ Error starting checkout");
+                        }
                    }
               }}
              className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded"
