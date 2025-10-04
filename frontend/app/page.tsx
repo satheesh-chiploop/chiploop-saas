@@ -1,14 +1,39 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 
 function LandingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isStudent, setIsStudent] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false); // ✅ new state
 
   const portal = searchParams.get("portal");
+
+  // ✅ Check subscription status based on Supabase email
+  useEffect(() => {
+    const checkSubscription = async () => {
+      try {
+        const token = localStorage.getItem("supabase.auth.token");
+        if (!token) return;
+
+        const parsed = JSON.parse(token);
+        const userEmail = parsed?.currentSession?.user?.email;
+        if (!userEmail) return;
+
+        const res = await fetch(`/api/check-subscription?email=${userEmail}`);
+        const data = await res.json();
+        if (data.status === "active") {
+          setIsSubscribed(true);
+        }
+      } catch (err) {
+        console.error("❌ Subscription check failed", err);
+      }
+    };
+
+    checkSubscription();
+  }, []);
 
   const plans = [
     { name: "Freemium", desc: "1 agent, 1 workflow, free trial", price: 0 },
@@ -76,6 +101,27 @@ function LandingPageContent() {
           </div>
         </div>
       </div>
+
+      {/* ✅ Manage Subscription (visible only if subscribed) */}
+      {isSubscribed && (
+        <div className="mt-10 text-center">
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/create-customer-portal-session", { method: "POST" });
+                const data = await res.json();
+                if (data.url) window.location.href = data.url;
+                else alert("❌ Failed to open customer portal");
+              } catch (err) {
+                console.error("Portal session error:", err);
+              }
+            }}
+            className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-lg shadow-lg transition"
+          >
+            ⚙️ Manage Subscription
+          </button>
+        </div>
+      )}
 
       {/* Pricing Section */}
       <div className="mt-20 w-full max-w-4xl text-center">
