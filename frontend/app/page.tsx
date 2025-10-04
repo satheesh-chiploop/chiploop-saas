@@ -1,16 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react"; 
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
 
-
-export default function LandingPage() {
+function LandingPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isStudent, setIsStudent] = useState(false);
 
-  // Pricing plans
+  const portal = searchParams.get("portal");
+
   const plans = [
     { name: "Freemium", desc: "1 agent, 1 workflow, free trial", price: 0 },
     { name: "Basic", desc: "10 agents, 5 workflows", price: 9.99 },
@@ -18,28 +17,23 @@ export default function LandingPage() {
     { name: "Enterprise", desc: "Unlimited agents/workflows", price: 249.99 },
   ];
 
-  const getPrice = (price: number) => {
-    if (price === 0) return "Free";
-    return isStudent ? `$${(price / 2).toFixed(2)}/mo` : `$${price}/mo`;
-  };
-  const searchParams = useSearchParams();
-  const portal = searchParams.get("portal");
+  const getPrice = (price: number) =>
+    price === 0 ? "Free" : isStudent ? `$${(price / 2).toFixed(2)}/mo` : `$${price}/mo`;
 
   return (
-    <Suspense fallback={<div className="text-center p-10">Loading...</div>}>
-     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white px-6">
-       {portal === "success" && (
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white px-6">
+      {portal === "success" && (
         <div className="mb-6 p-3 rounded-lg bg-green-100 text-green-700 font-medium">
-    🎉 Subscription updated successfully!
+          🎉 Subscription updated successfully!
         </div>
       )}
+
       {/* Hero */}
       <h1 className="text-5xl font-extrabold text-cyan-400 mb-6 text-center">
         Welcome to ChipLoop
       </h1>
       <p className="text-lg text-slate-300 max-w-2xl text-center mb-8">
-        Agentic AI platform to create, manage, and execute AI agents and
-        workflows effortlessly.
+        Agentic AI platform to create, manage, and execute AI agents and workflows effortlessly.
       </p>
 
       {/* CTA */}
@@ -58,9 +52,8 @@ export default function LandingPage() {
         </button>
       </div>
 
-      {/* Two Boxes */}
+      {/* Why ChipLoop / Use ChipLoop */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6 w-full max-w-5xl">
-        {/* Why ChipLoop */}
         <div className="p-6 bg-slate-800 rounded-xl shadow-lg">
           <h3 className="text-xl font-bold mb-4">Why ChipLoop?</h3>
           <ul className="space-y-2 text-slate-300">
@@ -71,7 +64,6 @@ export default function LandingPage() {
           </ul>
         </div>
 
-        {/* Use ChipLoop */}
         <div className="p-6 bg-slate-800 rounded-xl shadow-lg flex flex-col justify-between">
           <div>
             <h3 className="text-xl font-bold mb-4">Use ChipLoop</h3>
@@ -91,17 +83,13 @@ export default function LandingPage() {
         <div className="flex justify-center mb-6">
           <button
             onClick={() => setIsStudent(false)}
-            className={`px-4 py-2 rounded-l-lg ${
-              !isStudent ? "bg-cyan-500 text-black" : "bg-slate-700"
-            }`}
+            className={`px-4 py-2 rounded-l-lg ${!isStudent ? "bg-cyan-500 text-black" : "bg-slate-700"}`}
           >
             Regular
           </button>
           <button
             onClick={() => setIsStudent(true)}
-            className={`px-4 py-2 rounded-r-lg ${
-              isStudent ? "bg-cyan-500 text-black" : "bg-slate-700"
-            }`}
+            className={`px-4 py-2 rounded-r-lg ${isStudent ? "bg-cyan-500 text-black" : "bg-slate-700"}`}
           >
             Student (50% off)
           </button>
@@ -109,42 +97,44 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className="p-6 bg-slate-800 rounded-xl shadow-lg flex flex-col justify-between"
-            >
+            <div key={plan.name} className="p-6 bg-slate-800 rounded-xl shadow-lg flex flex-col justify-between">
               <h4 className="font-bold text-xl mb-2">{plan.name}</h4>
               <p className="text-slate-300 mb-4">{plan.desc}</p>
-              <p className="text-cyan-400 font-bold text-2xl mb-4">
-                {getPrice(plan.price)}
-              </p>
+              <p className="text-cyan-400 font-bold text-2xl mb-4">{getPrice(plan.price)}</p>
               <button
-                 onClick={async () => {
-                     if (plan.price === 0) {
-                       router.push("/login"); // Freemium → just login
-                     } else {
-                       const res = await fetch("/api/create-checkout-session", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ plan: plan.name }), // optional: send which plan
-                       });
-                      const { url } = await res.json();
-                      if (url) {
-                          window.location.href = url; // redirect to Stripe Checkout
-                      } else {
-                          alert("❌ Failed to start checkout");
-                      }
-                   }
-               }}
-               className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded"
->
-               Choose
-             </button>
+                onClick={async () => {
+                  if (plan.price === 0) {
+                    router.push("/login");
+                  } else {
+                    const res = await fetch("/api/create-checkout-session", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ plan: plan.name }),
+                    });
+                    const { url } = await res.json();
+                    if (url) {
+                      window.location.href = url;
+                    } else {
+                      alert("❌ Failed to start checkout");
+                    }
+                  }
+                }}
+                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2 px-4 rounded"
+              >
+                Choose
+              </button>
             </div>
           ))}
         </div>
       </div>
-     </main>
+    </main>
+  );
+}
+
+export default function LandingPage() {
+  return (
+    <Suspense fallback={<div className="text-center p-10">Loading...</div>}>
+      <LandingPageContent />
     </Suspense>
   );
 }
