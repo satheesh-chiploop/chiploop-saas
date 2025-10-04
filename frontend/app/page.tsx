@@ -20,10 +20,10 @@ export default function LandingPage() {
     if (price === 0) return "Free";
     return isStudent ? `$${(price / 2).toFixed(2)}/mo` : `$${price}/mo`;
   };
+  const searchParams = useSearchParams();
+  const portal = searchParams.get("portal");
 
   return (
-     const searchParams = useSearchParams();
-     const portal = searchParams.get("portal");
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white px-6">
       {portal === "success" && (
         <div className="mb-6 p-3 rounded-lg bg-green-100 text-green-700 font-medium">
