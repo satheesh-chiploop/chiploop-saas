@@ -3,10 +3,11 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { createClient } from "@supabase/supabase-js";
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Initialize Supabase client (add these two lines)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
 function LandingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -112,7 +113,10 @@ function LandingPageContent() {
           <button
             onClick={async () => {
               try {
-                const res = await fetch("/api/create-customer-portal-session", { method: "POST" });
+                const res = await fetch("http://209.38.74.151/create-customer-portal-session", {
+                   method: "POST",
+                   headers: { "Content-Type": "application/json" },
+                });
                 const data = await res.json();
                 if (data.url) window.location.href = data.url;
                 else alert("❌ Failed to open customer portal");
