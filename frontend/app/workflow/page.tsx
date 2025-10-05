@@ -208,7 +208,6 @@ export default function WorkflowPage() {
     setCustomAgents(savedAgents);
     setCustomWorkflows(savedWorkflows.map((k) => k.replace("workflow_", "")));
   };
-     if (session) setUserId(session.user.id);
   checkSession();
  }, [router]);
 
