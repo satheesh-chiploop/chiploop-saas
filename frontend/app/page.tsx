@@ -18,12 +18,10 @@ function LandingPageContent() {
 
   const portal = searchParams.get("portal");
 
-  // ✅ Check Supabase session & subscription
+  // ✅ Get Supabase user session
   useEffect(() => {
     const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       const email = session?.user?.email || null;
       setUserEmail(email);
 
@@ -50,7 +48,7 @@ function LandingPageContent() {
   const getPrice = (price: number) =>
     price === 0 ? "Free" : isStudent ? `$${(price / 2).toFixed(2)}/mo` : `$${price}/mo`;
 
-  // ✅ Stripe Checkout handler
+  // ✅ Stripe checkout
   const handleCheckout = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -79,6 +77,22 @@ function LandingPageContent() {
     }
   };
 
+  // ✅ Manage Subscription
+  const handleManage = async () => {
+    try {
+      const res = await fetch("http://209.38.74.151/create-customer-portal-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+      else alert("❌ Failed to open customer portal");
+    } catch (err) {
+      console.error("Portal error:", err);
+    }
+  };
+
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white px-6">
       {portal === "success" && (
@@ -94,7 +108,7 @@ function LandingPageContent() {
         Agentic AI platform to create, manage, and execute AI agents and workflows effortlessly.
       </p>
 
-      {/* ✅ Auth-dependent CTA */}
+      {/* ✅ Auth actions */}
       <div className="flex gap-4 mb-12">
         {userEmail ? (
           <button
@@ -113,35 +127,42 @@ function LandingPageContent() {
         )}
       </div>
 
-      {/* ✅ Manage Subscription (only for logged-in) */}
+      {/* ✅ Manage Subscription (if logged in) */}
       {userEmail && (
-        <div className="mt-4">
-          <button
-            onClick={async () => {
-              try {
-                const res = await fetch("http://209.38.74.151/create-customer-portal-session", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ email: userEmail }),
-                });
-                const data = await res.json();
-                if (data.url) window.location.href = data.url;
-                else alert("❌ Failed to open customer portal");
-              } catch (err) {
-                console.error("Portal error:", err);
-              }
-            }}
-            className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-lg shadow-lg transition"
-          >
-            ⚙️ Manage Subscription
-          </button>
-        </div>
+        <button
+          onClick={handleManage}
+          className="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-lg shadow-lg transition mb-8"
+        >
+          ⚙️ Manage Subscription
+        </button>
       )}
 
-      {/* ✅ Pricing Section */}
+      {/* ✅ Why ChipLoop / Use ChipLoop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6 w-full max-w-5xl">
+        <div className="p-6 bg-slate-800 rounded-xl shadow-lg">
+          <h3 className="text-xl font-bold mb-4">Why ChipLoop?</h3>
+          <ul className="space-y-2 text-slate-300">
+            <li>🚀 Faster chip design with AI</li>
+            <li>🎓 Learn RTL & verification interactively</li>
+            <li>🧩 Prebuilt agents & workflows</li>
+            <li>🌍 Marketplace to build & sell chip AI workflows</li>
+          </ul>
+        </div>
+
+        <div className="p-6 bg-slate-800 rounded-xl shadow-lg flex flex-col justify-between">
+          <h3 className="text-xl font-bold mb-4">Use ChipLoop</h3>
+          <ul className="space-y-2 text-slate-300">
+            <li>🔧 Drag & drop agents into workflows</li>
+            <li>📑 Run prebuilt workflows or create your own</li>
+            <li>💾 Save and load workflows to your account</li>
+            <li>🤖 Create your own custom AI agents</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* ✅ Pricing */}
       <div className="mt-20 w-full max-w-4xl text-center">
         <h3 className="text-3xl font-bold mb-6">Pricing</h3>
-
         <div className="flex justify-center mb-6">
           <button
             onClick={() => setIsStudent(false)}
@@ -159,7 +180,10 @@ function LandingPageContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {plans.map((plan) => (
-            <div key={plan.name} className="p-6 bg-slate-800 rounded-xl shadow-lg flex flex-col justify-between">
+            <div
+              key={plan.name}
+              className="p-6 bg-slate-800 rounded-xl shadow-lg flex flex-col justify-between"
+            >
               <h4 className="font-bold text-xl mb-2">{plan.name}</h4>
               <p className="text-slate-300 mb-4">{plan.desc}</p>
               <p className="text-cyan-400 font-bold text-2xl mb-4">{getPrice(plan.price)}</p>
