@@ -19,7 +19,7 @@ function CallbackContent() {
 
       if (session) {
         const next = searchParams.get("next");
-        router.replace(next || "/workflow");
+        router.replace(next || "/");
       } else {
         router.replace("/login");
       }
