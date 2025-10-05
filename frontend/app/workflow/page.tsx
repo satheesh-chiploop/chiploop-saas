@@ -394,7 +394,15 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
          </button>
          {userId && (
             <button
-                onClick={() => router.push("/api/create-customer-portal-session")}
+                 onClick={async () => {
+                     const res = await fetch("/api/create-customer-portal-session", { method: "POST" });
+                     const data = await res.json();
+                     if (data.url) {
+                         window.location.href = data.url; // redirect to Stripe portal
+                     } else {
+                        alert("❌ Failed to open customer portal");
+                     }
+                }}
                 className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded"
              >
                 Manage Subscription
