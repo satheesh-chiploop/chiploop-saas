@@ -25,15 +25,22 @@ function LandingPageContent() {
       const email = session?.user?.email || null;
       setUserEmail(email);
 
-      if (email) {
-        try {
-          const res = await fetch(`/api/check-subscription?email=${email}`);
-          const data = await res.json();
-          if (data.status === "active") setIsSubscribed(true);
-        } catch (err) {
-          console.error("❌ Subscription check failed", err);
-        }
-      }
+    if (email) {
+       try {
+          const { data, error } = await supabase
+             .from("workflows")
+             .select("subscription_status")
+             .eq("user_id", email)
+             .single();
+           if (!error && data?.subscription_status === "active") {
+             setIsSubscribed(true);
+           } else {
+             setIsSubscribed(false);
+           }
+       } catch (err) {
+         console.error("❌ Subscription check failed", err);
+       }
+     }
     };
     checkSession();
   }, []);
