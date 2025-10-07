@@ -309,12 +309,11 @@ from fastapi import APIRouter, Request
 
 
 @app.post("/create-checkout-session")
-async def create_checkout_session(request: Request):
+async def create_checkout_session(request: Request, user=Depends(verify_token)):
     try:
         data = await request.json()
 
-        #  Try to extract user_id from request body if provided
-        user_id = data.get("user_id", "unknown")
+        user_id = user.get("sub", "unknown")  # pulled from Supabase JWT
 
         session = stripe.checkout.Session.create(
             payment_method_types=["card"],
@@ -328,7 +327,7 @@ async def create_checkout_session(request: Request):
             success_url="https://chiploop-saas.vercel.app/success",
             cancel_url="https://chiploop-saas.vercel.app/cancel",
             metadata={
-                "user_id": user_id,  # Safe even if not provided
+                "user_id": user_id,
             },
         )
 
@@ -338,6 +337,7 @@ async def create_checkout_session(request: Request):
     except Exception as e:
         print("❌ Stripe checkout creation failed:", str(e))
         return {"error": str(e)}
+
 
 @app.post("/stripe-webhook")
 async def stripe_webhook(request: Request):
@@ -349,41 +349,57 @@ async def stripe_webhook(request: Request):
             payload, sig_header, endpoint_secret
         )
     except ValueError:
+        print("❌ Invalid payload")
         return {"error": "Invalid payload"}
     except stripe.error.SignatureVerificationError:
+        print("❌ Invalid Stripe signature")
         return {"error": "Invalid signature"}
 
     # --- Handle Stripe events ---
-    if event["type"] == "checkout.session.completed":
-        session = event["data"]["object"]
-        user_id = session["metadata"].get("user_id")
-        customer_id = session.get("customer")
+    event_type = event["type"]
+    data = event["data"]["object"]
+
+    if event_type == "checkout.session.completed":
+        user_id = data.get("metadata", {}).get("user_id")
+        customer_id = data.get("customer")
 
         if user_id and customer_id:
+            print(f"✅ Checkout completed for user {user_id}")
             supabase.table("workflows").update({
                 "subscription_status": "basic",
                 "stripe_customer_id": customer_id
             }).eq("user_id", user_id).execute()
+        else:
+            print("⚠️ Missing user_id or customer_id in checkout.session.completed")
 
-    elif event["type"] == "customer.subscription.updated":
-        subscription = event["data"]["object"]
-        user_id = subscription["metadata"].get("user_id")
+    elif event_type == "customer.subscription.updated":
+        user_id = data.get("metadata", {}).get("user_id")
+        new_status = data.get("status")
 
         if user_id:
+            print(f"🔄 Subscription updated for user {user_id}: {new_status}")
             supabase.table("workflows").update({
-                "subscription_status": subscription["status"]
+                "subscription_status": new_status
             }).eq("user_id", user_id).execute()
+        else:
+            print("⚠️ Missing user_id in customer.subscription.updated")
 
-    elif event["type"] == "customer.subscription.deleted":
-        subscription = event["data"]["object"]
-        user_id = subscription["metadata"].get("user_id")
+    elif event_type == "customer.subscription.deleted":
+        user_id = data.get("metadata", {}).get("user_id")
 
         if user_id:
+            print(f"❌ Subscription canceled for user {user_id}")
             supabase.table("workflows").update({
                 "subscription_status": "free"
             }).eq("user_id", user_id).execute()
+        else:
+            print("⚠️ Missing user_id in customer.subscription.deleted")
+
+    else:
+        print(f"ℹ️ Unhandled event type: {event_type}")
 
     return {"status": "success"}
+
 
 @app.post("/create-customer-portal-session")
 async def create_customer_portal_session(user=Depends(verify_token)):
@@ -416,5 +432,55 @@ async def create_customer_portal_session(user=Depends(verify_token)):
         return {"error": str(e)}
 
 
+# ---------- Portkey + Ollama Fallback ----------
+from portkey_ai import Portkey
+import requests, json
+
+PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
+USE_LOCAL_OLLAMA = os.getenv("USE_LOCAL_OLLAMA", "false").lower() == "true"
+OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
+
+client = Portkey(api_key=PORTKEY_API_KEY)
+
+@app.post("/run_ai")
+async def run_ai(prompt: str):
+    """
+    Try Portkey/OpenAI first, then fall back to local Ollama if it fails.
+    USE_LOCAL_OLLAMA=true forces Ollama directly.
+    """
+    try:
+        if not USE_LOCAL_OLLAMA:
+            completion = await client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                stream=False,
+                timeout=30,
+            )
+            return {
+                "backend": "Portkey/OpenAI",
+                "output": completion.choices[0].message.content,
+            }
+    except Exception as e:
+        logger.warning(f"[⚠️ Portkey failed, falling back to Ollama] {e}")
+
+    # ---- Ollama fallback ----
+    try:
+        payload = {"model": "llama3", "prompt": prompt}
+        r = requests.post(OLLAMA_URL, json=payload, stream=True, timeout=60)
+        r.raise_for_status()
+        out = []
+        for line in r.iter_lines():
+            if not line:
+                continue
+            try:
+                j = json.loads(line.decode())
+                if "response" in j:
+                    out.append(j["response"])
+            except Exception:
+                pass
+        return {"backend": "Ollama", "output": "".join(out)}
+    except Exception as e:
+        logger.error(f"❌ Both Portkey and Ollama failed: {e}")
+        return {"error": f"Both Portkey and Ollama failed: {str(e)}"}
 
 

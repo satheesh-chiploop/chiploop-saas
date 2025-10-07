@@ -84,21 +84,35 @@ function LandingPageContent() {
     }
   };
 
-  // ✅ Manage Subscription
-  const handleManage = async () => {
-    try {
-      const res = await fetch("http://209.38.74.151/create-customer-portal-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: userEmail }),
-      });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-      else alert("❌ Failed to open customer portal");
-    } catch (err) {
-      console.error("Portal error:", err);
+ // ✅ Manage Subscription (fixed)
+const handleManage = async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+
+    if (!token) {
+      alert("⚠️ Please log in first.");
+      return;
     }
-  };
+
+    const res = await fetch("http://209.38.74.151/create-customer-portal-session", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,  // ✅ send Supabase JWT for backend verification
+      },
+    });
+
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url; // ✅ open Stripe customer portal
+    } else {
+      alert("❌ Failed to open customer portal");
+    }
+  } catch (err) {
+    console.error("❌ Portal error:", err);
+    alert("Error opening customer portal");
+  }
+};
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white px-6">
