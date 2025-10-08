@@ -4,6 +4,8 @@ import React, { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import WorkflowResults from "./WorkflowResults";
 import { supabase } from '@/lib/supabaseClient'
+import WorkflowConsole from "./WorkflowConsole";
+
 
 import ReactFlow, {
   addEdge,
@@ -192,6 +194,7 @@ export default function WorkflowPage() {
   const [customWorkflows, setCustomWorkflows] = useState<string[]>([]);
   const [showSpecModal, setShowSpecModal] = useState(false);
   const [showCreateAgentModal, setShowCreateAgentModal] = useState(false);
+  const [jobId, setJobId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -289,8 +292,15 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
     }
 
     const data = await res.json();
-    addLog("✅ Workflow completed", "success");
+    addLog("✅ Workflow started", "success");
     setOutput(JSON.stringify(data, null, 2));
+
+// capture job_id from backend
+    if (data.job_id) {
+      setJobId(data.job_id);
+      addLog(`🎯 Tracking job ID: ${data.job_id}`, "info");
+    }
+
   } catch (err: unknown) {
     if (err instanceof Error) {
       addLog(`❌ Workflow failed: ${err.message}`, "error");
@@ -675,6 +685,12 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
             results={JSON.parse(output).workflow_results}
             artifacts={JSON.parse(output).artifacts}
           />
+         {jobId && (
+          <div className="mt-4">
+            <h3 className="font-bold text-cyan-400 mb-1">🔴 Live Execution Feed</h3>
+            <WorkflowConsole jobId={jobId} />
+           </div>
+         )}
         </div>
       )}
     </div>
