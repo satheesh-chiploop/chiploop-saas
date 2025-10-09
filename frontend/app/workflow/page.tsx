@@ -173,10 +173,11 @@ const agentList = [
   { type: "arch", label: "📐 Arch Doc Agent", desc: "Pin & timing documentation" },
   { type: "int", label: "🔗 Integration Doc Agent", desc: "System integration guidance" },
   { type: "tb", label: "🧪 Testbench Agent", desc: "Builds DUT testbench & stimulus" },
+  { type: "tc", label: "🧪 Testcase Agent", desc: "Builds Testcases" },
   { type: "sva", label: "⚡ Assertion Agent", desc: "Generates assertions (SVA)" },
   { type: "fcov", label: "📊 Cover group Agent", desc: "Adds covergroups for scenarios" },
   { type: "ccov", label: "📑 Coverage Agent", desc: "Tracks line, toggle, FSM and functional coverage" },
-  { type: "tpdoc", label: "📝 Simulation Agent", desc: "Simulation Agent " },
+  { type: "sim", label: "📝 Simulation Agent", desc: "Simulation Agent " },
   { type: "reg", label: "🔁 Regression Agent", desc: "Runs regressions & aggregates results" },
 ];
 
@@ -585,10 +586,11 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
                 { id: "1", type: "agentNode", position: { x: 250, y: 0 }, data: agentList.find((a) => a.type === "spec")! },
                 { id: "2", type: "agentNode", position: { x: 250, y: 120 }, data: agentList.find((a) => a.type === "rtl")! },
                 { id: "3", type: "agentNode", position: { x: 250, y: 240 }, data: agentList.find((a) => a.type === "tb")! },
-                { id: "4", type: "agentNode", position: { x: 250, y: 360 }, data: agentList.find((a) => a.type === "sva")! },
-                { id: "5", type: "agentNode", position: { x: 250, y: 480 }, data: agentList.find((a) => a.type === "fcov")! },
-                { id: "6", type: "agentNode", position: { x: 250, y: 600 }, data: agentList.find((a) => a.type === "sim")! },
-                { id: "7", type: "agentNode", position: { x: 250, y: 720 }, data: agentList.find((a) => a.type === "ccov")! },
+                { id: "4", type: "agentNode", position: { x: 250, y: 360 }, data: agentList.find((a) => a.type === "tc")! },
+                { id: "5", type: "agentNode", position: { x: 250, y: 480}, data: agentList.find((a) => a.type === "sva")! },
+                { id: "6", type: "agentNode", position: { x: 250, y: 600}, data: agentList.find((a) => a.type === "fcov")! },
+                { id: "7", type: "agentNode", position: { x: 250, y: 720}, data: agentList.find((a) => a.type === "sim")! },
+                { id: "8", type: "agentNode", position: { x: 250, y: 840}, data: agentList.find((a) => a.type === "ccov")! },
               ]);
               setEdges([
                 { id: "e1-2", source: "1", target: "2" },
@@ -596,6 +598,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
                 { id: "e3-4", source: "3", target: "4" },
                 { id: "e4-5", source: "4", target: "5" },
                 { id: "e5-6", source: "5", target: "6" },
+                { id: "e5-6", source: "6", target: "7" },
                 { id: "e5-6", source: "7", target: "8" },
               ]);
             }}
