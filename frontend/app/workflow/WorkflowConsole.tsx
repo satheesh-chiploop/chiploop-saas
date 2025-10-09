@@ -29,7 +29,7 @@ export default function WorkflowConsole({ jobId }: { jobId: string }) {
 
     // ⚡ Subscribe to Realtime workflow updates
     const channel = supabase
-      .channel("workflows-realtime")
+      .channel("realtime:public:workflows")
       .on(
         "postgres_changes",
         {
@@ -39,6 +39,7 @@ export default function WorkflowConsole({ jobId }: { jobId: string }) {
           filter: `id=eq.${jobId}`,
         },
         (payload) => {
+          console.log("📡 Realtime payload received:", payload);
           const updated = payload.new;
           if (updated?.logs) setLogs(updated.logs.split("\n"));
           if (updated?.status) setStatus(updated.status);
