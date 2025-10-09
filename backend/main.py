@@ -148,7 +148,7 @@ client_openai = OpenAI()
 from agents.spec_agent import spec_agent
 from agents.rtl_agent import rtl_agent
 from agents.optimizer_agent import optimizer_agent
-from agents.testbench_agent_uvm import run_testbench_agent_uvm
+from agents.testbench_agent_uvm import testbench_agent_uvm
 from agents.arch_doc_agent import arch_doc_agent
 from agents.integration_doc_agent import integration_doc_agent
 
@@ -178,15 +178,17 @@ def load_custom_agents():
 
 logger.info(f"🧠 Loaded agents: {list(AGENT_REGISTRY.keys())}")
 
+
 AGENT_FUNCTIONS = {
-   "testbench_agent": testbench_agent_uvm,
-    "arch_doc_agent":arc_doc_agent,
-    "integration_doc_agent":integration_doc_agent",
     "📘 Spec Agent": spec_agent,
     "💻 RTL Agent": rtl_agent,
-    "🛠 Optimizer Agent": optimizer_agent,
+    "🧩 Testbench Agent": testbench_agent_uvm,
+    "🧠 Testcase Agent": testcase_agent,
+    "⚖️ Assertion Agent": assertion_agent,
+    "🎯 Covergroup Agent": covergroup_agent,
+    "▶️ Simulation Agent": simulation_agent,
+    "📊 Coverage Agent": coverage_agent,
 }
-
 @app.post("/run_workflow")
 async def run_workflow(
     background_tasks: BackgroundTasks,
@@ -377,7 +379,8 @@ def execute_workflow_background(workflow_id, user_id, workflow, spec_text, uploa
             state["uploaded_file"] = upload_path
         if spec_text:
             state["spec"] = spec_text
-
+        state["workflow_id"] = workflow_id
+        state["workflow_dir"] = f"backend/workflows/{workflow_id}"
         results: Dict[str, str] = {}
         artifacts: Dict[str, Dict[str, str]] = {}
 
@@ -415,6 +418,7 @@ def execute_workflow_background(workflow_id, user_id, workflow, spec_text, uploa
                     art_path = None
                     if state.get("artifact"):
                         safe_label = label.replace(" ", "_").replace("📘", "").replace("💻", "").replace("🛠", "")
+                        os.makedirs(artifact_dir, exist_ok=True)
                         art_path = os.path.join(artifact_dir, f"{safe_label}.txt")
                         with open(art_path, "w") as f:
                             f.write(state["artifact"] or "")

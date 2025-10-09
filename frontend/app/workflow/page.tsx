@@ -174,9 +174,9 @@ const agentList = [
   { type: "int", label: "🔗 Integration Doc Agent", desc: "System integration guidance" },
   { type: "tb", label: "🧪 Testbench Agent", desc: "Builds DUT testbench & stimulus" },
   { type: "sva", label: "⚡ Assertion Agent", desc: "Generates assertions (SVA)" },
-  { type: "fcov", label: "📊 Functional Coverage Agent", desc: "Adds covergroups for scenarios" },
-  { type: "ccov", label: "📑 Code Coverage Agent", desc: "Tracks line, toggle, FSM coverage" },
-  { type: "tpdoc", label: "📝 Testplan Doc Agent", desc: "Generates test plan document" },
+  { type: "fcov", label: "📊 Cover group Agent", desc: "Adds covergroups for scenarios" },
+  { type: "ccov", label: "📑 Coverage Agent", desc: "Tracks line, toggle, FSM and functional coverage" },
+  { type: "tpdoc", label: "📝 Simulation Agent", desc: "Simulation Agent " },
   { type: "reg", label: "🔁 Regression Agent", desc: "Runs regressions & aggregates results" },
 ];
 
@@ -556,7 +556,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
   📑 RTL Optimizer Loop
 </button>
 
-          {/* Integration Workflow */}
+          {/* Doc (Integration/Arch) Loop*/}
           <button
             onClick={() => {
               setNodes([]);
@@ -571,7 +571,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
             }}
             className="w-full mb-4 px-3 py-2 text-left rounded-lg bg-indigo-600 hover:bg-indigo-500"
           >
-            📑 Integration Workflow
+            📑 Doc (Integration/Arch) Loop
           </button>
 
           {/* Verify Loop */}
@@ -582,12 +582,13 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
               setStatusLog([]);
               setOutput("");
               setNodes([
-                { id: "1", type: "agentNode", position: { x: 250, y: 0 }, data: agentList.find((a) => a.type === "tb")! },
-                { id: "2", type: "agentNode", position: { x: 250, y: 120 }, data: agentList.find((a) => a.type === "sva")! },
-                { id: "3", type: "agentNode", position: { x: 250, y: 240 }, data: agentList.find((a) => a.type === "fcov")! },
-                { id: "4", type: "agentNode", position: { x: 250, y: 360 }, data: agentList.find((a) => a.type === "ccov")! },
-                { id: "5", type: "agentNode", position: { x: 250, y: 480 }, data: agentList.find((a) => a.type === "tpdoc")! },
-                { id: "6", type: "agentNode", position: { x: 250, y: 600 }, data: agentList.find((a) => a.type === "reg")! },
+                { id: "1", type: "agentNode", position: { x: 250, y: 0 }, data: agentList.find((a) => a.type === "spec")! },
+                { id: "2", type: "agentNode", position: { x: 250, y: 120 }, data: agentList.find((a) => a.type === "rtl")! },
+                { id: "3", type: "agentNode", position: { x: 250, y: 240 }, data: agentList.find((a) => a.type === "tb")! },
+                { id: "4", type: "agentNode", position: { x: 250, y: 360 }, data: agentList.find((a) => a.type === "sva")! },
+                { id: "5", type: "agentNode", position: { x: 250, y: 480 }, data: agentList.find((a) => a.type === "fcov")! },
+                { id: "6", type: "agentNode", position: { x: 250, y: 600 }, data: agentList.find((a) => a.type === "sim")! },
+                { id: "7", type: "agentNode", position: { x: 250, y: 720 }, data: agentList.find((a) => a.type === "ccov")! },
               ]);
               setEdges([
                 { id: "e1-2", source: "1", target: "2" },
@@ -595,6 +596,7 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
                 { id: "e3-4", source: "3", target: "4" },
                 { id: "e4-5", source: "4", target: "5" },
                 { id: "e5-6", source: "5", target: "6" },
+                { id: "e5-6", source: "7", target: "8" },
               ]);
             }}
             className="w-full mb-2 px-3 py-2 text-left rounded-lg bg-indigo-600 hover:bg-indigo-500"

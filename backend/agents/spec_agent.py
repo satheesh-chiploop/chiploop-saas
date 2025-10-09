@@ -18,9 +18,7 @@ def spec_agent(state: dict) -> dict:
     # --- Added for multi-user workflow isolation ---
     workflow_id = state.get("workflow_id", "default")
     workflow_dir = state.get("workflow_dir", f"backend/workflows/{workflow_id}")
-    os.makedirs(workflow_dir, exist_ok=True)
-    os.chdir(workflow_dir)
-    # ------------------------------------------------
+    os.makedirs(workflow_dir, exist_ok=True)    # ------------------------------------------------
 
     spec_data = state.get("spec", "")
     if not spec_data:
@@ -81,6 +79,9 @@ def spec_agent(state: dict) -> dict:
     }
 
     # --- Modified to write inside workflow dir ---
+    workflow_dir = state.get("workflow_dir", f"backend/workflows/{workflow_id}")
+    os.makedirs(workflow_dir, exist_ok=True)
+
     spec_json_path = os.path.join(workflow_dir, f"{module_name}_spec.json")
     with open(spec_json_path, "w", encoding="utf-8") as f:
         json.dump(canonical_spec, f, indent=2)
@@ -99,7 +100,6 @@ You are a professional digital design engineer.
 Generate synthesizable Verilog-2005 code for this specification.
 Output must start with 'module' and end with 'endmodule'.
 Do NOT include markdown code fences or explanations.
-Generate syntactically correct Verilog-2001 code. 
 Ensure all ports are declared inside parentheses in the module declaration. 
 End every statement with a semicolon and close with `endmodule` only once.
 
@@ -153,11 +153,11 @@ Design Guidelines:
     rtl_code = rtl_code.replace("```verilog", "").replace("```", "").strip()
     if "module" in rtl_code:
         rtl_code = rtl_code[rtl_code.index("module"):]
-
+    os.makedirs(workflow_dir, exist_ok=True) 
     verilog_file = os.path.join(workflow_dir, f"{module_name}.v")
     with open(verilog_file, "w", encoding="utf-8") as f:
         f.write(rtl_code)
-
+ 
     log_path = os.path.join(workflow_dir, "spec_agent_compile.log")
     with open(log_path, "w") as logf:
         logf.write(f"Spec processed at {datetime.datetime.now()}\n")
@@ -169,6 +169,10 @@ Design Guidelines:
             ["/usr/bin/iverilog", "-o", "design.out", verilog_file],
             check=True, capture_output=True, text=True
         )
+        if result.returncode == 0:
+             compile_status = "✅ Verilog syntax check passed."
+        else:
+             compile_status = "⚠ Verilog syntax check failed."
         state["status"] = "✅ RTL and spec.json generated successfully"
         with open(log_path, "a") as logf:
             logf.write(result.stdout or "")

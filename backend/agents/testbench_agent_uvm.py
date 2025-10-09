@@ -30,7 +30,6 @@ def testbench_agent_uvm(state: dict) -> dict:
         workflow_id = state.get("workflow_id", "default")
         workflow_dir = Path(state.get("workflow_dir", f"backend/workflows/{workflow_id}"))
         workflow_dir.mkdir(parents=True, exist_ok=True)
-        os.chdir(workflow_dir)
 
         rtl_path = Path(state.get("artifact", workflow_dir / "auto_module.v"))
         spec_path = Path(state.get("spec_json", workflow_dir / "auto_module_spec.json"))
@@ -41,8 +40,8 @@ def testbench_agent_uvm(state: dict) -> dict:
         if not spec_path.exists():
             raise FileNotFoundError(f"Spec file not found: {spec_path}")
 
-        rtl_text = rtl_path.read_text()
-        spec_json = json.loads(spec_path.read_text())
+        rtl_text = rtl_path.read_text(encoding="utf-8")
+        spec_json = json.loads(spec_path.read_text(encoding="utf-8"))
 
         # --- Extract context ---
         module_match = re.search(r"module\s+(\w+)\s*\((.*?)\);", rtl_text, re.S)
@@ -61,7 +60,7 @@ def testbench_agent_uvm(state: dict) -> dict:
         tb_dir = workflow_dir / f"uvm_tb_{dut_name}"
         tb_dir.mkdir(parents=True, exist_ok=True)
 
-        # --- Base UVM components (unchanged logic) ---
+        # --- Base UVM components (unchanged) ---
         env = f"""\
 `ifndef {dut_name.upper()}_ENV_SV
 `define {dut_name.upper()}_ENV_SV
@@ -134,3 +133,101 @@ module tb_{dut_name};
   end
 endmodule
 """
+
+        # --- LLM-generated enhancements ---
+        llm_prompt = f"""
+You are a verification engineer.
+Generate SystemVerilog UVM stimulus ideas or assertions for the module below.
+
+Module: {dut_name}
+Clocks/Resets:
+{domain_info}
+
+Verilog RTL (snippet):
+{rtl_text[:1500]}
+
+Guidelines:
+- Output only synthesizable SystemVerilog/UVM code fragments.
+- Do not include ``` fences.
+- Keep compatible with UVM 1.2.
+"""
+
+        extra_uvm = ""
+        try:
+            if USE_LOCAL_OLLAMA:
+                print("⚙️ Using local Ollama to suggest UVM enhancements...")
+                payload = {"model": "llama3", "prompt": llm_prompt}
+                with requests.post(OLLAMA_URL, json=payload, stream=True, timeout=300) as r:
+                    for line in r.iter_lines():
+                        if not line:
+                            continue
+                        try:
+                            j = json.loads(line.decode())
+                            if "response" in j:
+                                extra_uvm += j["response"]
+                                print(j["response"], end="", flush=True)
+                        except Exception:
+                            continue
+            else:
+                print("🌐 Using Portkey backend to suggest UVM enhancements...")
+                try:
+                    completion = client_portkey.chat.completions.create(
+                        model="gpt-4o-mini",
+                        messages=[{"role": "user", "content": llm_prompt}],
+                        stream=True,
+                    )
+                    for chunk in completion:
+                        if chunk and hasattr(chunk, "choices"):
+                            delta = chunk.choices[0].delta.get("content", "")
+                            if delta:
+                                extra_uvm += delta
+                                print(delta, end="", flush=True)
+                except Exception as e:
+                    print(f"⚠️ Portkey failed, falling back to Ollama: {e}")
+                    payload = {"model": "llama3", "prompt": llm_prompt}
+                    with requests.post(OLLAMA_URL, json=payload, stream=True, timeout=300) as r:
+                        for line in r.iter_lines():
+                            if not line:
+                                continue
+                            try:
+                                j = json.loads(line.decode())
+                                if "response" in j:
+                                    extra_uvm += j["response"]
+                            except Exception:
+                                continue
+        except Exception as e:
+            extra_uvm = f"// ⚠️ LLM enhancement failed: {e}"
+
+        # --- Write files ---
+        files = {
+            f"{dut_name}_env.sv": env,
+            f"{dut_name}_drv.sv": drv,
+            f"{dut_name}_mon.sv": mon,
+            f"{dut_name}_seq.sv": seq,
+            f"{dut_name}_if.sv": iface,
+            f"tb_{dut_name}.sv": tb_top,
+            f"{dut_name}_extra_uvm.sv": extra_uvm,
+        }
+
+        for fname, content in files.items():
+            (tb_dir / fname).write_text(content, encoding="utf-8")
+
+        with open(log_path, "w", encoding="utf-8") as logf:
+            logf.write(f"UVM TB generated for {dut_name} at {datetime.datetime.now()}\n")
+            logf.write(f"Clocks/Resets Context:\n{domain_info}\n")
+
+        state.update({
+            "status": "✅ UVM Testbench generated",
+            "artifact": str(tb_dir),
+            "artifact_log": str(log_path),
+            "workflow_id": workflow_id,
+            "workflow_dir": str(workflow_dir),
+        })
+
+        print(f"\n✅ UVM Testbench Agent completed — TB @ {tb_dir}")
+        return state
+
+    except Exception as e:
+        logger.error(f"❌ UVM Testbench Agent failed: {e}")
+        state["status"] = f"❌ Failed: {e}"
+        return state
