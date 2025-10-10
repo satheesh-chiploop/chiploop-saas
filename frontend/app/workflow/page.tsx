@@ -175,7 +175,7 @@ const agentList = [
   { type: "tb", label: "Testbench Agent", desc: "Builds DUT testbench & stimulus" },
   { type: "tc", label: "Testcase Agent", desc: "Builds Testcases" },
   { type: "sva", label: "Assertion Agent", desc: "Generates assertions (SVA)" },
-  { type: "fcov", label: "Cover group Agent", desc: "Adds covergroups for scenarios" },
+  { type: "fcov", label: "Covergroup Agent", desc: "Adds covergroups for scenarios" },
   { type: "ccov", label: "Coverage Agent", desc: "Tracks line, toggle, FSM and functional coverage" },
   { type: "sim", label: "Simulation Agent", desc: "Simulation Agent " },
   { type: "reg", label: "Regression Agent", desc: "Runs regressions & aggregates results" },
