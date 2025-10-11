@@ -7,6 +7,9 @@ from pathlib import Path
 
 CONFIG_FILE = Path("config.yaml")
 
+# -------------------------------------------------------------------
+# Configuration Loader
+# -------------------------------------------------------------------
 def load_config():
     if not CONFIG_FILE.exists():
         print("❌ config.yaml not found. Please create one.")
@@ -14,23 +17,49 @@ def load_config():
     with open(CONFIG_FILE, "r") as f:
         return yaml.safe_load(f)
 
+# -------------------------------------------------------------------
+# Runner Registration
+# -------------------------------------------------------------------
 def register_runner(config):
+    """
+    Register this runner instance with the backend.
+    Creates or updates its entry in the 'runners' table.
+    """
     payload = {
         "runner_name": config["runner_name"],
         "email": config["email"],
         "token": config["supabase_token"]
     }
-    r = requests.post(f"{config['backend_url']}/register_runner", json=payload)
-    print("✅ Runner registered:", r.text)
-
-def get_job(config):
-    r = requests.get(f"{config['backend_url']}/get_job?runner={config['runner_name']}")
-    if r.status_code == 200 and r.json().get("job"):
-        return r.json()["job"]
-    return None
+    try:
+        r = requests.post(f"{config['backend_url']}/register_runner", json=payload)
+        if r.status_code == 200:
+            print(f"✅ Runner registered: {config['runner_name']}")
+        else:
+            print(f"⚠️ Runner registration failed ({r.status_code}): {r.text}")
+    except Exception as e:
+        print(f"❌ Error registering runner: {e}")
 
 # -------------------------------------------------------------------
-# Updated upload_results function
+# Job Fetcher
+# -------------------------------------------------------------------
+def get_job(config):
+    """
+    Poll the backend for a queued simulation job.
+    Returns a job dict if available, else None.
+    """
+    try:
+        r = requests.get(f"{config['backend_url']}/get_job?runner={config['runner_name']}")
+        if r.status_code == 200 and r.json().get("job"):
+            job = r.json()["job"]
+            print(f"🎯 Job {job['workflow_id']} assigned to {config['runner_name']}")
+            return job
+        return None
+    except Exception as e:
+        print(f"⚠️ Error fetching job: {e}")
+        return None
+
+# -------------------------------------------------------------------
+# Upload Results
 # -------------------------------------------------------------------
 def upload_results(config, workflow_id, status, logs, artifacts=None):
     """
@@ -43,16 +72,19 @@ def upload_results(config, workflow_id, status, logs, artifacts=None):
         "status": status,
         "logs": logs,
         "artifacts": artifacts or {},
-        "runner_name": config["runner_name"],  # 🆕 added
+        "runner_name": config["runner_name"],
     }
-    response = requests.post(url, json=payload)
-    if response.status_code == 200:
-        print(f"✅ Results uploaded for job {workflow_id}")
-    else:
-        print(f"❌ Upload failed: {response.status_code} {response.text}")
+    try:
+        response = requests.post(url, json=payload)
+        if response.status_code == 200:
+            print(f"✅ Results uploaded for job {workflow_id}")
+        else:
+            print(f"❌ Upload failed: {response.status_code} {response.text}")
+    except Exception as e:
+        print(f"❌ Upload exception: {e}")
 
 # -------------------------------------------------------------------
-# Simulation logic
+# Questa Simulation
 # -------------------------------------------------------------------
 def run_questa_simulation(config, workflow_id, design_dir, top_module):
     sim_dir = Path(f"sim_{workflow_id}")
@@ -70,13 +102,16 @@ def run_questa_simulation(config, workflow_id, design_dir, top_module):
         )
         coverage_path = sim_dir / "coverage_report.txt"
         coverage_text = coverage_path.read_text() if coverage_path.exists() else "⚠️ Coverage report not found."
-        upload_results(config, workflow_id, "completed", coverage_text, {"report": str(coverage_path)})  # 🆕 passed config
+        upload_results(config, workflow_id, "completed", coverage_text, {"report": str(coverage_path)})
         print(f"✅ Questa simulation completed for {workflow_id}")
         return True
     except subprocess.CalledProcessError as e:
         print(f"⚠️ Questa simulation failed for {workflow_id}: {e}")
         return False
 
+# -------------------------------------------------------------------
+# Verilator / Icarus Fallback
+# -------------------------------------------------------------------
 def run_fallback_simulation(config, workflow_id, design_dir, top_module):
     sim_dir = Path(f"sim_{workflow_id}_fallback")
     sim_dir.mkdir(exist_ok=True)
@@ -88,7 +123,7 @@ def run_fallback_simulation(config, workflow_id, design_dir, top_module):
             "verilator", "--cc", f"{design_dir}/{top_module}.sv",
             "--exe", "--build", "--trace"
         ], check=True)
-        upload_results(config, workflow_id, "completed", "✅ Verilator simulation succeeded.")  # 🆕 passed config
+        upload_results(config, workflow_id, "completed", "✅ Verilator simulation succeeded.")
         print("✅ Verilator fallback succeeded.")
         return True
     except Exception:
@@ -101,22 +136,23 @@ def run_fallback_simulation(config, workflow_id, design_dir, top_module):
             *[str(f) for f in Path(design_dir).glob("*.v")]
         ], check=True)
         subprocess.run([f"{sim_dir}/sim.out"], check=True)
-        upload_results(config, workflow_id, "completed", "✅ Icarus Verilog simulation succeeded.")  # 🆕 passed config
+        upload_results(config, workflow_id, "completed", "✅ Icarus Verilog simulation succeeded.")
         print("✅ Icarus fallback succeeded.")
         return True
     except subprocess.CalledProcessError as e:
-        upload_results(config, workflow_id, "failed", f"❌ All simulations failed: {e}")  # 🆕 passed config
+        upload_results(config, workflow_id, "failed", f"❌ All simulations failed: {e}")
         print(f"❌ All simulations failed for {workflow_id}")
         return False
 
 # -------------------------------------------------------------------
-# Runner main loop
+# Main Loop
 # -------------------------------------------------------------------
 def main():
     config = load_config()
     if not config:
         return
 
+    # Register runner before starting job polling
     register_runner(config)
     print("🔁 Polling for jobs... (Ctrl+C to stop)")
 

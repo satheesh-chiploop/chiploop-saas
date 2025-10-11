@@ -198,83 +198,6 @@ AGENT_FUNCTIONS = {
     "Arch Doc Agent" : arch_doc_agent,
    "Integration Doc Agent" : integration_doc_agent,
 }
-@app.post("/run_workflow")
-async def run_workflow(
-    background_tasks: BackgroundTasks,
-    workflow: str = Form(...),
-    file: UploadFile = File(None),
-    spec_text: str = Form(None),
-    user=Depends(verify_token)  # ✅ JWT auth
-):
-    """
-    Asynchronous Spec2RTL workflow runner (JWT + Supabase integrated)
-    - Creates workflow entry tied to the authenticated user
-    - Executes Spec → RTL → Optimizer agents in background
-    - Returns immediately to prevent 502 timeouts
-    """
-    try:
-        user_id = user.get("sub") if user else "anonymous"
-        workflow_id = str(uuid.uuid4())
-        now = datetime.utcnow().isoformat()
-
-        # ✅ Insert workflow record into Supabase
-        supabase.table("workflows").insert({
-            "id": workflow_id,
-            "user_id": user_id,
-            "name": "Digital Loop Run",
-            "status": "queued",
-            "phase": "Spec2RTL",
-            "logs": "🚀 Workflow started asynchronously.",
-            "created_at": now,
-            "updated_at": now,
-            "artifacts": {}
-        }).execute()
-
-        artifact_dir = f"artifacts/{user_id}/{workflow_id}"
-        os.makedirs(artifact_dir, exist_ok=True)
-
-        logger.info(f"🚀 run_workflow called by user: {user_id}")
-        logger.info(f"workflow raw: {workflow[:200] if workflow else '❌ missing'}")
-        logger.info(f"spec_text: {spec_text}")
-        logger.info(f"file: {file.filename if file else '❌ none'}")
-
-        # --- Save file (if any) ---
-        upload_path = None
-        if file:
-            contents = await file.read()
-            upload_path = os.path.join(artifact_dir, file.filename)
-            with open(upload_path, "wb") as f:
-                f.write(contents)
-            logger.info(f"📁 File uploaded: {upload_path}")
-
-        # --- Save spec text (if any) ---
-        if spec_text:
-            spec_path = os.path.join(artifact_dir, "spec.txt")
-            with open(spec_path, "w") as f:
-                f.write(spec_text)
-            logger.info("📝 Spec text saved successfully")
-
-        # --- Start background task ---
-        background_tasks.add_task(
-            execute_workflow_background,
-            workflow_id,
-            user_id,
-            workflow,
-            spec_text,
-            upload_path,
-            artifact_dir
-        )
-
-        return {
-            "job_id": workflow_id,
-            "status": "started",
-            "message": "Workflow queued successfully."
-        }
-
-    except Exception as e:
-        logger.error(f"❌ Error in run_workflow: {e}")
-        return {"status": "error", "message": str(e)}
-
 
 from fastapi import BackgroundTasks, Depends
 from datetime import datetime
@@ -347,20 +270,23 @@ async def run_workflow(
             logger.info("📝 Spec text saved successfully")
 
         # --- Start background task ---
+# --- Queue job for chiploop-runner instead of running locally ---
         background_tasks.add_task(
-            execute_workflow_background,
-            workflow_id,
-            user_id,
-            workflow,
-            spec_text,
-            upload_path,
-            artifact_dir
-        )
+           execute_workflow_background,
+           workflow_id,
+           user_id,
+           workflow,
+           spec_text,
+           upload_path,
+           artifact_dir
+         )
+        logger.info(f"🟡 Workflow {workflow_id} Started background  execution.")
+
 
         return {
             "job_id": workflow_id,
             "status": "started",
-            "message": "Workflow queued successfully."
+            "message": "Workflow started in background."
         }
 
     except Exception as e:
@@ -419,11 +345,19 @@ def execute_workflow_background(workflow_id, user_id, workflow, spec_text, uploa
                 try:
                     logger.info(f"🚀 Executing agent: {label}")
                     update_workflow_log(workflow_id, f"🚀 Running {label}\n")
+                    if label.strip().lower().startswith("simulation"):
+                        logger.info("▶️ Reached Simulation Agent → queuing for ChipRunner and stopping local agent chain.")
+                        supabase.table("workflows").update({
+                                "status": "queued",
+                                "phase": "simulation",
+                                "runner_assigned": None,
+                                "updated_at": datetime.utcnow().isoformat()
+                        }).eq("id", workflow_id).execute()
+                        update_workflow_log(workflow_id, "🟡 Queued for ChipRunner (Simulation phase)\n")
+                        return  # stop after queuing
 
                     state = func(state)
                     results[label] = state.get("status", "✅ Done")
-
-                    # Save artifact if available
                     art_path = None
                     if state.get("artifact"):
                         safe_label = label.replace(" ", "_").replace("📘", "").replace("💻", "").replace("🛠", "")
@@ -444,30 +378,9 @@ def execute_workflow_background(workflow_id, user_id, workflow, spec_text, uploa
                     results[label] = f"❌ Error: {str(agent_err)}"
                     logger.error(f"Agent {label} failed: {agent_err}")
                     update_workflow_log(workflow_id, f"❌ {label} failed: {agent_err}\n")
-            else:
-                results[label] = "⚠ No implementation found."
-                logger.warning(f"No function found for agent: {label}")
-                update_workflow_log(workflow_id, f"⚠ Missing agent: {label}\n")
-
-        # ✅ Update workflow record
-        supabase.table("workflows").update({
-            "status": "success",
-            "logs": json.dumps(results),
-            "artifacts": artifacts,
-            "updated_at": datetime.utcnow().isoformat(),
-        }).eq("id", workflow_id).execute()
-
-        logger.info(f"✅ [BG] Workflow {workflow_id} completed successfully.")
-
     except Exception as e:
-        err_trace = traceback.format_exc()
-        logger.error(f"❌ [BG] Workflow {workflow_id} failed:\n{err_trace}")
-        supabase.table("workflows").update({
-            "status": "failed",
-            "logs": f"❌ Workflow failed: {str(e)}\n{err_trace}",
-            "updated_at": datetime.utcnow().isoformat(),
-        }).eq("id", workflow_id).execute()
-
+        logger.error(f"❌ Workflow execution failed: {e}\n{traceback.format_exc()}")
+        update_workflow_log(workflow_id, f"❌ Workflow failed: {e}\n")
 
 @app.post("/create_agent")
 async def create_agent(agent_name: str = Form(...), description: str = Form(...)):
@@ -844,8 +757,9 @@ async def get_job(runner: str):
 
         # Assign the job to this runner
         supabase.table("workflows").update({
-            "status": "assigned",
-            "runner_assigned": runner,
+            "status": "queued"
+            "runner_assigned": None
+            "phase": "simulation"
             "updated_at": datetime.utcnow().isoformat()
         }).eq("id", workflow_id).execute()
 
