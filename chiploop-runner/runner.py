@@ -41,6 +41,21 @@ def run_local_sim(job):
     log_path.write_text("Simulation completed successfully\nCoverage: 85%")
     return log_path
 
+def upload_results(workflow_id, status, logs, artifacts=None):
+    url = f"{BACKEND_URL}/upload_results"
+    payload = {
+        "workflow_id": workflow_id,
+        "status": status,
+        "logs": logs,
+        "artifacts": artifacts or {}
+    }
+    response = requests.post(url, json=payload)
+    if response.status_code == 200:
+        print(f"✅ Results uploaded for job {workflow_id}")
+    else:
+        print(f"❌ Upload failed: {response.text}")
+
+
 def main():
     config = load_config()
     if not config:
@@ -52,12 +67,20 @@ def main():
     while True:
         job = get_job(config)
         if job:
-            print("🚀 Received job:", job["id"])
-            result = run_local_sim(job)
-            upload_results(config, job["id"], result)
+             workflow_id = job["workflow_id"]
+             print(f"🚀 Executing job {workflow_id} ...")
+
+             try:
+                  # ---- Simulate local flow (replace with real Questa later) ----
+                  logs = f"Simulated workflow {workflow_id} successfully at {time.ctime()}"
+                  artifacts = {"report": "dummy_coverage.txt"}
+                  time.sleep(5)
+                  upload_results(workflow_id, "completed", logs, artifacts)
+             except Exception as e:
+                  upload_results(workflow_id, "failed", str(e))
         else:
-            print("⏳ No job available. Sleeping...")
-        time.sleep(10)
+             print("⏳ No job available. Sleeping...")
+             time.sleep(10)
 
 if __name__ == "__main__":
     main()
