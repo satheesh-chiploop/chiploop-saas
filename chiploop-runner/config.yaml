@@ -2,3 +2,5 @@ runner_name: "chiploop-runner"
 email: "pillaisatheesh74@gmail.com"
 backend_url: "http://209.38.74.151"  # your backend API endpoint
 supabase_token: "iAjuY3ajy3CojRN4f5xYETFQDKFwx+7swFbt1x8nHbMKdj9Eum6UiQ1Z7sPyHulZioYuarFtTCxK4o5R/WNHrA=="
+sim_tool: "questa"
+questa_path: "C:\\altera\\24.1std\\questa_fse\\win64"
