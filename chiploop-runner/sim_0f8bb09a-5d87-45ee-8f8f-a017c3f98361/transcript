@@ -1,0 +1,9 @@
+# vsim -c -coverage tb_counter_4b -do "run -all; coverage save -onexit coverage.ucdb; exit" 
+# Start time: 19:05:53 on Oct 11,2025
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Error: (vopt-11) Could not find work.tb_counter_4b.
+# Optimization failed
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=1, Warnings=0.
+# Error loading design
+# End time: 19:05:55 on Oct 11,2025, Elapsed time: 0:00:02
+# Errors: 1, Warnings: 0

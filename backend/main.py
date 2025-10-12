@@ -237,7 +237,7 @@ async def run_workflow(
             "id": workflow_id,
             "user_id": user_id,
             "name": "Digital Loop Run",
-            "status": "queued",
+            "status": "running",
             "phase": "Spec2RTL",
             "logs": "🚀 Workflow started asynchronously.",
             "created_at": now,
@@ -345,13 +345,12 @@ def execute_workflow_background(workflow_id, user_id, workflow, spec_text, uploa
                 try:
                     logger.info(f"🚀 Executing agent: {label}")
                     update_workflow_log(workflow_id, f"🚀 Running {label}\n")
-                    if label.strip().lower().startswith("simulation"):
+                    if label.strip().lower() == "simulation agent":
                         logger.info("▶️ Reached Simulation Agent → queuing for ChipRunner and stopping local agent chain.")
                         supabase.table("workflows").update({
                                 "status": "queued",
                                 "phase": "simulation",
-                                "runner_assigned": None,
-                                "updated_at": datetime.utcnow().isoformat()
+                                "runner_assigned": None
                         }).eq("id", workflow_id).execute()
                         update_workflow_log(workflow_id, "🟡 Queued for ChipRunner (Simulation phase)\n")
                         return  # stop after queuing
@@ -701,7 +700,8 @@ async def register_runner(request: Request):
 @app.post("/upload_results")
 async def upload_results(request: Request):
     """
-    Called by runner after job completion to upload logs and results.
+    Called by ChipRunner after job completion (simulation + coverage).
+    Updates workflow logs, artifacts, and marks the runner idle.
     """
     try:
         data = await request.json()
@@ -711,15 +711,14 @@ async def upload_results(request: Request):
         status = data.get("status", "completed")
         runner_name = data.get("runner_name")
 
-        # Update workflow status and logs
+        # 🧠 Update workflow record with logs and artifacts
         supabase.table("workflows").update({
             "status": status,
             "logs": logs,
-            "artifacts": artifacts,
-            "completed_at": datetime.utcnow().isoformat()
+            "artifacts": artifacts
         }).eq("id", workflow_id).execute()
 
-        # 🆕 Optional but recommended: mark runner idle after upload
+        # 🧩 Mark runner as idle (optional, good housekeeping)
         if runner_name:
             supabase.table("runners").update({
                 "status": "idle",
@@ -727,12 +726,26 @@ async def upload_results(request: Request):
                 "last_seen": datetime.utcnow().isoformat()
             }).eq("runner_name", runner_name).execute()
 
+        # 🧾 Log to server output
         logger.info(f"✅ Results uploaded for workflow {workflow_id}")
-        return JSONResponse({"status": "success", "workflow_id": workflow_id})
+        logger.info(f"📦 Artifacts: {list(artifacts.keys()) if artifacts else 'None'}")
+
+        # 🪶 Append a note to the workflow log
+        update_workflow_log(workflow_id, "✅ Simulation + Coverage results uploaded successfully.\n")
+
+        return JSONResponse({
+            "status": "success",
+            "workflow_id": workflow_id,
+            "message": "Results uploaded and workflow updated successfully."
+        })
 
     except Exception as e:
         logger.error(f"❌ Error in /upload_results: {e}")
-        return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+        return JSONResponse(
+            {"status": "error", "message": str(e)},
+            status_code=500
+        )
+
 
 
 @app.get("/get_job")
@@ -757,9 +770,9 @@ async def get_job(runner: str):
 
         # Assign the job to this runner
         supabase.table("workflows").update({
-            "status": "queued"
-            "runner_assigned": None
-            "phase": "simulation"
+            "status": "queued",
+            "runner_assigned": None,
+            "phase": "simulation",
             "updated_at": datetime.utcnow().isoformat()
         }).eq("id", workflow_id).execute()
 

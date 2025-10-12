@@ -590,7 +590,6 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
                 { id: "5", type: "agentNode", position: { x: 250, y: 480}, data: agentList.find((a) => a.type === "sva")! },
                 { id: "6", type: "agentNode", position: { x: 250, y: 600}, data: agentList.find((a) => a.type === "fcov")! },
                 { id: "7", type: "agentNode", position: { x: 250, y: 720}, data: agentList.find((a) => a.type === "sim")! },
-                { id: "8", type: "agentNode", position: { x: 250, y: 840}, data: agentList.find((a) => a.type === "ccov")! },
               ]);
               setEdges([
                 { id: "e1-2", source: "1", target: "2" },
@@ -599,7 +598,6 @@ const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) =
                 { id: "e4-5", source: "4", target: "5" },
                 { id: "e5-6", source: "5", target: "6" },
                 { id: "e5-6", source: "6", target: "7" },
-                { id: "e5-6", source: "7", target: "8" },
               ]);
             }}
             className="w-full mb-2 px-3 py-2 text-left rounded-lg bg-indigo-600 hover:bg-indigo-500"

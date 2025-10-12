@@ -95,18 +95,52 @@ def run_questa_simulation(config, workflow_id, design_dir, top_module):
         os.environ["PATH"] += os.pathsep + questa_path
 
     try:
-        print(f"🧠 Launching Questa simulation for {workflow_id}...")
+        print(f"🧠 Launching Questa simulation + coverage for {workflow_id}...")
+
+        # Compile design and testbench with coverage enabled
         subprocess.run(
-            ["simulate.bat", str(design_dir), top_module, str(sim_dir)],
-            check=True, shell=True
+            ["vlog", "-cover", "bcest", "+acc=rn",
+             f"{design_dir}/auto_module.v",
+             f"{design_dir}/{top_module}.sv"],
+            check=True
         )
-        coverage_path = sim_dir / "coverage_report.txt"
-        coverage_text = coverage_path.read_text() if coverage_path.exists() else "⚠️ Coverage report not found."
-        upload_results(config, workflow_id, "completed", coverage_text, {"report": str(coverage_path)})
-        print(f"✅ Questa simulation completed for {workflow_id}")
+
+        # Run Questa simulation with coverage
+        subprocess.run(
+            ["vsim", "-c", "-coverage", top_module, "-do", "run -all; exit"],
+            check=True
+        )
+
+        # Generate coverage report
+        subprocess.run(
+            ["vcover", "report", "-details", "coverage.ucdb"],
+            check=False  # don't fail if UCDB missing
+        )
+
+        coverage_file = Path("coverage_report.txt")
+        if coverage_file.exists():
+            coverage_logs = coverage_file.read_text()
+        else:
+            coverage_logs = "⚠️ coverage_report.txt not found — possible Questa path issue."
+
+        # Upload results to backend
+        upload_results(
+            config,
+            workflow_id,
+            "completed",
+            coverage_logs,
+            {
+                "coverage_report": "coverage_report.txt",
+                "ucdb": "coverage.ucdb"
+            }
+        )
+
+        print(f"✅ Questa simulation + coverage completed for {workflow_id}")
         return True
+
     except subprocess.CalledProcessError as e:
         print(f"⚠️ Questa simulation failed for {workflow_id}: {e}")
+        upload_results(config, workflow_id, "failed", f"❌ Questa simulation failed: {e}")
         return False
 
 # -------------------------------------------------------------------
