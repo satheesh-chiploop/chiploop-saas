@@ -1,0 +1,24 @@
+{
+  "module": "auto_module",
+  "description": "Design 4 bit up counter. Requirements are as follows\r\n- inputs ports are clk_counter, reset and enable\r\n- output port are count which is 4 bit wide\r\n- Resets are active high\r\n- clock frequency should be 100 MHz\r\n- module name is counter_4b",
+  "clock": [
+    {
+      "name": "clk",
+      "frequency_mhz": 100,
+      "duty_cycle": 0.5
+    }
+  ],
+  "reset": [
+    {
+      "name": "reset",
+      "active_low": false,
+      "duration_cycles": 5
+    }
+  ],
+  "io": {
+    "inputs": [],
+    "outputs": []
+  },
+  "llm_source": "Ollama",
+  "timestamp": "2025-10-12 19:40:10"
+}

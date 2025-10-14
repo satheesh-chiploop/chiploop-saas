@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 // 🧩 Supabase client
@@ -9,82 +9,77 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// 🧱 Define the shape of a workflow row
 interface WorkflowRow {
   id?: string;
   status?: string;
   logs?: string;
 }
 
-export default function WorkflowConsole({ jobId }: { jobId: string }) {
+type TableName = "workflows" | "runs";
+
+export default function WorkflowConsole({
+  jobId,
+  table = "workflows", // ✅ default keeps current behavior
+}: {
+  jobId: string;
+  table?: TableName;
+}) {
   const [logs, setLogs] = useState<string[]>([]);
   const [status, setStatus] = useState("starting");
+
+  const channelName = useMemo(
+    () => `realtime:public:${table}`,
+    [table]
+  );
 
   useEffect(() => {
     if (!jobId) return;
 
-    const channelName = "realtime:public:workflows";
-    console.log(`⚙️ Subscribing to Supabase channel: ${channelName}`);
-
-    // 1️⃣ Fetch initial logs + status
+    // 1) Initial fetch
     const fetchInitial = async () => {
       const { data, error } = await supabase
-        .from("workflows")
+        .from(table)
         .select("status, logs")
         .eq("id", jobId)
         .single<WorkflowRow>();
-
       if (error) console.error("❌ Initial fetch error:", error);
-      if (data?.logs) setLogs(data.logs.split("\n"));
-      if (data?.status) setStatus(data.status);
+      if (data?.logs) setLogs((data.logs || "").split("\n"));
+      if (data?.status) setStatus(data.status || "unknown");
     };
     fetchInitial();
 
-    // 2️⃣ Realtime subscription
+    // 2) Realtime subscription
     const channel = supabase
       .channel(channelName)
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "workflows",
-          filter: `id=eq.${jobId}`,
-        },
+        { event: "*", schema: "public", table, filter: `id=eq.${jobId}` },
         (payload) => {
-          console.log("📡 Realtime payload received:", payload);
           const updated = payload.new as WorkflowRow;
-          if (updated?.logs) setLogs(updated.logs.split("\n"));
-          if (updated?.status) setStatus(updated.status);
+          if (updated?.logs) setLogs((updated.logs || "").split("\n"));
+          if (updated?.status) setStatus(updated.status || "unknown");
         }
       )
-      .subscribe((status) => {
-        console.log(`🧩 Realtime subscription: ${status}`);
-      });
+      .subscribe();
 
-    // 3️⃣ Poll fallback every 3s
+    // 3) Poll fallback
     const poll = setInterval(async () => {
       const { data, error } = await supabase
-        .from("workflows")
+        .from(table)
         .select("status, logs")
         .eq("id", jobId)
         .single<WorkflowRow>();
-
-      if (error) {
-        console.error("Polling error:", error);
-        return;
-      }
-
-      if (data?.logs) setLogs(data.logs.split("\n"));
-      if (data?.status) setStatus(data.status);
+      if (error) return; // quiet
+      if (data?.logs) setLogs((data.logs || "").split("\n"));
+      if (data?.status) setStatus(data.status || "unknown");
     }, 3000);
 
-    // 4️⃣ Cleanup
+    // 4) Cleanup
     return () => {
       clearInterval(poll);
       supabase.removeChannel(channel);
     };
-  }, [jobId]);
+  }, [jobId, table, channelName]);
 
   // 🎨 Colors for log lines
   const colorFor = (line: string) => {
@@ -94,17 +89,17 @@ export default function WorkflowConsole({ jobId }: { jobId: string }) {
     if (line.includes("🚀")) return "text-blue-400";
     if (line.includes("📘")) return "text-cyan-400";
     if (line.includes("🧠")) return "text-purple-400";
-    return "text-gray-300";
+    return "text-slate-300";
   };
 
   return (
-    <div className="mt-4 bg-gray-900 rounded-lg shadow-md p-4 font-mono text-sm text-green-400 h-72 overflow-y-auto border border-slate-700">
-      <div className="text-yellow-400 border-b border-slate-700 mb-2 pb-1">
-        🔴 Live Execution Feed — Status: {status.toUpperCase()}
+    <div className="mt-4 rounded-lg border border-slate-700 bg-slate-900/80 p-4 font-mono text-sm text-slate-200 shadow-md h-72 overflow-y-auto">
+      <div className="mb-2 border-b border-slate-700 pb-1 text-cyan-400">
+        🔴 Live Execution Feed — Status: <span className="font-semibold">{status.toUpperCase()}</span>
       </div>
 
       {logs.length === 0 ? (
-        <div className="text-slate-400 italic">Waiting for updates...</div>
+        <div className="italic text-slate-400">Waiting for updates...</div>
       ) : (
         logs.map((line, idx) => (
           <div key={idx} className={colorFor(line)}>

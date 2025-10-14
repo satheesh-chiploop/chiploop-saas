@@ -1,0 +1,11 @@
+# vsim -c -coverage tb_counter_4b -do "run -all; exit" 
+# Start time: 11:06:08 on Oct 12,2025
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Warning: (vopt-10908) Some optimizations are turned off because the +acc switch is in effect.
+# ** Error: downloads\ee7e4655-28f2-41f1-98eb-daa1bc9f764e/tb_counter_4b.sv(7): Module 'counter_4b_if' is not defined.
+#  For instance 'tb_if' at path 'tb_counter_4b'
+# Optimization failed
+# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=1, Warnings=1.
+# Error loading design
+# End time: 11:06:11 on Oct 12,2025, Elapsed time: 0:00:03
+# Errors: 1, Warnings: 1

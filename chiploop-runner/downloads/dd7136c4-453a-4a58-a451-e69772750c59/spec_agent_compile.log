@@ -1,0 +1,14 @@
+Spec processed at 2025-10-12 17:12:46.364872
+Module: auto_module
+Detected 1 clock(s), 1 reset(s)
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:15: warning: Extra digits given for sized binary constant.
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:1: error: Port clk (1) of module counter_4b is not declared within module.
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:1: error: Port reset (2) of module counter_4b is not declared within module.
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:1: error: Port enable (3) of module counter_4b is not declared within module.
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:1: error: no wire/reg clk in module counter_4b.
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:1: error: no wire/reg reset in module counter_4b.
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:1: error: no wire/reg enable in module counter_4b.
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:15: error: reg count_next; cannot be driven by primitives or continuous assignment.
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:8: error: Unable to bind wire/reg/memory `reset' in `counter_4b'
+backend/workflows/dd7136c4-453a-4a58-a451-e69772750c59/auto_module.v:8: error: Unable to elaborate condition expression.
+Elaboration failed

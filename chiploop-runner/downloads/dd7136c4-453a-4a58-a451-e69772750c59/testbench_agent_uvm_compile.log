@@ -1,0 +1,3 @@
+UVM TB generated for counter_4b at 2025-10-12 17:17:38.679366
+Clocks/Resets Context:
+- Clock 1: clk @ 100MHz (duty=0.5) | Reset: reset

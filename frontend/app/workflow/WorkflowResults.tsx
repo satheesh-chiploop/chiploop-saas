@@ -20,13 +20,13 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export default function WorkflowResults({ results, artifacts }: Props) {
   if (!results || Object.keys(results).length === 0) {
-    return <p className="text-xs text-gray-400">No results available.</p>;
+    return <p className="mt-2 text-xs text-slate-400">No results available.</p>;
+    // Prior version already returned a simple "No results available." line. :contentReference[oaicite:3]{index=3}
   }
 
   const parsed: AgentResult[] = Object.keys(results).map((label) => {
     const msg = results[label];
     const art = artifacts?.[label] || {};
-
     return {
       label,
       status: String(msg ?? ""),
@@ -38,14 +38,19 @@ export default function WorkflowResults({ results, artifacts }: Props) {
   });
 
   return (
-    <div className="space-y-3 text-xs mt-2">
+    <div className="mt-3 space-y-3 text-xs">
       {parsed.map((agent) => (
-        <div key={agent.label} className="border rounded p-2 bg-gray-800 text-gray-200">
-          <h3 className="font-bold">{agent.label}</h3>
-          <p>Status: {agent.status}</p>
+        <div
+          key={agent.label}
+          className="rounded border border-slate-700 bg-slate-900/80 p-3 text-slate-200 shadow"
+        >
+          <h3 className="mb-1 font-bold text-cyan-400">{agent.label}</h3>
+          <p className="mb-2 text-slate-300">
+            Status: <span className="font-semibold">{agent.status}</span>
+          </p>
 
           {agent.artifact && (
-            <p className="text-cyan-400 mt-1">
+            <p className="mt-1 text-cyan-400">
               ➤ Output:{" "}
               <a
                 href={`${API_BASE}${agent.artifact}`}
@@ -59,7 +64,7 @@ export default function WorkflowResults({ results, artifacts }: Props) {
           )}
 
           {agent.artifact_log && (
-            <p className="text-cyan-400 mt-1">
+            <p className="mt-1 text-cyan-400">
               ➤ Log:{" "}
               <a
                 href={`${API_BASE}${agent.artifact_log}`}
@@ -73,11 +78,15 @@ export default function WorkflowResults({ results, artifacts }: Props) {
           )}
 
           {agent.log && (
-            <pre className="bg-gray-900 p-2 rounded mt-2 overflow-x-auto">{agent.log}</pre>
+            <pre className="mt-2 max-h-56 overflow-auto rounded bg-black/70 p-2 text-[11px] leading-5 text-slate-200">
+              {agent.log}
+            </pre>
           )}
 
           {agent.code && (
-            <pre className="bg-gray-900 p-2 rounded mt-2 overflow-x-auto">{agent.code}</pre>
+            <pre className="mt-2 max-h-56 overflow-auto rounded bg-black/70 p-2 text-[11px] leading-5 text-slate-200">
+              {agent.code}
+            </pre>
           )}
         </div>
       ))}

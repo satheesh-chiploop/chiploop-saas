@@ -1,0 +1,12 @@
+Spec processed at 2025-10-12 18:44:07.966880
+Module: auto_module
+Detected 1 clock(s), 1 reset(s)
+backend/workflows/ece4cfa5-883c-410d-8585-ee76395382fd/auto_module.v:1: error: Port clk (1) of module counter_4b is not declared within module.
+backend/workflows/ece4cfa5-883c-410d-8585-ee76395382fd/auto_module.v:1: error: Port reset (2) of module counter_4b is not declared within module.
+backend/workflows/ece4cfa5-883c-410d-8585-ee76395382fd/auto_module.v:1: error: Port enable (3) of module counter_4b is not declared within module.
+backend/workflows/ece4cfa5-883c-410d-8585-ee76395382fd/auto_module.v:1: error: no wire/reg clk in module counter_4b.
+backend/workflows/ece4cfa5-883c-410d-8585-ee76395382fd/auto_module.v:1: error: no wire/reg reset in module counter_4b.
+backend/workflows/ece4cfa5-883c-410d-8585-ee76395382fd/auto_module.v:1: error: no wire/reg enable in module counter_4b.
+backend/workflows/ece4cfa5-883c-410d-8585-ee76395382fd/auto_module.v:7: error: Unable to bind wire/reg/memory `reset' in `counter_4b'
+backend/workflows/ece4cfa5-883c-410d-8585-ee76395382fd/auto_module.v:7: error: Unable to elaborate condition expression.
+Elaboration failed

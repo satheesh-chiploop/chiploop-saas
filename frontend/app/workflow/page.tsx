@@ -1,13 +1,8 @@
 "use client";
 
-
-
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import WorkflowResults from "./WorkflowResults";
-import { supabase } from '@/lib/supabaseClient'
-import WorkflowConsole from "./WorkflowConsole";
-
+import { createClient } from "@supabase/supabase-js";
 
 import ReactFlow, {
   addEdge,
@@ -19,86 +14,104 @@ import ReactFlow, {
   Connection,
   Edge,
   Node,
+  useReactFlow,
 } from "reactflow";
-
 import "reactflow/dist/style.css";
-import AgentNodeComponent from "./AgentNode";
-type AgentData = {
-  label: string;
-  desc: string;
-};
-//type AgentNode = Node<AgentData>;
-//new files
+
+import AgentNode from "./AgentNode";
+import WorkflowConsole from "./WorkflowConsole";
+import WorkflowResults from "./WorkflowResults";
+
+/* =========================
+   Setup
+========================= */
+
+type LoopKey = "digital" | "analog" | "embedded";
+type AgentData = { label: string; desc?: string };
+type LogEntry = { text: string; type: "info" | "success" | "error" };
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
-// --- Supabase workflow helpers ---
-async function saveWorkflowToDB(userId: string, name: string, nodes: unknown,edges: unknown) {
-  const { error } = await supabase.from("workflows").insert([
-    { user_id: userId, name, definition: { nodes, edges } }
-  ]);
-  if (error) {
-    console.error("❌ Save error:", error.message);
-    alert("Failed to save workflow");
-  } else {
-    alert("✅ Workflow saved to Supabase");
-  }
-}
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function loadWorkflowsFromDB(userId: string) {
-  const { data, error } = await supabase.from("workflows").select("*").eq("user_id", userId);
-  if (error) {
-    console.error("❌ Load error:", error.message);
-    return [];
-  }
-  return data || [];
-}
+/** 
+ * Prebuilt agent catalogs per loop.
+ * Labels match your backend AGENT_FUNCTIONS (Spec, RTL, Testbench, Testcase, Assertion, Covergroup, Simulation, Coverage, Optimizer, Arch Doc, Integration Doc). :contentReference[oaicite:0]{index=0}
+ */
+const LOOP_AGENTS: Record<LoopKey, { label: string; desc?: string }[]> = {
+  digital: [
+    { label: "Spec Agent", desc: "Natural language → initial design spec" },
+    { label: "RTL Agent", desc: "Generate synthesizable RTL" },
+    { label: "Optimizer Agent", desc: "Fix compile errors & improve" },
+    { label: "Arch Doc Agent", desc: "Architecture / pins / timing docs" },
+    { label: "Integration Doc Agent", desc: "System integration guidance" },
+    { label: "Testbench Agent", desc: "Create UVM/DUT environment" },
+    { label: "Testcase Agent", desc: "Generate tests" },
+    { label: "Assertion Agent", desc: "Create SVA/PSL properties" },
+    { label: "Covergroup Agent", desc: "Functional coverage points" },
+    { label: "Coverage Agent", desc: "Line/toggle/FSM coverage" },
+    { label: "Simulation Agent", desc: "Compile & simulate" },
+  ],
+  analog: [
+    // You can extend/rename to your analog-specific agents as your backend grows.
+    { label: "Spec Agent", desc: "Analog spec capture (topology/targets)" },
+    { label: "Optimizer Agent", desc: "Sweep/optimize design params" },
+    { label: "Simulation Agent", desc: "SPICE/AMS simulation" },
+    { label: "Arch Doc Agent", desc: "Analog architecture notes" },
+    { label: "Integration Doc Agent", desc: "Mixed-signal integration tips" },
+    { label: "Coverage Agent", desc: "Scenario/param coverage" },
+  ],
+  embedded: [
+    { label: "Spec Agent", desc: "Firmware/SoC requirements" },
+    { label: "RTL Agent", desc: "Peripheral RTL (if HW-in-the-loop)" },
+    { label: "Testbench Agent", desc: "HW/SW bring-up tests" },
+    { label: "Testcase Agent", desc: "Scenario & API tests" },
+    { label: "Simulation Agent", desc: "Co-sim / run harness" },
+    { label: "Integration Doc Agent", desc: "Board/driver integration" },
+  ],
+};
 
-async function deleteWorkflowFromDB(userId: string, name: string) {
-  const { error } = await supabase.from("workflows").delete().eq("user_id", userId).eq("name", name);
-  if (error) console.error("❌ Delete error:", error.message);
-}
+/* ============ Modals ============ */
 
-
-// ---------- Modal for Spec Input ----------
-// ---------- Modal for Spec Input ----------
-function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
+function SpecInputModal({
+  onClose,
+  onSubmit,
+}: {
+  onClose: () => void;
+  onSubmit: (text: string, file?: File) => void;
+}) {
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-      <div className="bg-slate-900 p-6 rounded-2xl w-full max-w-2xl shadow-2xl text-slate-100">
-        <h2 className="text-2xl font-bold text-cyan-400 mb-4">Enter Spec for Spec2RTL</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+      <div className="w-full max-w-2xl rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl">
+        <h2 className="mb-4 text-2xl font-bold text-cyan-400">Enter Spec for Spec2RTL</h2>
 
         <textarea
-          className="w-full h-40 p-4 text-lg rounded-lg bg-slate-800 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 mb-4"
+          className="mb-4 h-40 w-full rounded-lg border border-slate-600 bg-slate-800 p-4 text-lg outline-none focus:ring-2 focus:ring-cyan-500"
           placeholder="Type your design spec here..."
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
 
-        {/* Custom Upload Box */}
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Upload Spec Document</label>
+          <label className="mb-2 block text-sm font-medium">Upload Spec Document</label>
           <label
             htmlFor="file-upload"
-            className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-slate-600 rounded-lg cursor-pointer bg-slate-800 hover:bg-slate-700"
+            className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-slate-600 bg-slate-800 px-4 py-6 hover:bg-slate-700"
           >
-            {/* Upload Icon */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6 text-cyan-400 mr-2"
+              className="mr-2 h-6 w-6 text-cyan-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={2}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 8l-3-3m3 3l3-3"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 8l-3-3m3 3l3-3" />
             </svg>
             <span className="text-slate-300">Click to upload</span>
             <input
@@ -109,13 +122,11 @@ function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: 
               onChange={(e) => setFile(e.target.files?.[0] || null)}
             />
           </label>
-          {file && (
-            <p className="mt-2 text-sm text-green-400">📄 {file.name} selected</p>
-          )}
+          {file && <p className="mt-2 text-sm text-green-400">📄 {file.name} selected</p>}
         </div>
 
         <div className="flex justify-end space-x-3">
-          <button onClick={onClose} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg">
+          <button onClick={onClose} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">
             Cancel
           </button>
           <button
@@ -123,7 +134,7 @@ function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: 
               onSubmit(text, file || undefined);
               onClose();
             }}
-            className="px-6 py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-lg"
+            className="rounded-lg bg-cyan-500 px-6 py-2 font-bold text-black hover:bg-cyan-400"
           >
             Run Spec Agent
           </button>
@@ -132,33 +143,44 @@ function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: 
     </div>
   );
 }
-// ---------- Modal for Create Agent ----------
-function CreateAgentModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (name: string, desc: string) => void }) {
+
+function CreateAgentModal({
+  onClose,
+  onSubmit,
+}: {
+  onClose: () => void;
+  onSubmit: (name: string, desc: string) => void;
+}) {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
-      <div className="bg-slate-900 p-6 rounded-2xl w-full max-w-lg shadow-2xl text-slate-100">
-        <h2 className="text-2xl font-bold text-cyan-400 mb-4">Create Custom Agent</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+      <div className="w-full max-w-lg rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl">
+        <h2 className="mb-4 text-2xl font-bold text-cyan-400">Create Custom Agent</h2>
         <input
           type="text"
           placeholder="Agent name (e.g., decoder_agent)"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full mb-3 p-2 rounded bg-slate-800 border border-slate-600"
+          className="mb-3 w-full rounded border border-slate-600 bg-slate-800 p-2"
         />
         <textarea
           placeholder="Describe what this agent does..."
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
-          className="w-full h-28 mb-4 p-2 rounded bg-slate-800 border border-slate-600"
+          className="mb-4 h-28 w-full rounded border border-slate-600 bg-slate-800 p-2"
         />
         <div className="flex justify-end space-x-3">
-          <button onClick={onClose} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg">Cancel</button>
+          <button onClick={onClose} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">
+            Cancel
+          </button>
           <button
-            onClick={() => { onSubmit(name, desc); onClose(); }}
-            className="px-6 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-lg"
+            onClick={() => {
+              onSubmit(name, desc);
+              onClose();
+            }}
+            className="rounded-lg bg-emerald-500 px-6 py-2 font-bold text-black hover:bg-emerald-400"
           >
             Save Agent
           </button>
@@ -167,555 +189,406 @@ function CreateAgentModal({ onClose, onSubmit }: { onClose: () => void; onSubmit
     </div>
   );
 }
-// ---------- Prebuilt agents ----------
-const agentList = [
-  { type: "spec", label: "Spec Agent", desc: "Natural language → initial design spec" },
-  { type: "rtl", label: "RTL Agent", desc: "Generate synthesizable RTL" },
-  { type: "opt", label: "Optimizer Agent", desc: "Fix compile errors & improve" },
-  { type: "arch", label: "Arch Doc Agent", desc: "Pin & timing documentation" },
-  { type: "int", label: "Integration Doc Agent", desc: "System integration guidance" },
-  { type: "tb", label: "Testbench Agent", desc: "Builds DUT testbench & stimulus" },
-  { type: "tc", label: "Testcase Agent", desc: "Builds Testcases" },
-  { type: "sva", label: "Assertion Agent", desc: "Generates assertions (SVA)" },
-  { type: "fcov", label: "Covergroup Agent", desc: "Adds covergroups for scenarios" },
-  { type: "ccov", label: "Coverage Agent", desc: "Tracks line, toggle, FSM and functional coverage" },
-  { type: "sim", label: "Simulation Agent", desc: "Simulation Agent " },
-  { type: "reg", label: "Regression Agent", desc: "Runs regressions & aggregates results" },
-];
 
-type LogEntry = { text: string; type: "info" | "success" | "error" };
+/* =========================
+   Page
+========================= */
 
 export default function WorkflowPage() {
-  // ---------- State ----------
-  
-  const [nodes, setNodes, onNodesChange] = useNodesState<AgentData>([]);
+  const router = useRouter();
+  const rf = useReactFlow();
+
+  const [loop, setLoop] = useState<LoopKey>("digital");
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentData>>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
   const [statusLog, setStatusLog] = useState<LogEntry[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
   const [output, setOutput] = useState<string>("");
+  const [jobId, setJobId] = useState<string | null>(null);
+
   const [customAgents, setCustomAgents] = useState<{ label: string; desc?: string }[]>([]);
   const [customWorkflows, setCustomWorkflows] = useState<string[]>([]);
   const [showSpecModal, setShowSpecModal] = useState(false);
   const [showCreateAgentModal, setShowCreateAgentModal] = useState(false);
-  const [jobId, setJobId] = useState<string | null>(null);
-  const router = useRouter();
 
+  /* ---------- Auth gate ---------- */
   useEffect(() => {
-  const checkSession = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/login");
+        return;
+      }
+      const savedAgents = JSON.parse(localStorage.getItem("custom_agents") || "[]");
+      const savedWorkflows = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
+      setCustomAgents(savedAgents);
+      setCustomWorkflows(savedWorkflows.map((k) => k.replace("workflow_", "")));
+    })();
+  }, [router]);
 
-    if (!session) {
-      router.push("/login"); // not logged in → redirect
-      return;
-    }
-
-    const savedAgents = JSON.parse(localStorage.getItem("custom_agents") || "[]");
-    const savedWorkflows = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
-    setCustomAgents(savedAgents);
-    setCustomWorkflows(savedWorkflows.map((k) => k.replace("workflow_", "")));
-  };
-  checkSession();
- }, [router]);
-
-  const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
-
-  const addAgentNode = (agent: { label: string; desc?: string }) => {
-    const newId = `${nodes.length + 1}`;
-    const newNode: Node<AgentData> = {
-      id: newId,
-      type: "agentNode",
-      data: { label: agent.label, desc: agent.desc || "" },
-      position: { x: 250, y: nodes.length * 120 },
-    };
-    setNodes((nds) => [...nds, newNode]);
-    if (nodes.length > 0) {
-      const prevId = `${nodes.length}`;
-      setEdges((eds) => [...eds, { id: `e${prevId}-${newId}`, source: prevId, target: newId }]);
-    }
+  /* ---------- Drag & Drop ---------- */
+  const onDragStartAgent = (e: React.DragEvent, agentLabel: string, desc?: string) => {
+    e.dataTransfer.setData("application/agent", JSON.stringify({ label: agentLabel, desc }));
+    e.dataTransfer.effectAllowed = "move";
   };
 
-  const addLog = (text: string, type: "info" | "success" | "error" = "info") => {
+  const onDragOverCanvas = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const prevNodesRef = useRef<Node<AgentData>[]>([]);
+  useEffect(() => {
+    prevNodesRef.current = nodes;
+  }, [nodes]);
+
+  const onDropCanvas = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const payload = e.dataTransfer.getData("application/agent");
+      if (!payload) return;
+      const { label, desc } = JSON.parse(payload) as { label: string; desc?: string };
+
+      const newId = `n_${Date.now()}`;
+      const newNode: Node<AgentData> = {
+        id: newId,
+        type: "agentNode",
+        data: { label, desc },
+        position: { x: 80, y: 180 }, // will be re-laid out
+      };
+      setNodes((nds) => layoutHorizontal([...nds, newNode]));
+      setEdges((_eds) => layoutEdges(nodes.concat(newNode).map((n) => n.id)));
+      // Fit contents after layout
+      setTimeout(() => rf.fitView({ padding: 0.2 }), 0);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [nodes]
+  );
+
+  /* ---------- Auto layout helpers ---------- */
+  function layoutHorizontal(nds: Node<AgentData>[]) {
+    const X_START = 80;
+    const Y = 180;
+    const GAP = 220;
+    return nds.map((n, i) => ({ ...n, position: { x: X_START + i * GAP, y: Y } }));
+  }
+
+  function layoutEdges(nodeIds: string[]): Edge[] {
+    const newEdges: Edge[] = [];
+    for (let i = 0; i < nodeIds.length - 1; i++) {
+      newEdges.push({
+        id: `e_${nodeIds[i]}_${nodeIds[i + 1]}`,
+        source: nodeIds[i],
+        target: nodeIds[i + 1],
+        animated: true,
+        style: { stroke: "#22d3ee", strokeWidth: 2 },
+      });
+    }
+    return newEdges;
+  }
+
+  const onConnect = useCallback(
+    (params: Edge | Connection) =>
+      setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: "#22d3ee" } }, eds)),
+    []
+  );
+
+  /* ---------- Logging helpers ---------- */
+  const addLog = (text: string, type: LogEntry["type"] = "info") =>
     setStatusLog((prev) => [...prev, { text, type }]);
-  };
 
-  // ---- Run Workflow ----
+  /* ---------- Run workflow ---------- */
   const runWorkflow = async () => {
     setStatusLog([]);
     setOutput("");
     addLog("🚀 Running Workflow...", "info");
 
-   const hasSpecAgent = nodes.some((n) => {
-       const data = n.data as { label?: string };
-       return data.label?.includes("Spec Agent") ?? false;
-    });
-
-    if (hasSpecAgent) {
+    const hasSpec = nodes.some((n) => n.data?.label?.toLowerCase().includes("spec"));
+    if (hasSpec) {
       setShowSpecModal(true);
       return;
     }
-
     await executeWorkflow({});
   };
 
-const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) => {
-  addLog("⚡ Executing workflow agents...", "info");
+  const executeWorkflow = async ({ spec, file }: { spec?: string; file?: File }) => {
+    addLog("⚡ Executing workflow agents...", "info");
 
-  const graph = {
-    nodes: nodes.map((n) => {
-      const data = n.data as { label?: string };
-      return { id: n.id, label: data.label ?? "" };
-    }),
-    edges: edges.map((e) => ({ source: e.source, target: e.target })),
-  };
+    const graph = {
+      loop_type: loop, // <— include selected loop
+      nodes: nodes.map((n) => ({ id: n.id, label: n.data?.label || "" })),
+      edges: edges.map((e) => ({ source: e.source, target: e.target })),
+    };
 
-  const formData = new FormData();
-  formData.append("workflow", JSON.stringify(graph));
-  if (spec) formData.append("spec_text", spec);
-  if (file) formData.append("file", file);
+    const form = new FormData();
+    form.append("workflow", JSON.stringify(graph));
+    if (spec) form.append("spec_text", spec);
+    if (file) form.append("file", file);
 
-  try {
-    // ✅ fetch Supabase token
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      addLog("❌ Not logged in", "error");
-      return;
-    }
-    const token = session.access_token;
+    if (!session) return router.push("/login");
 
     const res = await fetch(`${API_BASE}/run_workflow`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,   // <-- add this
-      },
-      body: formData,
+      headers: { Authorization: `Bearer ${session.access_token}` },
+      body: form,
     });
 
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
-    }
-
     const data = await res.json();
-    addLog("✅ Workflow started", "success");
-    setOutput(JSON.stringify(data, null, 2));
-
-// capture job_id from backend
-    if (data.job_id) {
-      setJobId(data.job_id);
-      addLog(`🎯 Tracking job ID: ${data.job_id}`, "info");
-    }
-
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      addLog(`❌ Workflow failed: ${err.message}`, "error");
+    if (data?.job_id) {
+      setJobId(String(data.job_id));
+      addLog(`✅ Job started: ${String(data.job_id)}`, "success");
     } else {
-      addLog("❌ Workflow failed: Unknown error", "error");
+      addLog("❌ Failed to start job", "error");
     }
-  }
-};
-
- // ---- Create Agent ----
-  const createAgent = async (name: string, desc: string) => {
-    try {
-      const formData = new FormData();
-      formData.append("agent_name", name);
-      formData.append("description", desc);
-      const res = await fetch(`${API_BASE}/create_agent`, { method: "POST", body: formData });
-      if (!res.ok) {
-         throw new Error(`HTTP ${res.status}`);
-      }
-      await res.json();
-      addLog(`✅ Agent '${name}' created`, "success");
-
-      const newAgent = { label: `✨ ${name} Agent`, desc };
-      const updated = [...customAgents, newAgent];
-      setCustomAgents(updated);
-      localStorage.setItem("custom_agents", JSON.stringify(updated));
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-       addLog(`❌ Failed to create agent: ${err.message}`, "error");
-      } else {
-       addLog("❌ Failed to create agent: Unknown error", "error");
-     }
-   }
   };
 
-  // ---- Save / Load / Delete Workflows ----
-  const saveCurrentWorkflow = async () => {
-  const name = prompt("Enter a name to save this workflow:");
-  if (!name) return;
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    alert("Not logged in");
-    return;
-  }
-  await saveWorkflowToDB(session.user.id, name, nodes, edges);
-  if (!customWorkflows.includes(name)) {
-    setCustomWorkflows((prev) => [...prev, name]);
-   }
+  /* ---------- Save / Load workflow locally (simple) ---------- */
+  const saveWorkflow = () => {
+    const key = `workflow_${new Date().toISOString()}`;
+    const payload = {
+      loop_type: loop,
+      nodes,
+      edges,
+    };
+    localStorage.setItem(key, JSON.stringify(payload));
+    setCustomWorkflows((w) => [key.replace("workflow_", ""), ...w]);
   };
 
-
- const loadWorkflowByName = async (name: string) => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return;
-
-  const { data, error } = await supabase
-    .from("workflows")
-    .select("definition")
-    .eq("user_id", session.user.id)
-    .eq("name", name)
-    .single();
-
-  if (error || !data) return;
-
-  const { nodes: n, edges: e } = data.definition;
-  setNodes(n);
-  setEdges(e);
-  setStatusLog([]);
-  setOutput("");
+  const clearWorkflow = () => {
+    setNodes([]);
+    setEdges([]);
+    setStatusLog([]);
+    setOutput("");
+    setJobId(null);
   };
 
-  const deleteWorkflow = async (name: string) => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return;
-  await deleteWorkflowFromDB(session.user.id, name);
-  setCustomWorkflows((prev) => prev.filter((w) => w !== name));
-  };
+  /* ---------- UI Pieces ---------- */
+  const prebuiltAgents = useMemo(() => LOOP_AGENTS[loop], [loop]);
 
-  const deleteAgent = (label: string) => {
-    const updated = customAgents.filter((a) => a.label !== label);
-    setCustomAgents(updated);
-    localStorage.setItem("custom_agents", JSON.stringify(updated));
-  };
-
-  // ---------- UI ----------
   return (
-    <div className="flex flex-col h-[100vh] bg-gradient-to-br from-slate-900 via-slate-950 to-black text-slate-100">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white flex flex-col">
       {/* Header */}
-
-     <header className="flex justify-between items-center px-6 py-4 border-b border-slate-800 bg-black/70 backdrop-blur">
-        <div className="text-center flex-1">
-            <h1 className="text-3xl font-bold text-cyan-400">ChipLoop – Agentic AI Platform</h1>
-            <p className="text-sm text-slate-400">Build workflows by combining prebuilt/Custom AI agents</p>
-       </div>
-       <div className="flex space-x-3 absolute right-6 top-4">
+      <nav className="w-full flex justify-between items-center px-6 py-4 bg-black/70 backdrop-blur border-b border-slate-800">
+        <div
+          onClick={() => router.push("/")}
+          className="text-2xl font-extrabold text-cyan-400 cursor-pointer"
+        >
+          CHIPLOOP ⚡
+        </div>
+        <div className="flex items-center gap-6 text-slate-300">
+          <button onClick={() => router.push("/")} className="hover:text-cyan-400 transition">
+            Home
+          </button>
+          <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
+            Pricing
+          </button>
           <button
-              onClick={() => router.push("/")}
-              className="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded"
-          >
-             🏠 Home
-         </button>
-         {userId && (
-            <button
-                 onClick={async () => {
-                     const res = await fetch("/api/create-customer-portal-session", { method: "POST" });
-                     const data = await res.json();
-                     if (data.url) {
-                         window.location.href = data.url; // redirect to Stripe portal
-                     } else {
-                        alert("❌ Failed to open customer portal");
-                     }
-                }}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded"
-             >
-                Manage Subscription
-           </button>
-         )}
-       <button
-           onClick={async () => {
+            onClick={async () => {
               await supabase.auth.signOut();
               router.push("/");
-           }}
-           className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded"
-        >
-           Logout
-       </button>
-     </div>
-       <button
-            onClick={async () => {
-            await supabase.auth.signOut()
-            router.push('/login')
             }}
-           className="ml-4 bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded"
-        >
-          Logout
-       </button>
-    </header>
-  
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <div className="w-80 bg-slate-900/70 border-r border-slate-800 p-4 text-slate-200 overflow-y-auto">
-          {/* Prebuilt Agents */}
-          <h2 className="text-lg font-bold mb-4">Prebuilt Agents</h2>
-          {agentList.map((a) => (
-            <button
-              key={a.type}
-              onClick={() => addAgentNode(a)}
-              className="w-full mb-2 px-3 py-2 text-left rounded-lg bg-slate-800 hover:bg-slate-700"
+            className="rounded-lg bg-slate-800 px-4 py-2 hover:bg-slate-700"
+          >
+            Logout
+          </button>
+        </div>
+      </nav>
+
+      {/* Body */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar */}
+        <aside className="w-full max-w-xs bg-slate-900/70 border-r border-slate-800 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          {/* Loop selector */}
+          <div className="mb-4">
+            <label className="block text-xs uppercase text-cyan-400 mb-2">Loop</label>
+            <select
+              value={loop}
+              onChange={(e) => setLoop(e.target.value as LoopKey)}
+              className="w-full rounded-lg bg-slate-800 border border-slate-700 p-2 text-slate-200"
             >
-              {a.label}
-            </button>
-          ))}
+              <option value="digital">Digital Loop</option>
+              <option value="analog">Analog Loop</option>
+              <option value="embedded">Embedded Loop</option>
+            </select>
+          </div>
+
+          {/* Prebuilt Agents */}
+          <section className="mb-4">
+            <div className="mb-2 text-xs uppercase text-cyan-400">Prebuilt Agents</div>
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              {prebuiltAgents.map((a) => (
+                <div
+                  key={a.label}
+                  draggable
+                  onDragStart={(e) => onDragStartAgent(e, a.label, a.desc)}
+                  className="cursor-grab rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 hover:bg-slate-700"
+                  title={a.desc}
+                >
+                  {a.label}
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Custom Agents */}
-          <h2 className="text-lg font-bold mt-6 mb-2">Custom Agents</h2>
-          <button
-            onClick={() => {
-              const name = prompt("Enter new agent name:");
-              const desc = prompt("Enter agent description:") || "";
-              if (name) {
-                const newAgent = { label: name, desc };
-                const updated = [...customAgents, newAgent];
-                setCustomAgents(updated);
-                localStorage.setItem("custom_agents", JSON.stringify(updated));
-              }
-            }}
-            className="w-full mb-2 px-3 py-2 text-left rounded-lg bg-emerald-600 hover:bg-emerald-500"
-          >
-            ➕ Add Custom Agent
-          </button>
-          <button onClick={() => setShowCreateAgentModal(true)} className="w-full mb-2 px-3 py-2 text-left rounded-lg bg-emerald-600 hover:bg-emerald-500">
-            ➕ Create Agent
-          </button>
-          {customAgents.map((a) => (
-            <div key={a.label} className="flex items-center mb-2">
+          <section className="mb-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs uppercase text-cyan-400">Custom Agents</span>
               <button
-                onClick={() => addAgentNode(a)}
-                className="flex-1 px-3 py-2 text-left rounded-lg bg-slate-800 hover:bg-slate-700"
+                onClick={() => setShowCreateAgentModal(true)}
+                className="rounded bg-emerald-600 px-2 py-1 text-xs font-bold text-white hover:bg-emerald-500"
               >
-                {a.label}
-              </button>
-              <button onClick={() => deleteAgent(a.label)} className="ml-2 text-red-400 hover:text-red-600">
-                ❌
+                + Add
               </button>
             </div>
-          ))}
+            <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
+              {customAgents.length === 0 && (
+                <div className="text-xs text-slate-500">No custom agents yet.</div>
+              )}
+              {customAgents.map((a) => (
+                <div
+                  key={a.label}
+                  draggable
+                  onDragStart={(e) => onDragStartAgent(e, a.label, a.desc)}
+                  className="cursor-grab rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 hover:bg-slate-700"
+                  title={a.desc}
+                >
+                  ✨ {a.label}
+                </div>
+              ))}
+            </div>
+          </section>
 
-          {/* Prebuilt workflows */}
-          <h2 className="text-lg font-bold mt-6 mb-2">Prebuilt Workflows</h2>
+          {/* Prebuilt Workflows */}
+          <section className="mb-4">
+            <div className="mb-2 text-xs uppercase text-cyan-400">Prebuilt Workflows</div>
+            <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+              <div className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 hover:bg-slate-700">
+                Verify Loop (Spec → RTL → TB → Sim)
+              </div>
+              <div className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 hover:bg-slate-700">
+                Spec2RTL (Spec → RTL → Optimizer)
+              </div>
+            </div>
+          </section>
 
-          {/* Spec2RTL */}
-<button
-  onClick={() => {
-    setNodes([]);
-    setEdges([]);
-    setStatusLog([]);
-    setOutput("");
-    setNodes([
-      {
-        id: "1",
-        type: "agentNode",
-        position: { x: 250, y: 0 },
-        data: agentList.find((a) => a.type === "spec") as AgentData,
-      },
-      {
-        id: "2",
-        type: "agentNode",
-        position: { x: 250, y: 120 },
-        data: agentList.find((a) => a.type === "rtl") as AgentData,
-      },
-    ]);
-    setEdges([{ id: "e1-2", source: "1", target: "2" }]);
-  }}
-  className="w-full mb-2 px-3 py-2 text-left rounded-lg bg-indigo-600 hover:bg-indigo-500"
->
-  📑 Spec2RTL Loop
-</button>
-
-{/* RTL Optimizer Loop */}
-<button
-  onClick={() => {
-    setNodes([]);
-    setEdges([]);
-    setStatusLog([]);
-    setOutput("");
-    setNodes([
-      {
-        id: "1",
-        type: "agentNode",
-        position: { x: 250, y: 0 },
-        data: agentList.find((a) => a.type === "spec") as AgentData,
-      },
-      {
-        id: "2",
-        type: "agentNode",
-        position: { x: 250, y: 120 },
-        data: agentList.find((a) => a.type === "rtl") as AgentData,
-      },
-      {
-        id: "3",
-        type: "agentNode",
-        position: { x: 250, y: 240 },
-        data: agentList.find((a) => a.type === "opt") as AgentData,
-      },
-    ]);
-    setEdges([
-      { id: "e1-2", source: "1", target: "2" },
-      { id: "e2-3", source: "2", target: "3" },
-    ]);
-  }}
-  className="w-full mb-2 px-3 py-2 text-left rounded-lg bg-indigo-600 hover:bg-indigo-500"
->
-  📑 RTL Optimizer Loop
-</button>
-
-          {/* Doc (Integration/Arch) Loop*/}
-          <button
-            onClick={() => {
-              setNodes([]);
-              setEdges([]);
-              setStatusLog([]);
-              setOutput("");
-              setNodes([
-                { id: "arch1", type: "agentNode", position: { x: 250, y: 0 }, data: agentList.find((a) => a.type === "arch")! },
-                { id: "int1", type: "agentNode", position: { x: 250, y: 120 }, data: agentList.find((a) => a.type === "int")! },
-              ]);
-              setEdges([{ id: "e1-2", source: "arch1", target: "int1" }]);
-            }}
-            className="w-full mb-4 px-3 py-2 text-left rounded-lg bg-indigo-600 hover:bg-indigo-500"
-          >
-            📑 Doc (Integration/Arch) Loop
-          </button>
-
-          {/* Verify Loop */}
-          <button
-            onClick={() => {
-              setNodes([]);
-              setEdges([]);
-              setStatusLog([]);
-              setOutput("");
-              setNodes([
-                { id: "1", type: "agentNode", position: { x: 250, y: 0 }, data: agentList.find((a) => a.type === "spec")! },
-                { id: "2", type: "agentNode", position: { x: 250, y: 120 }, data: agentList.find((a) => a.type === "rtl")! },
-                { id: "3", type: "agentNode", position: { x: 250, y: 240 }, data: agentList.find((a) => a.type === "tb")! },
-                { id: "4", type: "agentNode", position: { x: 250, y: 360 }, data: agentList.find((a) => a.type === "tc")! },
-                { id: "5", type: "agentNode", position: { x: 250, y: 480}, data: agentList.find((a) => a.type === "sva")! },
-                { id: "6", type: "agentNode", position: { x: 250, y: 600}, data: agentList.find((a) => a.type === "fcov")! },
-                { id: "7", type: "agentNode", position: { x: 250, y: 720}, data: agentList.find((a) => a.type === "sim")! },
-              ]);
-              setEdges([
-                { id: "e1-2", source: "1", target: "2" },
-                { id: "e2-3", source: "2", target: "3" },
-                { id: "e3-4", source: "3", target: "4" },
-                { id: "e4-5", source: "4", target: "5" },
-                { id: "e5-6", source: "5", target: "6" },
-                { id: "e5-6", source: "6", target: "7" },
-              ]);
-            }}
-            className="w-full mb-2 px-3 py-2 text-left rounded-lg bg-indigo-600 hover:bg-indigo-500"
-          >
-            📑 Verify Loop
-          </button>
-
-          {/* Global controls */}
-          <button onClick={runWorkflow} className="w-full mb-2 px-3 py-2 rounded-lg bg-green-600 hover:bg-green-500 font-semibold">
-            ▶ Run Workflow
-          </button>
-          <button
-            onClick={() => {
-              setNodes([]);
-              setEdges([]);
-              setStatusLog([]);
-              setOutput("");
-            }}
-            className="w-full mb-2 px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600"
-          >
-            ➕ Add newCustom Workflow
-          </button>
-          <button onClick={saveCurrentWorkflow} className="w-full mb-4 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500">
-            💾 Save Current Workflow as…
-          </button>
-
-          {/* Custom workflows */}
-          <h2 className="text-lg font-bold mt-2 mb-2">My Workflows</h2>
-          {customWorkflows.length === 0 && <div className="text-xs text-slate-400 mb-2">(No saved workflows yet)</div>}
-          {customWorkflows.map((wf) => (
-            <div key={wf} className="flex items-center mb-2">
+          {/* My Workflows */}
+          <section className="mb-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs uppercase text-cyan-400">My Workflows</span>
               <button
-                onClick={() => loadWorkflowByName(wf)}
-                className="flex-1 px-3 py-2 text-left rounded-lg bg-slate-800 hover:bg-slate-700"
+                onClick={saveWorkflow}
+                className="rounded bg-cyan-500 px-2 py-1 text-xs font-bold text-black hover:bg-cyan-400"
               >
-                📁 {wf}
-              </button>
-              <button onClick={() => deleteWorkflow(wf)} className="ml-2 text-red-400 hover:text-red-600">
-                ❌
+                Save
               </button>
             </div>
-          ))}
-        </div>
+            <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+              {customWorkflows.length === 0 && (
+                <div className="text-xs text-slate-500">No saved workflows.</div>
+              )}
+              {customWorkflows.map((w) => (
+                <div
+                  key={w}
+                  className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 hover:bg-slate-700"
+                >
+                  {w}
+                </div>
+              ))}
+            </div>
+          </section>
 
-     {/* Canvas */}
-{/* Canvas */}
-<div className="flex-1 relative">
-  <ReactFlow
-    nodes={nodes}
-    edges={edges}
-    nodeTypes={{ agentNode: AgentNodeComponent }}
-    onNodesChange={onNodesChange}
-    onEdgesChange={onEdgesChange}
-    onConnect={onConnect}
-    fitView
-  >
-    <MiniMap />
-    <Controls />
-    <Background color="#555" gap={16} />
-  </ReactFlow>
+          {/* Controls */}
+          <section className="sticky bottom-0 bg-slate-900/90 backdrop-blur pt-3 border-t border-slate-800">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setShowSpecModal(true)}
+                className="rounded-lg bg-slate-700 px-3 py-2 hover:bg-slate-600"
+              >
+                + New Workflow
+              </button>
+              <button
+                onClick={runWorkflow}
+                className="rounded-lg bg-emerald-600 px-3 py-2 font-bold text-white hover:bg-emerald-500"
+              >
+                Run
+              </button>
+              <button
+                onClick={saveWorkflow}
+                className="rounded-lg bg-cyan-500 px-3 py-2 font-bold text-black hover:bg-cyan-400"
+              >
+                Save
+              </button>
+              <button
+                onClick={clearWorkflow}
+                className="rounded-lg bg-slate-700 px-3 py-2 hover:bg-slate-600"
+              >
+                Clear
+              </button>
+            </div>
+          </section>
+        </aside>
 
-  {(statusLog.length > 0 || output) && (
-    <div className="absolute bottom-0 left-0 right-0 h-64 overflow-auto bg-black/80 text-sm p-3 border-t border-slate-700">
-      <h3 className="font-bold mb-2 text-cyan-400">Agent Execution Log</h3>
-
-      {/* Status messages */}
-      <ul className="space-y-1">
-        {statusLog.map((e, i) => (
-          <li
-            key={i}
-            className={
-              e.type === "success"
-                ? "text-green-400"
-                : e.type === "error"
-                ? "text-red-400"
-                : "text-yellow-300"
-            }
+        {/* Canvas + Logs */}
+        <section className="flex-1 flex flex-col">
+          {/* Canvas */}
+          <div
+            className="relative flex-1"
+            onDrop={onDropCanvas}
+            onDragOver={onDragOverCanvas}
           >
-            {e.text}
-          </li>
-        ))}
-      </ul>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              nodeTypes={{ agentNode: AgentNode }}
+              fitView
+              defaultEdgeOptions={{ animated: true, style: { stroke: "#22d3ee" } }}
+              className="react-flow__container"
+            >
+              <Background color="#0ea5b7" gap={24} />
+              <Controls />
+              <MiniMap pannable zoomable />
+            </ReactFlow>
+          </div>
 
-      {/* ✅ Workflow Results now inside log box */}
-      {output && (
-        <div className="mt-3 text-xs">
-          <WorkflowResults
-            results={JSON.parse(output).workflow_results}
-            artifacts={JSON.parse(output).artifacts}
-          />
-         {jobId && (
-          <div className="mt-4">
-            <h3 className="font-bold text-cyan-400 mb-1">🔴 Live Execution Feed</h3>
-            <WorkflowConsole jobId={jobId} />
-           </div>
-         )}
-        </div>
+          {/* Execution Console / Results */}
+          <div className="border-t border-slate-800 bg-black/70 p-4">
+            <h3 className="mb-2 text-cyan-400 font-semibold">⚡ Workflow Execution</h3>
+            {/* Live feed from Supabase 'workflows' table */}
+            {jobId ? (
+              <WorkflowConsole jobId={jobId} />
+            ) : (
+              <div className="text-sm text-slate-400">No job started yet.</div>
+            )}
+
+            {/* Placeholder for per-agent results (artifacts/links) */}
+            {/* <WorkflowResults results={{}} artifacts={{}} /> */}
+          </div>
+        </section>
+      </div>
+
+      {/* Modals */}
+      {showSpecModal && (
+        <SpecInputModal
+          onClose={() => setShowSpecModal(false)}
+          onSubmit={(text, file) => executeWorkflow({ spec: text, file })}
+        />
       )}
-    </div>
-  )}
-</div>   {/* closes flex-1 relative (Canvas) */}
-</div>   {/* closes flex flex-1 (Sidebar + Canvas) */}
 
-{showSpecModal && (
-  <SpecInputModal
-    onClose={() => setShowSpecModal(false)}
-    onSubmit={(t, f) => executeWorkflow({ spec: t, file: f })}
-  />
-)}
-
-{showCreateAgentModal && (
-  <CreateAgentModal
-    onClose={() => setShowCreateAgentModal(false)}
-    onSubmit={createAgent}
-  />
-)}
-</div>   
-);        // closes return
-}         // closes component
+      {showCreateAgentModal && (
+        <CreateAgentModal
+          onClose={() => setShowCreateAgentModal(false)}
+          onSubmit={(name, desc) => {
+            // Persist locally for now (you can wire to /create_agent later)
+            const next = [...customAgents, { label: name, desc }];
+            setCustomAgents(next);
+            localStorage.setItem("custom_agents", JSON.stringify(next));
+          }}
+        />
+      )}
+    </main>
+  );
+}

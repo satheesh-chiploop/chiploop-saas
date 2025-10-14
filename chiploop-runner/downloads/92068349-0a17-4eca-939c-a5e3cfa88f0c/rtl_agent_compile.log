@@ -1,0 +1,101 @@
+RTL Validation Log — 2025-10-12 19:43:12.285254
+
+✅ Verilog syntax check passed.
+
+✅ All spec ports found in RTL.
+
+🔍 LLM Review Summary:
+{"model":"llama3","created_at":"2025-10-12T19:42:45.034101584Z","response":"module","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:45.334674608Z","response":" auto","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:45.667656443Z","response":"_module","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:45.967657871Z","response":"(\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:46.260582877Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:46.554963867Z","response":" input","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:46.859663663Z","response":" wire","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:47.150684044Z","response":" clk","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:47.440140918Z","response":",\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:47.740590135Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:48.039723766Z","response":" input","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:48.33002932Z","response":" wire","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:48.623136152Z","response":" reset","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:48.924892891Z","response":",\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:49.223450308Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:49.514498824Z","response":" input","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:49.804830057Z","response":" wire","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:50.106747071Z","response":" enable","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:50.398737214Z","response":",\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:50.698347499Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:50.987784606Z","response":" output","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:51.274009315Z","response":" reg","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:51.573730652Z","response":" [","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:51.866418529Z","response":"3","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:52.159734498Z","response":":","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:52.451639559Z","response":"0","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:52.739507908Z","response":"]","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:53.038676485Z","response":" count","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:53.327631717Z","response":"\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:53.617526233Z","response":");\n\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:53.917841427Z","response":"always","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:54.208017857Z","response":" @(","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:54.50512942Z","response":"posed","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:54.802925153Z","response":"ge","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:55.097654614Z","response":" clk","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:55.384768151Z","response":")","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:55.677479203Z","response":" begin","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:55.973195939Z","response":"\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:56.259859131Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:56.549818229Z","response":" if","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:56.857785437Z","response":" (","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:57.15114505Z","response":"reset","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:57.444632676Z","response":")","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:57.750220748Z","response":" begin","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:58.058889377Z","response":"\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:58.361376996Z","response":"   ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:58.644761865Z","response":" count","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:58.950021745Z","response":" \u003c=","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:59.240025578Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:59.525109664Z","response":"4","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:42:59.816399999Z","response":"'b","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:00.11764033Z","response":"000","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:00.401674052Z","response":"0","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:00.694880744Z","response":";\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:00.986423869Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:01.281219718Z","response":" end","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:01.583061721Z","response":" else","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:01.881244739Z","response":" if","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:02.190884132Z","response":" (!","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:02.49288183Z","response":"enable","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:02.783117644Z","response":")","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:03.06935544Z","response":" begin","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:03.35614358Z","response":"\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:03.644882002Z","response":"   ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:03.929422035Z","response":" count","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:04.209377245Z","response":" \u003c=","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:04.487352468Z","response":" count","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:04.764179212Z","response":";","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:05.047975322Z","response":" //","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:05.32979372Z","response":" remove","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:05.617185616Z","response":" unnecessary","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:05.908558018Z","response":" assignment","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:06.188745269Z","response":"\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:06.471009073Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:06.752409706Z","response":" end","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:07.034648913Z","response":" else","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:07.312131832Z","response":" begin","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:07.621396484Z","response":"\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:07.908008972Z","response":"   ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:08.214070794Z","response":" count","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:08.496697196Z","response":" \u003c=","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:08.790667038Z","response":" count","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:09.074815509Z","response":" +","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:09.354870069Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:09.63208044Z","response":"1","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:09.907353915Z","response":";\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:10.186280655Z","response":" ","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:10.471580581Z","response":" end","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:10.775167626Z","response":"\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:11.079653829Z","response":"end","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:11.377177247Z","response":"\n\n","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:11.683377754Z","response":"end","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:11.979608938Z","response":"module","done":false}
+{"model":"llama3","created_at":"2025-10-12T19:43:12.277521163Z","response":"","done":true,"done_reason":"stop","context":[128006,882,128007,1432,2675,527,264,10195,64835,56614,627,2127,56956,279,2768,6383,51873,2082,369,904,12496,477,1742,4819,320,1962,20047,4390,9370,5730,553,4819,9539,627,8238,2771,3770,5718,527,8272,198,32215,52389,8499,6383,51873,12,1049,20,2082,369,420,26185,627,5207,2011,1212,449,364,4450,6,323,842,449,364,408,4450,24482,5519,4276,2997,51594,2082,70255,477,41941,627,65539,682,20946,527,14610,4871,75075,304,279,4793,18489,13,720,53216,23329,16068,315,17738,1093,46898,11,7738,11,477,4279,20946,627,4959,8450,374,14610,1193,3131,4028,682,13761,627,5519,539,13454,1595,33683,7964,1595,9915,7964,477,904,1988,48116,304,1207,11786,422,2736,14610,304,279,1948,4793,627,53216,37631,6471,15285,320,4908,602,8,31550,627,32215,4335,52389,8499,6383,51873,449,13263,70692,198,5519,4276,2997,5732,38814,1093,1595,3576,7964,1595,12837,7964,477,2587,19170,627,3812,1475,5224,449,264,5347,39617,323,3345,449,1595,408,4450,63,1193,3131,627,61524,1193,98031,481,6383,51873,92374,10351,51873,2082,2001,912,41941,477,6170,4994,279,2082,627,23080,682,1988,48116,16068,21650,198,12,5560,43147,8450,5144,627,12,62410,682,20946,21650,627,12,1789,5361,51437,11,1893,9678,2744,10215,627,12,1789,2585,477,35884,14769,11,24499,8475,12496,97975,627,4450,3313,10983,1021,220,1988,9244,46898,345,220,1988,9244,7738,345,220,1988,9244,7431,345,220,2612,1239,510,18,25,15,60,1797,198,629,33222,43281,3950,713,46898,8,3240,198,220,422,320,9915,8,3240,198,262,1797,2717,220,19,91953,931,15,280,220,842,775,422,320,12837,8,3240,198,262,1797,2717,1797,489,220,16,280,220,842,198,408,271,408,4450,198,128009,128006,78191,128007,271,4450,3313,10983,1021,220,1988,9244,46898,345,220,1988,9244,7738,345,220,1988,9244,7431,345,220,2612,1239,510,18,25,15,60,1797,198,629,33222,43281,3950,713,46898,8,3240,198,220,422,320,9915,8,3240,198,262,1797,2717,220,19,91953,931,15,280,220,842,775,422,1533,12837,8,3240,198,262,1797,2717,1797,26,443,4148,26225,16720,198,220,842,775,3240,198,262,1797,2717,1797,489,220,16,280,220,842,198,408,271,408,4450],"total_duration":77120424971,"load_duration":121889740,"prompt_eval_count":336,"prompt_eval_duration":49750323056,"eval_count":94,"eval_duration":27247375306}
