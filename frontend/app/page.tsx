@@ -18,8 +18,8 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import AgentNode from "./AgentNode";
-import WorkflowConsole from "./WorkflowConsole";
+import AgentNode from "./workflow/AgentNode";
+import WorkflowConsole from "./workflow/WorkflowConsole";
 // import WorkflowResults from "./WorkflowResults"; // keep handy if you want to show artifacts
 
 /* =========================
