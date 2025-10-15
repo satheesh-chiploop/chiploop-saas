@@ -209,8 +209,15 @@ function CreateAgentModal({
 /* =========================
    Page
 ========================= */
-
-export default function WorkflowPage() {
+export default function WorkflowPageWrapper() {
+  // ✅ Wrap your page in the provider
+  return (
+    <ReactFlowProvider>
+      <WorkflowPage />
+    </ReactFlowProvider>
+  );
+}
+function WorkflowPage() {
   const router = useRouter();
   const rf = useReactFlow();
 
