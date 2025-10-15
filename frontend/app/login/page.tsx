@@ -45,7 +45,7 @@ export default function LoginPage() {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${location.origin}/auth/callback` },
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
       });
       if (error) throw error;
       toast.success("Magic link sent to your email!");
@@ -58,7 +58,7 @@ export default function LoginPage() {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: `${location.origin}/auth/callback` },
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
       });
       if (error) throw error;
       toast("Redirecting to " + provider.toUpperCase() + "…");
