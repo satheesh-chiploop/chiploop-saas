@@ -2,7 +2,8 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+#import { createClient } from "@supabase/supabase-js";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"; 
 
 import ReactFlow, {
   addEdge,
@@ -38,10 +39,7 @@ type AgentNodeData = {
 
 type LogEntry = { text: string; type: "info" | "success" | "error" };
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+
 const supabase = createClientComponentClient({
   cookieOptions: {
     sameSite: "lax",
