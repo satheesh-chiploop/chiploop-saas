@@ -233,16 +233,44 @@ function WorkflowPage() {
   const [showSpecModal, setShowSpecModal] = useState(false);
   const [showCreateAgentModal, setShowCreateAgentModal] = useState(false);
 
-  /* ---------- Auth gate ---------- */
   useEffect(() => {
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { router.push("/login"); return; }
+  let mounted = true;
+  const checkSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!mounted) return;
+
+    if (session) {
+      // ✅ Logged in: load user data
       const savedAgents = JSON.parse(localStorage.getItem("custom_agents") || "[]");
       const savedWorkflows = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
       setCustomAgents(savedAgents);
       setCustomWorkflows(savedWorkflows.map((k) => k.replace("workflow_", "")));
-    })();
+    } else {
+      // 🕐 Wait a bit and recheck before forcing redirect
+      setTimeout(async () => {
+        const { data: { session: retry } } = await supabase.auth.getSession();
+        if (!retry) router.push("/login");
+      }, 800); // give cookies time to settle
+    }
+  };
+
+  checkSession();
+
+  const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    if (session) {
+      const savedAgents = JSON.parse(localStorage.getItem("custom_agents") || "[]");
+      const savedWorkflows = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
+      setCustomAgents(savedAgents);
+      setCustomWorkflows(savedWorkflows.map((k) => k.replace("workflow_", "")));
+    } else {
+      router.push("/login");
+    }
+   });
+
+   return () => {
+    mounted = false;
+    listener.subscription.unsubscribe();
+   };
   }, [router]);
 
   /* ---------- Drag & Drop ---------- */

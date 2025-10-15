@@ -11,13 +11,14 @@ export async function GET(request: Request) {
     try {
       // Exchange the code for a session and set cookies
       await supabase.auth.exchangeCodeForSession(code);
+      await new Promise((r) => setTimeout(r, 500));
       console.log("✅ Supabase session created");
     } catch (error) {
       console.error("❌ Error exchanging session:", error);
       return NextResponse.redirect(`${requestUrl.origin}/login?error=auth_failed`);
     }
   }
-  await new Promise((r) => setTimeout(r, 200));
+
   // ✅ Redirect to workflow page
   return NextResponse.redirect(`${requestUrl.origin}/workflow`);
 }
