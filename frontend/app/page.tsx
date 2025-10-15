@@ -4,22 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
-import ReactFlow, {
-  addEdge,
-  Background,
-  Controls,
-  MiniMap,
-  useEdgesState,
-  useNodesState,
-  Connection,
-  Edge,
-  Node,
-  useReactFlow,
-} from "reactflow";
-import "reactflow/dist/style.css";
 
-import AgentNode from "./workflow/AgentNode";
-import WorkflowConsole from "./workflow/WorkflowConsole";
 // import WorkflowResults from "./WorkflowResults"; // keep handy if you want to show artifacts
 
 /* =========================
