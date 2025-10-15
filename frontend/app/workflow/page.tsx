@@ -18,9 +18,9 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-import AgentNode from "./workflow/AgentNode";
-import WorkflowConsole from "./workflow/WorkflowConsole";
-import WorkflowResults from "./workflow/WorkflowResults";
+import AgentNode from "./AgentNode";
+import WorkflowConsole from "./WorkflowConsole";
+import WorkflowResults from "./WorkflowResults";
 
 /* =========================
    Setup
