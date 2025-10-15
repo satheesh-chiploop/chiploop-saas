@@ -42,7 +42,12 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-
+const supabase = createClientComponentClient({
+  cookieOptions: {
+    sameSite: "lax",
+    path: "/",
+  },
+});
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 // Catalog item: pretty text + exact backend label (MUST match backend main.py)
