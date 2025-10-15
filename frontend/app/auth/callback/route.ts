@@ -17,7 +17,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${requestUrl.origin}/login?error=auth_failed`);
     }
   }
-
+  await new Promise((r) => setTimeout(r, 200));
   // ✅ Redirect to workflow page
   return NextResponse.redirect(`${requestUrl.origin}/workflow`);
 }
