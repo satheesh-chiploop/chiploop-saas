@@ -202,12 +202,31 @@ function WorkflowPage() {
 
   const prebuiltWorkflows = useMemo(() => {
     const all = {
-      digital: ["Verify Loop", "Timing Closure Loop", "Spec → RTL Flow"],
+      digital: ["Verify Loop", "Spec2RTL"],
       analog: ["Analog RC Filter", "OpAmp Design Flow", "PLL Verification"],
       embedded: ["Firmware Build Flow", "Co-Sim Integration", "Driver Verification"],
     };
     return all[loop];
   }, [loop]);
+
+  const loadPrebuiltWorkflow = (wf: string) => {
+    // clear existing canvas
+    setNodes([]);
+    setEdges([]);
+  
+    if (loop === "digital" && wf.includes("Spec → RTL")) {
+      const n: Node<AgentNodeData>[] = [
+        { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
+        { id: "rtl",  type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
+      ];
+      const e: Edge[] = [
+        { id: "e-spec-rtl", source: "spec", target: "rtl", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+      ];
+      setNodes(n);
+      setEdges(e);
+    }
+  };
+  
 
   /* =========================
      Render
@@ -297,16 +316,21 @@ function WorkflowPage() {
                 )}
               </ul>
             </section>
-
             <section>
               <h3 className="text-cyan-400 font-semibold mb-2">Prebuilt Workflows</h3>
-              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1 hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {prebuiltWorkflows.map((wf) => (
-                  <li key={wf} className="px-2 py-1 rounded hover:bg-slate-800">{wf}</li>
+                  <li
+                    key={wf}
+                    onClick={() => loadPrebuiltWorkflow(wf)}
+                    className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
+                  >
+                    {wf}
+                  </li>
                 ))}
               </ul>
             </section>
-
+            
             <section>
               <h3 className="text-cyan-400 font-semibold mb-2">Custom Workflows</h3>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
