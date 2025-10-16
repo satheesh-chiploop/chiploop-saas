@@ -5,6 +5,8 @@ import os
 import json
 import uuid
 import traceback
+import httpx
+import time;time.sleep(0.2)
 from datetime import datetime
 from typing import Dict, Any, Optional
 
@@ -217,7 +219,7 @@ async def run_workflow(
     """
     try:
         user = verify_token(request)
-        user_id = user.get("sub") if user and user.get("sub") else None
+        user_id = user.get("sub") if user and user.get("sub") and user.get("sub") != "anonymous" else None
         workflow_id = str(uuid.uuid4())
         run_id = str(uuid.uuid4())
         now = datetime.utcnow().isoformat()
@@ -226,23 +228,23 @@ async def run_workflow(
         # payload contains nodes with exact backend "label"
         loop_type = (data.get("loop_type") or "digital").lower().strip()
 
-        # Insert workflow row (back-compat with current UI)
         supabase.table("workflows").insert({
-            "id": workflow_id,
-            "user_id": user_id,
-            "name": f"{loop_type.capitalize()} Loop Run",
-            "status": "running",
-            "phase": "queued",
-            "logs": "🚀 Workflow queued.",
-            "created_at": now,
-            "updated_at": now,
-            "artifacts": {},
-            "loop_type": loop_type,
-            "definitions": data
+           "id": workflow_id,
+           "user_id": user_id,
+           "name": f"{loop_type.capitalize()} Loop Run",
+           "status": "running",
+           "phase": "queued",
+           "logs": "🚀 Workflow queued.",
+           "created_at": now,
+           "updated_at": now,
+           "artifacts": {},
+           "loop_type": loop_type,
+           "definitions": data
         }).execute()
 
         # Prepare artifact dir
-        artifact_dir = os.path.join("artifacts", user_id, workflow_id)
+        user_folder = str(user_id or "anonymous") 
+        artifact_dir = os.path.join("artifacts", user_folder, workflow_id)
         os.makedirs(artifact_dir, exist_ok=True)
 
         # Save uploaded file (optional)
@@ -272,6 +274,7 @@ async def run_workflow(
 
         append_log_workflow(workflow_id, f"📘 Loop: {loop_type}", phase="start")
         append_log_run(run_id, f"📘 Loop: {loop_type}")
+        time.sleep(0.2)
 
         # Queue background execution
         background_tasks.add_task(
@@ -328,14 +331,17 @@ def execute_workflow_background(
 
         append_log_workflow(workflow_id, "⚡ Executing workflow agents ...")
         append_log_run(run_id, "⚡ Executing workflow agents ...")
+        time.sleep(0.2)
 
         nodes = data.get("nodes", []) or []
         for node in nodes:
             label = (node or {}).get("label", "")
             step = label or "agent"
-
-            append_log_workflow(workflow_id, f"⚙️ Running {step} ...")
-            append_log_run(run_id, f"⚙️ Running {step} ...")
+            msg = f"⚙️ Running {step} ..."
+            logger.info(msg)
+            append_log_workflow(workflow_id, msg)
+            append_log_run(run_id, msg)
+            time.sleep(0.2)
 
             # Queue to external runner at Simulation phase (for any loop)
             if " sim agent" in step.lower():
@@ -349,6 +355,7 @@ def execute_workflow_background(
 
                 append_log_workflow(workflow_id, "🟡 Queued for ChipRunner (Simulation phase).", phase="simulation")
                 append_log_run(run_id, "🟡 Queued for ChipRunner (Simulation phase).", status="queued", artifacts_path=artifact_dir)
+                time.sleep(0.2)
                 return  # external runner will pick up
 
             # Resolve function
@@ -357,6 +364,7 @@ def execute_workflow_background(
                 msg = f"❌ No agent implementation found for: {step}"
                 append_log_workflow(workflow_id, msg)
                 append_log_run(run_id, msg)
+                time.sleep(0.2)
                 continue
 
             try:
@@ -388,21 +396,27 @@ def execute_workflow_background(
                     }
                     supabase.table("workflows").update({"artifacts": artifacts}).eq("id", workflow_id).execute()
 
-                append_log_workflow(workflow_id, f"✅ {step} done")
-                append_log_run(run_id, f"✅ {step} done")
+                msg = f"✅ {step} done"
+                logger.info(msg)
+                append_log_workflow(workflow_id, msg)
+                append_log_run(run_id, msg)
+                time.sleep(0.2)
 
             except Exception as agent_err:
                 err = f"❌ {step} failed: {agent_err}"
                 append_log_workflow(workflow_id, err)
                 append_log_run(run_id, err)
+                time.sleep(0.2)
 
         append_log_workflow(workflow_id, "🎉 Workflow complete", status="completed", phase="done")
         append_log_run(run_id, "🎉 Run complete", status="completed")
+        time.sleep(0.2)
 
     except Exception as e:
         err = f"❌ Workflow crashed: {e}\n{traceback.format_exc()}"
         append_log_workflow(workflow_id, err, status="failed", phase="error")
         append_log_run(run_id, err, status="failed")
+        time.sleep(0.2)
 from fastapi import Body
 from fastapi.responses import FileResponse
 from pathlib import Path

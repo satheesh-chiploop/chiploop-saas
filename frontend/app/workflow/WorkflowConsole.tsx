@@ -19,14 +19,14 @@ type TableName = "workflows" | "runs";
 
 export default function WorkflowConsole({
   jobId,
-  table = "workflows",
+  table = "workflows,runs",
 }: {
   jobId: string;
-  table?: TableName;
+  table?: TableName | string;
 }) {
   const [logs, setLogs] = useState<string[]>([]);
   const [status, setStatus] = useState("starting");
-  const consoleRef = useRef<HTMLDivElement | null>(null); // ✅ ref for autoscroll
+  const consoleRef = useRef<HTMLDivElement | null>(null);
 
   const channelName = useMemo(() => `realtime:public:${table}`, [table]);
 
@@ -36,7 +36,7 @@ export default function WorkflowConsole({
     // 1️⃣ Initial fetch
     const fetchInitial = async () => {
       const { data, error } = await supabase
-        .from(table)
+        .from("workflows")
         .select("status, logs")
         .eq("id", jobId)
         .single<WorkflowRow>();
@@ -46,36 +46,51 @@ export default function WorkflowConsole({
     };
     fetchInitial();
 
-    // 2️⃣ Realtime subscription
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table, filter: `id=eq.${jobId}` },
-        (payload) => {
-          const updated = payload.new as WorkflowRow;
-          if (updated?.logs) setLogs((updated.logs || "").split("\n"));
-          if (updated?.status) setStatus(updated.status || "unknown");
-        }
-      )
-      .subscribe();
+    // 2️⃣ Realtime subscription + polling fallback
+    const tables = table.split(",");
+    const channels: any[] = [];
 
-    // 3️⃣ Poll fallback (3s)
-    const poll = setInterval(async () => {
+    try {
+      tables.forEach((t) => {
+        const ch = supabase
+          .channel(`realtime:public:${t}`)
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: t, filter: `id=eq.${jobId}` },
+            (payload) => {
+              const updated = payload.new as WorkflowRow;
+              if (updated?.logs) setLogs((updated.logs || "").split("\n"));
+              if (updated?.status) setStatus(updated.status || "unknown");
+            }
+          )
+          .subscribe((status) => {
+            if (status === "SUBSCRIBED") {
+              console.log(`✅ Subscribed to realtime for ${t}`);
+            }
+          });
+        channels.push(ch);
+      });
+    } catch (err) {
+      console.warn("⚠️ Realtime unavailable, will use polling fallback:", err);
+    }
+
+    // 3️⃣ Poll fallback (runs every 3s)
+    const poller = setInterval(async () => {
       const { data, error } = await supabase
-        .from(table)
+        .from("workflows")
         .select("status, logs")
         .eq("id", jobId)
         .single<WorkflowRow>();
-      if (error) return;
-      if (data?.logs) setLogs((data.logs || "").split("\n"));
-      if (data?.status) setStatus(data.status || "unknown");
+      if (!error && data) {
+        if (data.logs) setLogs((data.logs || "").split("\n"));
+        if (data.status) setStatus(data.status || "unknown");
+      }
     }, 3000);
 
     // 4️⃣ Cleanup
     return () => {
-      clearInterval(poll);
-      supabase.removeChannel(channel);
+      clearInterval(poller);
+      channels.forEach((ch) => supabase.removeChannel(ch));
     };
   }, [jobId, table, channelName]);
 
@@ -86,7 +101,7 @@ export default function WorkflowConsole({
     }
   }, [logs]);
 
-  // 🎨 Colors for log lines
+  // 🎨 Log colors
   const colorFor = (line: string) => {
     if (line.includes("❌")) return "text-red-400";
     if (line.includes("✅")) return "text-green-400";
@@ -99,7 +114,7 @@ export default function WorkflowConsole({
 
   return (
     <div
-      ref={consoleRef} // ✅ attach ref for autoscroll
+      ref={consoleRef}
       className="mt-4 rounded-lg border border-slate-700 bg-slate-900/80 p-4 font-mono text-sm text-slate-200 shadow-md h-72 overflow-y-auto"
     >
       <div className="mb-2 border-b border-slate-700 pb-1 text-cyan-400">
