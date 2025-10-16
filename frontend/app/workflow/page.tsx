@@ -214,7 +214,7 @@ function WorkflowPage() {
     setNodes([]);
     setEdges([]);
   
-    if (loop === "digital" && wf.includes("Spec → RTL")) {
+    if (loop === "digital" && wf.includes("Spec2RTL")) {
       const n: Node<AgentNodeData>[] = [
         { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
         { id: "rtl",  type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
