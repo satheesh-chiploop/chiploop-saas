@@ -32,22 +32,22 @@ type CatalogItem = { uiLabel: string; backendLabel: string; desc?: string };
 
 const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
   digital: [
-    { uiLabel: "Spec Agent",          backendLabel: "Digital Spec Agent",         desc: "Capture design spec & I/Os" },
-    { uiLabel: "RTL Agent",           backendLabel: "Digital RTL Agent",          desc: "Generate synthesizable RTL" },
-    { uiLabel: "Verification Agent",  backendLabel: "Digital Testbench Agent",    desc: "Create TB & assertions" },
-    { uiLabel: "Sim Agent",           backendLabel: "Digital Sim Agent",          desc: "Compile & simulate" },
+    { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent", desc: "Capture design spec & I/Os" },
+    { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent", desc: "Generate synthesizable RTL" },
+    { uiLabel: "Verification Agent", backendLabel: "Digital Testbench Agent", desc: "Create TB & assertions" },
+    { uiLabel: "Sim Agent", backendLabel: "Digital Sim Agent", desc: "Compile & simulate" },
   ],
   analog: [
-    { uiLabel: "Spec Agent",          backendLabel: "Analog Spec Agent",          desc: "Analog specs & targets" },
-    { uiLabel: "Netlist Agent",       backendLabel: "Analog Netlist Agent",       desc: "Schematic/topology" },
-    { uiLabel: "Sim Agent",           backendLabel: "Analog Sim Agent",           desc: "SPICE/AMS runs" },
-    { uiLabel: "Result Agent",        backendLabel: "Analog Result Agent",        desc: "Summarize results" },
+    { uiLabel: "Spec Agent", backendLabel: "Analog Spec Agent", desc: "Analog specs & targets" },
+    { uiLabel: "Netlist Agent", backendLabel: "Analog Netlist Agent", desc: "Schematic/topology" },
+    { uiLabel: "Sim Agent", backendLabel: "Analog Sim Agent", desc: "SPICE/AMS runs" },
+    { uiLabel: "Result Agent", backendLabel: "Analog Result Agent", desc: "Summarize results" },
   ],
   embedded: [
-    { uiLabel: "Spec Agent",          backendLabel: "Embedded Spec Agent",        desc: "Firmware/SoC reqs" },
-    { uiLabel: "Code Agent",          backendLabel: "Embedded Code Agent",        desc: "Drivers & firmware" },
-    { uiLabel: "Sim Agent",           backendLabel: "Embedded Sim Agent",         desc: "Run harness / co-sim" },
-    { uiLabel: "Result Agent",        backendLabel: "Embedded Result Agent",      desc: "Summarize outputs" },
+    { uiLabel: "Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware/SoC reqs" },
+    { uiLabel: "Code Agent", backendLabel: "Embedded Code Agent", desc: "Drivers & firmware" },
+    { uiLabel: "Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
+    { uiLabel: "Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize outputs" },
   ],
 };
 
@@ -84,13 +84,15 @@ function WorkflowPage() {
   const [showSpecModal, setShowSpecModal] = useState(false);
   const [showCreateAgentModal, setShowCreateAgentModal] = useState(false);
 
-  /* ---------- Auth gate (lightweight, no loop) ---------- */
+  // workflow console tab state
+  const [activeTab, setActiveTab] = useState<"summary" | "live" | "output">("summary");
+
+  /* ---------- Auth gate ---------- */
   useEffect(() => {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) router.push("/login");
       else {
-        // restore local catalog
         const savedAgents = JSON.parse(localStorage.getItem("custom_agents") || "[]");
         const savedWF = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
         setCustomAgents(savedAgents);
@@ -99,24 +101,24 @@ function WorkflowPage() {
     })();
   }, [supabase, router]);
 
-  /* ---------- Default Verify Loop (Spec→RTL→Verification→Sim) ---------- */
+  /* ---------- Default Verify Loop ---------- */
   useEffect(() => {
     const n: Node<AgentNodeData>[] = [
-      { id: "spec", type: "agentNode", position: { x: 60,  y: 180 }, data: { uiLabel: "Spec Agent",         backendLabel: "Digital Spec Agent" } },
-      { id: "rtl",  type: "agentNode", position: { x: 300, y: 180 }, data: { uiLabel: "RTL Agent",          backendLabel: "Digital RTL Agent" } },
-      { id: "tb",   type: "agentNode", position: { x: 540, y: 180 }, data: { uiLabel: "Verification Agent", backendLabel: "Digital Testbench Agent" } },
-      { id: "sim",  type: "agentNode", position: { x: 780, y: 180 }, data: { uiLabel: "Sim Agent",          backendLabel: "Digital Sim Agent" } },
+      { id: "spec", type: "agentNode", position: { x: 60, y: 180 }, data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
+      { id: "rtl", type: "agentNode", position: { x: 300, y: 180 }, data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
+      { id: "tb", type: "agentNode", position: { x: 540, y: 180 }, data: { uiLabel: "Verification Agent", backendLabel: "Digital Testbench Agent" } },
+      { id: "sim", type: "agentNode", position: { x: 780, y: 180 }, data: { uiLabel: "Sim Agent", backendLabel: "Digital Sim Agent" } },
     ];
     const e: Edge[] = [
       { id: "e-spec-rtl", source: "spec", target: "rtl", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-      { id: "e-rtl-tb",   source: "rtl",  target: "tb",  animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-      { id: "e-tb-sim",   source: "tb",   target: "sim", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+      { id: "e-rtl-tb", source: "rtl", target: "tb", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+      { id: "e-tb-sim", source: "tb", target: "sim", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
     ];
     setNodes(n);
     setEdges(e);
   }, []);
 
-  /* ---------- Drag & Drop: Sidebar → Canvas ---------- */
+  /* ---------- Drag & Drop ---------- */
   const onDragStartAgent = (ev: React.DragEvent, item: CatalogItem) => {
     ev.dataTransfer.setData("application/reactflow", JSON.stringify(item));
     ev.dataTransfer.effectAllowed = "move";
@@ -134,7 +136,6 @@ function WorkflowPage() {
       if (!raw) return;
       const agent: CatalogItem = JSON.parse(raw);
 
-      // project mouse coords into RF space
       const bounds = (ev.currentTarget as HTMLDivElement).getBoundingClientRect();
       const position = rf.project({ x: ev.clientX - bounds.left, y: ev.clientY - bounds.top });
 
@@ -147,11 +148,9 @@ function WorkflowPage() {
       };
 
       setNodes((nds) => nds.concat(newNode));
-
-      // optional: auto-connect from the right-most node to the new node
       setEdges((eds) => {
-        if (ndsOr(eds).length === 0) return eds;
-        const lastNode = getRightMostNode(ndsOr(nodes));
+        if (nodes.length === 0) return eds;
+        const lastNode = getRightMostNode(nodes);
         if (!lastNode) return eds;
         const newEdge: Edge = {
           id: `e-${lastNode.id}-${id}`,
@@ -163,18 +162,14 @@ function WorkflowPage() {
         return eds.concat(newEdge);
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [rf, nodes, setNodes, setEdges]
   );
-
-  const ndsOr = (eds: Edge[]) => nodes; // tiny helper for closure
 
   const getRightMostNode = (nds: Node[]) => {
     if (!nds.length) return null;
     return nds.reduce((acc, n) => (n.position.x > acc.position.x ? n : acc), nds[0]);
   };
 
-  /* ---------- Connectors via onConnect ---------- */
   const onConnect = useCallback(
     (params: Connection | Edge) => setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: "#22d3ee" } }, eds)),
     [setEdges]
@@ -182,7 +177,6 @@ function WorkflowPage() {
 
   /* ---------- Actions ---------- */
   const runWorkflow = async () => {
-    // Insert a workflow row so WorkflowConsole can stream
     const { data, error } = await supabase
       .from("workflows")
       .insert([{ name: "Verify Loop", status: "running", logs: "🚀 Started verify loop...\n" }])
@@ -191,6 +185,7 @@ function WorkflowPage() {
 
     if (error || !data?.id) return;
     setJobId(data.id as string);
+    setActiveTab("live");
   };
 
   const saveWorkflowLocal = () => {
@@ -205,12 +200,21 @@ function WorkflowPage() {
   /* ---------- Derived ---------- */
   const prebuiltAgents = useMemo(() => LOOP_AGENTS[loop], [loop]);
 
+  const prebuiltWorkflows = useMemo(() => {
+    const all = {
+      digital: ["Verify Loop", "Timing Closure Loop", "Spec → RTL Flow"],
+      analog: ["Analog RC Filter", "OpAmp Design Flow", "PLL Verification"],
+      embedded: ["Firmware Build Flow", "Co-Sim Integration", "Driver Verification"],
+    };
+    return all[loop];
+  }, [loop]);
+
   /* =========================
      Render
   ========================= */
   return (
     <main className="min-h-screen bg-[#0b0b0c] text-white flex flex-col">
-      {/* Top bar (kept simple & consistent with Landing) */}
+      {/* Top bar */}
       <nav className="w-full flex justify-between items-center px-6 py-4 bg-black/70 backdrop-blur border-b border-slate-800">
         <div onClick={() => router.push("/")} className="text-2xl font-extrabold text-cyan-400 cursor-pointer">CHIPLOOP ⚡</div>
         <div className="flex items-center gap-6 text-slate-300">
@@ -228,7 +232,6 @@ function WorkflowPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* ===== Sidebar ===== */}
         <aside className="w-full max-w-xs bg-slate-900/70 border-r border-slate-800 p-4 overflow-hidden flex flex-col">
-          {/* Loop + Filter (fixed) */}
           <div className="mb-3">
             <label className="block text-xs uppercase text-cyan-400 mb-2">Loop</label>
             <select
@@ -241,18 +244,19 @@ function WorkflowPage() {
               <option value="embedded">Embedded Loop</option>
             </select>
 
-            <input
-              type="text"
-              placeholder="Filter agents..."
-              className="mt-3 w-full bg-slate-800 text-white placeholder-gray-400 rounded-md p-2 border border-slate-700 focus:ring-2 focus:ring-cyan-400"
-            />
+            <div className="mt-3 max-h-12 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              <input
+                type="text"
+                placeholder="Filter agents..."
+                className="w-full bg-slate-800 text-white placeholder-gray-400 rounded-md p-2 border border-slate-700 focus:ring-2 focus:ring-cyan-400"
+              />
+            </div>
           </div>
 
-          {/* Scrollable lists */}
           <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
             <section>
               <h3 className="text-cyan-400 font-semibold mb-2">Prebuilt Agents</h3>
-              <ul className="space-y-1 text-sm text-gray-300">
+              <ul className="space-y-1 text-sm text-gray-300 max-h-40 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {prebuiltAgents.map((a) => (
                   <li
                     key={a.backendLabel}
@@ -275,9 +279,9 @@ function WorkflowPage() {
               >
                 + Add New Agent
               </button>
-              {customAgents?.length ? (
-                <ul className="mt-2 space-y-1 text-sm text-gray-300">
-                  {customAgents.map((a, idx) => (
+              <ul className="mt-2 space-y-1 text-sm text-gray-300 max-h-40 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                {customAgents.length ? (
+                  customAgents.map((a, idx) => (
                     <li
                       key={`${a.backendLabel}-${idx}`}
                       draggable
@@ -286,41 +290,39 @@ function WorkflowPage() {
                     >
                       {a.uiLabel}
                     </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-2 text-xs text-slate-400">No custom agents yet</p>
-              )}
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400">No custom agents yet</p>
+                )}
+              </ul>
             </section>
 
             <section>
               <h3 className="text-cyan-400 font-semibold mb-2">Prebuilt Workflows</h3>
-              <ul className="space-y-1 text-sm text-gray-300 max-h-40 overflow-y-auto pr-1">
-                <li className="px-2 py-1 rounded hover:bg-slate-800">Verify Loop</li>
-                <li className="px-2 py-1 rounded hover:bg-slate-800">Timing Closure Loop</li>
-                <li className="px-2 py-1 rounded hover:bg-slate-800">Spec → RTL Flow</li>
-                <li className="px-2 py-1 rounded hover:bg-slate-800">Analog RC Filter</li>
+              <ul className="space-y-1 text-sm text-gray-300 max-h-40 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                {prebuiltWorkflows.map((wf) => (
+                  <li key={wf} className="px-2 py-1 rounded hover:bg-slate-800">{wf}</li>
+                ))}
               </ul>
             </section>
 
             <section>
               <h3 className="text-cyan-400 font-semibold mb-2">Custom Workflows</h3>
-              {customWorkflows.length ? (
-                <ul className="space-y-1 text-sm text-gray-300">
-                  {customWorkflows.map((w) => (
+              <ul className="space-y-1 text-sm text-gray-300 max-h-40 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                {customWorkflows.length ? (
+                  customWorkflows.map((w) => (
                     <li key={w} className="px-2 py-1 rounded hover:bg-slate-800">{w}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-slate-400">None created yet</p>
-              )}
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400">None created yet</p>
+                )}
+              </ul>
             </section>
           </div>
         </aside>
 
         {/* ===== Canvas & Console ===== */}
         <section className="flex-1 flex flex-col p-4">
-          {/* Canvas */}
           <div
             className="relative flex-1 border border-slate-800 rounded-xl overflow-hidden bg-black/60"
             onDrop={onDropCanvas}
@@ -342,30 +344,46 @@ function WorkflowPage() {
             </ReactFlow>
           </div>
 
-          {/* Buttons BELOW canvas */}
           <div className="flex justify-center gap-4 py-4 border-t border-slate-800 bg-black/40 mt-4">
-            <button onClick={() => setShowSpecModal(true)} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">
-              + Add Workflow
-            </button>
-            <button onClick={runWorkflow} className="rounded-lg bg-emerald-600 px-4 py-2 font-bold text-white hover:bg-emerald-500">
-              Run Workflow
-            </button>
-            <button onClick={saveWorkflowLocal} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
-              Save
-            </button>
-            <button onClick={clearWorkflow} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">
-              Clear
-            </button>
+            <button onClick={() => setShowSpecModal(true)} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">+ Add Workflow</button>
+            <button onClick={runWorkflow} className="rounded-lg bg-emerald-600 px-4 py-2 font-bold text-white hover:bg-emerald-500">Run Workflow</button>
+            <button onClick={saveWorkflowLocal} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">Save</button>
+            <button onClick={clearWorkflow} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">Clear</button>
           </div>
 
-          {/* Workflow Execution */}
+          {/* ===== Workflow Execution Tabs ===== */}
           <div className="border-t border-slate-800 bg-black/70 p-4 mt-2 rounded-md">
             <h3 className="mb-2 text-cyan-400 font-semibold">⚡ Workflow Execution</h3>
-            {jobId ? (
-              <WorkflowConsole jobId={jobId} table="workflows" />
-            ) : (
-              <div className="text-sm text-slate-400">No job started yet.</div>
-            )}
+
+            <div className="flex gap-4 border-b border-slate-800 mb-4">
+              <button
+                onClick={() => setActiveTab("summary")}
+                className={`pb-2 ${activeTab === "summary" ? "text-cyan-400 border-b-2 border-cyan-400" : "text-slate-400"}`}
+              >
+                Summary
+              </button>
+              <button
+                onClick={() => setActiveTab("live")}
+                className={`pb-2 ${activeTab === "live" ? "text-cyan-400 border-b-2 border-cyan-400" : "text-slate-400"}`}
+              >
+                Live Feed
+              </button>
+              <button
+                onClick={() => setActiveTab("output")}
+                className={`pb-2 ${activeTab === "output" ? "text-cyan-400 border-b-2 border-cyan-400" : "text-slate-400"}`}
+              >
+                Output Logs
+              </button>
+            </div>
+            {/* Tab Content Area */}
+            <div
+                className={`rounded-lg border p-3 transition-all duration-300 ${
+                     activeTab === "summary" || activeTab === "live" || activeTab === "output"
+                         ? "border-cyan-500/60 shadow-[0_0_8px_rgba(34,211,238,0.3)]"
+                         : "border-slate-700"
+                }`}
+             >
+            {activeTab === "live" && jobId && <WorkflowConsole jobId={jobId} table="workflows" />}
           </div>
         </section>
       </div>
@@ -375,8 +393,6 @@ function WorkflowPage() {
         <SpecInputModal
           onClose={() => setShowSpecModal(false)}
           onSubmit={(text, file) => {
-            // hook: you can create a workflow from spec here, or pass to backend
-            // For now, just keep a placeholder – your backend /run_workflow can be called from here.
             console.log("Spec submitted:", { text, file });
           }}
         />
@@ -397,16 +413,9 @@ function WorkflowPage() {
 }
 
 /* =========================
-   Modals
+   Modals (unchanged)
 ========================= */
-
-function SpecInputModal({
-  onClose,
-  onSubmit,
-}: {
-  onClose: () => void;
-  onSubmit: (text: string, file?: File) => void;
-}) {
+function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
@@ -414,35 +423,23 @@ function SpecInputModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div className="w-full max-w-2xl rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl">
         <h2 className="mb-4 text-2xl font-bold text-cyan-400">Enter Spec for Spec2RTL</h2>
-
         <textarea
           className="mb-4 h-40 w-full rounded-lg border border-slate-600 bg-slate-800 p-4 text-lg outline-none focus:ring-2 focus:ring-cyan-500"
           placeholder="Type your design spec here."
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-
         <div className="mb-4">
           <label className="mb-2 block text-sm font-medium">Upload Spec Document</label>
-          <label
-            htmlFor="file-upload"
-            className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-slate-600 bg-slate-800 px-4 py-6 hover:bg-slate-700"
-          >
+          <label htmlFor="file-upload" className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-slate-600 bg-slate-800 px-4 py-6 hover:bg-slate-700">
             <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 8l-3-3m3 3l3-3" />
             </svg>
             <span className="text-slate-300">Click to upload</span>
-            <input
-              id="file-upload"
-              type="file"
-              accept=".txt,md,pdf"
-              className="hidden"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-            />
+            <input id="file-upload" type="file" accept=".txt,md,pdf" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
           </label>
           {file && <p className="mt-2 text-sm text-green-400">📄 {file.name} selected</p>}
         </div>
-
         <div className="flex justify-end space-x-3">
           <button onClick={onClose} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">Cancel</button>
           <button
@@ -457,13 +454,7 @@ function SpecInputModal({
   );
 }
 
-function CreateAgentModal({
-  onClose,
-  onSubmit,
-}: {
-  onClose: () => void;
-  onSubmit: (backendLabel: string, uiLabel: string, desc: string) => void;
-}) {
+function CreateAgentModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (backendLabel: string, uiLabel: string, desc: string) => void }) {
   const [backendKey, setBackendKey] = useState("");
   const [uiLabel, setUiLabel] = useState("");
   const [desc, setDesc] = useState("");
@@ -472,36 +463,12 @@ function CreateAgentModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div className="w-full max-w-lg rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl">
         <h2 className="mb-4 text-2xl font-bold text-cyan-400">Create Custom Agent</h2>
-
-        <input
-          type="text"
-          placeholder='Backend label (e.g. "Digital RTL Agent")'
-          value={backendKey}
-          onChange={(e) => setBackendKey(e.target.value)}
-          className="mb-3 w-full rounded border border-slate-600 bg-slate-800 p-2"
-        />
-
-        <input
-          type="text"
-          placeholder='UI label (e.g. "RTL Agent")'
-          value={uiLabel}
-          onChange={(e) => setUiLabel(e.target.value)}
-          className="mb-3 w-full rounded border border-slate-600 bg-slate-800 p-2"
-        />
-
-        <textarea
-          placeholder="Describe what this agent does."
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-          className="mb-4 h-28 w-full rounded border border-slate-600 bg-slate-800 p-2"
-        />
-
+        <input type="text" placeholder='Backend label (e.g. "Digital RTL Agent")' value={backendKey} onChange={(e) => setBackendKey(e.target.value)} className="mb-3 w-full rounded border border-slate-600 bg-slate-800 p-2" />
+        <input type="text" placeholder='UI label (e.g. "RTL Agent")' value={uiLabel} onChange={(e) => setUiLabel(e.target.value)} className="mb-3 w-full rounded border border-slate-600 bg-slate-800 p-2" />
+        <textarea placeholder="Describe what this agent does." value={desc} onChange={(e) => setDesc(e.target.value)} className="mb-4 h-28 w-full rounded border border-slate-600 bg-slate-800 p-2" />
         <div className="flex justify-end space-x-3">
           <button onClick={onClose} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">Cancel</button>
-          <button
-            onClick={() => { onSubmit(backendKey, uiLabel || backendKey, desc); onClose(); }}
-            className="rounded-lg bg-emerald-500 px-6 py-2 font-bold text-black hover:bg-emerald-400"
-          >
+          <button onClick={() => { onSubmit(backendKey, uiLabel || backendKey, desc); onClose(); }} className="rounded-lg bg-emerald-500 px-6 py-2 font-bold text-black hover:bg-emerald-400">
             Save Agent
           </button>
         </div>
