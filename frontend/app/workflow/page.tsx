@@ -18,7 +18,7 @@ import ReactFlow, {
   useReactFlow,
 } from "reactflow";
 import "reactflow/dist/style.css";
-
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 import AgentNode from "./AgentNode";
 import WorkflowConsole from "./WorkflowConsole";
 
@@ -224,8 +224,49 @@ function WorkflowPage() {
       ];
       setNodes(n);
       setEdges(e);
+      setShowSpecModal(true);
     }
   };
+
+  const handleSpecSubmit = async (text: string, file?: File) => {
+    try {
+      // Define workflow for Spec→RTL
+      const workflow = {
+        loop_type: "digital",
+        nodes: [
+          { label: "Digital Spec Agent" },
+          { label: "Digital RTL Agent" },
+        ],
+      };
+  
+      // Build form data
+      const formData = new FormData();
+      formData.append("workflow", JSON.stringify(workflow));
+      formData.append("spec_text", text || "");
+      if (file) formData.append("file", file);
+  
+      // ✅ Use environment-based API endpoint
+      const res = await fetch(`${API_BASE}/run_workflow`, {
+        method: "POST",
+        body: formData,
+      });
+  
+      const result = await res.json();
+  
+      if (result.status === "success") {
+        console.log("✅ Workflow started:", result.workflow_id);
+        setJobId(result.workflow_id);
+        setActiveTab("live");
+      } else {
+        console.error("❌ Backend error:", result.message);
+      }
+    } catch (err) {
+      console.error("❌ API call failed:", err);
+    }
+  };
+  
+
+  
   
 
   /* =========================
@@ -421,6 +462,8 @@ function WorkflowPage() {
         <SpecInputModal
           onClose={() => setShowSpecModal(false)}
           onSubmit={(text, file) => {
+            handleSpecSubmit(text, file);
+            setShowSpecModal(false);
             console.log("Spec submitted:", { text, file });
           }}
         />
