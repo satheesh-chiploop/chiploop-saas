@@ -189,36 +189,48 @@ export default function WorkflowConsole({
     </div>
   );
 
-  const renderOutputs = () => (
-    <div className="p-3 space-y-3">
-      <p className="text-slate-300">
-        Download complete logs or generated artifacts below.
-      </p>
+  // ---------- 📦 Grouped Outputs ----------
+  const renderOutputs = () => {
+    const groupedArtifacts: Record<string, { label: string; path: string }[]> = {};
+    Object.entries(workflowMeta?.artifacts || {}).forEach(([key, path]) => {
+      const [agent, ...rest] = key.split("_agent_");
+      const group = agent ? `${agent}_agent` : "other";
+      if (!groupedArtifacts[group]) groupedArtifacts[group] = [];
+      groupedArtifacts[group].push({ label: rest.join("_"), path });
+    });
 
-      <button
-        onClick={handleDownloadLogs}
-        className="rounded bg-cyan-700 hover:bg-cyan-600 px-3 py-1 text-sm text-white"
-      >
-        ⬇️ Download Logs
-      </button>
+    return (
+      <div className="p-3 space-y-4">
+        <button
+          onClick={handleDownloadLogs}
+          className="rounded bg-cyan-700 hover:bg-cyan-600 px-3 py-1 text-sm text-white"
+        >
+          ⬇️ Download All Logs
+        </button>
 
-      {workflowMeta?.artifacts && (
-        <div className="mt-3 space-y-2">
-          {Object.entries(workflowMeta.artifacts).map(([label, path]) => (
-            <div key={label} className="flex items-center justify-between bg-slate-700/60 p-2 rounded">
-              <span className="text-slate-200">{label}</span>
-              <button
-                onClick={() => handleDownloadArtifact(path, label)}
-                className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-2 py-1 rounded"
-              >
-                ⬇️ Download
-              </button>
+        {Object.entries(groupedArtifacts).map(([agent, items]) => (
+          <div key={agent} className="border border-slate-700 rounded-lg p-3 bg-slate-800/50">
+            <h3 className="text-cyan-400 font-semibold mb-2">
+              {agent.replace("_agent", "").toUpperCase()} Agent
+            </h3>
+            <div className="space-y-1">
+              {items.map(({ label, path }) => (
+                <div key={label} className="flex items-center justify-between bg-slate-700/60 p-2 rounded">
+                  <span className="text-slate-300 capitalize">{label.replace(/_/g, " ")}</span>
+                  <button
+                    onClick={() => handleDownloadArtifact(path, `${agent}_${label}`)}
+                    className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-2 py-1 rounded"
+                  >
+                    ⬇️ Download
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="mt-4 rounded-lg border border-slate-700 bg-slate-800/80 p-3 text-sm text-slate-200 shadow-md">
