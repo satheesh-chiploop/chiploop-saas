@@ -231,7 +231,7 @@ function WorkflowPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* ===== Sidebar ===== */}
-        <aside className="w-full max-w-xs bg-slate-900/70 border-r border-slate-800 p-4 overflow-hidden flex flex-col">
+        <aside className="w-full max-w-xs bg-slate-900/70 border-r border-slate-800 p-4 overflow-y-auto flex flex-col">
           <div className="mb-3">
             <label className="block text-xs uppercase text-cyan-400 mb-2">Loop</label>
             <select
