@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 // 🧩 Supabase client
@@ -19,23 +19,21 @@ type TableName = "workflows" | "runs";
 
 export default function WorkflowConsole({
   jobId,
-  table = "workflows", // ✅ default keeps current behavior
+  table = "workflows",
 }: {
   jobId: string;
   table?: TableName;
 }) {
   const [logs, setLogs] = useState<string[]>([]);
   const [status, setStatus] = useState("starting");
+  const consoleRef = useRef<HTMLDivElement | null>(null); // ✅ ref for autoscroll
 
-  const channelName = useMemo(
-    () => `realtime:public:${table}`,
-    [table]
-  );
+  const channelName = useMemo(() => `realtime:public:${table}`, [table]);
 
   useEffect(() => {
     if (!jobId) return;
 
-    // 1) Initial fetch
+    // 1️⃣ Initial fetch
     const fetchInitial = async () => {
       const { data, error } = await supabase
         .from(table)
@@ -48,7 +46,7 @@ export default function WorkflowConsole({
     };
     fetchInitial();
 
-    // 2) Realtime subscription
+    // 2️⃣ Realtime subscription
     const channel = supabase
       .channel(channelName)
       .on(
@@ -62,24 +60,31 @@ export default function WorkflowConsole({
       )
       .subscribe();
 
-    // 3) Poll fallback
+    // 3️⃣ Poll fallback (3s)
     const poll = setInterval(async () => {
       const { data, error } = await supabase
         .from(table)
         .select("status, logs")
         .eq("id", jobId)
         .single<WorkflowRow>();
-      if (error) return; // quiet
+      if (error) return;
       if (data?.logs) setLogs((data.logs || "").split("\n"));
       if (data?.status) setStatus(data.status || "unknown");
     }, 3000);
 
-    // 4) Cleanup
+    // 4️⃣ Cleanup
     return () => {
       clearInterval(poll);
       supabase.removeChannel(channel);
     };
   }, [jobId, table, channelName]);
+
+  // ✅ Auto-scroll to bottom on new logs
+  useEffect(() => {
+    if (consoleRef.current) {
+      consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
+    }
+  }, [logs]);
 
   // 🎨 Colors for log lines
   const colorFor = (line: string) => {
@@ -93,9 +98,13 @@ export default function WorkflowConsole({
   };
 
   return (
-    <div className="mt-4 rounded-lg border border-slate-700 bg-slate-900/80 p-4 font-mono text-sm text-slate-200 shadow-md h-72 overflow-y-auto">
+    <div
+      ref={consoleRef} // ✅ attach ref for autoscroll
+      className="mt-4 rounded-lg border border-slate-700 bg-slate-900/80 p-4 font-mono text-sm text-slate-200 shadow-md h-72 overflow-y-auto"
+    >
       <div className="mb-2 border-b border-slate-700 pb-1 text-cyan-400">
-        🔴 Live Execution Feed — Status: <span className="font-semibold">{status.toUpperCase()}</span>
+        🔴 Live Execution Feed — Status:{" "}
+        <span className="font-semibold">{status.toUpperCase()}</span>
       </div>
 
       {logs.length === 0 ? (

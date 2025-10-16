@@ -127,7 +127,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="px-4 py-2 rounded-md text-black focus:ring-2 focus:ring-cyan-400"
+            className="px-4 py-2 rounded-md text-white focus:ring-2 focus:ring-cyan-400"
           />
 
           <button
