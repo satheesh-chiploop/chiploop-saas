@@ -384,6 +384,9 @@ function WorkflowPage() {
                 }`}
              >
             {activeTab === "live" && jobId && <WorkflowConsole jobId={jobId} table="workflows" />}
+            {activeTab === "summary" && <div></div>}
+            {activeTab === "output" && <div></div>}
+          </div>
           </div>
         </section>
       </div>
