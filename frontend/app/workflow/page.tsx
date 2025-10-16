@@ -256,7 +256,7 @@ function WorkflowPage() {
           <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
             <section>
               <h3 className="text-cyan-400 font-semibold mb-2">Prebuilt Agents</h3>
-              <ul className="space-y-1 text-sm text-gray-300 max-h-40 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {prebuiltAgents.map((a) => (
                   <li
                     key={a.backendLabel}
@@ -279,7 +279,8 @@ function WorkflowPage() {
               >
                 + Add New Agent
               </button>
-              <ul className="mt-2 space-y-1 text-sm text-gray-300 max-h-40 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              
                 {customAgents.length ? (
                   customAgents.map((a, idx) => (
                     <li
@@ -299,7 +300,7 @@ function WorkflowPage() {
 
             <section>
               <h3 className="text-cyan-400 font-semibold mb-2">Prebuilt Workflows</h3>
-              <ul className="space-y-1 text-sm text-gray-300 max-h-40 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {prebuiltWorkflows.map((wf) => (
                   <li key={wf} className="px-2 py-1 rounded hover:bg-slate-800">{wf}</li>
                 ))}
@@ -308,7 +309,7 @@ function WorkflowPage() {
 
             <section>
               <h3 className="text-cyan-400 font-semibold mb-2">Custom Workflows</h3>
-              <ul className="space-y-1 text-sm text-gray-300 max-h-40 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {customWorkflows.length ? (
                   customWorkflows.map((w) => (
                     <li key={w} className="px-2 py-1 rounded hover:bg-slate-800">{w}</li>
