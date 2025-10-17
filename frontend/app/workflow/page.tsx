@@ -25,7 +25,7 @@ import WorkflowConsole from "./WorkflowConsole";
 /* =========================
    Types & Constants
 ========================= */
-type LoopKey = "digital" | "analog" | "embedded";
+type LoopKey = "digital" | "analog" | "embedded" | "system";
 type AgentNodeData = { uiLabel: string; backendLabel: string; desc?: string };
 
 type CatalogItem = { uiLabel: string; backendLabel: string; desc?: string };
@@ -48,6 +48,13 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Code Agent", backendLabel: "Embedded Code Agent", desc: "Drivers & firmware" },
     { uiLabel: "Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
     { uiLabel: "Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize outputs" },
+  ],
+  system: [
+    { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent", desc: "System-level digital spec" },
+    { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent", desc: "Digital IP RTL design" },
+    { uiLabel: "Firmware Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
+    { uiLabel: "Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Firmware simulation harness" },
+    { uiLabel: "Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize hardware + firmware integration" },
   ],
 };
 
@@ -205,6 +212,7 @@ function WorkflowPage() {
       digital: ["Verify_Loop", "Spec2RTL"],
       analog: ["Spec2Circuit", "Spec2Sim"],
       embedded: ["Spec2Code", "Spec2Sim"],
+      system: ["Digital_IP_Prototype_Loop(Spec2Firmware)"]
     };
     return all[loop];
   }, [loop]);
@@ -248,6 +256,26 @@ function WorkflowPage() {
       setEdges(e);
       setShowSpecModal(true);
     }
+    if (loop === "system" && wf.includes("Digital_IP_Prototype_Loop(Spec2Firmware)")) {
+      const n: Node<AgentNodeData>[] = [
+        { id: "spec", type: "agentNode", position: { x: 80, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
+        { id: "rtl", type: "agentNode", position: { x: 300, y: 200 }, data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
+        { id: "code", type: "agentNode", position: { x: 520, y: 200 }, data: { uiLabel: "Firmware Agent", backendLabel: "Embedded Code Agent" } },
+        { id: "sim", type: "agentNode", position: { x: 740, y: 200 }, data: { uiLabel: "Sim Agent", backendLabel: "Embedded Sim Agent" } },
+        { id: "result", type: "agentNode", position: { x: 960, y: 200 }, data: { uiLabel: "Result Agent", backendLabel: "Embedded Result Agent" } },
+      ];
+    
+      const e: Edge[] = [
+        { id: "e1", source: "spec", target: "rtl", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+        { id: "e2", source: "rtl", target: "code", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+        { id: "e3", source: "code", target: "sim", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+        { id: "e4", source: "sim", target: "result", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+      ];
+    
+      setNodes(n);
+      setEdges(e);
+      setShowSpecModal(true);
+    }
   };
 
   const handleSpecSubmit = async (text: string, file?: File) => {
@@ -277,6 +305,17 @@ function WorkflowPage() {
           nodes: [
             { label: "Embedded Spec Agent" },
             { label: "Embedded Code Agent" },
+          ],
+        };
+      } else if (loop === "system") {
+        workflow = {
+          loop_type: "system",
+          nodes: [
+            { label: "Digital Spec Agent" },
+            { label: "Digital RTL Agent" },
+            { label: "Embedded Code Agent" },
+            { label: "Embedded Sim Agent" },
+            { label: "Embedded Result Agent" },
           ],
         };
       }
@@ -344,6 +383,7 @@ function WorkflowPage() {
               <option value="digital">Digital Loop</option>
               <option value="analog">Analog Loop</option>
               <option value="embedded">Embedded Loop</option>
+              <option value="system">System Loop (Digital+ Analog + Embedded)</option>
             </select>
 
             <div className="mt-3 max-h-12 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
@@ -535,10 +575,18 @@ function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div className="w-full max-w-2xl rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl">
-        <h2 className="mb-4 text-2xl font-bold text-cyan-400">Enter Spec for Spec2RTL</h2>
+      <h2 className="mb-4 text-2xl font-bold text-cyan-400">Enter Spec for {loop.charAt(0).toUpperCase() + loop.slice(1)} Loop</h2>
         <textarea
           className="mb-4 h-40 w-full rounded-lg border border-slate-600 bg-slate-800 p-4 text-lg outline-none focus:ring-2 focus:ring-cyan-500"
-          placeholder="Type your design spec here."
+          placeholder={
+              loop === "digital"
+              ? "Describe the digital module (I/Os, behavior)"
+              : loop === "analog"
+              ? "Describe the analog circuit (R, C, gain, etc.)"
+              : loop === "embedded"
+              ? "Describe MCU logic and IO behavior"
+              : "Describe System (integrated digital + firmware+Analog) behavior"
+          }
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
