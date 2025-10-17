@@ -234,6 +234,10 @@ function WorkflowPage() {
       const e: Edge[] = [
         { id: "e-spec-netlist", source: "spec", target: "netlist", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
       ];
+      setNodes(n);
+      setEdges(e);
+      setShowSpecModal(true);
+    }
   };
 
   const handleSpecSubmit = async (text: string, file?: File) => {
