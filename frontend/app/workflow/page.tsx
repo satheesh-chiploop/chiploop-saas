@@ -204,7 +204,7 @@ function WorkflowPage() {
     const all = {
       digital: ["Verify_Loop", "Spec2RTL"],
       analog: ["Spec2Circuit", "Spec2Sim"],
-      embedded: ["Firmware Build Flow", "Co-Sim Integration", "Driver Verification"],
+      embedded: ["Spec2Code", "Spec2Sim"],
     };
     return all[loop];
   }, [loop]);
@@ -234,6 +234,16 @@ function WorkflowPage() {
       const e: Edge[] = [
         { id: "e-spec-netlist", source: "spec", target: "netlist", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
       ];
+      setNodes(n);
+      setEdges(e);
+      setShowSpecModal(true);
+    }
+    if (loop === "embedded" && wf.includes("Spec2Code")) {
+      const n: Node<AgentNodeData>[] = [
+        { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Embedded Spec Agent" } },
+        { id: "code", type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "Code Agent", backendLabel: "Embedded Code Agent" } },
+      ];
+      const e: Edge[] = [{ id: "e-spec-code", source: "spec", target: "code", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } }];
       setNodes(n);
       setEdges(e);
       setShowSpecModal(true);
