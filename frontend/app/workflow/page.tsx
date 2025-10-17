@@ -249,7 +249,7 @@ function WorkflowPage() {
     if (loop === "embedded" && wf.includes("Spec2Code")) {
       const n: Node<AgentNodeData>[] = [
         { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Embedded Spec Agent" } },
-        { id: "code", type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "Code Agent", backendLabel: "Embedded Code Agent" } },
+        { id: "code", type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "Firmware Agent", backendLabel: "Embedded Code Agent" } },
       ];
       const e: Edge[] = [{ id: "e-spec-code", source: "spec", target: "code", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } }];
       setNodes(n);
@@ -334,7 +334,7 @@ function WorkflowPage() {
   
       const result = await res.json();
   
-      if (result.status === "success") {
+      if (result.status === "success" || result.workflow_id) {
         console.log(`✅ ${loop} workflow started:`, result.workflow_id);
         setJobId(result.workflow_id);
         setActiveTab("live");
@@ -542,6 +542,7 @@ function WorkflowPage() {
       {/* ===== Modals ===== */}
       {showSpecModal && (
         <SpecInputModal
+          loop={Loop}
           onClose={() => setShowSpecModal(false)}
           onSubmit={(text, file) => {
             handleSpecSubmit(text, file);
@@ -568,7 +569,7 @@ function WorkflowPage() {
 /* =========================
    Modals (unchanged)
 ========================= */
-function SpecInputModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
+function SpecInputModal({ loop, onClose, onSubmit }: { Loop: string; onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
