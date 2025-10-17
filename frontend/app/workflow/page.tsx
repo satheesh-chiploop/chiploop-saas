@@ -202,8 +202,8 @@ function WorkflowPage() {
 
   const prebuiltWorkflows = useMemo(() => {
     const all = {
-      digital: ["Verify Loop", "Spec2RTL"],
-      analog: ["Analog RC Filter", "OpAmp Design Flow", "PLL Verification"],
+      digital: ["Verify_Loop", "Spec2RTL"],
+      analog: ["Spec2Circuit", "Spec2Sim"],
       embedded: ["Firmware Build Flow", "Co-Sim Integration", "Driver Verification"],
     };
     return all[loop];
@@ -226,26 +226,54 @@ function WorkflowPage() {
       setEdges(e);
       setShowSpecModal(true);
     }
+    if (loop === "analog" && wf.includes("Spec2Circuit")) {
+      const n: Node<AgentNodeData>[] = [
+        { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Analog Spec Agent" } },
+        { id: "netlist", type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "Netlist Agent", backendLabel: "Analog Netlist Agent" } },
+      ];
+      const e: Edge[] = [
+        { id: "e-spec-netlist", source: "spec", target: "netlist", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+      ];
   };
 
   const handleSpecSubmit = async (text: string, file?: File) => {
     try {
-      // Define workflow for Spec→RTL
-      const workflow = {
-        loop_type: "digital",
-        nodes: [
-          { label: "Digital Spec Agent" },
-          { label: "Digital RTL Agent" },
-        ],
-      };
+      // Determine which loop is active
+      let workflow: any = {};
   
-      // Build form data
+      if (loop === "digital") {
+        workflow = {
+          loop_type: "digital",
+          nodes: [
+            { label: "Digital Spec Agent" },
+            { label: "Digital RTL Agent" },
+          ],
+        };
+      } else if (loop === "analog") {
+        workflow = {
+          loop_type: "analog",
+          nodes: [
+            { label: "Analog Spec Agent" },
+            { label: "Analog Netlist Agent" },
+          ],
+        };
+      } else if (loop === "embedded") {
+        workflow = {
+          loop_type: "embedded",
+          nodes: [
+            { label: "Embedded Spec Agent" },
+            { label: "Embedded Code Agent" },
+          ],
+        };
+      }
+  
+      // Build form data for /run_workflow
       const formData = new FormData();
       formData.append("workflow", JSON.stringify(workflow));
       formData.append("spec_text", text || "");
       if (file) formData.append("file", file);
   
-      // ✅ Use environment-based API endpoint
+      // Hit the unified backend route
       const res = await fetch(`${API_BASE}/run_workflow`, {
         method: "POST",
         body: formData,
@@ -254,11 +282,11 @@ function WorkflowPage() {
       const result = await res.json();
   
       if (result.status === "success") {
-        console.log("✅ Workflow started:", result.workflow_id);
+        console.log(`✅ ${loop} workflow started:`, result.workflow_id);
         setJobId(result.workflow_id);
         setActiveTab("live");
       } else {
-        console.error("❌ Backend error:", result.message);
+        console.error("❌ Backend error:", result.message || result.error);
       }
     } catch (err) {
       console.error("❌ API call failed:", err);
