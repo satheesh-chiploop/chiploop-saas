@@ -542,7 +542,7 @@ function WorkflowPage() {
       {/* ===== Modals ===== */}
       {showSpecModal && (
         <SpecInputModal
-          loop={Loop}
+          loop={loop}
           onClose={() => setShowSpecModal(false)}
           onSubmit={(text, file) => {
             handleSpecSubmit(text, file);
@@ -569,7 +569,7 @@ function WorkflowPage() {
 /* =========================
    Modals (unchanged)
 ========================= */
-function SpecInputModal({ loop, onClose, onSubmit }: { Loop: string; onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
+function SpecInputModal({ loop, onClose, onSubmit }: { loop: string; onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
