@@ -212,7 +212,7 @@ function WorkflowPage() {
       digital: ["Verify_Loop", "Spec2RTL"],
       analog: ["Spec2Circuit", "Spec2Sim"],
       embedded: ["Spec2Code", "Spec2Sim"],
-      system: ["Digital_IP_Prototype_Loop(Spec2Firmware)"]
+      system: ["Digital_IP_Prototype_Loop"]
     };
     return all[loop];
   }, [loop]);
@@ -256,7 +256,7 @@ function WorkflowPage() {
       setEdges(e);
       setShowSpecModal(true);
     }
-    if (loop === "system" && wf.includes("Digital_IP_Prototype_Loop(Spec2Firmware)")) {
+    if (loop === "system" && wf.includes("Digital_IP_Prototype_Loop")) {
       const n: Node<AgentNodeData>[] = [
         { id: "spec", type: "agentNode", position: { x: 80, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
         { id: "rtl", type: "agentNode", position: { x: 300, y: 200 }, data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
