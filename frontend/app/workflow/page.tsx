@@ -466,6 +466,20 @@ function WorkflowPage() {
                 )}
               </ul>
             </section>
+            <div className="mt-4 border-t border-slate-700 pt-3">
+              <button
+                  onClick={() => setShowPlanner(true)}
+                  className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+              >
+                  AI Workflow Planner
+              </button>
+              <button
+                  onClick={() => setShowAgentPlanner(true)}
+                  className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mt-2"
+              >
+                  AI Agent Planner
+              </button>
+            </div>
           </div>
         </aside>
 
