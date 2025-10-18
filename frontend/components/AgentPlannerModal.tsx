@@ -23,11 +23,10 @@ export default function AgentPlannerModal({ onClose }) {
 
       if (data?.agent) {
         setAgent(data.agent);
-        // Backend identifies source in log text automatically
-        const text = data.agent.full_code || "";
-        if (text.includes("llama") || text.includes("ollama")) setBackendSource("🦙 Local Ollama");
+        const text = JSON.stringify(data.agent).toLowerCase();
+        if (text.includes("ollama")) setBackendSource("🦙 Local Ollama");
         else if (text.includes("portkey")) setBackendSource("🪄 Portkey");
-        else if (text.includes("OpenAI")) setBackendSource("🌐 OpenAI");
+        else if (text.includes("openai")) setBackendSource("🌐 OpenAI");
         else setBackendSource("⚠️ Static Fallback");
       } else setBackendSource("⚠️ Unknown");
     } catch (e) {
@@ -38,15 +37,24 @@ export default function AgentPlannerModal({ onClose }) {
     }
   };
 
-  const handleDownload = () => {
-    if (!agent?.full_code) return;
-    const blob = new Blob([agent.full_code], { type: "text/x-python" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${agent.agent_name || "GeneratedAgent"}.py`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleSave = async () => {
+    if (!agent) return;
+    try {
+      const res = await fetch("/api/save_custom_agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agent }),
+      });
+      const data = await res.json();
+      if (data.status === "ok") {
+        window.dispatchEvent(new CustomEvent("customAgentSaved"));
+        alert(`✅ Agent "${agent.agent_name}" saved to Custom Agents`);
+      } else {
+        alert(`❌ Save failed: ${data.message}`);
+      }
+    } catch (e) {
+      alert("⚠️ Could not connect to backend");
+    }
   };
 
   return (
@@ -85,12 +93,12 @@ export default function AgentPlannerModal({ onClose }) {
           >
             Close
           </button>
-          {agent?.full_code && (
+          {agent?.agent_name && (
             <button
-              onClick={handleDownload}
-              className="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded ml-auto text-xs"
+              onClick={handleSave}
+              className="bg-green-700 hover:bg-green-600 px-3 py-1 rounded text-xs ml-auto"
             >
-              ⬇ Download .py
+              💾 Save to Custom Agents
             </button>
           )}
         </div>
@@ -142,9 +150,9 @@ export default function AgentPlannerModal({ onClose }) {
             )}
 
             {tab === "code" && (
-              <pre className="bg-slate-900 rounded p-3 text-xs overflow-auto max-h-80 text-slate-200 whitespace-pre-wrap">
-                {agent.full_code}
-              </pre>
+              <div className="bg-slate-900 rounded p-3 text-xs text-slate-400 italic">
+                Code generation is disabled in this version.
+              </div>
             )}
           </div>
         )}

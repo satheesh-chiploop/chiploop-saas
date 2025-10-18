@@ -21,7 +21,7 @@ import "reactflow/dist/style.css";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 import AgentNode from "./AgentNode";
 import WorkflowConsole from "./WorkflowConsole";
-
+import PlannerModal from "@/components/PlannerModal";
 /* =========================
    Types & Constants
 ========================= */
@@ -57,7 +57,9 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize hardware + firmware integration" },
   ],
 };
+const [showPlanner, setShowPlanner] = useState(false);
 
+{showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
 /* =========================
    Page Wrapper
 ========================= */
@@ -155,6 +157,18 @@ function WorkflowPage() {
       };
 
       setNodes((nds) => nds.concat(newNode));
+
+      try {
+        const res = await fetch(`${API_BASE}/suggest_next_agent`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ outputs: [agent.backendLabel], domain: loop })
+        });
+        const j = await res.json();
+        console.log("Suggested connection:", j);
+      } catch (e) {
+        console.warn("Suggestion failed", e);
+      }
       setEdges((eds) => {
         if (nodes.length === 0) return eds;
         const lastNode = getRightMostNode(nodes);
@@ -507,11 +521,70 @@ function WorkflowPage() {
           </div>
 
           <div className="flex justify-center gap-4 py-4 border-t border-slate-800 bg-black/40 mt-4">
-            <button onClick={() => setShowSpecModal(true)} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">+ Add Workflow</button>
-            <button onClick={runWorkflow} className="rounded-lg bg-emerald-600 px-4 py-2 font-bold text-white hover:bg-emerald-500">Run Workflow</button>
-            <button onClick={saveWorkflowLocal} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">Save</button>
-            <button onClick={clearWorkflow} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">Clear</button>
+            {/* Manual Workflow Creation */}
+            <button
+              onClick={() => setShowSpecModal(true)}
+              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
+            >
+              + Add Workflow
+            </button>
+
+            {/* Run Current Workflow */}
+            <button
+              onClick={runWorkflow}
+              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
+            >
+             ▶️ Run Workflow
+            </button>
+
+            {/* 💾 Save Workflow to Supabase */}
+            <button
+              onClick={async () => {
+                try {
+                  const wf = {
+                    workflow_name: "Custom_" + loop + "_Flow",
+                    loop_type: loop,
+                    nodes,
+                    edges,
+                  };
+                  const res = await fetch(`${API_BASE}/save_custom_workflow`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ workflow: wf }),
+                  });
+                  const j = await res.json();
+                  if (j.status === "ok") {
+                    alert("✅ Workflow saved to Supabase!");
+                  } else {
+                  alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);
+                  }
+                } catch (e) {
+                  console.error(e);
+                  alert("❌ Error saving workflow");
+                }
+              }}
+              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
+            >
+              💾 Save Workflow
+            </button>
+
+            {/* Local Save (Offline Backup) */}
+            <button
+              onClick={saveWorkflowLocal}
+              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
+            >
+              Save Local
+            </button>
+
+            {/* Clear Workflow */}
+            <button
+              onClick={clearWorkflow}
+              className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600"
+            >
+              🧹 Clear
+            </button>
           </div>
+
 
           {/* ===== Workflow Execution Tabs ===== */}
           <div className="border-t border-slate-800 bg-black/70 p-4 mt-2 rounded-md">
