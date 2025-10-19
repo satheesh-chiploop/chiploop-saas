@@ -139,7 +139,7 @@ function WorkflowPage() {
   };
 
   const onDropCanvas = useCallback(
-    (ev: React.DragEvent) => {
+    async (ev: React.DragEvent) => {
       ev.preventDefault();
       const raw = ev.dataTransfer.getData("application/reactflow");
       if (!raw) return;
