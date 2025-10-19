@@ -92,6 +92,8 @@ function WorkflowPage() {
   // modals
   const [showSpecModal, setShowSpecModal] = useState(false);
   const [showCreateAgentModal, setShowCreateAgentModal] = useState(false);
+  const [showPlanner, setShowPlanner] = useState(false);
+
 
   // workflow console tab state
   const [activeTab, setActiveTab] = useState<"summary" | "live" | "output">("summary");
@@ -647,6 +649,12 @@ function WorkflowPage() {
             setCustomAgents(next);
             localStorage.setItem("custom_agents", JSON.stringify(next));
           }}
+        />
+      )}
+
+      {showPlanner && (
+        <PlannerModal
+          onClose={() => setShowPlanner(false)}
         />
       )}
     </main>
