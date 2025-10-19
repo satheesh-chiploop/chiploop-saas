@@ -117,7 +117,7 @@ export default function PlannerModal({ onClose }) {
                         disabled={analyzing || !goal.trim()}
                         className="bg-indigo-700 hover:bg-indigo-600 px-3 py-1 rounded disabled:opacity-50"
                     >
-                        {analyzing ? "Analyzing..." : "🧠 Analyze / Improve Spec"}
+                        {analyzing ? "Analyzing..." : "Spec Analysis"}
                     </button>
 
                     <button
@@ -125,7 +125,7 @@ export default function PlannerModal({ onClose }) {
                         disabled={loading || !goal.trim()}
                         className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
                     >
-                        {loading ? "Generating..." : "⚡ Generate Plan"}
+                        {loading ? "Generating..." : "Generate Plan"}
                     </button>
 
                     <button
@@ -133,7 +133,7 @@ export default function PlannerModal({ onClose }) {
                         disabled={autoLoading || !goal.trim()}
                         className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
                     >
-                        {autoLoading ? "Composing..." : "🤖 Auto-Compose Flow"}
+                        {autoLoading ? "Composing..." : "Auto-Compose Flow"}
                     </button>
 
                     <button
