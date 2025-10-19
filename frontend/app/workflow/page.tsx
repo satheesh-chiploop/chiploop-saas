@@ -57,9 +57,9 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize hardware + firmware integration" },
   ],
 };
-const [showPlanner, setShowPlanner] = useState(false);
+//const [showPlanner, setShowPlanner] = useState(false);
 
-{showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
+//{showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
 /* =========================
    Page Wrapper
 ========================= */
