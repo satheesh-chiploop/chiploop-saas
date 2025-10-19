@@ -18,6 +18,9 @@ export default function PlannerModal({ onClose }) {
       });
       const data = await res.json();
       setPlan(data.plan || data);
+      console.log("🧠 Generated Plan:", data.plan || data);
+      alert("✅ Plan generated successfully! Check for missing agents below.");
+
     } catch (err) {
       alert("⚠️ Failed to generate workflow plan");
     } finally {
@@ -26,14 +29,16 @@ export default function PlannerModal({ onClose }) {
   };
 
   const handleAutoCompose = async () => {
-    setAutoLoading(true);
-    setPlan(null);
-    try {
-      const res = await fetch("/api/auto_compose_workflow", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal }),
-      });
+      setAutoLoading(true);
+      try {
+        const res = await fetch("/api/auto_compose_workflow", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            goal,
+            preplan: plan || null, // ✅ Pass plan result from Generate Plan
+          }),
+        });  
       const data = await res.json();
       if (data.status === "ok" || data.nodes) {
         setPlan({
@@ -42,6 +47,7 @@ export default function PlannerModal({ onClose }) {
           edges: data.edges,
         });
         alert(`✅ Auto-composed workflow:\n${data.summary}`);
+        alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");
       } else {
         alert(`⚠️ ${data.message || "Auto-compose failed."}`);
       }
@@ -90,6 +96,21 @@ export default function PlannerModal({ onClose }) {
             Close
           </button>
         </div>
+        {plan?.missing_agents?.length > 0 && (
+          <div className="mt-4 bg-amber-900/40 border border-amber-600 rounded-lg p-3">
+            <h4 className="font-semibold text-amber-300">⚠️ Missing Agents</h4>
+            <ul className="list-disc list-inside text-sm text-amber-200">
+              {plan.missing_agents.map((a: string) => (
+                <li key={a}>{a}</li>
+            ))}
+            </ul>
+            <p className="text-xs mt-2 text-amber-300">
+              These agents don't exist yet. You can create them manually or click{" "}
+              <strong>Auto-Compose Flow</strong> to let ChipLoop generate and register
+              them automatically.
+            </p>
+           </div>
+        )}
 
         {plan && (
           <div className="mt-4 bg-slate-900 rounded p-3 font-mono text-xs text-slate-200 overflow-auto max-h-64">
