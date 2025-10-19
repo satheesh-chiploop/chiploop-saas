@@ -2,122 +2,205 @@
 import { useState } from "react";
 
 export default function PlannerModal({ onClose }) {
-  const [goal, setGoal] = useState("");
-  const [plan, setPlan] = useState<any | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [autoLoading, setAutoLoading] = useState(false);
+    const [goal, setGoal] = useState("");
+    const [plan, setPlan] = useState<any | null>(null);
+    const [coverage, setCoverage] = useState<any | null>(null);
+    const [clarifications, setClarifications] = useState<string[]>([]);
+    const [analyzing, setAnalyzing] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [autoLoading, setAutoLoading] = useState(false);
 
-  const handlePlan = async () => {
-    setLoading(true);
-    setPlan(null);
-    try {
-      const res = await fetch("/api/plan_workflow", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: goal }),
-      });
-      const data = await res.json();
-      setPlan(data.plan || data);
-      console.log("🧠 Generated Plan:", data.plan || data);
-      alert("✅ Plan generated successfully! Check for missing agents below.");
+    const handlePlan = async () => {
+        setLoading(true);
+        setPlan(null);
+        try {
+            const res = await fetch("/api/plan_workflow", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: goal }),
+            });
+            const data = await res.json();
+            setPlan(data.plan || data);
+            console.log("🧠 Generated Plan:", data.plan || data);
+            alert("✅ Plan generated successfully! Check for missing agents below.");
+        } catch (err) {
+            alert("⚠️ Failed to generate workflow plan");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    } catch (err) {
-      alert("⚠️ Failed to generate workflow plan");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleAutoCompose = async () => {
+        setAutoLoading(true);
+        try {
+            const res = await fetch("/api/auto_compose_workflow", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    goal,
+                    preplan: plan || null, // ✅ Pass plan result from Generate Plan
+                }),
+            });
+            const data = await res.json();
+            if (data.status === "ok" || data.nodes) {
+                setPlan({
+                    summary: data.summary,
+                    nodes: data.nodes,
+                    edges: data.edges,
+                });
+                alert(`✅ Auto-composed workflow:\n${data.summary}`);
+                alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");
+            } else {
+                alert(`⚠️ ${data.message || "Auto-compose failed."}`);
+            }
+        } catch (err) {
+            alert("❌ Could not connect to backend");
+        } finally {
+            setAutoLoading(false);
+        }
+    };
 
-  const handleAutoCompose = async () => {
-      setAutoLoading(true);
-      try {
-        const res = await fetch("/api/auto_compose_workflow", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            goal,
-            preplan: plan || null, // ✅ Pass plan result from Generate Plan
-          }),
-        });  
-      const data = await res.json();
-      if (data.status === "ok" || data.nodes) {
-        setPlan({
-          summary: data.summary,
-          nodes: data.nodes,
-          edges: data.edges,
-        });
-        alert(`✅ Auto-composed workflow:\n${data.summary}`);
-        alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");
-      } else {
-        alert(`⚠️ ${data.message || "Auto-compose failed."}`);
-      }
-    } catch (err) {
-      alert("❌ Could not connect to backend");
-    } finally {
-      setAutoLoading(false);
-    }
-  };
+    const handleAnalyzeSpec = async () => {
+        setAnalyzing(true);
+        try {
+            const res = await fetch("/api/analyze_spec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ goal, user_id: "anonymous" }),
+            });
+            const data = await res.json();
+            if (data.status === "ok") {
+                setCoverage(data.coverage);
+                setClarifications(data.coverage.questions || []);
+                alert("✅ Spec analyzed successfully!");
+            } else {
+                alert("⚠️ Spec analysis failed.");
+            }
+        } catch (err) {
+            alert("❌ Could not connect to backend.");
+        } finally {
+            setAnalyzing(false);
+        }
+    };
 
-  return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="bg-slate-800 rounded-xl p-6 w-[600px] shadow-xl text-white">
-        <h2 className="text-cyan-400 font-bold text-lg mb-3">
-          🧠 AI Workflow Planner
-        </h2>
+    return (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-slate-800 relative rounded-xl p-6 w-[600px] shadow-xl text-white">
+                <h2 className="text-cyan-400 font-bold text-lg mb-3">
+                    🧠 AI Workflow Planner
+                </h2>
 
-        <textarea
-          value={goal}
-          onChange={(e) => setGoal(e.target.value)}
-          placeholder="Describe your design goal..."
-          className="w-full h-24 p-2 bg-slate-900 rounded border border-slate-700 text-sm text-slate-200 focus:ring-1 focus:ring-cyan-500"
-        />
+                {coverage && (
+                    <div
+                        className={`absolute top-6 right-8 px-3 py-1 rounded-full text-xs font-semibold ${
+                            coverage.total_score >= 80
+                                ? "bg-green-600 text-white"
+                                : coverage.total_score >= 60
+                                ? "bg-yellow-500 text-black"
+                                : "bg-red-600 text-white"
+                        }`}
+                    >
+                        Spec Coverage: {coverage.total_score}%
+                    </div>
+                )}
 
-        <div className="mt-3 flex gap-2">
-          <button
-            onClick={handlePlan}
-            disabled={loading || !goal.trim()}
-            className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
-          >
-            {loading ? "Generating..." : "Generate Plan"}
-          </button>
+                <textarea
+                    value={goal}
+                    onChange={(e) => setGoal(e.target.value)}
+                    placeholder="Describe your design goal..."
+                    className="w-full h-24 p-2 bg-slate-900 rounded border border-slate-700 text-sm text-slate-200 focus:ring-1 focus:ring-cyan-500"
+                />
 
-          <button
-            onClick={handleAutoCompose}
-            disabled={autoLoading || !goal.trim()}
-            className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
-          >
-            {autoLoading ? "Composing..." : "🧠 Auto-Compose Flow"}
-          </button>
+                <div className="mt-3 flex gap-2 flex-wrap">
+                    <button
+                        onClick={handleAnalyzeSpec}
+                        disabled={analyzing || !goal.trim()}
+                        className="bg-indigo-700 hover:bg-indigo-600 px-3 py-1 rounded disabled:opacity-50"
+                    >
+                        {analyzing ? "Analyzing..." : "🧠 Analyze / Improve Spec"}
+                    </button>
 
-          <button
-            onClick={onClose}
-            className="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded ml-auto"
-          >
-            Close
-          </button>
+                    <button
+                        onClick={handlePlan}
+                        disabled={loading || !goal.trim()}
+                        className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
+                    >
+                        {loading ? "Generating..." : "⚡ Generate Plan"}
+                    </button>
+
+                    <button
+                        onClick={handleAutoCompose}
+                        disabled={autoLoading || !goal.trim()}
+                        className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
+                    >
+                        {autoLoading ? "Composing..." : "🤖 Auto-Compose Flow"}
+                    </button>
+
+                    <button
+                        onClick={onClose}
+                        className="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded ml-auto"
+                    >
+                        Close
+                    </button>
+                </div>
+
+                {coverage && (
+                    <div className="mt-4 bg-slate-900 rounded-lg p-3 border border-slate-700">
+                        <div className="w-full bg-gray-700 rounded-full h-2.5 mb-2">
+                            <div
+                                className={`h-2.5 rounded-full ${
+                                    coverage.total_score >= 80
+                                        ? "bg-green-500"
+                                        : coverage.total_score >= 60
+                                        ? "bg-yellow-400"
+                                        : "bg-red-500"
+                                }`}
+                                style={{ width: `${coverage.total_score}%` }}
+                            ></div>
+                        </div>
+                        <p className="text-sm text-slate-300">
+                            Spec Coverage: {coverage.total_score}% (Intent {coverage.intent}, I/O {coverage.io}, Constraints {coverage.constraints}, Verification {coverage.verification})
+                        </p>
+
+                        {coverage.total_score < 80 && (
+                            <p className="text-xs mt-1 text-yellow-400">
+                                ⚠️ Recommended: Improve details or answer clarifying questions to reach ≥80% for best planning consistency.
+                            </p>
+                        )}
+
+                        {clarifications.length > 0 && (
+                            <div className="mt-2 text-xs text-slate-400">
+                                <strong className="text-slate-200">🔍 Clarifying Questions:</strong>
+                                <ul className="list-disc list-inside">
+                                    {clarifications.map((q, i) => (
+                                        <li key={i}>{q}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {plan?.missing_agents?.length > 0 && (
+                    <div className="mt-4 bg-amber-900/40 border border-amber-600 rounded-lg p-3">
+                        <h4 className="font-semibold text-amber-300">⚠️ Missing Agents</h4>
+                        <ul className="list-disc list-inside text-sm text-amber-200">
+                            {plan.missing_agents.map((a: string) => (
+                                <li key={a}>{a}</li>
+                            ))}
+                        </ul>
+                        <p className="text-xs mt-2 text-amber-300">
+                            These agents don't exist yet. You can create them manually or click <strong>Auto-Compose Flow</strong> to let ChipLoop generate and register them automatically.
+                        </p>
+                    </div>
+                )}
+
+                {plan && (
+                    <div className="mt-4 bg-slate-900 rounded p-3 font-mono text-xs text-slate-200 overflow-auto max-h-64">
+                        <pre>{JSON.stringify(plan, null, 2)}</pre>
+                    </div>
+                )}
+            </div>
         </div>
-        {plan?.missing_agents?.length > 0 && (
-          <div className="mt-4 bg-amber-900/40 border border-amber-600 rounded-lg p-3">
-            <h4 className="font-semibold text-amber-300">⚠️ Missing Agents</h4>
-            <ul className="list-disc list-inside text-sm text-amber-200">
-              {plan.missing_agents.map((a: string) => (
-                <li key={a}>{a}</li>
-            ))}
-            </ul>
-            <p className="text-xs mt-2 text-amber-300">
-              These agents don't exist yet. You can create them manually or click{" "}
-              <strong>Auto-Compose Flow</strong> to let ChipLoop generate and register
-              them automatically.
-            </p>
-           </div>
-        )}
-
-        {plan && (
-          <div className="mt-4 bg-slate-900 rounded p-3 font-mono text-xs text-slate-200 overflow-auto max-h-64">
-            <pre>{JSON.stringify(plan, null, 2)}</pre>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    );
 }
