@@ -6,6 +6,7 @@ import json
 import uuid
 import traceback
 import httpx
+import re
 import time;time.sleep(0.2)
 from datetime import datetime
 from typing import Dict, Any, Optional
@@ -16,6 +17,10 @@ from agent_capabilities import AGENT_CAPABILITIES
 from utils.graph_utils import build_capability_graph, serialize_graph
 from fastapi.responses import JSONResponse
 from utils.llm_utils import run_llm_fallback
+from utils.audio_utils import transcribe_audio
+from utils.notion_utils import append_to_notion, get_or_create_notion_page
+
+
 import logging
 logger = logging.getLogger("chiploop")
 logging.basicConfig(level=logging.INFO)
@@ -720,6 +725,17 @@ async def analyze_spec(request: Request):
 
     try:
         response = await run_llm_fallback(analyzer_prompt)
+
+# Extract first valid JSON block from the response
+        try:
+            match = re.search(r"\{[\s\S]*\}", response)
+            if not match:
+              raise ValueError("No JSON found in LLM response")
+            json_str = match.group(0)
+            result = json.loads(json_str)
+        except Exception as parse_err:
+            logger.error(f"JSON parse failed: {parse_err} | Raw response: {response[:200]}")
+            raise
         result = json.loads(response)
         total = (
             result.get("intent", 0)
@@ -818,17 +834,40 @@ def update_agent_memory(agent_name: str, workflow_name: str):
     except Exception as e:
         logger.warning(f"⚠️ Failed to update agent memory for {agent_name}: {e}")
 
+def fetch_memory_context(user_id: str):
+    try:
+        user_mem = supabase.table("user_memory").select("*").eq("user_id", user_id).execute()
+        user_data = user_mem.data[0] if user_mem.data else {}
+        agent_mem = supabase.table("agent_memory").select("agent_name, capability_tags").execute()
+        agent_data = agent_mem.data or []
+
+        return {
+            "recent_goals": user_data.get("recent_goals", []),
+            "frequent_agents": user_data.get("frequent_agents", []),
+            "known_agents": [a["agent_name"] for a in agent_data],
+        }
+    except Exception as e:
+        logger.warning(f"⚠️ fetch_memory_context failed: {e}")
+        return {"recent_goals": [], "frequent_agents": [], "known_agents": []}
 
 
-
-from planner.ai_agent_planner import plan_agent
+from planner.ai_agent_planner import plan_agent_with_memory
 
 @app.post("/plan_agent")
-async def plan_agent_api(request: Request):
+async def plan_agent(request: Request):
+    """
+    Agentic Agent Planner:
+    - Analyzes spec
+    - Fetches user + agent memory
+    - Returns proposed agent JSON
+    """
     data = await request.json()
-    prompt = data.get("prompt", "")
-    plan = plan_agent(prompt)
-    return {"status": "ok", "agent": plan}
+    goal = data.get("goal", "")
+    user_id = data.get("user_id", "anonymous")
+
+    from planner.ai_agent_planner import plan_agent_with_memory
+    result = await plan_agent_with_memory(goal, user_id)
+    return {"status": "ok", "agent_plan": result}
 
 @app.post("/save_custom_agent")
 async def save_custom_agent(request: Request):
@@ -943,4 +982,30 @@ async def auto_compose_workflow(request: Request):
     except Exception as e:
         logger.error(f"❌ Auto-compose failed: {e}")
         return {"status": "error", "message": str(e)}
+
+from utils.audio_utils import transcribe_audio
+from utils.notion_utils import append_to_notion, get_or_create_notion_page
+from utils.llm_utils import run_llm_fallback
+from fastapi import File, UploadFile, Form
+
+@app.post("/voice_stream")
+async def voice_stream(file: UploadFile = File(...), user_id: str = Form("anonymous")):
+    """Takes audio input, transcribes it, and appends to Notion."""
+    audio_bytes = await file.read()
+    transcript = transcribe_audio(audio_bytes)
+    page_id = get_or_create_notion_page(user_id)
+    append_to_notion(page_id, transcript)
+    return {"status": "ok", "transcript": transcript}
+
+@app.post("/summarize_notion")
+async def summarize_notion(user_id: str = Form("anonymous")):
+    """Fetch recent Notion text → summarize → send to analyzer."""
+    from utils.notion_utils import notion, get_or_create_notion_page
+    page_id = get_or_create_notion_page(user_id)
+    blocks = notion.blocks.children.list(page_id).get("results", [])
+    text = " ".join(b["paragraph"]["text"][0]["text"]["content"] for b in blocks if b["type"] == "paragraph")
+
+    summary = run_llm_fallback(f"Summarize this chip design spec in JSON (intent, inputs, outputs, constraints, verification): {text}")
+    return {"status": "ok", "summary": summary}
+
 

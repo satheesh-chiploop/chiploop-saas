@@ -22,6 +22,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 import AgentNode from "./AgentNode";
 import WorkflowConsole from "./WorkflowConsole";
 import PlannerModal from "@/components/PlannerModal";
+import AgentPlannerModal from "@/components/AgentPlannerModal";
 /* =========================
    Types & Constants
 ========================= */
@@ -93,6 +94,7 @@ function WorkflowPage() {
   const [showSpecModal, setShowSpecModal] = useState(false);
   const [showCreateAgentModal, setShowCreateAgentModal] = useState(false);
   const [showPlanner, setShowPlanner] = useState(false);
+  const [showAgentPlanner, setShowAgentPlanner] = useState(false);
 
 
   // workflow console tab state
@@ -487,13 +489,13 @@ function WorkflowPage() {
                   onClick={() => setShowPlanner(true)}
                   className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
               >
-                  AI Workflow Planner
+                  Agentic Workflow Planner
               </button>
               <button
                   onClick={() => setShowAgentPlanner(true)}
-                  className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mt-2"
+                  className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
               >
-                  AI Agent Planner
+                  Agentic Agent Planner
               </button>
             </div>
           </div>
@@ -567,7 +569,7 @@ function WorkflowPage() {
               }}
               className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
             >
-              💾 Save Workflow
+              Save Workflow
             </button>
 
             {/* Local Save (Offline Backup) */}
@@ -581,9 +583,9 @@ function WorkflowPage() {
             {/* Clear Workflow */}
             <button
               onClick={clearWorkflow}
-              className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600"
+              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
             >
-              🧹 Clear
+              Clear
             </button>
           </div>
 
@@ -657,6 +659,7 @@ function WorkflowPage() {
           onClose={() => setShowPlanner(false)}
         />
       )}
+      {showAgentPlanner && <AgentPlannerModal onClose={() => setShowAgentPlanner(false)} />}
     </main>
   );
 }
