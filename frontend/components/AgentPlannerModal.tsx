@@ -32,7 +32,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         const formData = new FormData();
         formData.append("file", blob);
   
-        await fetch("api/voice_stream", {
+        await fetch("/api/voice_stream", {
           method: "POST",
           body: formData,
         });
@@ -55,7 +55,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     setBackendSource("");
 
     try {
-      const res = await fetch("/plan_agent", {
+      const res = await fetch("/api/plan_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ goal }),
@@ -86,7 +86,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const handleSave = async () => {
     if (!agent) return;
     try {
-      const res = await fetch("/save_custom_agent", {
+      const res = await fetch("/api/save_custom_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: "anonymous", agent_data: agent }),
