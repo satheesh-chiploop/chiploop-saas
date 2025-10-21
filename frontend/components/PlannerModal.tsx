@@ -16,6 +16,8 @@ export default function PlannerModal({ onClose }) {
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
 
     const [summary, setSummary] = useState<any>(null);
+    const [voiceMode, setVoiceMode] = useState(false);
+
     
     async function startStopRecording() {
         if (isRecording && mediaRecorder) {
@@ -101,28 +103,47 @@ export default function PlannerModal({ onClose }) {
         }
     };
 
+    const handleVoiceInput = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+      
+        const res = await fetch("/api/voice_to_spec", { method: "POST", body: formData });
+        const data = await res.json();
+        setSummary(data.summary || "");
+        setCoverage(data.coverage || 0);
+        setVoiceMode(true);
+      };
+
     const handleAnalyzeSpec = async () => {
         setAnalyzing(true);
         try {
-            const res = await fetch("/api/analyze_spec", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ goal, user_id: "anonymous" }),
-            });
-            const data = await res.json();
-            if (data.status === "ok") {
-                setCoverage(data.coverage);
-                setClarifications(data.coverage.questions || []);
-                alert("✅ Spec analyzed successfully!");
-            } else {
-                alert("⚠️ Spec analysis failed.");
-            }
+          // 🧩 Unified payload — use voice summary if voiceMode is active
+          const payload = voiceMode
+            ? { voice_summary: summary, user_id: "anonymous" }
+            : { goal, user_id: "anonymous" };
+      
+          const res = await fetch("/api/analyze_spec", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+      
+          const data = await res.json();
+          if (data.status === "ok") {
+            setCoverage(data.coverage);
+            setClarifications(data.coverage.questions || []);
+            alert("✅ Spec analyzed successfully!");
+          } else {
+            console.warn("⚠️ Spec analysis failed:", data.message);
+            alert("⚠️ Spec analysis failed.");
+          }
         } catch (err) {
-            alert("❌ Could not connect to backend.");
+          console.error("❌ Analyzer error:", err);
+          alert("❌ Could not connect to backend.");
         } finally {
-            setAnalyzing(false);
+          setAnalyzing(false);
         }
-    };
+      };
 
     useEffect(() => {
         const ws = new WebSocket("/api/spec_live_feedback");
@@ -201,7 +222,7 @@ export default function PlannerModal({ onClose }) {
                             : "bg-purple-600 hover:bg-purple-700 text-white"
                         }`}
                     >
-                        🎙 {isRecording ? "Stop" : "Start"} Voice Input
+                        🎙 {isRecording ? "Stop" : "Start"}
                     </button>
 
                     <button
