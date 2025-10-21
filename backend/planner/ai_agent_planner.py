@@ -1,10 +1,10 @@
 import json
 from loguru import logger
 from utils.llm_utils import run_llm_fallback
-from utils.supabase_utils import supabase
-from planner.ai_work_planner import analyze_spec
-from datetime import datatime
 
+from datetime import datetime
+def plan_agent_fallback(goal, user_id):
+    from planner.ai_work_planner import analyze_spec
 
 async def fetch_user_memory(user_id: str):
     """Fetch user memory context from Supabase."""

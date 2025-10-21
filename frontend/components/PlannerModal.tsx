@@ -125,7 +125,7 @@ export default function PlannerModal({ onClose }) {
     };
 
     useEffect(() => {
-        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_BACKEND_WS_URL}/spec_live_feedback`);
+        const ws = new WebSocket("/api/spec_live_feedback");
       
         ws.onmessage = (event) => {
           try {
