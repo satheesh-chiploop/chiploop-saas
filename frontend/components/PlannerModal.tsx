@@ -1,14 +1,55 @@
 "use client";
 import { useState } from "react";
+import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 
 export default function PlannerModal({ onClose }) {
     const [goal, setGoal] = useState("");
     const [plan, setPlan] = useState<any | null>(null);
     const [coverage, setCoverage] = useState<any | null>(null);
+    const [liveCoverage, setLiveCoverage] = useState(0);
     const [clarifications, setClarifications] = useState<string[]>([]);
     const [analyzing, setAnalyzing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [autoLoading, setAutoLoading] = useState(false);
+
+    const [isRecording, setIsRecording] = useState(false);
+    const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+
+    const [summary, setSummary] = useState<any>(null);
+    
+    async function startStopRecording() {
+        if (isRecording && mediaRecorder) {
+          mediaRecorder.stop();
+          setIsRecording(false);
+          return;
+        }
+      
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const rec = new MediaRecorder(stream);
+          const chunks: BlobPart[] = [];
+      
+          rec.ondataavailable = (e) => chunks.push(e.data);
+          rec.onstop = async () => {
+            const blob = new Blob(chunks, { type: "audio/webm" });
+            const formData = new FormData();
+            formData.append("file", blob);
+      
+            // Send audio to backend
+            await fetch("/api/voice_stream", {
+              method: "POST",
+              body: formData,
+            });
+          };
+      
+          rec.start();
+          setMediaRecorder(rec);
+          setIsRecording(true);
+        } catch (err) {
+          console.error("🎙️ Voice recording failed:", err);
+        }
+    }
+      
 
     const handlePlan = async () => {
         setLoading(true);
@@ -83,6 +124,22 @@ export default function PlannerModal({ onClose }) {
         }
     };
 
+    useEffect(() => {
+        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_BACKEND_WS_URL}/spec_live_feedback`);
+      
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.summary) setSummary(data.summary);
+            if (data.coverage) setLiveCoverage(data.coverage);
+          } catch (err) {
+            console.error("⚠️ Error parsing WebSocket data", err);
+          }
+        };
+      
+        return () => ws.close();
+    }, []);
+
     return (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
             <div className="bg-slate-800 relative rounded-xl p-6 w-[600px] shadow-xl text-white">
@@ -134,6 +191,17 @@ export default function PlannerModal({ onClose }) {
                         className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
                     >
                         {autoLoading ? "Composing..." : "Auto-Compose Flow"}
+                    </button>
+
+                    <button
+                        onClick={startStopRecording}
+                        className={`px-4 py-2 rounded-md font-medium ${
+                          isRecording
+                            ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
+                            : "bg-purple-600 hover:bg-purple-700 text-white"
+                        }`}
+                    >
+                        🎙 {isRecording ? "Stop" : "Start"} Voice Input
                     </button>
 
                     <button
@@ -198,6 +266,31 @@ export default function PlannerModal({ onClose }) {
                 {plan && (
                     <div className="mt-4 bg-slate-900 rounded p-3 font-mono text-xs text-slate-200 overflow-auto max-h-64">
                         <pre>{JSON.stringify(plan, null, 2)}</pre>
+                    </div>
+                )}
+
+                {/* Floating Notion Summary */}
+                {summary && (
+                    <div className="absolute bottom-4 right-4 w-80 bg-gray-900 text-white p-4 rounded-xl shadow-lg">
+                        <h3  className="font-bold text-sm mb-2">🧾 Spec Summary Preview</h3>
+                        <pre className="text-xs whitespace-pre-wrap bg-gray-800 p-2 rounded-md max-h-48 overflow-auto">
+                           {JSON.stringify(summary, null, 2)}
+                        </pre>
+                        <div className="mt-2">
+                          <div className="w-full bg-gray-700 rounded-full h-2.5">
+                             <div 
+                                className={`h-2.5 rounded-full ${
+                                coverage >= 80
+                                  ? "bg-green-500"
+                                  : coverage >= 60
+                                  ? "bg-yellow-400"
+                                  : "bg-red-500"
+                                }`}
+                                style={{ width: `${liveCoverage}%` }}
+                             />
+                          </div>
+                          <p className="text-xs mt-1 text-gray-400">Coverage: {liveCoverage}%</p>
+                        </div>
                     </div>
                 )}
             </div>

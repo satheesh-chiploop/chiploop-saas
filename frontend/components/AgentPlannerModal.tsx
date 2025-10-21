@@ -1,12 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
+
 
 export default function AgentPlannerModal({ onClose }: { onClose: () => void }) {
   const [goal, setGoal] = useState("");
   const [agent, setAgent] = useState<any>(null);
   const [backendSource, setBackendSource] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [summary, setSummary] = useState<any>(null);
+  const [coverage, setCoverage] = useState(0);
+
+  async function startStopRecording() {
+    if (isRecording && mediaRecorder) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      return;
+    }
+  
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new MediaRecorder(stream);
+      const chunks: BlobPart[] = [];
+  
+      rec.ondataavailable = (e) => chunks.push(e.data);
+      rec.onstop = async () => {
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        const formData = new FormData();
+        formData.append("file", blob);
+  
+        await fetch("api/voice_stream", {
+          method: "POST",
+          body: formData,
+        });
+      };
+  
+      rec.start();
+      setMediaRecorder(rec);
+      setIsRecording(true);
+    } catch (err) {
+      console.error("🎙️ Voice recording failed:", err);
+    }
+  }
+
+
 
   // --- Generate Agent Plan ---
   const handlePlan = async () => {
@@ -62,6 +102,25 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       alert("⚠️ Could not connect to backend.");
     }
   };
+  
+  useEffect(() => {
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_BACKEND_WS_URL}/spec_live_feedback`);
+  
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.summary) setSummary(data.summary);
+        if (data.coverage) setCoverage(data.coverage);
+      } catch (err) {
+        console.error("⚠️ Error parsing WebSocket data", err);
+      }
+    };
+  
+    ws.onclose = () => console.log("🔌 WebSocket closed");
+    ws.onerror = (err) => console.error("⚠️ WS Error:", err);
+  
+    return () => ws.close();
+  }, []);
 
   return (
     <div className="fixed inset-0 bg-black/70 flex justify-end z-50">
@@ -112,6 +171,18 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           >
             💾 Save Agent
           </button>
+
+          <button
+            onClick={startStopRecording}
+            className={`mt-2 px-4 py-2 rounded-md font-medium ${
+              isRecording
+                ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
+                : "bg-purple-600 hover:bg-purple-700 text-white"
+              }`}
+          >
+            🎙 {isRecording ? "Stop" : "Start"} Voice Input
+          </button>
+
         </div>
 
         {backendSource && (
@@ -157,6 +228,31 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             </pre>
           </div>
         )}
+        
+        {summary && (
+          <div className="absolute bottom-4 right-4 w-80 bg-gray-900 text-white p-4 rounded-xl shadow-lg">
+              <h3 className="font-bold text-sm mb-2">🧾 Spec Summary Preview</h3>
+              <pre className="text-xs whitespace-pre-wrap bg-gray-800 p-2 rounded-md max-h-48 overflow-auto">
+                {JSON.stringify(summary, null, 2)}
+              </pre>
+              <div className="mt-2">
+                <div className="w-full bg-gray-700 rounded-full h-2.5">
+                  <div
+                    className={`h-2.5 rounded-full ${
+                      coverage >= 80
+                        ? "bg-green-500"
+                        : coverage >= 60
+                        ? "bg-yellow-400"
+                        : "bg-red-500"
+                    }`}
+                    style={{ width: `${coverage}%` }}
+                  />
+                </div>
+                <p className="text-xs mt-1 text-gray-400">Coverage: {coverage}%</p>
+              </div>
+          </div>
+        )}
+      
       </div>
     </div>
   );
