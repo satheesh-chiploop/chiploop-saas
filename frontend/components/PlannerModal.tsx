@@ -146,7 +146,7 @@ export default function PlannerModal({ onClose }) {
       };
 
     useEffect(() => {
-        const ws = new WebSocket("/api/spec_live_feedback");
+        const ws = new WebSocket("wss://209.38.74.151/spec_live_feedback");
       
         ws.onmessage = (event) => {
           try {
@@ -165,7 +165,7 @@ export default function PlannerModal({ onClose }) {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
             <div className="bg-slate-800 relative rounded-xl p-6 w-[600px] shadow-xl text-white">
                 <h2 className="text-cyan-400 font-bold text-lg mb-3">
-                    🧠 AI Workflow Planner
+                    AI Workflow Planner
                 </h2>
 
                 {coverage && (
@@ -195,7 +195,7 @@ export default function PlannerModal({ onClose }) {
                         disabled={analyzing || !goal.trim()}
                         className="bg-indigo-700 hover:bg-indigo-600 px-3 py-1 rounded disabled:opacity-50"
                     >
-                        {analyzing ? "Analyzing..." : "Spec Analysis"}
+                        {analyzing ? "Analyzing..." : "Analyze Spec"}
                     </button>
 
                     <button
@@ -214,17 +214,17 @@ export default function PlannerModal({ onClose }) {
                         {autoLoading ? "Composing..." : "Auto-Compose Flow"}
                     </button>
 
+                    {/* 🎙 Voice Mode Toggle */}
                     <button
-                        onClick={startStopRecording}
-                        className={`px-4 py-2 rounded-md font-medium ${
-                          isRecording
-                            ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
-                            : "bg-purple-600 hover:bg-purple-700 text-white"
-                        }`}
+                        onClick={toggleVoiceMode}
+                        className={`ml-4 px-3 py-2 rounded-full ${
+                        voiceMode ? "bg-green-600 hover:bg-green-700" : "bg-gray-700 hover:bg-gray-600"
+                        } text-white`}
+                        title={voiceMode ? "Voice Mode Active" : "Start Voice Mode"}
                     >
-                        🎙 {isRecording ? "Stop" : "Start"}
+                    🎙
                     </button>
-
+  
                     <button
                         onClick={onClose}
                         className="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded ml-auto"
