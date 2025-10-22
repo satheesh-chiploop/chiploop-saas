@@ -13,7 +13,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [summary, setSummary] = useState<any>(null);
   const [coverage, setCoverage] = useState(0);
-
+  const [analyzing, setAnalyzing] = useState(false);
+  
   async function startStopRecording() {
     if (isRecording && mediaRecorder) {
       mediaRecorder.stop();
@@ -49,38 +50,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
 
   // --- Generate Agent Plan ---
-  const handlePlan = async () => {
-    setLoading(true);
-    setAgent(null);
-    setBackendSource("");
-
-    try {
-      const res = await fetch("/api/plan_agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal }),
-      });
-
-      const data = await res.json();
-
-      if (data?.agent_plan) {
-        setAgent(data.agent_plan);
-        const text = JSON.stringify(data.agent_plan).toLowerCase();
-
-        if (text.includes("ollama")) setBackendSource("🦙 Local Ollama");
-        else if (text.includes("portkey")) setBackendSource("🪄 Portkey");
-        else if (text.includes("openai")) setBackendSource("🌐 OpenAI");
-        else setBackendSource("⚙️ Memory Enhanced");
-      } else {
-        setBackendSource("⚠️ Unknown");
-      }
-    } catch (e) {
-      console.error(e);
-      setBackendSource("❌ Request Failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   const handleAnalyzeSpec = async () => {
     setLoading(true);
@@ -142,26 +112,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   };
   
 
-  // --- Save Custom Agent ---
-  const handleSave = async () => {
-    if (!agent) return;
-    try {
-      const res = await fetch("/api/save_custom_agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: "anonymous", agent_data: agent }),
-      });
-
-      const data = await res.json();
-      if (data.status === "ok") {
-        alert(`✅ Agent "${agent.agent_name}" saved successfully.`);
-      } else {
-        alert(`❌ Save failed: ${data.message}`);
-      }
-    } catch (e) {
-      alert("⚠️ Could not connect to backend.");
-    }
-  };
+  
   
   useEffect(() => {
     const ws = new WebSocket("/api/spec_live_feedback");
@@ -229,7 +180,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
 
           <button
-            onClick={handlePlan}
+            onClick={handleGenerateAgent}
             disabled={loading || !goal.trim()}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
