@@ -82,6 +82,66 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     }
   };
 
+  const handleAnalyzeSpec = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/analyze_spec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ goal, user_id: "anonymous" }),
+      });
+      const data = await res.json();
+      if (data.status === "ok") {
+        setCoverage(data.coverage);
+        alert(`✅ Spec analyzed: ${data.coverage.total_score}%`);
+      }
+    } catch (err) {
+      alert("❌ Spec analysis failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleGenerateAgent = async () => {
+    setLoading(true);
+    try {
+      const payload = coverage
+        ? { goal, user_id: "anonymous", coverage }
+        : { goal, user_id: "anonymous" };
+      const res = await fetch("/api/plan_agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      setAgent(data.agent_plan);
+      alert(`✅ Agent generated: ${data.agent_plan.agent_name}`);
+  
+      const agentName = prompt("💾 Enter name to save this agent:", data.agent_plan.agent_name);
+      const loopType = prompt("🔁 Enter loop type (digital / analog / embedded / system):", "digital");
+  
+      if (agentName && loopType) {
+        const saveRes = await fetch("/api/save_custom_agent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            agent: {
+              ...data.agent_plan,
+              agent_name: agentName,
+              domain: loopType,
+            },
+          }),
+        });
+        const saveData = await saveRes.json();
+        alert(saveData.status === "ok" ? `💾 Agent "${agentName}" saved successfully!` : `⚠️ ${saveData.message}`);
+      }
+    } catch (err) {
+      alert("❌ Agent generation failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
   // --- Save Custom Agent ---
   const handleSave = async () => {
     if (!agent) return;
@@ -133,7 +193,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         )}
 
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">🤖 AI Agent Planner</h2>
+          <h2 className="text-xl font-bold text-white">AI Agent Planner</h2>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-white transition"
@@ -156,21 +216,26 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         />
 
         <div className="flex gap-2 mt-4">
+
+          <button
+            onClick={handleAnalyzeSpec}
+            disabled={analyzing || !goal.trim()}
+            className="bg-indigo-700 hover:bg-indigo-600 px-3 py-1 rounded disabled:opacity-50"
+          >
+            {analyzing ? "Analyzing..." : "Analyze Spec"}
+          </button>
+
+
+
+
           <button
             onClick={handlePlan}
             disabled={loading || !goal.trim()}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
-            {loading ? "Planning..." : "🧠 Generate Plan"}
+            {loading ? "Planning..." : "Generate Agent"}
           </button>
 
-          <button
-            onClick={handleSave}
-            disabled={!agent}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
-          >
-            💾 Save Agent
-          </button>
 
           <button
             onClick={startStopRecording}
@@ -180,7 +245,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 : "bg-purple-600 hover:bg-purple-700 text-white"
               }`}
           >
-            🎙 {isRecording ? "Stop" : "Start"} Voice Input
+            🎙 {isRecording ? "Stop" : "Start"}
           </button>
 
         </div>

@@ -89,11 +89,17 @@ export default function PlannerModal({ onClose }) {
             });
             const data = await res.json();
             if (data.status === "ok" || data.nodes) {
+
+                setPlan({
+                    summary: data.summary,
+                    nodes: data.nodes,
+                    edges: data.edges,
+                });
                 
                 const workflowName = prompt("💾 Enter a name to save this workflow:", `AI_Composed_${new Date().toISOString().slice(0,10)}`);
                 const loopType = prompt("🔁 Enter loop type (digital / analog / embedded / system):", "digital");
                 if (workflowName) {
-                  await fetch("/api/save_workflow", {
+                  await fetch("/api/save_custom_workflow", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -110,11 +116,6 @@ export default function PlannerModal({ onClose }) {
                   });
                   alert(`💾 Workflow "${workflowName}" saved under "${loopType}" Custom Workflows.`);
                 }
-                setPlan({
-                    summary: data.summary,
-                    nodes: data.nodes,
-                    edges: data.edges,
-                });
                 alert(`✅ Auto-composed workflow:\n${data.summary}`);
                 alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");
             } else {
