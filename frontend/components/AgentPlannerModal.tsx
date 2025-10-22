@@ -14,7 +14,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [summary, setSummary] = useState<any>(null);
   const [coverage, setCoverage] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
-  
+
   async function startStopRecording() {
     if (isRecording && mediaRecorder) {
       mediaRecorder.stop();
@@ -134,7 +134,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex justify-end z-50">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="relative bg-slate-800 w-[520px] h-full p-6 overflow-y-auto border-l border-slate-700 text-white shadow-xl">
         {/* Floating Spec Coverage Badge */}
         {agent?.coverage && (
@@ -171,7 +171,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           <button
             onClick={handleAnalyzeSpec}
             disabled={analyzing || !goal.trim()}
-            className="bg-indigo-700 hover:bg-indigo-600 px-3 py-1 rounded disabled:opacity-50"
+            className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
             {analyzing ? "Analyzing..." : "Analyze Spec"}
           </button>
@@ -188,6 +188,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </button>
 
 
+
+
           <button
             onClick={startStopRecording}
             className={`mt-2 px-4 py-2 rounded-md font-medium ${
@@ -197,6 +199,13 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               }`}
           >
             🎙 {isRecording ? "Stop" : "Start"}
+          </button>
+
+          <button
+            onClick={onClose}
+            className="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded ml-auto"
+          >
+            Close
           </button>
 
         </div>
