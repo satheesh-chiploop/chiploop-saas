@@ -88,6 +88,27 @@ export default function PlannerModal({ onClose }) {
             });
             const data = await res.json();
             if (data.status === "ok" || data.nodes) {
+                
+                const workflowName = prompt("💾 Enter a name to save this workflow:", `AI_Composed_${new Date().toISOString().slice(0,10)}`);
+                const loopType = prompt("🔁 Enter loop type (digital / analog / embedded / system):", "digital");
+                if (workflowName) {
+                  await fetch("/api/save_workflow", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      name: workflowName,
+                      loop_type: loopType.toLowerCase(),
+                      user_id: "anonymous",
+                      data: {
+                        summary: data.summary,
+                        nodes: data.nodes,
+                        edges: data.edges,
+                      },
+                      is_custom: true,
+                    }),
+                  });
+                  alert(`💾 Workflow "${workflowName}" saved under "${loopType}" Custom Workflows.`);
+                }
                 setPlan({
                     summary: data.summary,
                     nodes: data.nodes,
@@ -220,13 +241,13 @@ export default function PlannerModal({ onClose }) {
                     <button
                         onClick={toggleVoiceMode}
                         className={`ml-4 px-3 py-2 rounded-full ${
-                        voiceMode ? "bg-green-600 hover:bg-green-700" : "bg-gray-700 hover:bg-gray-600"
+                        isRecording ? "bg-green-600 hover:bg-yellow-700" : "bg-gray-700 hover:bg-red-600"
                         } text-white`}
-                        title={voiceMode ? "Voice Mode Active" : "Start Voice Mode"}
+                        title={isRecording ? "Voice Mode Active" : "Start Voice Mode"}
                     >
                     🎙
                     </button>
-  
+                    
                     <button
                         onClick={onClose}
                         className="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded ml-auto"
