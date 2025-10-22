@@ -51,7 +51,9 @@ export default function PlannerModal({ onClose }) {
           console.error("🎙️ Voice recording failed:", err);
         }
     }
-      
+    function toggleVoiceMode() {
+        startStopRecording();
+    }
 
     const handlePlan = async () => {
         setLoading(true);
