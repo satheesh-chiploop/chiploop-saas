@@ -42,6 +42,7 @@ export default function PlannerModal({ onClose }) {
               method: "POST",
               body: formData,
             });
+            setVoiceMode(true);
           };
       
           rec.start();
