@@ -96,7 +96,14 @@ function WorkflowPage() {
   const [showPlanner, setShowPlanner] = useState(false);
   const [showAgentPlanner, setShowAgentPlanner] = useState(false);
 
-
+  const {fitView} = useReactFlow();
+  
+  useEffect(() => {
+    if (nodes.length > 0 || edges.length > 0) {
+      fitView({ padding: 0.15, duration: 500 });
+    }
+  }, [nodes, edges, fitView]);
+  
   // workflow console tab state
   const [activeTab, setActiveTab] = useState<"summary" | "live" | "output">("summary");
 
@@ -372,7 +379,7 @@ function WorkflowPage() {
      Render
   ========================= */
   return (
-    <main className="min-h-screen bg-[#0b0b0c] text-white flex flex-col">
+    <main className="h-screen overflow-hidden bg-[#0b0b0c] text-white flex flex-col">
       {/* ===== Top bar ===== */}
       <nav className="w-full flex justify-between items-center px-6 py-4 bg-black/70 backdrop-blur border-b border-slate-800">
         <div
