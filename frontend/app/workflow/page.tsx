@@ -435,9 +435,9 @@ function WorkflowPage() {
   
           {/* ⚙️ Workflows */}
           <section className="mb-6">
-            <h3 className="text-cyan-400 font-semibold mb-2">Workflows</h3>
+            <h3 className="text-lg font-bold mb-3 text-cyan-400">Workflows</h3>
   
-            <p className="text-sm text-cyan-300 font-medium mb-1">Prebuilt</p>
+            <p className="text-sm text-cyan-400 font-medium mb-1"> Prebuilt</p>
             <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
               {prebuiltWorkflows.map((wf) => (
                 <li
@@ -450,7 +450,7 @@ function WorkflowPage() {
               ))}
             </ul>
   
-            <p className="text-sm text-cyan-300 font-medium mb-1">Custom</p>
+            <p className="text-sm text-cyan-400 font-medium mb-1"> Custom</p>
             <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
               {customWorkflows.length ? (
                 customWorkflows.map((w) => (
@@ -459,16 +459,16 @@ function WorkflowPage() {
                   </li>
                 ))
               ) : (
-                <p className="text-xs text-slate-400">None created yet</p>
+                <p className="text-xs text-slate-400"> None created yet</p>
               )}
             </ul>
           </section>
   
           {/* 🤖 Agents */}
           <section className="mb-6">
-            <h3 className="text-cyan-400 font-semibold mb-2">Agents</h3>
+            <h3 className="text-lg font-bold mb-3 text-cyan-400">Agents</h3>
   
-            <p className="text-sm text-cyan-300 font-medium mb-1">Prebuilt</p>
+            <p className="text-sm text-cyan-400 font-medium mb-1"> Prebuilt</p>
             <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
               {prebuiltAgents.map((a) => (
                 <li
@@ -483,7 +483,7 @@ function WorkflowPage() {
               ))}
             </ul>
   
-            <p className="text-sm text-cyan-300 font-medium mb-1">Custom</p>
+            <p className="text-sm text-cyan-400 font-medium mb-1"> Custom</p>
             <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
               {customAgents.length ? (
                 customAgents.map((a, idx) => (
@@ -497,27 +497,27 @@ function WorkflowPage() {
                   </li>
                 ))
               ) : (
-                <p className="text-xs text-slate-400">No custom agents yet</p>
+                <p className="text-xs text-slate-400"> No custom agents yet</p>
               )}
             </ul>
           </section>
   
           {/* 🛍 Marketplace */}
           <div className="mt-auto border-t border-slate-700 pt-3">
-            <h3 className="text-cyan-400 font-semibold mb-3">Marketplace</h3>
+            <h3 className="text-lg font-bold mb-3 text-cyan-400">Marketplace</h3>
   
             <button
               onClick={() => setShowSubmitMarketplaceModal(true)}
               className="w-full text-left px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-white mb-2"
             >
-              📨 Submit for Review
+              Submit for Review
             </button>
   
             <button
               onClick={() => router.push("/marketplace")}
               className="w-full text-left px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600 text-white"
             >
-              🌐 View Public Marketplace
+              View Public Marketplace
             </button>
           </div>
         </aside>
