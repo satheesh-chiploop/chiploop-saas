@@ -373,25 +373,53 @@ function WorkflowPage() {
   ========================= */
   return (
     <main className="min-h-screen bg-[#0b0b0c] text-white flex flex-col">
-      {/* Top bar */}
+      {/* ===== Top bar ===== */}
       <nav className="w-full flex justify-between items-center px-6 py-4 bg-black/70 backdrop-blur border-b border-slate-800">
-        <div onClick={() => router.push("/")} className="text-2xl font-extrabold text-cyan-400 cursor-pointer">CHIPLOOP ⚡</div>
+        <div
+          onClick={() => router.push("/")}
+          className="text-2xl font-extrabold text-cyan-400 cursor-pointer"
+        >
+          CHIPLOOP ⚡
+        </div>
         <div className="flex items-center gap-6 text-slate-300">
-          <button onClick={() => router.push("/")} className="hover:text-cyan-400 transition">Home</button>
-          <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">Pricing</button>
+          <button onClick={() => router.push("/")} className="hover:text-cyan-400 transition">
+            Home
+          </button>
+          <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
+            Pricing
+          </button>
           <button
-            onClick={async () => { await supabase.auth.signOut(); router.push("/"); }}
+            onClick={async () => {
+              await supabase.auth.signOut();
+              router.push("/");
+            }}
             className="rounded-lg bg-slate-800 px-4 py-2 hover:bg-slate-700"
           >
             Logout
           </button>
         </div>
       </nav>
-
+  
       <div className="flex flex-1 overflow-hidden">
         {/* ===== Sidebar ===== */}
-        <aside className="w-full max-w-xs bg-slate-900/70 border-r border-slate-800 p-4 overflow-y-auto flex flex-col">
-          <div className="mb-3">
+        <aside className="w-72 bg-slate-900/70 border-r border-slate-800 p-4 flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          {/* 🧠 Agentic Tools */}
+          <h2 className="text-lg font-bold mb-3 text-cyan-400">🧠 Agentic Tools</h2>
+          <button
+            onClick={() => setShowPlanner(true)}
+            className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
+          >
+            Workflow Planner
+          </button>
+          <button
+            onClick={() => setShowAgentPlanner(true)}
+            className="w-full text-left px-3 py-2 mb-4 rounded bg-purple-600 hover:bg-purple-500 text-white"
+          >
+            Agent Planner
+          </button>
+  
+          {/* 🔁 Loop Selector */}
+          <div className="mb-4">
             <label className="block text-xs uppercase text-cyan-400 mb-2">Loop</label>
             <select
               value={loop}
@@ -401,108 +429,88 @@ function WorkflowPage() {
               <option value="digital">Digital Loop</option>
               <option value="analog">Analog Loop</option>
               <option value="embedded">Embedded Loop</option>
-              <option value="system">System Loop (Digital+ Analog + Embedded)</option>
+              <option value="system">System Loop (Digital + Analog + Embedded)</option>
             </select>
-
-            <div className="mt-3 max-h-12 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-              <input
-                type="text"
-                placeholder="Filter agents..."
-                className="w-full bg-slate-800 text-white placeholder-gray-400 rounded-md p-2 border border-slate-700 focus:ring-2 focus:ring-cyan-400"
-              />
-            </div>
           </div>
-
-          <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-            <section>
-              <h3 className="text-cyan-400 font-semibold mb-2">Prebuilt Agents</h3>
-              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                {prebuiltAgents.map((a) => (
+  
+          {/* ⚙️ Workflows */}
+          <section className="mb-6">
+            <h3 className="text-cyan-400 font-semibold mb-2">⚙️ Workflows</h3>
+            <p className="text-xs text-slate-400">Prebuilt</p>
+            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-28 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-2">
+              {prebuiltWorkflows.map((wf) => (
+                <li
+                  key={wf}
+                  onClick={() => loadPrebuiltWorkflow(wf)}
+                  className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
+                >
+                  {wf}
+                </li>
+              ))}
+            </ul>
+  
+            <p className="text-xs text-slate-400">Custom</p>
+            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-28 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              {customWorkflows.length ? (
+                customWorkflows.map((w) => (
+                  <li key={w} className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer">
+                    {w}
+                  </li>
+                ))
+              ) : (
+                <p className="text-xs text-slate-400">None created yet</p>
+              )}
+            </ul>
+          </section>
+  
+          {/* 🤖 Agents */}
+          <section className="mb-6">
+            <h3 className="text-cyan-400 font-semibold mb-2">🤖 Agents</h3>
+            <p className="text-xs text-slate-400">Prebuilt</p>
+            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-28 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-2">
+              {prebuiltAgents.map((a) => (
+                <li
+                  key={a.backendLabel}
+                  draggable
+                  onDragStart={(e) => onDragStartAgent(e, a)}
+                  className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
+                  title={`${a.uiLabel} — ${a.desc || ""}`}
+                >
+                  {a.uiLabel}
+                </li>
+              ))}
+            </ul>
+  
+            <p className="text-xs text-slate-400">Custom</p>
+            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-28 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              {customAgents.length ? (
+                customAgents.map((a, idx) => (
                   <li
-                    key={a.backendLabel}
+                    key={`${a.backendLabel}-${idx}`}
                     draggable
                     onDragStart={(e) => onDragStartAgent(e, a)}
                     className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
-                    title={`${a.uiLabel} — ${a.desc || ""}`}
                   >
                     {a.uiLabel}
                   </li>
-                ))}
-              </ul>
-            </section>
-
-            <section>
-              <h3 className="text-cyan-400 font-semibold mb-2">Custom Agents</h3>
-              <button
-                onClick={() => setShowCreateAgentModal(true)}
-                className="text-sm rounded bg-slate-800 border border-slate-700 px-3 py-1 hover:bg-slate-700"
-              >
-                + Add New Agent
-              </button>
-              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
-              
-                {customAgents.length ? (
-                  customAgents.map((a, idx) => (
-                    <li
-                      key={`${a.backendLabel}-${idx}`}
-                      draggable
-                      onDragStart={(e) => onDragStartAgent(e, a)}
-                      className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
-                    >
-                      {a.uiLabel}
-                    </li>
-                  ))
-                ) : (
-                  <p className="text-xs text-slate-400">No custom agents yet</p>
-                )}
-              </ul>
-            </section>
-            <section>
-              <h3 className="text-cyan-400 font-semibold mb-2">Prebuilt Workflows</h3>
-              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1 hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                {prebuiltWorkflows.map((wf) => (
-                  <li
-                    key={wf}
-                    onClick={() => loadPrebuiltWorkflow(wf)}
-                    className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
-                  >
-                    {wf}
-                  </li>
-                ))}
-              </ul>
-            </section>
-            
-            <section>
-              <h3 className="text-cyan-400 font-semibold mb-2">Custom Workflows</h3>
-              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-40 pr-1hover:overflow-y-scroll scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                {customWorkflows.length ? (
-                  customWorkflows.map((w) => (
-                    <li key={w} className="px-2 py-1 rounded hover:bg-slate-800">{w}</li>
-                  ))
-                ) : (
-                  <p className="text-xs text-slate-400">None created yet</p>
-                )}
-              </ul>
-            </section>
-            <div className="mt-4 border-t border-slate-700 pt-3">
-              <button
-                  onClick={() => setShowPlanner(true)}
-                  className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
-              >
-                  Agentic Workflow Planner
-              </button>
-              <button
-                  onClick={() => setShowAgentPlanner(true)}
-                  className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
-              >
-                  Agentic Agent Planner
-              </button>
-            </div>
+                ))
+              ) : (
+                <p className="text-xs text-slate-400">No custom agents yet</p>
+              )}
+            </ul>
+          </section>
+  
+          {/* 🛍 Marketplace */}
+          <div className="mt-auto border-t border-slate-700 pt-3">
+            <h3 className="text-cyan-400 font-semibold mb-2">🛍 Marketplace</h3>
+            <button className="w-full text-left px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600 text-white">
+              Discover + Import
+            </button>
           </div>
         </aside>
-
+  
         {/* ===== Canvas & Console ===== */}
-        <section className="flex-1 flex flex-col p-4">
+        <section className="flex-1 flex flex-col p-4 overflow-hidden">
           <div
             className="relative flex-1 border border-slate-800 rounded-xl overflow-hidden bg-black/60"
             onDrop={onDropCanvas}
@@ -523,25 +531,15 @@ function WorkflowPage() {
               <Background color="#334155" gap={20} />
             </ReactFlow>
           </div>
-
+  
+          {/* Action Buttons Row */}
           <div className="flex justify-center gap-4 py-4 border-t border-slate-800 bg-black/40 mt-4">
-            {/* Manual Workflow Creation */}
-            <button
-              onClick={() => setShowSpecModal(true)}
-              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
-            >
+            <button onClick={() => setShowSpecModal(true)} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
               + Add Workflow
             </button>
-
-            {/* Run Current Workflow */}
-            <button
-              onClick={runWorkflow}
-              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
-            >
-             ▶️ Run Workflow
+            <button onClick={runWorkflow} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
+              ▶️ Run Workflow
             </button>
-
-            {/* 💾 Save Workflow to Supabase */}
             <button
               onClick={async () => {
                 try {
@@ -557,11 +555,8 @@ function WorkflowPage() {
                     body: JSON.stringify({ workflow: wf }),
                   });
                   const j = await res.json();
-                  if (j.status === "ok") {
-                    alert("✅ Workflow saved to Supabase!");
-                  } else {
-                  alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);
-                  }
+                  if (j.status === "ok") alert("✅ Workflow saved to Supabase!");
+                  else alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);
                 } catch (e) {
                   console.error(e);
                   alert("❌ Error saving workflow");
@@ -571,29 +566,18 @@ function WorkflowPage() {
             >
               Save Workflow
             </button>
-
-            {/* Local Save (Offline Backup) */}
-            <button
-              onClick={saveWorkflowLocal}
-              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
-            >
+            <button onClick={saveWorkflowLocal} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
               Save Local
             </button>
-
-            {/* Clear Workflow */}
-            <button
-              onClick={clearWorkflow}
-              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
-            >
+            <button onClick={clearWorkflow} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
               Clear
             </button>
           </div>
-
-
+  
           {/* ===== Workflow Execution Tabs ===== */}
-          <div className="border-t border-slate-800 bg-black/70 p-4 mt-2 rounded-md">
+          <div className="border-t border-slate-800 bg-black/70 p-4 mt-2 rounded-md overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
             <h3 className="mb-2 text-cyan-400 font-semibold">⚡ Workflow Execution</h3>
-
+  
             <div className="flex gap-4 border-b border-slate-800 mb-4">
               <button
                 onClick={() => setActiveTab("summary")}
@@ -614,22 +598,22 @@ function WorkflowPage() {
                 Output Logs
               </button>
             </div>
-            {/* Tab Content Area */}
+  
             <div
-                className={`rounded-lg border p-3 transition-all duration-300 ${
-                     activeTab === "summary" || activeTab === "live" || activeTab === "output"
-                         ? "border-cyan-500/60 shadow-[0_0_8px_rgba(34,211,238,0.3)]"
-                         : "border-slate-700"
-                }`}
-             >
-            {activeTab === "live" && jobId && <WorkflowConsole jobId={jobId} table="workflows" />}
-            {activeTab === "summary" && <div></div>}
-            {activeTab === "output" && <div></div>}
-          </div>
+              className={`rounded-lg border p-3 transition-all duration-300 ${
+                activeTab === "summary" || activeTab === "live" || activeTab === "output"
+                  ? "border-cyan-500/60 shadow-[0_0_8px_rgba(34,211,238,0.3)]"
+                  : "border-slate-700"
+              }`}
+            >
+              {activeTab === "live" && jobId && <WorkflowConsole jobId={jobId} table="workflows" />}
+              {activeTab === "summary" && <div></div>}
+              {activeTab === "output" && <div></div>}
+            </div>
           </div>
         </section>
       </div>
-
+  
       {/* ===== Modals ===== */}
       {showSpecModal && (
         <SpecInputModal
@@ -642,7 +626,7 @@ function WorkflowPage() {
           }}
         />
       )}
-
+  
       {showCreateAgentModal && (
         <CreateAgentModal
           onClose={() => setShowCreateAgentModal(false)}
@@ -653,15 +637,12 @@ function WorkflowPage() {
           }}
         />
       )}
-
-      {showPlanner && (
-        <PlannerModal
-          onClose={() => setShowPlanner(false)}
-        />
-      )}
+  
+      {showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
       {showAgentPlanner && <AgentPlannerModal onClose={() => setShowAgentPlanner(false)} />}
     </main>
   );
+  
 }
 
 /* =========================
