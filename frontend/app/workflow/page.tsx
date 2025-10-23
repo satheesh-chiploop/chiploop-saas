@@ -429,77 +429,87 @@ function WorkflowPage() {
               <option value="digital">Digital Loop</option>
               <option value="analog">Analog Loop</option>
               <option value="embedded">Embedded Loop</option>
-              <option value="system">System Loop (Digital + Analog + Embedded)</option>
+              <option value="system">System Loop</option>
             </select>
           </div>
+  
+          {/* ===== Divider before Workflows ===== */}
+          <div className="border-t border-slate-800 my-3" />
   
           {/* ⚙️ Workflows */}
           <section className="mb-6">
             <h3 className="text-lg font-bold mb-3 text-cyan-400">Workflows</h3>
   
-            <p className="text-sm text-cyan-400 font-medium mb-1"> Prebuilt</p>
-            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
-              {prebuiltWorkflows.map((wf) => (
-                <li
-                  key={wf}
-                  onClick={() => loadPrebuiltWorkflow(wf)}
-                  className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
-                >
-                  {wf}
-                </li>
-              ))}
-            </ul>
-  
-            <p className="text-sm text-cyan-400 font-medium mb-1"> Custom</p>
-            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-              {customWorkflows.length ? (
-                customWorkflows.map((w) => (
-                  <li key={w} className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer">
-                    {w}
+            <div className="pl-2">
+              <p className="text-sm text-cyan-400 font-medium mb-1">Prebuilt</p>
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
+                {prebuiltWorkflows.map((wf) => (
+                  <li
+                    key={wf}
+                    onClick={() => loadPrebuiltWorkflow(wf)}
+                    className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
+                  >
+                    {wf}
                   </li>
-                ))
-              ) : (
-                <p className="text-xs text-slate-400"> None created yet</p>
-              )}
-            </ul>
+                ))}
+              </ul>
+  
+              <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                {customWorkflows.length ? (
+                  customWorkflows.map((w) => (
+                    <li key={w} className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer">
+                      {w}
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400">None created yet</p>
+                )}
+              </ul>
+            </div>
           </section>
+  
+          {/* ===== Divider before Agents ===== */}
+          <div className="border-t border-slate-800 my-3" />
   
           {/* 🤖 Agents */}
           <section className="mb-6">
             <h3 className="text-lg font-bold mb-3 text-cyan-400">Agents</h3>
   
-            <p className="text-sm text-cyan-400 font-medium mb-1"> Prebuilt</p>
-            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
-              {prebuiltAgents.map((a) => (
-                <li
-                  key={a.backendLabel}
-                  draggable
-                  onDragStart={(e) => onDragStartAgent(e, a)}
-                  className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
-                  title={`${a.uiLabel} — ${a.desc || ""}`}
-                >
-                  {a.uiLabel}
-                </li>
-              ))}
-            </ul>
-  
-            <p className="text-sm text-cyan-400 font-medium mb-1"> Custom</p>
-            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-              {customAgents.length ? (
-                customAgents.map((a, idx) => (
+            <div className="pl-2">
+              <p className="text-sm text-cyan-400 font-medium mb-1">Prebuilt</p>
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
+                {prebuiltAgents.map((a) => (
                   <li
-                    key={`${a.backendLabel}-${idx}`}
+                    key={a.backendLabel}
                     draggable
                     onDragStart={(e) => onDragStartAgent(e, a)}
                     className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
+                    title={`${a.uiLabel} — ${a.desc || ""}`}
                   >
                     {a.uiLabel}
                   </li>
-                ))
-              ) : (
-                <p className="text-xs text-slate-400"> No custom agents yet</p>
-              )}
-            </ul>
+                ))}
+              </ul>
+  
+              <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                {customAgents.length ? (
+                  customAgents.map((a, idx) => (
+                    <li
+                      key={`${a.backendLabel}-${idx}`}
+                      draggable
+                      onDragStart={(e) => onDragStartAgent(e, a)}
+                      className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
+                    >
+                      {a.uiLabel}
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400">No custom agents yet</p>
+                )}
+              </ul>
+            </div>
           </section>
   
           {/* 🛍 Marketplace */}
@@ -508,14 +518,14 @@ function WorkflowPage() {
   
             <button
               onClick={() => setShowSubmitMarketplaceModal(true)}
-              className="w-full text-left px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-white mb-2"
+              className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-500 hover:bg-cyan-400 text-white"
             >
               Submit for Review
             </button>
   
             <button
               onClick={() => router.push("/marketplace")}
-              className="w-full text-left px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600 text-white"
+              className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-500 hover:bg-cyan-400 text-white"
             >
               View Public Marketplace
             </button>
@@ -656,6 +666,7 @@ function WorkflowPage() {
       {showAgentPlanner && <AgentPlannerModal onClose={() => setShowAgentPlanner(false)} />}
     </main>
   );
+  
   
 }
 
