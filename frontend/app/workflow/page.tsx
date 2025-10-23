@@ -417,7 +417,7 @@ function WorkflowPage() {
           >
             Agent Planner
           </button>
-  
+          <div className="border-t border-slate-800 my-3" />
           {/* 🔁 Loop Selector */}
           <div className="mb-4">
             <label className="block text-xs uppercase text-cyan-400 mb-2">Loop</label>
@@ -550,7 +550,17 @@ function WorkflowPage() {
               fitView
               defaultEdgeOptions={{ animated: true, style: { stroke: '#22d3ee' } }}
             >
-              <MiniMap pannable zoomable />
+              <MiniMap 
+                pannable 
+                zoomable
+                nodeColor="#0891b2"
+                maskColor="rgba(15,23,42,0.8)"
+                style={{
+                  backgroundColor: "rgba(0,0,0,0.8)",
+                  border: "1px solid #334155",
+                  borderRadius: "6px",
+                }}
+              />
               <Controls />
               <Background color="#334155" gap={20} />
             </ReactFlow>
