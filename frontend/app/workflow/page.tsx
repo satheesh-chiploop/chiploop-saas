@@ -404,7 +404,7 @@ function WorkflowPage() {
         {/* ===== Sidebar ===== */}
         <aside className="w-72 bg-slate-900/70 border-r border-slate-800 p-4 flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {/* 🧠 Agentic Tools */}
-          <h2 className="text-lg font-bold mb-3 text-cyan-400">🧠 Agentic Tools</h2>
+          <h2 className="text-lg font-bold mb-3 text-cyan-400">Agentic Tools</h2>
           <button
             onClick={() => setShowPlanner(true)}
             className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
@@ -413,7 +413,7 @@ function WorkflowPage() {
           </button>
           <button
             onClick={() => setShowAgentPlanner(true)}
-            className="w-full text-left px-3 py-2 mb-4 rounded bg-purple-600 hover:bg-purple-500 text-white"
+            className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
           >
             Agent Planner
           </button>
@@ -435,9 +435,10 @@ function WorkflowPage() {
   
           {/* ⚙️ Workflows */}
           <section className="mb-6">
-            <h3 className="text-cyan-400 font-semibold mb-2">⚙️ Workflows</h3>
-            <p className="text-xs text-slate-400">Prebuilt</p>
-            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-28 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-2">
+            <h3 className="text-cyan-400 font-semibold mb-2">Workflows</h3>
+  
+            <p className="text-sm text-cyan-300 font-medium mb-1">Prebuilt</p>
+            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
               {prebuiltWorkflows.map((wf) => (
                 <li
                   key={wf}
@@ -449,8 +450,8 @@ function WorkflowPage() {
               ))}
             </ul>
   
-            <p className="text-xs text-slate-400">Custom</p>
-            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-28 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+            <p className="text-sm text-cyan-300 font-medium mb-1">Custom</p>
+            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
               {customWorkflows.length ? (
                 customWorkflows.map((w) => (
                   <li key={w} className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer">
@@ -465,9 +466,10 @@ function WorkflowPage() {
   
           {/* 🤖 Agents */}
           <section className="mb-6">
-            <h3 className="text-cyan-400 font-semibold mb-2">🤖 Agents</h3>
-            <p className="text-xs text-slate-400">Prebuilt</p>
-            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-28 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-2">
+            <h3 className="text-cyan-400 font-semibold mb-2">Agents</h3>
+  
+            <p className="text-sm text-cyan-300 font-medium mb-1">Prebuilt</p>
+            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
               {prebuiltAgents.map((a) => (
                 <li
                   key={a.backendLabel}
@@ -481,8 +483,8 @@ function WorkflowPage() {
               ))}
             </ul>
   
-            <p className="text-xs text-slate-400">Custom</p>
-            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-28 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+            <p className="text-sm text-cyan-300 font-medium mb-1">Custom</p>
+            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
               {customAgents.length ? (
                 customAgents.map((a, idx) => (
                   <li
@@ -502,15 +504,27 @@ function WorkflowPage() {
   
           {/* 🛍 Marketplace */}
           <div className="mt-auto border-t border-slate-700 pt-3">
-            <h3 className="text-cyan-400 font-semibold mb-2">🛍 Marketplace</h3>
-            <button className="w-full text-left px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600 text-white">
-              Discover + Import
+            <h3 className="text-cyan-400 font-semibold mb-3">Marketplace</h3>
+  
+            <button
+              onClick={() => setShowSubmitMarketplaceModal(true)}
+              className="w-full text-left px-3 py-2 rounded bg-amber-600 hover:bg-amber-500 text-white mb-2"
+            >
+              📨 Submit for Review
+            </button>
+  
+            <button
+              onClick={() => router.push("/marketplace")}
+              className="w-full text-left px-3 py-2 rounded bg-emerald-700 hover:bg-emerald-600 text-white"
+            >
+              🌐 View Public Marketplace
             </button>
           </div>
         </aside>
   
         {/* ===== Canvas & Console ===== */}
         <section className="flex-1 flex flex-col p-4 overflow-hidden">
+          {/* Canvas */}
           <div
             className="relative flex-1 border border-slate-800 rounded-xl overflow-hidden bg-black/60"
             onDrop={onDropCanvas}
@@ -524,7 +538,7 @@ function WorkflowPage() {
               onConnect={onConnect}
               nodeTypes={{ agentNode: AgentNode }}
               fitView
-              defaultEdgeOptions={{ animated: true, style: { stroke: "#22d3ee" } }}
+              defaultEdgeOptions={{ animated: true, style: { stroke: '#22d3ee' } }}
             >
               <MiniMap pannable zoomable />
               <Controls />
@@ -532,7 +546,7 @@ function WorkflowPage() {
             </ReactFlow>
           </div>
   
-          {/* Action Buttons Row */}
+          {/* Action Buttons */}
           <div className="flex justify-center gap-4 py-4 border-t border-slate-800 bg-black/40 mt-4">
             <button onClick={() => setShowSpecModal(true)} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
               + Add Workflow
@@ -574,7 +588,7 @@ function WorkflowPage() {
             </button>
           </div>
   
-          {/* ===== Workflow Execution Tabs ===== */}
+          {/* Workflow Execution Tabs */}
           <div className="border-t border-slate-800 bg-black/70 p-4 mt-2 rounded-md overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
             <h3 className="mb-2 text-cyan-400 font-semibold">⚡ Workflow Execution</h3>
   
