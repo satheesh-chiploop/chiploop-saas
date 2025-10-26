@@ -68,10 +68,10 @@ export default function PlannerModal({ onClose }) {
             const data = await res.json();
 
             // ✅ capture the proper preplan structure only
-            const preplanData = data.preplan || data.plan || data;
-            setPlan(preplanData);
+          
+            setPlan(data);
 
-            console.log("🧠 Stored Preplan:", preplanData);
+            console.log("🧠 Stored Preplan:", data);
             alert("✅ Plan generated successfully! Check for missing agents below.");
         } catch (err) {
             alert("⚠️ Failed to generate workflow plan");
