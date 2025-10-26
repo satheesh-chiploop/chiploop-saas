@@ -635,7 +635,7 @@ function WorkflowPage() {
                   });
                   const j = await res.json();
                   if (j.status === "ok") alert("✅ Workflow saved to Supabase!");
-                  else alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);\
+                  else alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);
                   await loadCustomWorkflowsFromDB()
                 } catch (e) {
                   console.error(e);
