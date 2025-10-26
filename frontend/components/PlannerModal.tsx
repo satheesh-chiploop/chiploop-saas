@@ -63,11 +63,15 @@ export default function PlannerModal({ onClose }) {
             const res = await fetch("/api/plan_workflow", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt: goal }),
+                body: JSON.stringify({ goal }),
             });
             const data = await res.json();
-            setPlan(data.plan || data);
-            console.log("🧠 Generated Plan:", data.plan || data);
+
+            // ✅ capture the proper preplan structure only
+            const preplanData = data.preplan || data.plan || data;
+            setPlan(preplanData);
+
+            console.log("🧠 Stored Preplan:", preplanData);
             alert("✅ Plan generated successfully! Check for missing agents below.");
         } catch (err) {
             alert("⚠️ Failed to generate workflow plan");

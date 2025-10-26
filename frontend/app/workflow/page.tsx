@@ -303,6 +303,15 @@ function WorkflowPage() {
     }
   };
 
+  const loadCustomWorkflow = (wfName: string) => {
+    const stored = localStorage.getItem(`workflow_${wfName}`);
+    if (!stored) return;
+    const { nodes, edges } = JSON.parse(stored);
+    setNodes(nodes);
+    setEdges(edges);
+    fitView({ padding: 0.2 });
+  };
+
   const handleSpecSubmit = async (text: string, file?: File) => {
     try {
       // Determine which loop is active
@@ -465,7 +474,10 @@ function WorkflowPage() {
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {customWorkflows.length ? (
                   customWorkflows.map((w) => (
-                    <li key={w} className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer">
+                    <li 
+                      key={w} 
+                      onClick={() => loadCustomWorkflow(w)}
+                      className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer">
                       {w}
                     </li>
                   ))
