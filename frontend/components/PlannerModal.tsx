@@ -120,6 +120,8 @@ export default function PlannerModal({ onClose }) {
                   });
                   alert(`💾 Workflow "${workflowName}" saved under "${loopType}" Custom Workflows.`);
                 }
+                const stored = { nodes, edges };
+                localStorage.setItem(`workflow_${workflowName}`, JSON.stringify(stored));
                 alert(`✅ Auto-composed workflow:\n${data.summary}`);
                 alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");
             } else {
