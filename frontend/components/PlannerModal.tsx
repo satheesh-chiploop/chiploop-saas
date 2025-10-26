@@ -218,7 +218,7 @@ export default function PlannerModal({ onClose }) {
                     <button
                         onClick={handleAnalyzeSpec}
                         disabled={analyzing || !goal.trim()}
-                        className="bg-indigo-700 hover:bg-indigo-600 px-3 py-1 rounded disabled:opacity-50"
+                        className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
                     >
                         {analyzing ? "Analyzing..." : "Analyze Spec"}
                     </button>
