@@ -117,7 +117,9 @@ function WorkflowPage() {
         const savedWF = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
         setCustomAgents(savedAgents);
         setCustomWorkflows(savedWF.map((k) => k.replace("workflow_", "")));
+        await loadCustomWorkflowsFromDB();
       }
+
     })();
   }, [supabase, router]);
 
@@ -312,6 +314,40 @@ function WorkflowPage() {
     fitView({ padding: 0.2 });
   };
 
+  const loadCustomWorkflowsFromDB = async () => {
+    const { data, error } = await supabase
+      .from("workflows")
+      .select("id, name, created_at")
+      .order("created_at", { ascending: false });
+  
+    if (error) {
+      console.error("❌ Error loading workflows:", error);
+      return;
+    }
+  
+    const workflowNames = data.map((wf) => wf.name || `workflow_${wf.id}`);
+    setCustomWorkflows(workflowNames);
+    console.log("📁 Loaded workflows:", workflowNames);
+  };
+
+  const loadWorkflowFromDB = async (wfName: string) => {
+    const { data, error } = await supabase
+      .from("workflows")
+      .select("nodes, edges")
+      .eq("name", wfName)
+      .single();
+  
+    if (error) {
+      console.error("❌ Failed to load workflow:", error);
+      return;
+    }
+  
+    setNodes(data.nodes || []);
+    setEdges(data.edges || []);
+    fitView({ padding: 0.2 });
+    console.log(`✅ Loaded workflow: ${wfName}`);
+  };
+
   const handleSpecSubmit = async (text: string, file?: File) => {
     try {
       // Determine which loop is active
@@ -476,7 +512,7 @@ function WorkflowPage() {
                   customWorkflows.map((w) => (
                     <li 
                       key={w} 
-                      onClick={() => loadCustomWorkflow(w)}
+                      onClick={() => loadWorkflowFromDB(w)}
                       className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer">
                       {w}
                     </li>
@@ -599,7 +635,8 @@ function WorkflowPage() {
                   });
                   const j = await res.json();
                   if (j.status === "ok") alert("✅ Workflow saved to Supabase!");
-                  else alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);
+                  else alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);\
+                  await loadCustomWorkflowsFromDB()
                 } catch (e) {
                   console.error(e);
                   alert("❌ Error saving workflow");
