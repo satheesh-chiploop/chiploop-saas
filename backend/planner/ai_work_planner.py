@@ -6,7 +6,7 @@ from loguru import logger
 from openai import OpenAI
 from utils.llm_utils import run_llm_fallback 
 from portkey_ai import Portkey
-
+from supabase_client import supabase
 # Reuse your environment variable pattern
 USE_LOCAL_OLLAMA = os.getenv("USE_LOCAL_OLLAMA", "false").lower() == "true"
 
@@ -235,11 +235,24 @@ Output valid JSON with keys: nodes, edges, summary.
         missing = preplan["missing_agents"]
         logger.info(f"📎 Using missing_agents from preplan: {missing}")
     else:
-        existing_agents = [a["data"]["backendLabel"] for a in plan.get("nodes", [])]
+        existing_agents = []
+        for a in plan.get("nodes", []):
+        # Prefer the explicit 'agent' field from JSON; fall back to 'type'
+        agent_name = (
+            a.get("agent")
+            or a.get("data", {}).get("backendLabel")
+            or a.get("type")
+            or a.get("label")
+            or "unknown_agent"
+        )
+        existing_agents.append(agent_name)
+
         from agent_capabilities import AGENT_CAPABILITIES
         missing = [a for a in existing_agents if a not in AGENT_CAPABILITIES]
-        logger.info(f"🧩 Detected missing agents: {missing}")
 
+        logger.info(f"🔍 LLM suggested agents: {existing_agents}")
+        logger.info(f"📚 Known agents: {list(AGENT_CAPABILITIES.keys())[:10]}")
+        logger.info(f"🧩 Missing agents: {missing}")
     # --- Step 4: Create and persist any missing agents ---
     if missing:
         from .ai_agent_planner import plan_agent_fallback
@@ -265,17 +278,28 @@ Output valid JSON with keys: nodes, edges, summary.
     logger.success("✅ Auto-compose complete.")
 
     # --- Step 7: Update agent memory ---
+    
+    # --- Step 7: Update agent memory ---
     try:
         for node in plan.get("nodes", []):
-            agent_name = node["data"]["backendLabel"]
+        # handle both {"data": {...}} and flat {"type": "..."} formats
+            agent_name = (
+                node.get("data", {}).get("backendLabel")
+                or node.get("type")
+                or node.get("label")
+                or "unknown_agent"
+            )
+
             supabase.table("agent_memory").upsert({
-                "agent_name": agent_name,
-                "last_used_in": [goal],
-                "updated_at": datetime.utcnow().isoformat()
+               "agent_name": agent_name,
+               "last_used_in": [goal],
+               "updated_at": datetime.utcnow().isoformat()
             }).execute()
+
         logger.info("🧠 Agent memory updated successfully.")
     except Exception as e:
         logger.warning(f"⚠️ Failed to update agent memory: {e}")
+
 
     return {
         "nodes": plan.get("nodes", []),
