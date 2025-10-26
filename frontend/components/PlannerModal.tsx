@@ -79,60 +79,81 @@ export default function PlannerModal({ onClose }) {
             setLoading(false);
         }
     };
-
     const handleAutoCompose = async () => {
         setAutoLoading(true);
         try {
-            const res = await fetch("/api/auto_compose_workflow", {
+          const res = await fetch("/api/auto_compose_workflow", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              goal,
+              preplan: plan || null,
+            }),
+          });
+      
+          const data = await res.json();
+      
+          if (data.status === "ok" || data.nodes) {
+            // ✅ Update plan state for canvas rendering
+            setPlan({
+              summary: data.summary,
+              nodes: data.nodes,
+              edges: data.edges,
+            });
+      
+            // ✅ Save workflow to DB
+            const workflowName = prompt(
+              "💾 Enter a name to save this workflow:",
+              `AI_Composed_${new Date().toISOString().slice(0, 10)}`
+            );
+            const loopType = prompt(
+              "🔁 Enter loop type (digital / analog / embedded / system):",
+              "digital"
+            );
+      
+            if (workflowName) {
+              await fetch("/api/save_custom_workflow", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    goal,
-                    preplan: plan || null, // ✅ Pass plan result from Generate Plan
-                }),
-            });
-            const data = await res.json();
-            if (data.status === "ok" || data.nodes) {
-
-                setPlan({
-                    summary: data.summary,
+                  workflow: {
+                    workflow_name: workflowName,
+                    loop_type: loopType.toLowerCase(),
                     nodes: data.nodes,
                     edges: data.edges,
-                });
-                
-                const workflowName = prompt("💾 Enter a name to save this workflow:", `AI_Composed_${new Date().toISOString().slice(0,10)}`);
-                const loopType = prompt("🔁 Enter loop type (digital / analog / embedded / system):", "digital");
-                if (workflowName) {
-                  await fetch("/api/save_custom_workflow", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      name: workflowName,
-                      loop_type: loopType.toLowerCase(),
-                      user_id: "anonymous",
-                      data: {
-                        summary: data.summary,
-                        nodes: data.nodes,
-                        edges: data.edges,
-                      },
-                      is_custom: true,
-                    }),
-                  });
-                  alert(`💾 Workflow "${workflowName}" saved under "${loopType}" Custom Workflows.`);
-                }
-                const stored = { nodes, edges };
-                localStorage.setItem(`workflow_${workflowName}`, JSON.stringify(stored));
-                alert(`✅ Auto-composed workflow:\n${data.summary}`);
-                alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");
-            } else {
-                alert(`⚠️ ${data.message || "Auto-compose failed."}`);
+                    summary: data.summary,
+                  },
+                  user_id: "anonymous",
+                  is_custom: true,
+                }),
+              });
+      
+              alert(
+                `💾 Workflow "${workflowName}" saved under "${loopType}" Custom Workflows.`
+              );
             }
+      
+            // ✅ Save locally for instant reload
+            const stored = { nodes: data.nodes, edges: data.edges };
+            localStorage.setItem(
+              `workflow_${workflowName}`,
+              JSON.stringify(stored)
+            );
+      
+            alert(`✅ Auto-composed workflow:\n${data.summary}`);
+            alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");
+          } else {
+            alert(`⚠️ ${data.message || "Auto-compose failed."}`);
+          }
         } catch (err) {
-            alert("❌ Could not connect to backend");
+          console.error(err);
+          alert("❌ Could not connect to backend");
         } finally {
-            setAutoLoading(false);
+          setAutoLoading(false);
         }
     };
+      
+    
 
     const handleVoiceInput = async (file) => {
         const formData = new FormData();
