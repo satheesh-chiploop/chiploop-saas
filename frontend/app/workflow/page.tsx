@@ -335,11 +335,11 @@ function WorkflowPage() {
   };
 
   const loadCustomWorkflowsFromDB = async () => {
-    const userId = localStorage.getItem("anon_user_id") || "anonymous";
+    const userId = localStorage.getItem("anon_user_id") || null;
     const { data, error } = await supabase
       .from("workflows")
       .select("id, name, created_at, user_id")
-      .or(`user_id.eq."${userId}",user_id.is.null`)
+      .or(`user_id.is.null,user_id.eq.${userId || "null"}
       .order("created_at", { ascending: false });
   
     if (error) {
