@@ -31,6 +31,10 @@ type AgentNodeData = { uiLabel: string; backendLabel: string; desc?: string };
 
 type CatalogItem = { uiLabel: string; backendLabel: string; desc?: string };
 
+if (typeof window !== "undefined" && !localStorage.getItem("anon_user_id")) {
+  localStorage.setItem("anon_user_id", crypto.randomUUID());
+}
+
 const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
   digital: [
     { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent", desc: "Capture design spec & I/Os" },
@@ -97,6 +101,11 @@ function WorkflowPage() {
   const [showAgentPlanner, setShowAgentPlanner] = useState(false);
 
   const {fitView} = useReactFlow();
+
+  const anonUserId =
+    typeof window !== "undefined"
+      ? localStorage.getItem("anon_user_id")
+      : "anonymous";
   
   useEffect(() => {
     if (nodes.length > 0 || edges.length > 0) {
@@ -130,6 +139,7 @@ function WorkflowPage() {
       loadCustomWorkflowsFromDB();
     };
     window.addEventListener("workflow-saved", handleWorkflowSaved);
+    console.log("📥 Workflow saved event received — reloading sidebar...");
     return () => window.removeEventListener("workflow-saved", handleWorkflowSaved);
   }, []);
 
@@ -325,9 +335,11 @@ function WorkflowPage() {
   };
 
   const loadCustomWorkflowsFromDB = async () => {
+    const userId = localStorage.getItem("anon_user_id") || "anonymous";
     const { data, error } = await supabase
       .from("workflows")
-      .select("id, name, created_at")
+      .select("id, name, created_at, user_id")
+      .or(`user_id.eq.${userId},user_id.is.null`)
       .order("created_at", { ascending: false });
   
     if (error) {

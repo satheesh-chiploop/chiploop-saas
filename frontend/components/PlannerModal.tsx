@@ -123,7 +123,7 @@ export default function PlannerModal({ onClose }) {
                     edges: data.edges,
                     summary: data.summary,
                   },
-                  user_id: "anonymous",
+                  user_id: localStorage.getItem("anon_user_id") || "anonymous",
                   is_custom: true,
                 }),
               });
@@ -131,6 +131,8 @@ export default function PlannerModal({ onClose }) {
               alert(
                 `💾 Workflow "${workflowName}" saved under "${loopType}" Custom Workflows.`
               );
+              window.dispatchEvent(new Event("workflow-saved"));
+
             }
       
             // ✅ Save locally for instant reload
