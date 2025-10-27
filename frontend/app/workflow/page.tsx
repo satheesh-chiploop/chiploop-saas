@@ -335,11 +335,11 @@ function WorkflowPage() {
   };
 
   const loadCustomWorkflowsFromDB = async () => {
-    const userId = localStorage.getItem("anon_user_id") || null;
+    const userId = localStorage.getItem("anon_user_id") ;
     const { data, error } = await supabase
       .from("workflows")
       .select("id, name, created_at, user_id")
-      .or(`user_id.is.null,user_id.eq.${userId || "null"}`)
+      .or(`user_id.is.null,user_id.eq.${userId || "00000000-0000-0000-0000-000000000000"}`)
       .order("created_at", { ascending: false });
   
     if (error) {
@@ -349,6 +349,7 @@ function WorkflowPage() {
   
     const workflowNames = data.map((wf) => wf.name || `workflow_${wf.id}`);
     setCustomWorkflows(workflowNames);
+    setRefreshKey((prev) => prev + 1);
     console.log("📁 Loaded workflows:", workflowNames);
   };
 
