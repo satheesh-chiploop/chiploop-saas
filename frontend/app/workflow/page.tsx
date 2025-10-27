@@ -123,6 +123,16 @@ function WorkflowPage() {
     })();
   }, [supabase, router]);
 
+  // 🔁 Listen for new workflows saved by PlannerModal
+  useEffect(() => {
+    const handleWorkflowSaved = () => {
+      console.log("🔄 Refreshing workflow list after AI save...");
+      loadCustomWorkflowsFromDB();
+    };
+    window.addEventListener("workflow-saved", handleWorkflowSaved);
+    return () => window.removeEventListener("workflow-saved", handleWorkflowSaved);
+  }, []);
+
   /* ---------- Default Verify Loop ---------- */
   useEffect(() => {
     const n: Node<AgentNodeData>[] = [

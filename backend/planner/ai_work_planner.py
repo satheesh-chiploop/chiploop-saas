@@ -6,7 +6,14 @@ from loguru import logger
 from openai import OpenAI
 from utils.llm_utils import run_llm_fallback 
 from portkey_ai import Portkey
-from supabase_client import supabase
+# ---------------- Supabase client ----------------
+
+from supabase import create_client
+SUPABASE_URL = os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
 # Reuse your environment variable pattern
 USE_LOCAL_OLLAMA = os.getenv("USE_LOCAL_OLLAMA", "false").lower() == "true"
 
@@ -16,6 +23,22 @@ PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
 client_portkey = Portkey(api_key=PORTKEY_API_KEY)
 client_openai = OpenAI()
 
+import re
+
+def extract_json_block(text):
+    """Extract valid JSON block from any LLM text output."""
+    if isinstance(text, dict):
+        return text
+    if not isinstance(text, str):
+        return {}
+
+    match = re.search(r"\{[\s\S]*\}", text)
+    if match:
+        try:
+            return json.loads(match.group(0))
+        except json.JSONDecodeError:
+            pass
+    return {}
 
 
 def plan_workflow(prompt: str, agent_capabilities: dict, workflow_id: str = None) -> dict:
@@ -202,32 +225,55 @@ async def auto_compose_workflow_graph(goal: str, preplan: dict | str | None = No
     if preplan and isinstance(preplan, dict) and len(preplan.keys()) > 0:
         logger.info("📎 Using preplan from frontend to skip re-planning.")
         plan_data = preplan
+
+        prompt = f"""
+You are ChipLoop Workflow Architect.
+
+User goal:
+{goal}
+
+A preplan has already been generated with identified agents and their order of execution.
+Here is the preplan JSON:
+{json.dumps(plan_data, indent=2)}
+
+🧠 Instructions:
+- Use ONLY the agents listed in the preplan.
+- Do NOT create new or repeated agent instances.
+- Build logical connections (edges) between agents to represent workflow data flow.
+- Maintain order and hierarchy from the preplan.
+- Add a concise "summary" explaining how this workflow achieves the goal.
+- Output a valid JSON object with the following keys only: summary, nodes, edges.
+
+Each node must include:
+- id (n1, n2, ...)
+- type (agent name from preplan)
+- position (x, y) spaced horizontally
+"""    
     else:
         logger.info("🧠 No valid preplan supplied — generating plan internally.")
         from agent_capabilities import AGENT_CAPABILITIES
         plan_data = plan_workflow(goal, AGENT_CAPABILITIES)
+        prompt = f"""
+You are ChipLoop Workflow Architect.
 
-    # --- Step 2: Construct LLM prompt ---
-    prompt = f"""You are ChipLoop workflow architect.
-Build a workflow for this goal: {goal}.
-Here is a pre-generated plan you must follow:
+Goal:
+{goal}
+
+Available agents:
 {json.dumps(plan_data, indent=2)}
-Use known agents from AGENT_CAPABILITIES.
-Output valid JSON with keys: nodes, edges, summary.
+
+🧠 Instructions:
+- Choose the minimum number of relevant agents.
+- Each agent can appear only once.
+- Do NOT invent unknown or placeholder agents.
+- Build a clean JSON workflow with keys: summary, nodes, edges.
 """
     response = await run_llm_fallback(prompt)
+    plan = extract_json_block(response)
 
-    cleaned = (
-        response.strip()
-            .replace("```json", "")
-            .replace("```", "")
-            .strip()
-        )
-
-    try:
-        plan = json.loads(cleaned)
-    except Exception:
-        plan = {"nodes": [], "edges": [], "summary": cleaned}
+    if not plan:
+        logger.warning("⚠️ No valid JSON detected, falling back to empty plan.")
+        plan = {"nodes": [], "edges": [], "summary": str(response)}
 
     # --- Step 3: Detect missing agents ---
     missing = []
@@ -246,15 +292,26 @@ Output valid JSON with keys: nodes, edges, summary.
                 or "unknown_agent"
             )
             existing_agents.append(agent_name)
-
+        existing_agents = [
+            a for a in existing_agents
+            if a.lower() not in ["process", "flow", "pipeline", "unknown_agent"]
+        ]
         from agent_capabilities import AGENT_CAPABILITIES
         missing = [a for a in existing_agents if a not in AGENT_CAPABILITIES]
 
+         # ✅ Remove duplicates while preserving order
+        seen = set()
+        existing_agents = [a for a in existing_agents if not (a in seen or seen.add(a))]
+
+        if len(existing_agents) < len(plan.get("nodes", [])):
+            logger.warning(f"🧹 Deduplicated agents: {existing_agents}")
+       
         logger.info(f"🔍 LLM suggested agents: {existing_agents}")
+
         logger.info(f"📚 Known agents: {list(AGENT_CAPABILITIES.keys())[:10]}")
         logger.info(f"🧩 Missing agents: {missing}")
     # --- Step 4: Create and persist any missing agents ---
-    if missing:
+    if missing and any(m not in ["process", "flow", "pipeline"] for m in missing):
         from .ai_agent_planner import plan_agent_fallback
         for m in missing:
             try:
