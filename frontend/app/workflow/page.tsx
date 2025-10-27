@@ -335,7 +335,7 @@ function WorkflowPage() {
   };
 
   const loadCustomWorkflowsFromDB = async () => {
-    const userId = localStorage.getItem("anon_user_id") ;
+    const userId = localStorage.getItem("anon_user_id");
     const { data, error } = await supabase
       .from("workflows")
       .select("id, name, created_at, user_id")
@@ -347,17 +347,23 @@ function WorkflowPage() {
       return;
     }
   
-    const workflowNames = data.map((wf) => wf.name || `workflow_${wf.id}`);
-    setCustomWorkflows(workflowNames);
-    setRefreshKey((prev) => prev + 1);
-    console.log("📁 Loaded workflows:", workflowNames);
+    const names = Array.from(
+      new Map( // de-dup by name
+        (data || []).map(w => [w.name || `workflow_${w.id}`, w])
+      ).keys()
+    );
+    setCustomWorkflows(names);
+    console.log("📁 Loaded workflows:", names);
   };
+  
 
   const loadWorkflowFromDB = async (wfName: string) => {
     const { data, error } = await supabase
       .from("workflows")
-      .select("nodes, edges")
+      .select("definitions")
       .eq("name", wfName)
+      .order("created_at", { ascending: false })
+      .limit(1)
       .single();
   
     if (error) {
@@ -365,11 +371,51 @@ function WorkflowPage() {
       return;
     }
   
-    setNodes(data.nodes || []);
-    setEdges(data.edges || []);
+    // Normalize to React Flow
+    const defs = (data?.definitions as any) || {};
+    const rawNodes: any[] = defs.nodes || [];
+    const rawEdges: any[] = defs.edges || [];
+  
+    // nodes → agentNode with data.uiLabel/backendLabel
+    const normNodes = rawNodes.map((n, i) => {
+      const backendLabel =
+        n?.data?.backendLabel ||
+        n?.backendLabel ||
+        n?.type || "Agent";
+      const uiLabel =
+        n?.data?.uiLabel ||
+        n?.uiLabel ||
+        backendLabel.replace(/ Agent$/,"") || "Agent";
+  
+      // support [x,y] or {x,y}
+      const p = n.position;
+      const pos = Array.isArray(p)
+        ? { x: Number(p[0]) || 100 + i * 180, y: Number(p[1]) || 200 }
+        : { x: p?.x ?? 100 + i * 180, y: p?.y ?? 200 };
+  
+      return {
+        id: n.id || `n${i+1}`,
+        type: "agentNode",
+        position: pos,
+        data: { uiLabel, backendLabel, desc: n?.data?.description || n?.description || "" },
+      };
+    });
+  
+    // edges → ensure {source,target}
+    const normEdges = rawEdges.map((e, i) => ({
+      id: e.id || `e${i+1}`,
+      source: e.source || e.from,
+      target: e.target || e.to,
+      animated: true,
+      style: { stroke: "#22d3ee", strokeWidth: 2 },
+    })).filter(e => e.source && e.target);
+  
+    setNodes(normNodes);
+    setEdges(normEdges);
     fitView({ padding: 0.2 });
-    console.log(`✅ Loaded workflow: ${wfName}`);
+    console.log(`✅ Loaded workflow from DB: ${wfName}`, {nodes: normNodes.length, edges: normEdges.length});
   };
+  
 
   const handleSpecSubmit = async (text: string, file?: File) => {
     try {
