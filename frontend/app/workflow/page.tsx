@@ -339,7 +339,7 @@ function WorkflowPage() {
     const { data, error } = await supabase
       .from("workflows")
       .select("id, name, created_at, user_id")
-      .or(`user_id.eq.${userId},user_id.is.null`)
+      .or(`user_id.eq."${userId}",user_id.is.null`)
       .order("created_at", { ascending: false });
   
     if (error) {

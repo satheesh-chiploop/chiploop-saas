@@ -131,8 +131,7 @@ export default function PlannerModal({ onClose }) {
               alert(
                 `💾 Workflow "${workflowName}" saved under "${loopType}" Custom Workflows.`
               );
-              window.dispatchEvent(new Event("workflow-saved"));
-
+         
             }
       
             // ✅ Save locally for instant reload
@@ -144,6 +143,7 @@ export default function PlannerModal({ onClose }) {
       
             alert(`✅ Auto-composed workflow:\n${data.summary}`);
             alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");
+            window.dispatchEvent(new Event("workflow-saved"));
           } else {
             alert(`⚠️ ${data.message || "Auto-compose failed."}`);
           }
