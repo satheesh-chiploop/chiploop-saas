@@ -336,26 +336,30 @@ function WorkflowPage() {
   };
 
   const loadCustomWorkflowsFromDB = async () => {
-    const userId = localStorage.getItem("anon_user_id");
-    const { data, error } = await supabase
-      .from("workflows")
-      .select("id, name, created_at, user_id")
-      .or(`user_id.is.null,user_id.eq.${userId || "00000000-0000-0000-0000-000000000000"}`)
-      .order("created_at", { ascending: false });
+    const anonId = localStorage.getItem("anon_user_id");
+    console.log("🧠 Loading workflows for:", anonId || "anonymous");
+  
+    // ✅ Query based on whether user_id exists
+    let query = supabase.from("workflows").select("id, name, created_at, user_id").order("created_at", { ascending: false });
+  
+    if (anonId) {
+      query = query.eq("user_id", anonId);
+    } else {
+      query = query.is("user_id", null);
+    }
+  
+    const { data, error } = await query;
   
     if (error) {
       console.error("❌ Error loading workflows:", error);
       return;
     }
   
-    const names = Array.from(
-      new Map( // de-dup by name
-        (data || []).map(w => [w.name || `workflow_${w.id}`, w])
-      ).keys()
-    );
-    setCustomWorkflows(names);
-    console.log("📁 Loaded workflows:", names);
+    const workflowNames = (data || []).map((wf) => wf.name || `workflow_${wf.id}`);
+    console.log("📁 Loaded workflows:", workflowNames);
+    setCustomWorkflows(workflowNames);
   };
+  
   
 
   const loadWorkflowFromDB = async (wfName: string) => {
@@ -704,7 +708,7 @@ function WorkflowPage() {
                     body: JSON.stringify({ workflow: wf }),
                   });
                   const j = await res.json();
-                  
+
                   if (j.status === "ok") {
                     alert("✅ Workflow saved to Supabase!");
                     window.dispatchEvent(new CustomEvent("refreshWorkflows"));
