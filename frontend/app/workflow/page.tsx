@@ -104,6 +104,14 @@ function WorkflowPage() {
 
   const {fitView} = useReactFlow();
 
+  // 🔁 Ensure sidebar visible once agents/workflows are loaded
+  useEffect(() => {
+    if (customAgents.length > 0 || customWorkflows.length > 0) {
+      setLoadingAgents(false);
+      setLoadingWorkflows(false);
+    }
+  }, [customAgents, customWorkflows]);
+
   const anonUserId =
     typeof window !== "undefined"
       ? localStorage.getItem("anon_user_id")
