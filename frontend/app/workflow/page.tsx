@@ -504,6 +504,7 @@ function WorkflowPage() {
         .from("workflows")
         .select("definitions, nodes, edges")
         .eq("name", wfName)
+        .or(`user_id.eq.${anonId},user_id.is.null`)
         .maybeSingle();
   
       if (error || !data) {
@@ -524,6 +525,9 @@ function WorkflowPage() {
         id: n.id ?? `n-${i}`,
         type: "agentNode",
         position: n.position ?? { x: 120 * i, y: 160 },
+        position: Array.isArray(n.position)
+          ? { x: n.position[0] ?? 120 * i, y: n.position[1] ?? 160 }
+          : (n.position ?? { x: 120 * i, y: 160 }),
         data: {
           uiLabel: n.data?.uiLabel ?? n.uiLabel ?? n.label ?? `Node ${i + 1}`,
           backendLabel: n.data?.backendLabel ?? n.backendLabel ?? n.agent ?? `Agent ${i + 1}`,
