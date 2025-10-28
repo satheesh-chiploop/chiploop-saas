@@ -93,6 +93,8 @@ function WorkflowPage() {
   // local catalog states
   const [customAgents, setCustomAgents] = useState<CatalogItem[]>([]);
   const [customWorkflows, setCustomWorkflows] = useState<string[]>([]);
+  const [loadingAgents, setLoadingAgents] = useState(true);
+  const [loadingWorkflows, setLoadingWorkflows] = useState(true);
 
   // modals
   const [showSpecModal, setShowSpecModal] = useState(false);
@@ -119,16 +121,29 @@ function WorkflowPage() {
   /* ---------- Auth gate ---------- */
   useEffect(() => {
     (async () => {
+      setLoadingAgents(true);
+      setLoadingWorkflows(true);
+  
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) router.push("/login");
-      else {
+      if (!session) {
+        router.push("/login");
+        return;
+      }
+  
+      try {
         const savedAgents = JSON.parse(localStorage.getItem("custom_agents") || "[]");
         const savedWF = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
         setCustomAgents(savedAgents);
         setCustomWorkflows(savedWF.map((k) => k.replace("workflow_", "")));
+  
+        // Load from Supabase after local cache
         await loadCustomWorkflowsFromDB();
+      } catch (err) {
+        console.error("❌ Error loading user or workflows:", err);
+      } finally {
+        setLoadingAgents(false);
+        setLoadingWorkflows(false);
       }
-
     })();
   }, [supabase, router]);
 
@@ -579,22 +594,24 @@ function WorkflowPage() {
                   </li>
                 ))}
               </ul>
-  
+          {!loadingAgents && customAgents.length > 0 && (
+            <>
               <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
-              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                {customWorkflows.length ? (
-                  customWorkflows.map((w) => (
-                    <li 
-                      key={w} 
-                      onClick={() => loadWorkflowFromDB(w)}
-                      className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer">
-                      {w}
-                    </li>
-                  ))
-                ) : (
-                  <p className="text-xs text-slate-400">None created yet</p>
-                )}
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+               {customAgents.map((a, idx) => (
+                  <li
+                    key={`${a.backendLabel}-${idx}`}
+                    draggable
+                    onDragStart={(e) => onDragStartAgent(e, a)}
+                    className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
+                  >
+                    {a.uiLabel}
+                  </li>
+                ))}
               </ul>
+            </>
+          )}
+           
             </div>
           </section>
   
