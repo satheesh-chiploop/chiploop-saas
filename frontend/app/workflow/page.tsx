@@ -116,14 +116,22 @@ function WorkflowPage() {
   
   const deleteCustomWorkflow = async (name: string) => {
     try {
+      // Optimistic local removal so UI updates instantly
+      localStorage.removeItem(`workflow_${name}`);
+      setCustomWorkflows((prev) => prev.filter((n) => n !== name));
+  
+      // Backend delete
       const res = await fetch(`${API_BASE}/delete_custom_workflow?name=${encodeURIComponent(name)}`, { method: "DELETE" });
       const j = await res.json();
-      if (j.status === "ok") {
-        alert(`🗑 Deleted workflow "${name}"`);
-        window.dispatchEvent(new CustomEvent("refreshWorkflows"));
-      } else {
-        alert(`⚠️ Delete failed: ${j.message}`);
+      if (j.status !== "ok") {
+        alert(`⚠️ Delete failed: ${j.message || "Unknown error"}`);
+        // best-effort restore by reloading
+        await loadCustomWorkflowsFromDB();
+        return;
       }
+  
+      // Fresh fetch
+      await loadCustomWorkflowsFromDB();
     } catch (err) {
       console.error("Delete failed", err);
       alert("❌ Could not delete workflow.");
@@ -138,18 +146,33 @@ function WorkflowPage() {
         alert("Enter a valid new name.");
         return;
       }
+      // local optimistic update
+      const oldKey = `workflow_${renameTarget.oldName}`;
+      const newKey = `workflow_${renameTarget.newName}`;
+  
+      const cached = localStorage.getItem(oldKey);
+      if (cached) {
+        localStorage.removeItem(oldKey);
+        localStorage.setItem(newKey, cached);
+      }
+      setCustomWorkflows((prev) =>
+        prev.map((n) => (n === renameTarget.oldName ? renameTarget.newName : n))
+      );
+  
+      // backend rename
       const res = await fetch(`${API_BASE}/rename_custom_workflow`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(renameTarget),
       });
       const j = await res.json();
-      if (j.status === "ok") {
-        alert(`✅ Renamed to "${renameTarget.newName}"`);
-        window.dispatchEvent(new CustomEvent("refreshWorkflows"));
-      } else {
-        alert(`⚠️ Rename failed: ${j.message}`);
+      if (j.status !== "ok") {
+        alert(`⚠️ Rename failed: ${j.message || "Unknown error"}`);
+        await loadCustomWorkflowsFromDB();
+        return;
       }
+  
+      await loadCustomWorkflowsFromDB();
     } catch (err) {
       console.error("Rename failed", err);
       alert("❌ Could not rename workflow.");
@@ -158,6 +181,7 @@ function WorkflowPage() {
       closeContextMenu();
     }
   };
+  
   
 
   // 🔁 Ensure sidebar visible once agents/workflows are loaded
@@ -418,35 +442,46 @@ function WorkflowPage() {
     const anonId = localStorage.getItem("anon_user_id");
     console.log("🧠 Loading workflows for:", anonId || "anonymous");
   
-    let query = supabase
+    // 1) Read local first (for fallback)
+    const localNames = Object.keys(localStorage)
+      .filter((k) => k.startsWith("workflow_"))
+      .map((k) => k.replace("workflow_", ""));
+  
+    // 2) Build DB query: include both anonId and NULL
+    let q = supabase
       .from("workflows")
       .select("id, name, created_at, user_id")
       .order("created_at", { ascending: false });
   
-    if (anonId) query = query.eq("user_id", anonId);
-    else query = query.is("user_id", null);
+    if (anonId) {
+      // include rows of this anonId OR legacy rows with user_id null
+      // supabase-js v2: use or() with filter string
+      q = q.or(`user_id.eq.${anonId},user_id.is.null`);
+    } else {
+      q = q.is("user_id", null);
+    }
   
-    const { data, error } = await query;
-  
+    const { data, error } = await q;
     if (error) {
       console.error("❌ Error loading workflows:", error);
+      // fallback to local only
+      setCustomWorkflows([...new Set(localNames)]);
       return;
     }
   
-    // 🧩 Don't overwrite if Supabase is empty
-    if (data && data.length > 0) {
-      const workflowNames = data.map((wf) => wf.name || `workflow_${wf.id}`);
-      console.log("📁 Loaded workflows:", workflowNames);
-      setCustomWorkflows(workflowNames);
-    } else {
-      console.log("⚠️ No workflows found on Supabase — keeping local ones");
-    }
+    const dbNames = (data || []).map((wf) => wf.name || `workflow_${wf.id}`);
+  
+    // 3) Union (DB ⊎ local), DB first
+    const union = Array.from(new Set([...dbNames, ...localNames]));
+    console.log("📁 Loaded workflows:", union);
+    setCustomWorkflows(union);
   };
   
-  
-  
-
   const loadWorkflowFromDB = async (wfName: string) => {
+    setNodes([]); 
+    setEdges([]);
+    await new Promise(r => setTimeout(r, 50)); // wait for ReactFlow mount
+  
     const { data, error } = await supabase
       .from("workflows")
       .select("definitions")
@@ -454,56 +489,50 @@ function WorkflowPage() {
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
-  
-    if (error) {
-      console.error("❌ Failed to load workflow:", error);
-      return;
+    if (error || !data) {
+       console.error("❌ Failed to load workflow:", error);
+       return;
     }
   
-    // Normalize to React Flow
-    const defs = (data?.definitions as any) || {};
-    const rawNodes: any[] = defs.nodes || [];
-    const rawEdges: any[] = defs.edges || [];
+    const defs = data.definitions || {};
+    const rawNodes = defs.nodes || [];
+    const rawEdges = defs.edges || [];
   
-    // nodes → agentNode with data.uiLabel/backendLabel
-    const normNodes = rawNodes.map((n, i) => {
-      const backendLabel =
-        n?.data?.backendLabel ||
-        n?.backendLabel ||
-        n?.type || "Agent";
-      const uiLabel =
-        n?.data?.uiLabel ||
-        n?.uiLabel ||
-        backendLabel.replace(/ Agent$/,"") || "Agent";
+    const normNodes = rawNodes.map((n, i) => ({
+      id: n.id || `n${i+1}`,
+      type: "agentNode",                         // <-- force our node type
+      position: Array.isArray(n.position)
+        ? { x: +n.position[0] || 100 + i*180, y: +n.position[1] || 200 }
+        : { x: n.position?.x ?? 100 + i*180, y: n.position?.y ?? 200 },
+      data: {
+        uiLabel: n.data?.uiLabel || n.data?.backendLabel || n.type || "Agent",
+        backendLabel: n.data?.backendLabel || n.type || "Agent",
+        desc: n.data?.description || ""
+      }
+    }));
   
-      // support [x,y] or {x,y}
-      const p = n.position;
-      const pos = Array.isArray(p)
-        ? { x: Number(p[0]) || 100 + i * 180, y: Number(p[1]) || 200 }
-        : { x: p?.x ?? 100 + i * 180, y: p?.y ?? 200 };
+    const normEdges = rawEdges
+      .map((e,i)=>({
+        id: e.id || `e${i+1}`,
+        source: e.source || e.from,
+        target: e.target || e.to,
+        animated: true,
+        style:{stroke:"#22d3ee",strokeWidth:2}
+      }))
+      .filter(e=>e.source&&e.target);
   
-      return {
-        id: n.id || `n${i+1}`,
-        type: "agentNode",
-        position: pos,
-        data: { uiLabel, backendLabel, desc: n?.data?.description || n?.description || "" },
-      };
+    requestAnimationFrame(()=>{
+      setNodes(normNodes);
+      setEdges(normEdges);
+      fitView({padding:0.25});
     });
-  
-    // edges → ensure {source,target}
-    const normEdges = rawEdges.map((e, i) => ({
-      id: e.id || `e${i+1}`,
-      source: e.source || e.from,
-      target: e.target || e.to,
-      animated: true,
-      style: { stroke: "#22d3ee", strokeWidth: 2 },
-    })).filter(e => e.source && e.target);
-    console.log("🧩 Before setNodes", { wfName, defs, rawNodes, rawEdges });
-    setNodes(normNodes);
-    setEdges(normEdges);
-    fitView({ padding: 0.2 });
     console.log(`✅ Loaded workflow from DB: ${wfName}`, {nodes: normNodes.length, edges: normEdges.length});
   };
+  
+  
+  
+
+  
   
 
   const handleSpecSubmit = async (text: string, file?: File) => {
@@ -756,6 +785,7 @@ function WorkflowPage() {
             onDragOver={onDragOverCanvas}
           >
             <ReactFlow
+              key={nodes.length}
               nodes={nodes}
               edges={edges}
               onNodesChange={onNodesChange}
@@ -782,16 +812,19 @@ function WorkflowPage() {
             <button
               onClick={async () => {
                 try {
+                  const anonId = localStorage.getItem("anon_user_id") || undefined;
                   const wf = {
                     workflow_name: "Custom_" + loop + "_Flow",
                     loop_type: loop,
                     nodes,
                     edges,
+                    user_id: anonId, // <<< add this line
                   };
+
                   const res = await fetch(`${API_BASE}/save_custom_workflow`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ workflow: wf }),
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ workflow: wf }),
                   });
                   const j = await res.json();
 
