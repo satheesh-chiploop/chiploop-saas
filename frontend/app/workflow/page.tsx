@@ -501,7 +501,9 @@ function WorkflowPage() {
   const loadWorkflowFromDB = async (wfName: string) => {
     try {
       const anonId = localStorage.getItem("anon_user_id") || "anonymous";
-      wfName = wfName.trim().toLowerCase();
+      // 🔹 Normalize input name: remove whitespace and non-printable characters
+      wfName = (wfName || "").trim().replace(/\s+/g, " ");
+
       const { data, error } = await supabase
         .from("workflows")
         .select("definitions, nodes, edges")

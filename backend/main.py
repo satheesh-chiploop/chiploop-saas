@@ -857,13 +857,26 @@ async def save_custom_workflow(request: Request):
     """
     try:
         data = await request.json()
-        logger.info(f"💾 Saving workflow → name={data.get('name')} | user={data.get('user_id')} | keys={list(data.keys())}")
+        print("\n\n========== DEBUG SAVE_CUSTOM_WORKFLOW ==========")
+        print("RAW data keys:", list(data.keys()))
+        print("RAW data:", data)
+        print("RAW workflow type:", type(data.get("workflow")))
+        print("RAW workflow keys:", list(data.get("workflow", {}).keys()) if isinstance(data.get("workflow"), dict) else data.get("workflow"))
+        print("===============================================\n\n")
+
+    
 
         # Support both flat and nested payloads
         wf = data.get("workflow", data)
 
         user_id = wf.get("user_id", data.get("user_id", "anonymous"))
-        name = wf.get("workflow_name") or wf.get("name") or "Untitled Workflow"
+
+        name = (
+          data.get("workflow", {}).get("workflow_name")
+          or data.get("workflow", {}).get("name")
+          or "Untitled Workflow"
+        )
+        
         goal = wf.get("goal", "")
         summary = wf.get("summary") or wf.get("data", {}).get("summary", "")
         loop_type = wf.get("loop_type", "system")
