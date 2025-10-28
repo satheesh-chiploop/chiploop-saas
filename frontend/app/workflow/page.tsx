@@ -498,7 +498,7 @@ function WorkflowPage() {
       animated: true,
       style: { stroke: "#22d3ee", strokeWidth: 2 },
     })).filter(e => e.source && e.target);
-  
+    console.log("🧩 Before setNodes", { wfName, defs, rawNodes, rawEdges });
     setNodes(normNodes);
     setEdges(normEdges);
     fitView({ padding: 0.2 });
