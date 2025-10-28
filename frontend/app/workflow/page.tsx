@@ -145,7 +145,7 @@ function WorkflowPage() {
         setCustomWorkflows(savedWF.map((k) => k.replace("workflow_", "")));
   
         // Load from Supabase after local cache
-        await loadCustomWorkflowsFromDB();
+        setTimeout(() => loadCustomWorkflowsFromDB(), 600);
       } catch (err) {
         console.error("❌ Error loading user or workflows:", err);
       } finally {
@@ -362,14 +362,13 @@ function WorkflowPage() {
     const anonId = localStorage.getItem("anon_user_id");
     console.log("🧠 Loading workflows for:", anonId || "anonymous");
   
-    // ✅ Query based on whether user_id exists
-    let query = supabase.from("workflows").select("id, name, created_at, user_id").order("created_at", { ascending: false });
+    let query = supabase
+      .from("workflows")
+      .select("id, name, created_at, user_id")
+      .order("created_at", { ascending: false });
   
-    if (anonId) {
-      query = query.eq("user_id", anonId);
-    } else {
-      query = query.is("user_id", null);
-    }
+    if (anonId) query = query.eq("user_id", anonId);
+    else query = query.is("user_id", null);
   
     const { data, error } = await query;
   
@@ -378,10 +377,16 @@ function WorkflowPage() {
       return;
     }
   
-    const workflowNames = (data || []).map((wf) => wf.name || `workflow_${wf.id}`);
-    console.log("📁 Loaded workflows:", workflowNames);
-    setCustomWorkflows(workflowNames);
+    // 🧩 Don't overwrite if Supabase is empty
+    if (data && data.length > 0) {
+      const workflowNames = data.map((wf) => wf.name || `workflow_${wf.id}`);
+      console.log("📁 Loaded workflows:", workflowNames);
+      setCustomWorkflows(workflowNames);
+    } else {
+      console.log("⚠️ No workflows found on Supabase — keeping local ones");
+    }
   };
+  
   
   
 
@@ -602,7 +607,7 @@ function WorkflowPage() {
                   </li>
                 ))}
               </ul>
-          {!loadingWorkflows && customWorkflows.length > 0 && (
+          {customWorkflows && customWorkflows.length > 0 && (
             <>
               <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
