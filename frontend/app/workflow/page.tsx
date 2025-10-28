@@ -602,11 +602,11 @@ function WorkflowPage() {
                   </li>
                 ))}
               </ul>
-          {!loadingAgents && customAgents.length > 0 && (
+          {!loadingWorkflows && customWorkflows.length > 0 && (
             <>
               <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-               {customAgents.map((a, idx) => (
+               {customWorkflows.map((a, idx) => (
                   <li
                     key={`${a.backendLabel}-${idx}`}
                     draggable
