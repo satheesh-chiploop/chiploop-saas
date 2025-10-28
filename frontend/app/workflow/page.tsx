@@ -95,7 +95,7 @@ function WorkflowPage() {
   const [customWorkflows, setCustomWorkflows] = useState<string[]>([]);
   const [loadingAgents, setLoadingAgents] = useState(true);
   const [loadingWorkflows, setLoadingWorkflows] = useState(true);
-
+  
   // modals
   const [showSpecModal, setShowSpecModal] = useState(false);
   const [showCreateAgentModal, setShowCreateAgentModal] = useState(false);
@@ -103,6 +103,62 @@ function WorkflowPage() {
   const [showAgentPlanner, setShowAgentPlanner] = useState(false);
 
   const {fitView} = useReactFlow();
+
+  const [contextMenu, setContextMenu] = useState<{x:number; y:number; name:string} | null>(null);
+  const [renameTarget, setRenameTarget] = useState<{oldName:string, newName:string}>({oldName:"", newName:""});
+  
+  const openContextMenu = (e: React.MouseEvent, name: string) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY, name });
+  };
+  
+  const closeContextMenu = () => setContextMenu(null);
+  
+  const deleteCustomWorkflow = async (name: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/delete_custom_workflow?name=${encodeURIComponent(name)}`, { method: "DELETE" });
+      const j = await res.json();
+      if (j.status === "ok") {
+        alert(`🗑 Deleted workflow "${name}"`);
+        window.dispatchEvent(new CustomEvent("refreshWorkflows"));
+      } else {
+        alert(`⚠️ Delete failed: ${j.message}`);
+      }
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("❌ Could not delete workflow.");
+    } finally {
+      closeContextMenu();
+    }
+  };
+  
+  const renameCustomWorkflow = async () => {
+    try {
+      if (!renameTarget.newName.trim()) {
+        alert("Enter a valid new name.");
+        return;
+      }
+      const res = await fetch(`${API_BASE}/rename_custom_workflow`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(renameTarget),
+      });
+      const j = await res.json();
+      if (j.status === "ok") {
+        alert(`✅ Renamed to "${renameTarget.newName}"`);
+        window.dispatchEvent(new CustomEvent("refreshWorkflows"));
+      } else {
+        alert(`⚠️ Rename failed: ${j.message}`);
+      }
+    } catch (err) {
+      console.error("Rename failed", err);
+      alert("❌ Could not rename workflow.");
+    } finally {
+      setRenameTarget({ oldName: "", newName: "" });
+      closeContextMenu();
+    }
+  };
+  
 
   // 🔁 Ensure sidebar visible once agents/workflows are loaded
   useEffect(() => {
@@ -615,7 +671,8 @@ function WorkflowPage() {
                   <li
                     key={`${wf}-${idx}`}
                     onClick={() => loadWorkflowFromDB(wf)}
-                    className= "px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
+                    onContextMenu={(e) => openContextMenu(e, wf)}
+                    className= "px-2 py-1 rounded hover:bg-slate-800 cursor-pointer select-none"
                   >
                     {wf}
                   </li>
@@ -801,6 +858,57 @@ function WorkflowPage() {
           </div>
         </section>
       </div>
+
+      {contextMenu && (
+        <div
+          onMouseLeave={closeContextMenu}
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          className="fixed z-50 bg-slate-800 border border-slate-700 rounded-md shadow-lg"
+        >
+          <button
+            onClick={() => setRenameTarget({ oldName: contextMenu.name, newName: "" })}
+            className="block w-full text-left px-3 py-2 text-sky-300 hover:bg-slate-700"
+          >
+           ✏️ Rename “{contextMenu.name}”
+          </button>
+          <button
+            onClick={() => deleteCustomWorkflow(contextMenu.name)}
+            className="block w-full text-left px-3 py-2 text-red-400 hover:bg-slate-700"
+          >
+            🗑 Delete “{contextMenu.name}”
+          </button>
+        </div>
+      )}
+
+      {renameTarget.oldName && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+          <div className="bg-slate-900 rounded-xl p-6 shadow-xl w-96">
+            <h3 className="text-lg font-bold mb-3 text-cyan-400">Rename Workflow</h3>
+            <p className="text-sm mb-2 text-slate-400">Old name: {renameTarget.oldName}</p>
+            <input
+              type="text"
+              value={renameTarget.newName}
+              onChange={(e) => setRenameTarget({ ...renameTarget, newName: e.target.value })}
+              placeholder="Enter new name"
+              className="w-full mb-4 rounded-lg bg-slate-800 border border-slate-700 p-2 text-slate-200"
+            />
+           <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setRenameTarget({ oldName: "", newName: "" })}
+                className="px-4 py-2 rounded bg-slate-700 hover:bg-slate-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={renameCustomWorkflow}
+                className="px-4 py-2 rounded bg-cyan-500 text-black font-semibold hover:bg-cyan-400"
+              >
+                Rename
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
   
       {/* ===== Modals ===== */}
       {showSpecModal && (
