@@ -501,14 +501,15 @@ function WorkflowPage() {
   const loadWorkflowFromDB = async (wfName: string) => {
     try {
       const anonId = localStorage.getItem("anon_user_id") || "anonymous";
-  
+      wfName = wfName.trim().toLowerCase();
       const { data, error } = await supabase
         .from("workflows")
         .select("definitions, nodes, edges")
         .eq("name", wfName)
         .or(`user_id.eq.${anonId},user_id.is.null`)
         .maybeSingle();
-  
+      console.log("🧠 Fetching workflow:", wfName, "for user:", anonId);
+      console.log("🧠 Data returned:", data);
       if (error) {
         console.error("❌ Supabase error:", error);
         alert("⚠️ Could not load workflow");
