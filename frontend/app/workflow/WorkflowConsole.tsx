@@ -33,6 +33,18 @@ export default function WorkflowConsole({
   const [workflowMeta, setWorkflowMeta] = useState<WorkflowRow | null>(null);
   const consoleRef = useRef<HTMLDivElement | null>(null);
   const channelName = useMemo(() => `realtime:public:${table}`, [table]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+
+  // 🔁 Reload WorkflowConsole when global refresh happens
+  useEffect(() => {
+    const refreshHandler = () => {
+      console.log("🔄 Refreshing WorkflowConsole...");
+      setRefreshKey((prev) => prev + 1);
+  };
+    window.addEventListener("refreshWorkflows", refreshHandler);
+    return () => window.removeEventListener("refreshWorkflows", refreshHandler);
+  }, []);
 
   // ---------- 🧠 FETCH + LIVE SYNC ----------
   useEffect(() => {
@@ -108,7 +120,7 @@ export default function WorkflowConsole({
       clearInterval(poller);
       channels.forEach((ch) => supabase.removeChannel(ch));
     };
-  }, [jobId, table, channelName]);
+  }, [jobId, table, channelName,refreshKey]);
 
   // ---------- 🌀 Auto-scroll ----------
   useEffect(() => {

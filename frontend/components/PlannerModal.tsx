@@ -131,9 +131,9 @@ export default function PlannerModal({ onClose }) {
               alert(
                 `💾 Workflow "${workflowName}" saved under "${loopType}" Custom Workflows.`
               );
-         
+              window.dispatchEvent(new CustomEvent("refreshWorkflows"));
             }
-      
+            
             // ✅ Save locally for instant reload
             const stored = { nodes: data.nodes, edges: data.edges };
             localStorage.setItem(

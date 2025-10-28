@@ -133,15 +133,16 @@ function WorkflowPage() {
   }, [supabase, router]);
 
   // 🔁 Listen for new workflows saved by PlannerModal
+  // 🔁 Listen for global refresh events (Planner or Save)
   useEffect(() => {
-    const handleWorkflowSaved = () => {
-      console.log("🔄 Refreshing workflow list after AI save...");
+    const refreshHandler = () => {
+      console.log("🔄 Refreshing workflows (global trigger)");
       loadCustomWorkflowsFromDB();
     };
-    window.addEventListener("workflow-saved", handleWorkflowSaved);
-    console.log("📥 Workflow saved event received — reloading sidebar...");
-    return () => window.removeEventListener("workflow-saved", handleWorkflowSaved);
+    window.addEventListener("refreshWorkflows", refreshHandler);
+    return () => window.removeEventListener("refreshWorkflows", refreshHandler);
   }, []);
+
 
   /* ---------- Default Verify Loop ---------- */
   useEffect(() => {
@@ -703,9 +704,14 @@ function WorkflowPage() {
                     body: JSON.stringify({ workflow: wf }),
                   });
                   const j = await res.json();
-                  if (j.status === "ok") alert("✅ Workflow saved to Supabase!");
-                  else alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);
-                  await loadCustomWorkflowsFromDB()
+                  
+                  if (j.status === "ok") {
+                    alert("✅ Workflow saved to Supabase!");
+                    window.dispatchEvent(new CustomEvent("refreshWorkflows"));
+                  } else {
+                    alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);
+                  }
+                  
                 } catch (e) {
                   console.error(e);
                   alert("❌ Error saving workflow");
