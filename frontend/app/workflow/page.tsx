@@ -500,6 +500,8 @@ function WorkflowPage() {
   
   const loadWorkflowFromDB = async (wfName: string) => {
     try {
+      const anonId = localStorage.getItem("anon_user_id") || "anonymous";
+  
       const { data, error } = await supabase
         .from("workflows")
         .select("definitions, nodes, edges")
@@ -507,30 +509,48 @@ function WorkflowPage() {
         .or(`user_id.eq.${anonId},user_id.is.null`)
         .maybeSingle();
   
-      if (error || !data) {
+      if (error) {
+        console.error("❌ Supabase error:", error);
+        alert("⚠️ Could not load workflow");
+        return;
+      }
+      if (!data) {
         alert("⚠️ Workflow not found");
         return;
       }
   
-      // definitions can be JSON or string; parse if needed
+      // Parse definitions safely
       const defsRaw = data.definitions ?? null;
       const defs = typeof defsRaw === "string" ? JSON.parse(defsRaw) : defsRaw;
   
-      // prefer defs if present, else fallback to columns
-      const nodesIn = defs?.nodes ?? data.nodes ?? [];
-      const edgesIn = defs?.edges ?? data.edges ?? [];
+      if (!defs) {
+        alert("⚠️ Workflow is empty");
+        return;
+      }
   
-      // normalize to React Flow format and force agentNode type
+      // Extract nodes and edges
+      const nodesIn = defs.nodes || data.nodes || [];
+      const edgesIn = defs.edges || data.edges || [];
+  
+      // ✅ Normalize nodes (handle both [x,y] and {x,y})
       const normNodes = (nodesIn || []).map((n: any, i: number) => ({
         id: n.id ?? `n-${i}`,
         type: "agentNode",
-        position: n.position ?? { x: 120 * i, y: 160 },
         position: Array.isArray(n.position)
           ? { x: n.position[0] ?? 120 * i, y: n.position[1] ?? 160 }
           : (n.position ?? { x: 120 * i, y: 160 }),
         data: {
-          uiLabel: n.data?.uiLabel ?? n.uiLabel ?? n.label ?? `Node ${i + 1}`,
-          backendLabel: n.data?.backendLabel ?? n.backendLabel ?? n.agent ?? `Agent ${i + 1}`,
+          uiLabel:
+            n.data?.uiLabel ??
+            n.uiLabel ??
+            n.label ??
+            n.type ??
+            `Node ${i + 1}`,
+          backendLabel:
+            n.data?.backendLabel ??
+            n.backendLabel ??
+            n.type ??
+            `Agent ${i + 1}`,
           desc: n.data?.desc ?? n.desc ?? "",
         },
       }));
@@ -542,18 +562,16 @@ function WorkflowPage() {
         animated: true,
         style: { stroke: "#22d3ee", strokeWidth: 2 },
         label: e.label ?? undefined,
-      })).filter(e => e.source && e.target);
+      }));
   
-      // clear, set, and fit just like prebuilt flows do
       setNodes(normNodes);
       setEdges(normEdges);
-      setTimeout(() => fitView({ padding: 0.15, duration: 500 }), 0);
+      setTimeout(() => fitView({ padding: 0.15, duration: 500 }), 50);
     } catch (err) {
       console.error("loadWorkflowFromDB failed:", err);
       alert("❌ Could not load workflow");
     }
   };
-  
   
   
 
