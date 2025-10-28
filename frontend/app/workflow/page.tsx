@@ -851,18 +851,28 @@ function WorkflowPage() {
             <button
               onClick={async () => {
                 try {
-                  const anonId = localStorage.getItem("anon_user_id") || undefined;
+
+                  const { data: sessionData } = await supabase.auth.getSession();
+                  const userId =
+                    sessionData?.session?.user?.id ||
+                    localStorage.getItem("anon_user_id") ||
+                    "anonymous";
+
+                
                   const wf = {
                     workflow_name: "Custom_" + loop + "_Flow",
                     loop_type: loop,
                     nodes,
                     edges,
-                    user_id: anonId, // <<< add this line
+                    user_id: userId, // <<< add this line
                   };
 
                   const res = await fetch(`${API_BASE}/save_custom_workflow`, {
                   method: "POST",
-                  headers: { "Content-Type": "application/json" },
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-user-id": userId, // ✅ backend normalization uses this
+                  },
                   body: JSON.stringify({ workflow: wf }),
                   });
                   const j = await res.json();
