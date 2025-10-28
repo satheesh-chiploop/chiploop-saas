@@ -503,7 +503,7 @@ function WorkflowPage() {
       const anonId = localStorage.getItem("anon_user_id") || "anonymous";
       // 🔹 Normalize input name: remove whitespace and non-printable characters
       wfName = (wfName || "").trim().replace(/\s+/g, " ");
-
+      console.log("🧠 Attempting to load workflow:", wfName, "for anonId:", anonId);
       const { data, error } = await supabase
         .from("workflows")
         .select("definitions, nodes, edges")
