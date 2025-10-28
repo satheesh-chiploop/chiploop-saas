@@ -245,6 +245,27 @@ function WorkflowPage() {
     window.addEventListener("refreshWorkflows", refreshHandler);
     return () => window.removeEventListener("refreshWorkflows", refreshHandler);
   }, []);
+  // 🔹 Auto-load latest custom workflow after save/generate
+  useEffect(() => {
+    const onSaved = async () => {
+      const anonId = localStorage.getItem("anon_user_id") || "anonymous";
+      const { data } = await supabase
+        .from("workflows")
+        .select("name")
+        .eq("user_id", anonId)
+        .eq("is_custom", true)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data?.name) {
+        await loadWorkflowFromDB(data.name);
+      }
+    };
+
+    window.addEventListener("workflow-saved", onSaved);
+    return () => window.removeEventListener("workflow-saved", onSaved);
+  }, [supabase]);
 
 
   /* ---------- Default Verify Loop ---------- */
@@ -478,55 +499,55 @@ function WorkflowPage() {
   };
   
   const loadWorkflowFromDB = async (wfName: string) => {
-    setNodes([]); 
-    setEdges([]);
-    await new Promise(r => setTimeout(r, 50)); // wait for ReactFlow mount
+    try {
+      const { data, error } = await supabase
+        .from("workflows")
+        .select("definitions, nodes, edges")
+        .eq("name", wfName)
+        .maybeSingle();
   
-    const { data, error } = await supabase
-      .from("workflows")
-      .select("definitions")
-      .eq("name", wfName)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
-    if (error || !data) {
-       console.error("❌ Failed to load workflow:", error);
-       return;
-    }
-  
-    const defs = data.definitions || {};
-    const rawNodes = defs.nodes || [];
-    const rawEdges = defs.edges || [];
-  
-    const normNodes = rawNodes.map((n, i) => ({
-      id: n.id || `n${i+1}`,
-      type: "agentNode",                         // <-- force our node type
-      position: Array.isArray(n.position)
-        ? { x: +n.position[0] || 100 + i*180, y: +n.position[1] || 200 }
-        : { x: n.position?.x ?? 100 + i*180, y: n.position?.y ?? 200 },
-      data: {
-        uiLabel: n.data?.uiLabel || n.data?.backendLabel || n.type || "Agent",
-        backendLabel: n.data?.backendLabel || n.type || "Agent",
-        desc: n.data?.description || ""
+      if (error || !data) {
+        alert("⚠️ Workflow not found");
+        return;
       }
-    }));
   
-    const normEdges = rawEdges
-      .map((e,i)=>({
-        id: e.id || `e${i+1}`,
-        source: e.source || e.from,
-        target: e.target || e.to,
+      // definitions can be JSON or string; parse if needed
+      const defsRaw = data.definitions ?? null;
+      const defs = typeof defsRaw === "string" ? JSON.parse(defsRaw) : defsRaw;
+  
+      // prefer defs if present, else fallback to columns
+      const nodesIn = defs?.nodes ?? data.nodes ?? [];
+      const edgesIn = defs?.edges ?? data.edges ?? [];
+  
+      // normalize to React Flow format and force agentNode type
+      const normNodes = (nodesIn || []).map((n: any, i: number) => ({
+        id: n.id ?? `n-${i}`,
+        type: "agentNode",
+        position: n.position ?? { x: 120 * i, y: 160 },
+        data: {
+          uiLabel: n.data?.uiLabel ?? n.uiLabel ?? n.label ?? `Node ${i + 1}`,
+          backendLabel: n.data?.backendLabel ?? n.backendLabel ?? n.agent ?? `Agent ${i + 1}`,
+          desc: n.data?.desc ?? n.desc ?? "",
+        },
+      }));
+  
+      const normEdges = (edgesIn || []).map((e: any, j: number) => ({
+        id: e.id ?? `e-${j}`,
+        source: e.source,
+        target: e.target,
         animated: true,
-        style:{stroke:"#22d3ee",strokeWidth:2}
-      }))
-      .filter(e=>e.source&&e.target);
+        style: { stroke: "#22d3ee", strokeWidth: 2 },
+        label: e.label ?? undefined,
+      })).filter(e => e.source && e.target);
   
-    requestAnimationFrame(()=>{
+      // clear, set, and fit just like prebuilt flows do
       setNodes(normNodes);
       setEdges(normEdges);
-      fitView({padding:0.25});
-    });
-    console.log(`✅ Loaded workflow from DB: ${wfName}`, {nodes: normNodes.length, edges: normEdges.length});
+      setTimeout(() => fitView({ padding: 0.15, duration: 500 }), 0);
+    } catch (err) {
+      console.error("loadWorkflowFromDB failed:", err);
+      alert("❌ Could not load workflow");
+    }
   };
   
   
