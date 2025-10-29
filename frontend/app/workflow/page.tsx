@@ -504,21 +504,16 @@ function WorkflowPage() {
   };
   const loadWorkflowFromDB = async (wfName: string) => {
     try {
-      // 🧠 Step 1: Identify user
+      // 🧠 Identify User (session or anon)
       const { data: sessionData } = await supabase.auth.getSession();
-
       const anonId = localStorage.getItem("anon_user_id");
-      const userId = anonId || sessionData?.session?.user?.id || "anonymous";
-    
-      
-      console.log(`🧠 loadWorkflow Attempting to load workflow: ${wfName} for user: ${userId}`);
-
-      if (!wfName || !userId) {
-        console.warn("⚠️ Missing workflow name or userId:", { wfName, userId });
-        return;
-      }
+      const userId = anonId || sessionData?.session?.user?.id;
   
-      // 🧩 Step 2: Fetch from Supabase (dynamic user_id)
+      console.log(`🧠 (CustomWork) Loading workflow: ${wfName} for user: ${userId}`);
+  
+      if (!wfName || !userId) return;
+  
+      // 🎯 Fetch ONLY definitions (where nodes/edges live)
       const { data, error } = await supabase
         .from("workflows")
         .select("definitions")
@@ -526,60 +521,57 @@ function WorkflowPage() {
         .eq("name", wfName)
         .maybeSingle();
   
-      console.log("📦 Data returned:", data);
+      console.log("📦 Returned from Supabase:", data);
   
-      // 🧩 Step 3: Handle not found
       if (error) {
-        console.error("❌ Supabase fetch error:", error.message);
+        console.error("❌ Supabase fetch error:", error);
         alert("⚠️ Error loading workflow");
         return;
       }
   
-      if (!data) {
-        console.warn("⚠️ Workflow not found:", wfName);
-        alert("⚠️ Workflow not found");
+      if (!data?.definitions) {
+        console.warn("⚠️ No definitions found for:", wfName);
+        alert("⚠️ Workflow has no saved structure");
         return;
       }
   
-      // 🧩 Step 4: Extract definitions properly
-      const defs = data.definitions || { nodes: data.nodes, edges: data.edges };
-      if (!defs?.nodes?.length) {
-        console.warn("⚠️ Workflow has no nodes:", wfName);
-        alert("⚠️ Empty workflow");
-        return;
-      }
+      const defs = data.definitions;
+      const rawNodes = defs.nodes || [];
+      const rawEdges = defs.edges || [];
   
-      // 🧩 Step 5: Normalize nodes/edges
-      const parsedNodes = defs.nodes.map((n: any, i: number) => ({
-        id: n.id || `n${i}`,
-        type: n.type || "AgentNode",
-        position: n.position || { x: i * 200, y: 0 },
-        data: n.data || { label: n.type || "Agent" },
+      // ✅ Convert saved nodes → ReactFlow format
+      const parsedNodes = rawNodes.map((node: any, i: number) => ({
+        id: node.id || `n${i}`,
+        type: node.type || "AgentNode",
+        position: node.position ?? { x: i * 240, y: 120 },
+        data: {
+          label: node.data?.backendLabel || node.data?.label || node.type || "Agent",
+          ...node.data
+        }
       }));
   
-      const parsedEdges = (defs.edges || []).map((e: any, i: number) => ({
-        id: e.id || `e${i}`,
-        source: e.from || e.source,
-        target: e.to || e.target,
-        type: e.type || "smoothstep",
+      // ✅ Convert saved edges → ReactFlow format
+      const parsedEdges = rawEdges.map((edge: any, i: number) => ({
+        id: edge.id || `e${i}`,
+        source: edge.source || edge.from,
+        target: edge.target || edge.to,
+        type: edge.type || "smoothstep",
       }));
   
-      console.log(`✅ Parsed ${parsedNodes.length} nodes and ${parsedEdges.length} edges`);
+      console.log(`✅ Parsed ${parsedNodes.length} nodes, ${parsedEdges.length} edges`);
   
-      // 🧩 Step 6: Update ReactFlow state
+      // 🎨 Load into canvas
       setNodes(parsedNodes);
       setEdges(parsedEdges);
   
-      // 🧩 Step 7: Fit canvas view
-      setTimeout(() => {
-        fitView({ padding: 0.2, duration: 800 });
-        console.log("🎨 fitView executed — workflow rendered");
-      }, 100);
+      // 🔍 Fit into view
+      setTimeout(() => fitView({ padding: 0.2, duration: 600 }), 80);
     } catch (err) {
       console.error("🔥 Unexpected error loading workflow:", err);
       alert("❌ Could not load workflow");
     }
   };
+  
   
   
 
