@@ -248,11 +248,14 @@ function WorkflowPage() {
   // 🔹 Auto-load latest custom workflow after save/generate
   useEffect(() => {
     const onSaved = async () => {
-      const anonId = localStorage.getItem("anon_user_id") || "anonymous";
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (!userId) return;
+      
       const { data } = await supabase
         .from("workflows")
         .select("name")
-        .eq("user_id", anonId)
+        .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
