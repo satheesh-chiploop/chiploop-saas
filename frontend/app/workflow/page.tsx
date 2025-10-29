@@ -253,7 +253,6 @@ function WorkflowPage() {
         .from("workflows")
         .select("name")
         .eq("user_id", anonId)
-        .eq("is_custom", true)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
