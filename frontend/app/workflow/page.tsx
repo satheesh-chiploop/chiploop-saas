@@ -521,7 +521,7 @@ function WorkflowPage() {
       // 🧩 Step 2: Fetch from Supabase (dynamic user_id)
       const { data, error } = await supabase
         .from("workflows")
-        .select("definitions, nodes, edges")
+        .select("definitions")
         .eq("user_id", userId)
         .eq("name", wfName)
         .maybeSingle();
