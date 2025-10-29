@@ -506,15 +506,15 @@ function WorkflowPage() {
       const anonId = localStorage.getItem("anon_user_id");
       const userId = anonId || sessionData?.session?.user?.id || "anonymous";
     
-      console.log("🧠 loadWorkflow Attempting to load workflow:", wfName, "for user:", userId);
+      
+      console.log(`🧠 loadWorkflow Attempting to load workflow: ${wfName} for user: ${userId}`);
   
       // 🧩 Step 2: Fetch from Supabase (dynamic user_id)
       const { data, error } = await supabase
         .from("workflows")
         .select("definitions, nodes, edges")
+        .eq(`user_id.eq.${userId},user_id.is.null`)
         .eq("name", wfName)
-        // match user_id or null (for prebuilt/public workflows)
-        .or(`user_id.eq.${userId},user_id.is.null`)
         .maybeSingle();
   
       console.log("📦 Data returned:", data);
