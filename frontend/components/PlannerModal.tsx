@@ -124,7 +124,6 @@ export default function PlannerModal({ onClose }) {
                     summary: data.summary,
                   },
                   user_id: localStorage.getItem("anon_user_id") || "anonymous",
-                  is_custom: true,
                 }),
               });
       
