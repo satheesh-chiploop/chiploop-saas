@@ -508,12 +508,17 @@ function WorkflowPage() {
     
       
       console.log(`🧠 loadWorkflow Attempting to load workflow: ${wfName} for user: ${userId}`);
+
+      if (!wfName || !userId) {
+        console.warn("⚠️ Missing workflow name or userId:", { wfName, userId });
+        return;
+      }
   
       // 🧩 Step 2: Fetch from Supabase (dynamic user_id)
       const { data, error } = await supabase
         .from("workflows")
         .select("definitions, nodes, edges")
-        .eq(`user_id.eq.${userId},user_id.is.null`)
+        .eq("user_id", userId)
         .eq("name", wfName)
         .maybeSingle();
   
