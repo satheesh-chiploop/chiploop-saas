@@ -855,12 +855,12 @@ function WorkflowPage() {
                 try {
 
                   const { data: sessionData } = await supabase.auth.getSession();
-                  const userId =
-                    sessionData?.session?.user?.id ||
-                    localStorage.getItem("anon_user_id") ||
-                    "anonymous";
 
-                
+                  const anonId = localStorage.getItem("anon_user_id");
+                  const userId = session?.user?.id || anonId || "anonymous";
+
+                  console.log("🧠 Loading workflows for:", userId);
+               
                   const wf = {
                     workflow_name: "Custom_" + loop + "_Flow",
                     loop_type: loop,
