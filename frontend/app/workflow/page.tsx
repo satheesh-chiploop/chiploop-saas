@@ -462,12 +462,11 @@ function WorkflowPage() {
   const loadCustomWorkflowsFromDB = async () => {
 
     const { data: sessionData } = await supabase.auth.getSession();
-    const userId =
-        sessionData?.session?.user?.id ||
-        localStorage.getItem("anon_user_id") ||
-        "anonymous";
 
-    console.log("🧠 Loading workflows for:", userId);
+    const anonId = localStorage.getItem("anon_user_id");
+    const userId = anonId || sessionData?.session?.user?.id || "anonymous";
+
+    console.log("🧠 (CustomWork) Loading workflows for:", userId);
    
     // 1) Read local first (for fallback)
     const localNames = Object.keys(localStorage)
@@ -503,12 +502,11 @@ function WorkflowPage() {
     try {
       // 🧠 Step 1: Identify user
       const { data: sessionData } = await supabase.auth.getSession();
-      const userId =
-        sessionData?.session?.user?.id ||
-        localStorage.getItem("anon_user_id") ||
-        "anonymous";
-  
-      console.log("🧠 Attempting to load workflow:", wfName, "for user:", userId);
+
+      const anonId = localStorage.getItem("anon_user_id");
+      const userId = anonId || sessionData?.session?.user?.id || "anonymous";
+    
+      console.log("🧠 loadWorkflow Attempting to load workflow:", wfName, "for user:", userId);
   
       // 🧩 Step 2: Fetch from Supabase (dynamic user_id)
       const { data, error } = await supabase
