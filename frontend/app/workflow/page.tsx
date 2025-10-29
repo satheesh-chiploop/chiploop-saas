@@ -859,7 +859,9 @@ function WorkflowPage() {
                   const anonId = localStorage.getItem("anon_user_id");
                   const userId = anonId || sessionData?.session?.user?.id || "anonymous";
 
-                  console.log("🧠 Loading workflows for:", userId);
+                  console.log("SP: verifiying anonid",anonId)
+
+                  console.log("🧠 SP: Loading new workflows for:", userId);
                
                   const wf = {
                     workflow_name: "Custom_" + loop + "_Flow",
