@@ -504,16 +504,19 @@ function WorkflowPage() {
   };
   const loadWorkflowFromDB = async (wfName: string) => {
     try {
-      // 🧠 Identify User (session or anon)
+      // 1) Get user ID (session → anon → fail)
       const { data: sessionData } = await supabase.auth.getSession();
       const anonId = localStorage.getItem("anon_user_id");
-      const userId = anonId || sessionData?.session?.user?.id;
+      const userId = anonId || sessionData?.session?.user?.id || null;
   
-      console.log(`🧠 (CustomWork) Loading workflow: ${wfName} for user: ${userId}`);
+      if (!userId) {
+        console.warn("⚠️ No user ID detected.");
+        return;
+      }
   
-      if (!wfName || !userId) return;
+      console.log(`🧠 Loading workflow: ${wfName} for user: ${userId}`);
   
-      // 🎯 Fetch ONLY definitions (where nodes/edges live)
+      // 2) Fetch workflow record
       const { data, error } = await supabase
         .from("workflows")
         .select("definitions")
@@ -524,51 +527,50 @@ function WorkflowPage() {
       console.log("📦 Returned from Supabase:", data);
   
       if (error) {
-        console.error("❌ Supabase fetch error:", error);
-        alert("⚠️ Error loading workflow");
+        console.error("❌ Supabase fetch error:", error.message);
         return;
       }
-  
-      if (!data?.definitions) {
+      if (!data || !data.definitions) {
         console.warn("⚠️ No definitions found for:", wfName);
-        alert("⚠️ Workflow has no saved structure");
         return;
       }
   
       const defs = data.definitions;
-      const rawNodes = defs.nodes || [];
-      const rawEdges = defs.edges || [];
+      const nodes = defs.nodes || [];
+      const edges = defs.edges || [];
   
-      // ✅ Convert saved nodes → ReactFlow format
-      const parsedNodes = rawNodes.map((node: any, i: number) => ({
-        id: node.id || `n${i}`,
-        type: node.type || "AgentNode",
-        position: node.position ?? { x: i * 240, y: 120 },
+      // 3) Normalize nodes for ReactFlow rendering
+      const parsedNodes = nodes.map((n: any, i: number) => ({
+        id: n.id || `n${i}`,
+        type: n.type || "AgentNode",
+        position: n.position || { x: i * 250, y: i * 40 },
         data: {
-          label: node.data?.backendLabel || node.data?.label || node.type || "Agent",
-          ...node.data
+          label: n.data?.label || n.data?.backendLabel || n.type || "Agent",
+          ...n.data,
         }
       }));
   
-      // ✅ Convert saved edges → ReactFlow format
-      const parsedEdges = rawEdges.map((edge: any, i: number) => ({
-        id: edge.id || `e${i}`,
-        source: edge.source || edge.from,
-        target: edge.target || edge.to,
-        type: edge.type || "smoothstep",
+      // 4) Normalize edges
+      const parsedEdges = edges.map((e: any, i: number) => ({
+        id: e.id || `e${i}`,
+        source: e.source || e.from,
+        target: e.target || e.to,
+        type: e.type || "smoothstep",
       }));
   
-      console.log(`✅ Parsed ${parsedNodes.length} nodes, ${parsedEdges.length} edges`);
+      console.log(`✅ Parsed ${parsedNodes.length} nodes & ${parsedEdges.length} edges`);
   
-      // 🎨 Load into canvas
+      // 5) Update canvas
       setNodes(parsedNodes);
       setEdges(parsedEdges);
   
-      // 🔍 Fit into view
-      setTimeout(() => fitView({ padding: 0.2, duration: 600 }), 80);
+      setTimeout(() => {
+        fitView({ padding: 0.25, duration: 600 });
+        console.log("🎨 fitView executed — workflow rendered");
+      }, 50);
+  
     } catch (err) {
-      console.error("🔥 Unexpected error loading workflow:", err);
-      alert("❌ Could not load workflow");
+      console.error("🔥 Unexpected load error:", err);
     }
   };
   
