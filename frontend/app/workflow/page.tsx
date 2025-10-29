@@ -460,9 +460,15 @@ function WorkflowPage() {
   };
 
   const loadCustomWorkflowsFromDB = async () => {
-    const anonId = localStorage.getItem("anon_user_id");
-    console.log("🧠 Loading workflows for:", anonId || "anonymous");
-  
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const userId =
+        sessionData?.session?.user?.id ||
+        localStorage.getItem("anon_user_id") ||
+        "anonymous";
+
+    console.log("🧠 Loading workflows for:", userId);
+   
     // 1) Read local first (for fallback)
     const localNames = Object.keys(localStorage)
       .filter((k) => k.startsWith("workflow_"))
@@ -474,12 +480,8 @@ function WorkflowPage() {
       .select("id, name, created_at, user_id")
       .order("created_at", { ascending: false });
   
-    if (anonId) {
-      // include rows of this anonId OR legacy rows with user_id null
-      // supabase-js v2: use or() with filter string
-      q = q.or(`user_id.eq.${anonId},user_id.is.null`);
-    } else {
-      q = q.is("user_id", null);
+    if (userId) {
+        q = q.or(`user_id.eq.${userId},user_id.is.null`);
     }
   
     const { data, error } = await q;
