@@ -857,7 +857,7 @@ function WorkflowPage() {
                   const { data: sessionData } = await supabase.auth.getSession();
 
                   const anonId = localStorage.getItem("anon_user_id");
-                  const userId = session?.user?.id || anonId || "anonymous";
+                  const userId = anonId || sessionData?.session?.user?.id || "anonymous";
 
                   console.log("🧠 Loading workflows for:", userId);
                
