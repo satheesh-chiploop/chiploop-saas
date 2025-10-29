@@ -540,22 +540,24 @@ function WorkflowPage() {
       const edges = defs.edges || [];
   
       // 3) Normalize nodes for ReactFlow rendering
-      const parsedNodes = nodes.map((n: any, i: number) => ({
+      const parsedNodes = (defs.nodes || []).map((n: any, i: number) => ({
         id: n.id || `n${i}`,
-        type: n.type || "AgentNode",
-        position: n.position || { x: i * 250, y: i * 40 },
+        type: "agentNode", // <----- IMPORTANT!!!
+        position: n.position || { x: 100 + i * 220, y: 200 },
         data: {
-          label: n.data?.label || n.data?.backendLabel || n.type || "Agent",
-          ...n.data,
-        }
+          uiLabel: n.data?.uiLabel || n.data?.label || n.data?.backendLabel || "Agent",
+          backendLabel: n.data?.backendLabel || n.data?.uiLabel || "Unknown Agent",
+          desc: n.data?.desc || "",
+        },
       }));
   
       // 4) Normalize edges
-      const parsedEdges = edges.map((e: any, i: number) => ({
+      const parsedEdges = (defs.edges || []).map((e: any, i: number) => ({
         id: e.id || `e${i}`,
         source: e.source || e.from,
         target: e.target || e.to,
-        type: e.type || "smoothstep",
+        animated: true,
+        style: { stroke: "#22d3ee", strokeWidth: 2 },
       }));
   
       console.log(`✅ Parsed ${parsedNodes.length} nodes & ${parsedEdges.length} edges`);
