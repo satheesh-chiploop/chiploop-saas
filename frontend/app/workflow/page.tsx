@@ -478,13 +478,13 @@ function WorkflowPage() {
       .from("workflows")
       .select("id, name, created_at, user_id")
       .order("created_at", { ascending: false });
-  
-
+    
     if (userId && userId !== "undefined" && userId !== "anonymous") {
-      q = q.or(`(user_id.eq.${userId},user_id.is.null)`);
+       q = q.or(`user_id.eq.${userId},user_id.is.null`);
     } else {
-      q = q.or(`user_id.is.null`);
-    }
+       q = q.or(`user_id.is.null`);
+    }  
+
     const { data, error } = await q;
     if (error) {
       console.error("❌ Error loading workflows:", error);
