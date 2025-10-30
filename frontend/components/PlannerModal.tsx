@@ -38,7 +38,7 @@ export default function PlannerModal({ onClose }) {
             formData.append("file", blob);
       
             // Send audio to backend
-            await fetch("/api/voice_stream", {
+            await fetch("/voice_stream", {
               method: "POST",
               body: formData,
             });
@@ -199,7 +199,7 @@ export default function PlannerModal({ onClose }) {
       };
 
     useEffect(() => {
-        const ws = new WebSocket("wss://209.38.74.151/spec_live_feedback");
+        const ws = new WebSocket("ws://209.38.74.151/spec_live_feedback");
       
         ws.onmessage = (event) => {
           try {
