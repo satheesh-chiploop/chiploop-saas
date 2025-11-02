@@ -99,7 +99,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
     setIsSelectingAgents(true);
     try {
-      const res = await fetch("/plan_agents", {
+      const res = await fetch("/api/plan_agents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -226,7 +226,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
           <button
             onClick={handleSelectAgents}
-            disabled={!goal.trim() || isSelectingAgents}
+            disabled={!goal.trim() || !spec || isSelectingAgents}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
             {isSelectingAgents? "Selecting Agents..." : "Select Agents"}
@@ -290,7 +290,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
 
-        {coverage > 0 && (
+        {coverage !== null  0 && (
           <div className="mt-4 bg-slate-900 rounded-lg p-3 border border-slate-700">
             <div className="w-full bg-gray-700 rounded-full h-2.5 mb-2">
               <div
