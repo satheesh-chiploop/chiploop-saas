@@ -84,8 +84,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       });
       const data = await res.json();
       if (data.status === "ok") {
-        setSpec(data.structured_spec_final);
-        setCoverage(data.coverage.total_score);
+        setSpec(data.result.structured_spec_final);
+        setCoverage(data.result.coverage.total_score);
       }
     } catch (err) {
       alert("❌ Spec analysis failed");
@@ -170,6 +170,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         const data = JSON.parse(event.data);
         if (data.summary) setSummary(data.summary);
         if (data.coverage) setCoverage(data.coverage.total_score);
+        else if (data.result?.coverage) setCoverage(data.result.coverage.total_score);
       } catch (err) {
         console.error("⚠️ Error parsing WebSocket data", err);
       }
