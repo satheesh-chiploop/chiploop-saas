@@ -82,19 +82,30 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       });
       const data = await res.json();
   
-      if (data.status === "ok") {
+      // CASE 1: Digital structured analyzer (new)
+      if (data?.result?.structured_spec_final) {
+        setSpec(data.result.structured_spec_final);
   
-        // 🟢 Case A: data.result exists
-        if (data.result?.structured_spec_final) {
-          setSpec(data.result.structured_spec_final);
-          setCoverage(data.result.coverage?.total_score ?? 0);
+        const normCov =
+          data.result.coverage?.total_score ??
+          data.coverage?.total_score ??
+          0;
   
-        // 🟢 Case B: no result wrapper
-        } else if (data.structured_spec_final) {
-          setSpec(data.structured_spec_final);
-          setCoverage(data.coverage?.total_score ?? 0);
-        }
+        setCoverage(normCov);
       }
+  
+      // CASE 2: Generic analyzer fallback
+      else if (data?.structured_spec_final) {
+        setSpec(data.structured_spec_final);
+  
+        const normCov =
+          data.coverage?.total_score ??
+          data.result?.coverage?.total_score ??
+          0;
+  
+        setCoverage(normCov);
+      }
+  
     } catch (err) {
       console.error(err);
       alert("❌ Spec analysis failed");
@@ -102,6 +113,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setIsAnalyzing(false);
     }
   };
+  
   
 
   
