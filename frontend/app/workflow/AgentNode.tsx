@@ -42,7 +42,7 @@ export default function AgentNode({
 
   return (
     <div
-      onClick={handleSelectAgent}   {/* ✅ Added */}
+      onClick={handleSelectAgent}   
       className="rounded-xl border border-cyan-400 bg-slate-800/90 text-white shadow-lg px-4 py-3 min-w-[220px] relative cursor-pointer hover:border-cyan-300 transition"
     >
       {/* Agent name */}
