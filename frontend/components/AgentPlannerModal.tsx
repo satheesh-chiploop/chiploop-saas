@@ -72,8 +72,6 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   }, []);
 
   // --- Generate Agent Plan ---
-  
-
   const handleAnalyzeSpec = async () => {
     setIsAnalyzing(true);
     try {
@@ -83,17 +81,30 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         body: JSON.stringify({ goal, user_id: "anonymous" }),
       });
       const data = await res.json();
+  
       if (data.status === "ok") {
-        setSpec(data.result.structured_spec_final);
-        setCoverage(data.result.coverage.total_score);
+  
+        // 🟢 Case A: data.result exists
+        if (data.result?.structured_spec_final) {
+          setSpec(data.result.structured_spec_final);
+          setCoverage(data.result.coverage?.total_score ?? 0);
+  
+        // 🟢 Case B: no result wrapper
+        } else if (data.structured_spec_final) {
+          setSpec(data.structured_spec_final);
+          setCoverage(data.coverage?.total_score ?? 0);
+        }
       }
     } catch (err) {
+      console.error(err);
       alert("❌ Spec analysis failed");
     } finally {
       setIsAnalyzing(false);
     }
   };
+  
 
+  
   const handleSelectAgents = async () => {
     if (!goal.trim() || !spec) return;
   
