@@ -19,6 +19,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [missingAgents, setMissingAgents] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGeneratingAgent, setIsGeneratingAgent] = useState(false);
+  const [spec, setSpec] = useState<any>(null);
 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
@@ -83,8 +84,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       });
       const data = await res.json();
       if (data.status === "ok") {
-        setCoverage(data.coverage);
-        alert(`✅ Spec analyzed: ${data.coverage.total_score}%`);
+        setSpec(data.structured_spec_final);
+        setCoverage(data.coverage.total_score);
       }
     } catch (err) {
       alert("❌ Spec analysis failed");
@@ -94,7 +95,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   };
 
   const handleSelectAgents = async () => {
-    if (!goal.trim() || !structuredSpec) return;
+    if (!goal.trim() || !spec) return;
   
     setIsSelectingAgents(true);
     try {
@@ -103,7 +104,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: goal,
-          structured_spec_final: structuredSpec
+          structured_spec_final: spec
         })
       });
   
@@ -168,7 +169,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       try {
         const data = JSON.parse(event.data);
         if (data.summary) setSummary(data.summary);
-        if (data.coverage) setCoverage(data.coverage);
+        if (data.coverage) setCoverage(data.coverage.total_score);
       } catch (err) {
         console.error("⚠️ Error parsing WebSocket data", err);
       }
