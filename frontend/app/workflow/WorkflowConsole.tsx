@@ -34,6 +34,14 @@ export default function WorkflowConsole({
   const consoleRef = useRef<HTMLDivElement | null>(null);
   const channelName = useMemo(() => `realtime:public:${table}`, [table]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [focusedAgent, setFocusedAgent] = useState<string | null>(null);
+  
+  
+  useEffect(() => {
+    const handler = (e: any) => setFocusedAgent(e.detail);
+    window.addEventListener("selectAgent", handler);
+    return () => window.removeEventListener("selectAgent", handler);
+  }, []);
 
 
   // 🔁 Reload WorkflowConsole when global refresh happens
@@ -203,32 +211,67 @@ export default function WorkflowConsole({
 
   // ---------- 📦 Grouped Outputs ----------
   const renderOutputs = () => {
+    if (!workflowMeta?.artifacts || Object.keys(workflowMeta.artifacts).length === 0) {
+      return (
+        <div className="p-3 text-slate-400 italic">
+          No artifacts yet. Run the workflow to generate outputs.
+        </div>
+      );
+    }
+  
+    // ✅ Apply focus filter if user clicked an agent node
+    const filteredArtifacts = focusedAgent
+      ? Object.fromEntries(
+          Object.entries(workflowMeta.artifacts).filter(([key]) =>
+            key.toLowerCase().startsWith(focusedAgent.toLowerCase())
+          )
+        )
+      : workflowMeta.artifacts;
+  
+    // ✅ Group artifacts by agent name
     const groupedArtifacts: Record<string, { label: string; path: string }[]> = {};
-    Object.entries(workflowMeta?.artifacts || {}).forEach(([key, path]) => {
-      const [agent, ...rest] = key.split("_agent_");
+    Object.entries(filteredArtifacts).forEach(([key, path]) => {
+      const [agent] = key.split("_agent_");
       const group = agent ? `${agent}_agent` : "other";
+  
       if (!groupedArtifacts[group]) groupedArtifacts[group] = [];
-      groupedArtifacts[group].push({ label: rest.join("_"), path });
+  
+      groupedArtifacts[group].push({
+        label: key.replace(`${agent}_agent_`, "").replace(/_/g, " "),
+        path,
+      });
     });
-
+  
     return (
       <div className="p-3 space-y-4">
+  
         <button
           onClick={handleDownloadLogs}
           className="rounded bg-cyan-700 hover:bg-cyan-600 px-3 py-1 text-sm text-white"
         >
           ⬇️ Download All Logs
         </button>
-
+  
+        {focusedAgent && (
+          <div className="mb-3 text-cyan-300 text-xs">
+            🎯 Showing outputs for <strong>{focusedAgent}</strong>
+            &nbsp;(click another agent to switch)
+          </div>
+        )}
+  
         {Object.entries(groupedArtifacts).map(([agent, items]) => (
           <div key={agent} className="border border-slate-700 rounded-lg p-3 bg-slate-800/50">
             <h3 className="text-cyan-400 font-semibold mb-2">
-              {agent.replace("_agent", "").toUpperCase()} Agent
+              {agent.replace("_agent", "").toUpperCase()}
             </h3>
+  
             <div className="space-y-1">
               {items.map(({ label, path }) => (
-                <div key={label} className="flex items-center justify-between bg-slate-700/60 p-2 rounded">
-                  <span className="text-slate-300 capitalize">{label.replace(/_/g, " ")}</span>
+                <div
+                  key={label}
+                  className="flex items-center justify-between bg-slate-700/60 p-2 rounded"
+                >
+                  <span className="text-slate-300 capitalize">{label}</span>
                   <button
                     onClick={() => handleDownloadArtifact(path, `${agent}_${label}`)}
                     className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-2 py-1 rounded"
@@ -261,6 +304,14 @@ export default function WorkflowConsole({
             {tab === "summary" && "📘 Summary"}
             {tab === "live" && "🔴 Live Feed"}
             {tab === "outputs" && "📦 Outputs"}
+            <button
+               onClick={() => window.dispatchEvent(
+                 new CustomEvent("editAgent", { detail: agent })
+               )}
+               className="text-xs text-cyan-300 hover:text-cyan-200 underline mb-2"
+            >
+              ✏️ Edit Agent
+            </button>
           </button>
         ))}
       </div>

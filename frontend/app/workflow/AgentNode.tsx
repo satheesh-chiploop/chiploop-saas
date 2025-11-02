@@ -1,8 +1,8 @@
+
 "use client";
 
 import React from "react";
 import { Handle, Position } from "reactflow";
-
 
 export default function AgentNode({
   data,
@@ -33,8 +33,18 @@ export default function AgentNode({
     }
   };
 
+  // ✅ NEW: When clicking the node → tell WorkflowConsole which agent to focus on
+  const handleSelectAgent = () => {
+    window.dispatchEvent(
+      new CustomEvent("selectAgent", { detail: data.backendLabel })
+    );
+  };
+
   return (
-    <div className="rounded-xl border border-cyan-400 bg-slate-800/90 text-white shadow-lg px-4 py-3 min-w-[220px] relative">
+    <div
+      onClick={handleSelectAgent}   {/* ✅ Added */}
+      className="rounded-xl border border-cyan-400 bg-slate-800/90 text-white shadow-lg px-4 py-3 min-w-[220px] relative cursor-pointer hover:border-cyan-300 transition"
+    >
       {/* Agent name */}
       <div className="font-bold text-cyan-300">
         {data?.uiLabel || "Agent"}
@@ -52,7 +62,10 @@ export default function AgentNode({
 
       {/* ✨ AI Suggest Next */}
       <button
-        onClick={handleSuggestNext}
+        onClick={(e) => {
+          e.stopPropagation(); // prevent interfering with click-select behavior
+          handleSuggestNext();
+        }}
         className="absolute bottom-1 right-2 text-[10px] text-cyan-400 hover:text-cyan-300 transition-colors"
         title="AI Suggest Next Agent"
       >
@@ -73,4 +86,6 @@ export default function AgentNode({
     </div>
   );
 }
+
+
 

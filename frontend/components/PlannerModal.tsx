@@ -60,10 +60,14 @@ export default function PlannerModal({ onClose }) {
         setLoading(true);
         setPlan(null);
         try {
+          
             const res = await fetch("/api/plan_workflow", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ goal }),
+                body: JSON.stringify({ 
+                    prompt:goal,
+                    structured_spec_final: coverage?.structured_spec_final || summary?.structured_spec_final,
+                }),
             });
             const data = await res.json();
 
@@ -88,6 +92,7 @@ export default function PlannerModal({ onClose }) {
             body: JSON.stringify({
               goal,
               preplan: plan || null,
+              structured_spec_final: coverage?.structured_spec_final || summary?.structured_spec_final,
             }),
           });
       
@@ -218,7 +223,7 @@ export default function PlannerModal({ onClose }) {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
             <div className="bg-slate-800 relative rounded-xl p-6 w-[600px] shadow-xl text-white">
                 <h2 className="text-cyan-400 font-bold text-lg mb-3">
-                    AI Workflow Planner
+                    Workflow Builder
                 </h2>
 
                 {coverage && (
@@ -256,7 +261,7 @@ export default function PlannerModal({ onClose }) {
                         disabled={loading || !goal.trim()}
                         className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
                     >
-                        {loading ? "Generating..." : "Generate Plan"}
+                        {loading ? "Generating..." : "Select Agents"}
                     </button>
 
                     <button
@@ -264,7 +269,7 @@ export default function PlannerModal({ onClose }) {
                         disabled={autoLoading || !goal.trim()}
                         className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
                     >
-                        {autoLoading ? "Composing..." : "Auto-Compose Flow"}
+                        {autoLoading ? "Composing..." : "Build Workflow"}
                     </button>
 
                     {/* 🎙 Voice Mode Toggle */}

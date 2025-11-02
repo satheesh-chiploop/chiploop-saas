@@ -692,7 +692,7 @@ function WorkflowPage() {
             onClick={() => setShowPlanner(true)}
             className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
           >
-            Workflow Planner
+            Workflow Builder
           </button>
           <button
             onClick={() => setShowAgentPlanner(true)}
@@ -910,7 +910,7 @@ function WorkflowPage() {
   
           {/* Workflow Execution Tabs */}
           <div className="border-t border-slate-800 bg-black/70 p-4 mt-2 rounded-md overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-            <h3 className="mb-2 text-cyan-400 font-semibold">⚡ Workflow Execution</h3>
+            <h3 className="mb-2 text-cyan-400 font-semibold">⚡ Workflow Run updates </h3>
   
             <div className="flex gap-4 border-b border-slate-800 mb-4">
               <button

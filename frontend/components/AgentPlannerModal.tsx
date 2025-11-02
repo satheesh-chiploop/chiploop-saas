@@ -47,7 +47,20 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     }
   }
 
-
+  useEffect(() => {
+    const handler = (e: any) => {
+      const agentName = e.detail;
+      fetch(`/api/agents/get_code?agent=${agentName}`)
+        .then(r => r.text())
+        .then(code => {
+          setSelectedAgent(agentName);
+          setAgentCode(code);
+          setOpen(true);
+        });
+    };
+    window.addEventListener("editAgent", handler);
+    return () => window.removeEventListener("editAgent", handler);
+  }, []);
 
   // --- Generate Agent Plan ---
   
@@ -135,7 +148,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="relative bg-slate-800 w-[520px] h-full p-6 overflow-y-auto border-l border-slate-700 text-white shadow-xl">
+      <div className="bg-slate-800 relative rounded-xl p-6 w-[600px] shadow-xl text-white">
         {/* Floating Spec Coverage Badge */}
         {agent?.coverage && (
           <div className="absolute top-4 right-6 bg-purple-600/80 text-xs px-2 py-1 rounded shadow-md">
@@ -144,7 +157,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         )}
 
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">AI Agent Planner</h2>
+          <h2 className="text-xl font-bold text-white">Agent Planner</h2>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-white transition"
@@ -184,15 +197,20 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             disabled={loading || !goal.trim()}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
-            {loading ? "Planning..." : "Generate Agent"}
+            {loading ? "Planning..." : "Generate Missing Agent"}
           </button>
 
-
+          <button
+            onClick={handlePublish}
+            className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
+          >
+            Publish
+          </button>
 
 
           <button
             onClick={startStopRecording}
-            className={`mt-2 px-4 py-2 rounded-md font-medium ${
+            className={`bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition ${
               isRecording
                 ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
                 : "bg-purple-600 hover:bg-purple-700 text-white"
