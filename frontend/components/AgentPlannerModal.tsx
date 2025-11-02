@@ -14,7 +14,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [summary, setSummary] = useState<any>(null);
   const [coverage, setCoverage] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
-
+  const handlePublish = () => {
+    console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
+  };
   async function startStopRecording() {
     if (isRecording && mediaRecorder) {
       mediaRecorder.stop();
