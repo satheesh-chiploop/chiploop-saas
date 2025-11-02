@@ -290,7 +290,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
 
-        {coverage !== null  0 && (
+        {coverage !== null && (
           <div className="mt-4 bg-slate-900 rounded-lg p-3 border border-slate-700">
             <div className="w-full bg-gray-700 rounded-full h-2.5 mb-2">
               <div
