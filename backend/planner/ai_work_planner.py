@@ -6,6 +6,7 @@ from loguru import logger
 from openai import OpenAI
 from utils.llm_utils import run_llm_fallback 
 from portkey_ai import Portkey
+from typing import Optional, Union
 # ---------------- Supabase client ----------------
 
 from supabase import create_client
@@ -198,7 +199,14 @@ def register_new_agent(agent_data: dict):
 
 import json, random
 from .ai_agent_planner import plan_agent_fallback
-async def auto_compose_workflow_graph(goal: str, structured_spec_final: dict, preplan=dict | str | None = None):
+
+
+async def auto_compose_workflow_graph(
+    goal: str,
+    structured_spec_final: dict,
+    preplan: Optional[Union[dict, str]] = None
+):
+
 
     """
     Builds a structured workflow graph (nodes + edges)
@@ -284,7 +292,7 @@ Available agents:
                 or a.get("label")
                 or "unknown_agent"
             )
-            existing_agents.append(agent_name)
+        existing_agents.append(agent_name)
         existing_agents = [
             a for a in existing_agents
             if a.lower() not in ["process", "flow", "pipeline", "unknown_agent"]
@@ -316,13 +324,13 @@ Available agents:
     # --- Step 5: Auto-layout nodes ---
     for i, n in enumerate(plan.get("nodes", [])):
 
-    agent_name = (
-        n.get("agent")
-        or n.get("data", {}).get("backendLabel")
-        or n.get("type")
-        or n.get("label")
-        or "unknown_agent"
-    )
+        agent_name = (
+            n.get("agent")
+            or n.get("data", {}).get("backendLabel")
+            or n.get("type")
+            or n.get("label")
+            or "unknown_agent"
+        )
 
     n["id"] = f"n{i+1}"
     n["position"] = {"x": 150 * i, "y": 100 + 60 * (i % 2)}

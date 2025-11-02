@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 
+  
+
 export default function PlannerModal({ onClose }) {
     const [goal, setGoal] = useState("");
     const [plan, setPlan] = useState<any | null>(null);
@@ -17,6 +19,11 @@ export default function PlannerModal({ onClose }) {
 
     const [summary, setSummary] = useState<any>(null);
     const [voiceMode, setVoiceMode] = useState(false);
+
+
+    const handlePublish = () => {
+        console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
+    };
 
     
     async function startStopRecording() {
