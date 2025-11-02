@@ -14,6 +14,12 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [summary, setSummary] = useState<any>(null);
   const [coverage, setCoverage] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
+  const [isSelectingAgents, setIsSelectingAgents] = useState(false);
+  const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
+  const [missingAgents, setMissingAgents] = useState<string[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isGeneratingAgent, setIsGeneratingAgent] = useState(false);
+
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
   };
@@ -68,7 +74,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
 
   const handleAnalyzeSpec = async () => {
-    setLoading(true);
+    setIsAnalyzing(true);
     try {
       const res = await fetch("/api/analyze_spec", {
         method: "POST",
@@ -83,31 +89,37 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     } catch (err) {
       alert("❌ Spec analysis failed");
     } finally {
-      setLoading(false);
+      setIsAnalyzing(false);
     }
   };
 
   const handleSelectAgents = async () => {
-    setLoading(true);
+    if (!goal.trim() || !structuredSpec) return;
+  
+    setIsSelectingAgents(true);
     try {
-      const res = await fetch("/api/plan_agents", {
+      const res = await fetch("/plan_agents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal, user_id: "anonymous" })
+        body: JSON.stringify({
+          prompt: goal,
+          structured_spec_final: structuredSpec
+        })
       });
+  
       const data = await res.json();
-      alert(
-        `✅ Agents to use:\n${data.existing_agents.join(", ")}\n\nMissing: ${data.missing_agents.join(", ")}`
-      );
-    } catch (err) {
-      alert("❌ Select Agents failed.");
+      setSelectedAgents(data.existing_agents || []);
+      setMissingAgents(data.missing_agents || []);
+    } catch (e) {
+      console.error("Select Agents failed:", e);
     } finally {
-      setLoading(false);
+      setIsSelectingAgents(false);
     }
   };
   
+  
   const handleGenerateAgent = async () => {
-    setLoading(true);
+    setIsGeneratingAgent(true)
     try {
       const payload = coverage
         ? { goal, user_id: "anonymous", coverage }
@@ -142,7 +154,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     } catch (err) {
       alert("❌ Agent generation failed.");
     } finally {
-      setLoading(false);
+      setIsGeneratingAgent(true)
     }
   };
   
@@ -205,27 +217,27 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
           <button
             onClick={handleAnalyzeSpec}
-            disabled={analyzing || !goal.trim()}
+            disabled={isAnalyzing  || !goal.trim()}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
-            {analyzing ? "Analyzing..." : "Analyze Spec"}
+            {isAnalyzing ? "Analyzing..." : "Analyze Spec"}
           </button>
 
           <button
             onClick={handleSelectAgents}
-            disabled={loading || !goal.trim()}
+            disabled={!goal.trim() || isSelectingAgents}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
-            {loading ? "Selecting Agents..." : "Select Agents"}
+            {isSelectingAgents? "Selecting Agents..." : "Select Agents"}
           </button>
 
 
           <button
             onClick={handleGenerateAgent}
-            disabled={loading || !goal.trim()}
+            disabled={isGeneratingAgent || !goal.trim()}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
-            {loading ? "Planning..." : "Generate Missing Agent"}
+            {isGeneratingAgent  ? "Planning..." : "Generate Missing Agent"}
           </button>
 
           <button
@@ -255,6 +267,46 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </button>
 
         </div>
+
+        {(selectedAgents.length > 0 || missingAgents.length > 0) && (
+          <div className="mt-4 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
+            <p className="text-cyan-300 text-sm font-semibold mb-2">Detected Agents:</p>
+            <p className="text-green-400 text-xs mb-1">Required Agents:</p>
+            <ul className="ml-4 mb-2">
+              {selectedAgents.map(a => (
+                <li key={a} className="text-green-300 text-xs">• {a}</li>
+              ))}
+            </ul>
+            <p className="text-yellow-400 text-xs mb-1">Missing Agents:</p>
+            <ul className="ml-4">
+              {missingAgents.length > 0
+                ? missingAgents.map(a => (
+                   <li key={a} className="text-yellow-300 text-xs">• {a}</li>
+                  ))
+                : <li className="text-gray-400 text-xs">None 🎉</li>
+              }
+            </ul>
+          </div>
+        )}
+
+        {coverage > 0 && (
+          <div className="mt-4 bg-slate-900 rounded-lg p-3 border border-slate-700">
+            <div className="w-full bg-gray-700 rounded-full h-2.5 mb-2">
+              <div
+                className={`h-2.5 rounded-full ${
+                  coverage >= 80
+                   ? "bg-green-500"
+                   : coverage >= 60
+                   ? "bg-yellow-400"
+                   : "bg-red-500"
+                }`}
+                style={{ width: `${coverage}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-slate-300">Spec Coverage: {coverage}%</p>
+          </div>
+        )}
+
 
         {backendSource && (
           <p className="mt-3 text-xs text-slate-400">
