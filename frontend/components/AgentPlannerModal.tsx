@@ -86,6 +86,26 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setLoading(false);
     }
   };
+
+  const handleSelectAgents = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/plan_agents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ goal, user_id: "anonymous" })
+      });
+      const data = await res.json();
+      alert(
+        `✅ Agents to use:\n${data.existing_agents.join(", ")}\n\nMissing: ${data.missing_agents.join(", ")}`
+      );
+    } catch (err) {
+      alert("❌ Select Agents failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const handleGenerateAgent = async () => {
     setLoading(true);
     try {
@@ -150,7 +170,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="bg-slate-800 relative rounded-xl p-6 w-[600px] shadow-xl text-white">
+      <div className="bg-slate-800 relative rounded-xl p-6 w-[800px] shadow-xl text-white">
         {/* Floating Spec Coverage Badge */}
         {agent?.coverage && (
           <div className="absolute top-4 right-6 bg-purple-600/80 text-xs px-2 py-1 rounded shadow-md">
@@ -191,7 +211,13 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             {analyzing ? "Analyzing..." : "Analyze Spec"}
           </button>
 
-
+          <button
+            onClick={handleSelectAgents}
+            disabled={loading || !goal.trim()}
+            className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
+          >
+            {loading ? "Selecting Agents..." : "Select Agents"}
+          </button>
 
 
           <button
