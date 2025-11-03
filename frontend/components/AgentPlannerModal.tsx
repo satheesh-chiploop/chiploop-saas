@@ -22,6 +22,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [missingFields, setMissingFields] = useState([]);
   const [readyForPlanning, setReadyForPlanning] = useState(false);
   const [fieldEdits, setFieldEdits] = useState({});
+  const [improvedSpec, setImprovedSpec] = useState<string | null>(null);
+  const [finalizedSpec, setFinalizedSpec] = useState<string | null>(null);
 
 
   const handlePublish = () => {
