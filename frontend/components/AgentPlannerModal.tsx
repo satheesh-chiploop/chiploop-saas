@@ -381,6 +381,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 const resultData = res?.result ?? res;
         
                 setFinalizedSpec(cleaned);
+                setGoal(cleaned)
                 setResult(resultData);
                 setSpec(resultData.structured_spec_final ?? cleaned);
                 setCoverage(resultData.coverage ?? resultData.coverage?.total_score ?? 100);
