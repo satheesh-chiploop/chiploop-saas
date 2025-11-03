@@ -82,37 +82,28 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       });
       const data = await res.json();
   
-      // CASE 1: Digital structured analyzer (new)
+      console.log("DEBUG ANALYZE SPEC RESPONSE:", data);
+  
+      // --- CASE A: Structured digital pipeline ---
       if (data?.result?.structured_spec_final) {
         setSpec(data.result.structured_spec_final);
-  
-        const normCov =
-          data.result.coverage?.total_score ??
-          data.coverage?.total_score ??
-          0;
-  
-        setCoverage(normCov);
+        setCoverage(data.result.coverage?.total_score ?? 0);
       }
   
-      // CASE 2: Generic analyzer fallback
+      // --- CASE B: Direct response format ---
       else if (data?.structured_spec_final) {
         setSpec(data.structured_spec_final);
-  
-        const normCov =
-          data.coverage?.total_score ??
-          data.result?.coverage?.total_score ??
-          0;
-  
-        setCoverage(normCov);
+        setCoverage(data.coverage?.total_score ?? 0);
       }
   
     } catch (err) {
       console.error(err);
-      alert("❌ Spec analysis failed");
+      alert("❌ Analyze Spec failed");
     } finally {
       setIsAnalyzing(false);
     }
   };
+  
   
   
 
