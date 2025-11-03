@@ -25,6 +25,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [improvedSpec, setImprovedSpec] = useState<string | null>(null);
   const [finalizedSpec, setFinalizedSpec] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
+  const [missingFieldEdits, setMissingFieldEdits] = useState({});
 
 
   const handlePublish = () => {
@@ -240,9 +241,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="bg-slate-800 relative rounded-xl p-6 w-[800px] shadow-xl text-white">
         {/* Floating Spec Coverage Badge */}
-        {agent?.coverage && (
+        {coverage !== null && coverage !== undefined && (
           <div className="absolute top-4 right-6 bg-purple-600/80 text-xs px-2 py-1 rounded shadow-md">
-            Coverage: {agent.coverage.total_score || 0}%
+            Coverage: {coverage || 0}%
           </div>
         )}
 
@@ -357,10 +358,50 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 })
               }).then(r => r.json());
               setImprovedSpec(res.improved_spec);
+              if (res.auto_filled_values) {
+                setMissingFieldEdits(res.auto_filled_values);
+              }
             }}
           >
             Auto-Fill Missing Details
           </button>
+        )}
+        {improvedSpec && result?.missing?.length > 0 && !finalizedSpec && (
+         <div className="mt-4 border border-yellow-500 p-3 rounded-md bg-yellow-900/30">
+          <h3 className="text-yellow-300 font-semibold mb-2">
+            Review & Edit Auto-Filled Values
+          </h3>
+
+          <table className="w-full text-sm">
+            <tbody>
+             {result.missing.map((m, idx) => {
+              const fieldKey = m.path;
+              const currentValue =
+                missingFieldEdits[fieldKey] ??
+                (m.auto ?? "") ?? // in case your auto_fill_missing attaches .auto
+                "";
+
+              return (
+                <tr key={idx}>
+                  <td className="py-1 pr-2 text-gray-200">{m.ask}</td>
+                  <td className="py-1">
+                    <input
+                      className="w-full bg-gray-800 text-white border border-gray-600 rounded px-2 py-1"
+                      value={currentValue}
+                      onChange={(e) =>
+                        setMissingFieldEdits({
+                          ...missingFieldEdits,
+                          [fieldKey]: e.target.value,
+                        })
+                      }
+                    />
+                  </td>
+                </tr>
+              );
+             })}
+            </tbody>
+          </table>
+         </div>
         )}
 
         {/* Finalize Spec Button */}
@@ -368,30 +409,42 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-green-500 text-black font-semibold"
             onClick={async () => {
-
               try {
-                const cleaned = improvedSpec.replace(/\[(.*?)\]/g, "$1");
+                // ✅ Build natural-language additions using reviewed/edited missing values
+                const additions = Object.entries(missingFieldEdits).map(
+                  ([field, value]) =>
+                    `- ${value}`
+                ).join("\n");
         
-                const res = await fetch("/api/analyze_spec", {
+                const final = `${goal.trim()}
+        
+                  Additional Inferred Design Details:
+                  ${additions}
+                `;
+        
+                // ✅ Update UI: this is the final human spec user will see
+                setFinalizedSpec(final);
+                setGoal(final);
+        
+                // ✅ Re-analyze to regenerate structured spec + coverage
+                const analyzeRes = await fetch("/api/analyze_spec", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ goal: cleaned, user_id: "anonymous" })
+                  body: JSON.stringify({ goal: final })
                 }).then(r => r.json());
         
-                const resultData = res?.result ?? res;
+                const resultData = analyzeRes?.result ?? analyzeRes;
         
-                setFinalizedSpec(cleaned);
-                setGoal(cleaned)
                 setResult(resultData);
-                setSpec(resultData.structured_spec_final ?? cleaned);
-                setCoverage(resultData.coverage ?? resultData.coverage?.total_score ?? 100);
+                setCoverage(resultData.coverage ?? 100);
                 setMissingFields([]);
                 setReadyForPlanning(true);
-        
+            
               } catch (err) {
                 console.error(err);
-                alert("❌ Finalize Spec failed");
+                alert("❌ Finalize Spec failed.");
               }
+            
             }}
           >
             Finalize Spec
