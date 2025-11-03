@@ -72,6 +72,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   }, []);
 
   // --- Generate Agent Plan ---
+
   const handleAnalyzeSpec = async () => {
     setIsAnalyzing(true);
     try {
@@ -80,21 +81,27 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ goal, user_id: "anonymous" }),
       });
-      const data = await res.json();
   
+      const data = await res.json();
       console.log("DEBUG ANALYZE SPEC RESPONSE:", data);
   
-      // --- CASE A: Structured digital pipeline ---
-      if (data?.result?.structured_spec_final) {
-        setSpec(data.result.structured_spec_final);
-        setCoverage(data.result.coverage?.total_score ?? 0);
+      const result = data?.result ?? data;
+  
+      // ✅ Use final spec if available
+      if (result.structured_spec_final) {
+        setSpec(result.structured_spec_final);
       }
   
-      // --- CASE B: Direct response format ---
-      else if (data?.structured_spec_final) {
-        setSpec(data.structured_spec_final);
-        setCoverage(data.coverage?.total_score ?? 0);
+      // ✅ Otherwise use draft spec
+      else if (result.structured_spec_draft) {
+        setSpec(result.structured_spec_draft);
       }
+  
+      // ✅ Store coverage (works in both modes)
+      setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
+  
+      // ✅ (Temporary) Automatically mark spec as ready so Select Agents enables
+      setMissingFields(result.missing ?? []);
   
     } catch (err) {
       console.error(err);
@@ -104,33 +111,37 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     }
   };
   
-  
-  
+
 
   
+  
   const handleSelectAgents = async () => {
-    if (!goal.trim() || !spec) return;
+    if (!goal.trim()) return;
   
     setIsSelectingAgents(true);
     try {
       const res = await fetch("/api/plan_agents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: goal,
-          structured_spec_final: spec
-        })
+        body: JSON.stringify(
+          spec
+            ? { prompt: goal, structured_spec_final: spec }
+            : { prompt: goal }
+        ),
       });
   
       const data = await res.json();
-      setSelectedAgents(data.existing_agents || []);
-      setMissingAgents(data.missing_agents || []);
-    } catch (e) {
-      console.error("Select Agents failed:", e);
+      setSelectedAgents(data.existing_agents ?? []);
+      setMissingAgents(data.missing_agents ?? []);
+    } catch (err) {
+      console.error(err);
+      alert("❌ Select Agents failed");
     } finally {
       setIsSelectingAgents(false);
     }
   };
+  
+  
   
   
   const handleGenerateAgent = async () => {
@@ -241,7 +252,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
           <button
             onClick={handleSelectAgents}
-            disabled={!goal.trim() || !spec || isSelectingAgents}
+            disabled={!goal.trim() || isSelectingAgents}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
             {isSelectingAgents? "Selecting Agents..." : "Select Agents"}
