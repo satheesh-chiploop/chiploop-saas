@@ -13,7 +13,6 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [summary, setSummary] = useState<any>(null);
   const [coverage, setCoverage] = useState(0);
-  const [analyzing, setAnalyzing] = useState(false);
   const [isSelectingAgents, setIsSelectingAgents] = useState(false);
   const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
   const [missingAgents, setMissingAgents] = useState<string[]>([]);
@@ -21,6 +20,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [isGeneratingAgent, setIsGeneratingAgent] = useState(false);
   const [spec, setSpec] = useState<any>(null);
   const [missingFields, setMissingFields] = useState([]);
+  const [readyForPlanning, setReadyForPlanning] = useState(false);
 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
@@ -87,23 +87,21 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       console.log("DEBUG ANALYZE SPEC RESPONSE:", data);
   
       const result = data?.result ?? data;
-  
-      // ✅ Use final spec if available
+
       if (result.structured_spec_final) {
         setSpec(result.structured_spec_final);
-      }
-  
-      // ✅ Otherwise use draft spec
-      else if (result.structured_spec_draft) {
+        setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
+        setMissingFields([]);
+        setReadyForPlanning(true);
+        return;
+      } else if (result.structured_spec_draft) {
         setSpec(result.structured_spec_draft);
+        setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
+        setMissingFields(result.missing ?? []);
+        setReadyForPlanning(false);
+        return;
       }
-  
-      // ✅ Store coverage (works in both modes)
-      setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
-  
-      // ✅ (Temporary) Automatically mark spec as ready so Select Agents enables
-      setMissingFields(result.missing ?? []);
-  
+
     } catch (err) {
       console.error(err);
       alert("❌ Analyze Spec failed");
@@ -181,11 +179,36 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     } catch (err) {
       alert("❌ Agent generation failed.");
     } finally {
-      setIsGeneratingAgent(true)
+      setIsGeneratingAgent(false)
     }
   };
   
-
+  const handleAutoFillMissingFields = async () => {
+    if (!spec) return;
+  
+    setIsAnalyzing(true);
+    try {
+      const res = await fetch("/api/finalize_spec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ structured_spec_draft: spec }),
+      });
+  
+      const data = await res.json();
+      const result = data?.result ?? data;
+  
+      setSpec(result.structured_spec_final);
+      setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
+      setReadyForPlanning(true);
+      setMissingFields([]);
+  
+    } catch (err) {
+      console.error(err);
+      alert("❌ Could not finalize spec");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
   
   
   useEffect(() => {
@@ -334,8 +357,18 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             <p className="text-sm text-slate-300">Spec Coverage: {coverage}%</p>
           </div>
         )}
-
-
+        {missingFields.length > 0 && !readyForPlanning && (
+          <div className="p-3 border border-yellow-400 rounded-md bg-yellow-900/30 text-yellow-200 text-sm mt-4">
+            <div className="font-semibold mb-2">Fix Missing Fields ({missingFields.length})</div>
+            <button
+              className="px-3 py-1 bg-yellow-600 hover:bg-yellow-500 text-black rounded-md text-sm"
+              onClick={handleAutoFillMissingFields}
+            >
+              Auto-Fill & Finalize Spec
+            </button>
+          </div>
+        )}
+     
         {backendSource && (
           <p className="mt-3 text-xs text-slate-400">
             Source: <span className="text-slate-300">{backendSource}</span>
