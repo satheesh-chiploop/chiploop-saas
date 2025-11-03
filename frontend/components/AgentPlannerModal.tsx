@@ -368,11 +368,29 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-green-500 text-black font-semibold"
             onClick={async () => {
-              const cleaned = improvedSpec.replace(/\[(.*?)\]/g, "$1");
-              const res = await analyzeSpec(cleaned);
-              setFinalizedSpec(cleaned);
-              setResult(res);
-              setCoverage(res.coverage ?? res.coverage?.total_score ?? 100);
+
+              try {
+                const cleaned = improvedSpec.replace(/\[(.*?)\]/g, "$1");
+        
+                const res = await fetch("/api/analyze_spec", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ goal: cleaned, user_id: "anonymous" })
+                }).then(r => r.json());
+        
+                const resultData = res?.result ?? res;
+        
+                setFinalizedSpec(cleaned);
+                setResult(resultData);
+                setSpec(resultData.structured_spec_final ?? cleaned);
+                setCoverage(resultData.coverage ?? resultData.coverage?.total_score ?? 100);
+                setMissingFields([]);
+                setReadyForPlanning(true);
+        
+              } catch (err) {
+                console.error(err);
+                alert("❌ Finalize Spec failed");
+              }
             }}
           >
             Finalize Spec
