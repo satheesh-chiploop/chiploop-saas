@@ -24,6 +24,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [fieldEdits, setFieldEdits] = useState({});
   const [improvedSpec, setImprovedSpec] = useState<string | null>(null);
   const [finalizedSpec, setFinalizedSpec] = useState<string | null>(null);
+  const [result, setResult] = useState<any>(null);
 
 
   const handlePublish = () => {
@@ -91,6 +92,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       console.log("DEBUG ANALYZE SPEC RESPONSE:", data);
   
       const result = data?.result ?? data;
+      setResult(result);
+
 
       if (result.structured_spec_final) {
         setSpec(result.structured_spec_final);
@@ -329,28 +332,28 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
 
         {/* Show missing fields simply */}
-        {analysis?.missing?.length > 0 && !improvedSpec && (
+        {result ?.missing?.length > 0 && !improvedSpec && (
           <div className="mt-3 text-yellow-400 text-sm">
-            Missing Details ({analysis.missing.length}):
+            Missing Details ({result.missing.length}):
             <ul className="list-disc pl-6">
-              {analysis.missing.map((m, idx) => (
+              {result.missing.map((m, idx) => (
                 <li key={idx}>{m.path}</li>
               ))}
             </ul>
           </div>
         )}
         {/* Auto-Fill Button */}
-        {analysis?.missing?.length > 0 && !improvedSpec && (
+        {result?.missing?.length > 0 && !improvedSpec && (
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold"
             onClick={async () => {
-              const res = await fetch("/auto_fill_missing", {
+              const res = await fetch("/api/auto_fill_missing", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   original_text: goal,
-                  structured_spec_draft: analysis.structured_spec_draft,
-                  missing: analysis.missing
+                  structured_spec_draft: result.structured_spec_draft,
+                  missing: result.missing
                 })
               }).then(r => r.json());
               setImprovedSpec(res.improved_spec);
@@ -368,7 +371,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               const cleaned = improvedSpec.replace(/\[(.*?)\]/g, "$1");
               const res = await analyzeSpec(cleaned);
               setFinalizedSpec(cleaned);
-              setAnalysis(res);
+              setResult(res);
+              setCoverage(res.coverage ?? res.coverage?.total_score ?? 100);
             }}
           >
             Finalize Spec
