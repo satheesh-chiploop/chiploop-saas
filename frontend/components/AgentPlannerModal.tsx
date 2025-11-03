@@ -127,7 +127,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
     setIsSelectingAgents(true);
     try {
-      const res = await fetch("/api/plan_agents", {
+      const res = await fetch("/plan_agents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
@@ -155,7 +155,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       const payload = coverage
         ? { goal, user_id: "anonymous", coverage }
         : { goal, user_id: "anonymous" };
-      const res = await fetch("/api/plan_agent", {
+      const res = await fetch("/plan_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -410,23 +410,21 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             className="mt-3 px-4 py-2 rounded-lg bg-green-500 text-black font-semibold"
             onClick={async () => {
               try {
-                // ✅ Build natural-language additions using reviewed/edited missing values
-                const additions = Object.entries(missingFieldEdits).map(
-                  ([field, value]) =>
-                    `- ${value}`
-                ).join("\n");
+                const res = await fetch("/api/finalize_spec_natural_sentences", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    original_text: goal,
+                    missing: result?.missing ?? [],
+                    edited_values: missingFieldEdits
+                  })
+                }).then(r => r.json());
         
-                const final = `${goal.trim()}
+                const final = res.final_text;
         
-                  Additional Inferred Design Details:
-                  ${additions}
-                `;
-        
-                // ✅ Update UI: this is the final human spec user will see
                 setFinalizedSpec(final);
                 setGoal(final);
         
-                // ✅ Re-analyze to regenerate structured spec + coverage
                 const analyzeRes = await fetch("/api/analyze_spec", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
