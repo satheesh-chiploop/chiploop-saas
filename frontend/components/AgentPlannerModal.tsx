@@ -21,6 +21,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [spec, setSpec] = useState<any>(null);
   const [missingFields, setMissingFields] = useState([]);
   const [readyForPlanning, setReadyForPlanning] = useState(false);
+  const [fieldEdits, setFieldEdits] = useState({});
+
 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
@@ -123,9 +125,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
-          spec
-            ? { prompt: goal, structured_spec_final: spec }
-            : { prompt: goal }
+          spec ? { goal, structured_spec_final: spec } : { goal }
         ),
       });
   
@@ -257,8 +257,12 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         </p>
 
         <textarea
-          value={goal}
-          onChange={(e) => setGoal(e.target.value)}
+          value={finalizedSpec ?? improvedSpec ?? goal}
+          onChange={(e) => {
+            if (finalizedSpec !== null) setFinalizedSpec(e.target.value);
+            else if (improvedSpec !== null) setImprovedSpec(e.target.value);
+            else setGoal(e.target.value);
+          }}
           placeholder="e.g., Design a 4-bit counter agent for RTL generation"
           className="w-full bg-slate-700 text-white rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-cyan-400"
           rows={4}
@@ -273,6 +277,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           >
             {isAnalyzing ? "Analyzing..." : "Analyze Spec"}
           </button>
+
+
 
           <button
             onClick={handleSelectAgents}
@@ -318,6 +324,55 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </button>
 
         </div>
+
+
+        {/* Show missing fields simply */}
+        {analysis?.missing?.length > 0 && !improvedSpec && (
+          <div className="mt-3 text-yellow-400 text-sm">
+            Missing Details ({analysis.missing.length}):
+            <ul className="list-disc pl-6">
+              {analysis.missing.map((m, idx) => (
+                <li key={idx}>{m.path}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {/* Auto-Fill Button */}
+        {analysis?.missing?.length > 0 && !improvedSpec && (
+          <button
+            className="mt-3 px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold"
+            onClick={async () => {
+              const res = await fetch("/auto_fill_missing", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  original_text: goal,
+                  structured_spec_draft: analysis.structured_spec_draft,
+                  missing: analysis.missing
+                })
+              }).then(r => r.json());
+              setImprovedSpec(res.improved_spec);
+            }}
+          >
+            Auto-Fill Missing Details
+          </button>
+        )}
+
+        {/* Finalize Spec Button */}
+        {improvedSpec && !finalizedSpec && (
+          <button
+            className="mt-3 px-4 py-2 rounded-lg bg-green-500 text-black font-semibold"
+            onClick={async () => {
+              const cleaned = improvedSpec.replace(/\[(.*?)\]/g, "$1");
+              const res = await analyzeSpec(cleaned);
+              setFinalizedSpec(cleaned);
+              setAnalysis(res);
+            }}
+          >
+            Finalize Spec
+          </button>
+        )}
+
 
         {(selectedAgents.length > 0 || missingAgents.length > 0) && (
           <div className="mt-4 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
@@ -384,29 +439,14 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               </h3>
             </div>
 
-            {agent.coverage && (
-              <>
-                <div className="mb-2 text-xs text-slate-400">
-                  Spec Coverage: {agent.coverage.total_score}% (Intent{" "}
-                  {agent.coverage.intent_score}, I/O{" "}
-                  {agent.coverage.io_score}, Constraints{" "}
-                  {agent.coverage.constraint_score})
-                </div>
-                <div className="w-full bg-slate-700 h-1.5 rounded mb-3">
-                  <div
-                    className={`h-1.5 rounded ${
-                      agent.coverage.total_score >= 80
-                        ? "bg-green-500"
-                        : agent.coverage.total_score >= 60
-                        ? "bg-yellow-400"
-                        : "bg-red-500"
-                    }`}
-                    style={{ width: `${agent.coverage.total_score}%` }}
-                  ></div>
-                </div>
-              </>
+
+            {coverage !== null && (
+              <div className="absolute top-4 right-6 bg-purple-600/80 text-xs px-2 py-1 rounded shadow-md">
+                Spec Coverage: {coverage}%
+              </div>
             )}
 
+            
             <pre className="whitespace-pre-wrap text-slate-300">
               {JSON.stringify(agent, null, 2)}
             </pre>
