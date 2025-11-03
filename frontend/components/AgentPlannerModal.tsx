@@ -347,7 +347,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold"
             onClick={async () => {
-              const res = await fetch("/auto_fill_missing", {
+              const res = await fetch("/api/auto_fill_missing", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
