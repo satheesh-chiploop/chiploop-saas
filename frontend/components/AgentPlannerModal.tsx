@@ -20,6 +20,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGeneratingAgent, setIsGeneratingAgent] = useState(false);
   const [spec, setSpec] = useState<any>(null);
+  const [missingFields, setMissingFields] = useState([]);
 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
