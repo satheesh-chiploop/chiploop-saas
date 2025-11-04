@@ -135,13 +135,14 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       });
   
       const data = await res.json();
-      const required = data.required_agents ?? [];
-      const missing = data.missing_agents ?? [];
+      const plan = data.plan || {};
+      const required = plan.required_agents ?? [];
+      const missing = plan.missing_agents ?? [];
+      const preplan = plan.preplan ?? null;
   
       setSelectedAgents(required.filter(a => !missing.includes(a)));
       setMissingAgents(missing);
-      setPreplan(data.preplan ?? null); // << important for Generate Missing Agent
-  
+
       setReadyForPlanning(true);
       
     } catch (err) {
@@ -429,8 +430,11 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 setFinalizedSpec(res.final_text);                    // natural language
                 setGoal(res.final_text);
                 setResult((prev: any) => ({ ...prev, ...res }));     // keep around if you need
-                setSpec(res.structured_spec_final);                  // machine-usable
-                setCoverage(res.coverage_final ?? 0);                // real coverage
+                setSpec(res.structured_spec_final); 
+                const cov = res.coverage_final;
+                if (typeof cov === "number") setCoverage(cov);
+                else if (cov?.total_score !== undefined) setCoverage(cov.total_score);
+                else setCoverage(0);         // machine-usable
                 setMissingFields([]);
                 setReadyForPlanning(true);
               } catch (err) {
