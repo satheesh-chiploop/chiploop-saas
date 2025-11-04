@@ -190,7 +190,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
     setIsGeneratingAgents(false);
   };
-  
+
   const handleFinalizeSpec = async () => {
     if (!goal.trim()) return;
   
@@ -200,26 +200,26 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          original_text: goal,                  // original user spec
-          improved_text: improvedSpec ?? goal,  // natural language corrected spec
-          structured_spec_draft: spec ?? null   // draft spec from analyze step
+          original_text: goal,                 // user-entered spec
+          improved_text: improvedSpec ?? goal, // MUST send improvedSpec
+          structured_spec_draft: spec ?? null  // MUST send draft spec
         })
       });
   
       const data = await res.json();
   
-      // ✅ Natural language final spec (UI-facing)
       setFinalizedSpec(data.final_text);
       setGoal(data.final_text);
   
-      // ✅ Machine spec → this is what Select Agents & Workflow Builder need
       setSpec(data.structured_spec_final);
   
-      // ✅ Real coverage
       const cov = data.coverage_final;
-      setCoverage(cov?.total_score ?? cov ?? 0);
+      setCoverage(
+        typeof cov === "number" ? cov :
+        cov?.total_score !== undefined ? cov.total_score :
+        0
+      );
   
-      // ✅ Ready for Select Agents
       setReadyForPlanning(true);
       setMissingFields([]);
       setImprovedSpec(null);
@@ -229,6 +229,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     }
     setIsAnalyzing(false);
   };
+  
+  
+ 
   
   const handleAutoFillMissingFields = async () => {
     if (!spec) return;
