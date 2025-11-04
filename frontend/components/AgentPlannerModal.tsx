@@ -200,35 +200,39 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          original_text: goal,                 // user-entered spec
-          improved_text: improvedSpec ?? goal, // MUST send improvedSpec
-          structured_spec_draft: spec ?? null  // MUST send draft spec
-        })
+          original_text: goal,
+          improved_text: improvedSpec ?? goal,
+          structured_spec_draft: spec ?? null,
+        }),
       });
   
       const data = await res.json();
   
+      // ✅ Store natural language final spec
       setFinalizedSpec(data.final_text);
       setGoal(data.final_text);
   
+      // ✅ Store machine spec
       setSpec(data.structured_spec_final);
   
+      // ✅ Extract correct coverage
       const cov = data.coverage_final;
-      setCoverage(
-        typeof cov === "number" ? cov :
-        cov?.total_score !== undefined ? cov.total_score :
-        0
-      );
+      setCoverage(cov?.total_score ?? cov ?? 0);
   
-      setReadyForPlanning(true);
+      // ✅ ★ KEY FIX ★ Stop UI returning to auto-fill panel
+      setResult(null);
       setMissingFields([]);
       setImprovedSpec(null);
+  
+      // ✅ Enable Select Agents
+      setReadyForPlanning(true);
   
     } catch (err) {
       console.error("❌ Finalize Spec failed:", err);
     }
     setIsAnalyzing(false);
   };
+  
   
   
  
@@ -381,7 +385,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
 
         {/* Show missing fields simply */}
-        {result ?.missing?.length > 0 && !improvedSpec && (
+        {!finalizedSpec && result ?.missing?.length > 0 && !improvedSpec && (
           <div className="mt-3 text-yellow-400 text-sm">
             Missing Details ({result.missing.length}):
             <ul className="list-disc pl-6">
@@ -392,7 +396,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
         {/* Auto-Fill Button */}
-        {result?.missing?.length > 0 && !improvedSpec && (
+        {!finalizedSpec && result?.missing?.length > 0 && !improvedSpec && (
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold"
             onClick={async () => {
