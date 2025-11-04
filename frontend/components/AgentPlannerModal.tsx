@@ -258,13 +258,25 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       const data = await res.json();
   
       // ✅ This gives the improved natural-language version of the spec
-      setImprovedSpec(data.improved_text);
+      setImprovedSpec(data.improved_text ?? goal);
   
       // ✅ This is where draft is updated
       setSpec(data.structured_spec_enhanced ?? spec);
-  
-      // ✅ Show what changed (optional UI highlight)
-      setMissingFields((data.remaining_missing_fields ?? []).map(m => m.path));
+       
+
+      // ✅ Convert missing fields properly
+      const remaining = (data.remaining_missing_fields ?? []).map(m => m.path);
+      setMissingFields(remaining);
+
+      // ✅ Initialize editable values correctly
+      if (data.auto_filled_values) {
+        setMissingFieldEdits(data.auto_filled_values);
+      } else {
+        setMissingFieldEdits(
+          Object.fromEntries(remaining.map(f => [f, ""]))
+        );
+      }
+
   
     } catch (err) {
       console.error("❌ Auto-fill missing fields failed:", err);
