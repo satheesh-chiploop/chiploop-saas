@@ -127,7 +127,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
     setIsSelectingAgents(true);
     try {
-      const res = await fetch("/api/plan_agent", {
+      const res = await fetch("/plan_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
@@ -155,7 +155,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       const payload = coverage
         ? { goal, user_id: "anonymous", coverage }
         : { goal, user_id: "anonymous" };
-      const res = await fetch("/api/plan_agent", {
+      const res = await fetch("/plan_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
