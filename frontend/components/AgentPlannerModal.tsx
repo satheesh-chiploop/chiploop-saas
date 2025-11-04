@@ -404,7 +404,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold"
             onClick={async () => {
-              const res = await fetch("/api/auto_fill_missing", {
+              const res = await fetch("/api/auto_fill_missing_fields", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -412,10 +412,22 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                   user_prompt: goal
                 })
               }).then(r => r.json());
-              setImprovedSpec(res.improved_text);
+               // ✅ improved natural-language version
+              setImprovedSpec(res.improved_text ?? res.improved_spec ?? goal);
+
+              // ✅ updated structured draft
+              if (res.structured_spec_enhanced) {
+                setSpec(res.structured_spec_enhanced);
+              }
+
+              // ✅ fill missing field defaults
               if (res.auto_filled_values) {
                 setMissingFieldEdits(res.auto_filled_values);
               }
+
+              // ✅ update missing list
+              setMissingFields(res.remaining_missing_fields ?? []);
+
             }}
           >
             Auto-Fill Missing Details
