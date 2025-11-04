@@ -302,7 +302,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
 
           <button
-            onClick={handleGenerateAgent}
+            onClick={handleGenerateMissingAgents}
             disabled={isGeneratingAgent || !goal.trim()}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
