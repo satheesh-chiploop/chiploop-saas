@@ -425,21 +425,26 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 })
               }).then(r => r.json());
                // ✅ improved natural-language version
-              setImprovedSpec(res.improved_text ?? res.improved_spec ?? goal);
+              setImprovedSpec(null);
+
+              
 
               // ✅ updated structured draft
               if (res.structured_spec_enhanced) {
                 setSpec(res.structured_spec_enhanced);
               }
+              const remaining = res.remaining_missing_fields ?? [];
+              setMissingFields(remaining);
 
-              // ✅ fill missing field defaults
-              if (res.auto_filled_values) {
+               // ✅ Initialize / Fill editable missing-field values
+              if (res.auto_filled_values && Object.keys(res.auto_filled_values).length > 0) {
                 setMissingFieldEdits(res.auto_filled_values);
+              } else {
+                setMissingFieldEdits(
+                  Object.fromEntries(remaining.map(path => [path, ""]))
+                );
               }
-
-              // ✅ update missing list
-              setMissingFields(res.remaining_missing_fields ?? []);
-
+              
             }}
           >
             Auto-Fill Missing Details
