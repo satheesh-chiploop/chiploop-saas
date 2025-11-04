@@ -127,7 +127,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
     setIsSelectingAgents(true);
     try {
-      const res = await fetch("/plan_agent", {
+      const res = await fetch("/api/plan_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
@@ -155,7 +155,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       const payload = coverage
         ? { goal, user_id: "anonymous", coverage }
         : { goal, user_id: "anonymous" };
-      const res = await fetch("/plan_agent", {
+      const res = await fetch("/api/plan_agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -416,28 +416,17 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                   body: JSON.stringify({
                     original_text: goal,
                     missing: result?.missing ?? [],
-                    edited_values: missingFieldEdits
+                    edited_values: missingFieldEdits,
+                    structured_spec_draft: result?.structured_spec_draft ?? null,
                   })
                 }).then(r => r.json());
-        
-                const final = res.final_text;
-        
-                setFinalizedSpec(final);
-                setGoal(final);
-        
-                const analyzeRes = await fetch("/api/analyze_spec", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ goal: final })
-                }).then(r => r.json());
-        
-                const resultData = analyzeRes?.result ?? analyzeRes;
-        
-                setResult(resultData);
-                setCoverage(resultData.coverage ?? 100);
+                setFinalizedSpec(res.final_text);                    // natural language
+                setGoal(res.final_text);
+                setResult((prev: any) => ({ ...prev, ...res }));     // keep around if you need
+                setSpec(res.structured_spec_final);                  // machine-usable
+                setCoverage(res.coverage_final ?? 0);                // real coverage
                 setMissingFields([]);
                 setReadyForPlanning(true);
-            
               } catch (err) {
                 console.error(err);
                 alert("❌ Finalize Spec failed.");
