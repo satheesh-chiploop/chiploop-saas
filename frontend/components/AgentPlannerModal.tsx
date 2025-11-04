@@ -331,7 +331,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         </p>
 
         <textarea
-          value={finalizedSpec ?? improvedSpec ?? goal}
+          value={finalizedSpec ?? goal}
           onChange={(e) => {
             if (finalizedSpec !== null) setFinalizedSpec(e.target.value);
             else if (improvedSpec !== null) setImprovedSpec(e.target.value);
@@ -425,7 +425,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 })
               }).then(r => r.json());
                // ✅ improved natural-language version
-              setImprovedSpec(null);
+              setImprovedSpec("AUTO_FILL_READY");
 
               
 
