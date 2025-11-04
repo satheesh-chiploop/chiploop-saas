@@ -26,7 +26,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [finalizedSpec, setFinalizedSpec] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
   const [missingFieldEdits, setMissingFieldEdits] = useState({});
-
+  const [preplan, setPreplan] = useState(null);
 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
@@ -117,10 +117,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setIsAnalyzing(false);
     }
   };
-  
   const handleSelectAgents = async () => {
     if (!goal.trim()) return;
-  
     setIsSelectingAgents(true);
   
     try {
@@ -129,29 +127,27 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           spec
-            ? { prompt: goal, structured_spec_final: spec } // Strong Mode
-            : { prompt: goal } // Quick Mode
+            ? { prompt: goal, structured_spec_final: spec } // now spec is not null 🎯
+            : { prompt: goal }
         ),
       });
   
       const data = await res.json();
       const plan = data.plan || {};
-      const required = plan.required_agents ?? [];
-      const missing = plan.missing_agents ?? [];
-      const preplan = plan.preplan ?? null;
   
-      setSelectedAgents(required.filter(a => !missing.includes(a)));
-      setMissingAgents(missing);
-
-      setReadyForPlanning(true);
-      
+      setPreplan(plan);
+  
+      setSelectedAgents(plan.agents ?? []);
+      setMissingAgents(plan.missing_agents ?? []);
+  
     } catch (err) {
-      console.error("❌ Select Agents failed:", err);
-      alert("❌ Select Agents failed.");
+      console.error(err);
+      alert("❌ Select Agents failed");
     }
-  
     setIsSelectingAgents(false);
   };
+  
+  
   
      // --- GENERATE MISSING AGENTS (LLM memory + optional preplan context) ---
   const handleGenerateMissingAgents = async () => {
@@ -195,32 +191,74 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     setIsGeneratingAgents(false);
   };
   
+  const handleFinalizeSpec = async () => {
+    if (!goal.trim()) return;
+  
+    setIsAnalyzing(true);
+    try {
+      const res = await fetch("/api/finalize_spec_natural_sentences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          original_text: goal,                  // original user spec
+          improved_text: improvedSpec ?? goal,  // natural language corrected spec
+          structured_spec_draft: spec ?? null   // draft spec from analyze step
+        })
+      });
+  
+      const data = await res.json();
+  
+      // ✅ Natural language final spec (UI-facing)
+      setFinalizedSpec(data.final_text);
+      setGoal(data.final_text);
+  
+      // ✅ Machine spec → this is what Select Agents & Workflow Builder need
+      setSpec(data.structured_spec_final);
+  
+      // ✅ Real coverage
+      const cov = data.coverage_final;
+      setCoverage(cov?.total_score ?? cov ?? 0);
+  
+      // ✅ Ready for Select Agents
+      setReadyForPlanning(true);
+      setMissingFields([]);
+      setImprovedSpec(null);
+  
+    } catch (err) {
+      console.error("❌ Finalize Spec failed:", err);
+    }
+    setIsAnalyzing(false);
+  };
   
   const handleAutoFillMissingFields = async () => {
     if (!spec) return;
   
     setIsAnalyzing(true);
     try {
-      const res = await fetch("/api/finalize_spec", {
+      const res = await fetch("/api/auto_fill_missing_fields", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ structured_spec_draft: spec }),
+        body: JSON.stringify({
+          structured_spec_draft: spec,
+          user_prompt: goal
+        }),
       });
   
       const data = await res.json();
-      const result = data?.result ?? data;
   
-      setSpec(result.structured_spec_final);
-      setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
-      setReadyForPlanning(true);
-      setMissingFields([]);
+      // ✅ This gives the improved natural-language version of the spec
+      setImprovedSpec(data.improved_text);
+  
+      // ✅ This is where draft is updated
+      setSpec(data.structured_spec_enhanced ?? spec);
+  
+      // ✅ Show what changed (optional UI highlight)
+      setMissingFields(data.remaining_missing_fields ?? []);
   
     } catch (err) {
-      console.error(err);
-      alert("❌ Could not finalize spec");
-    } finally {
-      setIsAnalyzing(false);
+      console.error("❌ Auto-fill missing fields failed:", err);
     }
+    setIsAnalyzing(false);
   };
   
   
@@ -415,34 +453,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         {improvedSpec && !finalizedSpec && (
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-green-500 text-black font-semibold"
-            onClick={async () => {
-              try {
-                const res = await fetch("/api/finalize_spec_natural_sentences", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    original_text: goal,
-                    missing: result?.missing ?? [],
-                    edited_values: missingFieldEdits,
-                    structured_spec_draft: result?.structured_spec_draft ?? null,
-                  })
-                }).then(r => r.json());
-                setFinalizedSpec(res.final_text);                    // natural language
-                setGoal(res.final_text);
-                setResult((prev: any) => ({ ...prev, ...res }));     // keep around if you need
-                setSpec(res.structured_spec_final); 
-                const cov = res.coverage_final;
-                if (typeof cov === "number") setCoverage(cov);
-                else if (cov?.total_score !== undefined) setCoverage(cov.total_score);
-                else setCoverage(0);         // machine-usable
-                setMissingFields([]);
-                setReadyForPlanning(true);
-              } catch (err) {
-                console.error(err);
-                alert("❌ Finalize Spec failed.");
-              }
-            
-            }}
+            onClick={handleFinalizeSpec}
           >
             Finalize Spec
           </button>
