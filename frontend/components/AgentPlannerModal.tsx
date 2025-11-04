@@ -28,6 +28,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [result, setResult] = useState<any>(null);
   const [missingFieldEdits, setMissingFieldEdits] = useState({});
   const [preplan, setPreplan] = useState(null);
+  const [stage, setStage] = useState<"initial" | "analyzed" | "autofill" | "finalized">("initial");
 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
@@ -118,7 +119,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       alert("❌ Analyze Spec failed");
     } finally {
       setIsAnalyzing(false);
+      setStage("analyzed");
     }
+
   };
   const handleSelectAgents = async () => {
     if (!goal.trim()) return;
@@ -235,54 +238,39 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       console.error("❌ Finalize Spec failed:", err);
     }
     setIsAnalyzing(false);
+    setStage("finalized");
   };
   
+  const handleAutoFillMissingFields = async () => {
+    const res = await fetch("/api/auto_fill_missing_fields", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        structured_spec_draft: spec,
+        user_prompt: goal
+      })
+    }).then(r => r.json());
+  
+    // ✅ store natural language suggestions separately (do NOT modify user prompt)
+    setImprovedSpec(res.improved_text ?? null);
+  
+    // ✅ update structured draft
+    if (res.structured_spec_enhanced) setSpec(res.structured_spec_enhanced);
+  
+    // ✅ missing field list (convert to strings)
+    const remaining = (res.remaining_missing_fields ?? []).map(m => m.path);
+    setMissingFields(remaining);
+  
+    // ✅ missing field editable values
+    setMissingFieldEdits(res.auto_filled_values ?? {});
+  
+    // ✅ move to autofill stage
+    setStage("autofill");
+  };
   
   
  
   
-  const handleAutoFillMissingFields = async () => {
-    if (!spec) return;
-  
-    setIsAnalyzing(true);
-    try {
-      const res = await fetch("/api/auto_fill_missing_fields", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          structured_spec_draft: spec,
-          user_prompt: goal
-        }),
-      });
-  
-      const data = await res.json();
-  
-      // ✅ This gives the improved natural-language version of the spec
-      setImprovedSpec(data.improved_text ?? goal);
-  
-      // ✅ This is where draft is updated
-      setSpec(data.structured_spec_enhanced ?? spec);
-       
-
-      // ✅ Convert missing fields properly
-      const remaining = data.remaining_missing_fields ?? [];
-      setMissingFields(remaining);
-
-      // ✅ Initialize editable values correctly
-      if (data.auto_filled_values && Object.keys(data.auto_filled_values).length > 0 ) {
-        setMissingFieldEdits(data.auto_filled_values);
-      } else {
-        setMissingFieldEdits(
-          Object.fromEntries(remaining.map(path => [path, ""]))
-        );
-      }
-
-  
-    } catch (err) {
-      console.error("❌ Auto-fill missing fields failed:", err);
-    }
-    setIsAnalyzing(false);
-  };
   
   
   useEffect(() => {
@@ -450,7 +438,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             Auto-Fill Missing Details
           </button>
         )}
-        {improvedSpec && missingFields.length > 0 && !finalizedSpec && (
+        {stage === "autofill" && missingFields.length > 0 && (
          <div className="mt-4 border border-yellow-500 p-3 rounded-md bg-yellow-900/30">
           <h3 className="text-yellow-300 font-semibold mb-2">
             Review & Edit Auto-Filled Values
@@ -481,7 +469,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         )}
 
         {/* Finalize Spec Button */}
-        {improvedSpec && !finalizedSpec && (
+        {stage === "autofill" && (
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-green-500 text-black font-semibold"
             onClick={handleFinalizeSpec}
