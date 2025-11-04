@@ -265,15 +265,15 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
        
 
       // ✅ Convert missing fields properly
-      const remaining = (data.remaining_missing_fields ?? []).map(m => m.path);
+      const remaining = data.remaining_missing_fields ?? [];
       setMissingFields(remaining);
 
       // ✅ Initialize editable values correctly
-      if (data.auto_filled_values) {
+      if (data.auto_filled_values && Object.keys(data.auto_filled_values).length > 0 ) {
         setMissingFieldEdits(data.auto_filled_values);
       } else {
         setMissingFieldEdits(
-          Object.fromEntries(remaining.map(f => [f, ""]))
+          Object.fromEntries(remaining.map(path => [path, ""]))
         );
       }
 
