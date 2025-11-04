@@ -108,7 +108,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       } else if (result.structured_spec_draft) {
         setSpec(result.structured_spec_draft);
         setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
-        setMissingFields(result.missing ?? []);
+        setMissingFields((result.missing ?? []).map(m => m.path));
         setReadyForPlanning(false);
         return;
       }
@@ -264,7 +264,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setSpec(data.structured_spec_enhanced ?? spec);
   
       // ✅ Show what changed (optional UI highlight)
-      setMissingFields(data.remaining_missing_fields ?? []);
+      setMissingFields((data.remaining_missing_fields ?? []).map(m => m.path));
   
     } catch (err) {
       console.error("❌ Auto-fill missing fields failed:", err);
