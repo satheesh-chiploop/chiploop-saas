@@ -2,6 +2,7 @@
 
 import React, { useState,useEffect } from "react";
 import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
+import { Special_Elite } from "next/font/google";
 
 
 export default function AgentPlannerModal({ onClose }: { onClose: () => void }) {
@@ -96,11 +97,13 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setResult(result);
 
 
+
       if (result.structured_spec_final) {
         setSpec(result.structured_spec_final);
         setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
         setMissingFields([]);
         setReadyForPlanning(true);
+        setResult(null);
         return;
       } else if (result.structured_spec_draft) {
         setSpec(result.structured_spec_draft);
@@ -222,6 +225,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       // ✅ ★ KEY FIX ★ Stop UI returning to auto-fill panel
       setResult(null);
       setMissingFields([]);
+      setMissingFieldEdits({});
       setImprovedSpec(null);
   
       // ✅ Enable Select Agents
@@ -385,18 +389,18 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
 
         {/* Show missing fields simply */}
-        {!finalizedSpec && result ?.missing?.length > 0 && !improvedSpec && (
+        {!finalizedSpec && missingFields.length > 0 && !improvedSpec && (
           <div className="mt-3 text-yellow-400 text-sm">
-            Missing Details ({result.missing.length}):
+            Missing Details ({missingFields.length}):
             <ul className="list-disc pl-6">
-              {result.missing.map((m, idx) => (
-                <li key={idx}>{m.path}</li>
-              ))}
+             {missingFields.map((m, idx) => (
+              <li key={idx}>{m}</li>
+             ))}
             </ul>
           </div>
         )}
         {/* Auto-Fill Button */}
-        {!finalizedSpec && result?.missing?.length > 0 && !improvedSpec && (
+        {!finalizedSpec && missingFields.length > 0 && !improvedSpec && (
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold"
             onClick={async () => {
@@ -404,12 +408,11 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  original_text: goal,
-                  structured_spec_draft: result.structured_spec_draft,
-                  missing: result.missing
+                  structured_spec_draft: spec,
+                  user_prompt: goal
                 })
               }).then(r => r.json());
-              setImprovedSpec(res.improved_spec);
+              setImprovedSpec(res.improved_text);
               if (res.auto_filled_values) {
                 setMissingFieldEdits(res.auto_filled_values);
               }
@@ -418,7 +421,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             Auto-Fill Missing Details
           </button>
         )}
-        {improvedSpec && result?.missing?.length > 0 && !finalizedSpec && (
+        {improvedSpec && missingFields.length > 0 && !finalizedSpec && (
          <div className="mt-4 border border-yellow-500 p-3 rounded-md bg-yellow-900/30">
           <h3 className="text-yellow-300 font-semibold mb-2">
             Review & Edit Auto-Filled Values
@@ -426,20 +429,13 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
           <table className="w-full text-sm">
             <tbody>
-             {result.missing.map((m, idx) => {
-              const fieldKey = m.path;
-              const currentValue =
-                missingFieldEdits[fieldKey] ??
-                (m.auto ?? "") ?? // in case your auto_fill_missing attaches .auto
-                "";
-
-              return (
+              {missingFields.map((fieldKey, idx) => (
                 <tr key={idx}>
-                  <td className="py-1 pr-2 text-gray-200">{m.ask}</td>
+                  <td className="py-1 pr-2 text-gray-200">{fieldKey}</td>
                   <td className="py-1">
                     <input
                       className="w-full bg-gray-800 text-white border border-gray-600 rounded px-2 py-1"
-                      value={currentValue}
+                      value={missingFieldEdits[fieldKey] ?? ""}
                       onChange={(e) =>
                         setMissingFieldEdits({
                           ...missingFieldEdits,
@@ -449,8 +445,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                     />
                   </td>
                 </tr>
-              );
-             })}
+              ))}
             </tbody>
           </table>
          </div>
