@@ -118,76 +118,82 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     }
   };
   
-
-
-  
-  
   const handleSelectAgents = async () => {
     if (!goal.trim()) return;
   
     setIsSelectingAgents(true);
+  
     try {
-      const res = await fetch("/api/plan_agent", {
+      const res = await fetch("/api/plan_workflow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
-          spec ? { goal, structured_spec_final: spec } : { goal }
+          spec
+            ? { prompt: goal, structured_spec_final: spec } // Strong Mode
+            : { prompt: goal } // Quick Mode
         ),
       });
   
       const data = await res.json();
-      setSelectedAgents(data.existing_agents ?? []);
-      setMissingAgents(data.missing_agents ?? []);
+      const required = data.required_agents ?? [];
+      const missing = data.missing_agents ?? [];
+  
+      setSelectedAgents(required.filter(a => !missing.includes(a)));
+      setMissingAgents(missing);
+      setPreplan(data.preplan ?? null); // << important for Generate Missing Agent
+  
+      setReadyForPlanning(true);
+      
     } catch (err) {
-      console.error(err);
-      alert("❌ Select Agents failed");
-    } finally {
-      setIsSelectingAgents(false);
+      console.error("❌ Select Agents failed:", err);
+      alert("❌ Select Agents failed.");
     }
+  
+    setIsSelectingAgents(false);
   };
   
-  
-  
-  
-  const handleGenerateAgent = async () => {
-    setIsGeneratingAgent(true)
+     // --- GENERATE MISSING AGENTS (LLM memory + optional preplan context) ---
+  const handleGenerateMissingAgents = async () => {
+    if (missingAgents.length === 0) return;
+
+    setIsGeneratingAgents(true);
+
     try {
-      const payload = coverage
-        ? { goal, user_id: "anonymous", coverage }
-        : { goal, user_id: "anonymous" };
-      const res = await fetch("/api/plan_agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      setAgent(data.agent_plan);
-      alert(`✅ Agent generated: ${data.agent_plan.agent_name}`);
-  
-      const agentName = prompt("💾 Enter name to save this agent:", data.agent_plan.agent_name);
-      const loopType = prompt("🔁 Enter loop type (digital / analog / embedded / system):", "digital");
-  
-      if (agentName && loopType) {
-        const saveRes = await fetch("/api/save_custom_agent", {
+      for (const agentName of missingAgents) {
+        const res = await fetch("/api/plan_agent_with_memory", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            agent: {
-              ...data.agent_plan,
-              agent_name: agentName,
-              domain: loopType,
-            },
+            goal,
+            user_id: "anonymous",
+            missing_agent: agentName,
+            preplan: preplan ?? null, // << if workflow plan guided selection exists, use it
+            structured_spec_final: spec ?? null // << increases accuracy when spec is finalized
           }),
         });
-        const saveData = await saveRes.json();
-        alert(saveData.status === "ok" ? `💾 Agent "${agentName}" saved successfully!` : `⚠️ ${saveData.message}`);
+
+        const agentData = await res.json();
+
+        // Save agent locally (to custom registry list)
+        const existing = JSON.parse(localStorage.getItem("custom_agents") || "[]");
+        localStorage.setItem(
+          "custom_agents",
+          JSON.stringify([...existing, agentData])
+        );
       }
+
+      // After creation → update UI state
+      setMissingAgents([]);
+      alert("✅ Missing agents generated successfully");
+
     } catch (err) {
-      alert("❌ Agent generation failed.");
-    } finally {
-      setIsGeneratingAgent(false)
+      console.error("❌ Generate Missing Agents failed:", err);
+      alert("❌ Generate Missing Agents failed.");
     }
+
+    setIsGeneratingAgents(false);
   };
+  
   
   const handleAutoFillMissingFields = async () => {
     if (!spec) return;
