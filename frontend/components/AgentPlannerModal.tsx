@@ -115,9 +115,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       } else if (result.structured_spec_draft) {
         setSpec(result.structured_spec_draft);
         setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
-        const missingList = (result.missing ?? []).map(m =>
-          typeof m === "string" ? m : m.path
-        ).filter(Boolean); // remove null/undefined
+        const missingList = normalizeMissing(result.missing ?? []);
         
         setMissingFields(missingList);
 
@@ -437,7 +435,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
 
         {/* Show missing fields simply */}
-        {!finalizedSpec && missingFields.length > 0 && !improvedSpec && (
+        {!finalizedSpec && missingFields.length > 0 && (
           <div className="mt-3 text-yellow-400 text-sm">
             Missing Details ({missingFields.length}):
             <ul className="list-disc pl-6">
@@ -448,7 +446,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
         {/* Auto-Fill Button */}
-        {!finalizedSpec && missingFields.length > 0 && !improvedSpec && (
+        {!finalizedSpec && missingFields.length > 0  && (
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold"
             onClick={handleAutoFillMissingFields}        
