@@ -214,6 +214,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           original_text: goal,
           improved_text: improvedSpec ?? goal,
           structured_spec_draft: spec ?? null,
+          edited_values: missingFieldEdits
         }),
       });
   
@@ -247,40 +248,48 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   };
   
   const handleAutoFillMissingFields = async () => {
-    const res = await fetch("/api/auto_fill_missing_fields", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        structured_spec_draft: spec,
-        user_prompt: goal
-      })
-    }).then(r => r.json());
+    if (!spec) return;
   
-    // ✅ store natural language suggestions separately (do NOT modify user prompt)
-    setImprovedSpec(res.improved_text ?? null);
+    setIsAnalyzing(true);
+    try {
+      const res = await fetch("/api/auto_fill_missing_fields", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          structured_spec_draft: spec,
+          user_prompt: goal
+        })
+      }).then(r => r.json());
   
-    // ✅ update structured draft
-    if (res.structured_spec_enhanced) setSpec(res.structured_spec_enhanced);
+      // 1) Keep NL suggestions separate (do NOT overwrite user prompt)
+      setImprovedSpec(res.improved_text ?? null);
   
-    // ✅ missing field list (convert to strings)
-
-    const remaining = (res.remaining_missing_fields ?? []).map(m =>
-      typeof m === "string" ? m : m.path
-    ).filter(Boolean);
-    
-    
-    setMissingFields(remaining);
+      // 2) Update machine draft if backend enhanced structure
+      if (res.structured_spec_enhanced) setSpec(res.structured_spec_enhanced);
   
-    // ✅ missing field editable values
-    setMissingFieldEdits(prev =>
-      Object.fromEntries(
-        remaining.map(f => [f, (res.auto_filled_values ?? {})[f] ?? ""])
-      )
-    );
+      // 3) Build editable field list from remaining or from auto-filled keys
+      const autoVals = res.auto_filled_values ?? {};
+      const remainingRaw = res.remaining_missing_fields ?? [];
+      const remaining = (remainingRaw.length ? remainingRaw : Object.keys(autoVals))
+        .map((m: any) => (typeof m === "string" ? m : m?.path))
+        .filter(Boolean);
   
-    // ✅ move to autofill stage
-    setStage("autofill");
+      setMissingFields(remaining);
+  
+      // 4) Initialize edit values (use auto-filled values when present)
+      setMissingFieldEdits(
+        Object.fromEntries(remaining.map((f: string) => [f, autoVals[f] ?? ""]))
+      );
+  
+      // 5) Show the edit UI
+      setStage("autofill");
+    } catch (err) {
+      console.error("❌ Auto-fill missing fields failed:", err);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
+  
   
   
  
@@ -506,6 +515,13 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           <p className="mt-3 text-xs text-slate-400">
             Source: <span className="text-slate-300">{backendSource}</span>
           </p>
+        )}
+
+        {stage === "autofill" && improvedSpec && (
+          <div className="mt-3 text-xs text-slate-300 bg-slate-900 border border-slate-700 rounded p-2">
+            <div className="font-semibold mb-1 text-slate-200">Natural-language additions (preview)</div>
+            <pre className="whitespace-pre-wrap">{improvedSpec}</pre>
+          </div>
         )}
 
         {/* Display Agent JSON */}
