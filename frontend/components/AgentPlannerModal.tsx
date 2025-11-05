@@ -549,12 +549,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </p>
         )}
 
-        {stage === "autofill" && improvedSpec && (
-          <div className="mt-3 text-xs text-slate-300 bg-slate-900 border border-slate-700 rounded p-2">
-            <div className="font-semibold mb-1 text-slate-200">Natural-language additions (preview)</div>
-            <pre className="whitespace-pre-wrap">{improvedSpec}</pre>
-          </div>
-        )}
+        
 
         {/* Display Agent JSON */}
         {agent && (
