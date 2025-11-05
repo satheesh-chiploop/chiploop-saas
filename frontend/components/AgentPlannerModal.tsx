@@ -258,7 +258,12 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     if (res.structured_spec_enhanced) setSpec(res.structured_spec_enhanced);
   
     // ✅ missing field list (convert to strings)
-    const remaining = (res.remaining_missing_fields ?? []).map(m => m.path);
+
+    const remaining = (res.remaining_missing_fields ?? []).map(m =>
+      typeof m === "string" ? m : m.path
+    );
+    
+    
     setMissingFields(remaining);
   
     // ✅ missing field editable values
@@ -403,37 +408,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         {!finalizedSpec && missingFields.length > 0 && !improvedSpec && (
           <button
             className="mt-3 px-4 py-2 rounded-lg bg-yellow-500 text-black font-semibold"
-            onClick={async () => {
-              const res = await fetch("/api/auto_fill_missing_fields", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  structured_spec_draft: spec,
-                  user_prompt: goal
-                })
-              }).then(r => r.json());
-               // ✅ improved natural-language version
-              setImprovedSpec("AUTO_FILL_READY");
-
-              
-
-              // ✅ updated structured draft
-              if (res.structured_spec_enhanced) {
-                setSpec(res.structured_spec_enhanced);
-              }
-              const remaining = res.remaining_missing_fields ?? [];
-              setMissingFields(remaining);
-
-               // ✅ Initialize / Fill editable missing-field values
-              if (res.auto_filled_values && Object.keys(res.auto_filled_values).length > 0) {
-                setMissingFieldEdits(res.auto_filled_values);
-              } else {
-                setMissingFieldEdits(
-                  Object.fromEntries(remaining.map(path => [path, ""]))
-                );
-              }
-              
-            }}
+            onClick={handleAutoFillMissingFields}        
           >
             Auto-Fill Missing Details
           </button>
@@ -517,18 +492,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             <p className="text-sm text-slate-300">Spec Coverage: {coverage}%</p>
           </div>
         )}
-        {missingFields.length > 0 && !readyForPlanning && (
-          <div className="p-3 border border-yellow-400 rounded-md bg-yellow-900/30 text-yellow-200 text-sm mt-4">
-            <div className="font-semibold mb-2">Fix Missing Fields ({missingFields.length})</div>
-            <button
-              className="px-3 py-1 bg-yellow-600 hover:bg-yellow-500 text-black rounded-md text-sm"
-              onClick={handleAutoFillMissingFields}
-            >
-              Auto-Fill & Finalize Spec
-            </button>
-          </div>
-        )}
-     
+             
         {backendSource && (
           <p className="mt-3 text-xs text-slate-400">
             Source: <span className="text-slate-300">{backendSource}</span>
