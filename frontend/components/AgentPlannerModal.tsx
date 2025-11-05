@@ -33,6 +33,12 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
   };
+
+  function normalizeMissing(input) {
+    return (input || []).map(m =>
+      typeof m === "string" ? { path: m, ask: "", type: "text" } : m
+    );
+  }
   async function startStopRecording() {
     if (isRecording && mediaRecorder) {
       mediaRecorder.stop();
@@ -215,7 +221,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           improved_text: improvedSpec,
           structured_spec_draft: spec,
           edited_values: missingFieldEdits,
-          missing: missingFields,
+          missing: normalizeMissing(missingFields),
         }),
       });
   
@@ -257,7 +263,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           structured_spec_draft: spec,
-          missing: missingFields   // ✅ send missing fields list to backend
+          missing: normalizeMissing(missingFields),
+          original_text: goal,   
         })
       }).then(r => r.json());
 
