@@ -212,9 +212,10 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           original_text: goal,
-          improved_text: improvedSpec ?? goal,
-          structured_spec_draft: spec ?? null,
-          edited_values: missingFieldEdits
+          improved_text: improvedSpec
+          structured_spec_draft: spec,
+          edited_values: missingFieldEdits,
+          missing: missingFields,
         }),
       });
   
@@ -246,7 +247,6 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     setIsAnalyzing(false);
     setStage("finalized");
   };
-  
   const handleAutoFillMissingFields = async () => {
     if (!spec) return;
   
@@ -257,45 +257,41 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           structured_spec_draft: spec,
-          user_prompt: goal
+          missing: missingFields   // ✅ send missing fields list to backend
         })
       }).then(r => r.json());
   
-      // 1) Keep NL suggestions separate (do NOT overwrite user prompt)
+      // ✅ Natural language preview text (just preview, do NOT overwrite goal)
       setImprovedSpec(res.improved_text ?? null);
   
-      // 2) Update machine draft if backend enhanced structure
+      // ✅ Structured spec from backend (if inferred)
       if (res.structured_spec_enhanced) setSpec(res.structured_spec_enhanced);
   
-      // 3) Build editable field list from remaining or from auto-filled keys
-      const autoVals = res.auto_filled_values ?? {};
-      const remainingRaw = res.remaining_missing_fields ?? [];
-      const remaining = (remainingRaw.length ? remainingRaw : Object.keys(autoVals))
-        .map((m: any) => (typeof m === "string" ? m : m?.path))
+      // ✅ SAFELY extract missing fields (works whether objects OR strings)
+      const remaining = (res.remaining_missing_fields ?? missingFields)
+        .map((m: any) => (typeof m === "string" ? { path: m } : m))
         .filter(Boolean);
   
       setMissingFields(remaining);
   
-      // 4) Initialize edit values (use auto-filled values when present)
+      // ✅ Build editable fields map
+      const autoVals = res.auto_filled_values ?? {};
       setMissingFieldEdits(
-        Object.fromEntries(remaining.map((f: string) => [f, autoVals[f] ?? ""]))
+        Object.fromEntries(
+          remaining.map((m: any) => [m.path, autoVals[m.path] ?? ""])
+        )
       );
   
-      // 5) Show the edit UI
+      // ✅ Switch UI to edit panel
       setStage("autofill");
     } catch (err) {
-      console.error("❌ Auto-fill missing fields failed:", err);
+      console.error("❌ Auto-fill failed:", err);
     } finally {
       setIsAnalyzing(false);
     }
   };
   
-  
-  
  
-  
-  
-  
   useEffect(() => {
     const ws = new WebSocket("/api/spec_live_feedback");
   
@@ -439,17 +435,17 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
           <table className="w-full text-sm">
             <tbody>
-              {missingFields.map((fieldKey, idx) => (
+              {missingFields.map((item, idx) => (
                 <tr key={idx}>
-                  <td className="py-1 pr-2 text-gray-200">{fieldKey}</td>
+                  <td className="py-1 pr-2 text-gray-200">{item.path}</td>
                   <td className="py-1">
                     <input
                       className="w-full bg-gray-800 text-white border border-gray-600 rounded px-2 py-1"
-                      value={missingFieldEdits[fieldKey] ?? ""}
+                      value={missingFieldEdits[item.path] ?? ""}
                       onChange={(e) =>
                         setMissingFieldEdits({
                           ...missingFieldEdits,
-                          [fieldKey]: e.target.value,
+                          [item.path]: e.target.value,
                         })
                       }
                     />
