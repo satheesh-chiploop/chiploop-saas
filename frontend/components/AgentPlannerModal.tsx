@@ -219,7 +219,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           improved_text: improvedSpec,
           structured_spec_draft: spec,
           edited_values: missingFieldEdits,
-          missing: normalizeMissing(missingFields),
+          missing: missingFields,
         }),
       });
   
@@ -288,12 +288,23 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setMissingFields(remaining);
 
       const autoVals = res.auto_filled_values ?? {};
+
+      function resolveAutoValue(path: string, autoVals: any) {
+        const leaf = path.split(".").pop().replace(/\[\d+\]/g, "");
+        return (
+          autoVals[path] ??
+          autoVals[leaf] ??
+          autoVals[leaf.toLowerCase()] ??
+          ""
+        );
+      }
+      
       setMissingFieldEdits(
         Object.fromEntries(
-          remaining.map((m: any) => [m.path, autoVals[m.path] ?? ""])
+          remaining.map((m: any) => [m.path, resolveAutoValue(m.path, autoVals)])
         )
       );
-
+      
       // ✅ Switch UI to edit panel
       setStage("autofill");
 
