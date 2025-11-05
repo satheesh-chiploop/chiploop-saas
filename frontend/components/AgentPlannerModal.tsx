@@ -440,7 +440,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             Missing Details ({missingFields.length}):
             <ul className="list-disc pl-6">
              {missingFields.map((m, idx) => (
-              <li key={idx}>{m}</li>
+              <li key={idx}>{m.path}</li>
              ))}
             </ul>
           </div>
