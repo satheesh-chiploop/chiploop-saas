@@ -109,7 +109,12 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       } else if (result.structured_spec_draft) {
         setSpec(result.structured_spec_draft);
         setCoverage(result.coverage ?? result.coverage?.total_score ?? 0);
-        setMissingFields((result.missing ?? []).map(m => m.path));
+        const missingList = (result.missing ?? []).map(m =>
+          typeof m === "string" ? m : m.path
+        ).filter(Boolean); // remove null/undefined
+        
+        setMissingFields(missingList);
+
         setReadyForPlanning(false);
         return;
       }
@@ -261,13 +266,17 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
     const remaining = (res.remaining_missing_fields ?? []).map(m =>
       typeof m === "string" ? m : m.path
-    );
+    ).filter(Boolean);
     
     
     setMissingFields(remaining);
   
     // ✅ missing field editable values
-    setMissingFieldEdits(res.auto_filled_values ?? {});
+    setMissingFieldEdits(prev =>
+      Object.fromEntries(
+        remaining.map(f => [f, (res.auto_filled_values ?? {})[f] ?? ""])
+      )
+    );
   
     // ✅ move to autofill stage
     setStage("autofill");
