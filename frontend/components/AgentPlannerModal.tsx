@@ -284,13 +284,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       if (res.structured_spec_enhanced) setSpec(res.structured_spec_enhanced);
   
       // ✅ SAFELY extract missing fields (works whether objects OR strings)
-      const remaining = (res.remaining_missing_fields ?? missingFields)
-        .map((m: any) => (typeof m === "string" ? { path: m } : m))
-        .filter(Boolean);
-  
+      const remaining = normalizeMissing(res.remaining_missing_fields ?? missingFields);
       setMissingFields(remaining);
-  
-      // ✅ Build editable fields map
+
       const autoVals = res.auto_filled_values ?? {};
       setMissingFieldEdits(
         Object.fromEntries(
