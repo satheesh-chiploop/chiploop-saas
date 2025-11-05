@@ -212,7 +212,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           original_text: goal,
-          improved_text: improvedSpec
+          improved_text: improvedSpec,
           structured_spec_draft: spec,
           edited_values: missingFieldEdits,
           missing: missingFields,
