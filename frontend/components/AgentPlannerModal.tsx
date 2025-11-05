@@ -233,8 +233,10 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setSpec(data.structured_spec_final);
   
       // ✅ Extract correct coverage
-      const cov = data.coverage_final;
-      setCoverage(cov?.total_score ?? cov ?? 0);
+
+      const cov = data.coverage ?? data.coverage_final ?? 0;
+      setCoverage(typeof cov === "object" ? (cov.total_score ?? 0) : cov);
+  
   
       // ✅ ★ KEY FIX ★ Stop UI returning to auto-fill panel
       setResult(null);
@@ -261,7 +263,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           structured_spec_draft: spec,
-          missing: normalizeMissing(missingFields),
+          missing: missingFields,
           original_text: goal,   
         })
       }).then(r => r.json());
