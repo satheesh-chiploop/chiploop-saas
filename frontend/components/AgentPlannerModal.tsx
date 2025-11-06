@@ -239,6 +239,11 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
       // ✅ Store machine spec
       setSpec(data.structured_spec_final);
+
+
+      /* ✅ Normalize & update missing list correctly */
+      const remaining = normalizeMissing(data.remaining_missing ?? []);
+      setMissingFields(remaining);
   
       // ✅ Extract correct coverage
 
@@ -248,7 +253,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
       // ✅ ★ KEY FIX ★ Stop UI returning to auto-fill panel
       setResult(null);
-      setMissingFields([]);
+      // setMissingFields([]);
       setMissingFieldEdits({});
       setImprovedSpec(null);
   
