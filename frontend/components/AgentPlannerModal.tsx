@@ -33,12 +33,18 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
   };
-
   function normalizeMissing(input) {
     return (input || []).map(m =>
-      typeof m === "string" ? { path: m, ask: "", type: "text" } : m
+      typeof m === "string"
+        ? m                     // ✅ keep raw strings as strings
+        : m                     // ✅ keep dict objects untouched
     );
   }
+ // function normalizeMissing(input) {
+  //  return (input || []).map(m =>
+  //    typeof m === "string" ? { path: m, ask: "", type: "text" } : m
+ //   );
+ // }
   async function startStopRecording() {
     if (isRecording && mediaRecorder) {
       mediaRecorder.stop();
@@ -258,7 +264,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setImprovedSpec(null);
   
       // ✅ Enable Select Agents
-      setReadyForPlanning(true);
+      //setReadyForPlanning(true);
+      setReadyForPlanning(remaining.length === 0);
   
     } catch (err) {
       console.error("❌ Finalize Spec failed:", err);
