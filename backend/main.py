@@ -56,6 +56,56 @@ import asyncio
 notion = NotionClient(auth=os.getenv("NOTION_API_KEY"))
 
 
+# --- merge helper for nested spec paths ---
+def apply_spec_value(spec: dict, path: str, value: Any):
+    import re
+    tokens = [t for t in re.split(r"\.|\[|\]", path) if t]
+    target = spec
+
+    for i, tok in enumerate(tokens[:-1]):
+        if tok.isdigit():
+            target = target[int(tok)]
+        else:
+            next_tok = tokens[i + 1] if i + 1 < len(tokens) else None
+            if next_tok and next_tok.isdigit():
+                if tok not in target or not isinstance(target.get(tok), list):
+                    target[tok] = []
+                target = target[tok]
+            else:
+                if tok not in target or not isinstance(target.get(tok), dict):
+                    target[tok] = {}
+                target = target[tok]
+
+    last = tokens[-1]
+    if last.isdigit():
+        idx = int(last)
+        if not isinstance(target, list):
+            return
+        while len(target) <= idx:
+            target.append({})
+        target[idx] = value
+    else:
+        target[last] = value
+
+def convert_numeric_types(obj):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            obj[k] = convert_numeric_types(v)
+        return obj
+    elif isinstance(obj, list):
+        return [convert_numeric_types(x) for x in obj]
+    elif isinstance(obj, str):
+        # Dynamic: convert numbers only if safe
+        try:
+            if '.' in obj:
+                return float(obj)
+            return int(obj)
+        except:
+            return obj
+    else:
+        return obj
+
+
 def verify_token(request: Request) -> Dict[str, Any]:
     """Best-effort JWT decode from Authorization: Bearer <token>. Fallback to anonymous."""
     auth = request.headers.get("authorization") or request.headers.get("Authorization") or ""
@@ -1264,10 +1314,7 @@ async def finalize_spec_natural_sentences(data: dict):
     """
 
     
-    print("\n---- FINALIZE (request) ----")
-    print("keys:", list(data.keys()))
-    d = data.get("structured_spec_draft")
-    print("structured_spec_draft is None?", d )
+
     original_raw = (data.get("original_text") or "").strip()
     improved_raw = (data.get("improved_text") or "").strip()
 
@@ -1280,6 +1327,11 @@ async def finalize_spec_natural_sentences(data: dict):
     missing = data.get("missing", [])
     edited_values = data.get("edited_values", {})
     structured_spec_draft = data.get("structured_spec_draft")  # optional
+    user_id = data.get("user_id",None)
+
+    print("Structured_spec_draft just before merge",structured_spec_draft)
+    print("Edited_values just before merge",edited_values)
+    print("missing_values just before merge",missing)
 
     additions = []
     for item in missing:
@@ -1311,47 +1363,18 @@ Additional Inferred Design Details:
     try:
         # Prefer finalizing from a known draft if provided
         from analyze.digital.analyze_spec_digital import analyze_spec_digital, finalize_spec_digital
-  
+
         if structured_spec_draft:
             # Merge edited values into draft (path strings like "clock.freq")
 
             # Merge edited values into draft (path strings like "clock_domains[0].frequency_mhz")
             print("\n---- FINALIZE START ----")
-            print("original_text:", original_text[:120], "...")
             print("edited_values:", edited_values)
             print("missing:", missing)
-            print("structured_spec_draft BEFORE merge:", structured_spec_draft)
-            def _apply_value(spec: dict, path: str, value: Any):
-                import re
-                # split on '.' and brackets, keep only tokens
-                tokens = [t for t in re.split(r"\.|\[|\]", path) if t != ""]
-                target = spec
-                for tok in tokens[:-1]:
-                    if tok.isdigit():                 # array index
-                        target = target[int(tok)]
-                    else:
-                  # ensure dict exists for next hop
-                        if tok not in target or not isinstance(target[tok], (dict, list)):
-                # guess next token; if next token is a digit we need a list
-                # else a dict
-                            next_idx = tokens.index(tok) + 1
-                            is_list = next_idx < len(tokens) and tokens[next_idx].isdigit()
-                            target[tok] = [] if is_list else {}
-                        target = target[tok]
-                last = tokens[-1]
-                if last.isdigit():
-        # ensure list is big enough
-                    idx = int(last)
-                    if not isinstance(target, list):
-                        raise ValueError(f"Path expects list at '{path}'")
-                    while len(target) <= idx:
-                        target.append({})
-                    target[idx] = value
-                else:
-                    target[last] = value
-
+            print("structured_spec_draft inside if :", structured_spec_draft)
+            
             for path, value in edited_values.items():
-              _apply_value(structured_spec_draft, path, value)
+              apply_spec_value(structured_spec_draft, path, value)
     
             if additions_text and additions_text.strip():
                structured_spec_draft["natural_language_notes"] = additions_text.strip()
@@ -1359,14 +1382,19 @@ Additional Inferred Design Details:
             
             print("structured_spec_draft AFTER merge:", structured_spec_draft)
 
-            final = await finalize_spec_digital(structured_spec_draft)
+            try:
+               structured_spec_draft = convert_numeric_types(structured_spec_draft)
+               print("structured_spec_draft after type normalization:", structured_spec_draft)
+            except Exception as e:
+               print("🔥 ERROR in convert_numeric_types:", e)
+               print("Offending structured_spec_draft:", structured_spec_draft)
 
-            structured_final = (
-               final.get("structured_spec_final")
-               or final.get("structured_spec_draft")
-               or final
-            )
+            final = await finalize_spec_digital(structured_spec_draft,edited_values,user_id)
+
+            structured_final = structured_spec_draft
+               
             print("final result raw:", final)
+            print("structured_final", structured_spec)
 
             coverage = final.get("coverage") or final.get("coverage_score") or {}
 
