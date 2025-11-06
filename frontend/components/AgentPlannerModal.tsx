@@ -168,7 +168,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const handleGenerateMissingAgents = async () => {
     if (missingAgents.length === 0) return;
 
-    setIsGeneratingAgents(true);
+    setIsGeneratingAgent(true);
 
     try {
       for (const agentName of missingAgents) {
@@ -203,7 +203,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       alert("❌ Generate Missing Agents failed.");
     }
 
-    setIsGeneratingAgents(false);
+    setIsGeneratingAgent(false);
   };
 
   const handleFinalizeSpec = async () => {

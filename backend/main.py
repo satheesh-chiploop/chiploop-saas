@@ -56,36 +56,65 @@ import asyncio
 notion = NotionClient(auth=os.getenv("NOTION_API_KEY"))
 
 
-# --- merge helper for nested spec paths ---
+def find_missing_generic(spec, path=""):
+    missing = []
+
+    if isinstance(spec, dict):
+        for key, value in spec.items():
+            new_path = f"{path}.{key}" if path else key
+            missing += find_missing_generic(value, new_path)
+
+    elif isinstance(spec, list):
+        for index, item in enumerate(spec):
+            new_path = f"{path}[{index}]"
+            missing += find_missing_generic(item, new_path)
+
+    else:
+        # ✅ Value-level missing check (dynamic, not hard-coded)
+        if spec in (None, "", "unspecified"):
+            missing.append({"path": path})
+
+    return missing
+
+
 def apply_spec_value(spec: dict, path: str, value: Any):
     import re
+
     tokens = [t for t in re.split(r"\.|\[|\]", path) if t]
     target = spec
 
-    for i, tok in enumerate(tokens[:-1]):
+    for tok in tokens[:-1]:
         if tok.isdigit():
-            target = target[int(tok)]
+            idx = int(tok)
+            # Ensure target is a list
+            if not isinstance(target, list):
+                raise ValueError(f"Expected list in path: {path}")
+            # ✅ Auto-expand list dynamically
+            while len(target) <= idx:
+                target.append({})
+            target = target[idx]
         else:
-            next_tok = tokens[i + 1] if i + 1 < len(tokens) else None
-            if next_tok and next_tok.isdigit():
-                if tok not in target or not isinstance(target.get(tok), list):
-                    target[tok] = []
-                target = target[tok]
-            else:
-                if tok not in target or not isinstance(target.get(tok), dict):
-                    target[tok] = {}
-                target = target[tok]
+            # Ensure dict key exists
+            if tok not in target or not isinstance(target[tok], (dict, list)):
+                # Detect next token - if numeric → create list, else dict
+                next_tok_index = tokens.index(tok) + 1
+                is_next_list = next_tok_index < len(tokens) and tokens[next_tok_index].isdigit()
+                target[tok] = [] if is_next_list else {}
+            target = target[tok]
 
     last = tokens[-1]
     if last.isdigit():
         idx = int(last)
         if not isinstance(target, list):
-            return
+            raise ValueError(f"Expected list before index in path: {path}")
         while len(target) <= idx:
             target.append({})
         target[idx] = value
     else:
         target[last] = value
+
+
+# --- merge helper for nested spec paths ---
 
 def convert_numeric_types(obj):
     if isinstance(obj, dict):
@@ -1319,13 +1348,48 @@ async def finalize_spec_natural_sentences(data: dict):
     improved_raw = (data.get("improved_text") or "").strip()
 
     # ✅ Prefer improved (LLM-enhanced) text if available
-    base_text = improved_raw if improved_raw else original_raw
+    base_text = improved_raw if (improved_raw and len(improved_raw) > len(original_raw)) else original_raw
     # --- REMOVE incomplete / missing details block ---
-    base_text = re.sub(r"Detected missing or incomplete details:.*?(?=Additional Inferred Design Details:|$)", "", base_text, flags=re.DOTALL).strip()
+    base_text = re.sub(
+        r"Detected missing or incomplete details:\s*\n(?:- .*\n)*",
+        "",
+        base_text,
+        flags=re.MULTILINE
+    ).strip()
+
+    # Remove autofill hint lines like: field_name: [value]
+    base_text = re.sub(
+        r"^[A-Za-z0-9_.\[\]-]+\s*:\s*\[.*?\]\s*$",
+        "",
+        base_text,
+        flags=re.MULTILINE
+    ).strip()
+
+    # Remove any pre-existing "Additional Inferred Design Details" block if present
+    base_text = re.sub(
+        r"Additional Inferred Design Details:.*$",
+        "",
+        base_text,
+        flags=re.DOTALL
+    ).strip()
+
 
 
     missing = data.get("missing", [])
     edited_values = data.get("edited_values", {})
+    def normalize_value(path, value):
+        mf = next((m for m in missing if m.get("path") == path), None)
+        if mf and mf.get("type") == "number":
+            try:
+                return int(value)
+            except:
+                try:
+                   return float(value)
+                except:
+                   return value
+        return value
+
+    edited_values = {path: normalize_value(path, val) for path, val in edited_values.items()}
     structured_spec_draft = data.get("structured_spec_draft")  # optional
     user_id = data.get("user_id",None)
 
@@ -1334,12 +1398,20 @@ async def finalize_spec_natural_sentences(data: dict):
     print("missing_values just before merge",missing)
 
     additions = []
+
+    additions = [] 
+
     for item in missing:
         path = item.get("path", "")
         ask = item.get("ask", "") or path.replace("_", " ").replace(".", " → ")
-        value = (edited_values.get(path) or "").strip()
+
+    # ✅ FIXED: safe numeric + string handling
+        raw_val = edited_values.get(path, "")
+        value = str(raw_val).strip()
+
         if not value:
            continue
+
         sentence_prompt = f"""
         Write one clear natural language design clarification sentence.
         Clarification: "{ask}"
@@ -1348,16 +1420,18 @@ async def finalize_spec_natural_sentences(data: dict):
         Do NOT repeat or rewrite the original spec.
         Keep concise, factual, and correct.
         """.strip()
+
         sentence = (await run_llm_fallback(sentence_prompt)).strip()
         additions.append(f"- {sentence}")
-
 
     additions_text = "\n".join(additions)
     final_text = f"""{base_text}
 
-Additional Inferred Design Details:
-{additions_text}
-""".strip()
+    Additional Inferred Design Details:
+    {additions_text}
+    """.strip()
+
+    
 
     # --- Recompute structured spec + coverage ---
     try:
@@ -1374,7 +1448,33 @@ Additional Inferred Design Details:
             print("structured_spec_draft inside if :", structured_spec_draft)
             
             for path, value in edited_values.items():
-              apply_spec_value(structured_spec_draft, path, value)
+                try:
+                    apply_spec_value(structured_spec_draft, path, value)
+                except Exception as e:
+                    print(f"❌ ERROR applying {path} = {value} → {e}")
+
+            # ✅ Mark edited fields as user-confirmed so coverage increases
+            for item in missing:
+                path = item.get("path")
+                if path in edited_values:
+        # Mark explicit confirmation in the structured spec
+                    try:
+                        tokens = [t for t in re.split(r"\.|\[|\]", path) if t]
+                        target = structured_spec_draft
+                        for t in tokens[:-1]:
+                           target = target[int(t)] if t.isdigit() else target.get(t, target)
+                           last = tokens[-1]
+
+                        # Add a confidence marker without overwriting actual field values
+                        if isinstance(target, dict):
+                           meta = target.setdefault("_confirmed", {})
+                           meta[last] = True
+
+                    except Exception as e:
+                        print(f"⚠️ Confirmation tag failed for {path}: {e}")
+
+
+
     
             if additions_text and additions_text.strip():
                structured_spec_draft["natural_language_notes"] = additions_text.strip()
@@ -1391,10 +1491,14 @@ Additional Inferred Design Details:
 
             final = await finalize_spec_digital(structured_spec_draft,edited_values,user_id)
 
-            structured_final = structured_spec_draft
+            structured_final = final.get("structured_spec_final", structured_spec_draft)
+            remaining_missing = final.get("remaining_missing",[])
+
+            
                
             print("final result raw:", final)
-            print("structured_final", structured_spec)
+            print("structured_final", structured_final)
+            print("Remaining missing",remaining_missing)
 
             coverage = final.get("coverage") or final.get("coverage_score") or {}
 
@@ -1434,13 +1538,38 @@ Additional Inferred Design Details:
         # Never fail the finalize call—return at least the final_text
         structured_final, coverage_final = {}, 0
 
+    for item in missing:
+        path = item.get("path", "")
+        if path in edited_values and item.get("type") == "enum":
+            val = str(edited_values[path]).lower().replace(" ", "").replace("-", "")
+            options = [o.lower().replace(" ", "").replace("-", "") for o in item.get("options", [])]
+
+        # If direct match → keep it
+            if val not in options:
+            # Best-effort normalization mappings (still dynamic)
+                if val in ("none", "no"):
+                   val = "not_required"
+                elif val in ("yes", "true"):
+                   val = "required"
+                else:
+                   val = "unspecified"
+
+            edited_values[path] = val
+
+# --- Remove already-resolved missing fields (dynamic) ---
+    remaining_missing = [
+        m for m in (final.get("remaining_missing", []) if "final" in locals() else [])
+        if m.get("path") not in edited_values
+    ]
+
     return {
         "status": "ok",
         "final_text": final_text,
         "structured_spec_final": structured_final,
         "coverage": int(coverage_final) if isinstance(coverage_final, (int, float)) else 0,
         "coverage_final": int(coverage_final) if isinstance(coverage_final, (int, float)) else 0,
-        "additions": additions
+        "additions": additions,
+        "remaining_missing": remaining_missing,
     }
 
 
