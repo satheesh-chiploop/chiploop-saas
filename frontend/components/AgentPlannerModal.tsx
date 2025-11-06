@@ -224,6 +224,13 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       });
   
       const data = await res.json();
+
+      console.group("🧪 FINALIZE PAYLOAD");
+      console.log("spec?", spec && Object.keys(spec || {}).length, spec);
+      console.log("missingFields:", missingFields);
+      console.log("edited_values:", missingFieldEdits);
+      console.log("improvedSpec?", !!improvedSpec);
+      console.groupEnd();
   
       // ✅ Store natural language final spec
       setFinalizedSpec(data.final_text);
@@ -268,16 +275,6 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         })
       }).then(r => r.json());
 
-      console.group("✨ Auto-Fill Response Debug");
-      console.log("raw response:", res);
-      console.log("remaining_missing_fields:", res.remaining_missing_fields);
-      console.log("auto_filled_values:", res.auto_filled_values);
-      console.log("improved_text:", res.improved_text);
-      console.groupEnd();
-      console.group("📌 UI State Before Normalization");
-      console.log("missingFields (current state):", missingFields);
-      console.log("spec (current):", spec);
-      console.groupEnd();
   
       // ✅ Natural language preview text (just preview, do NOT overwrite goal)
       setImprovedSpec(res.improved_text ?? null);
@@ -310,16 +307,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       // ✅ Switch UI to edit panel
       setStage("autofill");
 
-      setTimeout(() => {
-        console.group("✅ UI State After Auto-Fill");
-        console.log("missingFields:", remaining);
-        console.log("missingFieldEdits:", res.auto_filled_values);
-        console.log("improvedSpec:", res.improved_text);
-        console.log("stage:", "autofill");
-        console.groupEnd();
-      }, 0);
-
-
+  
     } catch (err) {
       console.error("❌ Auto-fill failed:", err);
     } finally {

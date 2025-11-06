@@ -1259,7 +1259,15 @@ async def finalize_spec_natural_sentences(data: dict):
     Convert edited missing values into natural language sentences and append to original prompt.
     Then recompute structured spec + real coverage and return all in one shot.
     Optional: if structured_spec_draft is provided, we finalize from the draft for higher accuracy.
+
+
     """
+
+    
+    print("\n---- FINALIZE (request) ----")
+    print("keys:", list(data.keys()))
+    d = data.get("structured_spec_draft")
+    print("structured_spec_draft is None?", d )
     original_raw = (data.get("original_text") or "").strip()
     improved_raw = (data.get("improved_text") or "").strip()
 
@@ -1303,20 +1311,53 @@ Additional Inferred Design Details:
     try:
         # Prefer finalizing from a known draft if provided
         from analyze.digital.analyze_spec_digital import analyze_spec_digital, finalize_spec_digital
-
-
-        
-
+  
         if structured_spec_draft:
             # Merge edited values into draft (path strings like "clock.freq")
+
+            # Merge edited values into draft (path strings like "clock_domains[0].frequency_mhz")
+            print("\n---- FINALIZE START ----")
+            print("original_text:", original_text[:120], "...")
+            print("edited_values:", edited_values)
+            print("missing:", missing)
+            print("structured_spec_draft BEFORE merge:", structured_spec_draft)
+            def _apply_value(spec: dict, path: str, value: Any):
+                import re
+                # split on '.' and brackets, keep only tokens
+                tokens = [t for t in re.split(r"\.|\[|\]", path) if t != ""]
+                target = spec
+                for tok in tokens[:-1]:
+                    if tok.isdigit():                 # array index
+                        target = target[int(tok)]
+                    else:
+                  # ensure dict exists for next hop
+                        if tok not in target or not isinstance(target[tok], (dict, list)):
+                # guess next token; if next token is a digit we need a list
+                # else a dict
+                            next_idx = tokens.index(tok) + 1
+                            is_list = next_idx < len(tokens) and tokens[next_idx].isdigit()
+                            target[tok] = [] if is_list else {}
+                        target = target[tok]
+                last = tokens[-1]
+                if last.isdigit():
+        # ensure list is big enough
+                    idx = int(last)
+                    if not isinstance(target, list):
+                        raise ValueError(f"Path expects list at '{path}'")
+                    while len(target) <= idx:
+                        target.append({})
+                    target[idx] = value
+                else:
+                    target[last] = value
+
             for path, value in edited_values.items():
-                keys = path.split(".")
-                target = structured_spec_draft
-                for k in keys[:-1]:
-                    target = target.setdefault(k, {})
-                target[keys[-1]] = value
+              _apply_value(structured_spec_draft, path, value)
+    
             if additions_text and additions_text.strip():
                structured_spec_draft["natural_language_notes"] = additions_text.strip()
+
+            
+            print("structured_spec_draft AFTER merge:", structured_spec_draft)
 
             final = await finalize_spec_digital(structured_spec_draft)
 
@@ -1325,9 +1366,25 @@ Additional Inferred Design Details:
                or final.get("structured_spec_draft")
                or final
             )
+            print("final result raw:", final)
 
             coverage = final.get("coverage") or final.get("coverage_score") or {}
-            coverage_final = coverage.get("total_score", 0) if isinstance(coverage, dict) else coverage
+
+            print("DEBUG coverage_obj:", coverage)
+
+            # Normalize coverage to a single numeric score
+            if isinstance(coverage, dict):
+              coverage_final = (
+                coverage.get("total_score")
+                or coverage.get("overall_score")
+                or coverage.get("score", {}).get("total")
+                or 0
+              )
+            else:
+              coverage_final = coverage
+
+            print("coverage_final computed:", coverage_final)
+            print("---- FINALIZE END ----\n")
 
            
         else:
@@ -1353,6 +1410,7 @@ Additional Inferred Design Details:
         "status": "ok",
         "final_text": final_text,
         "structured_spec_final": structured_final,
+        "coverage": int(coverage_final) if isinstance(coverage_final, (int, float)) else 0,
         "coverage_final": int(coverage_final) if isinstance(coverage_final, (int, float)) else 0,
         "additions": additions
     }

@@ -39,12 +39,33 @@ Your task:
     #}
 
     # ✅ Extract values solely based on bracket order from LLM output
-    bracket_values = re.findall(r"\[([^\]]+)\]", improved_text)
 
-    auto_filled_values = {}
-    for i, m in enumerate(missing_fields):
-        if i < len(bracket_values):
-           auto_filled_values[m["path"]] = bracket_values[i].strip()
+    # ✅ 1) Try to extract labeled values: "path: [value]"
+    labeled_pairs = re.findall(r"([A-Za-z0-9_\[\].]+)\s*:\s*\[([^\]]+)\]", improved_text)
+    auto_filled_values = {path.strip(): val.strip() for path, val in labeled_pairs}
+
+    # ✅ 2) Fallback: assign bracket values by position to paths NOT already filled
+    missing_section_match = re.search(
+       r"Detected missing or incomplete details:(.*?)(?:\n\n|$)",
+       improved_text,
+       flags=re.DOTALL
+    )
+
+    if missing_section_match:
+       missing_section = missing_section_match.group(1)
+       bracket_values = re.findall(r"\[([^\]]+)\]", missing_section)
+    else:
+    # fallback: no missing block found → do not extract from full text
+       bracket_values = []
+
+
+    b_index = 0
+    for m in missing_fields:
+        path = m["path"]
+        if path not in auto_filled_values and b_index < len(bracket_values):
+           auto_filled_values[path] = bracket_values[b_index].strip()
+           b_index += 1
+
     # ✅ Convert missing field objects → UI string list
     #remaining_missing_fields = [m["path"] for m in missing_fields]
     remaining_missing_fields = missing_fields
