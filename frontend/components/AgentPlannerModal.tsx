@@ -220,7 +220,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           structured_spec_draft: spec,
           edited_values: missingFieldEdits,
           missing: missingFields,
-          user_id: session?.user?.id || null,
+          user_id: null,
         }),
       });
   
