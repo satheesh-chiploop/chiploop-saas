@@ -594,7 +594,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               setIsGeneratingAgent(true);
             
               try {
-                const res = await fetch("/generate_missing_agents_batch", {
+                const res = await fetch("/api/generate_missing_agents_batch", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
