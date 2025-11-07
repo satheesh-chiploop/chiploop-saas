@@ -234,7 +234,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         body: JSON.stringify({
           original_text: goal,
           improved_text: improvedSpec,
-          structured_spec_draft: spec,
+          structured_spec_draft: spec || improvedSpec ,
           edited_values:  Object.fromEntries(
             missingFields.map(m => {
               const path = m.path;                    // ✅ still using dict shape, not reversing
