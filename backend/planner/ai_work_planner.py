@@ -53,6 +53,28 @@ async def plan_workflow(prompt: str, structured_spec_final=None) -> dict:
     Now enhanced with structured_spec_final → AGX-context-informed LLM planning.
     """
 
+
+    if not structured_spec_final:
+        from fastapi.testclient import TestClient
+        from main import app
+        client = TestClient(app)
+
+        resp = client.post("/analyze_spec", json={"goal": prompt, "voice_summary": "", "user_id": "anonymous"})
+        res_json = resp.json()
+
+        result_section = res_json.get("result", {}) or {}
+
+        # ✅ Use draft — NOT final — because finalization has not happened yet
+        structured_spec_final = (
+           result_section.get("structured_spec_final")
+           or result_section.get("structured_spec_draft")
+        )
+
+    if structured_spec_final:
+           logger.info("🔄 Auto-analyzed spec for Agent Planner path (using structured_spec_draft).")
+    else:
+           logger.warning("⚠️ Auto-analyze spec produced no structured spec.")
+           
     logger.info(f"🧠 Planning workflow for goal: {prompt[:100]}...")
 
     from agent_capabilities import AGENT_CAPABILITIES
@@ -142,7 +164,7 @@ Rules:
 
             plan["missing_agents"] = missing
 
-            from palnner.ai_agent_planner import llm_detect_missing_behavioral_agents
+            from planner.ai_agent_planner import llm_detect_missing_behavioral_agents
 
             if structured_spec_final:
                 decision = await llm_detect_missing_behavioral_agents(structured_spec_final)
@@ -154,7 +176,6 @@ Rules:
                         plan["missing_agents"].append(candidate)
 
             logger.info(f"🧠 After behavioral LLM inference, missing agents: {plan['missing_agents']}")
--
 
             logger.info(f"🧩 Missing agents detected (to autogen in auto-compose): {missing}")
             return plan

@@ -340,7 +340,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
  
   useEffect(() => {
-    const ws = new WebSocket("/api/spec_live_feedback");
+    const ws = new WebSocket("/spec_live_feedback");
   
     ws.onmessage = (event) => {
       try {
@@ -594,7 +594,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               setIsGeneratingAgent(true);
             
               try {
-                const res = await fetch("/api/generate_missing_agents_batch", {
+                const res = await fetch("/generate_missing_agents_batch", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
@@ -607,7 +607,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             
                 // Append new agents to local custom agent list
                 const existing = JSON.parse(localStorage.getItem("custom_agents") || "[]");
-                const newOnes = res.created_agents.map(a => ({
+                const newOnes = (res.generated_agents || []).map(a => ({
                   agent_name: a.agent_name,
                   loop_type: a.loop_type,
                   script_path: a.path,
