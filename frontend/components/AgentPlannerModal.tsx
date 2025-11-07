@@ -4,6 +4,17 @@ import React, { useState,useEffect } from "react";
 import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 import { Special_Elite } from "next/font/google";
 
+function getValueFromSpec(obj, path) {
+  try {
+    return path
+      .replace(/\]/g, "")
+      .split(/\.|\[/)
+      .reduce((o, k) => (o ? o[k] : undefined), obj);
+  } catch {
+    return undefined;
+  }
+}
+
 
 export default function AgentPlannerModal({ onClose }: { onClose: () => void }) {
   const [goal, setGoal] = useState("");
@@ -224,7 +235,17 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           original_text: goal,
           improved_text: improvedSpec,
           structured_spec_draft: spec,
-          edited_values: missingFieldEdits,
+          edited_values:  Object.fromEntries(
+            missingFields.map(m => {
+              const path = m.path;                    // ✅ still using dict shape, not reversing
+              return [
+                path,
+                (path in missingFieldEdits)
+                  ? missingFieldEdits[path]           // user-provided value
+                  : getValueFromSpec(spec, path)      // confirm value already present in spec
+              ];
+            })
+          ),
           missing: missingFields,
           user_id: null,
         }),
