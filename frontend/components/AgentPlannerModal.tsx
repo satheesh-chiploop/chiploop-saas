@@ -3,6 +3,8 @@
 import React, { useState,useEffect } from "react";
 import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 import { Special_Elite } from "next/font/google";
+import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
+
 
 function getValueFromSpec(obj, path) {
   try {
@@ -40,6 +42,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [missingFieldEdits, setMissingFieldEdits] = useState({});
   const [preplan, setPreplan] = useState(null);
   const [stage, setStage] = useState<"initial" | "analyzed" | "autofill" | "finalized">("initial");
+  const [showNamingDialog, setShowNamingDialog] = useState(false);
+  const [namingTargets, setNamingTargets] = useState<string[]>([]);
+
 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
@@ -179,49 +184,43 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     setIsSelectingAgents(false);
   };
   
-  
-  
-     // --- GENERATE MISSING AGENTS (LLM memory + optional preplan context) ---
   const handleGenerateMissingAgents = async () => {
-    if (missingAgents.length === 0) return;
-
-    setIsGeneratingAgent(true);
-
     try {
-      for (const agentName of missingAgents) {
-        const res = await fetch("/api/plan_agent_with_memory", {
+      // Case 1: User did NOT run Select Agents yet → compute missing agents automatically
+      if ((!preplan || !preplan.missing_agents || preplan.missing_agents.length === 0) && spec) {
+        const res = await fetch("/api/plan_workflow", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            goal,
-            user_id: "anonymous",
-            missing_agent: agentName,
-            preplan: preplan ?? null, // << if workflow plan guided selection exists, use it
-            structured_spec_final: spec ?? null // << increases accuracy when spec is finalized
+            prompt: goal,
+            structured_spec_final: spec,
           }),
         });
-
-        const agentData = await res.json();
-
-        // Save agent locally (to custom registry list)
-        const existing = JSON.parse(localStorage.getItem("custom_agents") || "[]");
-        localStorage.setItem(
-          "custom_agents",
-          JSON.stringify([...existing, agentData])
-        );
+  
+        const data = await res.json();
+        const newPlan = data.plan || data;
+  
+        setPreplan(newPlan);
+        setMissingAgents(newPlan.missing_agents || []);
+  
+        // 👇 Open naming dialog with missing agents
+        setNamingTargets(newPlan.missing_agents || []);
+        setShowNamingDialog(true);
+        return;
       }
-
-      // After creation → update UI state
-      setMissingAgents([]);
-      alert("✅ Missing agents generated successfully");
-
+  
+      // Case 2: User already ran Select Agents → just open naming dialog
+      setNamingTargets(missingAgents);
+      setShowNamingDialog(true);
+  
     } catch (err) {
-      console.error("❌ Generate Missing Agents failed:", err);
-      alert("❌ Generate Missing Agents failed.");
+      console.error("❌ Setup for Generate Missing Agents failed:", err);
+      alert("❌ Could not determine missing agents.");
     }
-
-    setIsGeneratingAgent(false);
   };
+  
+  
+
 
   const handleFinalizeSpec = async () => {
     if (!goal.trim()) return;
@@ -584,6 +583,51 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               {JSON.stringify(agent, null, 2)}
             </pre>
           </div>
+        )}
+        {showNamingDialog && (
+          <MissingAgentNamingDialog
+            missingAgents={namingTargets}
+            domain={(spec?.loop_type || "digital").toLowerCase()}
+            onCancel={() => setShowNamingDialog(false)}
+            onConfirm={async (finalNames) => {
+              setShowNamingDialog(false);
+              setIsGeneratingAgent(true);
+            
+              try {
+                const res = await fetch("/api/generate_missing_agents_batch", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    goal,
+                    user_id: "anonymous",
+                    agent_names: finalNames,
+                    structured_spec_final: spec
+                  })
+                }).then(r => r.json());
+            
+                // Append new agents to local custom agent list
+                const existing = JSON.parse(localStorage.getItem("custom_agents") || "[]");
+                const newOnes = res.created_agents.map(a => ({
+                  agent_name: a.agent_name,
+                  loop_type: a.loop_type,
+                  script_path: a.path,
+                  description: a.description
+                }));
+                localStorage.setItem("custom_agents", JSON.stringify([...existing, ...newOnes]));
+            
+                // Trigger UI refresh event
+                window.dispatchEvent(new Event("refreshAgents"));
+            
+                alert("✅ Missing agents successfully generated!");
+            
+              } catch (err) {
+                console.error(err);
+                alert("❌ Failed to generate missing agents");
+              }
+            
+              setIsGeneratingAgent(false);
+            }}
+          />
         )}
         
         {summary && (
