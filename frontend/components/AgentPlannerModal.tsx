@@ -599,7 +599,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     goal,
-                    user_id: "anonymous",
+                    user_id: null,
                     agent_names: finalNames,
                     structured_spec_final: spec
                   })
@@ -611,7 +611,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                   agent_name: a.agent_name,
                   loop_type: a.loop_type,
                   script_path: a.path,
-                  description: a.description
+                  description: a.description,
+                  is_custom: true
                 }));
                 localStorage.setItem("custom_agents", JSON.stringify([...existing, ...newOnes]));
             
