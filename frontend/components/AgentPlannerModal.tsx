@@ -3,7 +3,7 @@
 import React, { useState,useEffect } from "react";
 import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 import { Special_Elite } from "next/font/google";
-import MissingAgentNamingDialog from "./components/AgentPlanner/MissingAgentNamingDialog";
+import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
 
 
 function getValueFromSpec(obj, path) {
