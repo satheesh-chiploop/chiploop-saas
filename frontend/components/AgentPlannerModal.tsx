@@ -234,19 +234,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         body: JSON.stringify({
           original_text: goal,
           improved_text: improvedSpec,
-          structured_spec_draft: spec || improvedSpec ,
-          edited_values:  Object.fromEntries(
-            missingFields.map(m => {
-              const path = m.path;                    // ✅ still using dict shape, not reversing
-              return [
-                path,
-                (path in missingFieldEdits)
-                  ? missingFieldEdits[path]           // user-provided value
-                  : getValueFromSpec(spec, path)      // confirm value already present in spec
-              ];
-            })
-          ),
-          missing: missingFields,
+          structured_spec_draft: JSON.parse(JSON.stringify(spec)),
+          edited_values: {...missingFieldEdits},
+          missing: JSON.parse(JSON.stringify(missingFields)),
           user_id: null,
         }),
       });
