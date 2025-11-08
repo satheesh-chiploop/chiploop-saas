@@ -159,15 +159,20 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const handleSelectAgents = async () => {
     if (!goal.trim()) return;
     setIsSelectingAgents(true);
+    
+
   
     try {
+
+      const { data: { session } } = await supabase.auth.getSession();
+      const user_id = session?.user?.id || "anonymous";
       const res = await fetch("/api/plan_workflow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           spec
-            ? { prompt: goal, structured_spec_final: spec } // now spec is not null 🎯
-            : { prompt: goal }
+            ? { prompt: goal, structured_spec_final: spec,user_id } // now spec is not null 🎯
+            : { prompt: goal,user_id }
         ),
       });
   
