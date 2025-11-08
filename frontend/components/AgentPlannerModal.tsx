@@ -4,6 +4,8 @@ import React, { useState,useEffect } from "react";
 import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 import { Special_Elite } from "next/font/google";
 import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+const supabase = createClientComponentClient();
 
 
 function getValueFromSpec(obj, path) {
@@ -594,12 +596,14 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               setIsGeneratingAgent(true);
             
               try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const user_id = session?.user?.id;
                 const res = await fetch("/api/generate_missing_agents_batch", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     goal,
-                    user_id: null,
+                    user_id: user_id,
                     agent_names: finalNames,
                     structured_spec_final: spec
                   })

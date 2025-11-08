@@ -219,9 +219,25 @@ function WorkflowPage() {
       }
   
       try {
-        const savedAgents = JSON.parse(localStorage.getItem("custom_agents") || "[]");
+        
         const savedWF = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
-        setCustomAgents(savedAgents);
+        // ✅ Load custom agents per user from Supabase
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id || localStorage.getItem("anon_user_id") || "anonymous";
+
+        const { data } = await supabase
+          .from("agents")
+          .select("*")
+          .eq("owner_id", userId)
+          .order("created_at", { ascending: false });
+
+        setCustomAgents(
+            (data || []).map(a => ({
+              uiLabel: a.ui_label || a.name,
+              backendLabel: a.name,
+              desc: a.description || "",
+            }))
+        );
         setCustomWorkflows(savedWF.map((k) => k.replace("workflow_", "")));
   
         // Load from Supabase after local cache
@@ -245,6 +261,31 @@ function WorkflowPage() {
     window.addEventListener("refreshWorkflows", refreshHandler);
     return () => window.removeEventListener("refreshWorkflows", refreshHandler);
   }, []);
+
+  useEffect(() => {
+    const refreshAgents = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id || localStorage.getItem("anon_user_id") || "anonymous";
+  
+      const { data } = await supabase
+        .from("agents")
+        .select("*")
+        .eq("owner_id", userId)
+        .order("created_at", { ascending: false });
+  
+      setCustomAgents(
+        (data || []).map(a => ({
+          uiLabel: a.ui_label || a.name,
+          backendLabel: a.name,
+          desc: a.description || "",
+        }))
+      );
+    };
+  
+    window.addEventListener("refreshAgents", refreshAgents);
+    return () => window.removeEventListener("refreshAgents", refreshAgents);
+  }, []);
+  
   // 🔹 Auto-load latest custom workflow after save/generate
   useEffect(() => {
     const onSaved = async () => {
