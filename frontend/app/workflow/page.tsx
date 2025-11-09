@@ -275,8 +275,8 @@ function WorkflowPage() {
   
       setCustomAgents(
         (data || []).map(a => ({
-          uiLabel: a.ui_label || a.name,
-          backendLabel: a.name,
+          uiLabel: a.agent_name,
+          backendLabel: a.agent_name,
           desc: a.description || "",
         }))
       );
