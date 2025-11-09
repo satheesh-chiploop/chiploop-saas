@@ -585,6 +585,28 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
         {/* NEW: Workflow Canvas stage */}
         
+        
+        {(selectedAgents.length > 0 || missingAgents.length > 0) && (
+          <div className="mt-4 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
+            <p className="text-cyan-300 text-sm font-semibold mb-2">Detected Agents:</p>
+            <p className="text-green-400 text-xs mb-1">Required Agents:</p>
+            <ul className="ml-4 mb-2">
+              {(finalAgents.length > 0 ? finalAgents : selectedAgents).map(a => (
+                <li key={a} className="text-green-300 text-xs">• {a}</li>
+              ))}
+            </ul>
+            <p className="text-yellow-400 text-xs mb-1">Missing Agents:</p>
+            <ul className="ml-4">
+              {missingAgents.length > 0
+                ? missingAgents.map(a => (
+                   <li key={a} className="text-yellow-300 text-xs">• {a}</li>
+                  ))
+                : <li className="text-gray-400 text-xs">None 🎉</li>
+              }
+            </ul>
+          </div>
+        )}
+
         {finalAgents.length > 0 && (
           <div className="mt-6 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
             <p className="text-cyan-300 text-sm font-semibold mb-2">
@@ -623,26 +645,6 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
 
-        {(selectedAgents.length > 0 || missingAgents.length > 0) && (
-          <div className="mt-4 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
-            <p className="text-cyan-300 text-sm font-semibold mb-2">Detected Agents:</p>
-            <p className="text-green-400 text-xs mb-1">Required Agents:</p>
-            <ul className="ml-4 mb-2">
-              {(finalAgents.length > 0 ? finalAgents : selectedAgents).map(a => (
-                <li key={a} className="text-green-300 text-xs">• {a}</li>
-              ))}
-            </ul>
-            <p className="text-yellow-400 text-xs mb-1">Missing Agents:</p>
-            <ul className="ml-4">
-              {missingAgents.length > 0
-                ? missingAgents.map(a => (
-                   <li key={a} className="text-yellow-300 text-xs">• {a}</li>
-                  ))
-                : <li className="text-gray-400 text-xs">None 🎉</li>
-              }
-            </ul>
-          </div>
-        )}
 
         {stage === "analyzed" && coverage !== null && (
           <div className="mt-4 bg-slate-900 rounded-lg p-3 border border-slate-700">
