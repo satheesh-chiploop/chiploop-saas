@@ -418,6 +418,16 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     return () => ws.close();
   }, []);
 
+  useEffect(() => {
+    if (stage === "workflow" && workflowGraph) {
+      console.log("📡 Dispatching workflow graph to canvas:", workflowGraph);
+      window.dispatchEvent(
+        new CustomEvent("loadWorkflowGraph", { detail: workflowGraph })
+      );
+      onClose(); // ✅ Close the System Planner modal when done
+    }
+  }, [stage, workflowGraph, onClose]);
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="bg-slate-800 relative rounded-xl p-6 w-[800px] shadow-xl text-white">
@@ -574,11 +584,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         )}
 
         {/* NEW: Workflow Canvas stage */}
-        {stage === "workflow" && workflowGraph && (
-          <div className="mt-4">
-            window.dispatchEvent(new CustomEvent("loadWorkflowGraph", { detail: workflowGraph }));
-          </div>
-        )}
+        
         {finalAgents.length > 0 && (
           <div className="mt-6 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
             <p className="text-cyan-300 text-sm font-semibold mb-2">
