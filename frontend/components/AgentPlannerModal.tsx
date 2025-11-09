@@ -191,11 +191,11 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setSelectedAgents(plan.agents ?? []);
       setMissingAgents(plan.missing_agents ?? []);
 
-      if ((plan.missing_agents ?? []).length === 0) {
+    
         // ✅ No missing → This is the final agent set
-        setFinalAgents(plan.agents ?? []);
-        setRecentlyGenerated([]); // none generated yet
-      }
+      setFinalAgents(plan.agents ?? []);
+      setRecentlyGenerated([]); // none generated yet
+      
   
     } catch (err) {
       console.error(err);
@@ -744,6 +744,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
                 // ✅ Clear missing list, they are resolved
                 setMissingAgents([]);
+                
+                setPreplan(prev => ({ ...prev, missing_agents: [] }));
+
 
                 // ✅ Small visual cue
                 alert("✅ Missing agents resolved! You can now Build Workflow.");
