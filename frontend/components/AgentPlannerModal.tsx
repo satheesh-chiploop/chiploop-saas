@@ -222,6 +222,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       // Case 2: User already ran Select Agents → just open naming dialog
       setNamingTargets(missingAgents);
       setShowNamingDialog(true);
+      
+      window.dispatchEvent(new Event("refreshAgents"));
+
   
     } catch (err) {
       console.error("❌ Setup for Generate Missing Agents failed:", err);
