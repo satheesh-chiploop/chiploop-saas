@@ -166,6 +166,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
       const { data: { session } } = await supabase.auth.getSession();
       const user_id = session?.user?.id || "anonymous";
+
+      console.log("🟢 Supabase session check:", session);
+      console.log("🟢 Supabase session check:", user_id);
       const res = await fetch("/api/plan_workflow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
