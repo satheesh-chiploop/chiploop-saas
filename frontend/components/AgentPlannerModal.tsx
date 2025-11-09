@@ -623,12 +623,12 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
 
-        {finalAgents.length > 0 && (
+        {(selectedAgents.length > 0 || missingAgents.length > 0) && (
           <div className="mt-4 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
             <p className="text-cyan-300 text-sm font-semibold mb-2">Detected Agents:</p>
             <p className="text-green-400 text-xs mb-1">Required Agents:</p>
             <ul className="ml-4 mb-2">
-              {finalAgents.map(a => (
+              {(finalAgents.length > 0 ? finalAgents : selectedAgents).map(a => (
                 <li key={a} className="text-green-300 text-xs">• {a}</li>
               ))}
             </ul>
