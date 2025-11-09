@@ -586,7 +586,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         {/* NEW: Workflow Canvas stage */}
         
         
-        {(selectedAgents.length > 0 || missingAgents.length > 0) && (
+        {missingAgents.length > 0 && (
           <div className="mt-4 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
             <p className="text-cyan-300 text-sm font-semibold mb-2">Detected Agents:</p>
             <p className="text-green-400 text-xs mb-1">Required Agents:</p>
@@ -607,7 +607,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
 
-        {finalAgents.length > 0 && (
+        {missingAgents.length === 0 && finalAgents.length > 0 && (
           <div className="mt-6 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
             <p className="text-cyan-300 text-sm font-semibold mb-2">
               ✅ Final Agents for Workflow:
@@ -632,16 +632,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               </div>
             )}
 
-            {missingAgents.length > 0 && (
-              <div className="mt-3 bg-yellow-900/30 border border-yellow-600 rounded p-2">
-                <p className="text-yellow-300 text-xs font-medium mb-1">⚠ Missing Agents (generate these before workflow):</p>
-                <ul className="ml-4 space-y-0.5">
-                  {missingAgents.map(a => (
-                    <li key={a} className="text-yellow-300 text-xs">• {a}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+
           </div>
         )}
 
@@ -744,7 +735,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
                 // ✅ Clear missing list, they are resolved
                 setMissingAgents([]);
-                
+
                 setPreplan(prev => ({ ...prev, missing_agents: [] }));
 
 
