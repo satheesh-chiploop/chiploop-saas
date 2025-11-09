@@ -6,6 +6,7 @@ import { Special_Elite } from "next/font/google";
 import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 const supabase = createClientComponentClient();
+import WorkflowConsole from "@/app/workflow/WorkflowConsole";
 
 
 function getValueFromSpec(obj, path) {
@@ -43,10 +44,13 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [result, setResult] = useState<any>(null);
   const [missingFieldEdits, setMissingFieldEdits] = useState({});
   const [preplan, setPreplan] = useState(null);
-  const [stage, setStage] = useState<"initial" | "analyzed" | "autofill" | "finalized">("initial");
+  const [stage, setStage] = useState<"initial" | "analyzed" | "autofill" | "finalized" | "workflow">("initial");
   const [showNamingDialog, setShowNamingDialog] = useState(false);
   const [namingTargets, setNamingTargets] = useState<string[]>([]);
-
+  // ADD this new state near your other state declarations:
+  const [workflowGraph, setWorkflowGraph] = useState<any | null>(null);
+  const [finalAgents, setFinalAgents] = useState<string[]>([]);
+  const [recentlyGenerated, setRecentlyGenerated] = useState<string[]>([]);
 
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
@@ -186,11 +190,18 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
       setSelectedAgents(plan.agents ?? []);
       setMissingAgents(plan.missing_agents ?? []);
+
+      if ((plan.missing_agents ?? []).length === 0) {
+        // ✅ No missing → This is the final agent set
+        setFinalAgents(plan.agents ?? []);
+        setRecentlyGenerated([]); // none generated yet
+      }
   
     } catch (err) {
       console.error(err);
       alert("❌ Select Agents failed");
     }
+    
     setIsSelectingAgents(false);
   };
   
@@ -222,7 +233,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       // Case 2: User already ran Select Agents → just open naming dialog
       setNamingTargets(missingAgents);
       setShowNamingDialog(true);
-      
+
       window.dispatchEvent(new Event("refreshAgents"));
 
   
@@ -351,7 +362,42 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     }
   };
   
- 
+    // NEW: Build Workflow (Step 3)
+  const handleBuildWorkflow = async () => {
+    try {
+      // Ensure we have a user_id (your Select step already uses Supabase)
+      const { data: { session } } = await supabase.auth.getSession();
+      const user_id = session?.user?.id || "anonymous";
+
+      if (!selectedAgents || selectedAgents.length === 0) {
+        alert("Please run Select Agents first (or add at least one agent).");
+        return;
+      }
+
+      const res = await fetch("/api/build_workflow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id,
+          agents: selectedAgents, // ← reuse from Step 2
+        }),
+      });
+
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || "Build workflow failed.");
+      }
+
+      const data = await res.json();
+      // Expecting { workflow: { nodes: [...], edges: [...], ... } }
+      setWorkflowGraph(data.workflow);
+      setStage("workflow");
+
+    } catch (err) {
+      console.error("❌ Build Workflow failed:", err);
+      alert(`❌ Build Workflow failed: ${String(err)}`);
+    }
+  };
   useEffect(() => {
     const ws = new WebSocket("/spec_live_feedback");
   
@@ -439,12 +485,12 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </button>
 
           <button
-            onClick={handlePublish}
+            onClick={handleBuildWorkflow}
+            disabled={missingAgents.length > 0 || finalAgents.length === 0}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
-            Publish
+            Build Workflow
           </button>
-
 
           <button
             onClick={startStopRecording}
@@ -527,6 +573,49 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </button>
         )}
 
+        {/* NEW: Workflow Canvas stage */}
+        {stage === "workflow" && workflowGraph && (
+          <div className="mt-4">
+            window.dispatchEvent(new CustomEvent("loadWorkflowGraph", { detail: workflowGraph }));
+          </div>
+        )}
+        {finalAgents.length > 0 && (
+          <div className="mt-6 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
+            <p className="text-cyan-300 text-sm font-semibold mb-2">
+              ✅ Final Agents for Workflow:
+            </p>
+
+            <ul className="ml-4 mb-3 space-y-0.5">
+              {finalAgents.map(a => (
+                <li key={a} className="text-green-300 text-xs">• {a}</li>
+              ))}
+            </ul>
+
+            {recentlyGenerated.length > 0 && (
+              <div className="bg-green-900/30 border border-green-600 rounded p-2 mt-2">
+                <p className="text-green-400 text-xs font-medium mb-1">
+                  🟢 Generated in this step:
+                </p>
+                <ul className="ml-4 space-y-0.5">
+                  {recentlyGenerated.map(a => (
+                    <li key={a} className="text-green-300 text-xs">+ {a}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {missingAgents.length > 0 && (
+              <div className="mt-3 bg-yellow-900/30 border border-yellow-600 rounded p-2">
+                <p className="text-yellow-300 text-xs font-medium mb-1">⚠ Missing Agents (generate these before workflow):</p>
+                <ul className="ml-4 space-y-0.5">
+                  {missingAgents.map(a => (
+                    <li key={a} className="text-yellow-300 text-xs">• {a}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
 
         {(selectedAgents.length > 0 || missingAgents.length > 0) && (
           <div className="mt-4 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
@@ -635,6 +724,22 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 window.dispatchEvent(new Event("refreshAgents"));
             
                 alert("✅ Missing agents successfully generated!");
+                // Extract actual generated agent names
+                const generatedAgents = (res.generated_agents || []).map(a => a.agent_name);
+
+                // ✅ Add generated agents into selectedAgents + finalAgent list
+                setSelectedAgents(prev => [...prev, ...generatedAgents]);
+                setFinalAgents(prev => [...prev, ...generatedAgents]);
+
+                // ✅ Track for UI highlighting
+                setRecentlyGenerated(generatedAgents);
+
+                // ✅ Clear missing list, they are resolved
+                setMissingAgents([]);
+
+                // ✅ Small visual cue
+                alert("✅ Missing agents resolved! You can now Build Workflow.");
+
             
               } catch (err) {
                 console.error(err);

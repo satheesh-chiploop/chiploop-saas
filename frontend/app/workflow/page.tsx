@@ -263,6 +263,43 @@ function WorkflowPage() {
   }, []);
 
   useEffect(() => {
+    const handler = (e: any) => {
+      const graph = e.detail;
+      if (!graph) return;
+  
+      console.log("🎯 Received workflow graph from System Planner:", graph);
+  
+      // Normalize nodes to match ReactFlow agentNode structure
+      const newNodes = (graph.nodes || []).map((n: any, idx: number) => ({
+        id: n.id || `n${idx}`,
+        type: "agentNode",
+        position: n.position || { x: 120 * idx, y: 200 },
+        data: {
+          uiLabel: n.data?.uiLabel || n.data?.backendLabel || n.label || "Agent",
+          backendLabel: n.data?.backendLabel || n.data?.uiLabel || n.label || "Unknown Agent",
+          desc: n.data?.desc || "",
+        },
+      }));
+  
+      const newEdges = (graph.edges || []).map((e: any, idx: number) => ({
+        id: e.id || `e${idx}`,
+        source: e.source,
+        target: e.target,
+        animated: true,
+        style: { stroke: "#22d3ee", strokeWidth: 2 },
+      }));
+  
+      setNodes(newNodes);
+      setEdges(newEdges);
+  
+      setTimeout(() => fitView({ padding: 0.25 }), 50);
+    };
+  
+    window.addEventListener("loadWorkflowGraph", handler);
+    return () => window.removeEventListener("loadWorkflowGraph", handler);
+  }, [setNodes, setEdges, fitView]);  
+
+  useEffect(() => {
     const refreshAgents = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id || localStorage.getItem("anon_user_id") || "anonymous";
