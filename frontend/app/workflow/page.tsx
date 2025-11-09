@@ -822,7 +822,7 @@ function WorkflowPage() {
               </ul>
   
               <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
-              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {customAgents.length ? (
                   customAgents.map((a, idx) => (
                     <li
