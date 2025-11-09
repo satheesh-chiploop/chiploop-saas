@@ -369,7 +369,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       const { data: { session } } = await supabase.auth.getSession();
       const user_id = session?.user?.id || "anonymous";
 
-      if (!selectedAgents || selectedAgents.length === 0) {
+      if (!finalAgents || finalAgents.length === 0) {
         alert("Please run Select Agents first (or add at least one agent).");
         return;
       }
@@ -379,7 +379,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id,
-          agents: selectedAgents, // ← reuse from Step 2
+          agents: finalAgents, // ← reuse from Step 2
         }),
       });
 
@@ -432,7 +432,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="bg-slate-800 relative rounded-xl p-6 w-[800px] shadow-xl text-white">
         {/* Floating Spec Coverage Badge */}
-        {coverage !== null && coverage !== undefined && (
+        {stage === "analyzed" && coverage !== null && coverage !== undefined && (
           <div className="absolute top-4 right-6 bg-purple-600/80 text-xs px-2 py-1 rounded shadow-md">
             Coverage: {coverage || 0}%
           </div>
@@ -623,12 +623,12 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
 
-        {(selectedAgents.length > 0 || missingAgents.length > 0) && (
+        {finalAgents.length > 0 && (
           <div className="mt-4 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
             <p className="text-cyan-300 text-sm font-semibold mb-2">Detected Agents:</p>
             <p className="text-green-400 text-xs mb-1">Required Agents:</p>
             <ul className="ml-4 mb-2">
-              {selectedAgents.map(a => (
+              {finalAgents.map(a => (
                 <li key={a} className="text-green-300 text-xs">• {a}</li>
               ))}
             </ul>
@@ -644,7 +644,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
 
-        {coverage !== null && (
+        {stage === "analyzed" && coverage !== null && (
           <div className="mt-4 bg-slate-900 rounded-lg p-3 border border-slate-700">
             <div className="w-full bg-gray-700 rounded-full h-2.5 mb-2">
               <div
@@ -680,7 +680,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             </div>
 
 
-            {coverage !== null && (
+            {stage === "analyzed" && coverage !== null && (
               <div className="absolute top-4 right-6 bg-purple-600/80 text-xs px-2 py-1 rounded shadow-md">
                 Spec Coverage: {coverage}%
               </div>
