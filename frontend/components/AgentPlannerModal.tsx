@@ -725,7 +725,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             
                 // Append new agents to local custom agent list
                 const existing = JSON.parse(localStorage.getItem("custom_agents") || "[]");
-                const newOnes = (res.generated_agents || []).map(a => ({
+                const newOnes = (res.created_agents || []).map(a => ({
                   agent_name: a.agent_name,
                   loop_type: a.loop_type,
                   script_path: a.path,
