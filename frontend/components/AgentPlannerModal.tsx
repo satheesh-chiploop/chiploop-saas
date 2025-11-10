@@ -191,10 +191,10 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       setSelectedAgents(plan.agents ?? []);
       setMissingAgents(plan.missing_agents ?? []);
 
-
-      console.log("🧭 PREPLAN (from Select Agents):", JSON.stringify(data.preplan, null, 2));
-      console.log("🔗 Ordered agent list:", data.preplan?.agents);
-      console.log("❓ Missing agents detected:", data.missing_agents);
+      console.log("🧭 PREPLAN (from Select Agents):", JSON.stringify(plan, null, 2));
+      console.log("🔗 Ordered agent list:", plan.agents);
+      console.log("❓ Missing agents detected:", plan.missing_agents);
+    
 
     
         // ✅ No missing → This is the final agent set
