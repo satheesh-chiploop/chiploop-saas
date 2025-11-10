@@ -379,6 +379,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         return;
       }
 
+      console.log("🧾 Before PREPLAN snapshot at Build:", preplan);
+      console.log("✅ Before FINAL AGENTS (frontend):", finalAgents);
 
 
       const res = await fetch("/api/build_workflow", {
@@ -392,6 +394,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       });
 
       console.log("🚀 FINAL AGENTS SENT TO BACKEND:", preplan?.agents);
+      console.log("🧾 After PREPLAN snapshot at Build:", preplan);
+      console.log("✅ After FINAL AGENTS (frontend):", finalAgents);
+
 
       if (!res.ok) {
         const msg = await res.text();
@@ -736,43 +741,34 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
                 // ✅ After new agent(s) are successfully generated
                 // ✅ Replace missing agent names in-place (preserves original order)
-                const old = preplan?.agents || [];
-                const miss = missingAgents || [];
+                // ✅ Names created in this step (keep for the green panel)
+                const newlyCreated = (res.generated_agents || []).map((a: any) => a.agent_name);
+                console.log("🟢 Newly Generated Agents:", newlyCreated);
 
-                const updatedAgents = old.map(a =>
-                  miss.includes(a) ? finalNames[miss.indexOf(a)] : a
-                );
+                // ✅ Build the final ordered list for System Planner:
+                //    1) Keep the order from Select Agents (preplan.agents)
+                //    2) Append the newly created agents at the end (for now)
+                //       (We’ll introduce LLM-based ordering later.)
+                const base = preplan?.agents || [];
+                const mergedAgents = [...base, ...newlyCreated];
 
-                setFinalAgents(updatedAgents);
-                setSelectedAgents(updatedAgents);
-                setPreplan(prev => ({ ...prev, agents: updatedAgents }));
+                // ✅ Update all relevant state in one place
+                setFinalAgents(mergedAgents);
+                setSelectedAgents(mergedAgents);
+                setRecentlyGenerated(newlyCreated);
 
-                // ✅ Clear missing list
+                // ✅ Clear “missing” and reflect it in preplan too
                 setMissingAgents([]);
-                if (result.generated_agents && result.generated_agents.length > 0) {
-                  const newlyCreated = result.generated_agents.map(a => a.agent_name);
-                
-                  console.log("🟢 Newly Generated Agents:", newlyCreated);
-                
-                  // 1. Update selectedAgents (UI list)
-                  setSelectedAgents(prev => [...prev, ...newlyCreated]);
-                
-                  // 2. Update preplan.agents (this is what gets sent into Build Workflow)
-                  setPreplan(prev =>
-                    prev ? { ...prev, agents: [...prev.agents, ...newlyCreated] } : prev
-                  );
-                
-                  // Optional but recommended: Show updated panel immediately
-                  setFinalAgents(prev => [...prev, ...newlyCreated]);
-                
-                  console.log("✅ Updated final agent list (UI):", [...(preplan?.agents || []), ...newlyCreated]);
-                }
-                
-               
-
-                setRecentlyGenerated(finalNames);
-
-                              
+                setPreplan(prev =>
+                  prev
+                    ? { ...prev, agents: mergedAgents, missing_agents: [] }
+                    : {
+                        loop_type: (spec?.loop_type || "system").toLowerCase(),
+                        agents: mergedAgents,
+                        missing_agents: [],
+                      }
+                );
+                             
                 // ✅ Small visual cue
                 alert("✅ Missing agents resolved! You can now Build Workflow.");
 
