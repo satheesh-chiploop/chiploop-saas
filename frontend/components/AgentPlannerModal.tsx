@@ -379,6 +379,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         return;
       }
 
+
+
       const res = await fetch("/api/build_workflow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -388,6 +390,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           preplan : preplan,
         }),
       });
+
+      console.log("🚀 FINAL AGENTS SENT TO BACKEND:", preplan?.agents);
 
       if (!res.ok) {
         const msg = await res.text();
@@ -745,6 +749,27 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
                 // ✅ Clear missing list
                 setMissingAgents([]);
+                if (result.generated_agents && result.generated_agents.length > 0) {
+                  const newlyCreated = result.generated_agents.map(a => a.agent_name);
+                
+                  console.log("🟢 Newly Generated Agents:", newlyCreated);
+                
+                  // 1. Update selectedAgents (UI list)
+                  setSelectedAgents(prev => [...prev, ...newlyCreated]);
+                
+                  // 2. Update preplan.agents (this is what gets sent into Build Workflow)
+                  setPreplan(prev =>
+                    prev ? { ...prev, agents: [...prev.agents, ...newlyCreated] } : prev
+                  );
+                
+                  // Optional but recommended: Show updated panel immediately
+                  setFinalAgents(prev => [...prev, ...newlyCreated]);
+                
+                  console.log("✅ Updated final agent list (UI):", [...(preplan?.agents || []), ...newlyCreated]);
+                }
+                
+               
+
                 setRecentlyGenerated(finalNames);
 
                               
