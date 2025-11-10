@@ -171,8 +171,6 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       const { data: { session } } = await supabase.auth.getSession();
       const user_id = session?.user?.id || "anonymous";
 
-      console.log("🟢 Supabase session check:", session);
-      console.log("🟢 Supabase session check:", user_id);
       const res = await fetch("/api/plan_workflow", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -185,11 +183,18 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
       const data = await res.json();
       const plan = data.plan || {};
+
+      
   
       setPreplan(plan);
   
       setSelectedAgents(plan.agents ?? []);
       setMissingAgents(plan.missing_agents ?? []);
+
+
+      console.log("🧭 PREPLAN (from Select Agents):", JSON.stringify(data.preplan, null, 2));
+      console.log("🔗 Ordered agent list:", data.preplan?.agents);
+      console.log("❓ Missing agents detected:", data.missing_agents);
 
     
         // ✅ No missing → This is the final agent set
@@ -726,15 +731,23 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 alert("✅ Missing agents successfully generated!");
 
                 // ✅ After new agent(s) are successfully generated
-                const updatedAgents = [...(preplan?.agents || []), ...namingTargets];
-                setFinalAgents(updatedAgents);
-                setSelectedAgents(updatedAgents);   // UI consistency
-                setPreplan((prev) => ({ ...prev, agents: updatedAgents }));
+                // ✅ Replace missing agent names in-place (preserves original order)
+                const old = preplan?.agents || [];
+                const miss = missingAgents || [];
 
-               // ✅ Clear missing list
+                const updatedAgents = old.map(a =>
+                  miss.includes(a) ? finalNames[miss.indexOf(a)] : a
+                );
+
+                setFinalAgents(updatedAgents);
+                setSelectedAgents(updatedAgents);
+                setPreplan(prev => ({ ...prev, agents: updatedAgents }));
+
+                // ✅ Clear missing list
                 setMissingAgents([]);
-                setRecentlyGenerated(namingTargets); // show green block
-                
+                setRecentlyGenerated(finalNames);
+
+                              
                 // ✅ Small visual cue
                 alert("✅ Missing agents resolved! You can now Build Workflow.");
 
