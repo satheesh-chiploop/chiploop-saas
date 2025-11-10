@@ -742,7 +742,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 // ✅ After new agent(s) are successfully generated
                 // ✅ Replace missing agent names in-place (preserves original order)
                 // ✅ Names created in this step (keep for the green panel)
-                const newlyCreated = (res.generated_agents || []).map((a: any) => a.agent_name);
+                const newlyCreated = (res.created_agents || []).map((a: any) => a.agent_name);
                 console.log("🟢 Newly Generated Agents:", newlyCreated);
 
                 // ✅ Build the final ordered list for System Planner:
@@ -751,6 +751,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 //       (We’ll introduce LLM-based ordering later.)
                 const base = preplan?.agents || [];
                 const mergedAgents = [...base, ...newlyCreated];
+
+                console.log("🟢 Newly merged Agents:", mergedAgents);
 
                 // ✅ Update all relevant state in one place
                 setFinalAgents(mergedAgents);
