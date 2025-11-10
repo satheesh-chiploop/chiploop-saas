@@ -380,6 +380,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         body: JSON.stringify({
           user_id,
           agents: finalAgents, // ← reuse from Step 2
+          preplan : preplan,
         }),
       });
 
@@ -723,22 +724,17 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                 window.dispatchEvent(new Event("refreshAgents"));
             
                 alert("✅ Missing agents successfully generated!");
-                // Extract actual generated agent names
-                const generatedAgents = (res.generated_agents || []).map(a => a.agent_name);
 
-                // ✅ Add generated agents into selectedAgents + finalAgent list
-                setSelectedAgents(prev => [...prev, ...generatedAgents]);
-                setFinalAgents(prev => [...prev, ...generatedAgents]);
+                // ✅ After new agent(s) are successfully generated
+                const updatedAgents = [...(preplan?.agents || []), ...namingTargets];
+                setFinalAgents(updatedAgents);
+                setSelectedAgents(updatedAgents);   // UI consistency
+                setPreplan((prev) => ({ ...prev, agents: updatedAgents }));
 
-                // ✅ Track for UI highlighting
-                setRecentlyGenerated(generatedAgents);
-
-                // ✅ Clear missing list, they are resolved
+               // ✅ Clear missing list
                 setMissingAgents([]);
-
-                setPreplan(prev => ({ ...prev, missing_agents: [] }));
-
-
+                setRecentlyGenerated(namingTargets); // show green block
+                
                 // ✅ Small visual cue
                 alert("✅ Missing agents resolved! You can now Build Workflow.");
 
