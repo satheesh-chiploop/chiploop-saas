@@ -730,7 +730,6 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                   loop_type: a.loop_type,
                   script_path: a.path,
                   description: a.description,
-                  is_custom: true
                 }));
                 localStorage.setItem("custom_agents", JSON.stringify([...existing, ...newOnes]));
             
