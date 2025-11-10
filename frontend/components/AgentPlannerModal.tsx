@@ -388,7 +388,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id,
-          finalAgents: finalAgents, // ← reuse from Step 2
+          final_agents : finalAgents, // ← reuse from Step 2
           preplan : preplan,
         }),
       });
