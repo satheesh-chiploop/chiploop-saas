@@ -7,6 +7,7 @@ import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 const supabase = createClientComponentClient();
 import WorkflowConsole from "@/app/workflow/WorkflowConsole";
+import { getStableUserId } from "@/utils/userId";
 
 
 function autoLayoutHorizontal(nodes, spacing = 350, startX = 100, startY = 200) {

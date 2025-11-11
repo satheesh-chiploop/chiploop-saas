@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { getStableUserId } from "@/utils/userId"
 
 import ReactFlow, {
   addEdge,
@@ -582,12 +583,10 @@ function WorkflowPage() {
 
   const loadCustomWorkflowsFromDB = async () => {
 
-    const { data: sessionData } = await supabase.auth.getSession();
-
-    const anonId = localStorage.getItem("anon_user_id");
-    const userId = anonId || sessionData?.session?.user?.id || "anonymous";
-
+    const userId = await getStableUserId(supabase);
     console.log("🧠 (CustomWork) Loading workflows for:", userId);
+
+
    
     // 1) Read local first (for fallback)
     const localNames = Object.keys(localStorage)
@@ -600,11 +599,11 @@ function WorkflowPage() {
       .select("id, name, created_at, user_id")
       .order("created_at", { ascending: false });
     
-    if (userId && userId !== "undefined" && userId !== "anonymous") {
-       q = q.or(`user_id.eq.${userId},user_id.is.null`);
-    } else {
-       q = q.or(`user_id.is.null`);
-    }  
+    //if (userId && userId !== "undefined" && userId !== "anonymous") {
+    // q = q.or(`user_id.eq.${userId},user_id.is.null`);
+    //} else {
+    //   q = q.or(`user_id.is.null`);
+    //}  
 
     const { data, error } = await q;
     if (error) {
@@ -978,9 +977,11 @@ function WorkflowPage() {
                 const name = prompt("💾 Enter a name for this workflow:", `CanvasFlow_${new Date().toISOString().slice(0, 10)}`);
                 if (!name) return;
             
-                const { data: sessionData } = await supabase.auth.getSession();
-                const anonId = localStorage.getItem("anon_user_id");
-                const userId = sessionData?.session?.user?.id || anonId || "anonymous";
+                //const { data: sessionData } = await supabase.auth.getSession();
+                //const anonId = localStorage.getItem("anon_user_id");
+                //const userId = sessionData?.session?.user?.id || anonId || "anonymous";
+
+                const userId = await getStableUserId();
             
                 await fetch("/api/save_custom_workflow", {
                   method: "POST",
