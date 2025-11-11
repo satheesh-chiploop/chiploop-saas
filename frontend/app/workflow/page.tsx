@@ -117,22 +117,19 @@ function WorkflowPage() {
   
   const deleteCustomWorkflow = async (name: string) => {
     try {
-      // Optimistic local removal so UI updates instantly
-      localStorage.removeItem(`workflow_${name}`);
-      setCustomWorkflows((prev) => prev.filter((n) => n !== name));
-  
-      // Backend delete
-      const res = await fetch(`${API_BASE}/delete_custom_workflow?name=${encodeURIComponent(name)}`, { method: "DELETE" });
+      const userId = await getStableUserId(supabase);  // ✅ unified ID
+
+      const res = await fetch(`${API_BASE}/delete_custom_workflow?name=${encodeURIComponent(name)}&user_id=${userId}`, {
+        method: "DELETE"
+      });
+
       const j = await res.json();
       if (j.status !== "ok") {
-        alert(`⚠️ Delete failed: ${j.message || "Unknown error"}`);
-        // best-effort restore by reloading
-        await loadCustomWorkflowsFromDB();
+        alert("Delete failed");
         return;
       }
-  
-      // Fresh fetch
-      await loadCustomWorkflowsFromDB();
+
+      await loadCustomWorkflowsFromDB();  // ✅ refresh sidebar list
     } catch (err) {
       console.error("Delete failed", err);
       alert("❌ Could not delete workflow.");
@@ -211,18 +208,20 @@ function WorkflowPage() {
   };
 
   const deleteCustomAgent = async (name: string) => {
-    if (!confirm(`Delete agent "${name}"? This cannot be undone.`)) return;
-    const res = await fetch(`${API_BASE}/delete_custom_agent?name=${encodeURIComponent(name)}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+    const userId = await getStableUserId(supabase);  // ✅ unify ID
+
+    const res = await fetch(`${API_BASE}/delete_custom_agent?name=${encodeURIComponent(name)}&user_id=${userId}`, {
+      method: "DELETE"
     });
+
     const j = await res.json();
     if (j.status !== "ok") {
-      alert(`⚠️ Delete failed: ${j.message || "Unknown error"}`);
-    } else {
-      window.dispatchEvent(new Event("refreshAgents"));
-      window.dispatchEvent(new Event("refreshWorkflows"));
+      alert(`Delete failed: ${j.message}`);
+      return;
     }
+
+    window.dispatchEvent(new Event("refreshAgents"));
+    window.dispatchEvent(new Event("refreshWorkflows"));
     closeAgentMenu();
   };
 
@@ -651,16 +650,16 @@ function WorkflowPage() {
   const loadWorkflowFromDB = async (wfName: string) => {
     try {
       // 1) Get user ID (session → anon → fail)
-      const { data: sessionData } = await supabase.auth.getSession();
-      const anonId = localStorage.getItem("anon_user_id");
-      const userId = anonId || sessionData?.session?.user?.id || null;
-  
+      const userId = await getStableUserId(supabase);  // ✅ unified identity
+
+      console.log(`🧠 Loading workflow: ${wfName} for user: ${userId}`);
+ 
       if (!userId) {
         console.warn("⚠️ No user ID detected.");
         return;
       }
   
-      console.log(`🧠 Loading workflow: ${wfName} for user: ${userId}`);
+
   
       // 2) Fetch workflow record
       const { data, error } = await supabase
@@ -976,7 +975,7 @@ function WorkflowPage() {
             onDragOver={onDragOverCanvas}
           >
             <ReactFlow
-              key={nodes.length}
+              key={nodes.map(n => n.id).join("-")}
               nodes={nodes}
               edges={edges}
               onNodesChange={onNodesChange}
@@ -995,7 +994,7 @@ function WorkflowPage() {
           {/* Action Buttons */}
           <div className="flex justify-center gap-4 py-4 border-t border-slate-800 bg-black/40 mt-4">
             <button 
-              className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded"
+              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
               onClick={() => {
                 setNodes([]);
                 setEdges([]);
@@ -1008,9 +1007,9 @@ function WorkflowPage() {
             </button>
             <button
               onClick={async () => {
-                const name = prompt("💾 Enter a name for this workflow:", `CanvasFlow_${new Date().toISOString().slice(0, 10)}`);
-                if (!name) return;
-            
+                const workflowName = prompt("💾 Enter a name for this workflow:", `CanvasFlow_${new Date().toISOString().slice(0, 10)}`);
+
+
                 //const { data: sessionData } = await supabase.auth.getSession();
                 //const anonId = localStorage.getItem("anon_user_id");
                 //const userId = sessionData?.session?.user?.id || anonId || "anonymous";
@@ -1022,9 +1021,9 @@ function WorkflowPage() {
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     user_id: userId,
-                    name: name.trim(),
+                    name: workflowName.trim(),
                     goal: "",
-                    summary: `Workflow created from canvas: ${name}`,
+                    summary: `Workflow created from canvas: ${workflowName}`,
                     loop_type: loop.toLowerCase(),   // ✅ correct loop
                     definitions: { nodes, edges },   // ✅ actual workflow graph!
                     status: "saved",
@@ -1032,7 +1031,7 @@ function WorkflowPage() {
                 });
             
                 window.dispatchEvent(new Event("refreshWorkflows"));
-                alert(`✅ Workflow "${name}" saved successfully.`);
+                alert(`✅ Workflow "${workflowName}" saved successfully.`);
               }}
               className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
             >
