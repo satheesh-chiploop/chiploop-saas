@@ -431,15 +431,16 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              workflow: {
-                workflow_name: workflowName,
-                loop_type: preplan?.loop_type || "system",
-                nodes: builtWorkflow.nodes,
-                edges: builtWorkflow.edges,
-                is_custom : true,
-                summary: goal
+              user_id,                                     // ✅ correct field
+              name: workflowName,                          // ✅ correct field
+              goal,                                        // ✅ required
+              summary: `Workflow for ${goal?.slice(0, 80)}`, 
+              loop_type: preplan?.loop_type || "system",   // ✅ same as sidebar grouping
+              definitions: {                               // ✅ must wrap nodes & edges
+                 nodes: builtWorkflow.nodes,
+                 edges: builtWorkflow.edges,
               },
-              user_id
+              status: "saved",                             // ✅ matches backend schema
             }),
           });
       
