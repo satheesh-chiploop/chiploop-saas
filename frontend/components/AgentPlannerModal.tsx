@@ -60,6 +60,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [finalAgents, setFinalAgents] = useState<string[]>([]);
   const [recentlyGenerated, setRecentlyGenerated] = useState<string[]>([]);
 
+  
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
   };
@@ -415,7 +416,13 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       // Expecting { workflow: { nodes: [...], edges: [...], ... } }
 
       const laidOutNodes = autoLayoutHorizontal(data.workflow.nodes);
-      setWorkflowGraph({ ...data.workflow, nodes: laidOutNodes });
+      // setWorkflowGraph({ ...data.workflow, nodes: laidOutNodes });
+      // ✅ Build laid-out workflow object BEFORE saving
+      const builtWorkflow = {
+          ...data.workflow,
+          nodes: laidOutNodes,   // we already applied layout
+          edges: data.workflow.edges,
+      };
       setStage("workflow");
       try {
         const workflowName = prompt("💾 Name your workflow:", "My_Composed_Workflow");
@@ -427,8 +434,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               workflow: {
                 workflow_name: workflowName,
                 loop_type: preplan?.loop_type || "system",
-                nodes: workflowGraph?.nodes || [],
-                edges: workflowGraph?.edges || [],
+                nodes: builtWorkflow.nodes,
+                edges: builtWorkflow.edges,
+                is_custom : true,
                 summary: goal
               },
               user_id
@@ -815,6 +823,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             }}
           />
         )}
+
+ 
+
         
         {summary && (
           <div className="absolute bottom-4 right-4 w-80 bg-gray-900 text-white p-4 rounded-xl shadow-lg">

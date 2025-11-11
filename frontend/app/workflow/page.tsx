@@ -182,7 +182,46 @@ function WorkflowPage() {
     }
   };
   
-  
+  // NEW: agent context menu state
+  const [agentMenu, setAgentMenu] = useState<{ x: number; y: number; name: string } | null>(null);
+
+  const openAgentMenu = (e: React.MouseEvent, name: string) => {
+    e.preventDefault();
+    setAgentMenu({ x: e.clientX, y: e.clientY, name });
+  };
+  const closeAgentMenu = () => setAgentMenu(null);
+
+// NEW: API calls
+  const renameCustomAgent = async (oldName: string) => {
+    const newName = prompt("New agent name:", oldName) || "";
+    if (!newName || newName === oldName) return;
+    const res = await fetch("/rename_custom_agent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ old_name: oldName, new_name: newName }),
+    });
+    const j = await res.json();
+    if (j.status !== "ok") {
+      alert(`⚠️ Rename failed: ${j.message || "Unknown error"}`);
+    } else {
+      window.dispatchEvent(new Event("refreshAgents")); // reuse your existing refresh pattern
+    }
+    closeAgentMenu();
+  };
+
+  const deleteCustomAgent = async (name: string) => {
+    if (!confirm(`Delete agent "${name}"? This cannot be undone.`)) return;
+    const res = await fetch(`/delete_custom_agent?name=${encodeURIComponent(name)}`, {
+      method: "DELETE",
+    });
+    const j = await res.json();
+    if (j.status !== "ok") {
+      alert(`⚠️ Delete failed: ${j.message || "Unknown error"}`);
+    } else {
+      window.dispatchEvent(new Event("refreshAgents"));
+    }
+    closeAgentMenu();
+  };
 
   // 🔁 Ensure sidebar visible once agents/workflows are loaded
   useEffect(() => {
@@ -866,6 +905,7 @@ function WorkflowPage() {
                       key={`${a.backendLabel}-${idx}`}
                       draggable
                       onDragStart={(e) => onDragStartAgent(e, a)}
+                      onContextMenu={(e) => openAgentMenu(e, a.backendLabel)}
                       className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
                     >
                       {a.uiLabel}
@@ -1075,6 +1115,28 @@ function WorkflowPage() {
             </div>
           </div>
         </div>
+      )}
+
+             {/* Agent context menu */}
+      {agentMenu && (
+          <div
+            className="fixed z-50 bg-slate-800 text-white border border-slate-600 rounded shadow-xl py-1"
+            style={{ left: agentMenu.x, top: agentMenu.y }}
+            onMouseLeave={closeAgentMenu}
+          >
+            <button
+              className="px-4 py-1 hover:bg-slate-700 w-full text-left"
+              onClick={() => renameCustomAgent(agentMenu.name)}
+            >
+              ✏️ Rename
+            </button>
+            <button
+              className="px-4 py-1 hover:bg-slate-700 w-full text-left text-red-400"
+              onClick={() => deleteCustomAgent(agentMenu.name)}
+            >
+              🗑 Delete
+            </button>
+          </div>
       )}
   
       {/* ===== Modals ===== */}
