@@ -121,34 +121,8 @@ export default function PlannerModal({ onClose }) {
               "digital"
             );
       
-            if (workflowName) {
-              await fetch("/api/save_custom_workflow", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  workflow: {
-                    workflow_name: workflowName,
-                    loop_type: loopType.toLowerCase(),
-                    nodes: data.nodes,
-                    edges: data.edges,
-                    summary: data.summary,
-                  },
-                  user_id: localStorage.getItem("anon_user_id") || "anonymous",
-                }),
-              });
-      
-              alert(
-                `💾 Workflow "${workflowName}" saved under "${loopType}" Custom Workflows.`
-              );
-              window.dispatchEvent(new CustomEvent("refreshWorkflows"));
-            }
+                        
             
-            // ✅ Save locally for instant reload
-            const stored = { nodes: data.nodes, edges: data.edges };
-            localStorage.setItem(
-              `workflow_${workflowName}`,
-              JSON.stringify(stored)
-            );
       
             alert(`✅ Auto-composed workflow:\n${data.summary}`);
             alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");

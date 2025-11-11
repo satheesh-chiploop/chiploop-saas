@@ -416,34 +416,40 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       // Expecting { workflow: { nodes: [...], edges: [...], ... } }
 
       const laidOutNodes = autoLayoutHorizontal(data.workflow.nodes);
-      // setWorkflowGraph({ ...data.workflow, nodes: laidOutNodes });
-      // ✅ Build laid-out workflow object BEFORE saving
+
       const builtWorkflow = {
-          ...data.workflow,
-          nodes: laidOutNodes,   // we already applied layout
-          edges: data.workflow.edges,
+       ...data.workflow,
+       nodes: laidOutNodes,
+       edges: data.workflow.edges,
       };
+
+// ✅ SEND WORKFLOW TO CANVAS
+      setWorkflowGraph(builtWorkflow);
       setStage("workflow");
       try {
-        const workflowName = prompt("💾 Name your workflow:", "My_Composed_Workflow");
+        const workflowName = prompt(
+          "💾 Enter a name to save this workflow:",
+          `AI_Composed_${new Date().toISOString().slice(0, 10)}`
+        );
+        const loopType = preplan?.loop_type || "system";
         if (workflowName) {
           await fetch("/api/save_custom_workflow", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              user_id,                                     // ✅ correct field
-              name: workflowName,                          // ✅ correct field
-              goal,                                        // ✅ required
-              summary: `Workflow for ${goal?.slice(0, 80)}`, 
-              loop_type: preplan?.loop_type || "system",   // ✅ same as sidebar grouping
-              definitions: {                               // ✅ must wrap nodes & edges
-                 nodes: builtWorkflow.nodes,
-                 edges: builtWorkflow.edges,
+              workflow: {
+                workflow_name: workflowName.trim(),              // ✅ matches working format
+                loop_type: loopType.toLowerCase(),               // ✅ matches sidebar categories
+                nodes: builtWorkflow.nodes,                      // ✅ do NOT send definitions wrapper
+                edges: builtWorkflow.edges,
+                summary: `Auto-composed workflow for ${workflowName}`, 
               },
-              status: "saved",                             // ✅ matches backend schema
+              user_id: user_id && user_id !== "anonymous"
+                ? user_id
+                : localStorage.getItem("anon_user_id") || "anonymous",  // ✅ matches working workflow planner
             }),
           });
-      
+   
           window.dispatchEvent(new Event("refreshWorkflows")); // ✅ Refresh sidebar
         }
       } catch (err) {

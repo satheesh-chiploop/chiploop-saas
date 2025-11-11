@@ -213,12 +213,14 @@ function WorkflowPage() {
     if (!confirm(`Delete agent "${name}"? This cannot be undone.`)) return;
     const res = await fetch(`${API_BASE}/delete_custom_agent?name=${encodeURIComponent(name)}`, {
       method: "DELETE",
+      headers: { "Content-Type": "application/json" },
     });
     const j = await res.json();
     if (j.status !== "ok") {
       alert(`⚠️ Delete failed: ${j.message || "Unknown error"}`);
     } else {
       window.dispatchEvent(new Event("refreshAgents"));
+      window.dispatchEvent(new Event("refreshWorkflows"));
     }
     closeAgentMenu();
   };
@@ -973,46 +975,29 @@ function WorkflowPage() {
             </button>
             <button
               onClick={async () => {
-                try {
-
-                  const { data: sessionData } = await supabase.auth.getSession();
-
-                  const anonId = localStorage.getItem("anon_user_id");
-                  const userId = anonId || sessionData?.session?.user?.id || "anonymous";
-
-                  console.log("SP: verifiying anonid",anonId)
-
-                  console.log("🧠 SP: Loading new workflows for:", userId);
-               
-                  const wf = {
-                    workflow_name: "Custom_" + loop + "_Flow",
-                    loop_type: loop,
-                    nodes,
-                    edges,
-                    user_id: userId, // <<< add this line
-                  };
-
-                  const res = await fetch(`${API_BASE}/save_custom_workflow`, {
+                const name = prompt("💾 Enter a name for this workflow:", `CanvasFlow_${new Date().toISOString().slice(0, 10)}`);
+                if (!name) return;
+            
+                const { data: sessionData } = await supabase.auth.getSession();
+                const anonId = localStorage.getItem("anon_user_id");
+                const userId = sessionData?.session?.user?.id || anonId || "anonymous";
+            
+                await fetch("/api/save_custom_workflow", {
                   method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "x-user-id": userId, // ✅ backend normalization uses this
-                  },
-                  body: JSON.stringify({ workflow: wf }),
-                  });
-                  const j = await res.json();
-
-                  if (j.status === "ok") {
-                    alert("✅ Workflow saved to Supabase!");
-                    window.dispatchEvent(new CustomEvent("refreshWorkflows"));
-                  } else {
-                    alert(`⚠️ Save failed: ${j.message || "Unknown error"}`);
-                  }
-                  
-                } catch (e) {
-                  console.error(e);
-                  alert("❌ Error saving workflow");
-                }
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    user_id: userId,
+                    name: name.trim(),
+                    goal: "",
+                    summary: `Workflow created from canvas: ${name}`,
+                    loop_type: loop.toLowerCase(),   // ✅ correct loop
+                    definitions: { nodes, edges },   // ✅ actual workflow graph!
+                    status: "saved",
+                  }),
+                });
+            
+                window.dispatchEvent(new Event("refreshWorkflows"));
+                alert(`✅ Workflow "${name}" saved successfully.`);
               }}
               className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
             >
