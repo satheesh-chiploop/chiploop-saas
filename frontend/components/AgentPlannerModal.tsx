@@ -718,7 +718,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
                   body: JSON.stringify({
                     goal,
                     user_id: user_id,
-                    agent_names: finalNames,
+                    agent_names: finalNames.map(n => (typeof n === "string" ? n : n.new)),
                     structured_spec_final: spec
                   })
                 }).then(r => r.json());
