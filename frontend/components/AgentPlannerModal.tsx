@@ -9,6 +9,14 @@ const supabase = createClientComponentClient();
 import WorkflowConsole from "@/app/workflow/WorkflowConsole";
 
 
+function autoLayoutHorizontal(nodes, spacing = 350, startX = 100, startY = 200) {
+  return nodes.map((node, index) => ({
+    ...node,
+    position: { x: startX + index * spacing, y: startY },
+  }));
+}
+
+
 function getValueFromSpec(obj, path) {
   try {
     return path
@@ -405,9 +413,33 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
       const data = await res.json();
       // Expecting { workflow: { nodes: [...], edges: [...], ... } }
-      setWorkflowGraph(data.workflow);
-      setStage("workflow");
 
+      const laidOutNodes = autoLayoutHorizontal(data.workflow.nodes);
+      setWorkflowGraph({ ...data.workflow, nodes: laidOutNodes });
+      setStage("workflow");
+      try {
+        const workflowName = prompt("💾 Name your workflow:", "My_Composed_Workflow");
+        if (workflowName) {
+          await fetch("/api/save_custom_workflow", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              workflow: {
+                workflow_name: workflowName,
+                loop_type: preplan?.loop_type || "system",
+                nodes: workflowGraph?.nodes || [],
+                edges: workflowGraph?.edges || [],
+                summary: goal
+              },
+              user_id
+            }),
+          });
+      
+          window.dispatchEvent(new Event("refreshWorkflows")); // ✅ Refresh sidebar
+        }
+      } catch (err) {
+        console.error("❌ Save workflow failed", err);
+      }
     } catch (err) {
       console.error("❌ Build Workflow failed:", err);
       alert(`❌ Build Workflow failed: ${String(err)}`);
