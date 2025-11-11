@@ -195,7 +195,7 @@ function WorkflowPage() {
   const renameCustomAgent = async (oldName: string) => {
     const newName = prompt("New agent name:", oldName) || "";
     if (!newName || newName === oldName) return;
-    const res = await fetch("/rename_custom_agent", {
+    const res = await fetch(`${API_BASE}/rename_custom_agent`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ old_name: oldName, new_name: newName }),
@@ -211,7 +211,7 @@ function WorkflowPage() {
 
   const deleteCustomAgent = async (name: string) => {
     if (!confirm(`Delete agent "${name}"? This cannot be undone.`)) return;
-    const res = await fetch(`/delete_custom_agent?name=${encodeURIComponent(name)}`, {
+    const res = await fetch(`${API_BASE}/delete_custom_agent?name=${encodeURIComponent(name)}`, {
       method: "DELETE",
     });
     const j = await res.json();
