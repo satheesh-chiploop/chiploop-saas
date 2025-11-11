@@ -390,6 +390,20 @@ function WorkflowPage() {
   }, [supabase]);
 
 
+  useEffect(() => {
+    function handleLoadWorkflowGraph(e: any) {
+      const wf = e.detail;
+      if (!wf) return;
+      setNodes(wf.nodes || []);
+      setEdges(wf.edges || []);
+    }
+  
+    window.addEventListener("loadWorkflowGraph", handleLoadWorkflowGraph);
+    return () =>
+      window.removeEventListener("loadWorkflowGraph", handleLoadWorkflowGraph);
+  }, []);
+
+
   /* ---------- Default Verify Loop ---------- */
   useEffect(() => {
     const n: Node<AgentNodeData>[] = [
@@ -586,18 +600,27 @@ function WorkflowPage() {
     const userId = await getStableUserId(supabase);
     console.log("🧠 (CustomWork) Loading workflows for:", userId);
 
+    const { data, error } = await supabase
+      .from("workflows")
+      .select("name, created_at")
+      .eq("user_id", userId)        // ✅ Correct filtering
+      .order("created_at", { ascending: false });
 
+    if (error) {
+      console.error("❌ Error loading workflows:", error);
+      return;
+    }
    
     // 1) Read local first (for fallback)
-    const localNames = Object.keys(localStorage)
-      .filter((k) => k.startsWith("workflow_"))
-      .map((k) => k.replace("workflow_", ""));
+    //const localNames = Object.keys(localStorage)
+     // .filter((k) => k.startsWith("workflow_"))
+    //  .map((k) => k.replace("workflow_", ""));
   
     // 2) Build DB query: include both anonId and NULL
-    let q = supabase
-      .from("workflows")
-      .select("id, name, created_at, user_id")
-      .order("created_at", { ascending: false });
+    //let q = supabase
+    //  .from("workflows")
+     // .select("id, name, created_at, user_id")
+     // .order("created_at", { ascending: false });
     
     //if (userId && userId !== "undefined" && userId !== "anonymous") {
     // q = q.or(`user_id.eq.${userId},user_id.is.null`);
@@ -605,20 +628,25 @@ function WorkflowPage() {
     //   q = q.or(`user_id.is.null`);
     //}  
 
-    const { data, error } = await q;
-    if (error) {
-      console.error("❌ Error loading workflows:", error);
+    //const { data, error } = await q;
+    //if (error) {
+     // console.error("❌ Error loading workflows:", error);
       // fallback to local only
-      setCustomWorkflows([...new Set(localNames)]);
-      return;
-    }
+     // setCustomWorkflows([...new Set(localNames)]);
+     // return;
+    //}
   
-    const dbNames = (data || []).map((wf) => wf.name || `workflow_${wf.id}`);
+    //const dbNames = (data || []).map((wf) => wf.name || `workflow_${wf.id}`);
+
+    const dbNames = (data || []).map(w => w.name);
+
+    console.log("📁 Loaded workflows:", dbNames);
+    setCustomWorkflows(dbNames);
   
     // 3) Union (DB ⊎ local), DB first
-    const union = Array.from(new Set([...dbNames, ...localNames]));
-    console.log("📁 Loaded workflows:", union);
-    setCustomWorkflows(union);
+    //const union = Array.from(new Set([...dbNames, ...localNames]));
+    //console.log("📁 Loaded workflows:", union);
+    //setCustomWorkflows(union);
   };
   const loadWorkflowFromDB = async (wfName: string) => {
     try {
@@ -966,11 +994,17 @@ function WorkflowPage() {
   
           {/* Action Buttons */}
           <div className="flex justify-center gap-4 py-4 border-t border-slate-800 bg-black/40 mt-4">
-            <button onClick={() => setShowSpecModal(true)} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
-              + Add Workflow
+            <button 
+              className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded"
+              onClick={() => {
+                setNodes([]);
+                setEdges([]);
+              }}
+            >
+              New Workflow
             </button>
             <button onClick={runWorkflow} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
-              ▶️ Run Workflow
+              Run Workflow
             </button>
             <button
               onClick={async () => {
@@ -1003,9 +1037,6 @@ function WorkflowPage() {
               className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
             >
               Save Workflow
-            </button>
-            <button onClick={saveWorkflowLocal} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
-              Save Local
             </button>
             <button onClick={clearWorkflow} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
               Clear
