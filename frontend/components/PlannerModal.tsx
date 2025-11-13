@@ -20,13 +20,24 @@ export default function PlannerModal({ onClose }) {
     const [summary, setSummary] = useState<any>(null);
     const [voiceMode, setVoiceMode] = useState(false);
 
+    const mergeAnswersIntoPrompt = () => {
+      let merged = refinedPrompt;
+      clarifyQuestions.forEach((q) => {
+        const ans = userAnswers[q];
+        if (ans) {
+          merged += `\n\n${q}\n${ans}`;
+        }
+      });
+      return merged;
+    };
+
     // -----------------------------
     // 🧩 Design Intent Planner state
     // -----------------------------
     const [isDesignIntentMode, setIsDesignIntentMode] = useState(true); // temporary toggle
     const [roundNumber, setRoundNumber] = useState(1);
     const [clarifyQuestions, setClarifyQuestions] = useState<string[]>([]);
-    const [answers, setAnswers] = useState<Record<string, string>>({});
+    const [suggestedAnswers, setsuggestedAnswers] = useState<Record<string, string>>({});
     const [refinedPrompt, setRefinedPrompt] = useState("");
     const [loopInterpretation, setLoopInterpretation] = useState<{
         digital?: string;
@@ -194,7 +205,85 @@ export default function PlannerModal({ onClose }) {
           setAnalyzing(false);
         }
       };
+    // -----------------------------
+    // 🧩 Phase 1 placeholder handlers
+    // -----------------------------
+    const handleContinueRound = async () => {
+      try {
 
+        const nextPrompt = mergeAnswersIntoPrompt();
+
+        const res = await fetch("/api/clarify_intent_round", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            round: roundNumber,
+            prompt: nextPrompt,
+            previous_loop_interpretation: loopInterpretation
+          })
+        });
+    
+        const data = await res.json();
+    
+        if (data.status === "ok") {
+          // update state from backend response
+          setClarifyQuestions(data.questions || []);
+          setSuggestedAnswers(data.suggested_answers || []);
+          setRefinedPrompt(data.refined_prompt || refinedPrompt);
+          setLoopInterpretation(data.loop_interpretation || loopInterpretation);
+    
+          // Next round
+          setRoundNumber(prev => prev + 1);
+        } else {
+          console.error("Backend error:", data.message);
+        }
+      } catch (err) {
+        console.error("Network error:", err);
+      }
+    };
+    
+    const handleFinalizeDesignIntent = async () => {
+      try {
+        const payload = {
+          user_id: userId,
+          title: refinedPrompt.substring(0, 40) || "Untitled Design Intent",
+          refined_prompt: refinedPrompt,
+          implementation_strategy: `
+    Digital: ${loopInterpretation.digital || ""}
+    Embedded: ${loopInterpretation.embedded || ""}
+    Analog: ${loopInterpretation.analog || ""}
+    System: ${loopInterpretation.system || ""}
+          `.trim(),
+          structured_intent: loopInterpretation,
+          version: 1,
+        };
+    
+        const response = await fetch("/api/save_design_intent_draft", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+    
+        const data = await response.json();
+        console.log("Save design intent:", data);
+    
+        if (data.status === "ok") {
+          alert("Design Intent Draft saved successfully!");
+          onClose(); // Close modal after save
+        } else {
+          console.error("Save failed:", data.message);
+        }
+      } catch (err) {
+        console.error("Save intent network error:", err);
+      }
+    };
+    
+    
     useEffect(() => {
         const ws = new WebSocket("wss://209.38.74.151/spec_live_feedback");
       
@@ -215,7 +304,7 @@ export default function PlannerModal({ onClose }) {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
             <div className="bg-slate-800 relative rounded-xl p-6 w-[600px] shadow-xl text-white">
                 <h2 className="text-cyan-400 font-bold text-lg mb-3">
-                    Workflow Builder
+                  {isDesignIntentMode ? "Design Intent Planner" : "Workflow Builder"} 
                 </h2>
 
                 {coverage && (
@@ -232,60 +321,24 @@ export default function PlannerModal({ onClose }) {
                     </div>
                 )}
 
-                <textarea
+                {isDesignIntentMode ? (
+                  <textarea
+                    value={refinedPrompt}
+                    onChange={(e) => setRefinedPrompt(e.target.value)}
+                    placeholder="Describe your design idea..."
+                    className="w-full h-32 p-2 bg-slate-900 rounded border border-slate-700 text-sm text-slate-200"
+                  />
+                ) : (
+                  <textarea
                     value={goal}
                     onChange={(e) => setGoal(e.target.value)}
                     placeholder="Describe your design goal..."
                     className="w-full h-24 p-2 bg-slate-900 rounded border border-slate-700 text-sm text-slate-200 focus:ring-1 focus:ring-cyan-500"
-                />
-
-                <div className="mt-3 flex gap-2 flex-wrap">
-                    <button
-                        onClick={handleAnalyzeSpec}
-                        disabled={analyzing || !goal.trim()}
-                        className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
-                    >
-                        {analyzing ? "Analyzing..." : "Analyze Spec"}
-                    </button>
-
-                    <button
-                        onClick={handlePlan}
-                        disabled={loading || !goal.trim()}
-                        className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
-                    >
-                        {loading ? "Generating..." : "Select Agents"}
-                    </button>
-
-                    <button
-                        onClick={handleAutoCompose}
-                        disabled={autoLoading || !goal.trim()}
-                        className="bg-cyan-700 hover:bg-cyan-600 px-3 py-1 rounded disabled:opacity-50"
-                    >
-                        {autoLoading ? "Composing..." : "Build Workflow"}
-                    </button>
-
-                    {/* 🎙 Voice Mode Toggle */}
-                    <button
-                        onClick={toggleVoiceMode}
-                        className={`ml-4 px-3 py-2 rounded-full ${
-                        isRecording ? "bg-green-600 hover:bg-yellow-700" : "bg-gray-700 hover:bg-red-600"
-                        } text-white`}
-                        title={isRecording ? "Voice Mode Active" : "Start Voice Mode"}
-                    >
-                    🎙
-                    </button>
-                    
-                    <button
-                        onClick={onClose}
-                        className="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded ml-auto"
-                    >
-                        Close
-                    </button>
-                </div>
-
+                  />
+                )}
                 {/* 🧩 DESIGN INTENT PLANNER PANEL */}
                 {isDesignIntentMode && (
-                  <div className="mt-6 border-t border-slate-700 pt-4">
+                  <div className="mt-4">
                     <h3 className="text-xl font-semibold text-emerald-400 mb-3">
                       Design Intent Planner – Round {roundNumber}
                     </h3>
@@ -356,7 +409,7 @@ export default function PlannerModal({ onClose }) {
                 )}
 
 
-                {coverage && (
+                {!isDesignIntentMode && coverage && (
                     <div className="mt-4 bg-slate-900 rounded-lg p-3 border border-slate-700">
                         <div className="w-full bg-gray-700 rounded-full h-2.5 mb-2">
                             <div
@@ -393,7 +446,7 @@ export default function PlannerModal({ onClose }) {
                     </div>
                 )}
 
-                {plan?.missing_agents?.length > 0 && (
+                {!isDesignIntentMode && plan?.missing_agents?.length > 0 && (
                     <div className="mt-4 bg-amber-900/40 border border-amber-600 rounded-lg p-3">
                         <h4 className="font-semibold text-amber-300">⚠️ Missing Agents</h4>
                         <ul className="list-disc list-inside text-sm text-amber-200">
@@ -407,14 +460,28 @@ export default function PlannerModal({ onClose }) {
                     </div>
                 )}
 
-                {plan && (
+                {!isDesignIntentMode && plan && (
                     <div className="mt-4 bg-slate-900 rounded p-3 font-mono text-xs text-slate-200 overflow-auto max-h-64">
                         <pre>{JSON.stringify(plan, null, 2)}</pre>
                     </div>
                 )}
 
+                <button
+                  onClick={handleContinueRound}
+                  className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-4 py-2 rounded"
+                >
+                  Continue Asking Questions
+                </button>
+
+                <button
+                  onClick={handleFinalizeDesignIntent}
+                  className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-4 py-2 rounded"
+                >
+                  Done Generate Final Spec
+                </button>
+
                 {/* Floating Notion Summary */}
-                {summary && (
+                {!isDesignIntentMode && summary && (
                     <div className="absolute bottom-4 right-4 w-80 bg-gray-900 text-white p-4 rounded-xl shadow-lg">
                         <h3  className="font-bold text-sm mb-2">🧾 Spec Summary Preview</h3>
                         <pre className="text-xs whitespace-pre-wrap bg-gray-800 p-2 rounded-md max-h-48 overflow-auto">
