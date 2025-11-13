@@ -23,8 +23,10 @@ export default function PlannerModal({ onClose }) {
 
     const mergeAnswersIntoPrompt = () => {
       let merged = refinedPrompt;
+      console.log("🧩 mergeAnswersIntoPrompt – clarifyQuestions:", clarifyQuestions);
+      console.log("🧩 mergeAnswersIntoPrompt – answers:", answers);
       clarifyQuestions.forEach((q) => {
-        const ans = userAnswers[q];
+        const ans = answers[q];
         if (ans) {
           merged += `\n\n${q}\n${ans}`;
         }
