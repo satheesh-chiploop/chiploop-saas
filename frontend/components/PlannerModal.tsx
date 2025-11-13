@@ -256,7 +256,13 @@ export default function PlannerModal({ onClose }) {
             mappedAnswers[q] = sas[key] || "";
           });
 
-          setSuggestedAnswers(sas);
+
+          console.log("🟢 sas array from backend:", sas);
+          console.log("🟢 mappedAnswers (q → suggested):", mappedAnswers);
+
+
+
+          setSuggestedAnswers(mappedAnswers);
           setAnswers(mappedAnswers);
 
  
