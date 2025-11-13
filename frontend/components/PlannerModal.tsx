@@ -47,6 +47,15 @@ export default function PlannerModal({ onClose }) {
     } | null>(null);
     const [isLoadingRound, setIsLoadingRound] = useState(false);
 
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+      (async () => {
+        const id = await getStableUserId(supabase);
+        setUserId(id);
+      })();
+    }, []);
+
  
     async function startStopRecording() {
         if (isRecording && mediaRecorder) {
@@ -307,6 +316,17 @@ export default function PlannerModal({ onClose }) {
                   {isDesignIntentMode ? "Design Intent Planner" : "Workflow Builder"} 
                 </h2>
 
+                {isDesignIntentMode && (
+                  <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 text-slate-300 hover:text-white"
+                    aria-label="Close"
+                  >
+                    ✕
+                  </button>
+                )}
+
+
                 {coverage && (
                     <div
                         className={`absolute top-6 right-8 px-3 py-1 rounded-full text-xs font-semibold ${
@@ -340,13 +360,6 @@ export default function PlannerModal({ onClose }) {
                       <label className="block text-sm text-slate-400 mb-1">
                         Current Understanding
                       </label>
-                      <textarea
-                        className="w-full bg-slate-800 text-slate-200 rounded-md p-2"
-                        rows={4}
-                        value={refinedPrompt}
-                        onChange={(e) => setRefinedPrompt(e.target.value)}
-                        placeholder="Describe your design idea..."
-                      />
                     </div>
 
                     {/* 🔍 Loop Interpretation */}
