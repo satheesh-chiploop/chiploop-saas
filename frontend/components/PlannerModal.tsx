@@ -244,10 +244,16 @@ export default function PlannerModal({ onClose }) {
           setClarifyQuestions(data.questions || []);
           
           // suggested_answers is an array → convert to { question: answer }
+          // FIX: map suggested answers into answers
           const mappedAnswers: Record<string, string> = {};
-            (data.questions || []).forEach((q: string, idx: number) => {
-            mappedAnswers[q] = data.suggested_answers?.[idx] || "";
+          const qs = data.questions || [];
+          const sas = data.suggested_answers || [];
+
+          qs.forEach((q: string, idx: number) => {
+             mappedAnswers[q] = sas[idx] ?? "";
           });
+
+          
           setSuggestedAnswers(data.suggested_answers || []);
           setAnswers(mappedAnswers);
 
