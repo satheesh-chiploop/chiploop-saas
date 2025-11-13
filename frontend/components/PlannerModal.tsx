@@ -321,21 +321,13 @@ export default function PlannerModal({ onClose }) {
                     </div>
                 )}
 
-                {isDesignIntentMode ? (
-                  <textarea
+                <textarea
+                    className="w-full bg-slate-800 text-slate-200 rounded-md p-2"
+                    rows={4}
                     value={refinedPrompt}
                     onChange={(e) => setRefinedPrompt(e.target.value)}
                     placeholder="Describe your design idea..."
-                    className="w-full h-32 p-2 bg-slate-900 rounded border border-slate-700 text-sm text-slate-200"
-                  />
-                ) : (
-                  <textarea
-                    value={goal}
-                    onChange={(e) => setGoal(e.target.value)}
-                    placeholder="Describe your design goal..."
-                    className="w-full h-24 p-2 bg-slate-900 rounded border border-slate-700 text-sm text-slate-200 focus:ring-1 focus:ring-cyan-500"
-                  />
-                )}
+                />
                 {/* 🧩 DESIGN INTENT PLANNER PANEL */}
                 {isDesignIntentMode && (
                   <div className="mt-4">
@@ -392,14 +384,14 @@ export default function PlannerModal({ onClose }) {
                     {/* ⚙️ Footer Buttons */}
                     <div className="flex gap-3 mt-5 justify-end">
                       <button
-                        onClick={() => console.log("Continue Round – LLM call (Phase 2)")}
+                        onClick={handleContinueRound}
                         disabled={isLoadingRound}
                         className="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold px-4 py-2 rounded"
                       >
                         {isLoadingRound ? "Thinking..." : "Continue Asking Questions"}
                       </button>
                       <button
-                        onClick={() => console.log("Finalize Design Intent – Save (Phase 3)")}
+                        onClick={handleFinalizeDesignIntent}
                         className="bg-cyan-600 hover:bg-cyan-500 text-black font-semibold px-4 py-2 rounded"
                       >
                         Done – Generate Final Spec
@@ -466,19 +458,9 @@ export default function PlannerModal({ onClose }) {
                     </div>
                 )}
 
-                <button
-                  onClick={handleContinueRound}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-4 py-2 rounded"
-                >
-                  Continue Asking Questions
-                </button>
+                
 
-                <button
-                  onClick={handleFinalizeDesignIntent}
-                  className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-4 py-2 rounded"
-                >
-                  Done Generate Final Spec
-                </button>
+               
 
                 {/* Floating Notion Summary */}
                 {!isDesignIntentMode && summary && (
