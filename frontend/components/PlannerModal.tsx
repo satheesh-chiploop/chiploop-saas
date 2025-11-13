@@ -250,11 +250,16 @@ export default function PlannerModal({ onClose }) {
           const mappedAnswers: Record<string, string> = {};
           const qs = data.questions || [];
           const sas = data.suggested_answers || {};
+          const keys = data.question_keys || []; 
           const reversedSAS = [...sas].reverse();
+          console.log("🟢 qs:", qs);
+          console.log("🟢 sas dict:", sas);
+          console.log("🟢 question_keys:", keys);
+          
           qs.forEach((q, idx) => {
-            mappedAnswers[q] = reversedSAS[idx] || "";
+            const key = keys[idx];        // "Q1", "Q2", ...
+            mappedAnswers[q] = sas[key] || "";
           });
-
 
           console.log("🟢 sas array from backend:", sas);
           console.log("🟣 reversedSAS:", reversedSAS);
