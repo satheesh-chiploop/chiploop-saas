@@ -38,7 +38,7 @@ export default function PlannerModal({ onClose }) {
     const [isDesignIntentMode, setIsDesignIntentMode] = useState(true); // temporary toggle
     const [roundNumber, setRoundNumber] = useState(1);
     const [clarifyQuestions, setClarifyQuestions] = useState<string[]>([]);
-    const [suggestedAnswers, setsuggestedAnswers] = useState<Record<string, string>>({});
+    const [suggestedAnswers, setSuggestedAnswers] = useState<Record<string, string>>({});
     const [refinedPrompt, setRefinedPrompt] = useState("");
     const [loopInterpretation, setLoopInterpretation] = useState<{
         digital?: string;
@@ -47,6 +47,7 @@ export default function PlannerModal({ onClose }) {
         system?: string;
     } | null>(null);
     const [isLoadingRound, setIsLoadingRound] = useState(false);
+    const [answers, setAnswers] = useState<Record<string, string>>({});
 
     const [userId, setUserId] = useState(null);
 
@@ -242,6 +243,8 @@ export default function PlannerModal({ onClose }) {
           // update state from backend response
           setClarifyQuestions(data.questions || []);
           setSuggestedAnswers(data.suggested_answers || []);
+          setAnswers(data.suggested_answers || {});
+
           setRefinedPrompt(data.refined_prompt || refinedPrompt);
           setLoopInterpretation(data.loop_interpretation || loopInterpretation);
     
