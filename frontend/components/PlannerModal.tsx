@@ -20,10 +20,23 @@ export default function PlannerModal({ onClose }) {
     const [summary, setSummary] = useState<any>(null);
     const [voiceMode, setVoiceMode] = useState(false);
 
+    // -----------------------------
+    // 🧩 Design Intent Planner state
+    // -----------------------------
+    const [isDesignIntentMode, setIsDesignIntentMode] = useState(true); // temporary toggle
+    const [roundNumber, setRoundNumber] = useState(1);
+    const [clarifyQuestions, setClarifyQuestions] = useState<string[]>([]);
+    const [answers, setAnswers] = useState<Record<string, string>>({});
+    const [refinedPrompt, setRefinedPrompt] = useState("");
+    const [loopInterpretation, setLoopInterpretation] = useState<{
+        digital?: string;
+        embedded?: string;
+        analog?: string;
+        system?: string;
+    } | null>(null);
+    const [isLoadingRound, setIsLoadingRound] = useState(false);
 
  
-
-    
     async function startStopRecording() {
         if (isRecording && mediaRecorder) {
           mediaRecorder.stop();
@@ -269,6 +282,79 @@ export default function PlannerModal({ onClose }) {
                         Close
                     </button>
                 </div>
+
+                {/* 🧩 DESIGN INTENT PLANNER PANEL */}
+                {isDesignIntentMode && (
+                  <div className="mt-6 border-t border-slate-700 pt-4">
+                    <h3 className="text-xl font-semibold text-emerald-400 mb-3">
+                      Design Intent Planner – Round {roundNumber}
+                    </h3>
+
+                    {/* 📝 Current Understanding */}
+                    <div className="mb-4">
+                      <label className="block text-sm text-slate-400 mb-1">
+                        Current Understanding
+                      </label>
+                      <textarea
+                        className="w-full bg-slate-800 text-slate-200 rounded-md p-2"
+                        rows={4}
+                        value={refinedPrompt}
+                        onChange={(e) => setRefinedPrompt(e.target.value)}
+                        placeholder="Describe your design idea..."
+                      />
+                    </div>
+
+                    {/* 🔍 Loop Interpretation */}
+                    {loopInterpretation && (
+                      <div className="mb-4">
+                        <p className="text-sm text-slate-400 mb-1">
+                          Interpretation Across Domains
+                        </p>
+                        <ul className="text-xs text-slate-300 list-disc ml-4 space-y-1">
+                          <li><strong>Digital:</strong> {loopInterpretation.digital}</li>
+                          <li><strong>Embedded:</strong> {loopInterpretation.embedded}</li>
+                          <li><strong>Analog:</strong> {loopInterpretation.analog}</li>
+                          <li><strong>System:</strong> {loopInterpretation.system}</li>
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* ❓ Clarifying Questions */}
+                    <div className="space-y-3">
+                      {clarifyQuestions.map((q, i) => (
+                        <div key={i} className="bg-slate-800 p-3 rounded-md">
+                          <p className="text-sm font-semibold text-slate-300 mb-1">
+                            {i + 1}. {q}
+                          </p>
+                          <input
+                            className="w-full bg-slate-900 text-slate-200 rounded-md px-2 py-1"
+                            value={answers[q] || ""}
+                            onChange={(e) => setAnswers({ ...answers, [q]: e.target.value })}
+                            placeholder="Type or edit your answer"
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* ⚙️ Footer Buttons */}
+                    <div className="flex gap-3 mt-5 justify-end">
+                      <button
+                        onClick={() => console.log("Continue Round – LLM call (Phase 2)")}
+                        disabled={isLoadingRound}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold px-4 py-2 rounded"
+                      >
+                        {isLoadingRound ? "Thinking..." : "Continue Asking Questions"}
+                      </button>
+                      <button
+                        onClick={() => console.log("Finalize Design Intent – Save (Phase 3)")}
+                        className="bg-cyan-600 hover:bg-cyan-500 text-black font-semibold px-4 py-2 rounded"
+                      >
+                        Done – Generate Final Spec
+                      </button>
+                    </div>
+                  </div>
+                )}
+
 
                 {coverage && (
                     <div className="mt-4 bg-slate-900 rounded-lg p-3 border border-slate-700">

@@ -837,13 +837,13 @@ function WorkflowPage() {
             onClick={() => setShowPlanner(true)}
             className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
           >
-            Workflow Builder
+            Design Intent Planner
           </button>
           <button
             onClick={() => setShowAgentPlanner(true)}
             className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
           >
-            Agent Planner
+            System Planner
           </button>
           <div className="border-t border-slate-800 my-3" />
           {/* 🔁 Loop Selector */}
