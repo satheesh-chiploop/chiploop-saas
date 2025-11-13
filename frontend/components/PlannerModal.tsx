@@ -242,8 +242,14 @@ export default function PlannerModal({ onClose }) {
         if (data.status === "ok") {
           // update state from backend response
           setClarifyQuestions(data.questions || []);
+          
+          // suggested_answers is an array → convert to { question: answer }
+          const mappedAnswers: Record<string, string> = {};
+            (data.questions || []).forEach((q: string, idx: number) => {
+            mappedAnswers[q] = data.suggested_answers?.[idx] || "";
+          });
           setSuggestedAnswers(data.suggested_answers || []);
-          setAnswers(data.suggested_answers || {});
+          setAnswers(mappedAnswers);
 
           setRefinedPrompt(data.refined_prompt || refinedPrompt);
           setLoopInterpretation(data.loop_interpretation || loopInterpretation);
