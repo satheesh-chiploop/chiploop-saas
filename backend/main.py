@@ -1813,13 +1813,14 @@ STRICT RULES:
 
         # Ensure structure
         questions = data.get("questions", [])
+        question_keys = []
         question_keys = [f"Q{i+1}" for i in range(len(questions))]
         raw_answers = data.get("suggested_answers", {})
 
         # Convert dict → ordered list aligned with questions
 
         #✅ Convert dict → ordered list aligned with Q1..Qn
-        suggested_answers = raw_answers
+        suggested_answers = []
         for idx, q in enumerate(questions):
             key = f"Q{idx + 1}"
             suggested_answers.append(raw_answers.get(key, ""))
@@ -1831,7 +1832,7 @@ STRICT RULES:
         print(f"🔍 clarify_intent_round parsed questions: {questions}")
         print(f"🔍 clarify_intent_round raw_answers: {raw_answers}")
         print(f"🔍 clarify_intent_round suggested_answers list: {suggested_answers}")
-        print(f"🔍 clarify_intent_round question_keys list: {question_keys}}")
+        print(f"🔍 clarify_intent_round question_keys list: {question_keys}")
 
 
 
@@ -1839,7 +1840,8 @@ STRICT RULES:
             "status": "ok",
             "round": round_num,
             "max_questions": max_questions,
-            "questions": question_keys,
+            "questions": questions,
+            "question_keys":question_keys,
             "suggested_answers": suggested_answers,
             "refined_prompt": refined_prompt,
             "loop_interpretation": loop_interpretation,
