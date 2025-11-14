@@ -96,6 +96,7 @@ function WorkflowPage() {
   const [customWorkflows, setCustomWorkflows] = useState<string[]>([]);
   const [loadingAgents, setLoadingAgents] = useState(true);
   const [loadingWorkflows, setLoadingWorkflows] = useState(true);
+  const [designIntents, setDesignIntents] = useState<any[]>([]);
   
   // modals
   const [showSpecModal, setShowSpecModal] = useState(false);
@@ -232,6 +233,25 @@ function WorkflowPage() {
       setLoadingWorkflows(false);
     }
   }, [customAgents, customWorkflows]);
+
+  // Load Saved Design Intents
+  const loadIntents = async () => {
+    const stableId = await getStableUserId(supabase);
+    const { data } = await supabase
+      .from("design_intent_drafts")
+      .select("id, title, refined_prompt, structured_intent, created_at")
+      .eq("user_id", stableId)
+      .order("created_at", { ascending: false });
+
+    setDesignIntents(data || []);
+  };
+
+  const loadDesignIntent = (item: any) => {
+    window.dispatchEvent(
+      new CustomEvent("loadDesignIntent", { detail: item })
+    );
+    setShowPlanner(true); // Opens Planner with loaded data
+  };
 
   const anonUserId =
     typeof window !== "undefined"
@@ -926,7 +946,7 @@ function WorkflowPage() {
               </ul>
   
               <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
-              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-48 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {customAgents.length ? (
                   customAgents.map((a, idx) => (
                     <li
@@ -945,6 +965,32 @@ function WorkflowPage() {
               </ul>
             </div>
           </section>
+
+          {/* 🧠 Design Intent Library */}
+          <div className="border-t border-slate-800 my-3" />
+
+          <section className="mb-6">
+            <h3 className="text-lg font-bold mb-3 text-cyan-400">Design Intent Library</h3>
+
+            <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 
+                 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+    
+              {designIntents.length ? (
+                designIntents.map((d, idx) => (
+                  <li
+                    key={d.id}
+                    onClick={() => loadDesignIntent(d)}
+                    className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer select-none"
+                  >
+                    {d.title || `Untitled ${idx+1}`}
+                  </li>
+                ))
+              ) : (
+                <p className="text-xs text-slate-400">No design intents yet</p>
+              )}
+            </ul>
+          </section>
+
   
           {/* 🛍 Marketplace */}
           <div className="mt-auto border-t border-slate-700 pt-3">

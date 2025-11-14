@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 import { getStableUserId } from "@/utils/userId";
-
-  
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+const supabase = createClientComponentClient();
 
 export default function PlannerModal({ onClose }) {
     const [goal, setGoal] = useState("");
@@ -21,6 +21,35 @@ export default function PlannerModal({ onClose }) {
     const [summary, setSummary] = useState<any>(null);
     const [voiceMode, setVoiceMode] = useState(false);
 
+    const [designIntents, setDesignIntents] = useState<any[]>([]);
+    const [loadedIntent, setLoadedIntent] = useState<any | null>(null);
+
+    useEffect(() => {
+      const handler = (e) => {
+          setLoadedIntent(e.detail);
+      };
+      window.addEventListener("loadDesignIntent", handler);
+      return () => window.removeEventListener("loadDesignIntent", handler);
+    }, []);
+
+    useEffect(() => {
+      if (!loadedIntent) return;
+    
+      console.log("📥 Hydrating planner with loaded intent:", loadedIntent);
+    
+      if (loadedIntent.refined_prompt) {
+        setRefinedPrompt(loadedIntent.refined_prompt);
+      }
+      if (loadedIntent.structured_intent) {
+        setLoopInterpretation(loadedIntent.structured_intent);
+      }
+      if (loadedIntent.qa_pairs) {
+        setAnswers(loadedIntent.qa_pairs);
+        setClarifyQuestions(Object.keys(loadedIntent.qa_pairs));
+      }
+    }, [loadedIntent]);
+    
+
     const mergeAnswersIntoPrompt = () => {
       let merged = refinedPrompt;
       console.log("🧩 mergeAnswersIntoPrompt – clarifyQuestions:", clarifyQuestions);
@@ -32,6 +61,27 @@ export default function PlannerModal({ onClose }) {
         }
       });
       return merged;
+    };
+
+  
+    
+
+    // When user clicks an item, hydrate the planner with it
+    const handleLoadIntentIntoPlanner = (intent: any) => {
+      console.log("📥 Loading design intent into planner:", intent?.id);
+      if (intent?.refined_prompt) {
+        setRefinedPrompt(intent.refined_prompt);
+      }
+      if (intent?.structured_intent) {
+        setLoopInterpretation(intent.structured_intent);
+      }
+
+      // Optional: future-proof for qa_pairs if you add that column later
+      const maybeQa = (intent as any).qa_pairs;
+      if (maybeQa && typeof maybeQa === "object") {
+        setClarifyQuestions(Object.keys(maybeQa));
+        setAnswers(maybeQa);
+      }
     };
 
     // -----------------------------
@@ -285,20 +335,33 @@ export default function PlannerModal({ onClose }) {
     
     const handleFinalizeDesignIntent = async () => {
       try {
+
+        const effectiveUserId = userId || (await getStableUserId(supabase));
+        if (!userId && effectiveUserId) {
+          setUserId(effectiveUserId);
+        }
+
         const payload = {
           user_id: userId,
-          title: refinedPrompt.substring(0, 40) || "Untitled Design Intent",
+          title: refinedPrompt.substring(0, 40),
           refined_prompt: refinedPrompt,
           implementation_strategy: `
-    Digital: ${loopInterpretation.digital || ""}
-    Embedded: ${loopInterpretation.embedded || ""}
-    Analog: ${loopInterpretation.analog || ""}
-    System: ${loopInterpretation.system || ""}
+            Digital: ${loopInterpretation.digital || ""}
+            Embedded: ${loopInterpretation.embedded || ""}
+            Analog: ${loopInterpretation.analog || ""}
+            System: ${loopInterpretation.system || ""}
           `.trim(),
           structured_intent: loopInterpretation,
+          qa_pairs: answers,                       // NEW
+          full_intent: {                           // NEW (optional)
+            refined_prompt,
+            structured_intent: loopInterpretation,
+            qa_pairs: answers,
+            round: roundNumber
+          },
           version: 1,
         };
-    
+        
         const response = await fetch("/api/save_design_intent_draft", {
           method: "POST",
           headers: {
