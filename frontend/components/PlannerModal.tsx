@@ -341,9 +341,12 @@ export default function PlannerModal({ onClose }) {
           setUserId(effectiveUserId);
         }
 
+        let title = prompt("Enter a name for this Design Intent:", "My Design");
+        if (!title) title = "Untitled Design Intent";
+
         const payload = {
-          user_id: userId,
-          title: refinedPrompt.substring(0, 40),
+          user_id: effectiveUserId,
+          title,
           refined_prompt: refinedPrompt,
           implementation_strategy: `
             Digital: ${loopInterpretation.digital || ""}
