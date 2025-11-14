@@ -239,7 +239,7 @@ function WorkflowPage() {
     const stableId = await getStableUserId(supabase);
     const { data } = await supabase
       .from("design_intent_drafts")
-      .select("id, title, refined_prompt, structured_intent, created_at")
+      .select("*")
       .eq("user_id", stableId)
       .order("created_at", { ascending: false });
 
@@ -252,6 +252,12 @@ function WorkflowPage() {
     );
     setShowPlanner(true); // Opens Planner with loaded data
   };
+
+  useEffect(() => {
+    const handler = () => loadIntents();
+    window.addEventListener("refreshDesignIntents", handler);
+    return () => window.removeEventListener("refreshDesignIntents", handler);
+  }, []);
 
   const anonUserId =
     typeof window !== "undefined"
@@ -291,6 +297,8 @@ function WorkflowPage() {
           .select("*")
           .eq("owner_id", userId)
           .order("created_at", { ascending: false });
+
+        await loadIntents()
 
         setCustomAgents(
             (data || []).map(a => ({

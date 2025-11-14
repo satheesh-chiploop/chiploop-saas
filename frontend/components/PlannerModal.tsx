@@ -102,6 +102,10 @@ export default function PlannerModal({ onClose }) {
     const [answers, setAnswers] = useState<Record<string, string>>({});
 
     const [userId, setUserId] = useState(null);
+    const [allRoundsQA, setAllRoundsQA] = useState({});
+    const [allRefinedPrompts, setAllRefinedPrompts] = useState([]);
+    const [allInterpretations, setAllInterpretations] = useState([]);
+    const [initialUserIntent, setInitialUserIntent] = useState("");
 
     useEffect(() => {
       (async () => {
@@ -276,6 +280,11 @@ export default function PlannerModal({ onClose }) {
 
         const nextPrompt = mergeAnswersIntoPrompt();
 
+        // Capture original refinedPrompt only during ROUND 1
+        if (roundNumber === 1 && initialUserIntent === "") {
+          setInitialUserIntent(refinedPrompt);
+        }
+
         const res = await fetch("/api/clarify_intent_round", {
           method: "POST",
           headers: {
@@ -284,8 +293,8 @@ export default function PlannerModal({ onClose }) {
           body: JSON.stringify({
             user_id: userId,
             round: roundNumber,
-            prompt: nextPrompt,
-            previous_loop_interpretation: loopInterpretation
+            prompt:  buildCumulativePrompt(),
+            previous_loop_interpretation: buildMergedLoopInterpretation(),
           })
         });
     
@@ -311,18 +320,25 @@ export default function PlannerModal({ onClose }) {
           });
 
           console.log("🟢 Final mappedAnswers:", mappedAnswers);
-
-          setSuggestedAnswers(mappedAnswers);
+          setSuggestedAnswers(prev => ({ ...prev, ...mappedAnswers }));
           setAnswers(mappedAnswers);
+          
 
+          setAllRoundsQA(prev => ({
+           ...prev,
+           ...mappedAnswers,
+          }));
 
 
 
           
          
           setRefinedPrompt(data.refined_prompt || refinedPrompt);
+
+          setAllRefinedPrompts(prev => [...prev, data.refined_prompt]);
+
           setLoopInterpretation(data.loop_interpretation || loopInterpretation);
-    
+          setAllInterpretations(prev => [...prev, data.loop_interpretation]);
           // Next round
           setRoundNumber(prev => prev + 1);
         } else {
@@ -331,6 +347,37 @@ export default function PlannerModal({ onClose }) {
       } catch (err) {
         console.error("Network error:", err);
       }
+    };
+
+    const buildCumulativePrompt = () => {
+      let final = "### Original User Intent\n" + initialUserIntent + "\n\n";
+    
+      let i = 1;
+      for (const prompt of allRefinedPrompts) {
+        final += `### Refined Prompt Round ${i}\n${prompt}\n\n`;
+        i++;
+      }
+    
+      final += "### All Questions and Answers So Far\n";
+      for (const [q, a] of Object.entries(allRoundsQA)) {
+        final += `Q: ${q}\nA: ${a}\n\n`;
+      }
+    
+      return final.trim();
+    };
+
+    const buildMergedLoopInterpretation = () => {
+      const merged = { digital: "", embedded: "", analog: "", system: "" };
+    
+      allInterpretations.forEach(int => {
+        if (!int) return;
+        merged.digital = merged.digital || int.digital || "";
+        merged.embedded = merged.embedded || int.embedded || "";
+        merged.analog = merged.analog || int.analog || "";
+        merged.system = merged.system || int.system || "";
+      });
+    
+      return merged;
     };
     
     const handleFinalizeDesignIntent = async () => {
@@ -347,20 +394,20 @@ export default function PlannerModal({ onClose }) {
         const payload = {
           user_id: effectiveUserId,
           title,
-          refined_prompt: refinedPrompt,
+          refined_prompt: buildCumulativePrompt(),
           implementation_strategy: `
-            Digital: ${loopInterpretation.digital || ""}
-            Embedded: ${loopInterpretation.embedded || ""}
-            Analog: ${loopInterpretation.analog || ""}
-            System: ${loopInterpretation.system || ""}
+            Digital: ${buildMergedLoopInterpretation().digital || ""}
+            Embedded: ${buildMergedLoopInterpretation().embedded || ""}
+            Analog: ${buildMergedLoopInterpretation().analog || ""}
+            System: ${buildMergedLoopInterpretation().system || ""}
           `.trim(),
-          structured_intent: loopInterpretation,
-          qa_pairs: answers,                       // NEW
+          structured_intent: buildMergedLoopInterpretation(),
+          qa_pairs: allRoundsQA,                       // NEW
           full_intent: {                           // NEW (optional)
-            refined_prompt:refinedPrompt,
-            structured_intent: loopInterpretation,
-            qa_pairs: answers,
-            round: roundNumber
+            refined_prompt:buildCumulativePrompt(),
+            structured_intent: buildMergedLoopInterpretation(),
+            qa_pairs: allRoundsQA,
+            round: roundNumber-1
           },
           version: 1,
         };
@@ -382,6 +429,8 @@ export default function PlannerModal({ onClose }) {
         } else {
           console.error("Save failed:", data.message);
         }
+        window.dispatchEvent(new CustomEvent("refreshDesignIntents"));
+
       } catch (err) {
         console.error("Save intent network error:", err);
       }
