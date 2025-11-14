@@ -354,7 +354,7 @@ export default function PlannerModal({ onClose }) {
           structured_intent: loopInterpretation,
           qa_pairs: answers,                       // NEW
           full_intent: {                           // NEW (optional)
-            refined_prompt,
+            refined_prompt:refinedPrompt,
             structured_intent: loopInterpretation,
             qa_pairs: answers,
             round: roundNumber
