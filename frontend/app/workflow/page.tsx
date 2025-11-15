@@ -184,6 +184,21 @@ function WorkflowPage() {
   // NEW: agent context menu state
   const [agentMenu, setAgentMenu] = useState<{ x: number; y: number; name: string } | null>(null);
 
+    // 🌿 Design Intent context menu
+  const [designIntentMenu, setDesignIntentMenu] = useState<{
+      x: number;
+      y: number;
+      intent: any;
+  } | null>(null);
+  
+  const openDesignIntentMenu = (e: React.MouseEvent, intent: any) => {
+      e.preventDefault();
+      setDesignIntentMenu({ x: e.clientX, y: e.clientY, intent });
+  };
+  
+  const closeDesignIntentMenu = () => setDesignIntentMenu(null);
+  
+
   const openAgentMenu = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
     setAgentMenu({ x: e.clientX, y: e.clientY, name });
@@ -225,6 +240,60 @@ function WorkflowPage() {
     window.dispatchEvent(new Event("refreshWorkflows"));
     closeAgentMenu();
   };
+
+
+  const renameDesignIntent = async (intent: any) => {
+    try {
+      const currentTitle = intent.title || "Untitled Design Intent";
+      const newTitle = prompt("New name for this Design Intent:", currentTitle) || "";
+      if (!newTitle.trim() || newTitle === currentTitle) {
+        closeDesignIntentMenu();
+        return;
+      }
+
+      const { error } = await supabase
+        .from("design_intent_drafts")
+        .update({ title: newTitle })
+        .eq("id", intent.id);
+
+      if (error) {
+        console.error("❌ Rename design intent failed:", error.message);
+        alert("Rename failed. Please try again.");
+      } else {
+        await loadIntents(); // refresh sidebar list
+      }
+    } catch (err) {
+      console.error("❌ Rename design intent error:", err);
+    } finally {
+      closeDesignIntentMenu();
+    }
+  };
+
+  const deleteDesignIntent = async (intent: any) => {
+    try {
+      if (!confirm(`Delete design intent "${intent.title || "Untitled"}"?`)) {
+        closeDesignIntentMenu();
+        return;
+      }
+
+      const { error } = await supabase
+        .from("design_intent_drafts")
+        .delete()
+        .eq("id", intent.id);
+
+      if (error) {
+        console.error("❌ Delete design intent failed:", error.message);
+        alert("Delete failed. Please try again.");
+      } else {
+        await loadIntents(); // refresh sidebar list
+      }
+    } catch (err) {
+      console.error("❌ Delete design intent error:", err);
+    } finally {
+      closeDesignIntentMenu();
+    }
+  };
+
 
   // 🔁 Ensure sidebar visible once agents/workflows are loaded
   useEffect(() => {
@@ -988,6 +1057,11 @@ function WorkflowPage() {
                   <li
                     key={d.id}
                     onClick={() => loadDesignIntent(d)}
+                    onContextMenu={(e) => {
+                      // If later you add prebuilt intents, guard here:
+                      // if (d.is_prebuilt) return;
+                      openDesignIntentMenu(e, d);
+                    }}
                     className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer select-none"
                   >
                     {d.title || `Untitled ${idx+1}`}
@@ -1208,6 +1282,38 @@ function WorkflowPage() {
             </button>
           </div>
       )}
+
+      {designIntentMenu && (
+        <div
+          className="absolute z-50 bg-slate-900 border border-slate-700 rounded shadow-lg text-xs"
+          style={{ top: designIntentMenu.y, left: designIntentMenu.x }}
+          onMouseLeave={closeDesignIntentMenu}
+        >
+          <button
+            className="block w-full text-left px-3 py-1 hover:bg-slate-800"
+            onClick={() => {
+          // Edit = open in Planner with hydration
+              loadDesignIntent(designIntentMenu.intent);
+              closeDesignIntentMenu();
+            }}
+          >
+            Edit in Planner
+          </button>
+          <button
+            className="block w-full text-left px-3 py-1 hover:bg-slate-800"
+            onClick={() => renameDesignIntent(designIntentMenu.intent)}
+          >
+            Rename
+          </button>
+          <button
+            className="block w-full text-left px-3 py-1 text-red-400 hover:bg-red-900/40"
+            onClick={() => deleteDesignIntent(designIntentMenu.intent)}
+          >
+            Delete
+          </button>
+        </div>
+      )}
+
   
       {/* ===== Modals ===== */}
       {showSpecModal && (
