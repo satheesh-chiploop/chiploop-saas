@@ -387,9 +387,11 @@ export default function PlannerModal({ onClose }) {
         if (!userId && effectiveUserId) {
           setUserId(effectiveUserId);
         }
+        // If we loaded an existing intent, use its title as default
+        const existingTitle = loadedIntent?.title || "My Design";
+        let title = prompt("Enter a name for this Design Intent:", existingTitle);
+        if (!title) title = existingTitle || "Untitled Design Intent";
 
-        let title = prompt("Enter a name for this Design Intent:", "My Design");
-        if (!title) title = "Untitled Design Intent";
 
         const payload = {
           user_id: effectiveUserId,
