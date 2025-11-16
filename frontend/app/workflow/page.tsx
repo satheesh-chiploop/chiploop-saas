@@ -1065,10 +1065,13 @@ function WorkflowPage() {
                 designIntents.map((d, idx) => (
                   <li
                     key={d.id}
-                    onClick={() => loadDesignIntent(d)}
+                    onClick={(e) => {
+                     // Prevent left-click on release after right-click
+                      if (designIntentMenu) return;
+                      loadDesignIntent(d);
+                    }}
                     onContextMenu={(e) => {
-                      // If later you add prebuilt intents, guard here:
-                      // if (d.is_prebuilt) return;
+                      e.preventDefault();   // block browser menu
                       openDesignIntentMenu(e, d);
                     }}
                     className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer select-none"
@@ -1306,7 +1309,7 @@ function WorkflowPage() {
               closeDesignIntentMenu();
             }}
           >
-            Edit in Planner
+            Edit
           </button>
           <button
             className="block w-full text-left px-3 py-1 hover:bg-slate-800"

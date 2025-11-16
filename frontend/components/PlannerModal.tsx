@@ -59,7 +59,6 @@ export default function PlannerModal({ onClose }) {
         const intent = e.detail;
         setJsonContent(JSON.stringify(intent, null, 2)); // pretty JSON
         setJsonEditMode(true);
-        setOpen(true);  // show the modal if you already have `open` state
       };
     
       window.addEventListener("openJsonEditorForDesignIntent", handleOpenJsonEditor);
