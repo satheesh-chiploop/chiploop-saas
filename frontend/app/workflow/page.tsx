@@ -183,7 +183,7 @@ function WorkflowPage() {
 
 
   const openDesignIntentJsonEditor = (intent: any) => {
-    console.log("🟢 Dispatching openJsonEditorForDesignIntent", intent);
+    
     window.dispatchEvent(
       new CustomEvent("openJsonEditorForDesignIntent", {
         detail: intent,
@@ -1352,7 +1352,7 @@ function WorkflowPage() {
         />
       )}
   
-      {<PlannerModal onClose={() => setShowPlanner(false)} />}
+      {showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
       {showAgentPlanner && <AgentPlannerModal onClose={() => setShowAgentPlanner(false)} />}
     </main>
   );
