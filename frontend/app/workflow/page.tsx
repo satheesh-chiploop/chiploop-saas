@@ -180,6 +180,15 @@ function WorkflowPage() {
       closeContextMenu();
     }
   };
+
+
+  const openDesignIntentJsonEditor = (intent: any) => {
+    window.dispatchEvent(
+      new CustomEvent("openJsonEditorForDesignIntent", {
+        detail: intent,
+      })
+    );
+  };
   
   // NEW: agent context menu state
   const [agentMenu, setAgentMenu] = useState<{ x: number; y: number; name: string } | null>(null);
@@ -1293,7 +1302,7 @@ function WorkflowPage() {
             className="block w-full text-left px-3 py-1 hover:bg-slate-800"
             onClick={() => {
           // Edit = open in Planner with hydration
-              loadDesignIntent(designIntentMenu.intent);
+              openDesignIntentJsonEditor(designIntentMenu.intent);
               closeDesignIntentMenu();
             }}
           >

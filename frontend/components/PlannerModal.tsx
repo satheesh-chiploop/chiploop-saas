@@ -4,6 +4,7 @@ import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 import { getStableUserId } from "@/utils/userId";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 const supabase = createClientComponentClient();
+import Editor from "@monaco-editor/react";
 
 export default function PlannerModal({ onClose }) {
     const [goal, setGoal] = useState("");
@@ -23,6 +24,10 @@ export default function PlannerModal({ onClose }) {
 
     const [designIntents, setDesignIntents] = useState<any[]>([]);
     const [loadedIntent, setLoadedIntent] = useState<any | null>(null);
+
+
+    const [jsonEditMode, setJsonEditMode] = useState(false);
+    const [jsonContent, setJsonContent] = useState("");
 
     useEffect(() => {
       const handler = (e) => {
@@ -48,6 +53,21 @@ export default function PlannerModal({ onClose }) {
         setClarifyQuestions(Object.keys(loadedIntent.qa_pairs));
       }
     }, [loadedIntent]);
+
+    useEffect(() => {
+      const handleOpenJsonEditor = (e: any) => {
+        const intent = e.detail;
+        setJsonContent(JSON.stringify(intent, null, 2)); // pretty JSON
+        setJsonEditMode(true);
+        setOpen(true);  // show the modal if you already have `open` state
+      };
+    
+      window.addEventListener("openJsonEditorForDesignIntent", handleOpenJsonEditor);
+    
+      return () => {
+        window.removeEventListener("openJsonEditorForDesignIntent", handleOpenJsonEditor);
+      };
+    }, []);
     
 
     const mergeAnswersIntoPrompt = () => {
@@ -454,6 +474,70 @@ export default function PlannerModal({ onClose }) {
       
         return () => ws.close();
     }, []);
+
+    if (jsonEditMode) {
+      return (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-slate-900 p-4 rounded w-[90%] h-[90%] flex flex-col">
+            <h2 className="text-lg font-bold mb-3">Edit Design Intent (JSON)</h2>
+    
+            <div className="flex-1 border border-slate-700 rounded">
+              <Editor
+                height="100%"
+                defaultLanguage="json"
+                value={jsonContent}
+                onChange={(value) => setJsonContent(value ?? "")}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  scrollBeyondLastLine: false,
+                  smoothScrolling: true,
+                }}
+              />
+            </div>
+    
+            <div className="mt-3 flex justify-end gap-3">
+              <button
+                className="px-3 py-1 bg-slate-600 rounded"
+                onClick={() => {
+                  setJsonEditMode(false);
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </button>
+    
+              <button
+                className="px-3 py-1 bg-green-600 rounded"
+                onClick={async () => {
+                  try {
+                    const parsed = JSON.parse(jsonContent);
+    
+                    const { error } = await supabase
+                      .from("design_intent_drafts")
+                      .update(parsed)
+                      .eq("id", parsed.id);
+    
+                    if (error) {
+                      alert("Save failed: " + error.message);
+                      return;
+                    }
+    
+                    window.dispatchEvent(new Event("refreshDesignIntents"));
+                    setJsonEditMode(false);
+                    setOpen(false);
+                  } catch (err) {
+                    alert("JSON Error — fix before saving.");
+                  }
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     return (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
