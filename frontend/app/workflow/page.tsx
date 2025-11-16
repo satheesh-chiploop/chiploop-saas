@@ -1352,7 +1352,7 @@ function WorkflowPage() {
         />
       )}
   
-      {showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
+      {<PlannerModal onClose={() => setShowPlanner(false)} />}
       {showAgentPlanner && <AgentPlannerModal onClose={() => setShowAgentPlanner(false)} />}
     </main>
   );
