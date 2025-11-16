@@ -500,7 +500,6 @@ export default function PlannerModal({ onClose }) {
                 className="px-3 py-1 bg-slate-600 rounded"
                 onClick={() => {
                   setJsonEditMode(false);
-                  setOpen(false);
                 }}
               >
                 Cancel
@@ -523,8 +522,7 @@ export default function PlannerModal({ onClose }) {
                     }
     
                     window.dispatchEvent(new Event("refreshDesignIntents"));
-                    setJsonEditMode(false);
-                    setOpen(false);
+                    setJsonEditMode(false)
                   } catch (err) {
                     alert("JSON Error — fix before saving.");
                   }
