@@ -183,6 +183,7 @@ function WorkflowPage() {
 
 
   const openDesignIntentJsonEditor = (intent: any) => {
+    console.log("🟢 Dispatching openJsonEditorForDesignIntent", intent);
     window.dispatchEvent(
       new CustomEvent("openJsonEditorForDesignIntent", {
         detail: intent,

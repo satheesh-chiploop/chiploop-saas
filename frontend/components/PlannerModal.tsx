@@ -56,6 +56,7 @@ export default function PlannerModal({ onClose }) {
 
     useEffect(() => {
       const handleOpenJsonEditor = (e: any) => {
+        console.log("🟢 PlannerModal RECEIVED event:", e.detail);
         const intent = e.detail;
         setJsonContent(JSON.stringify(intent, null, 2)); // pretty JSON
         setJsonEditMode(true);
