@@ -181,15 +181,22 @@ function WorkflowPage() {
     }
   };
 
-
   const openDesignIntentJsonEditor = (intent: any) => {
-    
-    window.dispatchEvent(
-      new CustomEvent("openJsonEditorForDesignIntent", {
-        detail: intent,
-      })
-    );
+    console.log("🧾 Edit Design Intent via JSON editor:", intent?.id, intent?.title);
+  
+    // 1️⃣ Ensure the planner modal is visible
+    setShowPlanner(true);
+  
+    // 2️⃣ After the modal mounts and attaches the listener, fire the event
+    setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent("openJsonEditorForDesignIntent", {
+          detail: intent,
+        })
+      );
+    }, 0);
   };
+  
   
   // NEW: agent context menu state
   const [agentMenu, setAgentMenu] = useState<{ x: number; y: number; name: string } | null>(null);
