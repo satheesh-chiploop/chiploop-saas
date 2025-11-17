@@ -61,6 +61,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [finalAgents, setFinalAgents] = useState<string[]>([]);
   const [recentlyGenerated, setRecentlyGenerated] = useState<string[]>([]);
 
+  const [savedIntents, setSavedIntents] = useState<any[]>([]);
+  const [selectedIntentId, setSelectedIntentId] = useState<string>("");
+
   
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
@@ -122,6 +125,33 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     };
     window.addEventListener("editAgent", handler);
     return () => window.removeEventListener("editAgent", handler);
+  }, []);
+
+  useEffect(() => {
+    async function loadDesignIntentsForSystemPlanner() {
+      try {
+        const stableId = await getStableUserId(supabase);
+        const { data, error } = await supabase
+          .from("design_intent_drafts")
+          .select("*")
+          .eq("user_id", stableId)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error(
+            "❌ Failed to load design intents for System Planner:",
+            error.message
+          );
+          return;
+        }
+
+        setSavedIntents(data || []);
+      } catch (err) {
+        console.error("❌ Unexpected error loading design intents:", err);
+      }
+    }
+
+    loadDesignIntentsForSystemPlanner();
   }, []);
 
   // --- Generate Agent Plan ---
@@ -515,6 +545,50 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           Enter a goal or description. The planner will analyze the spec,
           leverage memory, and design a new agent if required.
         </p>
+
+
+        {/* Optional: Start from existing Design Intent (only in initial stage) */}
+        {stage === "initial" && (
+          <div className="mb-3">
+            <label className="text-xs text-slate-400">
+              Start from Design Intent (optional)
+            </label>
+
+            <select
+              value={selectedIntentId}
+              onChange={(e) => {
+                const id = e.target.value;
+                setSelectedIntentId(id);
+
+                const intent = savedIntents.find((d: any) => d.id === id);
+
+                if (intent) {
+                  const newGoal =
+                    intent.refined_prompt ||
+                    intent.full_intent?.refined_prompt ||
+                    "";
+
+                  // Fill System Planner spec input
+                  setGoal(newGoal);
+
+                  // Reset pipeline
+                  setFinalizedSpec(null);
+                  setImprovedSpec(null);
+                  setSpec(null);
+                  setStage("initial");
+                }
+              }}
+              className="w-full bg-slate-700 text-xs text-white rounded px-2 py-1 mt-1"
+            >
+              <option value="">Select saved design intent…</option>
+              {savedIntents.map((intent: any) => (
+                <option key={intent.id} value={intent.id}>
+                  {intent.title || "Untitled design intent"}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <textarea
           value={finalizedSpec ?? goal}
