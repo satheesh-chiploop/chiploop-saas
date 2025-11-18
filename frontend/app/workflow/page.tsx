@@ -180,6 +180,33 @@ function WorkflowPage() {
       closeContextMenu();
     }
   };
+  const publishCustomWorkflow = async (name: string) => {
+    try {
+      const userId = await getStableUserId(supabase);  // ✅ unified ID
+
+      const res = await fetch(`${API_BASE}/publish_custom_workflow`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          workflow_name: name,
+          user_id: userId,
+        }),
+      });
+
+      const j = await res.json();
+      if (j.status !== "ok") {
+        alert(`⚠️ Publish failed: ${j.message || "Unknown error"}`);
+        return;
+      }
+
+      alert("✅ Workflow submitted to marketplace for review.");
+    } catch (err) {
+      console.error("Publish custom workflow failed", err);
+      alert("❌ Could not publish workflow.");
+    } finally {
+      closeContextMenu();
+    }
+  };
 
   const openDesignIntentJsonEditor = (intent: any) => {
     console.log("🧾 Edit Design Intent via JSON editor:", intent?.id, intent?.title);
@@ -256,6 +283,33 @@ function WorkflowPage() {
     window.dispatchEvent(new Event("refreshAgents"));
     window.dispatchEvent(new Event("refreshWorkflows"));
     closeAgentMenu();
+  };
+  const publishCustomAgent = async (name: string) => {
+    try {
+      const userId = await getStableUserId(supabase);  // ✅ unified ID
+
+      const res = await fetch(`${API_BASE}/publish_custom_agent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agent_name: name,
+          user_id: userId,
+        }),
+      });
+
+      const j = await res.json();
+      if (j.status !== "ok") {
+        alert(`⚠️ Publish failed: ${j.message || "Unknown error"}`);
+        return;
+      }
+
+      alert("✅ Agent submitted to marketplace for review.");
+    } catch (err) {
+      console.error("Publish custom agent failed", err);
+      alert("❌ Could not publish agent.");
+    } finally {
+      closeAgentMenu();
+    }
   };
 
 
@@ -1242,6 +1296,13 @@ function WorkflowPage() {
           >
            ✏️ Rename “{contextMenu.name}”
           </button>
+
+          <button
+            onClick={() => publishCustomWorkflow(contextMenu.name)}
+            className="block w-full text-left px-3 py-2 text-sky-300 hover:bg-slate-700"
+          >
+            📤 Publish “{contextMenu.name}” to Marketplace
+          </button>
           <button
             onClick={() => deleteCustomWorkflow(contextMenu.name)}
             className="block w-full text-left px-3 py-2 text-red-400 hover:bg-slate-700"
@@ -1293,6 +1354,12 @@ function WorkflowPage() {
               onClick={() => renameCustomAgent(agentMenu.name)}
             >
               ✏️ Rename
+            </button>
+            <button
+              className="px-4 py-1 hover:bg-slate-700 w-full text-left"
+              onClick={() => publishCustomAgent(agentMenu.name)}
+            >
+              📤 Publish to Marketplace
             </button>
             <button
               className="px-4 py-1 hover:bg-slate-700 w-full text-left text-red-400"
