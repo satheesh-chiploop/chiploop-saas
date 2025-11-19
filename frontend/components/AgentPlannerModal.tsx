@@ -537,12 +537,14 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   };
   useEffect(() => {
 
-    const WS_URL =
-      process.env.NEXT_PUBLIC_WS_URL ||
-      "wss://209.38.74.151/spec_live_feedback";
+    const ws = new WebSocket("/spec_live_feedback");
 
-    console.log("🔌 Connecting to WebSocket:", WS_URL);
-    const ws = new WebSocket(WS_URL);
+    // const WS_URL =
+    //  process.env.NEXT_PUBLIC_WS_URL ||
+    //  "wss://209.38.74.151/spec_live_feedback";
+
+    //console.log("🔌 Connecting to WebSocket:", WS_URL);
+    //const ws = new WebSocket(WS_URL);
 
   
     ws.onmessage = (event) => {
