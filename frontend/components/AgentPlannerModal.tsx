@@ -64,6 +64,11 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [savedIntents, setSavedIntents] = useState<any[]>([]);
   const [selectedIntentId, setSelectedIntentId] = useState<string>("");
 
+  const [summary, setSummary] = useState<any>(null);
+  const [voiceSummary, setVoiceSummary] = useState<string | null>(null);
+  const [coverage, setCoverage] = useState(0);
+
+
   
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
@@ -80,30 +85,62 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   //    typeof m === "string" ? { path: m, ask: "", type: "text" } : m
  //   );
  // }
-  async function startStopRecording() {
+    async function startStopRecording() {
     if (isRecording && mediaRecorder) {
       mediaRecorder.stop();
       setIsRecording(false);
       return;
     }
-  
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const rec = new MediaRecorder(stream);
       const chunks: BlobPart[] = [];
-  
+
       rec.ondataavailable = (e) => chunks.push(e.data);
+
       rec.onstop = async () => {
         const blob = new Blob(chunks, { type: "audio/webm" });
         const formData = new FormData();
         formData.append("file", blob);
-  
-        await fetch("/api/voice_stream", {
-          method: "POST",
-          body: formData,
-        });
+
+        try {
+          // 1) Send audio → backend (append to Notion)
+          await fetch("/api/voice_stream", {
+            method: "POST",
+            body: formData,
+          });
+
+          // 2) Ask backend to summarize Notion into a spec-style summary
+          const sumRes = await fetch("/api/summarize_notion", {
+            method: "POST",
+          });
+
+          const sumJson = await sumRes.json();
+          // backend usually returns { summary: "<text or json>" }
+          const raw = sumJson.summary ?? sumJson.result ?? "";
+
+          console.log("🎧 Notion voice summary (raw):", raw);
+
+          const summaryText =
+            typeof raw === "string" ? raw : JSON.stringify(raw, null, 2);
+
+          // 3) Use this as the current goal + voice summary
+          setVoiceSummary(summaryText);
+          setGoal(summaryText);
+          setBackendSource("Voice → Notion summary");
+
+          // 4) Reset spec state so Analyze Spec runs cleanly on this new text
+          setSpec(null);
+          setMissingFields([]);
+          setCoverage(0);
+          setStage("initial");
+          setReadyForPlanning(false);
+        } catch (err) {
+          console.error("❌ Voice → Notion pipeline failed", err);
+        }
       };
-  
+
       rec.start();
       setMediaRecorder(rec);
       setIsRecording(true);
@@ -111,6 +148,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
       console.error("🎙️ Voice recording failed:", err);
     }
   }
+
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -159,11 +197,17 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const handleAnalyzeSpec = async () => {
     setIsAnalyzing(true);
     try {
+
+      const payload = voiceSummary
+      ? { voice_summary: voiceSummary, user_id: "anonymous" }
+      : { goal, user_id: "anonymous" };
+
       const res = await fetch("/api/analyze_spec", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal, user_id: "anonymous" }),
+        body: JSON.stringify(payload),
       });
+      
   
       const data = await res.json();
       console.log("DEBUG ANALYZE SPEC RESPONSE:", data);
@@ -492,18 +536,42 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
     }
   };
   useEffect(() => {
-    const ws = new WebSocket("/spec_live_feedback");
+
+    const WS_URL =
+      process.env.NEXT_PUBLIC_WS_URL ||
+      "ws://209.38.74.151/spec_live_feedback";
+
+    console.log("🔌 Connecting to WebSocket:", WS_URL);
+    const ws = new WebSocket(WS_URL);
+
   
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.summary) setSummary(data.summary);
-        if (data.coverage) setCoverage(data.coverage.total_score);
-        else if (data.result?.coverage) setCoverage(data.result.coverage.total_score);
+
+        if (data.summary) {
+          setSummary(data.summary);
+        }
+
+        if (data.coverage !== undefined && data.coverage !== null) {
+          // coverage can be a number or an object with total_score
+          const cov =
+            typeof data.coverage === "object"
+              ? data.coverage.total_score ?? 0
+              : data.coverage;
+          setCoverage(cov);
+        } else if (data.result?.coverage !== undefined) {
+          const cov =
+            typeof data.result.coverage === "object"
+              ? data.result.coverage.total_score ?? 0
+              : data.result.coverage;
+          setCoverage(cov);
+        }
       } catch (err) {
         console.error("⚠️ Error parsing WebSocket data", err);
       }
     };
+
   
     ws.onclose = () => console.log("🔌 WebSocket closed");
     ws.onerror = (err) => console.error("⚠️ WS Error:", err);
