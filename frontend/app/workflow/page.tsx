@@ -38,29 +38,29 @@ if (typeof window !== "undefined" && !localStorage.getItem("anon_user_id")) {
 
 const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
   digital: [
-    { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent", desc: "Capture design spec & I/Os" },
-    { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent", desc: "Generate synthesizable RTL" },
-    { uiLabel: "Verification Agent", backendLabel: "Digital Testbench Agent", desc: "Create TB & assertions" },
-    { uiLabel: "Sim Agent", backendLabel: "Digital Sim Agent", desc: "Compile & simulate" },
+    { uiLabel: "Digital Spec Agent", backendLabel: "Digital Spec Agent", desc: "Capture design spec & I/Os" },
+    { uiLabel: "Digital RTL Agent", backendLabel: "Digital RTL Agent", desc: "Generate synthesizable RTL" },
+    { uiLabel: "Digital Verification Agent", backendLabel: "Digital Testbench Agent", desc: "Create TB & assertions" },
+    { uiLabel: "Digital Sim Agent", backendLabel: "Digital Sim Agent", desc: "Compile & simulate" },
   ],
   analog: [
-    { uiLabel: "Spec Agent", backendLabel: "Analog Spec Agent", desc: "Analog specs & targets" },
-    { uiLabel: "Netlist Agent", backendLabel: "Analog Netlist Agent", desc: "Schematic/topology" },
-    { uiLabel: "Sim Agent", backendLabel: "Analog Sim Agent", desc: "SPICE/AMS runs" },
-    { uiLabel: "Result Agent", backendLabel: "Analog Result Agent", desc: "Summarize results" },
+    { uiLabel: "Analog Spec Agent", backendLabel: "Analog Spec Agent", desc: "Analog specs & targets" },
+    { uiLabel: "Analog Netlist Agent", backendLabel: "Analog Netlist Agent", desc: "Schematic/topology" },
+    { uiLabel: "Analog Sim Agent", backendLabel: "Analog Sim Agent", desc: "SPICE/AMS runs" },
+    { uiLabel: "Analog Result Agent", backendLabel: "Analog Result Agent", desc: "Summarize results" },
   ],
   embedded: [
-    { uiLabel: "Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware/SoC reqs" },
-    { uiLabel: "Code Agent", backendLabel: "Embedded Code Agent", desc: "Drivers & firmware" },
-    { uiLabel: "Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
-    { uiLabel: "Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize outputs" },
+    { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware/SoC reqs" },
+    { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Drivers & firmware" },
+    { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
+    { uiLabel: "Embedded Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize outputs" },
   ],
   system: [
-    { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent", desc: "System-level digital spec" },
-    { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent", desc: "Digital IP RTL design" },
-    { uiLabel: "Firmware Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
-    { uiLabel: "Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Firmware simulation harness" },
-    { uiLabel: "Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize hardware + firmware integration" },
+    { uiLabel: "Digital Spec Agent", backendLabel: "Digital Spec Agent", desc: "System-level digital spec" },
+    { uiLabel: "Digital RTL Agent", backendLabel: "Digital RTL Agent", desc: "Digital IP RTL design" },
+    { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
+    { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
+    { uiLabel: "Embedded Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize hardware + firmware integration" },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);
