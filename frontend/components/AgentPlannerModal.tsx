@@ -64,9 +64,9 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [savedIntents, setSavedIntents] = useState<any[]>([]);
   const [selectedIntentId, setSelectedIntentId] = useState<string>("");
 
-  const [summary, setSummary] = useState<any>(null);
+
   const [voiceSummary, setVoiceSummary] = useState<string | null>(null);
-  const [coverage, setCoverage] = useState(0);
+
 
 
   
