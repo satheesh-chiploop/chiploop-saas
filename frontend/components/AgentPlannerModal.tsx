@@ -539,7 +539,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
     const WS_URL =
       process.env.NEXT_PUBLIC_WS_URL ||
-      "ws://209.38.74.151/spec_live_feedback";
+      "wss://209.38.74.151/spec_live_feedback";
 
     console.log("🔌 Connecting to WebSocket:", WS_URL);
     const ws = new WebSocket(WS_URL);
