@@ -103,7 +103,7 @@ function WorkflowPage() {
   const [showCreateAgentModal, setShowCreateAgentModal] = useState(false);
   const [showPlanner, setShowPlanner] = useState(false);
   const [showAgentPlanner, setShowAgentPlanner] = useState(false);
-
+  const [selectedWorkflowName, setSelectedWorkflowName] = useState<string | null>(null);
   const {fitView} = useReactFlow();
 
   const [contextMenu, setContextMenu] = useState<{x:number; y:number; name:string} | null>(null);
@@ -131,6 +131,9 @@ function WorkflowPage() {
       }
 
       await loadCustomWorkflowsFromDB();  // ✅ refresh sidebar list
+      if (name === selectedWorkflowName) {
+        setSelectedWorkflowName(null);
+      }
     } catch (err) {
       console.error("Delete failed", err);
       alert("❌ Could not delete workflow.");
@@ -659,17 +662,23 @@ function WorkflowPage() {
 
   /* ---------- Actions ---------- */
   const runWorkflow = async () => {
-    const { data, error } = await supabase
-      .from("workflows")
-      .insert([{ name: "Verify Loop", status: "running", logs: "🚀 Started verify loop...\n" }])
-      .select("id")
-      .single();
-
-    if (error || !data?.id) return;
-    setJobId(data.id as string);
-    setActiveTab("live");
+    // 1) Require user to pick a workflow first
+    if (!selectedWorkflowName) {
+      alert("Please select a Custom Workflow from the sidebar first.");
+      return;
+    }
+  
+    // 2) If the canvas is empty, try reloading the workflow (defensive)
+    if (!nodes.length) {
+      const wfName = selectedWorkflowName;
+      console.log("Canvas empty, reloading workflow:", wfName);
+      await loadWorkflowFromDB(wfName);
+    }
+  
+    // 3) Open the Spec input modal – this will use handleSpecSubmit
+    setShowSpecModal(true);
   };
-
+  
   const saveWorkflowLocal = () => {
     localStorage.setItem("workflow_verify_loop", JSON.stringify({ loop, nodes, edges }));
   };
@@ -1053,16 +1062,23 @@ function WorkflowPage() {
             <>
               <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-               {customWorkflows.map((wf, idx) => (
-                  <li
-                    key={`${wf}-${idx}`}
-                    onClick={() => loadWorkflowFromDB(wf)}
+
+                {customWorkflows.map((wf) => (
+                  <button
+                    key={wf}
+                    className={`w-full text-left px-2 py-1 rounded text-xs hover:bg-slate-700 ${
+                      selectedWorkflowName === wf ? "bg-slate-700 border border-cyan-400" : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedWorkflowName(wf);
+                      loadWorkflowFromDB(wf);
+                    }}
                     onContextMenu={(e) => openContextMenu(e, wf)}
-                    className= "px-2 py-1 rounded hover:bg-slate-800 cursor-pointer select-none"
                   >
                     {wf}
-                  </li>
+                  </button>
                 ))}
+               
               </ul>
             </>
           )}

@@ -459,16 +459,16 @@ def execute_workflow_background(
 
         loop_map = AGENT_FUNCTIONS.get(loop_type, DIGITAL_AGENT_FUNCTIONS)
 
-        if loop_type == "system":
-            has_validation = any(
-                n.get("label") == "System Workflow Agent"
-                for n in (data.get("nodes") or [])
-            )
-            if not has_validation:
-                logger.info("🧩 Auto-appending System Workflow Agent as final step for System Loop.")
+        # if loop_type == "system":
+        #   has_validation = any(
+        #       n.get("label") == "System Workflow Agent"
+        #        for n in (data.get("nodes") or [])
+         #   )
+        #   if not has_validation:
+        #        logger.info("🧩 Auto-appending System Workflow Agent as final step for System Loop.")
                 # Append as a node for execution
-                data["nodes"].append({"label": "System Workflow Agent"})
-                append_log_workflow(workflow_id, "🧩 Added System Workflow Agent as final validation step.")
+        #       data["nodes"].append({"label": "System Workflow Agent"})
+        #      append_log_workflow(workflow_id, "🧩 Added System Workflow Agent as final validation step.")
 
         # Merge with dynamic/custom agents
         agent_map = dict(loop_map)
@@ -1053,19 +1053,19 @@ async def save_custom_workflow(request: Request):
                 domains.add("system")
 
         # ✅ Auto-append System Workflow Agent if multiple domains exist
-        if len(domains) > 1 and not any("System Workflow Agent" in n.get("data", {}).get("backendLabel", "") for n in nodes):
-            system_agent = {
-                "id": f"system_validation_{len(nodes) + 1}",
-                "type": "default",
-                "data": {
-                    "uiLabel": "System Workflow Agent",
-                    "backendLabel": "System Workflow Agent",
-                    "description": "Validates cross-domain integration.",
-                },
-                "position": {"x": 400, "y": 400},
-            }
-            nodes.append(system_agent)
-            logger.info(f"🧩 Auto-added System Workflow Agent to {name}")
+        #if len(domains) > 1 and not any("System Workflow Agent" in n.get("data", {}).get("backendLabel", "") for n in nodes):
+        #   system_agent = {
+        #       "id": f"system_validation_{len(nodes) + 1}",
+        #       "type": "default",
+        #       "data": {
+        #           "uiLabel": "System Workflow Agent",
+        #            "backendLabel": "System Workflow Agent",
+        #           "description": "Validates cross-domain integration.",
+        #       },
+        #         "position": {"x": 400, "y": 400},
+        #   }
+        #   nodes.append(system_agent)
+        #     logger.info(f"🧩 Auto-added System Workflow Agent to {name}")
 
         # --- Prepare payload for Supabase ---
         payload = {
