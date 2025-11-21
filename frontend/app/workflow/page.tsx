@@ -898,58 +898,30 @@ function WorkflowPage() {
     }
   };
   
-  
-  
-
   const handleSpecSubmit = async (text: string, file?: File) => {
     try {
-      // Determine which loop is active
-      let workflow: any = {};
-  
-      if (loop === "digital") {
-        workflow = {
-          loop_type: "digital",
-          nodes: [
-            { label: "Digital Spec Agent" },
-            { label: "Digital RTL Agent" },
-          ],
-        };
-      } else if (loop === "analog") {
-        workflow = {
-          loop_type: "analog",
-          nodes: [
-            { label: "Analog Spec Agent" },
-            { label: "Analog Netlist Agent" },
-          ],
-        };
-      } else if (loop === "embedded") {
-        workflow = {
-          loop_type: "embedded",
-          nodes: [
-            { label: "Embedded Spec Agent" },
-            { label: "Embedded Code Agent" },
-          ],
-        };
-      } else if (loop === "system") {
-        workflow = {
-          loop_type: "system",
-          nodes: [
-            { label: "Digital Spec Agent" },
-            { label: "Digital RTL Agent" },
-            { label: "Embedded Code Agent" },
-            { label: "Embedded Sim Agent" },
-            { label: "Embedded Result Agent" },
-          ],
-        };
+      if (!nodes.length) {
+        alert("Workflow canvas is empty — nothing to run.");
+        return;
       }
   
-      // Build form data for /run_workflow
+      // Build workflow from actual canvas graph
+      const workflow = {
+        loop_type: loop,
+        nodes: nodes.map(n => ({
+          label: n.data.backendLabel
+        })),
+        edges: edges.map(e => ({
+          source: e.source,
+          target: e.target
+        })),
+      };
+  
       const formData = new FormData();
       formData.append("workflow", JSON.stringify(workflow));
       formData.append("spec_text", text || "");
       if (file) formData.append("file", file);
   
-      // Hit the unified backend route
       const res = await fetch(`${API_BASE}/run_workflow`, {
         method: "POST",
         body: formData,
@@ -957,17 +929,20 @@ function WorkflowPage() {
   
       const result = await res.json();
   
-      if (result.status === "success" || result.workflow_id) {
-        console.log(`✅ ${loop} workflow started:`, result.workflow_id);
+      if (result.workflow_id) {
         setJobId(result.workflow_id);
         setActiveTab("live");
       } else {
-        console.error("❌ Backend error:", result.message || result.error);
+        console.error("❌ Workflow run error:", result);
       }
     } catch (err) {
       console.error("❌ API call failed:", err);
     }
   };
+  
+  
+
+
   
 
   
