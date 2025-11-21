@@ -905,9 +905,36 @@ function WorkflowPage() {
         return;
       }
   
-      // Build workflow from actual canvas graph
+      // -------------------------------
+      // FIX LOOP TYPE
+      // -------------------------------
+      let finalLoopType = "system";
+  
+      // If workflow came from Supabase sidebar, respect its loop_type
+      if (selectedWorkflow && selectedWorkflow.loop_type) {
+        finalLoopType = selectedWorkflow.loop_type;
+      } else {
+        // Otherwise infer from canvas nodes
+        const domains = new Set(
+          nodes.map((n) => {
+            const lbl = (n.data?.backendLabel || "").toLowerCase();
+            if (lbl.includes("digital")) return "digital";
+            if (lbl.includes("embedded")) return "embedded";
+            if (lbl.includes("analog")) return "analog";
+            return null;
+          }).filter(Boolean)
+        );
+  
+        if (domains.size === 1) {
+          finalLoopType = [...domains][0];
+        } else {
+          finalLoopType = "system"; // multiple domains → system loop
+        }
+      }
+  
+      // Build workflow payload
       const workflow = {
-        loop_type: loop,
+        loop_type: finalLoopType,
         nodes: nodes.map(n => ({
           label: n.data.backendLabel
         })),
@@ -939,6 +966,7 @@ function WorkflowPage() {
       console.error("❌ API call failed:", err);
     }
   };
+  
   
   
 
