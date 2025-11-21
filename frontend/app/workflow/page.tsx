@@ -909,10 +909,16 @@ function WorkflowPage() {
       // FIX LOOP TYPE
       // -------------------------------
       let finalLoopType = "system";
+
+      // Try reading loop type from saved workflow
+      const fromSidebarLoop =
+        typeof selectedWorkflow !== "undefined"
+          ? (selectedWorkflow as any)?.loop_type
+          : null;
   
       // If workflow came from Supabase sidebar, respect its loop_type
-      if (selectedWorkflow && selectedWorkflow.loop_type) {
-        finalLoopType = selectedWorkflow.loop_type;
+      if (fromSidebarLoop) {
+        finalLoopType = fromSidebarLoop;
       } else {
         // Otherwise infer from canvas nodes
         const domains = new Set(
