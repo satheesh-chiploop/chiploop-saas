@@ -9,14 +9,17 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+
 interface WorkflowRow {
   id?: string;
   status?: string;
   logs?: string;
-  artifacts?: Record<string, string>;
+  artifacts?: Record<string, any>;   
   created_at?: string;
   loop_type?: string;
 }
+
+
 
 type TableName = "workflows" | "runs";
 
@@ -209,9 +212,10 @@ export default function WorkflowConsole({
     </div>
   );
 
-  // ---------- 📦 Grouped Outputs ----------
   const renderOutputs = () => {
-    if (!workflowMeta?.artifacts || Object.keys(workflowMeta.artifacts).length === 0) {
+    const artifacts = workflowMeta?.artifacts;
+  
+    if (!artifacts || Object.keys(artifacts).length === 0) {
       return (
         <div className="p-3 text-slate-400 italic">
           No artifacts yet. Run the workflow to generate outputs.
@@ -219,32 +223,66 @@ export default function WorkflowConsole({
       );
     }
   
-    // ✅ Apply focus filter if user clicked an agent node
-    const filteredArtifacts = focusedAgent
-      ? Object.fromEntries(
-          Object.entries(workflowMeta.artifacts).filter(([key]) =>
-            key.toLowerCase().startsWith(focusedAgent.toLowerCase())
-          )
+    type FlatItem = { agent: string; label: string; path: string };
+    const flat: FlatItem[] = [];
+  
+    Object.entries(artifacts).forEach(([key, value]) => {
+      if (!value) return;
+  
+      // --- Case 1: legacy flat key → string path
+      if (typeof value === "string") {
+        const [agentPart] = key.split("_agent_");
+        const agent = agentPart ? `${agentPart}_agent` : "other";
+        const label = key
+          .replace(`${agentPart}_agent_`, "")
+          .replace(/_/g, " ")
+          .trim();
+  
+        flat.push({ agent, label: label || "artifact", path: value });
+        return;
+      }
+  
+      // --- Case 2: new per-agent dict (our current backend behavior)
+      if (typeof value === "object") {
+        Object.entries(value as Record<string, any>).forEach(([subKey, subVal]) => {
+          if (typeof subVal !== "string") return;
+  
+          // Heuristic: only show Supabase-storage artifacts, not local /artifacts/...
+          if (!subVal.startsWith("backend/")) return;
+  
+          flat.push({
+            agent: key, // here 'key' is the agent name: "Digital RTL Agent", "Embedded Sim Agent", ...
+            label: subKey.replace(/_/g, " "),
+            path: subVal,
+          });
+        });
+      }
+    });
+  
+    if (flat.length === 0) {
+      return (
+        <div className="p-3 text-slate-400 italic">
+          No downloadable artifacts yet. Run the workflow to generate outputs.
+        </div>
+      );
+    }
+  
+    // Apply focus filter (if node clicked)
+    const filtered = focusedAgent
+      ? flat.filter((item) =>
+          item.agent.toLowerCase().startsWith(focusedAgent.toLowerCase())
         )
-      : workflowMeta.artifacts;
+      : flat;
   
-    // ✅ Group artifacts by agent name
-    const groupedArtifacts: Record<string, { label: string; path: string }[]> = {};
-    Object.entries(filteredArtifacts).forEach(([key, path]) => {
-      const [agent] = key.split("_agent_");
-      const group = agent ? `${agent}_agent` : "other";
-  
-      if (!groupedArtifacts[group]) groupedArtifacts[group] = [];
-  
-      groupedArtifacts[group].push({
-        label: key.replace(`${agent}_agent_`, "").replace(/_/g, " "),
-        path,
-      });
+    // Group by agent
+    const grouped: Record<string, FlatItem[]> = {};
+    filtered.forEach((item) => {
+      if (!grouped[item.agent]) grouped[item.agent] = [];
+      grouped[item.agent].push(item);
     });
   
     return (
       <div className="p-3 space-y-4">
-  
         <button
           onClick={handleDownloadLogs}
           className="rounded bg-cyan-700 hover:bg-cyan-600 px-3 py-1 text-sm text-white"
@@ -259,8 +297,11 @@ export default function WorkflowConsole({
           </div>
         )}
   
-        {Object.entries(groupedArtifacts).map(([agent, items]) => (
-          <div key={agent} className="border border-slate-700 rounded-lg p-3 bg-slate-800/50">
+        {Object.entries(grouped).map(([agent, items]) => (
+          <div
+            key={agent}
+            className="border border-slate-700 rounded-lg p-3 bg-slate-800/50"
+          >
             <h3 className="text-cyan-400 font-semibold mb-2">
               {agent.replace("_agent", "").toUpperCase()}
             </h3>
@@ -268,7 +309,7 @@ export default function WorkflowConsole({
             <div className="space-y-1">
               {items.map(({ label, path }) => (
                 <div
-                  key={label}
+                  key={`${agent}-${label}-${path}`}
                   className="flex items-center justify-between bg-slate-700/60 p-2 rounded"
                 >
                   <span className="text-slate-300 capitalize">{label}</span>
@@ -286,6 +327,7 @@ export default function WorkflowConsole({
       </div>
     );
   };
+  
 
   return (
     <div className="mt-4 rounded-lg border border-slate-700 bg-slate-800/80 p-3 text-sm text-slate-200 shadow-md">
@@ -304,14 +346,6 @@ export default function WorkflowConsole({
             {tab === "summary" && "📘 Summary"}
             {tab === "live" && "🔴 Live Feed"}
             {tab === "outputs" && "📦 Outputs"}
-            <button
-               onClick={() => window.dispatchEvent(
-                 new CustomEvent("editAgent", { detail: agent })
-               )}
-               className="text-xs text-cyan-300 hover:text-cyan-200 underline mb-2"
-            >
-              ✏️ Edit Agent
-            </button>
           </button>
         ))}
       </div>

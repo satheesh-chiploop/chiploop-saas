@@ -1,102 +1,157 @@
-"""
-artifact_utils.py
-Generic helper functions for uploading agent outputs (artifacts)
-to Supabase Storage and updating the workflows.artifacts JSON field.
-"""
+# utils/artifact_utils.py
 
 import os
-from supabase import create_client, Client
-from typing import Optional, Dict
+import json
+import logging
+from typing import Any, Dict, Optional
 
-# --------------------------------------------------------------------
-# 🔧 Initialize Supabase client (service role key for full access)
-# --------------------------------------------------------------------
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+from supabase import create_client, Client  # supabase-py v2
+
+logger = logging.getLogger("chiploop")
+
+# --- Supabase client (same pattern as main.py, but local to this module) ---
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+
 if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
-    raise RuntimeError("Supabase URL or SERVICE KEY missing from environment")
+    raise RuntimeError(
+        "artifact_utils: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY "
+        "— check your environment variables."
+    )
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
+# Default bucket name (matches how you're writing artifacts now)
+ARTIFACT_BUCKET = os.getenv("ARTIFACT_BUCKET_NAME", "artifacts")
 
-# --------------------------------------------------------------------
-# 📦 Upload any file to Supabase Storage
-# --------------------------------------------------------------------
-def upload_artifact_generic(
-    local_path: str, user_id: str, workflow_id: str, agent_label: str
-) -> Optional[str]:
+
+def _safe_get_artifacts(workflow_id: str) -> Dict[str, Any]:
     """
-    Uploads a local file to the 'artifacts' bucket in Supabase Storage.
-    Returns the relative bucket path (without 'artifacts/' prefix) or None on failure.
+    Read the current artifacts JSON from workflows.artifacts.
+    Returns a dict (empty if null).
+    """
+    res = (
+        supabase.table("workflows")
+        .select("artifacts")
+        .eq("id", workflow_id)
+        .single()
+        .execute()
+    )
+
+    data = getattr(res, "data", None) or res  # depending on supabase-py version
+    artifacts = (data or {}).get("artifacts")
+    if artifacts is None:
+        return {}
+
+    if isinstance(artifacts, str):
+        try:
+            return json.loads(artifacts)
+        except Exception:
+            logger.warning("artifact_utils: artifacts column is string but not JSON; resetting.")
+            return {}
+
+    if isinstance(artifacts, dict):
+        return artifacts
+
+    logger.warning("artifact_utils: artifacts column has unexpected type; resetting.")
+    return {}
+
+
+def append_artifact_record(
+    workflow_id: str,
+    agent_name: str,
+    key: str,
+    storage_path: str,
+) -> None:
+    """
+    Append/merge a single artifact entry into workflows.artifacts.
+
+    Final JSON shape (example):
+
+    {
+      "Digital Spec Agent": {
+        "spec_json": "backend/workflows/<id>/digital/spec.json"
+      },
+      "Digital RTL Agent": {
+        "rtl_log": "artifacts/anonymous/workflows/<id>/rtl/rtl_agent_compile.log"
+      }
+    }
+
+    The frontend expects each leaf value (like storage_path) to be a STRING
+    so that createSignedUrl(path) works without 'e.replace is not a function' errors.
     """
     try:
-        if not os.path.exists(local_path):
-            print(f"⚠️ File not found: {local_path}")
-            return None
+        artifacts = _safe_get_artifacts(workflow_id)
 
-        filename = os.path.basename(local_path)
-        bucket_path = f"{user_id}/workflows/{workflow_id}/{agent_label}/{filename}"
+        agent_entry = artifacts.get(agent_name)
+        if not isinstance(agent_entry, dict):
+            agent_entry = {}
 
-        with open(local_path, "rb") as f:
-            result = supabase.storage.from_("artifacts").upload(bucket_path, f)
+        # Store exactly the string path that Supabase Storage uses
+        agent_entry[key] = storage_path
+        artifacts[agent_name] = agent_entry
 
-        if isinstance(result, dict) and result.get("error"):
-            raise Exception(result["error"]["message"])
-
-        print(f"✅ Uploaded artifact: {bucket_path}")
-        return bucket_path
-    except Exception as e:
-        print(f"❌ Upload failed for {local_path}: {e}")
-        return None
-
-
-# --------------------------------------------------------------------
-# 🧱 Append artifact entry to workflows.artifacts JSON field
-# --------------------------------------------------------------------
-def append_artifact_record(workflow_id: str, key: str, path: str) -> None:
-    """
-    Inserts or updates a single artifact entry inside the workflows.artifacts JSON.
-    Example:
-        append_artifact_record('abcd123', 'rtl_file', 'user1/workflows/abcd123/rtl/counter.v')
-    """
-    try:
-        # Fetch existing artifacts
-        existing = (
-            supabase.table("workflows")
-            .select("artifacts")
-            .eq("id", workflow_id)
-            .single()
-            .execute()
+        supabase.table("workflows").update({"artifacts": artifacts}).eq("id", workflow_id).execute()
+        logger.info(
+            f"artifact_utils: Updated artifacts for workflow={workflow_id}, "
+            f"agent={agent_name}, key={key}, path={storage_path}"
+        )
+    except Exception as exc:
+        logger.exception(
+            f"artifact_utils: Failed to append artifact record for workflow={workflow_id}, "
+            f"agent={agent_name}, key={key}: {exc}"
         )
 
-        artifacts: Dict[str, str] = existing.data.get("artifacts", {}) if existing.data else {}
-        artifacts[key] = path  # add or overwrite
 
-        # Push update
-        supabase.table("workflows").update({"artifacts": artifacts}).eq("id", workflow_id).execute()
-        print(f"🧩 Updated artifacts JSON for workflow {workflow_id} with key '{key}'")
-    except Exception as e:
-        print(f"❌ Failed to update artifact record: {e}")
+def save_text_artifact_and_record(
+    workflow_id: str,
+    agent_name: str,
+    subdir: str,
+    filename: str,
+    content: str,
+    tenant: str = "backend",
+) -> Optional[str]:
+    """
+    Helper to:
+    1) Upload a text artifact to Supabase Storage
+    2) Record the storage path in workflows.artifacts via append_artifact_record
 
+    Returns the storage path (string) or None on failure.
 
-# --------------------------------------------------------------------
-# 🧹 Optional cleanup
-# --------------------------------------------------------------------
-def delete_artifact_from_storage(path: str) -> bool:
-    """Removes a file from the Supabase 'artifacts' bucket."""
+    Example resulting path:
+      backend/workflows/<workflow_id>/rtl/rtl_agent_compile.log
+    """
     try:
-        result = supabase.storage.from_("artifacts").remove([path])
-        print(f"🗑️ Deleted artifact: {path}")
-        return True
-    except Exception as e:
-        print(f"❌ Failed to delete artifact: {e}")
-        return False
+        if not content:
+            logger.warning(
+                f"artifact_utils: Empty content for {agent_name}/{filename}; skipping upload"
+            )
+            return None
 
+        # Path inside the bucket
+        storage_path = f"{tenant}/workflows/{workflow_id}/{subdir.rstrip('/')}/{filename}"
 
-def reset_workflow_artifacts(workflow_id: str) -> None:
-    """Clears the artifacts JSON for a given workflow."""
-    try:
-        supabase.table("workflows").update({"artifacts": {}}).eq("id", workflow_id).execute()
-        print(f"♻️ Reset artifacts for workflow {workflow_id}")
-    except Exception as e:
-        print(f"❌ Failed to reset artifacts: {e}")
+        # Upload to the 'artifacts' bucket
+        from supabase.lib.client_options import ClientOptions  # (import here to avoid issues)
+
+        # supabase.storage.from_(bucket).upload(path, content[, ...])
+        storage = supabase.storage.from_(ARTIFACT_BUCKET)
+        storage.upload(storage_path, content.encode("utf-8"), {"content-type": "text/plain"})
+
+        # Record in workflows.artifacts — key is usually the filename or a logical name
+        key = filename
+        append_artifact_record(workflow_id, agent_name, key, storage_path)
+
+        logger.info(
+            f"artifact_utils: Uploaded and recorded artifact "
+            f"workflow={workflow_id}, agent={agent_name}, path={storage_path}"
+        )
+        return storage_path
+
+    except Exception as exc:
+        logger.exception(
+            f"artifact_utils: Failed to upload artifact for workflow={workflow_id}, "
+            f"agent={agent_name}, file={filename}: {exc}"
+        )
+        return None
