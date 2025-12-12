@@ -60,6 +60,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Digital RTL Agent", backendLabel: "Digital RTL Agent", desc: "Digital IP RTL design" },
     { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
+    { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
     { uiLabel: "Embedded Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize hardware + firmware integration" },
   ],
 };
