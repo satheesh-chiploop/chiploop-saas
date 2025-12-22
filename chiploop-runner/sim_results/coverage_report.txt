@@ -1,0 +1,7 @@
+Questa Intel Starter FPGA Edition-64 vcover 2024.3 Coverage Utility 2024.09 Sep 10 2024
+Start time: 13:01:23 on Dec 12,2025
+vcover report -details coverage.ucdb 
+** Error: (vcover-7) Failed to open UCDB file "coverage.ucdb" in read mode.
+** Note: (vcover-17388) No matching coverage data found in file 'coverage.ucdb'.
+End time: 13:01:23 on Dec 12,2025, Elapsed time: 0:00:00
+Errors: 1, Warnings: 0
