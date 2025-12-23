@@ -246,6 +246,10 @@ export default function WorkflowConsole({
       if (typeof value === "object") {
         Object.entries(value as Record<string, any>).forEach(([subKey, subVal]) => {
           if (typeof subVal !== "string") return;
+
+          const SKIP_KEYS = new Set(["artifact", "artifact_log", "log", "code"]);
+          if (SKIP_KEYS.has(subKey)) return;
+    
   
           // Heuristic: only show Supabase-storage artifacts, not local /artifacts/...
           if (!subVal.startsWith("backend/")) return;
@@ -258,6 +262,7 @@ export default function WorkflowConsole({
         });
       }
     });
+
   
     if (flat.length === 0) {
       return (
