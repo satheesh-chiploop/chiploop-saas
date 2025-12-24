@@ -179,6 +179,33 @@ export default function WorkflowConsole({
     }
   };
 
+  const handleDownloadAllArtifacts = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "/api"}/workflow/${jobId}/download_zip`,
+        { method: "GET" }
+      );
+  
+      if (!res.ok) {
+        throw new Error("Failed to download zip");
+      }
+  
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+  
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `workflow_${jobId}_artifacts.zip`;
+      a.click();
+  
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("❌ ZIP download failed:", err);
+      alert("Failed to download workflow artifacts.");
+    }
+  };
+  
+
   // ---------- 🧩 Render ----------
   const renderSummary = () => (
     <div className="space-y-2">
@@ -293,6 +320,12 @@ export default function WorkflowConsole({
           className="rounded bg-cyan-700 hover:bg-cyan-600 px-3 py-1 text-sm text-white"
         >
           ⬇️ Download All Logs
+        </button>
+        <button
+          onClick={handleDownloadAllArtifacts}
+          className="rounded bg-emerald-700 hover:bg-emerald-600 px-3 py-1 text-sm text-white"
+        >
+          📦 Download All Outputs (ZIP)
         </button>
   
         {focusedAgent && (
