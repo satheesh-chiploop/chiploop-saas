@@ -62,6 +62,8 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
     { uiLabel: "Embedded Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize hardware + firmware integration" },
+    { uiLabel: "System CoSim Integration Agent", backendLabel: "System CoSim Integration Agent", desc: "Generates co-sim scaffolding: AXI4-Lite register block template + firmware MMIO header + basic cocotb smoke test" },
+    { uiLabel: "System ISS Bridge Agent", backendLabel: "System ISS Bridge Agent", desc: "Generates scaffolding for an ISS<->RTL bridge (MMIO/IRQ contract + Verilator harness skeleton + run notes)" },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);
