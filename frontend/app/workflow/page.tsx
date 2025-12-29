@@ -1105,7 +1105,7 @@ function WorkflowPage() {
   
       <div className="flex flex-1 overflow-hidden">
         {/* ===== Sidebar ===== */}
-        <aside className="w-72 bg-slate-900/70 border-r border-slate-800 p-4 flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <aside className="w-96 bg-slate-900/70 border-r border-slate-800 p-4 flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {/* 🧠 Agentic Tools */}
           <h2 className="text-lg font-bold mb-3 text-cyan-400">Agentic Tools</h2>
           <button
@@ -1503,20 +1503,7 @@ function WorkflowPage() {
           )}
         </div>
 
-        {/* Console */}
-        <div className="mt-4 flex-1 overflow-hidden rounded-lg border border-slate-800 bg-black/30 p-3">
-          <div className="text-sm font-semibold text-cyan-300 mb-2">
-            Run Console {jobId ? <span className="text-slate-400 font-normal">({jobId})</span> : ""}
-          </div>
-
-          {!jobId ? (
-            <div className="text-slate-400 text-sm italic">
-              Select a run to view logs & outputs.
-            </div>
-          ) : (
-            <WorkflowConsole jobId={jobId} table="workflows" />
-          )}
-        </div>
+        
       </aside>
 
       {contextMenu && (
