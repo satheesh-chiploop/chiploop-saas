@@ -136,6 +136,46 @@ function WorkflowPage() {
   };
   
   const closeContextMenu = () => setContextMenu(null);
+
+  type RunRecord = {
+    run_id: string;        // workflow_id returned by backend
+    run_name: string;      // friendly name (Save-as prompt)
+    created_at: string;    // ISO
+  };
+  
+  const runStorageKey = (workflowName: string) => `workflow_runs__${workflowName}`;
+  
+  const loadRunsForWorkflow = (workflowName: string): RunRecord[] => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem(runStorageKey(workflowName));
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed;
+    } catch {
+      return [];
+    }
+  };
+  
+  const saveRunsForWorkflow = (workflowName: string, runs: RunRecord[]) => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(runStorageKey(workflowName), JSON.stringify(runs));
+  };
+  
+  const defaultRunName = (workflowName: string) => {
+    const d = new Date();
+    const yyyyMmDd = d.toISOString().slice(0, 10);
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${workflowName}_${yyyyMmDd}_${hh}${mm}`;
+  };
+
+  const [runs, setRuns] = useState<RunRecord[]>([]);
+  const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+  const [pendingRunName, setPendingRunName] = useState<string | null>(null);
+
+  
   
   const deleteCustomWorkflow = async (name: string) => {
     try {
@@ -688,18 +728,27 @@ function WorkflowPage() {
       alert("Please select a Custom Workflow from the sidebar first.");
       return;
     }
-  
+    // Defensive: ensure canvas populated
     // 2) If the canvas is empty, try reloading the workflow (defensive)
     if (!nodes.length) {
       const wfName = selectedWorkflowName;
       console.log("Canvas empty, reloading workflow:", wfName);
       await loadWorkflowFromDB(wfName);
     }
-  
-    // 3) Open the Spec input modal – this will use handleSpecSubmit
+
+    // ✅ Save-as prompt for every run
+    const proposed = defaultRunName(selectedWorkflowName);
+    const rn = prompt("💾 Save this run as:", proposed) || "";
+    const runName = rn.trim();
+    if (!runName) return;
+
+    setPendingRunName(runName);
+
+    // Open spec input modal (handleSpecSubmit will create the run)
     setShowSpecModal(true);
   };
   
+    
   const saveWorkflowLocal = () => {
     localStorage.setItem("workflow_verify_loop", JSON.stringify({ loop, nodes, edges }));
   };
@@ -982,13 +1031,32 @@ function WorkflowPage() {
       });
   
       const result = await res.json();
-  
+
       if (result.workflow_id) {
-        setJobId(result.workflow_id);
+        const newJobId = result.workflow_id;
+        setJobId(newJobId);
         setActiveTab("live");
+      
+        // ✅ append run record (localStorage)
+        if (selectedWorkflowName) {
+          const rec: RunRecord = {
+            run_id: newJobId,
+            run_name: pendingRunName || defaultRunName(selectedWorkflowName),
+            created_at: new Date().toISOString(),
+          };
+      
+          const next = [rec, ...runs].slice(0, 100); // keep last 100 runs
+          setRuns(next);
+          saveRunsForWorkflow(selectedWorkflowName, next);
+      
+          setSelectedRunId(newJobId);
+        }
+      
+        setPendingRunName(null);
       } else {
         console.error("❌ Workflow run error:", result);
       }
+
     } catch (err) {
       console.error("❌ API call failed:", err);
     }
@@ -1102,6 +1170,15 @@ function WorkflowPage() {
                     onClick={() => {
                       setSelectedWorkflowName(wf);
                       loadWorkflowFromDB(wf);
+                      // ✅ load runs for this workflow (localStorage)
+                      const loaded = loadRunsForWorkflow(wf);
+                      setRuns(loaded);
+                      // optional: auto-select latest run if exists
+                      if (loaded.length > 0) {
+                        setSelectedRunId(loaded[0].run_id);
+                      } else {
+                        setSelectedRunId(null);
+                      }
                     }}
                     onContextMenu={(e) => openContextMenu(e, wf)}
                   >
@@ -1329,6 +1406,118 @@ function WorkflowPage() {
           </div>
         </section>
       </div>
+
+      {/* ===== Right Panel: Run Management ===== */}
+      <aside className="w-[420px] bg-slate-900/60 border-l border-slate-800 p-4 flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-lg font-bold text-cyan-400">Runs</h3>
+            <div className="text-xs text-slate-400">
+              {selectedWorkflowName ? `Workflow: ${selectedWorkflowName}` : "Select a workflow to see runs"}
+            </div>
+          </div>
+        </div>
+        {/* Runs list */}
+        <div className="rounded-lg border border-slate-800 bg-black/30 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          {runs.length === 0 ? (
+            <div className="p-3 text-slate-400 text-sm italic">
+              No runs yet. Click <b>Run</b> to create one.
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-800">
+              {runs.map((r) => (
+                <div
+                  key={r.run_id}
+                  className={`p-3 cursor-pointer ${
+                    selectedRunId === r.run_id ? "bg-slate-800/70" : "hover:bg-slate-800/40"
+                  }`}
+                  onClick={() => {
+                    setSelectedRunId(r.run_id);
+                    setJobId(r.run_id); // ✅ load this run in console
+                    setActiveTab("live");
+                  }}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-slate-100 truncate">
+                        {r.run_name}
+                      </div>
+                      <div className="text-[11px] text-slate-400 truncate">
+                        {new Date(r.created_at).toLocaleString()}
+                      </div>
+                      <div className="text-[11px] text-slate-500 truncate">
+                        id: {r.run_id}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            const res = await fetch(`${API_BASE}/workflow/${r.run_id}/download_zip`, { method: "GET" });
+                            if (!res.ok) throw new Error("download failed");
+                            const blob = await res.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `${r.run_name || "run"}_${r.run_id}.zip`;
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                          } catch (err) {
+                            console.error("❌ ZIP download failed:", err);
+                            alert("Failed to download ZIP for this run.");
+                          }
+                        }}
+                        className="text-xs px-2 py-1 rounded bg-emerald-700 hover:bg-emerald-600 text-white"
+                        title="Download ZIP"
+                      >
+                        ZIP
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!selectedWorkflowName) return;
+
+                          if (!confirm(`Delete run "${r.run_name}"?`)) return;
+
+                          const next = runs.filter((x) => x.run_id !== r.run_id);
+                          setRuns(next);
+                          saveRunsForWorkflow(selectedWorkflowName, next);
+
+                          if (selectedRunId === r.run_id) {
+                            setSelectedRunId(null);
+                          }
+                        }}
+                        className="text-xs px-2 py-1 rounded bg-red-700 hover:bg-red-600 text-white"
+                        title="Delete from run history"
+                      >
+                        Del
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Console */}
+        <div className="mt-4 flex-1 overflow-hidden rounded-lg border border-slate-800 bg-black/30 p-3">
+          <div className="text-sm font-semibold text-cyan-300 mb-2">
+            Run Console {jobId ? <span className="text-slate-400 font-normal">({jobId})</span> : ""}
+          </div>
+
+          {!jobId ? (
+            <div className="text-slate-400 text-sm italic">
+              Select a run to view logs & outputs.
+            </div>
+          ) : (
+            <WorkflowConsole jobId={jobId} table="workflows" />
+          )}
+        </div>
+      </aside>
 
       {contextMenu && (
         <div
