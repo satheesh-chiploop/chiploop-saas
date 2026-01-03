@@ -133,7 +133,7 @@ function LandingPageContent() {
         <div className="p-6 bg-slate-800/70 rounded-xl shadow-lg">
           <h3 className="text-xl font-bold mb-4 text-cyan-400">Testimonials</h3>
           <p className="text-slate-300">
-            Used by Engineers at Analog Devices, Broadcom, and Universities worldwide.
+            Coming soon.
           </p>
         </div>
         <div className="p-6 bg-slate-800/70 rounded-xl shadow-lg">
@@ -154,7 +154,7 @@ function LandingPageContent() {
             Book a Demo
           </button>
         </div>
-        <p>© 2025 ChipLoop | Built with ❤️ by Satheesh Pillai</p>
+        <p>© 2026 ChipLoop </p>
         <div className="mt-2 space-x-4 text-slate-500">
           <button onClick={() => router.push("/contact")}>Contact</button>
           <button onClick={() => router.push("/careers")}>Careers</button>
