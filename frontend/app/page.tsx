@@ -97,6 +97,11 @@ function LandingPageContent() {
               desc: "Streamline embedded systems development",
               icon: "📶",
             },
+            {
+              name: "Validation Loop",
+              desc: "Automate Hardware/Lab testing/validation",
+              icon: "📶",
+            },
           ].map((loop) => (
             <div
               key={loop.name}

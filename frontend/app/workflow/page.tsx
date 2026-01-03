@@ -883,9 +883,10 @@ function WorkflowPage() {
       digital: ["Verify_Loop", "Spec2RTL"],
       analog: ["Spec2Circuit", "Spec2Sim"],
       embedded: ["Spec2Code", "Spec2Sim"],
-      system: ["Digital_IP_Prototype_Loop"]
+      system: ["Digital_IP_Prototype_Loop"],
+      validation: [],
     };
-    return all[loop];
+    return all[loop] ?? [];
   }, [loop]);
 
   const loadPrebuiltWorkflow = (wf: string) => {
