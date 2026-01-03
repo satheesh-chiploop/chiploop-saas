@@ -38,7 +38,66 @@ export default function WorkflowConsole({
   const channelName = useMemo(() => `realtime:public:${table}`, [table]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [focusedAgent, setFocusedAgent] = useState<string | null>(null);
+
+  const [validationManifest, setValidationManifest] = useState<any | null>(null);
+  const [validationManifestError, setValidationManifestError] = useState<string | null>(null);
+
+  const findArtifactPath = (artifacts: any, needle: string): string | null => {
+    if (!artifacts) return null;
   
+    // artifacts can be:
+    // 1) { "some_key": "backend/..." }
+    // 2) { "Agent Name": { "subKey": "backend/..." } }
+    for (const [k, v] of Object.entries(artifacts)) {
+      if (!v) continue;
+  
+      if (typeof v === "string") {
+        if (v.includes(needle)) return v;
+        continue;
+      }
+  
+      if (typeof v === "object") {
+        for (const subVal of Object.values(v as Record<string, any>)) {
+          if (typeof subVal === "string" && subVal.includes(needle)) return subVal;
+        }
+      }
+    }
+  
+    return null;
+  };
+  useEffect(() => {
+    const loadManifest = async () => {
+      setValidationManifest(null);
+      setValidationManifestError(null);
+  
+      if (workflowMeta?.loop_type !== "validation") return;
+  
+      const artifacts = workflowMeta?.artifacts;
+      const manifestPath = findArtifactPath(artifacts, "validation/run_manifest.json");
+      if (!manifestPath) return;
+  
+      try {
+        const { data, error } = await supabase.storage
+          .from("artifacts")
+          .createSignedUrl(manifestPath, 60);
+  
+        if (error) throw error;
+  
+        const resp = await fetch(data.signedUrl);
+        if (!resp.ok) throw new Error(`Manifest fetch failed (${resp.status})`);
+        const json = await resp.json();
+  
+        setValidationManifest(json);
+      } catch (e: any) {
+        console.error("❌ Failed to load validation manifest:", e);
+        setValidationManifestError(e?.message || "Failed to load manifest");
+      }
+    };
+  
+    loadManifest();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workflowMeta?.loop_type, workflowMeta?.artifacts]);
+    
   
   useEffect(() => {
     const handler = (e: any) => setFocusedAgent(e.detail);
@@ -213,6 +272,53 @@ export default function WorkflowConsole({
       <div><strong>Loop Type:</strong> {workflowMeta?.loop_type}</div>
       <div><strong>Status:</strong> {workflowMeta?.status?.toUpperCase()}</div>
       <div><strong>Created:</strong> {workflowMeta?.created_at}</div>
+      {workflowMeta?.loop_type === "validation" && (
+        <div className="mt-2 rounded border border-slate-700 bg-slate-900/40 p-2">
+          <div className="text-cyan-300 font-semibold mb-1">🧪 Validation Context</div>
+          {validationManifestError && (
+            <div className="text-red-300 text-xs">
+              Failed to load run manifest: {validationManifestError}
+            </div>
+          )}
+
+          {!validationManifest && !validationManifestError && (
+            <div className="text-slate-400 text-xs italic">
+              Waiting for validation manifest...
+            </div>
+          )}
+
+          {validationManifest && (
+            <div className="space-y-1 text-xs text-slate-200">
+              {/* Try common shapes, but remain robust */}
+              {Array.isArray(validationManifest?.instruments) && (
+                <div>
+                  <span className="text-slate-400">Instruments:</span>{" "}
+                  {validationManifest.instruments
+                    .map((x: any) => x?.nickname || x?.id || String(x))
+                    .join(", ")}
+                </div>
+              )}
+
+              {Array.isArray(validationManifest?.instrument_ids) && (
+                <div>
+                  <span className="text-slate-400">Instrument IDs:</span>{" "}
+                  {validationManifest.instrument_ids.join(", ")}
+                </div>
+              )}
+
+              {validationManifest?.dut && (
+                <div>
+                  <span className="text-slate-400">DUT:</span>{" "}
+                  {typeof validationManifest.dut === "string"
+                    ? validationManifest.dut
+                    : JSON.stringify(validationManifest.dut)}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       <div>
         <strong>Artifacts:</strong>{" "}
         {workflowMeta?.artifacts
@@ -298,13 +404,26 @@ export default function WorkflowConsole({
         </div>
       );
     }
+
+    const isValidation = workflowMeta?.loop_type === "validation";
+    const isValidationItem = (it: FlatItem) =>
+      it.path.includes("/validation/") || it.path.includes("validation/");
+
+    const sortedFlat = [...flat].sort((a, b) => {
+      if (!isValidation) return 0;
+      const av = isValidationItem(a) ? 0 : 1;
+      const bv = isValidationItem(b) ? 0 : 1;
+      if (av !== bv) return av - bv;
+      return a.label.localeCompare(b.label);
+    });
+
   
     // Apply focus filter (if node clicked)
     const filtered = focusedAgent
-      ? flat.filter((item) =>
+      ? sortedFlat.filter((item) =>
           item.agent.toLowerCase().startsWith(focusedAgent.toLowerCase())
         )
-      : flat;
+      : sortedFlat;
   
     // Group by agent
     const grouped: Record<string, FlatItem[]> = {};
@@ -327,6 +446,55 @@ export default function WorkflowConsole({
         >
           📦 Download All Outputs (ZIP)
         </button>
+
+        {/* 🧪 Validation Outputs (run-level, shown first) */}
+        {workflowMeta?.loop_type === "validation" && (
+          <div className="border border-slate-700 rounded-lg p-3 bg-slate-900/40">
+            <div className="text-cyan-300 font-semibold mb-2">
+               🧪 Validation Outputs
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {[
+                "validation/results.json",
+                "validation/results.csv",
+                "validation/run_manifest.json",
+              ].map((needle) => {
+             // find artifact path by substring match
+                let foundPath: string | null = null;
+
+                Object.values(workflowMeta?.artifacts || {}).forEach((v: any) => {
+                  if (typeof v === "string" && v.includes(needle)) {
+                    foundPath = v;
+                  } else if (typeof v === "object") {
+                    Object.values(v).forEach((sv: any) => {
+                      if (typeof sv === "string" && sv.includes(needle)) {
+                        foundPath = sv;
+                      }
+                    });
+                  }
+                });
+
+                if (!foundPath) return null;
+
+                const label = needle.split("/").pop()!;
+
+                return (
+                  <button
+                    key={needle}
+                    onClick={() =>
+                      handleDownloadArtifact(foundPath!, `validation_${label}`)
+                    }
+                    className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-2 py-1 rounded"
+                  >
+                    ⬇️ {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
   
         {focusedAgent && (
           <div className="mb-3 text-cyan-300 text-xs">

@@ -27,7 +27,7 @@ import AgentPlannerModal from "@/components/AgentPlannerModal";
 /* =========================
    Types & Constants
 ========================= */
-type LoopKey = "digital" | "analog" | "embedded" | "system";
+type LoopKey = "digital" | "analog" | "embedded" | "system" |"validation";
 type AgentNodeData = { uiLabel: string; backendLabel: string; desc?: string };
 
 type CatalogItem = { uiLabel: string; backendLabel: string; desc?: string };
@@ -71,6 +71,13 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
     { uiLabel: "Embedded Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize outputs" },
   ],
+  validation:[
+    { uiLabel: "Validation Instrument Setup Agent", backendLabel: "Validation Instrument Setup Agent", desc: "Resolves the user's bench setup from registered instruments (or defaults) and writes bench_setup.json for downstream validation agents." },
+    { uiLabel: "Validation Test Plan Agent", backendLabel: "Validation Test Plan Agent", desc: "Generates a structured hardware validation test plan from datasheet/spec text; uses generic instrument types (psu/dmm/scope)." },
+    { uiLabel: "Validation Sequence Builder Agent", backendLabel: "Validation Sequence Builder Agent", desc: "Builds an executable SCPI test sequence (steps) from bench_setup + test_plan (initially Keysight-class examples; transport is PyVISA/SCPI)." },
+    { uiLabel: "Validation Execution Orchestrator Agent", backendLabel: "Validation Execution Orchestrator Agent", desc: "Executes the validation test_sequence and produces results artifacts. MVP uses a stub executor; next step swaps in real PyVISA I/O." },
+    { uiLabel: "Validation Analytics Agent", backendLabel: "Validation Analytics Agent", desc: "Applies test_plan measurement limits (min/max) to captured results and generates analytics + a demo-ready report." },
+  ],
   system: [
     { uiLabel: "Digital Spec Agent", backendLabel: "Digital Spec Agent", desc: "System-level digital spec" },
     { uiLabel: "Digital RTL Agent", backendLabel: "Digital RTL Agent", desc: "Digital IP RTL design" },
@@ -92,6 +99,11 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Digital Synthesis Readiness Agent", backendLabel: "Digital Synthesis Readiness Agent", desc: "Checks synthesizable subset red flags and runs open-source synthesis sanity (Yosys) to assess readiness; reports timing/area intent gaps from spec." },
     { uiLabel: "Digital Power Intent (UPF-lite) Agent", backendLabel: "Digital Power Intent (UPF-lite) Agent", desc: "Generates a UPF-lite power intent file (domains + optional isolation/retention) derived from spec/architecture (no hardcoding)." },
     { uiLabel: "Digital IP Packaging & Handoff Agent", backendLabel: "Digital IP Packaging & Handoff Agent", desc: "Creates SoC-ready IP package folder layout + manifest + checklist; bundles key RTL/docs/constraints/power/verification collateral." },
+    { uiLabel: "Validation Instrument Setup Agent", backendLabel: "Validation Instrument Setup Agent", desc: "Resolves the user's bench setup from registered instruments (or defaults) and writes bench_setup.json for downstream validation agents." },
+    { uiLabel: "Validation Test Plan Agent", backendLabel: "Validation Test Plan Agent", desc: "Generates a structured hardware validation test plan from datasheet/spec text; uses generic instrument types (psu/dmm/scope)." },
+    { uiLabel: "Validation Sequence Builder Agent", backendLabel: "Validation Sequence Builder Agent", desc: "Builds an executable SCPI test sequence (steps) from bench_setup + test_plan (initially Keysight-class examples; transport is PyVISA/SCPI)." },
+    { uiLabel: "Validation Execution Orchestrator Agent", backendLabel: "Validation Execution Orchestrator Agent", desc: "Executes the validation test_sequence and produces results artifacts. MVP uses a stub executor; next step swaps in real PyVISA I/O." },
+    { uiLabel: "Validation Analytics Agent", backendLabel: "Validation Analytics Agent", desc: "Applies test_plan measurement limits (min/max) to captured results and generates analytics + a demo-ready report." },
     { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
@@ -145,6 +157,31 @@ function WorkflowPage() {
 
   const [contextMenu, setContextMenu] = useState<{x:number; y:number; name:string} | null>(null);
   const [renameTarget, setRenameTarget] = useState<{oldName:string, newName:string}>({oldName:"", newName:""});
+
+  // Validation instrument picker (only used when loop === "validation")
+
+  const [instrumentLoadErr, setInstrumentLoadErr] = useState<string | null>(null);
+
+  const [showInstrumentPicker, setShowInstrumentPicker] = useState(false);
+  const [validationInstruments, setValidationInstruments] = useState<any[]>([]);
+  const [selectedInstrumentIds, setSelectedInstrumentIds] = useState<string[]>([]);
+
+  const [pendingSpecText, setPendingSpecText] = useState<string>("");
+  const [pendingSpecFile, setPendingSpecFile] = useState<File | undefined>(undefined);
+  const [pendingWorkflowPayload, setPendingWorkflowPayload] = useState<any>(null);
+  const [pendingValidationRun, setPendingValidationRun] = useState(false);
+
+
+  // lightweight "add instrument" form inside the modal
+  const [newInstrument, setNewInstrument] = useState({
+    nickname: "",
+    vendor: "Keysight",
+    model: "",
+    instrument_type: "psu",      // psu | dmm | scope
+    transport: "pyvisa",         // keep as "pyvisa"
+    interface: "TCPIP",          // TCPIP | USB | GPIB
+    resource_string: "",
+  });
   
   const openContextMenu = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
@@ -303,6 +340,62 @@ function WorkflowPage() {
       );
     }, 0);
   };
+  const fetchValidationInstruments = async () => {
+    setInstrumentLoadErr(null);
+    try {
+      const userId = await getStableUserId(supabase);
+  
+      const res = await fetch(`${API_BASE}/validation/instruments/list?user_id=${encodeURIComponent(userId)}`);
+      const j = await res.json();
+      if (!res.ok || j.status !== "ok") throw new Error(j.message || "Failed to load instruments");
+  
+      const items = j.instruments || [];
+      setValidationInstruments(items);
+  
+      // auto-select defaults if present (nice UX)
+      const defaults = items.filter((x: any) => x.is_default).map((x: any) => x.id);
+      if (defaults.length > 0) setSelectedInstrumentIds(defaults);
+    } catch (e: any) {
+      setInstrumentLoadErr(e.message || "Failed to load instruments");
+    }
+  };
+  
+  const registerValidationInstrument = async () => {
+    try {
+      const userId = await getStableUserId(supabase);
+  
+      const res = await fetch(`${API_BASE}/validation/instruments/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, ...newInstrument }),
+      });
+      const j = await res.json();
+      if (!res.ok || j.status !== "ok") throw new Error(j.message || "Register failed");
+  
+      // refresh list & auto-select newly added
+      await fetchValidationInstruments();
+      if (j.instrument?.id) {
+        setSelectedInstrumentIds((prev) => Array.from(new Set([...prev, j.instrument.id])));
+      }
+  
+      // optional: immediately probe so demo feels real
+      if (j.instrument?.id) {
+        await fetch(`${API_BASE}/validation/instruments/${j.instrument.id}/probe`, { method: "POST" });
+      }
+  
+      // reset minimal fields
+      setNewInstrument((s) => ({ ...s, nickname: "", model: "", resource_string: "" }));
+    } catch (e: any) {
+      alert(e.message || "Register failed");
+    }
+  };
+  
+  const toggleInstrument = (id: string) => {
+    setSelectedInstrumentIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+  
   
   
   // NEW: agent context menu state
@@ -650,6 +743,14 @@ function WorkflowPage() {
       window.removeEventListener("loadWorkflowGraph", handleLoadWorkflowGraph);
   }, []);
 
+  useEffect(() => {
+    if (showInstrumentPicker) {
+      fetchValidationInstruments();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showInstrumentPicker]);
+  
+
 
   /* ---------- Default Verify Loop ---------- */
   useEffect(() => {
@@ -983,6 +1084,47 @@ function WorkflowPage() {
       console.error("🔥 Unexpected load error:", err);
     }
   };
+
+
+  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[]) => {
+    const formData = new FormData();
+    formData.append("workflow", JSON.stringify(workflowPayload));
+    formData.append("spec_text", text || "");
+    if (file) formData.append("file", file);
+  
+    // ✅ Step 4: attach selected instruments (validation only)
+    if (instrumentIds?.length) {
+      formData.append("instrument_ids", JSON.stringify(instrumentIds));
+    }
+  
+    const res = await fetch(`${API_BASE}/run_workflow`, { method: "POST", body: formData });
+    const result = await res.json();
+  
+    if (result.workflow_id) {
+      const newJobId = result.workflow_id;
+      setJobId(newJobId);
+      setActiveTab("live");
+  
+      if (selectedWorkflowName) {
+        const rec: RunRecord = {
+          run_id: newJobId,
+          run_name: pendingRunName || defaultRunName(selectedWorkflowName),
+          created_at: new Date().toISOString(),
+        };
+  
+        const next = [rec, ...runs].slice(0, 100);
+        setRuns(next);
+        saveRunsForWorkflow(selectedWorkflowName, next);
+        setSelectedRunId(newJobId);
+      }
+  
+      setPendingRunName(null);
+    } else {
+      console.error("❌ Workflow run error:", result);
+    }
+  };
+  
+  
   
   const handleSpecSubmit = async (text: string, file?: File) => {
     try {
@@ -1013,12 +1155,13 @@ function WorkflowPage() {
             if (lbl.includes("digital")) return "digital";
             if (lbl.includes("embedded")) return "embedded";
             if (lbl.includes("analog")) return "analog";
+            if (lbl.includes("validation")) return "validation";
             return null;
           }).filter(Boolean)
         );
   
         if (domains.size === 1) {
-          finalLoopType = [...domains][0];
+          finalLoopType = Array.from(domains)[0] as string;
         } else {
           finalLoopType = "system"; // multiple domains → system loop
         }
@@ -1035,7 +1178,16 @@ function WorkflowPage() {
           target: e.target
         })),
       };
-  
+
+      // ✅ Step 3: if validation loop → open picker first, do NOT run yet
+      if (finalLoopType === "validation") {
+        setPendingSpecText(text || "");
+        setPendingSpecFile(file);
+        setPendingWorkflowPayload(workflow);
+        setShowInstrumentPicker(true);
+        return;
+      }
+
       const formData = new FormData();
       formData.append("workflow", JSON.stringify(workflow));
       formData.append("spec_text", text || "");
@@ -1149,6 +1301,7 @@ function WorkflowPage() {
               <option value="analog">Analog Loop</option>
               <option value="embedded">Embedded Loop</option>
               <option value="system">System Loop</option>
+              <option value="validation">Validation Loop</option>
             </select>
           </div>
   
@@ -1639,6 +1792,118 @@ function WorkflowPage() {
         </div>
       )}
 
+      {showInstrumentPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="w-full max-w-2xl rounded-xl bg-zinc-900 p-5 text-white shadow-xl">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Select instruments for this Validation run</h2>
+              <button
+                className="rounded px-2 py-1 bg-zinc-800 hover:bg-zinc-700"
+                onClick={() => setShowInstrumentPicker(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {instrumentLoadErr && (
+              <div className="mt-3 rounded bg-red-900/40 p-2 text-sm">{instrumentLoadErr}</div>
+            )}
+
+            <div className="mt-4 space-y-2">
+              {(validationInstruments || []).map((inst: any) => (
+                <label key={inst.id} className="flex items-center gap-3 rounded bg-zinc-800/60 p-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedInstrumentIds.includes(inst.id)}
+                    onChange={() => toggleInstrument(inst.id)}
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium">
+                      {inst.nickname} {inst.is_default ? <span className="text-xs text-cyan-300">(default)</span> : null}
+                    </div>
+                    <div className="text-xs text-zinc-300">
+                      {inst.vendor} {inst.model} • {inst.instrument_type} • {inst.interface} • {inst.resource_string}
+                    </div>
+                    {inst.scpi_idn && <div className="text-xs text-zinc-400 mt-1">IDN: {inst.scpi_idn}</div>}
+                  </div>
+
+                  <button
+                    className="rounded bg-zinc-700 px-3 py-1 text-sm hover:bg-zinc-600"
+                    onClick={async () => {
+                      await fetch(`${API_BASE}/validation/instruments/${inst.id}/probe`, { method: "POST" });
+                      await fetchValidationInstruments();
+                    }}
+                  >
+                    Test
+                  </button>
+                </label>
+              ))}
+            </div>
+
+            {/* Add instrument mini-form */}
+            <div className="mt-5 rounded bg-zinc-800/50 p-3">
+              <div className="text-sm font-medium mb-2">Add instrument</div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  className="rounded bg-zinc-900 p-2 text-sm"
+                  placeholder="Nickname"
+                  value={newInstrument.nickname}
+                  onChange={(e) => setNewInstrument(s => ({ ...s, nickname: e.target.value }))}
+                />
+                <input
+                  className="rounded bg-zinc-900 p-2 text-sm"
+                  placeholder="Model (e.g. E36312A)"
+                  value={newInstrument.model}
+                  onChange={(e) => setNewInstrument(s => ({ ...s, model: e.target.value }))}
+                />
+                <input
+                  className="col-span-2 rounded bg-zinc-900 p-2 text-sm"
+                  placeholder='Resource string (e.g. TCPIP0::192.168.0.10::INSTR)'
+                  value={newInstrument.resource_string}
+                  onChange={(e) => setNewInstrument(s => ({ ...s, resource_string: e.target.value }))}
+                />
+              </div>
+
+              <div className="mt-2 flex gap-2">
+                <button
+                  className="rounded bg-cyan-700 px-3 py-2 text-sm hover:bg-cyan-600"
+                  onClick={registerValidationInstrument}
+                >
+                  Register
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm */}
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                className="rounded bg-zinc-800 px-4 py-2 text-sm hover:bg-zinc-700"
+                onClick={() => setShowInstrumentPicker(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="rounded bg-green-700 px-4 py-2 text-sm hover:bg-green-600"
+                onClick={() => {
+                  if (!selectedInstrumentIds.length) {
+                    alert("Select at least one instrument.");
+                    return;
+                  }
+                  setShowInstrumentPicker(false);
+                  // Now trigger the original run path again (simple pattern: call your run function)
+                  // Option A: set a flag like "pendingValidationRun" and handle in useEffect
+                  // Option B: directly call your run function here if you have access
+                }}
+              >
+                Use selected instruments
+              </button>
+            </div>
+          </div>
+        <div>
+      )}
+
+
   
       {/* ===== Modals ===== */}
       {showSpecModal && (
@@ -1663,6 +1928,7 @@ function WorkflowPage() {
           }}
         />
       )}
+      
   
       {showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
       {showAgentPlanner && <AgentPlannerModal onClose={() => setShowAgentPlanner(false)} />}
