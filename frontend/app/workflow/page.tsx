@@ -1900,7 +1900,7 @@ function WorkflowPage() {
               </button>
             </div>
           </div>
-        <div>
+        </div>
       )}
 
       {/* ===== Modals ===== */}
