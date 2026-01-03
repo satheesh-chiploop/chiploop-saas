@@ -1903,8 +1903,6 @@ function WorkflowPage() {
         <div>
       )}
 
-
-  
       {/* ===== Modals ===== */}
       {showSpecModal && (
         <SpecInputModal
