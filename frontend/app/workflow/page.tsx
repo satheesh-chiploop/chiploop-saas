@@ -366,6 +366,7 @@ function WorkflowPage() {
   
   const registerValidationInstrument = async () => {
     try {
+      
       const userId = await getStableUserId(supabase);
 
       const res = await fetch(`${API_BASE}/validation/instruments/register`, {
@@ -392,6 +393,7 @@ function WorkflowPage() {
       alert(e.message || "Register failed");
     }
   };
+
   
   const toggleInstrument = (id: string) => {
     setSelectedInstrumentIds((prev) =>
