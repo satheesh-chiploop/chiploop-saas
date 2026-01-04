@@ -1895,24 +1895,6 @@ function WorkflowPage() {
                     return;
                   }
                   setShowInstrumentPicker(false);
-                  // ✅ trigger actual workflow execution now
-                  if (!pendingWorkflowPayload) {
-                    alert("Missing pending workflow payload. Please click Run Workflow again.");
-                    return;
-                  }
-
-                  await runWorkflowWithFormData(
-                    pendingWorkflowPayload,
-                    pendingSpecText,
-                    pendingSpecFile,
-                    selectedInstrumentIds
-                  );
-
-                  // ✅ cleanup
-                  setPendingWorkflowPayload(null);
-                  setPendingSpecText("");
-                  setPendingSpecFile(undefined);
-
                   // Now trigger the original run path again (simple pattern: call your run function)
                   // Option A: set a flag like "pendingValidationRun" and handle in useEffect
                   // Option B: directly call your run function here if you have access
