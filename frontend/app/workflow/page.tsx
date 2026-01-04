@@ -1095,13 +1095,21 @@ function WorkflowPage() {
     formData.append("workflow", JSON.stringify(workflowPayload));
     formData.append("spec_text", text || "");
     if (file) formData.append("file", file);
+
+    const userId = await getStableUserId(); // or however you already do it in this file
   
     // ✅ Step 4: attach selected instruments (validation only)
     if (instrumentIds?.length) {
       formData.append("instrument_ids", JSON.stringify(instrumentIds));
     }
-  
-    const res = await fetch(`${API_BASE}/run_workflow`, { method: "POST", body: formData });
+    const res = await fetch(`${API_BASE}/run_workflow`, {
+      method: "POST",
+      headers: {
+        "x-user-id": userId,
+      },
+      body: formData,
+    });
+    
     const result = await res.json();
   
     if (result.workflow_id) {
