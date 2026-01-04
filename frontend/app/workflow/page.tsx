@@ -346,17 +346,19 @@ function WorkflowPage() {
     setInstrumentLoadErr(null);
     try {
       const userId = await getStableUserId(supabase);
-  
-      const res = await fetch(`${API_BASE}/validation/instruments/list?user_id=${encodeURIComponent(userId)}`);
+
+      const res = await fetch(`${API_BASE}/validation/instruments`, {
+        headers: { "x-user-id": userId },
+      });
       const j = await res.json();
-      if (!res.ok || j.status !== "ok") throw new Error(j.message || "Failed to load instruments");
-  
+      if (!res.ok || !j.ok) throw new Error(j.detail || "Failed to load instruments");
+
       const items = j.instruments || [];
       setValidationInstruments(items);
-  
-      // auto-select defaults if present (nice UX)
+
       const defaults = items.filter((x: any) => x.is_default).map((x: any) => x.id);
       if (defaults.length > 0) setSelectedInstrumentIds(defaults);
+
     } catch (e: any) {
       setInstrumentLoadErr(e.message || "Failed to load instruments");
     }
@@ -365,27 +367,26 @@ function WorkflowPage() {
   const registerValidationInstrument = async () => {
     try {
       const userId = await getStableUserId(supabase);
-  
+
       const res = await fetch(`${API_BASE}/validation/instruments/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, ...newInstrument }),
+        headers: { "Content-Type": "application/json", "x-user-id": userId },
+        body: JSON.stringify({ ...newInstrument }),
       });
       const j = await res.json();
-      if (!res.ok || j.status !== "ok") throw new Error(j.message || "Register failed");
-  
-      // refresh list & auto-select newly added
+      if (!res.ok || !j.ok) throw new Error(j.detail || "Register failed");
+
       await fetchValidationInstruments();
+
       if (j.instrument?.id) {
         setSelectedInstrumentIds((prev) => Array.from(new Set([...prev, j.instrument.id])));
+
+        await fetch(`${API_BASE}/validation/instruments/${j.instrument.id}/probe`, {
+          method: "POST",
+          headers: { "x-user-id": userId },
+        });
       }
-  
-      // optional: immediately probe so demo feels real
-      if (j.instrument?.id) {
-        await fetch(`${API_BASE}/validation/instruments/${j.instrument.id}/probe`, { method: "POST" });
-      }
-  
-      // reset minimal fields
+      
       setNewInstrument((s) => ({ ...s, nickname: "", model: "", resource_string: "" }));
     } catch (e: any) {
       alert(e.message || "Register failed");
@@ -397,7 +398,7 @@ function WorkflowPage() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-  
+ 
   
   
   // NEW: agent context menu state
