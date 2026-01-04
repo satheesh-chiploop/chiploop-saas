@@ -77,6 +77,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Validation Sequence Builder Agent", backendLabel: "Validation Sequence Builder Agent", desc: "Builds an executable SCPI test sequence (steps) from bench_setup + test_plan (initially Keysight-class examples; transport is PyVISA/SCPI)." },
     { uiLabel: "Validation Execution Orchestrator Agent", backendLabel: "Validation Execution Orchestrator Agent", desc: "Executes the validation test_sequence and produces results artifacts. MVP uses a stub executor; next step swaps in real PyVISA I/O." },
     { uiLabel: "Validation Analytics Agent", backendLabel: "Validation Analytics Agent", desc: "Applies test_plan measurement limits (min/max) to captured results and generates analytics + a demo-ready report." },
+    { uiLabel: "Validation Scope Agent", backendLabel: "Validation Scope Agent", desc: "Applies user-selected scope (by tags or test names) to the generated validation test_plan and produces a scoped test plan for downstream sequence building." },
   ],
   system: [
     { uiLabel: "Digital Spec Agent", backendLabel: "Digital Spec Agent", desc: "System-level digital spec" },
@@ -104,6 +105,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Validation Sequence Builder Agent", backendLabel: "Validation Sequence Builder Agent", desc: "Builds an executable SCPI test sequence (steps) from bench_setup + test_plan (initially Keysight-class examples; transport is PyVISA/SCPI)." },
     { uiLabel: "Validation Execution Orchestrator Agent", backendLabel: "Validation Execution Orchestrator Agent", desc: "Executes the validation test_sequence and produces results artifacts. MVP uses a stub executor; next step swaps in real PyVISA I/O." },
     { uiLabel: "Validation Analytics Agent", backendLabel: "Validation Analytics Agent", desc: "Applies test_plan measurement limits (min/max) to captured results and generates analytics + a demo-ready report." },
+    { uiLabel: "Validation Scope Agent", backendLabel: "Validation Scope Agent", desc: "Applies user-selected scope (by tags or test names) to the generated validation test_plan and produces a scoped test plan for downstream sequence building." },
     { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
