@@ -366,7 +366,6 @@ function WorkflowPage() {
   
   const registerValidationInstrument = async () => {
     try {
-      
       const userId = await getStableUserId(supabase);
 
       const res = await fetch(`${API_BASE}/validation/instruments/register`, {
@@ -393,14 +392,13 @@ function WorkflowPage() {
       alert(e.message || "Register failed");
     }
   };
-
   
   const toggleInstrument = (id: string) => {
     setSelectedInstrumentIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-
+ 
   
   
   // NEW: agent context menu state
@@ -1914,6 +1912,10 @@ function WorkflowPage() {
                   setPendingWorkflowPayload(null);
                   setPendingSpecText("");
                   setPendingSpecFile(undefined);
+
+                  // Now trigger the original run path again (simple pattern: call your run function)
+                  // Option A: set a flag like "pendingValidationRun" and handle in useEffect
+                  // Option B: directly call your run function here if you have access
                 }}
               >
                 Use selected instruments
