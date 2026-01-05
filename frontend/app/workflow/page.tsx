@@ -117,6 +117,32 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
 //const [showPlanner, setShowPlanner] = useState(false);
 
 //{showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
+
+function computeMissingInstrumentTypes(plan: any, selectedNames: string[], selectedInstrumentRows: any[]) {
+  const selectedSet = new Set(selectedNames);
+
+  const needed = new Set<string>();
+  for (const t of (plan?.tests || [])) {
+    if (!t?.name) continue;
+    if (!selectedSet.has(t.name)) continue;
+    for (const it of (t.required_instruments || [])) needed.add(String(it));
+  }
+
+  const have = new Set<string>();
+  for (const inst of (selectedInstrumentRows || [])) {
+    if (inst?.instrument_type) have.add(String(inst.instrument_type));
+  }
+
+  const missing: string[] = [];
+  for (const req of needed) if (!have.has(req)) missing.push(req);
+
+  return missing;
+}
+
+
+
+
+
 /* =========================
    Page Wrapper
 ========================= */
@@ -172,6 +198,12 @@ function WorkflowPage() {
   const [pendingSpecFile, setPendingSpecFile] = useState<File | undefined>(undefined);
   const [pendingWorkflowPayload, setPendingWorkflowPayload] = useState<any>(null);
   const [pendingValidationRun, setPendingValidationRun] = useState(false);
+
+  const [showScopeModal, setShowScopeModal] = useState(false);
+  const [previewTestPlan, setPreviewTestPlan] = useState<any>(null);
+  const [selectedTestNames, setSelectedTestNames] = useState<string[]>([]);
+  const [missingInstrumentTypes, setMissingInstrumentTypes] = useState<string[]>([]);
+
 
 
   // lightweight "add instrument" form inside the modal
@@ -1090,7 +1122,7 @@ function WorkflowPage() {
   };
 
 
-  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[]) => {
+  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any) => {
     const formData = new FormData();
     formData.append("workflow", JSON.stringify(workflowPayload));
     formData.append("spec_text", text || "");
@@ -1101,6 +1133,10 @@ function WorkflowPage() {
     // ✅ Step 4: attach selected instruments (validation only)
     if (instrumentIds?.length) {
       formData.append("instrument_ids", JSON.stringify(instrumentIds));
+    }
+    // ✅ NEW: scope selection
+    if (scopePayload) {
+      formData.append("scope_json", JSON.stringify(scopePayload));
     }
     const res = await fetch(`${API_BASE}/run_workflow`, {
       method: "POST",
@@ -1910,20 +1946,41 @@ function WorkflowPage() {
                     return;
                   }
 
-                  await runWorkflowWithFormData(
-                    pendingWorkflowPayload,
-                    pendingSpecText,
-                    pendingSpecFile,
-                    selectedInstrumentIds
+                  // ✅ Phase-0 (Option 1): generate test plan preview, then open scope modal
+                  const selectedInstrumentRows = (validationInstruments || []).filter((i: any) =>
+                    selectedInstrumentIds.includes(i.id)
                   );
 
-                  // ✅ cleanup
-                  setPendingWorkflowPayload(null);
-                  setPendingSpecText("");
-                  setPendingSpecFile(undefined);
-                  // Now trigger the original run path again (simple pattern: call your run function)
-                  // Option A: set a flag like "pendingValidationRun" and handle in useEffect
-                  // Option B: directly call your run function here if you have access
+                  const resp = await fetch(`${BACKEND_URL}/validation/test_plan/preview`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      workflow_id: pendingWorkflowPayload.workflow_id ?? pendingWorkflowPayload.id, // whichever you use
+                      datasheet_text: pendingSpecText,
+                      goal: "Create a validation test plan",
+                    }),
+                  });
+
+                  const data = await resp.json();
+                  if (!resp.ok || data?.status !== "ok") {
+                    alert(data?.message || "Failed to generate test plan preview");
+                    return;
+                  }
+
+                  const plan = data.test_plan;
+                  setPreviewTestPlan(plan);
+
+                  // default: select all tests
+                  const allNames =
+                    (plan?.tests || []).map((t: any) => t?.name).filter(Boolean) || [];
+                  setSelectedTestNames(allNames);
+
+                  // compute missing instrument types based on selected tests
+                  const missing = computeMissingInstrumentTypes(plan, allNames, selectedInstrumentRows);
+                  setMissingInstrumentTypes(missing);
+
+                  // open scope modal (user selects tests/features + sees instrument coverage)
+                  setShowScopeModal(true);
                 }}
               >
                 Use selected instruments
@@ -1956,6 +2013,119 @@ function WorkflowPage() {
           }}
         />
       )}
+
+      {showScopeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-[900px] max-w-[95vw] rounded-lg bg-zinc-900 p-4 border border-zinc-700">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">Validation Scope for this Run</h3>
+              <button className="text-zinc-300 hover:text-white" onClick={() => setShowScopeModal(false)}>✕</button>
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-4">
+              <div className="border border-zinc-700 rounded p-3">
+                <div className="text-sm text-zinc-200 mb-2">Select tests/features to include:</div>
+                <div className="max-h-[380px] overflow-auto space-y-2">
+                  {(previewTestPlan?.tests || []).map((t: any) => {
+                    const name = t?.name;
+                    if (!name) return null;
+                    const checked = selectedTestNames.includes(name);
+                    return (
+                      <label key={name} className="flex items-start gap-2 text-zinc-100">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            const next = e.target.checked
+                              ? [...selectedTestNames, name]
+                              : selectedTestNames.filter((x) => x !== name);
+                            setSelectedTestNames(next);
+
+                            // recompute missing
+                            const missing = computeMissingInstrumentTypes(previewTestPlan, next, selectedInstrumentRows);
+                            setMissingInstrumentTypes(missing);
+                          }}
+                        />
+                        <div>
+                          <div className="font-medium">{name}</div>
+                          <div className="text-xs text-zinc-400">{t?.objective || ""}</div>
+                          <div className="text-xs text-zinc-500">
+                            requires: {(t?.required_instruments || []).join(", ")}
+                          </div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="border border-zinc-700 rounded p-3">
+                <div className="text-sm text-zinc-200 mb-2">Instrument coverage</div>
+
+                {missingInstrumentTypes.length === 0 ? (
+                  <div className="text-green-400 text-sm">✅ Your selected instruments cover this scope.</div>
+                ) : (
+                  <div className="text-yellow-300 text-sm">
+                    ⚠ Missing instrument types for selected scope: <b>{missingInstrumentTypes.join(", ")}</b>
+                    <div className="text-xs text-zinc-400 mt-2">
+                      Either (1) deselect tests requiring these instruments, or (2) register/select matching instruments.
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-4 flex gap-2">
+                  <button
+                    className="px-3 py-2 rounded bg-zinc-700 text-white hover:bg-zinc-600"
+                    onClick={() => {
+                    // go back to instrument selection
+                      setShowScopeModal(false);
+                      setShowInstrumentPicker(true);
+                    }}
+                  >
+                    Change Instruments
+                  </button>
+
+                  <button
+                    className="ml-auto px-3 py-2 rounded bg-cyan-600 text-white hover:bg-cyan-500"
+                    onClick={async () => {
+                      if (!pendingWorkflowPayload) {
+                        alert("Missing pending workflow payload. Please click Run Workflow again.");
+                        return;
+                      }
+                      if (selectedTestNames.length === 0) {
+                        alert("Please select at least one test.");
+                        return;
+                      }
+
+                      // Build scope payload for Validation Scope Agent
+                      const scopePayload = {
+                        mode: "by_test_names",
+                        include_tests: selectedTestNames,
+                      };
+
+                      // Run the workflow uninterrupted with scope_json
+                      await runWorkflowWithFormData(
+                        pendingWorkflowPayload,
+                        pendingSpecText,
+                        pendingSpecFile,
+                        selectedInstrumentIds,
+                        scopePayload
+                      );
+
+                      // cleanup
+                      setShowScopeModal(false);
+                      setPreviewTestPlan(null);
+                    }}
+                  >
+                    Run Selected Scope
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       
   
       {showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
