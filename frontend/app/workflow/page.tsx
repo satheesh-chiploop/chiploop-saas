@@ -1234,10 +1234,7 @@ function WorkflowPage() {
       // ✅ Step 3: if validation loop → open picker first, do NOT run yet
       if (finalLoopType === "validation") {
   // IMPORTANT: preview endpoint needs a REAL workflow_id (saved workflow row)
-        const savedWorkflowId =
-          (selectedWorkflow as any)?.id ||
-          (selectedWorkflow as any)?.workflow_id ||
-          null;
+        const savedWorkflowId = selectedWorkflowId;
 
         if (!savedWorkflowId) {
           alert("Validation preview needs a saved workflow. Please select (or save) a workflow, then click Run Workflow again.");
