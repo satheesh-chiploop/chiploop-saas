@@ -206,6 +206,9 @@ function WorkflowPage() {
 
   const [selectedInstrumentRows, setSelectedInstrumentRows] = useState<any[]>([]);
 
+  const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
+  const [selectedWorkflowLoopType, setSelectedWorkflowLoopType] = useState<string | null>(null);
+
 
 
 
@@ -1067,10 +1070,18 @@ function WorkflowPage() {
       // 2) Fetch workflow record
       const { data, error } = await supabase
         .from("workflows")
-        .select("definitions")
+        .select("id,loop_type,definitions")
         .eq("user_id", userId)
         .eq("name", wfName)
+        .eq("id",workflowId)
         .maybeSingle();
+
+        if (!error && data) {
+          setSelectedWorkflowId(data.id);
+          setSelectedWorkflowLoopType(data.loop_type || null);
+        
+          // keep your existing logic that loads `definitions` into nodes/edges
+        }
   
       console.log("📦 Returned from Supabase:", data);
   
@@ -1190,10 +1201,8 @@ function WorkflowPage() {
       let finalLoopType = "system";
 
       // Try reading loop type from saved workflow
-      const fromSidebarLoop =
-        typeof selectedWorkflow !== "undefined"
-          ? (selectedWorkflow as any)?.loop_type
-          : null;
+      
+      const fromSidebarLoop = selectedWorkflowLoopType;
   
       // If workflow came from Supabase sidebar, respect its loop_type
       if (fromSidebarLoop) {
@@ -1246,10 +1255,11 @@ function WorkflowPage() {
 
         // attach workflow_id so preview can work
         setPendingWorkflowPayload({
-          ...workflow,
+          workflow,
           workflow_id: savedWorkflowId,
-          id: savedWorkflowId, // optional, but helps your existing fallback logic
+          id: savedWorkflowId, // keep if your fallback uses it
         });
+        
 
         setShowInstrumentPicker(true);
         return;
