@@ -204,6 +204,9 @@ function WorkflowPage() {
   const [selectedTestNames, setSelectedTestNames] = useState<string[]>([]);
   const [missingInstrumentTypes, setMissingInstrumentTypes] = useState<string[]>([]);
 
+  const [selectedInstrumentRows, setSelectedInstrumentRows] = useState<any[]>([]);
+
+
 
 
   // lightweight "add instrument" form inside the modal
@@ -1950,8 +1953,11 @@ function WorkflowPage() {
                   const selectedInstrumentRows = (validationInstruments || []).filter((i: any) =>
                     selectedInstrumentIds.includes(i.id)
                   );
+                  
+                  setSelectedInstrumentRows(selectedInstrumentRows);
 
-                  const resp = await fetch(`${BACKEND_URL}/validation/test_plan/preview`, {
+
+                  const resp = await fetch(`${API_BASE}/validation/test_plan/preview`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
