@@ -1953,16 +1953,33 @@ function WorkflowPage() {
                   const selectedInstrumentRows = (validationInstruments || []).filter((i: any) =>
                     selectedInstrumentIds.includes(i.id)
                   );
-                  
+
                   setSelectedInstrumentRows(selectedInstrumentRows);
 
+                  const wfId =
+                    pendingWorkflowPayload?.workflow_id ||
+                    pendingWorkflowPayload?.id ||
+                    pendingWorkflowPayload?.workflowId;
 
+                  const dsText = (pendingSpecText || "").trim();
+
+                  if (!wfId) {
+                    alert("Missing workflow_id for preview. Please click Run Workflow again.");
+                    return;
+                  }
+                  if (!dsText) {
+                    alert("Missing datasheet/spec text. Please paste datasheet in the Spec modal.");
+                    return;
+                  }
+
+                  console.log("[Preview] wfId =", wfId);
+                  console.log("[Preview] datasheet_text length =", dsText.length);
                   const resp = await fetch(`${API_BASE}/validation/test_plan/preview`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                      workflow_id: pendingWorkflowPayload.workflow_id ?? pendingWorkflowPayload.id, // whichever you use
-                      datasheet_text: pendingSpecText,
+                      workflow_id: wfId,
+                      datasheet_text: dsText,
                       goal: "Create a validation test plan",
                     }),
                   });
