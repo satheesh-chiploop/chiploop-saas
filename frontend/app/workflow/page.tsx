@@ -1934,6 +1934,24 @@ function WorkflowPage() {
                   value={newInstrument.model}
                   onChange={(e) => setNewInstrument(s => ({ ...s, model: e.target.value }))}
                 />
+
+                {/* Instrument Type */}
+                <select
+                  className="rounded bg-zinc-900 p-2 text-sm border border-zinc-700"
+                  value={newInstrument.instrument_type}
+                  onChange={(e) =>
+                    setNewInstrument({
+                      ...newInstrument,
+                      instrument_type: e.target.value,
+                    })
+                  }
+                >
+                  <option value="psu">PSU</option>
+                  <option value="dmm">DMM</option>
+                  <option value="smu">SMU</option>
+                  <option value="scope">Scope</option>
+                </select>
+  
                 <input
                   className="col-span-2 rounded bg-zinc-900 p-2 text-sm"
                   placeholder='Resource string (e.g. TCPIP0::192.168.0.10::INSTR)'
