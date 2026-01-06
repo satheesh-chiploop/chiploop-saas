@@ -1073,7 +1073,6 @@ function WorkflowPage() {
         .select("id,loop_type,definitions")
         .eq("user_id", userId)
         .eq("name", wfName)
-        .eq("id",workflowId)
         .maybeSingle();
 
         if (!error && data) {
