@@ -1231,13 +1231,33 @@ function WorkflowPage() {
       };
 
       // ✅ Step 3: if validation loop → open picker first, do NOT run yet
+      // ✅ Step 3: if validation loop → open picker first, do NOT run yet
       if (finalLoopType === "validation") {
+  // IMPORTANT: preview endpoint needs a REAL workflow_id (saved workflow row)
+        const savedWorkflowId =
+          (selectedWorkflow as any)?.id ||
+          (selectedWorkflow as any)?.workflow_id ||
+          null;
+
+        if (!savedWorkflowId) {
+          alert("Validation preview needs a saved workflow. Please select (or save) a workflow, then click Run Workflow again.");
+          return;
+        }
+
         setPendingSpecText(text || "");
         setPendingSpecFile(file);
-        setPendingWorkflowPayload(workflow);
+
+        // attach workflow_id so preview can work
+        setPendingWorkflowPayload({
+          ...workflow,
+          workflow_id: savedWorkflowId,
+          id: savedWorkflowId, // optional, but helps your existing fallback logic
+        });
+
         setShowInstrumentPicker(true);
         return;
       }
+
 
       const formData = new FormData();
       formData.append("workflow", JSON.stringify(workflow));
