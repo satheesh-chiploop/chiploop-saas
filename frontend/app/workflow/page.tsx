@@ -1137,11 +1137,17 @@ function WorkflowPage() {
 
   const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any) => {
     const formData = new FormData();
-    formData.append("workflow", JSON.stringify(workflowPayload));
+
+    // ✅ unwrap if caller passed { workflow: {...}, workflow_id: ... }
+    const wf = workflowPayload?.workflow ? workflowPayload.workflow : workflowPayload;
+
+    formData.append("workflow", JSON.stringify(wf));
+
+    
     formData.append("spec_text", text || "");
     if (file) formData.append("file", file);
 
-    const userId = await getStableUserId(); // or however you already do it in this file
+    const userId = await getStableUserId(supabase); // or however you already do it in this file
   
     // ✅ Step 4: attach selected instruments (validation only)
     if (instrumentIds?.length) {
