@@ -3,7 +3,10 @@ import json
 import csv
 import io
 import datetime
+import logging
+logger = logging.getLogger(__name__)
 from typing import Any, Dict, Optional, Tuple
+
 
 from utils.artifact_utils import save_text_artifact_and_record
 
@@ -112,13 +115,21 @@ def run_agent(state: dict) -> dict:
 
     if not workflow_id or not seq:
         state["status"] = "❌ Missing workflow_id or test_sequence"
+        logger.warning(
+          "[EXECUTION ORCH] Early return | "
+          f"has_test_sequence={bool(test_sequence)} | "
+          f"has_workflow_id={bool(workflow_id)} | "
+          f"state_keys={list(state.keys())}"
+        )
         return state
 
     agent_name = "Validation Execution Orchestrator Agent"
 
+    logger.info(f"[DEBUG] {agent_name} status={state.get('status')}")
+
     # Decide executor mode: "pyvisa" (default) or "stub"
     mode = (os.getenv("VALIDATION_EXECUTION_MODE") or "pyvisa").lower()
-
+    mode = "stub"
     results_rows = []
     results_json: Dict[str, Any] = {
         "workflow_id": workflow_id,
@@ -130,7 +141,7 @@ def run_agent(state: dict) -> dict:
     # Build instrument map from sequence["instruments"]
     instruments = (seq.get("instruments") or {})
     handle_cache: Dict[str, Any] = {}
-
+    
     def _get_handle(rm, resource: str):
         if resource not in handle_cache:
             handle_cache[resource] = _open_resource(rm, resource)
