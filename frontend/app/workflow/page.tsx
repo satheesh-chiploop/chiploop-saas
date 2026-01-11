@@ -215,6 +215,11 @@ function WorkflowPage() {
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
   const [selectedWorkflowLoopType, setSelectedWorkflowLoopType] = useState<string | null>(null);
 
+  const [showBenchPicker, setShowBenchPicker] = useState(false);
+  const [validationBenches, setValidationBenches] = useState<any[]>([]);
+  const [selectedBenchId, setSelectedBenchId] = useState<string>("");
+
+
 
 
 
@@ -559,6 +564,16 @@ function WorkflowPage() {
       closeDesignIntentMenu();
     }
   };
+
+  const loadBenches = async () => {
+    const { data, error } = await supabase
+      .from("validation_benches")
+      .select("id,name,location,status")
+      .order("created_at", { ascending: false });
+  
+    if (!error) setValidationBenches(data || []);
+  };
+  
 
   const deleteDesignIntent = async (intent: any) => {
     try {
@@ -1141,7 +1156,7 @@ function WorkflowPage() {
   };
 
 
-  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any) => {
+  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string) => {
     const formData = new FormData();
 
     // ✅ unwrap if caller passed { workflow: {...}, workflow_id: ... }
@@ -1162,6 +1177,10 @@ function WorkflowPage() {
     // ✅ NEW: scope selection
     if (scopePayload) {
       formData.append("scope_json", JSON.stringify(scopePayload));
+    }
+    // ✅ NEW: only for WF-2/WF-3
+    if (benchId) {
+      formData.append("bench_id", benchId);
     }
     const res = await fetch(`${API_BASE}/run_workflow`, {
       method: "POST",
@@ -1270,9 +1289,20 @@ function WorkflowPage() {
           workflow_id: savedWorkflowId,
           id: savedWorkflowId, // keep if your fallback uses it
         });
-        
 
-        setShowInstrumentPicker(true);
+        // ✅ NEW: WF-2/WF-3 should go Bench-first, WF-1 stays Instrument-first
+        const wfName = (selectedWorkflowName || "").toLowerCase();
+        const needsBench =
+          wfName.includes("Preflight") ||
+          wfName.includes("Hardware_Test_Run") ||
+          wfName.includes("run validation");
+
+        if (needsBench) {
+          setShowBenchPicker(true);   // <-- you add this modal/state
+        } else {
+          setShowInstrumentPicker(true); // <-- existing WF-1 behavior unchanged
+        }
+      
         return;
       }
 
@@ -2068,6 +2098,61 @@ function WorkflowPage() {
           </div>
         </div>
       )}
+
+      {showBenchPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-[700px] max-w-[95vw] rounded-lg bg-zinc-900 p-4 border border-zinc-700">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">Select Bench</h3>
+              <button className="text-zinc-300 hover:text-white" onClick={() => setShowBenchPicker(false)}>✕</button>
+            </div>
+
+            <div className="mt-3">
+              <select
+                className="w-full rounded bg-zinc-800 border border-zinc-700 p-2 text-white"
+                value={selectedBenchId}
+                onChange={(e) => setSelectedBenchId(e.target.value)}
+              >
+                <option value="">-- choose a bench --</option>
+                {validationBenches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name} — {b.location || "NA"} ({b.status})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button className="rounded bg-zinc-800 px-4 py-2 text-sm hover:bg-zinc-700"
+                onClick={() => setShowBenchPicker(false)}>
+                Cancel
+              </button>
+
+              <button className="rounded bg-green-700 px-4 py-2 text-sm hover:bg-green-600"
+                onClick={async () => {
+                  if (!selectedBenchId) {
+                    alert("Select a bench.");
+                    return;
+                  }
+                  setShowBenchPicker(false);
+
+                  // For WF-2/WF-3: run preflight/run-validation directly with bench_id
+                  await runWorkflowWithFormData(
+                    pendingWorkflowPayload,
+                    pendingSpecText,
+                    pendingSpecFile,
+                    [],                 // instruments not required here
+                    null,               // scope_json optional
+                    selectedBenchId      // ✅ add as new param
+                  );
+                }}>
+                Use selected bench
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* ===== Modals ===== */}
       {showSpecModal && (
