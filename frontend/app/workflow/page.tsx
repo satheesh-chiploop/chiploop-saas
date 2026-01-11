@@ -2155,7 +2155,10 @@ function WorkflowPage() {
                     return;
                   }
                   setShowBenchPicker(false);
-
+                  if (!pendingWorkflowPayload) {
+                    alert("Missing pending workflow payload. Close and click Run Workflow again.");
+                    return;
+                  }
                   // For WF-2/WF-3: run preflight/run-validation directly with bench_id
                   await runWorkflowWithFormData(
                     pendingWorkflowPayload,
