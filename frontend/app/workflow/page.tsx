@@ -932,13 +932,38 @@ function WorkflowPage() {
       wfNameLower.includes("hardware_test_run");
 
     if ((loop || "").toLowerCase() === "validation" && needsBench) {
-    // ensure bench list is loaded (you already have loadBenches())
+      // ✅ bench workflows must have a saved workflow id
+      if (!selectedWorkflowId) {
+        alert("Please save/select the workflow first (missing workflow_id).");
+        return;
+      }
+      
+      // ✅ build workflow payload exactly like handleSpecSubmit does
+      const workflow = {
+        loop_type: "validation",
+        nodes: nodes.map((n) => ({
+          label: n.data.backendLabel,
+        })),
+        edges: edges.map((e) => ({
+          source: e.source,
+          target: e.target,
+        })),
+      };
+     
+      // ✅ IMPORTANT: set pending payload so bench picker can run
+      setPendingWorkflowPayload({
+        workflow,
+        workflow_id: selectedWorkflowId,
+        id: selectedWorkflowId,
+      });
+      
       await loadBenches();
       setPendingSpecText("");
       setPendingSpecFile(undefined);
       setShowBenchPicker(true);
       return;
     }
+      
 
     // ✅ WF-1 unchanged (spec-driven)
     setShowSpecModal(true);
