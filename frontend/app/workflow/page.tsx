@@ -923,8 +923,26 @@ function WorkflowPage() {
 
     setPendingRunName(runName);
 
-    // Open spec input modal (handleSpecSubmit will create the run)
+    // ✅ WF-2/WF-3 bench-first: skip spec modal
+    const wfNameLower = (selectedWorkflowName || "").toLowerCase();
+    const needsBench =
+      wfNameLower.includes("validation_preflight_bench") ||
+      wfNameLower.includes("validation_hardware_test_run") ||
+      wfNameLower.includes("preflight") ||
+      wfNameLower.includes("hardware_test_run");
+
+    if ((loop || "").toLowerCase() === "validation" && needsBench) {
+    // ensure bench list is loaded (you already have loadBenches())
+      await loadBenches();
+      setPendingSpecText("");
+      setPendingSpecFile(undefined);
+      setShowBenchPicker(true);
+      return;
+    }
+
+    // ✅ WF-1 unchanged (spec-driven)
     setShowSpecModal(true);
+
   };
   
     
@@ -1292,10 +1310,12 @@ function WorkflowPage() {
 
         // ✅ NEW: WF-2/WF-3 should go Bench-first, WF-1 stays Instrument-first
         const wfName = (selectedWorkflowName || "").toLowerCase();
+
         const needsBench =
+          wfName.includes("validation_preflight_bench") ||
+          wfName.includes("validation_hardware_test_run") ||
           wfName.includes("preflight") ||
-          wfName.includes("hardware_test_run") ||
-          wfName.includes("run_validation");
+          wfName.includes("hardware_test_run");
 
         if (needsBench) {
           setShowBenchPicker(true);   // <-- you add this modal/state
