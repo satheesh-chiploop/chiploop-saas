@@ -81,6 +81,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Validation Connectivity Intent Agent", backendLabel: "Validation Connectivity Intent Agent", desc: "Phase-1: Generates logical connectivity intent (bench template) from test plan. No physical resource strings; reusable across labs." },
     { uiLabel: "Validation Wiring Instructions Agent", backendLabel: "Validation Wiring Instructions Agent", desc: "Phase-1: Generates human-readable lab wiring instructions from connectivity intent (lab never logs into ChipLoop)." },
     { uiLabel: "Validation Preflight Agent", backendLabel: "Validation Preflight Agent", desc: "Phase-2a: Safe bench readiness checks (coverage + resource string sanity + optional *IDN?); no DUT stimulus. Supports stub or pyvisa mode." },
+    { uiLabel: "Validation Bench Create Agent", backendLabel: "Validation Bench Create Agent", desc: "Creates a new validation bench and maps selected instruments to it. Outputs a creation report and summary." },
   ],
   system: [
     { uiLabel: "Digital Spec Agent", backendLabel: "Digital Spec Agent", desc: "System-level digital spec" },
@@ -112,6 +113,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Validation Connectivity Intent Agent", backendLabel: "Validation Connectivity Intent Agent", desc: "Phase-1: Generates logical connectivity intent (bench template) from test plan. No physical resource strings; reusable across labs." },
     { uiLabel: "Validation Wiring Instructions Agent", backendLabel: "Validation Wiring Instructions Agent", desc: "Phase-1: Generates human-readable lab wiring instructions from connectivity intent (lab never logs into ChipLoop)." },
     { uiLabel: "Validation Preflight Agent", backendLabel: "Validation Preflight Agent", desc: "Phase-2a: Safe bench readiness checks (coverage + resource string sanity + optional *IDN?); no DUT stimulus. Supports stub or pyvisa mode." },
+    { uiLabel: "Validation Bench Create Agent", backendLabel: "Validation Bench Create Agent", desc: "Creates a new validation bench and maps selected instruments to it. Outputs a creation report and summary." },
     { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
@@ -218,6 +220,10 @@ function WorkflowPage() {
   const [showBenchPicker, setShowBenchPicker] = useState(false);
   const [validationBenches, setValidationBenches] = useState<any[]>([]);
   const [selectedBenchId, setSelectedBenchId] = useState<string>("");
+
+  const [benchName, setBenchName] = useState("");
+  const [benchLocation, setBenchLocation] = useState("");
+
 
 
 
@@ -1225,6 +1231,12 @@ function WorkflowPage() {
     if (benchId) {
       formData.append("bench_id", benchId);
     }
+
+    if (selectedWorkflowName === "Validation_Create_Bench") {
+      formData.append("bench_name", benchName);
+      formData.append("bench_location", benchLocation || "");
+    }
+    
     const res = await fetch(`${API_BASE}/run_workflow`, {
       method: "POST",
       headers: {
@@ -1958,6 +1970,23 @@ function WorkflowPage() {
 
       {showInstrumentPicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          {selectedWorkflowName === "Validation_Create_Bench" && (
+            <div className="mb-4 space-y-2">
+              <input
+                className="w-full border px-2 py-1"
+                placeholder="Bench name"
+                value={benchName}
+                onChange={(e) => setBenchName(e.target.value)}
+              />
+              <input
+                className="w-full border px-2 py-1"
+                placeholder="Bench location (optional)"
+                value={benchLocation}
+                onChange={(e) => setBenchLocation(e.target.value)}
+              />
+            </div>
+          )}
+
           <div className="w-full max-w-2xl rounded-xl bg-zinc-900 p-5 text-white shadow-xl">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Select instruments for this Validation run</h2>
