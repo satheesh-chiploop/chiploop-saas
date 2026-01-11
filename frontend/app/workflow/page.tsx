@@ -1293,9 +1293,9 @@ function WorkflowPage() {
         // ✅ NEW: WF-2/WF-3 should go Bench-first, WF-1 stays Instrument-first
         const wfName = (selectedWorkflowName || "").toLowerCase();
         const needsBench =
-          wfName.includes("Preflight") ||
-          wfName.includes("Hardware_Test_Run") ||
-          wfName.includes("run validation");
+          wfName.includes("preflight") ||
+          wfName.includes("hardware_test_run") ||
+          wfName.includes("run_validation");
 
         if (needsBench) {
           setShowBenchPicker(true);   // <-- you add this modal/state
