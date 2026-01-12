@@ -929,49 +929,74 @@ function WorkflowPage() {
 
     setPendingRunName(runName);
 
-    // ✅ WF-2/WF-3 bench-first: skip spec modal
-    const wfNameLower = (selectedWorkflowName || "").toLowerCase();
+    const wfNameLower = selectedWorkflowName.toLowerCase();
+    const loopLower = (loop || "").toLowerCase();
+
+    // ✅ special-case: create bench does NOT require spec and does NOT need bench picker
+    const isCreateBench = wfNameLower.includes("validation_create_bench");
+
+    // ✅ bench picker is only for preflight/hardware run workflows (not create-bench)
     const needsBench =
-      wfNameLower.includes("validation_preflight_bench") ||
       wfNameLower.includes("validation_hardware_test_run") ||
       wfNameLower.includes("preflight") ||
       wfNameLower.includes("hardware_test_run");
 
-    if ((loop || "").toLowerCase() === "validation" && needsBench) {
-      // ✅ bench workflows must have a saved workflow id
+    if (loopLower === "validation" && isCreateBench) {
+      // must have saved workflow id
       if (!selectedWorkflowId) {
         alert("Please save/select the workflow first (missing workflow_id).");
         return;
       }
-      
-      // ✅ build workflow payload exactly like handleSpecSubmit does
+
+      // build workflow payload (same as your bench picker branch)
       const workflow = {
         loop_type: "validation",
-        nodes: nodes.map((n) => ({
-          label: n.data.backendLabel,
-        })),
-        edges: edges.map((e) => ({
-          source: e.source,
-          target: e.target,
-        })),
+        nodes: nodes.map((n) => ({ label: n.data.backendLabel })),
+        edges: edges.map((e) => ({ source: e.source, target: e.target })),
       };
-     
-      // ✅ IMPORTANT: set pending payload so bench picker can run
+
       setPendingWorkflowPayload({
         workflow,
         workflow_id: selectedWorkflowId,
         id: selectedWorkflowId,
       });
-      
+
+     // ✅ no spec for create-bench
+      setPendingSpecText("");
+      setPendingSpecFile(undefined);
+
+      // ✅ go straight to instrument picker
+      setShowInstrumentPicker(true);
+      return;
+    }
+
+    if (loopLower === "validation" && needsBench) {
+      // ✅ existing bench-picker workflows (preflight/hardware_test_run)
+      if (!selectedWorkflowId) {
+        alert("Please save/select the workflow first (missing workflow_id).");
+        return;
+      }
+
+      const workflow = {
+        loop_type: "validation",
+        nodes: nodes.map((n) => ({ label: n.data.backendLabel })),
+        edges: edges.map((e) => ({ source: e.source, target: e.target })),
+      };
+
+      setPendingWorkflowPayload({
+        workflow,
+        workflow_id: selectedWorkflowId,
+        id: selectedWorkflowId,
+      });
+
       await loadBenches();
       setPendingSpecText("");
       setPendingSpecFile(undefined);
       setShowBenchPicker(true);
       return;
     }
-      
 
-    // ✅ WF-1 unchanged (spec-driven)
+  // ✅ WF-1 unchanged (spec-driven)
     setShowSpecModal(true);
 
   };
@@ -1279,6 +1304,35 @@ function WorkflowPage() {
         alert("Workflow canvas is empty — nothing to run.");
         return;
       }
+
+      const wfNameLower = (selectedWorkflowName || "").toLowerCase();
+      const loopLower = (selectedWorkflowLoopType || "").toLowerCase();
+
+      if (loopLower === "validation" && wfNameLower.includes("validation_create_bench")) {
+        // create-bench should never require spec
+        setPendingSpecText("");
+        setPendingSpecFile(undefined);
+
+        // if payload wasn’t set (e.g., modal opened unexpectedly), set it now
+        if (!pendingWorkflowPayload && selectedWorkflowId) {
+          const workflow = {
+            loop_type: "validation",
+            nodes: nodes.map((n) => ({ label: n.data.backendLabel })),
+            edges: edges.map((e) => ({ source: e.source, target: e.target })),
+          };
+          setPendingWorkflowPayload({
+            workflow,
+            workflow_id: selectedWorkflowId,
+            id: selectedWorkflowId,
+          });
+        }
+
+        setShowSpecModal(false);
+        setShowBenchPicker(false);
+        setShowInstrumentPicker(true);
+        return;
+      }
+
   
       // -------------------------------
       // FIX LOOP TYPE
