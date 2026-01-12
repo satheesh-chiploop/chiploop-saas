@@ -2156,6 +2156,43 @@ function WorkflowPage() {
                     alert("Select at least one instrument.");
                     return;
                   }
+                  const wfNameLower = (selectedWorkflowName || "").toLowerCase();
+                  const isCreateBench = wfNameLower.includes("validation_create_bench");
+                
+                  // ✅ Create Bench: NO spec required, NO preview, run immediately
+                  if (isCreateBench) {
+                    if (!benchName || !benchName.trim()) {
+                      alert("Bench name is required.");
+                      return; // keep modal open
+                    }
+                    if (!pendingWorkflowPayload) {
+                      alert("Missing pending workflow payload. Please click Run Workflow again.");
+                      return;
+                    }
+                
+                    setShowInstrumentPicker(false);
+                
+                    // spec_text must be empty for create-bench
+                    await runWorkflowWithFormData(
+                      pendingWorkflowPayload,
+                      "",            // spec text
+                      undefined,     // spec file
+                      selectedInstrumentIds,
+                      undefined,     // scope payload
+                      undefined      // benchId
+                    );
+                
+                    return;
+                  }
+                
+                  // ✅ Existing Validation run flow (WF-1): preview → scope modal
+                  setShowInstrumentPicker(false);
+                
+                  if (!pendingWorkflowPayload) {
+                    alert("Missing pending workflow payload. Please click Run Workflow again.");
+                    return;
+                  }
+
                   setShowInstrumentPicker(false);
                   // ✅ trigger actual workflow execution now
                   if (!pendingWorkflowPayload) {
