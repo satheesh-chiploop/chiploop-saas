@@ -2158,6 +2158,12 @@ function WorkflowPage() {
                   }
                   const wfNameLower = (selectedWorkflowName || "").toLowerCase();
                   const isCreateBench = wfNameLower.includes("validation_create_bench");
+
+                  const isBenchRun =
+                    wfNameLower.includes("validation_preflight_bench") ||
+                    wfNameLower.includes("validation_hardware_test_run") ||
+                    wfNameLower.includes("preflight") ||
+                    wfNameLower.includes("hardware_test_run");
                 
                   // ✅ Create Bench: NO spec required, NO preview, run immediately
                   if (isCreateBench) {
@@ -2182,6 +2188,25 @@ function WorkflowPage() {
                       undefined      // benchId
                     );
                 
+                    return;
+                  }
+
+                  //✅ Bench runs: also skip spec + preview
+                  if (isBenchRun) {
+                    if (!pendingWorkflowPayload) {
+                      alert("Missing pending workflow payload. Please click Run Workflow again.");
+                      return;
+                    }
+                    setShowInstrumentPicker(false);
+
+                    await runWorkflowWithFormData(
+                      pendingWorkflowPayload,
+                      "",                 // spec text
+                      undefined,          // spec file
+                      selectedInstrumentIds,
+                      undefined,          // scope
+                      selectedBenchId || undefined // bench_id if you have it (optional)
+                    );
                     return;
                   }
                 
