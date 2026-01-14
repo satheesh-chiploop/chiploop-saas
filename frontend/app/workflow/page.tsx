@@ -82,6 +82,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Validation Wiring Instructions Agent", backendLabel: "Validation Wiring Instructions Agent", desc: "Phase-1: Generates human-readable lab wiring instructions from connectivity intent (lab never logs into ChipLoop)." },
     { uiLabel: "Validation Preflight Agent", backendLabel: "Validation Preflight Agent", desc: "Phase-2a: Safe bench readiness checks (coverage + resource string sanity + optional *IDN?); no DUT stimulus. Supports stub or pyvisa mode." },
     { uiLabel: "Validation Bench Create Agent", backendLabel: "Validation Bench Create Agent", desc: "Creates a new validation bench and maps selected instruments to it. Outputs a creation report and summary." },
+    { uiLabel: "Validation Test Plan Load Agent", backendLabel: "Validation Test Plan Load Agent", desc: "Loads a previously saved validation test plan from the database using test_plan_id and makes it available as state['test_plan'] for execution workflows (no datasheet/spec needed)." },
   ],
   system: [
     { uiLabel: "Digital Spec Agent", backendLabel: "Digital Spec Agent", desc: "System-level digital spec" },
@@ -114,6 +115,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Validation Wiring Instructions Agent", backendLabel: "Validation Wiring Instructions Agent", desc: "Phase-1: Generates human-readable lab wiring instructions from connectivity intent (lab never logs into ChipLoop)." },
     { uiLabel: "Validation Preflight Agent", backendLabel: "Validation Preflight Agent", desc: "Phase-2a: Safe bench readiness checks (coverage + resource string sanity + optional *IDN?); no DUT stimulus. Supports stub or pyvisa mode." },
     { uiLabel: "Validation Bench Create Agent", backendLabel: "Validation Bench Create Agent", desc: "Creates a new validation bench and maps selected instruments to it. Outputs a creation report and summary." },
+    { uiLabel: "Validation Test Plan Load Agent", backendLabel: "Validation Test Plan Load Agent", desc: "Loads a previously saved validation test plan from the database using test_plan_id and makes it available as state['test_plan'] for execution workflows (no datasheet/spec needed)." },
     { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
@@ -2332,8 +2334,8 @@ function WorkflowPage() {
                   // For WF-2/WF-3: run preflight/run-validation directly with bench_id
                   await runWorkflowWithFormData(
                     pendingWorkflowPayload,
-                    pendingSpecText,
-                    pendingSpecFile,
+                    "",
+                    undefined,
                     [],                 // instruments not required here
                     null,               // scope_json optional
                     selectedBenchId      // ✅ add as new param
