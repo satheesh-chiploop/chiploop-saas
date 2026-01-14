@@ -1104,9 +1104,12 @@ function WorkflowPage() {
 
     const { data, error } = await supabase
       .from("workflows")
-      .select("name, created_at")
-      .eq("user_id", userId)        // ✅ Correct filtering
+      .select("name, created_at, status")
+      .eq("user_id", userId)
+      .eq("status", "saved")                 // ✅ ONLY show saved templates
       .order("created_at", { ascending: false });
+
+
 
     if (error) {
       console.error("❌ Error loading workflows:", error);
