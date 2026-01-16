@@ -226,6 +226,9 @@ function WorkflowPage() {
   const [benchName, setBenchName] = useState("");
   const [benchLocation, setBenchLocation] = useState("");
 
+  const [testPlanName, setTestPlanName] = useState("");
+
+
 
 
 
@@ -1235,7 +1238,7 @@ function WorkflowPage() {
   };
 
 
-  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string) => {
+  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string,test_plan_name?:string) => {
     const formData = new FormData();
 
     // ✅ unwrap if caller passed { workflow: {...}, workflow_id: ... }
@@ -1260,6 +1263,10 @@ function WorkflowPage() {
     // ✅ NEW: only for WF-2/WF-3
     if (benchId) {
       formData.append("bench_id", benchId);
+    }
+
+    if(test_plan_name) {
+       formData.append("test_plan_name",test_plan_name);
     }
 
     if (selectedWorkflowName === "Validation_Create_Bench") {
@@ -2356,11 +2363,15 @@ function WorkflowPage() {
       {showSpecModal && (
         <SpecInputModal
           loop={loop}
+          showTestPlanName={selectedWorkflowName === "Validation_Generate_Lab_Handoff"}
+          testPlanName={testPlanName}
+          setTestPlanName={setTestPlanName}
           onClose={() => setShowSpecModal(false)}
           onSubmit={(text, file) => {
             handleSpecSubmit(text, file);
             setShowSpecModal(false);
-            console.log("Spec submitted:", { text, file });
+            console.log("Spec submitted:", { text, file, testPlanName });
+         
           }}
         />
       )}
@@ -2471,7 +2482,8 @@ function WorkflowPage() {
                         pendingSpecText,
                         pendingSpecFile,
                         selectedInstrumentIds,
-                        scopePayload
+                        scopePayload,
+                        testPlanName
                       );
 
                       // cleanup
@@ -2501,7 +2513,7 @@ function WorkflowPage() {
 /* =========================
    Modals (unchanged)
 ========================= */
-function SpecInputModal({ loop, onClose, onSubmit }: { loop: string; onClose: () => void; onSubmit: (text: string, file?: File) => void }) {
+function SpecInputModal({ loop, onClose, onSubmit,showTestPlanName,testPlanName,setTestPlanName }: { loop: string; onClose: () => void; onSubmit: (text: string, file?: File) => void;showTestPlanName?: boolean;testPlanName?: string;setTestPlanName?: (v: string) => void; }) {
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
@@ -2509,6 +2521,22 @@ function SpecInputModal({ loop, onClose, onSubmit }: { loop: string; onClose: ()
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div className="w-full max-w-2xl rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl">
       <h2 className="mb-4 text-2xl font-bold text-cyan-400">Enter Spec for {loop.charAt(0).toUpperCase() + loop.slice(1)} Loop</h2>
+        {showTestPlanName && (
+          <div className="mb-4">
+            <label className="mb-2 block text-sm font-medium text-slate-200">
+             Test Plan Name (saved)
+            </label>
+            <input
+              className="w-full rounded-lg border border-slate-600 bg-slate-800 p-3 text-slate-100 outline-none focus:ring-2 focus:ring-cyan-500"
+              placeholder="e.g., PMIC_Bringup_v1 / PCIe_Smoke_TP"
+              value={testPlanName || ""}
+              onChange={(e) => setTestPlanName?.(e.target.value)}
+            />
+            <div className="mt-1 text-xs text-slate-400">
+              This name will be stored with the generated test_plan_id in Supabase.
+            </div>
+          </div>
+        )}
         <textarea
           className="mb-4 h-40 w-full rounded-lg border border-slate-600 bg-slate-800 p-4 text-lg outline-none focus:ring-2 focus:ring-cyan-500"
           placeholder={
