@@ -1265,9 +1265,10 @@ function WorkflowPage() {
       formData.append("bench_id", benchId);
     }
 
-    if(test_plan_name) {
-       formData.append("test_plan_name",testPlanName);
+    if (testPlanName && testPlanName.trim()) {
+      formData.append("test_plan_name", testPlanName.trim());
     }
+  
 
     if (selectedWorkflowName === "Validation_Create_Bench") {
       formData.append("bench_name", benchName);
@@ -1296,7 +1297,7 @@ function WorkflowPage() {
           created_at: new Date().toISOString(),
         };
   
-        const next = [rec, ...runs].slice(0, 100);
+        const next = [rec, ...(runs || [])].slice(0, 100);
         setRuns(next);
         saveRunsForWorkflow(selectedWorkflowName, next);
         setSelectedRunId(newJobId);
@@ -2483,6 +2484,7 @@ function WorkflowPage() {
                         pendingSpecFile,
                         selectedInstrumentIds,
                         scopePayload,
+                        selectedBenchId || undefined,
                         testPlanName
                       );
 
