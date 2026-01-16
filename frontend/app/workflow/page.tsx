@@ -1238,7 +1238,7 @@ function WorkflowPage() {
   };
 
 
-  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string,test_plan_name?:string) => {
+  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string,testPlanName?:string) => {
     const formData = new FormData();
 
     // ✅ unwrap if caller passed { workflow: {...}, workflow_id: ... }
@@ -1266,7 +1266,7 @@ function WorkflowPage() {
     }
 
     if(test_plan_name) {
-       formData.append("test_plan_name",test_plan_name);
+       formData.append("test_plan_name",testPlanName);
     }
 
     if (selectedWorkflowName === "Validation_Create_Bench") {
