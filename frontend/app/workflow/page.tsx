@@ -2198,7 +2198,8 @@ function WorkflowPage() {
                       undefined,     // spec file
                       selectedInstrumentIds,
                       undefined,     // scope payload
-                      undefined      // benchId
+                      undefined,      // benchId
+                      testPlanName
                     );
                 
                     return;
@@ -2218,7 +2219,8 @@ function WorkflowPage() {
                       undefined,          // spec file
                       selectedInstrumentIds,
                       undefined,          // scope
-                      selectedBenchId || undefined // bench_id if you have it (optional)
+                      selectedBenchId || undefined,// bench_id if you have it (optional)
+                      testPlanName
                     );
                     return;
                   }
@@ -2349,7 +2351,8 @@ function WorkflowPage() {
                     undefined,
                     [],                 // instruments not required here
                     null,               // scope_json optional
-                    selectedBenchId      // ✅ add as new param
+                    selectedBenchId,      // ✅ add as new param
+                    testPlanName
                   );
                 }}>
                 Use selected bench
