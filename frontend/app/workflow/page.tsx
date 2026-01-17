@@ -2282,6 +2282,16 @@ function WorkflowPage() {
                     }),
                   });
 
+                  let data: any;
+                  try {
+                    data = await resp.json();
+                  } catch (e) {
+                    const raw = await resp.text().catch(() => "");
+                    console.error("[Preview] resp.json() failed. status=", resp.status, "raw=", raw);
+                    alert(`Preview response was not JSON (status ${resp.status}). See console.`);
+                    return;
+                  }
+
                   const data = await resp.json();
                   if (!resp.ok || data?.status !== "ok") {
                     alert(data?.message || "Failed to generate test plan preview");
@@ -2290,18 +2300,24 @@ function WorkflowPage() {
 
                   const plan = data.test_plan;
                   setPreviewTestPlan(plan);
-
-                  // default: select all tests
-                  const allNames =
-                    (plan?.tests || []).map((t: any) => t?.name).filter(Boolean) || [];
-                  setSelectedTestNames(allNames);
-
-                  // compute missing instrument types based on selected tests
-                  const missing = computeMissingInstrumentTypes(plan, allNames, selectedInstrumentRows);
-                  setMissingInstrumentTypes(missing);
-
                   // open scope modal (user selects tests/features + sees instrument coverage)
                   setShowScopeModal(true);
+
+                  try {
+                    const tests = Array.isArray(plan?.tests) ? plan.tests : [];
+                    const allNames = tests.map((t: any) => t?.name).filter(Boolean);
+                    setSelectedTestNames(allNames);
+                  
+                    const missing = computeMissingInstrumentTypes(plan, allNames, selectedInstrumentRows);
+                    setMissingInstrumentTypes(missing);
+                  } catch (e) {
+                    console.error("[Preview] post-processing failed:", e, plan);
+                    // modal is already open; user can still proceed or you can show a message later
+                    setSelectedTestNames([]);
+                    setMissingInstrumentTypes([]);
+                  }
+
+                  
                 }}
               >
                 Use selected instruments
