@@ -1238,7 +1238,7 @@ function WorkflowPage() {
   };
 
 
-  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string,testPlanName?:string) => {
+  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string,testPlanName?:string,previewTestPlanOverride?: any) => {
     const formData = new FormData();
 
     // ✅ unwrap if caller passed { workflow: {...}, workflow_id: ... }
@@ -1259,6 +1259,11 @@ function WorkflowPage() {
     // ✅ NEW: scope selection
     if (scopePayload) {
       formData.append("scope_json", JSON.stringify(scopePayload));
+    }
+
+    // ✅ NEW: WF1 override — use preview plan as authoritative test_plan
+    if (previewTestPlanOverride) {
+      formData.append("preview_test_plan_json", JSON.stringify(previewTestPlanOverride));
     }
     // ✅ NEW: only for WF-2/WF-3
     if (benchId) {
@@ -2199,7 +2204,8 @@ function WorkflowPage() {
                       selectedInstrumentIds,
                       undefined,     // scope payload
                       undefined,      // benchId
-                      testPlanName
+                      testPlanName,
+                      previewTestPlan
                     );
                 
                     return;
@@ -2220,7 +2226,8 @@ function WorkflowPage() {
                       selectedInstrumentIds,
                       undefined,          // scope
                       selectedBenchId || undefined,// bench_id if you have it (optional)
-                      testPlanName
+                      testPlanName,
+                      previewTestPlan
                     );
                     return;
                   }
@@ -2352,7 +2359,8 @@ function WorkflowPage() {
                     [],                 // instruments not required here
                     null,               // scope_json optional
                     selectedBenchId,      // ✅ add as new param
-                    testPlanName
+                    testPlanName,
+                    previewTestPlan 
                   );
                 }}>
                 Use selected bench
@@ -2488,7 +2496,8 @@ function WorkflowPage() {
                         selectedInstrumentIds,
                         scopePayload,
                         selectedBenchId || undefined,
-                        testPlanName
+                        testPlanName,
+                        previewTestPlan
                       );
 
                       // cleanup
