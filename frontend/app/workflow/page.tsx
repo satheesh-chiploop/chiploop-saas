@@ -2292,7 +2292,7 @@ function WorkflowPage() {
                     return;
                   }
 
-                  const data = await resp.json();
+                  
                   if (!resp.ok || data?.status !== "ok") {
                     alert(data?.message || "Failed to generate test plan preview");
                     return;
