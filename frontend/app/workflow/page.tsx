@@ -576,6 +576,35 @@ function WorkflowPage() {
     }
   };
 
+  type ValidationTestPlan = {
+    id: string;
+    name: string;
+    description?: string | null;
+    created_at?: string | null;
+  };
+  
+  const [validationTestPlans, setValidationTestPlans] = useState<ValidationTestPlan[]>([]);
+  const [selectedTestPlanId, setSelectedTestPlanId] = useState<string>("");
+  const fetchValidationTestPlans = async () => {
+    try {
+      const userId = await getStableUserId(supabase);
+  
+      const resp = await fetch(`${API_BASE}/validation/test_plans?user_id=${userId}`);
+      const json = await resp.json();
+  
+      if (json?.status === "ok") {
+        setValidationTestPlans(json.plans || []);
+      } else {
+        console.warn("[validation test plans] unexpected:", json);
+        setValidationTestPlans([]);
+      }
+    } catch (e) {
+      console.error("[validation test plans] fetch failed:", e);
+      setValidationTestPlans([]);
+    }
+  };
+    
+
   const loadBenches = async () => {
     const { data, error } = await supabase
       .from("validation_benches")
@@ -1000,6 +1029,7 @@ function WorkflowPage() {
       setPendingSpecText("");
       setPendingSpecFile(undefined);
       setShowBenchPicker(true);
+      fetchValidationTestPlans();
       return;
     }
 
@@ -1430,6 +1460,7 @@ function WorkflowPage() {
 
         if (needsBench) {
           setShowBenchPicker(true);   // <-- you add this modal/state
+          fetchValidationTestPlans();
         } else {
           setShowInstrumentPicker(true); // <-- existing WF-1 behavior unchanged
         }
@@ -2352,21 +2383,45 @@ function WorkflowPage() {
               </select>
             </div>
 
-            {/* ✅ WF4 only: collect test plan name so Test Plan Load Agent can resolve it */}
+            {/* ✅ WF4 only: Select Test Plan Name from saved plans */}
             {selectedWorkflowName === "Validation_Hardware_Test_Run" && (
               <div className="mt-4">
-                <div className="text-sm text-zinc-200 mb-1">Test Plan Name (required)</div>
-                <input
-                  className="w-full rounded border border-zinc-700 bg-black px-2 py-1 text-zinc-100"
-                  placeholder="e.g., Baby"
-                  value={testPlanName}
-                  onChange={(e) => setTestPlanName(e.target.value)}
-                />
-                <div className="mt-1 text-xs text-zinc-400">
-                  Must match validation_test_plans.name
+                <div className="text-sm text-zinc-200 mb-1">Test Plan (required)</div>
+
+                <select
+                  className="w-full rounded bg-zinc-800 border border-zinc-700 p-2 text-white"
+                  value={selectedTestPlanId}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setSelectedTestPlanId(id);
+
+                    const picked = validationTestPlans.find((p) => p.id === id);
+                    if (picked?.name) {
+                      setTestPlanName(picked.name); // ✅ this is what backend expects (test_plan_name)
+                    }
+                  }}
+                >
+                  <option value="">-- choose a test plan --</option>
+                  {validationTestPlans.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Optional fallback text input (keep if you want manual entry) */}
+                <div className="mt-2">
+                  <div className="text-xs text-zinc-400 mb-1">Or type a name (advanced)</div>
+                  <input
+                    className="w-full rounded border border-zinc-700 bg-black px-2 py-1 text-zinc-100"
+                    placeholder="e.g., Baby"
+                    value={testPlanName}
+                    onChange={(e) => setTestPlanName(e.target.value)}
+                  />
                 </div>
               </div>
             )}
+
 
             <div className="mt-5 flex justify-end gap-2">
               <button className="rounded bg-zinc-800 px-4 py-2 text-sm hover:bg-zinc-700"
