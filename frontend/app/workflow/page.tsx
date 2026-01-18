@@ -935,7 +935,9 @@ function WorkflowPage() {
     setPendingRunName(runName);
 
     const wfNameLower = selectedWorkflowName.toLowerCase();
-    const loopLower = (loop || "").toLowerCase();
+
+    const loopLower = ((selectedWorkflowLoopType || loop) || "").toLowerCase();
+
 
     // ✅ special-case: create bench does NOT require spec and does NOT need bench picker
     const isCreateBench = wfNameLower.includes("validation_create_bench");
