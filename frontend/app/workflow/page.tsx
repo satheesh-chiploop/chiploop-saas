@@ -2352,6 +2352,22 @@ function WorkflowPage() {
               </select>
             </div>
 
+            {/* ✅ WF4 only: collect test plan name so Test Plan Load Agent can resolve it */}
+            {selectedWorkflowName === "Validation_Hardware_Test_Run" && (
+              <div className="mt-4">
+                <div className="text-sm text-zinc-200 mb-1">Test Plan Name (required)</div>
+                <input
+                  className="w-full rounded border border-zinc-700 bg-black px-2 py-1 text-zinc-100"
+                  placeholder="e.g., Baby"
+                  value={testPlanName}
+                  onChange={(e) => setTestPlanName(e.target.value)}
+                />
+                <div className="mt-1 text-xs text-zinc-400">
+                  Must match validation_test_plans.name
+                </div>
+              </div>
+            )}
+
             <div className="mt-5 flex justify-end gap-2">
               <button className="rounded bg-zinc-800 px-4 py-2 text-sm hover:bg-zinc-700"
                 onClick={() => setShowBenchPicker(false)}>
@@ -2362,6 +2378,10 @@ function WorkflowPage() {
                 onClick={async () => {
                   if (!selectedBenchId) {
                     alert("Select a bench.");
+                    return;
+                  }
+                  if (selectedWorkflowName === "Validation_Hardware_Test_Run" && !testPlanName.trim()) {
+                    alert("Enter Test Plan Name (required).");
                     return;
                   }
                   setShowBenchPicker(false);
