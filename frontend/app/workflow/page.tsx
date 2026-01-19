@@ -228,11 +228,11 @@ function WorkflowPage() {
   const [selectedBenchId, setSelectedBenchId] = useState<string>("");
 
     // ✅ Bench schematic viewer (bench picker)
-  const [benchSchematicOpen, setBenchSchematicOpen] = useState(false);
-  const [benchSchematicLoading, setBenchSchematicLoading] = useState(false);
+
+ 
   const [benchSchematicError, setBenchSchematicError] = useState<string | null>(null);
   const [benchSchematicRow, setBenchSchematicRow] = useState<any | null>(null);
-  
+  const [benchSchematicLoading, setBenchSchematicLoading] = useState(false);
 
   const [benchName, setBenchName] = useState("");
   const [benchLocation, setBenchLocation] = useState("");
@@ -242,12 +242,12 @@ function WorkflowPage() {
   const [showBenchSchematicModal, setShowBenchSchematicModal] = useState(false);
   const [benchSchematicObj, setBenchSchematicObj] = useState<any | null>(null);
   const [benchSchematicErr, setBenchSchematicErr] = useState<string | null>(null);
-  const [benchSchematicLoading, setBenchSchematicLoading] = useState(false);
+  const [benchSchematicModalLoading, setBenchSchematicModalLoading] = useState(false);
 
   const openBenchSchematic = async (benchId: string) => {
     setBenchSchematicErr(null);
     setBenchSchematicObj(null);
-    setBenchSchematicLoading(true);
+    setBenchSchematicModalLoading(true);
     setShowBenchSchematicModal(true);
 
     try {
@@ -266,7 +266,7 @@ function WorkflowPage() {
     } catch (e: any) {
       setBenchSchematicErr(e?.message || "Failed to load bench schematic");
     } finally {
-      setBenchSchematicLoading(false);
+      setBenchSchematicModalLoading(false);
     }
   };
 
@@ -2585,11 +2585,11 @@ function WorkflowPage() {
               </div>
             )}
 
-            {!benchSchematicErr && benchSchematicLoading && (
+            {!benchSchematicErr && benchSchematicModalLoading && (
               <div className="text-zinc-400 text-sm">Loading schematic…</div>
             )}
 
-            {!benchSchematicErr && !benchSchematicLoading && benchSchematicObj && (
+            {!benchSchematicErr && !benchSchematicModalLoading && benchSchematicObj && (
               <div className="space-y-3">
                 {/* Minimal “visual” summary first */}
                 <div className="rounded-lg border border-zinc-700 bg-black/30 p-3">
