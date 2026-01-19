@@ -49,6 +49,14 @@ export default function WorkflowConsole({
   const [viewJson, setViewJson] = useState<any | null>(null);
   const [viewError, setViewError] = useState<string | null>(null);
 
+  const normalizeStoragePath = (p: string) => {
+    const s = (p || "").trim();
+    if (!s) return s;
+    if (s.startsWith("/")) return s.slice(1);
+    return s;
+  };
+  
+
   const fetchArtifactAsTextOrJson = async (path: string) => {
     setViewError(null);
     setViewText("");
@@ -57,7 +65,7 @@ export default function WorkflowConsole({
     try {
       const { data, error } = await supabase.storage
         .from("artifacts")
-        .createSignedUrl(path, 60);
+        .createSignedUrl(normalizeStoragePath(path), 60);
 
       if (error) throw error;
 
@@ -705,6 +713,8 @@ export default function WorkflowConsole({
       if (!grouped[item.agent]) grouped[item.agent] = [];
       grouped[item.agent].push(item);
     });
+
+
   
     return (
       <div className="p-3 space-y-4">
@@ -740,17 +750,27 @@ export default function WorkflowConsole({
              // find artifact path by substring match
                 let foundPath: string | null = null;
 
+                const consider = (candidate: string) => {
+                  // Only allow Supabase storage objects
+                  if (!candidate.startsWith("backend/")) return;
+                
+                  // First valid wins; storage-only avoids /artifacts/... routes
+                  if (!foundPath) foundPath = candidate;
+                };
+                
                 Object.values(workflowMeta?.artifacts || {}).forEach((v: any) => {
                   if (typeof v === "string" && v.includes(needle)) {
-                    foundPath = v;
+                    consider(v);
                   } else if (typeof v === "object") {
                     Object.values(v).forEach((sv: any) => {
                       if (typeof sv === "string" && sv.includes(needle)) {
-                        foundPath = sv;
+                        consider(sv);
                       }
                     });
                   }
                 });
+
+                
 
                 if (!foundPath) return null;
 
