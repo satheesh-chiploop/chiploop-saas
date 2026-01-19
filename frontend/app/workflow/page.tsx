@@ -2743,7 +2743,7 @@ function WorkflowPage() {
                   <pre className="mt-3 text-xs text-zinc-200 whitespace-pre-wrap overflow-auto">
                     {JSON.stringify(benchSchematicObj, null, 2)}
                   </pre>
-                </details
+                </details>
               </div>
             )}
           </div>
