@@ -42,6 +42,280 @@ export default function WorkflowConsole({
   const [validationManifest, setValidationManifest] = useState<any | null>(null);
   const [validationManifestError, setValidationManifestError] = useState<string | null>(null);
 
+    // ✅ Schematic / Mapping viewer
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewTitle, setViewTitle] = useState<string>("");
+  const [viewText, setViewText] = useState<string>("");
+  const [viewJson, setViewJson] = useState<any | null>(null);
+  const [viewError, setViewError] = useState<string | null>(null);
+
+  const fetchArtifactAsTextOrJson = async (path: string) => {
+    setViewError(null);
+    setViewText("");
+    setViewJson(null);
+
+    try {
+      const { data, error } = await supabase.storage
+        .from("artifacts")
+        .createSignedUrl(path, 60);
+
+      if (error) throw error;
+
+      const resp = await fetch(data.signedUrl);
+      if (!resp.ok) throw new Error(`Fetch failed (${resp.status})`);
+
+      const contentType = resp.headers.get("content-type") || "";
+      const text = await resp.text();
+
+      // best-effort json parse
+      if (contentType.includes("application/json") || path.endsWith(".json")) {
+        try {
+          const json = JSON.parse(text);
+          setViewJson(json);
+        } catch {
+          setViewText(text);
+        }
+      } else {
+        setViewText(text);
+      }
+    } catch (e: any) {
+      console.error("❌ View fetch failed:", e);
+      setViewError(e?.message || "Failed to load artifact");
+    }
+  };
+
+  const openArtifactViewer = async (title: string, path: string) => {
+    setViewTitle(title);
+    setViewOpen(true);
+    await fetchArtifactAsTextOrJson(path);
+  };
+
+  const extractDutPoints = (obj: any): string[] => {
+    // Supports both: schematic shape and execution mapping shape
+    const points = new Set<string>();
+
+    const schematic =
+      obj?.schematic ||
+      obj?.bench_schematic ||
+      obj?.bench_schematic_loaded ||
+      obj;
+
+    const rails =
+      schematic?.connections?.rails ||
+      obj?.mappings?.rails ||
+      [];
+    const probes =
+      schematic?.connections?.probes ||
+      obj?.mappings?.probes ||
+      [];
+
+    [...(rails || []), ...(probes || [])].forEach((x: any) => {
+      (x?.dut_points || []).forEach((p: any) => points.add(String(p)));
+    });
+
+    return Array.from(points);
+  };
+
+  const renderSchematicMvp = (obj: any) => {
+    if (!obj) return null;
+
+    // If viewing bench_schematic_loaded.json, actual schematic is nested
+    const schematic = obj?.schematic || obj;
+
+    const bench = schematic?.bench || {};
+    const dut = schematic?.dut || { name: "DUT" };
+    const rails = schematic?.connections?.rails || [];
+    const probes = schematic?.connections?.probes || [];
+
+    const dutPoints = extractDutPoints(schematic);
+
+    return (
+      <div className="space-y-4">
+        {/* Bench header */}
+        <div className="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+          <div className="text-cyan-300 font-semibold">Bench</div>
+          <div className="text-slate-200 text-sm">
+            <span className="font-semibold">{bench?.name || "Unknown Bench"}</span>
+            {bench?.location ? <span className="text-slate-400"> — {bench.location}</span> : null}
+          </div>
+        </div>
+
+        {/* Visual: Instruments -> DUT */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Left: Instruments (derived) */}
+          <div className="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+            <div className="text-cyan-300 font-semibold mb-2">Instruments</div>
+            <div className="space-y-2 text-sm">
+              {(schematic?.instruments || []).map((i: any) => (
+                <div key={i.instrument_id} className="rounded bg-slate-800/60 p-2">
+                  <div className="text-slate-200 font-semibold">
+                    {i.nickname || i.instrument_type || "Instrument"}
+                  </div>
+                  <div className="text-[12px] text-slate-400">
+                    {i.model ? `${i.vendor || ""} ${i.model}` : (i.vendor || "")}
+                  </div>
+                  <div className="text-[11px] text-slate-500 break-all">
+                    {i.resource_string || ""}
+                  </div>
+                </div>
+              ))}
+              {(!schematic?.instruments || schematic.instruments.length === 0) && (
+                <div className="text-slate-400 text-sm">No instruments listed in schematic.</div>
+              )}
+            </div>
+          </div>
+
+          {/* Center: DUT */}
+          <div className="rounded-lg border border-cyan-700/60 bg-slate-900/40 p-3">
+            <div className="text-cyan-300 font-semibold mb-2">DUT</div>
+            <div className="rounded-lg border border-slate-700 bg-black/40 p-3">
+              <div className="text-slate-100 font-semibold">
+                {dut?.name || "DUT"}
+              </div>
+              {dut?.notes ? (
+                <div className="text-[12px] text-slate-400 mt-1">{dut.notes}</div>
+              ) : null}
+
+              <div className="mt-3 text-[12px] text-slate-300 font-semibold">DUT Points</div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(dutPoints.length ? dutPoints : ["VIN", "VOUT", "GND"]).map((p) => (
+                  <span key={p} className="text-xs px-2 py-1 rounded bg-slate-800 text-slate-200 border border-slate-700">
+                    {p}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Connections summary */}
+          <div className="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+            <div className="text-cyan-300 font-semibold mb-2">Connections</div>
+
+            <div className="text-slate-200 font-semibold text-sm">Rails</div>
+            <div className="mt-2 space-y-2 text-sm">
+              {(rails || []).map((r: any, idx: number) => (
+                <div key={idx} className="rounded bg-slate-800/60 p-2">
+                  <div className="text-slate-200">
+                    <span className="font-semibold">{r.rail_name || "Rail"}</span>
+                    <span className="text-slate-400"> → DUT {JSON.stringify(r.dut_points || [])}</span>
+                  </div>
+                  {r.psu?.instrument_id ? (
+                    <div className="text-[12px] text-slate-400">
+                      PSU: {r.psu.instrument_id} CH{r.psu.channel ?? "?"}
+                    </div>
+                  ) : null}
+                  {r.sense?.dmm_instrument_id ? (
+                    <div className="text-[12px] text-slate-400">
+                      Sense: {r.sense.dmm_instrument_id} ({r.sense.mode || "vdc"})
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+              {(!rails || rails.length === 0) && <div className="text-slate-400 text-sm">No rails defined.</div>}
+            </div>
+
+            <div className="mt-4 text-slate-200 font-semibold text-sm">Probes</div>
+            <div className="mt-2 space-y-2 text-sm">
+              {(probes || []).map((p: any, idx: number) => (
+                <div key={idx} className="rounded bg-slate-800/60 p-2">
+                  <div className="text-slate-200">
+                    <span className="font-semibold">{p.signal_name || "Signal"}</span>
+                    <span className="text-slate-400"> → DUT {JSON.stringify(p.dut_points || [])}</span>
+                  </div>
+                  {p.scope?.instrument_id ? (
+                    <div className="text-[12px] text-slate-400">
+                      Scope: {p.scope.instrument_id} CH{p.scope.channel ?? "?"}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+              {(!probes || probes.length === 0) && <div className="text-slate-400 text-sm">No probes defined.</div>}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderExecutionMappingMvp = (obj: any) => {
+    if (!obj) return null;
+    const rails = obj?.mappings?.rails || [];
+    const probes = obj?.mappings?.probes || [];
+    const dutPoints = extractDutPoints(obj);
+
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+          <div className="text-cyan-300 font-semibold">Execution Mapping</div>
+          <div className="text-slate-300 text-sm">
+            Bench: <span className="text-slate-200">{obj?.bench_id}</span>
+            {"  "} Executor: <span className="text-slate-200">{obj?.executor || "stub"}</span>
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-cyan-700/60 bg-slate-900/40 p-3">
+          <div className="text-cyan-300 font-semibold">DUT</div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(dutPoints.length ? dutPoints : ["VIN", "VOUT", "GND"]).map((p) => (
+              <span key={p} className="text-xs px-2 py-1 rounded bg-slate-800 text-slate-200 border border-slate-700">
+                {p}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+            <div className="text-slate-200 font-semibold">Rails</div>
+            <div className="mt-2 space-y-2 text-sm">
+              {rails.map((r: any, idx: number) => (
+                <div key={idx} className="rounded bg-slate-800/60 p-2">
+                  <div className="text-slate-200 font-semibold">{r.rail_name}</div>
+                  <div className="text-[12px] text-slate-400">
+                    PSU: {r.psu?.nickname || r.psu?.instrument_id} CH{r.psu?.channel ?? "?"}
+                  </div>
+                  {r.sense?.instrument_id || r.sense?.nickname ? (
+                    <div className="text-[12px] text-slate-400">
+                      Sense: {r.sense?.nickname || r.sense?.instrument_id} ({r.sense?.mode || "vdc"})
+                    </div>
+                  ) : null}
+                  <div className="text-[12px] text-slate-500">DUT: {JSON.stringify(r.dut_points || [])}</div>
+                </div>
+              ))}
+              {rails.length === 0 && <div className="text-slate-400 text-sm">No rail mappings.</div>}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-700 bg-slate-900/40 p-3">
+            <div className="text-slate-200 font-semibold">Probes</div>
+            <div className="mt-2 space-y-2 text-sm">
+              {probes.map((p: any, idx: number) => (
+                <div key={idx} className="rounded bg-slate-800/60 p-2">
+                  <div className="text-slate-200 font-semibold">{p.signal_name}</div>
+                  <div className="text-[12px] text-slate-400">
+                    Scope: {p.scope?.nickname || p.scope?.instrument_id} CH{p.scope?.channel ?? "?"}
+                  </div>
+                  <div className="text-[12px] text-slate-500">DUT: {JSON.stringify(p.dut_points || [])}</div>
+                </div>
+              ))}
+              {probes.length === 0 && <div className="text-slate-400 text-sm">No probe mappings.</div>}
+            </div>
+          </div>
+        </div>
+
+        {Array.isArray(obj?.issues) && obj.issues.length > 0 && (
+          <div className="rounded-lg border border-yellow-700/60 bg-slate-900/40 p-3">
+            <div className="text-yellow-300 font-semibold mb-2">Issues</div>
+            <pre className="text-xs text-slate-200 whitespace-pre-wrap">
+              {JSON.stringify(obj.issues, null, 2)}
+            </pre>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+
   const findArtifactPath = (artifacts: any, needle: string): string | null => {
     if (!artifacts) return null;
   
@@ -459,6 +733,9 @@ export default function WorkflowConsole({
                 "validation/results.json",
                 "validation/results.csv",
                 "validation/run_manifest.json",
+                "validation/bench_schematic_loaded.json",
+                "validation/execution_mapping.json",
+                "validation/execution_mapping_summary.md",
               ].map((needle) => {
              // find artifact path by substring match
                 let foundPath: string | null = null;
@@ -480,16 +757,25 @@ export default function WorkflowConsole({
                 const label = needle.split("/").pop()!;
 
                 return (
-                  <button
-                    key={needle}
-                    onClick={() =>
-                      handleDownloadArtifact(foundPath!, `validation_${label}`)
-                    }
-                    className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-2 py-1 rounded"
-                  >
-                    ⬇️ {label}
-                  </button>
+                  <div key={needle} className="flex gap-2">
+                    <button
+                      onClick={() => openArtifactViewer(label, foundPath!)}
+                      className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-2 py-1 rounded"
+                      title="View"
+                    >
+                      👁 {label}
+                    </button>
+                
+                    <button
+                      onClick={() => handleDownloadArtifact(foundPath!, `validation_${label}`)}
+                      className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-2 py-1 rounded"
+                      title="Download"
+                    >
+                      ⬇️
+                    </button>
+                  </div>
                 );
+                
               })}
             </div>
           </div>
@@ -560,6 +846,58 @@ export default function WorkflowConsole({
       {activeTab === "summary" && renderSummary()}
       {activeTab === "live" && renderLogs()}
       {activeTab === "outputs" && renderOutputs()}
+
+            {/* ✅ Artifact Viewer Modal */}
+            {viewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="w-[1100px] max-w-[96vw] max-h-[92vh] overflow-auto rounded-xl border border-slate-700 bg-slate-900 p-4 shadow-2xl">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-cyan-300 font-semibold">👁 {viewTitle}</div>
+              <button
+                className="text-slate-300 hover:text-white"
+                onClick={() => setViewOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {viewError && (
+              <div className="rounded border border-red-700 bg-red-950/40 p-3 text-red-200 text-sm">
+                {viewError}
+              </div>
+            )}
+
+            {!viewError && !viewJson && !viewText && (
+              <div className="text-slate-400 text-sm">Loading...</div>
+            )}
+
+            {!viewError && viewJson && (
+              <div className="space-y-4">
+                {/* Render schematic / mapping visually when recognized */}
+                {viewTitle.includes("bench_schematic") && renderSchematicMvp(viewJson)}
+                {viewTitle.includes("execution_mapping") && renderExecutionMappingMvp(viewJson)}
+
+                {/* Fallback: raw JSON */}
+                <div className="rounded-lg border border-slate-700 bg-black/40 p-3">
+                  <div className="text-slate-200 font-semibold mb-2">Raw JSON</div>
+                  <pre className="text-xs text-slate-200 whitespace-pre-wrap">
+                    {JSON.stringify(viewJson, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            )}
+
+            {!viewError && !viewJson && viewText && (
+              <div className="rounded-lg border border-slate-700 bg-black/40 p-3">
+                <pre className="text-xs text-slate-200 whitespace-pre-wrap">
+                  {viewText}
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
 
       {/* Footer */}
       <div className="mt-2 text-right text-cyan-400 border-t border-slate-700 pt-1">

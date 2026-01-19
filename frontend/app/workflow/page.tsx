@@ -119,7 +119,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Validation Bench Create Agent", backendLabel: "Validation Bench Create Agent", desc: "Creates a new validation bench and maps selected instruments to it. Outputs a creation report and summary." },
     { uiLabel: "Validation Test Plan Load Agent", backendLabel: "Validation Test Plan Load Agent", desc: "Loads a previously saved validation test plan from the database using test_plan_id and makes it available as state['test_plan'] for execution workflows (no datasheet/spec needed)." },
     { uiLabel: "Validation Bench Schematic Agent", backendLabel: "Validation Bench Schematic Agent", desc: "Generates bench_schematic.json (instruments + basic rail/probe templates) and persists it to validation_bench_connections.schematic for preflight/run mapping." },
-    { uiLabel: "Validation Bench Schematic Load + Mapping Agent", backendLabel: "Validation Bench Schematic Load + Mapping Agent", desc: "Loads bench schematic from validation_bench_connections and reconciles with bench_setup to generate execution_mapping.json for WF4." },
+    { uiLabel: "Validation Bench Schematic Load + Mapping Agent", backendLabel: "Validation Bench Schematic Load + Mapping Agent", desc: "Loads bench schematic from validation_bench_connections and reconciles with bench_setup to generate execution_mapping.json for WF4." },selectedBenchId
     { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
@@ -227,11 +227,48 @@ function WorkflowPage() {
   const [validationBenches, setValidationBenches] = useState<any[]>([]);
   const [selectedBenchId, setSelectedBenchId] = useState<string>("");
 
+    // ✅ Bench schematic viewer (bench picker)
+  const [benchSchematicOpen, setBenchSchematicOpen] = useState(false);
+  const [benchSchematicLoading, setBenchSchematicLoading] = useState(false);
+  const [benchSchematicError, setBenchSchematicError] = useState<string | null>(null);
+  const [benchSchematicRow, setBenchSchematicRow] = useState<any | null>(null);
+  
+
   const [benchName, setBenchName] = useState("");
   const [benchLocation, setBenchLocation] = useState("");
 
   const [testPlanName, setTestPlanName] = useState("");
 
+  const [showBenchSchematicModal, setShowBenchSchematicModal] = useState(false);
+  const [benchSchematicObj, setBenchSchematicObj] = useState<any | null>(null);
+  const [benchSchematicErr, setBenchSchematicErr] = useState<string | null>(null);
+  const [benchSchematicLoading, setBenchSchematicLoading] = useState(false);
+
+  const openBenchSchematic = async (benchId: string) => {
+    setBenchSchematicErr(null);
+    setBenchSchematicObj(null);
+    setBenchSchematicLoading(true);
+    setShowBenchSchematicModal(true);
+
+    try {
+      const { data, error } = await supabase
+        .from("validation_bench_connections")
+        .select("schematic")
+        .eq("bench_id", benchId)
+        .limit(1)
+        .single();
+
+      if (error) throw error;
+
+      // table holds { schematic: {...} } or could be empty
+      const schematic = data?.schematic || {};
+      setBenchSchematicObj(schematic);
+    } catch (e: any) {
+      setBenchSchematicErr(e?.message || "Failed to load bench schematic");
+    } finally {
+      setBenchSchematicLoading(false);
+    }
+  };
 
 
 
@@ -617,6 +654,35 @@ function WorkflowPage() {
   
     if (!error) setValidationBenches(data || []);
   };
+
+  const loadBenchSchematic = async (benchId: string) => {
+    setBenchSchematicLoading(true);
+    setBenchSchematicError(null);
+    setBenchSchematicRow(null);
+
+    try {
+      const { data, error } = await supabase
+        .from("validation_bench_connections")
+        .select("id, bench_id, schematic, updated_at")
+        .eq("bench_id", benchId)
+        .order("updated_at", { ascending: false })
+        .limit(1);
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        setBenchSchematicError("No schematic found for this bench. Run WF2 'Create Bench' + 'Schematic Agent' first.");
+      } else {
+        setBenchSchematicRow(data[0]);
+      }
+    } catch (e: any) {
+      console.error("❌ loadBenchSchematic failed:", e);
+      setBenchSchematicError(e?.message || "Failed to load bench schematic");
+    } finally {
+      setBenchSchematicLoading(false);
+    }
+  };
+
   
 
   const deleteDesignIntent = async (intent: any) => {
@@ -2385,6 +2451,20 @@ function WorkflowPage() {
                   </option>
                 ))}
               </select>
+              {/* NEW: View Schematic */}
+              <div className="mt-2 flex justify-end">
+                <button
+                  className="rounded bg-cyan-700 px-3 py-1.5 text-xs text-white hover:bg-cyan-600 disabled:opacity-50"
+                  disabled={!selectedBenchId}
+                  onClick={async () => {
+                    if (!selectedBenchId) return;
+                    await openBenchSchematic(selectedBenchId);
+                  }}
+                  title={!selectedBenchId ? "Select a bench first" : "View bench schematic"}
+                >
+                  👁 View Schematic
+                </button>
+              </div>
             </div>
 
             {/* ✅ WF4 only: Select Test Plan Name from saved plans */}
@@ -2483,6 +2563,57 @@ function WorkflowPage() {
          
           }}
         />
+      )}
+
+      {/* NEW: Bench Schematic Viewer Modal */}
+      {showBenchSchematicModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="w-[1100px] max-w-[96vw] max-h-[92vh] overflow-auto rounded-xl border border-zinc-700 bg-zinc-900 p-4 shadow-2xl">
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-cyan-300 font-semibold">🔌 Bench Schematic</div>
+              <button
+                className="text-zinc-300 hover:text-white"
+                onClick={() => setShowBenchSchematicModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {benchSchematicErr && (
+              <div className="rounded border border-red-700 bg-red-950/40 p-3 text-red-200 text-sm">
+                {benchSchematicErr}
+              </div>
+            )}
+
+            {!benchSchematicErr && benchSchematicLoading && (
+              <div className="text-zinc-400 text-sm">Loading schematic…</div>
+            )}
+
+            {!benchSchematicErr && !benchSchematicLoading && benchSchematicObj && (
+              <div className="space-y-3">
+                {/* Minimal “visual” summary first */}
+                <div className="rounded-lg border border-zinc-700 bg-black/30 p-3">
+                  <div className="text-zinc-200 text-sm">
+                    <span className="text-cyan-300 font-semibold">Bench:</span>{" "}
+                    {benchSchematicObj?.bench?.name || "Unknown"}{" "}
+                    <span className="text-zinc-500">
+                      {benchSchematicObj?.bench?.location ? `— ${benchSchematicObj.bench.location}` : ""}
+                    </span>
+                  </div>
+                  <div className="text-zinc-200 text-sm mt-1">
+                    <span className="text-cyan-300 font-semibold">DUT:</span>{" "}
+                    {benchSchematicObj?.dut?.name || "DUT"}
+                  </div>
+                </div>
+
+                {/* Raw JSON (always useful for now) */}
+                <pre className="rounded-lg border border-zinc-700 bg-black/40 p-3 text-xs text-zinc-200 overflow-auto">
+      {JSON.stringify(benchSchematicObj, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
       )}
   
       {showCreateAgentModal && (
