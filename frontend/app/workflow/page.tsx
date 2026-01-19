@@ -1581,6 +1581,132 @@ function WorkflowPage() {
     }
   };
   
+  const extractDutPointsFromSchematic = (schematic: any): string[] => {
+    const points = new Set<string>();
+    const rails = schematic?.connections?.rails || [];
+    const probes = schematic?.connections?.probes || [];
+    [...rails, ...probes].forEach((x: any) => {
+      (x?.dut_points || []).forEach((p: any) => points.add(String(p)));
+    });
+    return Array.from(points);
+  };
+  
+  const renderBenchSchematicVisual = (schematic: any) => {
+    if (!schematic) return null;
+  
+    const bench = schematic?.bench || {};
+    const dut = schematic?.dut || { name: "DUT" };
+    const instruments = schematic?.instruments || [];
+    const rails = schematic?.connections?.rails || [];
+    const probes = schematic?.connections?.probes || [];
+  
+    const dutPoints = extractDutPointsFromSchematic(schematic);
+    const dutPointList = dutPoints.length ? dutPoints : ["VIN", "VOUT", "GND"];
+  
+    return (
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="rounded-lg border border-zinc-700 bg-black/30 p-3">
+          <div className="text-zinc-200 text-sm">
+            <span className="text-cyan-300 font-semibold">Bench:</span>{" "}
+            {bench?.name || "Unknown"}
+            {bench?.location ? <span className="text-zinc-500"> — {bench.location}</span> : null}
+          </div>
+          <div className="text-zinc-200 text-sm mt-1">
+            <span className="text-cyan-300 font-semibold">DUT:</span>{" "}
+            {dut?.name || "DUT"}
+          </div>
+        </div>
+  
+        {/* Main visual: Instruments | DUT | Connections */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Instruments */}
+          <div className="rounded-lg border border-zinc-700 bg-black/30 p-3">
+            <div className="text-cyan-300 font-semibold mb-2">Instruments</div>
+            <div className="space-y-2 text-sm">
+              {instruments.map((i: any) => (
+                <div key={i.instrument_id || i.nickname} className="rounded bg-zinc-900/60 p-2 border border-zinc-800">
+                  <div className="text-zinc-100 font-semibold">
+                    {i.nickname || i.instrument_type || "Instrument"}
+                  </div>
+                  <div className="text-[12px] text-zinc-400">
+                    {i.model ? `${i.vendor || ""} ${i.model}` : (i.vendor || "")}
+                  </div>
+                  <div className="text-[11px] text-zinc-500 break-all">
+                    {i.resource_string || ""}
+                  </div>
+                </div>
+              ))}
+              {(!instruments || instruments.length === 0) && (
+                <div className="text-zinc-400 text-sm">No instruments listed.</div>
+              )}
+            </div>
+          </div>
+  
+          {/* DUT */}
+          <div className="rounded-lg border border-cyan-700/60 bg-black/30 p-3">
+            <div className="text-cyan-300 font-semibold mb-2">DUT</div>
+            <div className="rounded-lg border border-zinc-700 bg-zinc-950/60 p-3">
+              <div className="text-zinc-100 font-semibold">{dut?.name || "DUT"}</div>
+              {dut?.notes ? <div className="text-[12px] text-zinc-400 mt-1">{dut.notes}</div> : null}
+  
+              <div className="mt-3 text-[12px] text-zinc-300 font-semibold">DUT Points</div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {dutPointList.map((p: string) => (
+                  <span
+                    key={p}
+                    className="text-xs px-2 py-1 rounded bg-zinc-900 text-zinc-200 border border-zinc-700"
+                  >
+                    {p}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+  
+          {/* Connections */}
+          <div className="rounded-lg border border-zinc-700 bg-black/30 p-3">
+            <div className="text-cyan-300 font-semibold mb-2">Connections</div>
+  
+            <div className="text-zinc-200 font-semibold text-sm">Rails</div>
+            <div className="mt-2 space-y-2 text-sm">
+              {rails.map((r: any, idx: number) => (
+                <div key={idx} className="rounded bg-zinc-900/60 p-2 border border-zinc-800">
+                  <div className="text-zinc-100 font-semibold">{r.rail_name || "Rail"}</div>
+                  <div className="text-[12px] text-zinc-400">
+                    PSU: {r?.psu?.instrument_id} CH{r?.psu?.channel ?? "?"}
+                  </div>
+                  <div className="text-[12px] text-zinc-400">
+                    Sense: {r?.sense?.dmm_instrument_id} ({r?.sense?.mode || "vdc"})
+                  </div>
+                  <div className="text-[12px] text-zinc-500">
+                    DUT: {JSON.stringify(r?.dut_points || [])}
+                  </div>
+                </div>
+              ))}
+              {rails.length === 0 && <div className="text-zinc-400 text-sm">No rails defined.</div>}
+            </div>
+  
+            <div className="mt-4 text-zinc-200 font-semibold text-sm">Probes</div>
+            <div className="mt-2 space-y-2 text-sm">
+              {probes.map((p: any, idx: number) => (
+                <div key={idx} className="rounded bg-zinc-900/60 p-2 border border-zinc-800">
+                  <div className="text-zinc-100 font-semibold">{p.signal_name || "Signal"}</div>
+                  <div className="text-[12px] text-zinc-400">
+                    Scope: {p?.scope?.instrument_id} CH{p?.scope?.channel ?? "?"}
+                  </div>
+                  <div className="text-[12px] text-zinc-500">
+                    DUT: {JSON.stringify(p?.dut_points || [])}
+                  </div>
+                </div>
+              ))}
+              {probes.length === 0 && <div className="text-zinc-400 text-sm">No probes defined.</div>}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
   
   
 
@@ -2607,9 +2733,17 @@ function WorkflowPage() {
                 </div>
 
                 {/* Raw JSON (always useful for now) */}
-                <pre className="rounded-lg border border-zinc-700 bg-black/40 p-3 text-xs text-zinc-200 overflow-auto">
-      {JSON.stringify(benchSchematicObj, null, 2)}
-                </pre>
+
+                {renderBenchSchematicVisual(benchSchematicObj)}
+
+                <details className="mt-4 rounded-lg border border-zinc-700 bg-black/30 p-3">
+                  <summary className="cursor-pointer text-zinc-200 text-sm font-semibold">
+                    Raw JSON (debug)
+                  </summary>
+                  <pre className="mt-3 text-xs text-zinc-200 whitespace-pre-wrap overflow-auto">
+                    {JSON.stringify(benchSchematicObj, null, 2)}
+                  </pre>
+                </details
               </div>
             )}
           </div>
