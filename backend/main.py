@@ -319,6 +319,7 @@ from agents.validation.validation_wiring_instructions_agent import run_agent as 
 from agents.validation.validation_preflight_agent import run_agent as validation_preflight_agent
 from agents.validation.validation_bench_create_agent import run_agent as validation_bench_create_agent
 from agents.validation.validation_test_plan_load_agent  import run_agent as validation_test_plan_load_agent
+from agents.validation.validation_bench_schematic_agent import run_agent as validation_bench_schematic_agent
 
 #  VALIDATION FUNCTIONS
 # ==========================================================
@@ -335,6 +336,7 @@ VALIDATION_AGENT_FUNCTIONS: Dict[str, Any] = {
     "Validation Bench Create Agent": validation_bench_create_agent,
     "Validation Preflight Agent": validation_preflight_agent,
     "Validation Test Plan Load Agent": validation_test_plan_load_agent,
+    "Validation Bench Schematic Agent": validation_bench_schematic_agent,
     # "Measurement Logger Agent": validation_logger_agent,
     "Validation Analytics Agent": validation_analytics_agent,
     # "Validation Debug Agent": validation_debug_agent,
@@ -392,6 +394,7 @@ SYSTEM_AGENT_FUNCTIONS: Dict[str,Any] = {
     "Validation Analytics Agent": validation_analytics_agent,
     "Validation Bench Create Agent": validation_bench_create_agent,
     "Validation Test Plan Load Agent": validation_test_plan_load_agent,
+    "Validation Bench Schematic Agent": validation_bench_schematic_agent,
     "System Workflow Agent": system_workflow_agent,  
     "System CoSim Integration Agent": system_cosim_integration_agent,
     "System ISS Bridge Agent": system_iss_bridge_agent,  
@@ -2754,6 +2757,28 @@ def create_validation_bench(request: Request, payload: BenchCreateIn):
         supabase.table("validation_bench_capabilities").insert(cap_rows).execute()
 
     return {"ok": True, "bench_id": bench_id}
+
+
+@app.get("/validation/test_plans")
+async def list_validation_test_plans(user_id: str):
+    # returns [{id, name, description, created_at}] for dropdown
+    if not supabase:
+        return JSONResponse(status_code=500, content={"status": "error", "message": "Supabase not configured"})
+
+    try:
+        resp = (
+            supabase.table("validation_test_plans")
+            .select("id,name,description,created_at")
+            .eq("user_id", user_id)
+            .eq("is_active", True)
+            .order("created_at", desc=True)
+            .execute()
+        )
+        return {"status": "ok", "plans": resp.data or []}
+    except Exception as e:
+        logger.exception("list_validation_test_plans failed")
+        return JSONResponse(status_code=500, content={"status": "error", "message": f"{type(e).__name__}: {e}"})
+
 
 
 
