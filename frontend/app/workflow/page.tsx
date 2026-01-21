@@ -84,7 +84,10 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Validation Bench Create Agent", backendLabel: "Validation Bench Create Agent", desc: "Creates a new validation bench and maps selected instruments to it. Outputs a creation report and summary." },
     { uiLabel: "Validation Test Plan Load Agent", backendLabel: "Validation Test Plan Load Agent", desc: "Loads a previously saved validation test plan from the database using test_plan_id and makes it available as state['test_plan'] for execution workflows (no datasheet/spec needed)." },
     { uiLabel: "Validation Bench Schematic Agent", backendLabel: "Validation Bench Schematic Agent", desc: "Generates bench_schematic.json (instruments + basic rail/probe templates) and persists it to validation_bench_connections.schematic for preflight/run mapping." },
-    { uiLabel: "Validation Bench Schematic Load + Mapping Agent", backendLabel: "Validation Bench Schematic Load + Mapping Agent", desc: "Loads bench schematic from validation_bench_connections and reconciles with bench_setup to generate execution_mapping.json for WF4." },
+    { uiLabel: "Validation Pattern Detection Agent", backendLabel: "Validation Pattern Detection Agent", desc: "Analyzes historical validation runs (facts + interpretations) for a given bench_id + test_plan_id and detects recurring clusters, flaky tests, and correlations. Writes patterns artifacts only; does not mutate WF4 execution artifacts." },
+    { uiLabel: "Validation Apply Proposal Agent", backendLabel: "Validation Apply Proposal Agent", desc: "Applies a proposed test plan (from evolution or coverage proposal) by inserting vNext into validation_test_plans, deactivating previous active plan(s) for that user+name, and activating the new version. Deterministic; no LLM." },
+    { uiLabel: "Validation Evolution Proposal Agent", backendLabel: "Validation Evolution Proposal Agent", desc: "WF7: Failure-driven diagnostic proposal. Hard no-op if no actionable failures found." },
+    { uiLabel: "Validation Coverage Proposal Agent", backendLabel: "Validation Coverage Proposal Agent", desc: "WF8: Coverage intelligence + proposal. Computes gaps from recent run facts and proposes coverage tests." },
   ],
   system: [
     { uiLabel: "Digital Spec Agent", backendLabel: "Digital Spec Agent", desc: "System-level digital spec" },
@@ -120,6 +123,10 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Validation Test Plan Load Agent", backendLabel: "Validation Test Plan Load Agent", desc: "Loads a previously saved validation test plan from the database using test_plan_id and makes it available as state['test_plan'] for execution workflows (no datasheet/spec needed)." },
     { uiLabel: "Validation Bench Schematic Agent", backendLabel: "Validation Bench Schematic Agent", desc: "Generates bench_schematic.json (instruments + basic rail/probe templates) and persists it to validation_bench_connections.schematic for preflight/run mapping." },
     { uiLabel: "Validation Bench Schematic Load + Mapping Agent", backendLabel: "Validation Bench Schematic Load + Mapping Agent", desc: "Loads bench schematic from validation_bench_connections and reconciles with bench_setup to generate execution_mapping.json for WF4." },
+    { uiLabel: "Validation Pattern Detection Agent", backendLabel: "Validation Pattern Detection Agent", desc: "Analyzes historical validation runs (facts + interpretations) for a given bench_id + test_plan_id and detects recurring clusters, flaky tests, and correlations. Writes patterns artifacts only; does not mutate WF4 execution artifacts." },
+    { uiLabel: "Validation Apply Proposal Agent", backendLabel: "Validation Apply Proposal Agent", desc: "Applies a proposed test plan (from evolution or coverage proposal) by inserting vNext into validation_test_plans, deactivating previous active plan(s) for that user+name, and activating the new version. Deterministic; no LLM." },
+    { uiLabel: "Validation Evolution Proposal Agent", backendLabel: "Validation Evolution Proposal Agent", desc: "WF7: Failure-driven diagnostic proposal. Hard no-op if no actionable failures found." },
+    { uiLabel: "Validation Coverage Proposal Agent", backendLabel: "Validation Coverage Proposal Agent", desc: "WF8: Coverage intelligence + proposal. Computes gaps from recent run facts and proposes coverage tests." },
     { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Embedded driver / firmware" },
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
@@ -2594,7 +2601,14 @@ function WorkflowPage() {
             </div>
 
             {/* ✅ WF4 only: Select Test Plan Name from saved plans */}
-            {selectedWorkflowName === "Validation_Hardware_Test_Run" && (
+
+            const needsTestPlanName =
+              selectedWorkflowName === "Validation_Hardware_Test_Run" ||
+              selectedWorkflowName === "Validation_Evolution_Proposal" ||
+              selectedWorkflowName === "Validation_Coverage_Proposal" ||
+              selectedWorkflowName === "Validation_Apply_Proposal";
+
+            {needsTestPlanName  && (
               <div className="mt-4">
                 <div className="text-sm text-zinc-200 mb-1">Test Plan (required)</div>
 
@@ -2645,7 +2659,7 @@ function WorkflowPage() {
                     alert("Select a bench.");
                     return;
                   }
-                  if (selectedWorkflowName === "Validation_Hardware_Test_Run" && !testPlanName.trim()) {
+                  if (needsTestPlanName && !testPlanName.trim()) {
                     alert("Enter Test Plan Name (required).");
                     return;
                   }
