@@ -1140,6 +1140,10 @@ function WorkflowPage() {
   }, [loop]);
 
   const loadPrebuiltWorkflow = (wf: string) => {
+
+    setSelectedWorkflowName(wf);
+    setSelectedWorkflowId(null);
+    setSelectedWorkflowLoopType(loop);
     // clear existing canvas
     setNodes([]);
     setEdges([]);
@@ -1154,7 +1158,7 @@ function WorkflowPage() {
       ];
       setNodes(n);
       setEdges(e);
-      setShowSpecModal(true);
+    //  setShowSpecModal(true);
     }
     if (loop === "analog" && wf.includes("Spec2Circuit")) {
       const n: Node<AgentNodeData>[] = [
@@ -1166,7 +1170,7 @@ function WorkflowPage() {
       ];
       setNodes(n);
       setEdges(e);
-      setShowSpecModal(true);
+    //  setShowSpecModal(true);
     }
     if (loop === "embedded" && wf.includes("Spec2Code")) {
       const n: Node<AgentNodeData>[] = [
@@ -1176,7 +1180,7 @@ function WorkflowPage() {
       const e: Edge[] = [{ id: "e-spec-code", source: "spec", target: "code", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } }];
       setNodes(n);
       setEdges(e);
-      setShowSpecModal(true);
+    // setShowSpecModal(true);
     }
     if (loop === "system" && wf.includes("Digital_IP_Prototype_Loop")) {
       const n: Node<AgentNodeData>[] = [
@@ -1196,7 +1200,7 @@ function WorkflowPage() {
     
       setNodes(n);
       setEdges(e);
-      setShowSpecModal(true);
+    //  setShowSpecModal(true);
     }
   };
 
