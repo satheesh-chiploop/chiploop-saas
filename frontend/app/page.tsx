@@ -68,7 +68,7 @@ function LandingPageContent() {
           <br /> Chip Design Workflows
         </h1>
         <p className="text-lg text-slate-300 max-w-3xl mb-10">
-          An Agentic AI Platform unifying Digital, Analog and Embedded Loops in one platform.
+          An Agentic AI Platform unifying Digital, Analog,Embedded and Validation Loops in one platform.
         </p>
         <button
           onClick={handleMainButton}
