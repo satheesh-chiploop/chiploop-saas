@@ -191,7 +191,12 @@ function WorkflowPage() {
 
   // local catalog states
   const [customAgents, setCustomAgents] = useState<CatalogItem[]>([]);
-  const [customWorkflows, setCustomWorkflows] = useState<string[]>([]);
+
+  type CustomWorkflowRow = { name: string; loop_type?: string | null };
+  const [customWorkflows, setCustomWorkflows] = useState<CustomWorkflowRow[]>([]);
+
+
+
   const [loadingAgents, setLoadingAgents] = useState(true);
   const [loadingWorkflows, setLoadingWorkflows] = useState(true);
   const [designIntents, setDesignIntents] = useState<any[]>([]);
@@ -250,6 +255,16 @@ function WorkflowPage() {
   const [benchSchematicObj, setBenchSchematicObj] = useState<any | null>(null);
   const [benchSchematicErr, setBenchSchematicErr] = useState<string | null>(null);
   const [benchSchematicModalLoading, setBenchSchematicModalLoading] = useState(false);
+
+  const inferLoopTypeFromName = (name: string): string => {
+    if (!name) return "digital";
+    if (name.startsWith("Validation_")) return "validation";
+    if (name.startsWith("System_")) return "system";
+    if (name.startsWith("Analog_")) return "analog";
+    if (name.startsWith("Embedded_")) return "embedded";
+    return "digital"; // default
+  };
+  
 
   const openBenchSchematic = async (benchId: string) => {
     setBenchSchematicErr(null);
@@ -381,9 +396,18 @@ function WorkflowPage() {
         localStorage.removeItem(oldKey);
         localStorage.setItem(newKey, cached);
       }
+
       setCustomWorkflows((prev) =>
-        prev.map((n) => (n === renameTarget.oldName ? renameTarget.newName : n))
+        prev.map((w) =>
+          w.name === renameTarget.oldName
+            ? { ...w, name: renameTarget.newName }
+            : w
+        )
       );
+      
+      // setCustomWorkflows((prev) =>
+      //  prev.map((n) => (n === renameTarget.oldName ? renameTarget.newName : n))
+      //);
   
       // backend rename
       const res = await fetch(`${API_BASE}/rename_custom_workflow`, {
@@ -799,7 +823,15 @@ function WorkflowPage() {
               desc: a.description || "",
             }))
         );
-        setCustomWorkflows(savedWF.map((k) => k.replace("workflow_", "")));
+
+        setCustomWorkflows(
+          savedWF.map((k) => {
+            const name = k.replace("workflow_", "");
+            return { name, loop_type: inferLoopTypeFromName(name) };
+          })
+        );
+        
+        // setCustomWorkflows(savedWF.map((k) => k.replace("workflow_", "")));
   
         // Load from Supabase after local cache
         setTimeout(() => loadCustomWorkflowsFromDB(), 600);
@@ -1259,10 +1291,18 @@ function WorkflowPage() {
   
     //const dbNames = (data || []).map((wf) => wf.name || `workflow_${wf.id}`);
 
-    const dbNames = (data || []).map(w => w.name);
+    const dbRows = (data || []).map((w: any) => ({
+      name: w.name,
+      loop_type: w.loop_type || inferLoopTypeFromName(w.name),
+    }));
+    
+    setCustomWorkflows(dbRows);
+    
 
-    console.log("📁 Loaded workflows:", dbNames);
-    setCustomWorkflows(dbNames);
+    // const dbNames = (data || []).map(w => w.name);
+
+    console.log("📁 Loaded workflows:", dbRows);
+    // setCustomWorkflows(dbNames);
   
     // 3) Union (DB ⊎ local), DB first
     //const union = Array.from(new Set([...dbNames, ...localNames]));
@@ -1722,6 +1762,11 @@ function WorkflowPage() {
   
 
 
+  const needsTestPlanName =
+  selectedWorkflowName === "Validation_Hardware_Test_Run" ||
+  selectedWorkflowName === "Validation_Evolution_Proposal" ||
+  selectedWorkflowName === "Validation_Coverage_Proposal" ||
+  selectedWorkflowName === "Validation_Apply_Proposal";
   
 
   
@@ -1818,29 +1863,31 @@ function WorkflowPage() {
               <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
 
-                {customWorkflows.map((wf) => (
-                  <button
-                    key={wf}
-                    className={`w-full text-left px-2 py-1 rounded text-xs hover:bg-slate-700 ${
-                      selectedWorkflowName === wf ? "bg-slate-700 border border-cyan-400" : ""
-                    }`}
-                    onClick={() => {
-                      setSelectedWorkflowName(wf);
-                      loadWorkflowFromDB(wf);
-                      // ✅ load runs for this workflow (localStorage)
-                      const loaded = loadRunsForWorkflow(wf);
-                      setRuns(loaded);
-                      // optional: auto-select latest run if exists
-                      if (loaded.length > 0) {
-                        setSelectedRunId(loaded[0].run_id);
-                      } else {
-                        setSelectedRunId(null);
-                      }
-                    }}
-                    onContextMenu={(e) => openContextMenu(e, wf)}
-                  >
-                    {wf}
-                  </button>
+                {customWorkflows
+                  .filter((w) => (w.loop_type || inferLoopTypeFromName(w.name)) === loop)
+                  .map((w) => (
+                    <button
+                      key={w.name}
+                      className={`w-full text-left px-2 py-1 rounded text-xs hover:bg-slate-700 ${
+                        selectedWorkflowName === w.name ? "bg-slate-700 border border-cyan-400" : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedWorkflowName(w.name);
+                        loadWorkflowFromDB(w.name);
+                        // ✅ load runs for this workflow (localStorage)
+                        const loaded = loadRunsForWorkflow(w.name);
+                        setRuns(loaded);
+                        // optional: auto-select latest run if exists
+                        if (loaded.length > 0) {
+                          setSelectedRunId(loaded[0].run_id);
+                        } else {
+                          setSelectedRunId(null);
+                        }
+                      }}
+                      onContextMenu={(e) => openContextMenu(e, w.name)}
+                    >
+                      {w.name}
+                    </button>
                 ))}
                
               </ul>
@@ -2606,11 +2653,7 @@ function WorkflowPage() {
 
             {/* ✅ WF4 only: Select Test Plan Name from saved plans */}
 
-            const needsTestPlanName =
-              selectedWorkflowName === "Validation_Hardware_Test_Run" ||
-              selectedWorkflowName === "Validation_Evolution_Proposal" ||
-              selectedWorkflowName === "Validation_Coverage_Proposal" ||
-              selectedWorkflowName === "Validation_Apply_Proposal";
+            
 
             {needsTestPlanName  && (
               <div className="mt-4">
