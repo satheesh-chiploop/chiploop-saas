@@ -1084,11 +1084,11 @@ function WorkflowPage() {
     const needsBench =
       wfNameLower.includes("validation_hardware_test_run") ||
       wfNameLower.includes("preflight") ||
-      wfNameLower.includes("hardware_test_run");
+      wfNameLower.includes("hardware_test_run") ||
       wfNameLower.includes("validation_pattern_detection") ||
       wfNameLower.includes("validation_evolution_proposal") ||
       wfNameLower.includes("validation_coverage_proposal") ||
-      wfNameLower.includes("validation_apply_proposal") ||
+      wfNameLower.includes("validation_apply_proposal") ;
 
     if (loopLower === "validation" && isCreateBench) {
       // must have saved workflow id
@@ -1585,7 +1585,7 @@ function WorkflowPage() {
           wfName.includes("validation_pattern_detection") ||
           wfName.includes("validation_coverage_proposal") ||
           wfName.includes("validation_evoluation_proposal") ||
-          wfName.includes("validation_apply_proposal")
+          wfName.includes("validation_apply_proposal");
 
         if (needsBench) {
           setShowBenchPicker(true);   // <-- you add this modal/state
