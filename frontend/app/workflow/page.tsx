@@ -1771,10 +1771,11 @@ function WorkflowPage() {
 
 
   const needsTestPlanName =
-  selectedWorkflowName === "Validation_Hardware_Test_Run" ||
-  selectedWorkflowName === "Validation_Evolution_Proposal" ||
-  selectedWorkflowName === "Validation_Coverage_Proposal" ||
-  selectedWorkflowName === "Validation_Apply_Proposal";
+    selectedWorkflowName === "Validation_Hardware_Test_Run" ||
+    selectedWorkflowName === "Validation_Evolution_Proposal" ||
+    selectedWorkflowName === "Validation_Coverage_Proposal" ||
+    selectedWorkflowName === "Validation_Pattern_Detection" ||
+    selectedWorkflowName === "Validation_Apply_Proposal";
   
 
   
