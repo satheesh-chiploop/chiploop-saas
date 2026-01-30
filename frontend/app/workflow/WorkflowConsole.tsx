@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
 // 🧩 Supabase client
@@ -55,7 +56,7 @@ export default function WorkflowConsole({
     if (s.startsWith("/")) return s.slice(1);
     return s;
   };
-  
+  const router = useRouter();
 
   const fetchArtifactAsTextOrJson = async (path: string) => {
     setViewError(null);
@@ -717,6 +718,32 @@ export default function WorkflowConsole({
 
   
     return (
+
+      <div className="mb-3 flex items-center justify-between rounded-xl border border-slate-800 bg-black/40 px-4 py-3">
+        <div className="text-sm text-slate-300">
+          <span className="font-semibold text-cyan-300">Studio</span>
+          <span className="text-slate-500"> • build workflows</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => router.push("/apps")}
+            className="rounded-lg bg-cyan-600 px-3 py-2 text-sm font-semibold text-black hover:bg-cyan-500 transition"
+            title="Go to Apps (default experience)"
+          >
+            Apps
+          </button>
+
+          <button
+            onClick={() => router.push("/workflow")}
+            className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-900 transition"
+            title="You are in Studio"
+          >
+            Studio
+          </button>
+        </div>
+      </div>
+
       <div className="p-3 space-y-4">
         <button
           onClick={handleDownloadLogs}
