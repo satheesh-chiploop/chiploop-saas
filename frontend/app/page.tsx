@@ -50,6 +50,12 @@ function LandingPageContent() {
           <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
             Pricing
           </button>
+          <button
+            onClick={() => router.push("/apps")}
+            className="hover:text-cyan-400 transition"
+          >
+            Apps
+          </button>
         </div>
         <div>
           <button
@@ -83,9 +89,14 @@ function LandingPageContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
-              name: "Digital Loop",
+              name: "Digital Frontend Loop",
               desc: "Accelerate digital design and verification",
             },
+            {
+              name: "Digital Implementation Loop",
+              desc: "Accelerate digital Implementation",
+            },
+            
             {
               name: "Analog Loop",
               desc: "Automate analog circuit optimization",
