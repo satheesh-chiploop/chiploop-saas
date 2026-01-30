@@ -716,153 +716,150 @@ export default function WorkflowConsole({
     });
 
 
-  
     return (
-
-      <div className="mb-3 flex items-center justify-between rounded-xl border border-slate-800 bg-black/40 px-4 py-3">
-        <div className="text-sm text-slate-300">
-          <span className="font-semibold text-cyan-300">Studio</span>
-          <span className="text-slate-500"> • build workflows</span>
+      <>
+        <div className="mb-3 flex items-center justify-between rounded-xl border border-slate-800 bg-black/40 px-4 py-3">
+          <div className="text-sm text-slate-300">
+            <span className="font-semibold text-cyan-300">Studio</span>
+            <span className="text-slate-500"> • build workflows</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/apps")}
+              className="rounded-lg bg-cyan-600 px-3 py-2 text-sm font-semibold text-black hover:bg-cyan-500 transition"
+              title="Go to Apps (default experience)"
+            >
+              Apps
+            </button>
+            <button
+              onClick={() => router.push("/workflow")}
+              className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-900 transition"
+              title="You are in Studio"
+            >
+              Studio
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+    
+        <div className="p-3 space-y-4">
           <button
-            onClick={() => router.push("/apps")}
-            className="rounded-lg bg-cyan-600 px-3 py-2 text-sm font-semibold text-black hover:bg-cyan-500 transition"
-            title="Go to Apps (default experience)"
+            onClick={handleDownloadLogs}
+            className="rounded bg-cyan-700 hover:bg-cyan-600 px-3 py-1 text-sm text-white"
           >
-            Apps
+            ⬇️ Download All Logs
           </button>
+    
           <button
-            onClick={() => router.push("/workflow")}
-            className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-900 transition"
-            title="You are in Studio"
+            onClick={handleDownloadAllArtifacts}
+            className="rounded bg-emerald-700 hover:bg-emerald-600 px-3 py-1 text-sm text-white"
           >
-            Studio
+            📦 Download All Outputs (ZIP)
           </button>
-        </div>
-      </div>
-      <div className="p-3 space-y-4">
-        <button
-          onClick={handleDownloadLogs}
-          className="rounded bg-cyan-700 hover:bg-cyan-600 px-3 py-1 text-sm text-white"
-        >
-          ⬇️ Download All Logs
-        </button>
-        <button
-          onClick={handleDownloadAllArtifacts}
-          className="rounded bg-emerald-700 hover:bg-emerald-600 px-3 py-1 text-sm text-white"
-        >
-          📦 Download All Outputs (ZIP)
-        </button>
-
-        {/* 🧪 Validation Outputs (run-level, shown first) */}
-        {workflowMeta?.loop_type === "validation" && (
-          <div className="border border-slate-700 rounded-lg p-3 bg-slate-900/40">
-            <div className="text-cyan-300 font-semibold mb-2">
-               🧪 Validation Outputs
+    
+          {/* 🧪 Validation Outputs (run-level, shown first) */}
+          {workflowMeta?.loop_type === "validation" && (
+            <div className="border border-slate-700 rounded-lg p-3 bg-slate-900/40">
+              <div className="text-cyan-300 font-semibold mb-2">🧪 Validation Outputs</div>
+    
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "validation/results.json",
+                  "validation/results.csv",
+                  "validation/run_manifest.json",
+                  "validation/bench_schematic_loaded.json",
+                  "validation/execution_mapping.json",
+                  "validation/execution_mapping_summary.md",
+                ].map((needle) => {
+                  // find artifact path by substring match
+                  let foundPath: string | null = null;
+    
+                  const consider = (candidate: string) => {
+                    // Only allow Supabase storage objects
+                    if (!candidate.startsWith("backend/")) return;
+    
+                    // First valid wins; storage-only avoids /artifacts/... routes
+                    if (!foundPath) foundPath = candidate;
+                  };
+    
+                  Object.values(workflowMeta?.artifacts || {}).forEach((v: any) => {
+                    if (typeof v === "string" && v.includes(needle)) {
+                      consider(v);
+                    } else if (typeof v === "object") {
+                      Object.values(v).forEach((sv: any) => {
+                        if (typeof sv === "string" && sv.includes(needle)) {
+                          consider(sv);
+                        }
+                      });
+                    }
+                  });
+    
+                  if (!foundPath) return null;
+    
+                  const label = needle.split("/").pop()!;
+    
+                  return (
+                    <div key={needle} className="flex gap-2">
+                      <button
+                        onClick={() => openArtifactViewer(label, foundPath!)}
+                        className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-2 py-1 rounded"
+                        title="View"
+                      >
+                        👁 {label}
+                      </button>
+    
+                      <button
+                        onClick={() => handleDownloadArtifact(foundPath!, `validation_${label}`)}
+                        className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-2 py-1 rounded"
+                        title="Download"
+                      >
+                        ⬇️
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              {[
-                "validation/results.json",
-                "validation/results.csv",
-                "validation/run_manifest.json",
-                "validation/bench_schematic_loaded.json",
-                "validation/execution_mapping.json",
-                "validation/execution_mapping_summary.md",
-              ].map((needle) => {
-             // find artifact path by substring match
-                let foundPath: string | null = null;
-
-                const consider = (candidate: string) => {
-                  // Only allow Supabase storage objects
-                  if (!candidate.startsWith("backend/")) return;
-                
-                  // First valid wins; storage-only avoids /artifacts/... routes
-                  if (!foundPath) foundPath = candidate;
-                };
-                
-                Object.values(workflowMeta?.artifacts || {}).forEach((v: any) => {
-                  if (typeof v === "string" && v.includes(needle)) {
-                    consider(v);
-                  } else if (typeof v === "object") {
-                    Object.values(v).forEach((sv: any) => {
-                      if (typeof sv === "string" && sv.includes(needle)) {
-                        consider(sv);
-                      }
-                    });
-                  }
-                });
-
-                
-
-                if (!foundPath) return null;
-
-                const label = needle.split("/").pop()!;
-
-                return (
-                  <div key={needle} className="flex gap-2">
+          )}
+    
+          {focusedAgent && (
+            <div className="mb-3 text-cyan-300 text-xs">
+              🎯 Showing outputs for <strong>{focusedAgent}</strong>
+              &nbsp;(click another agent to switch)
+            </div>
+          )}
+    
+          {Object.entries(grouped).map(([agent, items]) => (
+            <div key={agent} className="border border-slate-700 rounded-lg p-3 bg-slate-800/50">
+              <h3 className="text-cyan-400 font-semibold mb-2">
+                {agent.replace("_agent", "").toUpperCase()}
+              </h3>
+    
+              <div className="space-y-1">
+                {items.map(({ label, path }) => (
+                  <div
+                    key={`${agent}-${label}-${path}`}
+                    className="flex items-center justify-between bg-slate-700/60 p-2 rounded"
+                  >
+                    <span className="text-slate-300 capitalize">{label}</span>
                     <button
-                      onClick={() => openArtifactViewer(label, foundPath!)}
-                      className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-2 py-1 rounded"
-                      title="View"
-                    >
-                      👁 {label}
-                    </button>
-                
-                    <button
-                      onClick={() => handleDownloadArtifact(foundPath!, `validation_${label}`)}
+                      onClick={() => handleDownloadArtifact(path, `${agent}_${label}`)}
                       className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-2 py-1 rounded"
-                      title="Download"
                     >
-                      ⬇️
+                      ⬇️ Download
                     </button>
                   </div>
-                );
-                
-              })}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
+      </>
+    );
+    
+
 
   
-        {focusedAgent && (
-          <div className="mb-3 text-cyan-300 text-xs">
-            🎯 Showing outputs for <strong>{focusedAgent}</strong>
-            &nbsp;(click another agent to switch)
-          </div>
-        )}
-  
-        {Object.entries(grouped).map(([agent, items]) => (
-          <div
-            key={agent}
-            className="border border-slate-700 rounded-lg p-3 bg-slate-800/50"
-          >
-            <h3 className="text-cyan-400 font-semibold mb-2">
-              {agent.replace("_agent", "").toUpperCase()}
-            </h3>
-  
-            <div className="space-y-1">
-              {items.map(({ label, path }) => (
-                <div
-                  key={`${agent}-${label}-${path}`}
-                  className="flex items-center justify-between bg-slate-700/60 p-2 rounded"
-                >
-                  <span className="text-slate-300 capitalize">{label}</span>
-                  <button
-                    onClick={() => handleDownloadArtifact(path, `${agent}_${label}`)}
-                    className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-2 py-1 rounded"
-                  >
-                    ⬇️ Download
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
+    
   
 
   return (
