@@ -724,7 +724,6 @@ export default function WorkflowConsole({
           <span className="font-semibold text-cyan-300">Studio</span>
           <span className="text-slate-500"> • build workflows</span>
         </div>
-
         <div className="flex items-center gap-2">
           <button
             onClick={() => router.push("/apps")}
@@ -733,7 +732,6 @@ export default function WorkflowConsole({
           >
             Apps
           </button>
-
           <button
             onClick={() => router.push("/workflow")}
             className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-900 transition"
@@ -743,7 +741,6 @@ export default function WorkflowConsole({
           </button>
         </div>
       </div>
-
       <div className="p-3 space-y-4">
         <button
           onClick={handleDownloadLogs}
