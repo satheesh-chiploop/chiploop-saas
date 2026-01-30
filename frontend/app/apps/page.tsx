@@ -102,6 +102,16 @@ export default function AppsHomePage() {
 
   const go = (path: string) => router.push(path);
 
+  const routeForApp = (slug: string) => {
+    // Dedicated pages (apps with custom UX)
+    const dedicated: Record<string, string> = {
+      "validation-run": "/apps/validation-run",
+      // later:
+      // "digital-rtl-generator": "/apps/digital-rtl-generator",
+    };
+    return dedicated[slug] || `/apps/${slug}`;
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
       {/* Top bar */}
@@ -311,7 +321,7 @@ export default function AppsHomePage() {
           {flagship.map((app) => (
             <button
               key={app.slug}
-              onClick={() => go(`/apps/${app.slug}`)}
+              onClick={() => go(routeForApp(app.slug))}
               className="rounded-2xl border border-slate-800 bg-slate-950/50 p-5 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
             >
               <div className="flex items-center justify-between gap-3">
@@ -364,7 +374,7 @@ export default function AppsHomePage() {
                   {animatedApps.map((app, idx) => (
                     <button
                       key={`${app.slug}-${idx}`}
-                      onClick={() => go(`/apps/${app.slug}`)}
+                      onClick={() => go(routeForApp(app.slug))}
                       className="min-w-[280px] max-w-[280px] rounded-2xl border border-slate-800 bg-slate-950/55 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -419,3 +429,4 @@ export default function AppsHomePage() {
     </main>
   );
 }
+
