@@ -25,7 +25,7 @@ function LandingPageContent() {
 
   // ✅ Handle Login/Workflow button
   const handleMainButton = () => {
-    if (userEmail) router.push("/workflow");
+    if (userEmail) router.push("/apps");
     else router.push("/login");
   };
 
@@ -56,7 +56,7 @@ function LandingPageContent() {
             onClick={handleMainButton}
             className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-5 py-2 rounded-lg shadow-lg"
           >
-            {userEmail ? "🚀 Go to Workflow" : "🔑 Login"}
+            {userEmail ? "🚀 Go to apps" : "Login"}
           </button>
         </div>
       </nav>
@@ -85,23 +85,22 @@ function LandingPageContent() {
             {
               name: "Digital Loop",
               desc: "Accelerate digital design and verification",
-              icon: "💻",
             },
             {
               name: "Analog Loop",
               desc: "Automate analog circuit optimization",
-              icon: "⚙️",
             },
             {
               name: "Embedded Loop",
               desc: "Streamline embedded systems development",
-              icon: "📶",
             },
             {
               name: "Validation Loop",
               desc: "Automate Hardware/Lab testing/validation",
-              icon: "📶",
             },
+            { name: "System Loop",
+              desc: "Connecting loops ( Digital/Analog/Firmware/Validation) for system level execution ",
+            }
           ].map((loop) => (
             <div
               key={loop.name}
