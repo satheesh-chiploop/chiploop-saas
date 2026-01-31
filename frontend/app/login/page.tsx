@@ -22,7 +22,7 @@ export default function LoginPage() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (session) router.push("/workflow");
+      if (session) router.push("/apps");
     })();
   }, [supabase, router]);
 
@@ -50,7 +50,7 @@ export default function LoginPage() {
           ? "✅ Account created! Check your email to confirm."
           : "✅ Welcome back!"
       );
-      if (mode === "signin") router.push("/workflow");
+      if (mode === "signin") router.push("/apps");
     } catch (error: any) {
       toast.error(error.message || "Something went wrong.");
     } finally {
