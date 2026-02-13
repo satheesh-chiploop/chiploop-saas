@@ -16,15 +16,38 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
 
-  // 🔹 Redirect to workflow if already logged in
+  // ✅ NEW: prevent flash by waiting until auth is checked
+  const [authChecked, setAuthChecked] = useState(false);
+
+  // 🔹 Redirect to apps if already logged in (no flash)
   useEffect(() => {
+    let mounted = true;
+
     (async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (session) router.push("/apps");
+
+      if (!mounted) return;
+
+      setAuthChecked(true);
+
+      if (session) router.replace("/apps"); // ✅ replace avoids back-button loops
     })();
+
+    return () => {
+      mounted = false;
+    };
   }, [supabase, router]);
+
+  // ✅ NEW: show a lightweight loading screen until session is known
+  if (!authChecked) {
+    return (
+      <main className="min-h-screen flex flex-col justify-center items-center bg-[#0b0b0c] text-white">
+        <div className="text-slate-300">Checking session…</div>
+      </main>
+    );
+  }
 
   // 🔹 Email/Password sign-in or sign-up
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -37,7 +60,10 @@ export default function LoginPage() {
         result = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+          // ✅ small improvement: keep consistent apps-first landing after confirm
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=/apps`,
+          },
         });
       } else {
         result = await supabase.auth.signInWithPassword({ email, password });
@@ -50,7 +76,8 @@ export default function LoginPage() {
           ? "✅ Account created! Check your email to confirm."
           : "✅ Welcome back!"
       );
-      if (mode === "signin") router.push("/apps");
+
+      if (mode === "signin") router.replace("/apps"); // ✅ replace
     } catch (error: any) {
       toast.error(error.message || "Something went wrong.");
     } finally {
@@ -62,7 +89,8 @@ export default function LoginPage() {
   const handleOAuth = async (provider: "google" | "github") => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      // ✅ small improvement: apps-first return
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/apps` },
     });
     if (error) toast.error(error.message);
   };
@@ -72,7 +100,8 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      // ✅ small improvement: apps-first return
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/apps` },
     });
     setLoading(false);
     if (error) toast.error(error.message);

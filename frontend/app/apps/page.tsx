@@ -33,19 +33,62 @@ export default function AppsHomePage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
+  // ✅ MINIMAL ADD: stop flashing by gating redirects until auth is known
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
+
   // A tiny “choice architecture” state: keep UI simple by defaulting to Recommended
   const [view, setView] = useState<"recommended" | "all">("recommended");
 
+  // ✅ MINIMAL CHANGE: avoid immediate redirect during Supabase session hydration
   useEffect(() => {
+    let mounted = true;
+    let redirectTimer: any = null;
+
+    const applySession = (session: any) => {
+      if (!mounted) return;
+
+      const authed = !!session;
+      setIsAuthed(authed);
+      setAuthChecked(true);
+
+      if (authed) {
+        setUserEmail(session?.user?.email || null);
+        if (redirectTimer) clearTimeout(redirectTimer);
+      } else {
+        // small delay prevents flicker during hydration
+        redirectTimer = setTimeout(() => {
+          router.replace("/login");
+        }, 250);
+      }
+    };
+
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push("/login");
-        return;
-      }
-      setUserEmail(session.user.email || null);
+      applySession(session);
+
+      const { data: sub } = supabase.auth.onAuthStateChange((_event, session2) => {
+        applySession(session2);
+      });
+
+      return () => sub?.subscription?.unsubscribe();
     })();
+
+    return () => {
+      mounted = false;
+      if (redirectTimer) clearTimeout(redirectTimer);
+    };
   }, [router]);
+
+  // ✅ MINIMAL ADD: render gate prevents UI bounce/flash
+  if (!authChecked) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-slate-300">Loading apps…</div>
+      </main>
+    );
+  }
+  if (!isAuthed) return null;
 
   // For now hardcoded (later replace with Supabase “apps registry”)
   const apps: AppCard[] = useMemo(() => ([
@@ -429,4 +472,3 @@ export default function AppsHomePage() {
     </main>
   );
 }
-
