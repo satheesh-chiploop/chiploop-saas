@@ -40,43 +40,40 @@ export default function AppsHomePage() {
   // A tiny “choice architecture” state: keep UI simple by defaulting to Recommended
   const [view, setView] = useState<"recommended" | "all">("recommended");
 
-  // ✅ MINIMAL CHANGE: avoid immediate redirect during Supabase session hydration
+
   useEffect(() => {
     let mounted = true;
-    let redirectTimer: any = null;
-
-    const applySession = (session: any) => {
-      if (!mounted) return;
-
-      const authed = !!session;
-      setIsAuthed(authed);
-      setAuthChecked(true);
-
-      if (authed) {
-        setUserEmail(session?.user?.email || null);
-        if (redirectTimer) clearTimeout(redirectTimer);
-      } else {
-        // small delay prevents flicker during hydration
-        redirectTimer = setTimeout(() => {
-          router.replace("/login");
-        }, 250);
-      }
-    };
 
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      applySession(session);
+      if (!mounted) return;
 
-      const { data: sub } = supabase.auth.onAuthStateChange((_event, session2) => {
-        applySession(session2);
-      });
+      setAuthChecked(true);
 
-      return () => sub?.subscription?.unsubscribe();
+      // Middleware should prevent this, but keep as safety net
+      if (!session) {
+        router.replace("/login?next=/apps");
+        return;
+      }
+
+      setIsAuthed(true);
+      setUserEmail(session.user.email ?? null);
     })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      if (!session) {
+        setIsAuthed(false);
+        router.replace("/login?next=/apps");
+        return;
+      }
+      setIsAuthed(true);
+      setUserEmail(session.user.email ?? null);
+    }); 
 
     return () => {
       mounted = false;
-      if (redirectTimer) clearTimeout(redirectTimer);
+      sub?.subscription?.unsubscribe();
     };
   }, [router]);
 

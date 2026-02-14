@@ -9,7 +9,8 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = requestUrl.searchParams.get("next");
+  const next = requestUrl.searchParams.get("next") || "/apps";
+
 
   const supabase = createRouteHandlerClient({ cookies });
 
@@ -27,11 +28,8 @@ export async function GET(request: Request) {
 
   // ✅ SINGLE SOURCE OF TRUTH
   // Default → /apps
-  const redirectTo =
-    next && next.startsWith("/") ? next : "/apps";
-
-  return NextResponse.redirect(
-    `${requestUrl.origin}${redirectTo}`
-  );
+  const redirectTo = next.startsWith("/") ? next : "/apps";
+  return NextResponse.redirect(`${requestUrl.origin}${redirectTo}`);
+  
 }
 

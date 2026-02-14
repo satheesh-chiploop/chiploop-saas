@@ -788,6 +788,7 @@ function WorkflowPage() {
   
   // workflow console tab state
   const [activeTab, setActiveTab] = useState<"summary" | "live" | "output">("summary");
+  const [authChecked, setAuthChecked] = useState(false);
 
   /* ---------- Auth gate ---------- */
   useEffect(() => {
@@ -796,8 +797,12 @@ function WorkflowPage() {
       setLoadingWorkflows(true);
   
       const { data: { session } } = await supabase.auth.getSession();
+      setAuthChecked(true);
+      // Middleware should prevent this, but keep safety net
       if (!session) {
-        router.push("/login");
+        router.replace("/login?next=/workflow");
+        setLoadingAgents(false);
+        setLoadingWorkflows(false);
         return;
       }
   
@@ -843,6 +848,15 @@ function WorkflowPage() {
       }
     })();
   }, [supabase, router]);
+
+  // then early in render (top-level):
+  if (!authChecked) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-slate-300">Loading Studio…</div>
+      </main>
+    );
+  }
 
   // 🔁 Listen for new workflows saved by PlannerModal
   // 🔁 Listen for global refresh events (Planner or Save)

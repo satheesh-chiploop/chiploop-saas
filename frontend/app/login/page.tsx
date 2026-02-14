@@ -19,22 +19,24 @@ export default function LoginPage() {
   // ✅ NEW: prevent flash by waiting until auth is checked
   const [authChecked, setAuthChecked] = useState(false);
 
-  // 🔹 Redirect to apps if already logged in (no flash)
+  const getNext = () => {
+    if (typeof window === "undefined") return "/apps";
+    const next = new URLSearchParams(window.location.search).get("next");
+    return next && next.startsWith("/") ? next : "/apps";
+  };
+  
   useEffect(() => {
     let mounted = true;
-
+  
     (async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
       if (!mounted) return;
-
+  
       setAuthChecked(true);
-
-      if (session) router.replace("/apps"); // ✅ replace avoids back-button loops
+  
+      if (session) router.replace(getNext());
     })();
-
+  
     return () => {
       mounted = false;
     };
@@ -77,7 +79,7 @@ export default function LoginPage() {
           : "✅ Welcome back!"
       );
 
-      if (mode === "signin") router.replace("/apps"); // ✅ replace
+      if (mode === "signin") router.replace(getNext()); // ✅ replace
     } catch (error: any) {
       toast.error(error.message || "Something went wrong.");
     } finally {
@@ -93,7 +95,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       // ✅ small improvement: apps-first return
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/apps` },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(getNext())}` },
     });
     setLoading(false);
     if (error) toast.error(error.message);
