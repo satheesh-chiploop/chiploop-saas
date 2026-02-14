@@ -85,15 +85,7 @@ export default function LoginPage() {
     }
   };
 
-  // 🔹 OAuth login (Google/GitHub)
-  const handleOAuth = async (provider: "google" | "github") => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      // ✅ small improvement: apps-first return
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/apps` },
-    });
-    if (error) toast.error(error.message);
-  };
+  
 
   // 🔹 Magic Link
   const handleMagicLink = async () => {
@@ -188,21 +180,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* OAuth providers */}
-        <div className="flex flex-col space-y-3 mt-6">
-          <button
-            onClick={() => handleOAuth("google")}
-            className="flex items-center justify-center gap-3 bg-white text-black py-2 rounded-md hover:bg-gray-200"
-          >
-            <FcGoogle size={20} /> Continue with Google
-          </button>
-          <button
-            onClick={() => handleOAuth("github")}
-            className="flex items-center justify-center gap-3 bg-gray-800 text-white py-2 rounded-md hover:bg-gray-700"
-          >
-            <FaGithub size={20} /> Continue with GitHub
-          </button>
-        </div>
+        
       </div>
 
       <p className="text-gray-500 text-xs mt-6">
