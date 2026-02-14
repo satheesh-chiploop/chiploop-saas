@@ -40,8 +40,8 @@ function LandingPageContent() {
       router.push("/apps");
       return;
     }
-  
-    router.push("/login");
+    router.push("/login?next=/apps");
+
   };
 
   if (loginLoading) {
