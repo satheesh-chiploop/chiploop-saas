@@ -33,59 +33,28 @@ export default function AppsHomePage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  // ✅ MINIMAL ADD: stop flashing by gating redirects until auth is known
-  const [authChecked, setAuthChecked] = useState(false);
-  const [isAuthed, setIsAuthed] = useState(false);
+  
 
   // A tiny “choice architecture” state: keep UI simple by defaulting to Recommended
   const [view, setView] = useState<"recommended" | "all">("recommended");
 
 
+  // We only fetch user email for display (optional).
   useEffect(() => {
     let mounted = true;
 
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!mounted) return;
-
-      setAuthChecked(true);
-
-      // Middleware should prevent this, but keep as safety net
-      if (!session) {
-        router.replace("/login?next=/apps");
-        return;
-      }
-
-      setIsAuthed(true);
-      setUserEmail(session.user.email ?? null);
+       setUserEmail(user?.email ?? null);
     })();
-
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted) return;
-      if (!session) {
-        setIsAuthed(false);
-        router.replace("/login?next=/apps");
-        return;
-      }
-      setIsAuthed(true);
-      setUserEmail(session.user.email ?? null);
-    }); 
 
     return () => {
       mounted = false;
-      sub?.subscription?.unsubscribe();
     };
-  }, [router]);
+  }, []);
 
-  // ✅ MINIMAL ADD: render gate prevents UI bounce/flash
-  if (!authChecked) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="text-slate-300">Loading apps…</div>
-      </main>
-    );
-  }
-  if (!isAuthed) return null;
+  
 
   // For now hardcoded (later replace with Supabase “apps registry”)
   const apps: AppCard[] = useMemo(() => ([

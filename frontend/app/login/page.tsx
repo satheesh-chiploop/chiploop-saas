@@ -24,24 +24,25 @@ export default function LoginPage() {
     const next = new URLSearchParams(window.location.search).get("next");
     return next && next.startsWith("/") ? next : "/apps";
   };
-  
+
   useEffect(() => {
     let mounted = true;
   
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!mounted) return;
   
       setAuthChecked(true);
   
-      if (session) router.replace(getNext());
+      if (user) router.replace(getNext());
     })();
   
     return () => {
       mounted = false;
     };
   }, [supabase, router]);
-
+  
+  
   // ✅ NEW: show a lightweight loading screen until session is known
   if (!authChecked) {
     return (
