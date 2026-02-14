@@ -23,11 +23,30 @@ function LandingPageContent() {
     getSession();
   }, []);
 
-  // ✅ Handle Login/Workflow button
-  const handleMainButton = () => {
-    if (userEmail) router.push("/apps");
-    else router.push("/login");
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  const handleMainButton = async () => {
+    if (userEmail) {
+      router.push("/apps");
+      return;
+    }
+
+    setLoginLoading(true);
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=/apps`,
+      },
+    });
+
+    if (error) {
+      console.error("OAuth login error:", error);
+      setLoginLoading(false);
+    }
   };
+
+ 
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white">
@@ -60,9 +79,14 @@ function LandingPageContent() {
         <div>
           <button
             onClick={handleMainButton}
-            className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-5 py-2 rounded-lg shadow-lg"
+            disabled={loginLoading}
+            className={`rounded-xl px-5 py-3 font-semibold transition ${
+             loginLoading
+              ? "bg-slate-700 cursor-not-allowed"
+              : "bg-cyan-600 hover:bg-cyan-500 text-black"
+            }`}
           >
-            {userEmail ? "🚀 Go to apps" : "Login"}
+            {loginLoading ? "Redirecting…" : userEmail ? "Enter Apps" : "Login"}
           </button>
         </div>
       </nav>
