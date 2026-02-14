@@ -26,7 +26,7 @@ function LandingPageContent() {
   const [loginLoading, setLoginLoading] = useState(false);
 
   const handleMainButton = () => {
-       // Email-only login flow
+    // Email-only login flow
     setLoginLoading(true);
 
     if (userEmail) {
