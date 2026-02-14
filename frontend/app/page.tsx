@@ -36,7 +36,13 @@ function LandingPageContent() {
     router.push("/login");
   };
 
- 
+  if (loginLoading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-slate-300">Redirecting…</div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white">
