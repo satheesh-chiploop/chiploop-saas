@@ -25,25 +25,15 @@ function LandingPageContent() {
 
   const [loginLoading, setLoginLoading] = useState(false);
 
-  const handleMainButton = async () => {
+  const handleMainButton = () => {
     if (userEmail) {
       router.push("/apps");
       return;
     }
 
+    // Email-only login flow
     setLoginLoading(true);
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/apps`,
-      },
-    });
-
-    if (error) {
-      console.error("OAuth login error:", error);
-      setLoginLoading(false);
-    }
+    router.push("/login");
   };
 
  
