@@ -25,7 +25,8 @@ function LandingPageContent() {
 
   const [loginLoading, setLoginLoading] = useState(false);
 
-  const handleMainButton = () => {
+  const handleMainButton = async () => {
+
     // Email-only login flow
     setLoginLoading(true);
 
@@ -39,8 +40,7 @@ function LandingPageContent() {
       router.push("/apps");
       return;
     }
-    // Email-only login flow
-    setLoginLoading(true);
+  
     router.push("/login");
   };
 
