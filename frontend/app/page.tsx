@@ -26,11 +26,19 @@ function LandingPageContent() {
   const [loginLoading, setLoginLoading] = useState(false);
 
   const handleMainButton = () => {
+       // Email-only login flow
+    setLoginLoading(true);
+
     if (userEmail) {
       router.push("/apps");
       return;
     }
-
+    // ✅ Avoid flash: check session right now (userEmail might not be loaded yet)
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      router.push("/apps");
+      return;
+    }
     // Email-only login flow
     setLoginLoading(true);
     router.push("/login");
