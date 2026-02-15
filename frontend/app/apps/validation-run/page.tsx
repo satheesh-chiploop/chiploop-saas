@@ -160,15 +160,17 @@ export default function ValidationRunAppPage() {
     }
   }, [logLines.length]);
 
-  function authHeaders(): HeadersInit {
+  function authHeaders(userId?: string, token?: string): HeadersInit {
     const h: Record<string, string> = {};
-    if (sessionUserId) h["x-user-id"] = sessionUserId;
-    if (accessToken) h["Authorization"] = `Bearer ${accessToken}`;
+    const uid = userId ?? sessionUserId;
+    const tok = token ?? accessToken;
+    if (uid) h["x-user-id"] = uid;
+    if (tok) h["Authorization"] = `Bearer ${tok}`;
     return h;
   }
 
-  async function fetchJSON<T>(path: string): Promise<T> {
-    const resp = await fetch(`${API_BASE}${path}`, { headers: authHeaders() });
+  async function fetchJSON<T>(path: string, headersOverride?: HeadersInit): Promise<T> {
+    const resp = await fetch(`${API_BASE}${path}`, { headers: headersOverride ?? authHeaders() });
     if (!resp.ok) {
       const txt = await resp.text().catch(() => "");
       throw new Error(`${resp.status} ${resp.statusText}${txt ? ` — ${txt}` : ""}`);
@@ -176,10 +178,10 @@ export default function ValidationRunAppPage() {
     return resp.json();
   }
 
-  async function postJSON<T>(path: string, body: any): Promise<T> {
+  async function postJSON<T>(path: string, body: any, headersOverride?: HeadersInit): Promise<T> {
     const resp = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...authHeaders() },
+      headers: { "Content-Type": "application/json", ...(headersOverride ?? authHeaders()) },
       body: JSON.stringify(body),
     });
     if (!resp.ok) {
@@ -204,12 +206,17 @@ export default function ValidationRunAppPage() {
       setAccessToken(session.access_token);
       setEmail(session.user.email || null);
 
+      // ✅ Use session values immediately (don’t wait for state to update)
+      const h = authHeaders(session.user.id, session.access_token);
+
       try {
         const [benchesRes, instRes, plansRes] = await Promise.all([
-          fetchJSON<{ ok: boolean; benches: Bench[] }>("/validation/benches"),
-          fetchJSON<{ ok: boolean; instruments: Instrument[] }>("/validation/instruments"),
-          fetchJSON<{ status: string; plans: TestPlan[] }>("/validation/test_plans"),
+          fetchJSON<{ ok: boolean; benches: Bench[] }>("/validation/benches", h),
+          fetchJSON<{ ok: boolean; instruments: Instrument[] }>("/validation/instruments", h),
+          fetchJSON<{ status: string; plans: TestPlan[] }>("/validation/test_plans", h),
         ]);
+
+      
 
         const loadedBenches = benchesRes.benches || [];
         const loadedInst = instRes.instruments || [];
