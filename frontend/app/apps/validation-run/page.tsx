@@ -12,8 +12,7 @@ const supabase = createClientComponentClient();
 //);
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  process.env.NEXT_PUBLIC_SUPABASE_URL||
   "http://localhost:8000";
 
 type Bench = {
