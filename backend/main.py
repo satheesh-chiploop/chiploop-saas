@@ -2873,29 +2873,88 @@ async def validation_register_instrument(payload: InstrumentRegisterIn, request:
     return {"ok": True, "instrument": (res.data[0] if res.data else None)}
 
 @app.get("/validation/instruments")
-async def validation_list_instruments(request: Request):
-    user_id = _require_user_id(request)
+async def validation_list_instruments(request: Request, user_id: Optional[str] = None):
+    """
+    Backward compatible:
+      - Apps call: /validation/instruments  (user_id from auth)
+      - Studio can call: /validation/instruments?user_id=...
+    Also supports legacy ownership stored in metadata.
+    """
+    effective_user_id = user_id or _require_user_id(request)
 
-    res = supabase.table("validation_instruments") \
-        .select("*") \
-        .eq("user_id", user_id) \
-        .order("created_at", desc=True) \
-        .execute()
+    try:
+        # Primary: user_id column
+        res = (
+            supabase.table("validation_instruments")
+            .select("*")
+            .eq("user_id", effective_user_id)
+            .order("created_at", desc=True)
+            .execute()
+        )
+        instruments = res.data or []
 
-    return {"ok": True, "instruments": res.data or []}
+        # Fallback: legacy rows where user_id is NULL but metadata stores ownership
+        if not instruments:
+            res2 = (
+                supabase.table("validation_instruments")
+                .select("*")
+                .order("created_at", desc=True)
+                .execute()
+            )
+            instruments = []
+            for r in (res2.data or []):
+                md = r.get("metadata") or {}
+                owner = md.get("owner_user_id") or md.get("created_by")
+                if owner == effective_user_id:
+                    instruments.append(r)
+
+        return {"ok": True, "instruments": instruments}
+
+    except Exception as e:
+        logger.exception("validation_list_instruments failed")
+        return JSONResponse(status_code=500, content={"ok": False, "message": f"{type(e).__name__}: {e}"})
+
 
 @app.get("/validation/instruments/default")
 async def validation_get_default_instrument(request: Request):
     user_id = _require_user_id(request)
 
-    res = supabase.table("validation_instruments") \
-        .select("*") \
-        .eq("user_id", user_id) \
-        .eq("is_default", True) \
-        .limit(1) \
-        .execute()
+    try:
+        # Primary: correct column
+        res = (
+            supabase.table("validation_instruments")
+            .select("*")
+            .eq("user_id", user_id)
+            .eq("is_default", True)
+            .limit(1)
+            .execute()
+        )
 
-    return {"ok": True, "instrument": (res.data[0] if res.data else None)}
+        if res.data:
+            return {"ok": True, "instrument": res.data[0]}
+
+        # Fallback: legacy metadata-based ownership
+        res2 = (
+            supabase.table("validation_instruments")
+            .select("*")
+            .eq("is_default", True)
+            .execute()
+        )
+
+        for r in (res2.data or []):
+            md = r.get("metadata") or {}
+            owner = md.get("owner_user_id") or md.get("created_by")
+            if owner == user_id:
+                return {"ok": True, "instrument": r}
+
+        return {"ok": True, "instrument": None}
+
+    except Exception as e:
+        logger.exception("validation_get_default_instrument failed")
+        return JSONResponse(
+            status_code=500,
+            content={"ok": False, "message": f"{type(e).__name__}: {e}"}
+        )
 
 
 @app.post("/validation/instruments/default")
@@ -3155,13 +3214,14 @@ async def list_validation_test_plans(request: Request, user_id: Optional[str] = 
 
         resp = (
             supabase.table("validation_test_plans")
-            .select("id,name,description,created_at")
+            # include is_active so UI can filter later
+            .select("id,name,description,is_active,created_at")
             .eq("user_id", effective_user_id)
-            .eq("is_active", True)
             .order("created_at", desc=True)
             .execute()
         )
         return {"status": "ok", "plans": resp.data or []}
+
     except Exception as e:
         logger.exception("list_validation_test_plans failed")
         return JSONResponse(status_code=500, content={"status": "error", "message": f"{type(e).__name__}: {e}"})
@@ -3171,21 +3231,26 @@ async def list_validation_test_plans(request: Request, user_id: Optional[str] = 
 async def list_validation_benches(request: Request):
     """
     Return benches owned by the current user.
-    Ownership is stored in validation_benches.metadata.owner_user_id (MVP pattern).
+    For MVP, ownership is stored inside metadata.
+    We support BOTH keys:
+      - metadata.owner_user_id  (older expectation)
+      - metadata.created_by     (what create agent currently writes)
     """
     user_id = _require_user_id(request)
 
     try:
         res = (
             supabase.table("validation_benches")
-            .select("id,name,location,status,metadata,created_at,updated_at")
+            # ✅ match your real table columns (no updated_at)
+            .select("id,org_id,name,location,status,metadata,created_at")
             .order("created_at", desc=True)
             .execute()
         )
 
         benches = []
         for b in (res.data or []):
-            owner = (b.get("metadata") or {}).get("owner_user_id")
+            md = b.get("metadata") or {}
+            owner = md.get("owner_user_id") or md.get("created_by")
             if owner == user_id:
                 benches.append(b)
 
@@ -3193,8 +3258,10 @@ async def list_validation_benches(request: Request):
 
     except Exception as e:
         logger.exception("list_validation_benches failed")
-        return JSONResponse(status_code=500, content={"ok": False, "message": f"{type(e).__name__}: {e}"})
-
+        return JSONResponse(
+            status_code=500,
+            content={"ok": False, "message": f"{type(e).__name__}: {e}"},
+        )
 
 
 

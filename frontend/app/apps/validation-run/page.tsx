@@ -418,6 +418,28 @@ export default function ValidationRunAppPage() {
     }
   }
 
+  const handleDownloadLogs = () => {
+    const content = workflowRow?.logs || "";
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${workflowId || "validation"}_logs.txt`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+  
+  const handleDownloadAllArtifacts = async () => {
+    if (!workflowId) return;
+  
+    // Use your existing API_BASE, which is /api in production
+    const url = `${API_BASE}/workflow/${workflowId}/download_zip`;
+  
+    // Open in a new tab to trigger download
+    // (works well even with auth headers not required)
+    window.open(url, "_blank");
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
       {/* Top nav */}
@@ -997,21 +1019,32 @@ export default function ValidationRunAppPage() {
           </div>
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900/15 p-6">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-lg font-bold">Run log</div>
-                <div className="text-sm text-slate-400">
-                  Streaming logs from the parent workflow.
-                </div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-sm font-semibold text-white">Run log</div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleDownloadLogs}
+                  disabled={!workflowRow?.logs}
+                  className="rounded border border-white/10 bg-white/5 px-3 py-1 text-xs text-white hover:bg-white/10 disabled:opacity-50"
+                >
+                  Download logs
+                </button>
+
+                <button
+                  onClick={handleDownloadAllArtifacts}
+                  disabled={!workflowId}
+                  className="rounded border border-white/10 bg-white/5 px-3 py-1 text-xs text-white hover:bg-white/10 disabled:opacity-50"
+                >
+                  Download outputs (zip)
+                </button>
+
+                <button
+                  onClick={() => scrollLogsToBottom()}
+                  className="rounded border border-white/10 bg-white/5 px-3 py-1 text-xs text-white hover:bg-white/10"
+                >
+                  Jump to end
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  if (logsRef.current) logsRef.current.scrollTop = logsRef.current.scrollHeight;
-                }}
-                className="rounded-xl border border-slate-700 bg-slate-950/30 px-3 py-2 text-xs hover:bg-slate-950 transition"
-              >
-                Jump to end
-              </button>
             </div>
 
             <div
