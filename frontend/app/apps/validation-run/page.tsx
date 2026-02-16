@@ -11,9 +11,7 @@ const supabase = createClientComponentClient();
 //  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 //);
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL
-  "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 type Bench = {
   id: string;
@@ -153,12 +151,17 @@ export default function ValidationRunAppPage() {
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const phaseProgress = useMemo(() => inferPhaseProgress(logLines), [logLines]);
 
+  
+
   const logsRef = useRef<HTMLDivElement | null>(null);
 
+  const scrollLogsToBottom = () => {
+    if (!logsRef.current) return;
+    logsRef.current.scrollTop = logsRef.current.scrollHeight;
+  };
+
   useEffect(() => {
-    if (logsRef.current) {
-      logsRef.current.scrollTop = logsRef.current.scrollHeight;
-    }
+    scrollLogsToBottom();
   }, [logLines.length]);
 
   function authHeaders(userId?: string, token?: string): HeadersInit {
