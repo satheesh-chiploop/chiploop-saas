@@ -151,6 +151,8 @@ export default function ValidationRunAppPage() {
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const phaseProgress = useMemo(() => inferPhaseProgress(logLines), [logLines]);
 
+  const [datasheetText, setDatasheetText] = useState<string>("");
+
   
 
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -326,7 +328,7 @@ export default function ValidationRunAppPage() {
 
   const canRun = useMemo(() => {
     if (running) return false;
-
+  
     // Bench logic
     if (benchMode === "use_existing") {
       if (!selectedBenchId) return false;
@@ -334,17 +336,29 @@ export default function ValidationRunAppPage() {
       if (!benchName.trim()) return false;
       if (selectedInstrumentIds.length === 0) return false;
     }
-
-    // Test plan logic (MVP: allow either plan_id OR typed name OR empty; first workflow might generate)
+  
+    // Test plan logic
     if (planMode === "use_existing") {
-      // ok even if empty, but nudge: prefer selecting
-      return true;
-    } else {
-      // allow empty too, but nudge recommends naming
+      // allow running even without selecting a plan (MVP)
       return true;
     }
-  }, [running, benchMode, selectedBenchId, benchName, selectedInstrumentIds.length, planMode]);
+  
+    // planMode === "type_name" (generate new plan)
+    if (!testPlanName.trim()) return false;              // require name
+    if (!datasheetText.trim()) return false;             // require datasheet/spec text
+    return true;
+  }, [
+    running,
+    benchMode,
+    selectedBenchId,
+    benchName,
+    selectedInstrumentIds.length,
+    planMode,
+    testPlanName,
+    datasheetText,
+  ]);
 
+  
   async function onRun() {
     setRunErr(null);
     setRunning(true);
@@ -365,6 +379,10 @@ export default function ValidationRunAppPage() {
         instrument_ids: instrument_ids && instrument_ids.length > 0 ? instrument_ids : undefined,
         test_plan_id: planMode === "use_existing" ? (selectedPlanId || undefined) : undefined,
         test_plan_name: planMode === "type_name" ? (testPlanName.trim() || undefined) : undefined,
+      
+        // ✅ NEW: needed by Validation Test Plan Agent when generating a plan
+        datasheet_text: planMode === "type_name" ? (datasheetText.trim() || undefined) : undefined,
+      
         toggles: {
           apply: applyProposal,
         },
@@ -782,6 +800,24 @@ export default function ValidationRunAppPage() {
                 Type plan name
               </button>
             </div>
+
+            {testPlanMode === "create_new" ? (
+              <div className="mt-3">
+                <div className="text-xs text-slate-300 mb-1">
+                  Datasheet / spec text (required to generate a new test plan)
+                </div>
+                <textarea
+                  value={datasheetText}
+                  onChange={(e) => setDatasheetText(e.target.value)}
+                  rows={6}
+                  placeholder="Paste relevant datasheet sections or a spec summary here (interfaces, commands, electrical limits, expected behavior, pass/fail criteria)."
+                  className="w-full rounded border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+                />
+                <div className="mt-1 text-[11px] text-slate-500">
+                  Tip: even 10–30 lines is enough for a first plan. You can refine later.
+                </div>
+              </div>
+            ) : null}
 
             {planMode === "use_existing" ? (
               <div className="mt-4">

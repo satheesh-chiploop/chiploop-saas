@@ -32,9 +32,9 @@ type AgentNodeData = { uiLabel: string; backendLabel: string; desc?: string };
 
 type CatalogItem = { uiLabel: string; backendLabel: string; desc?: string };
 
-if (typeof window !== "undefined" && !localStorage.getItem("anon_user_id")) {
-  localStorage.setItem("anon_user_id", crypto.randomUUID());
-}
+// if (typeof window !== "undefined" && !localStorage.getItem("anon_user_id")) {
+//  localStorage.setItem("anon_user_id", crypto.randomUUID());
+// }
 
 const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
   digital: [
@@ -182,6 +182,18 @@ function WorkflowPage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
   const rf = useReactFlow();
+
+  // ✅ Move anon id init into effect (avoids module init / bundler ordering issues)
+  useEffect(() => {
+    try {
+      if (typeof window === "undefined") return;
+      if (!localStorage.getItem("anon_user_id")) {
+        localStorage.setItem("anon_user_id", crypto.randomUUID());
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // core state
   const [loop, setLoop] = useState<LoopKey>("digital");

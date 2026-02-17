@@ -33,6 +33,7 @@ export default function WorkflowConsole({
   jobId: string;
   table?: TableName | string;
 }) {
+  const supabase = createClientComponentClient();
   const [activeTab, setActiveTab] = useState<"summary" | "live" | "outputs">("live");
   const [logs, setLogs] = useState<string[]>([]);
   const [status, setStatus] = useState("starting");
