@@ -2,14 +2,16 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+//import { createClient } from "@supabase/supabase-js";
 
 // 🧩 Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+//const supabase = createClient(
+//  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+//  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+const supabase = createClientComponentClient();
 
 interface WorkflowRow {
   id?: string;
