@@ -801,7 +801,7 @@ export default function ValidationRunAppPage() {
               </button>
             </div>
 
-            {testPlanMode === "create_new" ? (
+            {planMode === "type_name" ? (
               <div className="mt-3">
                 <div className="text-xs text-slate-300 mb-1">
                   Datasheet / spec text (required to generate a new test plan)
