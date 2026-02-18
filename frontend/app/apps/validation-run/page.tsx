@@ -454,7 +454,7 @@ export default function ValidationRunAppPage() {
     if (!workflowId) return;
   
     // Use your existing API_BASE, which is /api in production
-    const url = `${API_BASE}/workflow/${workflowId}/download_zip`;
+    const url = `${API_BASE}/workflow/${workflowId}/download_zip?full=1`;
   
     // Open in a new tab to trigger download
     // (works well even with auth headers not required)
