@@ -28,7 +28,7 @@ type TableName = "workflows" | "runs";
 
 export default function WorkflowConsole({
   jobId,
-  table = "workflows,runs",
+  table = "workflows",
 }: {
   jobId: string;
   table?: TableName | string;
