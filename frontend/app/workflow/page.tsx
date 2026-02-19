@@ -861,14 +861,7 @@ function WorkflowPage() {
     })();
   }, [supabase, router]);
 
-  // then early in render (top-level):
-  if (!authChecked) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="text-slate-300">Loading Studio…</div>
-      </main>
-    );
-  }
+  
 
   // 🔁 Listen for new workflows saved by PlannerModal
   // 🔁 Listen for global refresh events (Planner or Save)
@@ -1804,7 +1797,14 @@ function WorkflowPage() {
     selectedWorkflowName === "Validation_Apply_Proposal";
   
 
-  
+  // then early in render (top-level):
+  if (!authChecked) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-slate-300">Loading Studio…</div>
+      </main>
+    );
+  }
   
 
   /* =========================
