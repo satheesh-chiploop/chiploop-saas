@@ -1,3 +1,5 @@
+// ✅ AFTER: app_apps_page.tsx (minimal edits only)
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -18,7 +20,7 @@ type AppCard = {
   loop_type: LoopType;
   status?: "Flagship" | "Coming";
   nudge?: "Recommended" | "Most used" | "New";
-  promise?: string; // short outcome promise
+  promise?: string;
 };
 
 const LOOP_META: Record<LoopType, { title: string; tagline: string; accent: string }> = {
@@ -33,30 +35,19 @@ export default function AppsHomePage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  
-
-  // A tiny “choice architecture” state: keep UI simple by defaulting to Recommended
   const [view, setView] = useState<"recommended" | "all">("recommended");
 
-
-  // We only fetch user email for display (optional).
   useEffect(() => {
     let mounted = true;
-
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!mounted) return;
-       setUserEmail(user?.email ?? null);
+      setUserEmail(user?.email ?? null);
     })();
-
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
-  
-
-  // For now hardcoded (later replace with Supabase “apps registry”)
+  // ✅ updated apps list (only change is digital apps)
   const apps: AppCard[] = useMemo(() => ([
     {
       slug: "validation-run",
@@ -67,15 +58,37 @@ export default function AppsHomePage() {
       nudge: "Recommended",
       promise: "Get run results + gaps + exec report",
     },
+
+    // ✅ NEW DIGITAL FLAGSHIPS
     {
-      slug: "digital-rtl-generator",
-      title: "RTL Generator",
-      subtitle: "Spec → RTL + micro-architecture summary",
+      slug: "arch2rtl",
+      title: "Arch2RTL",
+      subtitle: "Spec → Architecture → Microarch → RTL → Handoff package",
       loop_type: "digital",
       status: "Flagship",
       nudge: "Most used",
-      promise: "Generate clean SV + docs fast",
+      promise: "Generate RTL + docs + handoff artifacts",
     },
+    {
+      slug: "dqa",
+      title: "DQA",
+      subtitle: "CDC + RDC + Lint + Synthesis readiness quality gate",
+      loop_type: "digital",
+      status: "Flagship",
+      nudge: "Recommended",
+      promise: "Catch issues before tape-in",
+    },
+    {
+      slug: "verify",
+      title: "Verify",
+      subtitle: "Testbench + Coverage + SVA + Simulation summary",
+      loop_type: "digital",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Generate verification environment fast",
+    },
+
+    // unchanged placeholders
     {
       slug: "analog-insight-explorer",
       title: "Analog Insight Explorer",
@@ -105,18 +118,17 @@ export default function AppsHomePage() {
 
   const featured = apps.find(a => a.slug === "validation-run") || apps[0];
   const flagship = apps.filter(a => a.status === "Flagship");
-  const recommended = apps.filter(a => a.nudge === "Recommended" || a.status === "Flagship");
-
   const loops: LoopType[] = useMemo(() => (["validation", "digital", "analog", "embedded", "system"]), []);
 
   const go = (path: string) => router.push(path);
 
   const routeForApp = (slug: string) => {
-    // Dedicated pages (apps with custom UX)
+    // ✅ Dedicated pages (apps with custom UX)
     const dedicated: Record<string, string> = {
       "validation-run": "/apps/validation-run",
-      // later:
-      // "digital-rtl-generator": "/apps/digital-rtl-generator",
+      "arch2rtl": "/apps/arch2rtl",
+      "dqa": "/apps/dqa",
+      "verify": "/apps/verify",
     };
     return dedicated[slug] || `/apps/${slug}`;
   };
@@ -157,10 +169,9 @@ export default function AppsHomePage() {
         </div>
       </div>
 
-      {/* Hero (nudges + anchors) */}
+      {/* Hero */}
       <section className="mx-auto max-w-6xl px-6 pt-10 pb-6">
         <div className="grid gap-4 md:grid-cols-5">
-          {/* Left: featured card (default choice) */}
           <div className="md:col-span-3 rounded-2xl border border-slate-800 bg-slate-900/30 p-6 shadow-lg">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -171,7 +182,7 @@ export default function AppsHomePage() {
                   Run outcomes, not workflows.
                 </h1>
                 <p className="mt-2 max-w-xl text-slate-300">
-                  Pick an app, give inputs once, click run. ChipLoop handles preflight, execution, learning, and reporting.
+                  Pick an app, give inputs once, click run. ChipLoop handles execution, learning, and reporting.
                 </p>
               </div>
 
@@ -186,65 +197,31 @@ export default function AppsHomePage() {
                   <div className="text-sm text-slate-400">Featured</div>
                   <div className="mt-1 text-2xl font-bold text-white">{featured.title}</div>
                   <div className="mt-1 text-slate-300">{featured.subtitle}</div>
-                  {featured.promise ? (
-                    <div className="mt-3 text-sm text-slate-400">
-                      Outcome: <span className="text-slate-200">{featured.promise}</span>
-                    </div>
-                  ) : null}
 
                   <div className="mt-5 flex flex-wrap gap-3">
                     <button
-                      onClick={() => go(`/apps/${featured.slug}`)}
+                      onClick={() => go(routeForApp(featured.slug))}
                       className="rounded-xl bg-cyan-600 px-5 py-3 font-semibold hover:bg-cyan-500 transition"
                     >
                       Run now
                     </button>
                     <button
-                      onClick={() => go(`/apps/${featured.slug}`)}
+                      onClick={() => go(routeForApp(featured.slug))}
                       className="rounded-xl border border-slate-700 bg-slate-950/40 px-5 py-3 text-slate-200 hover:bg-slate-950 transition"
                     >
                       Preview outputs
                     </button>
                   </div>
 
-                  {/* Micro nudge (loss aversion, reassurance) */}
                   <div className="mt-4 text-xs text-slate-500">
-                    Preflight included to prevent rerun failures • Exec report generated automatically
-                  </div>
-                </div>
-
-                <div className="hidden md:block w-40">
-                  <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4">
-                    <div className="text-xs text-slate-400">Default path</div>
-                    <div className="mt-2 space-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-cyan-400" />
-                        <span>Inputs</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-cyan-400" />
-                        <span>Preflight</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-cyan-400" />
-                        <span>Run</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-cyan-400" />
-                        <span>Learn</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-cyan-400" />
-                        <span>Report</span>
-                      </div>
-                    </div>
+                    Progressive outputs • Executive summary • ZIP artifacts
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right: choice controls + light nudges */}
+          {/* Right */}
           <div className="md:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/20 p-6">
             <div className="text-sm text-slate-400">Quick choices</div>
             <div className="mt-2 text-xl font-bold">What do you want to do today?</div>
@@ -263,34 +240,21 @@ export default function AppsHomePage() {
                 <div className="mt-1 text-sm text-slate-400">Bench → instruments → preflight → run → report</div>
               </button>
 
+              {/* ✅ change this to Arch2RTL */}
               <button
-                onClick={() => go("/apps/digital-rtl-generator")}
+                onClick={() => go("/apps/arch2rtl")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
               >
                 <div className="flex items-center justify-between">
-                  <div className="font-semibold">Generate RTL from spec</div>
+                  <div className="font-semibold">Spec → RTL + handoff</div>
                   <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
                     Most used
                   </span>
                 </div>
-                <div className="mt-1 text-sm text-slate-400">SV + micro-arch summary + docs</div>
+                <div className="mt-1 text-sm text-slate-400">Arch2RTL: docs + SV + package</div>
               </button>
-
-              <div className="mt-4 rounded-2xl border border-slate-800 bg-black/20 p-4">
-                <div className="text-xs text-slate-400">Power move (Advanced)</div>
-                <div className="mt-1 text-sm text-slate-300">
-                  Build your own apps in <span className="text-cyan-300">Studio</span> and publish into Apps.
-                </div>
-                <button
-                  onClick={() => go("/workflow")}
-                  className="mt-3 w-full rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700"
-                >
-                  Open Studio
-                </button>
-              </div>
             </div>
 
-            {/* View toggle (choice architecture: default recommended) */}
             <div className="mt-6 flex items-center gap-2">
               <button
                 onClick={() => setView("recommended")}
@@ -317,12 +281,12 @@ export default function AppsHomePage() {
         </div>
       </section>
 
-      {/* Flagship row (anchoring + easy first decision) */}
+      {/* Flagship row */}
       <section className="mx-auto max-w-6xl px-6 pb-4">
         <div className="mb-3 flex items-end justify-between">
           <div>
             <div className="text-lg font-bold">Flagship apps</div>
-            <div className="text-sm text-slate-400">Best starting points to feel the ChipLoop philosophy.</div>
+            <div className="text-sm text-slate-400">Best starting points.</div>
           </div>
         </div>
 
@@ -340,20 +304,22 @@ export default function AppsHomePage() {
                 </span>
               </div>
               <div className="mt-2 text-slate-300">{app.subtitle}</div>
-              {app.promise ? <div className="mt-3 text-sm text-slate-400">Outcome: <span className="text-slate-200">{app.promise}</span></div> : null}
-              <div className="mt-4 text-xs text-slate-500">One click → progressive outputs → executive summary</div>
+              {app.promise ? (
+                <div className="mt-3 text-sm text-slate-400">
+                  Outcome: <span className="text-slate-200">{app.promise}</span>
+                </div>
+              ) : null}
+              <div className="mt-4 text-xs text-slate-500">One click → progressive outputs → ZIP</div>
             </button>
           ))}
         </div>
       </section>
 
-      {/* Loop rows (Netflix/YouTube style) */}
+      {/* Loop rows */}
       <section className="mx-auto max-w-6xl px-6 pb-16 space-y-10">
         {(view === "recommended" ? loops.filter(l => l === "validation" || l === "digital") : loops).map((loop) => {
           const meta = LOOP_META[loop];
           const rowApps = apps.filter((a) => a.loop_type === loop);
-
-          // Duplicate to create “infinite feel”
           const animatedApps = [...rowApps, ...rowApps, ...rowApps];
 
           return (
@@ -367,10 +333,7 @@ export default function AppsHomePage() {
                   <div className="text-sm text-slate-400">{meta.tagline}</div>
                 </div>
 
-                <button
-                  onClick={() => setView("all")}
-                  className="text-sm text-cyan-300 hover:underline"
-                >
+                <button onClick={() => setView("all")} className="text-sm text-cyan-300 hover:underline">
                   See all
                 </button>
               </div>
@@ -418,21 +381,11 @@ export default function AppsHomePage() {
       <style jsx>{`
         .marquee {
           width: max-content;
-          animation: marquee 22s linear infinite;
+          animation: marquee 38s linear infinite;
         }
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-33.333%); }
-        }
-        .accent-digital { background: #22c55e; }
-        .accent-validation { background: #06b6d4; }
-        .accent-analog { background: #a855f7; }
-        .accent-embedded { background: #f97316; }
-        .accent-system { background: #eab308; }
-
-        /* Respect reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-          .marquee { animation: none; }
         }
       `}</style>
     </main>

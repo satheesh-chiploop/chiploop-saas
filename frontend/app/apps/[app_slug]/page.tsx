@@ -11,20 +11,19 @@ export default function AppSlugRouter() {
   useEffect(() => {
     if (!slug) return;
 
-    // Dedicated apps with custom UX
     const dedicated: Record<string, string> = {
       "validation-run": "/apps/validation-run",
-      // later:
-      // "digital-rtl-generator": "/apps/digital-rtl-generator",
+
+      // ✅ NEW
+      "arch2rtl": "/apps/arch2rtl",
+      "dqa": "/apps/dqa",
+      "verify": "/apps/verify",
     };
 
     const target = dedicated[slug];
-    if (target) {
-      router.replace(target);
-    }
+    if (target) router.replace(target);
   }, [slug, router]);
 
-  // Fallback: generic runner placeholder for everything else
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
       <div className="mx-auto max-w-4xl px-6 py-10">
@@ -47,14 +46,13 @@ export default function AppSlugRouter() {
           <div className="text-sm text-slate-400">Generic App Runner</div>
           <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">{slug || "unknown"}</h1>
           <p className="mt-3 text-slate-300">
-            This app doesn’t have a dedicated page yet. We’ll render a generic runner UI here next.
+            This app doesn’t have a dedicated page yet.
           </p>
-
-          <div className="mt-5 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
-            Nudge: Most users start with <span className="text-cyan-300">Validation Run</span> to see the full loop end-to-end.
-          </div>
         </div>
       </div>
     </main>
   );
 }
+
+
+
