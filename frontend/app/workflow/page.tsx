@@ -60,6 +60,23 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Digital IP Packaging & Handoff Agent", backendLabel: "Digital IP Packaging & Handoff Agent", desc: "Creates SoC-ready IP package folder layout + manifest + checklist; bundles key RTL/docs/constraints/power/verification collateral." },
     { uiLabel: "Digital Smoke Preflight Agent", backendLabel: "Digital Smoke Preflight Agent", desc: "Normalizes RTL inputs for Smoke, infers top module, and writes a stable smoke_preflight.json manifest." },
     { uiLabel: "Digital Smoke Executive Summary Agent", backendLabel: "Digital Smoke Executive Summary Agent", desc: "Creates one-page Smoke PASS/FAIL summary + next steps using compile + sim control outputs." },
+    {
+      uiLabel: "Digital RTL Signature Agent",
+      backendLabel: "Digital RTL Signature Agent",
+      desc: "Scans RTL sources and extracts module + port signatures into rtl_signatures.json for integration planning."
+    },
+    
+    {
+      uiLabel: "Digital Integration Intent Agent",
+      backendLabel: "Digital Integration Intent Agent",
+      desc: "Transforms user free-text integration description into structured integration_intent.json."
+    },
+    
+    {
+      uiLabel: "Digital Top Assembly Agent",
+      backendLabel: "Digital Top Assembly Agent",
+      desc: "Generates top-level assembly RTL (top_module.sv) from integration intent."
+    },
   ],
   analog: [
     { uiLabel: "Analog Spec Agent", backendLabel: "Analog Spec Agent", desc: "Analog specs & targets" },
@@ -114,6 +131,23 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Digital IP Packaging & Handoff Agent", backendLabel: "Digital IP Packaging & Handoff Agent", desc: "Creates SoC-ready IP package folder layout + manifest + checklist; bundles key RTL/docs/constraints/power/verification collateral." },
     { uiLabel: "Digital Smoke Preflight Agent", backendLabel: "Digital Smoke Preflight Agent", desc: "Normalizes RTL inputs for Smoke, infers top module, and writes a stable smoke_preflight.json manifest." },
     { uiLabel: "Digital Smoke Executive Summary Agent", backendLabel: "Digital Smoke Executive Summary Agent", desc: "Creates one-page Smoke PASS/FAIL summary + next steps using compile + sim control outputs." },
+    {
+      uiLabel: "Digital RTL Signature Agent",
+      backendLabel: "Digital RTL Signature Agent",
+      desc: "Scans RTL sources and extracts module + port signatures into rtl_signatures.json for integration planning."
+    },
+    
+    {
+      uiLabel: "Digital Integration Intent Agent",
+      backendLabel: "Digital Integration Intent Agent",
+      desc: "Transforms user free-text integration description into structured integration_intent.json."
+    },
+    
+    {
+      uiLabel: "Digital Top Assembly Agent",
+      backendLabel: "Digital Top Assembly Agent",
+      desc: "Generates top-level assembly RTL (top_module.sv) from integration intent."
+    },
     { uiLabel: "Validation Instrument Setup Agent", backendLabel: "Validation Instrument Setup Agent", desc: "Resolves the user's bench setup from registered instruments (or defaults) and writes bench_setup.json for downstream validation agents." },
     { uiLabel: "Validation Test Plan Agent", backendLabel: "Validation Test Plan Agent", desc: "Generates a structured hardware validation test plan from datasheet/spec text; uses generic instrument types (psu/dmm/scope)." },
     { uiLabel: "Validation Scope Agent", backendLabel: "Validation Scope Agent", desc: "Applies user-selected scope (by tags or test names) to the generated validation test_plan and produces a scoped test plan for downstream sequence building." },

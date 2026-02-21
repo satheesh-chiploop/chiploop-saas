@@ -16,8 +16,10 @@ export default function AppSlugRouter() {
 
       // ✅ NEW
       "arch2rtl": "/apps/arch2rtl",
+      "integrate": "/apps/integrate",
       "dqa": "/apps/dqa",
       "verify": "/apps/verify",
+      "smoke": "/apps/smoke",
     };
 
     const target = dedicated[slug];

@@ -87,6 +87,24 @@ export default function AppsHomePage() {
       nudge: "New",
       promise: "Generate verification environment fast",
     },
+    {
+      slug: "smoke",
+      title: "Smoke",
+      subtitle: "Fast compile + quick sim + triage pack",
+      loop_type: "digital",
+      status: "Flagship",
+      nudge: "Recommended",
+      promise: "Quick confidence the RTL isn't broken",
+    },
+    {
+      slug: "integrate",
+      title: "Integrate",
+      subtitle: "Text → Integration intent → Top RTL + report",
+      loop_type: "digital",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Assemble IPs into a runnable top",
+    },
 
     // unchanged placeholders
     {
@@ -127,8 +145,10 @@ export default function AppsHomePage() {
     const dedicated: Record<string, string> = {
       "validation-run": "/apps/validation-run",
       "arch2rtl": "/apps/arch2rtl",
+      "integrate": "/apps/integrate",
       "dqa": "/apps/dqa",
       "verify": "/apps/verify",
+      "smoke": "/apps/smoke",
     };
     return dedicated[slug] || `/apps/${slug}`;
   };
