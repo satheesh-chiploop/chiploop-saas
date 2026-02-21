@@ -1,56 +1,67 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-type WorkflowRowLite = {
+type WorkflowRow = {
   id: string;
-  status: string | null;
-  phase: string | null;
-  logs: string | null;
+  status?: string | null;
+  phase?: string | null;
+  logs?: string | null;
   updated_at?: string | null;
 };
 
-export default function ValidationPlanPage() {
+function parseLogLines(logs: string | null | undefined): string[] {
+  if (!logs) return [];
+  return logs
+    .split("\n")
+    .map((l) => l.trimEnd())
+    .filter((l) => l.trim().length > 0);
+}
+
+export default function ValidationPlanAppPage() {
   const router = useRouter();
 
-  // auth/session
-  const [loading, setLoading] = useState(true);
   const [sessionUserId, setSessionUserId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
 
-  // intake
+  const [loading, setLoading] = useState(true);
+  const [running, setRunning] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const [workflowId, setWorkflowId] = useState<string | null>(null);
+  const [runId, setRunId] = useState<string | null>(null);
+  const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
+
+  // Intake
   const [datasheetText, setDatasheetText] = useState("");
   const [goal, setGoal] = useState("");
   const [enableScope, setEnableScope] = useState(false);
   const [enableCoverage, setEnableCoverage] = useState(true);
 
-  // run state
-  const [running, setRunning] = useState(false);
-  const [runErr, setRunErr] = useState<string | null>(null);
-  const [workflowId, setWorkflowId] = useState<string | null>(null);
-  const [runId, setRunId] = useState<string | null>(null);
-  const [workflowRow, setWorkflowRow] = useState<WorkflowRowLite | null>(null);
+  const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const logsRef = useRef<HTMLDivElement | null>(null);
 
-  // --- helpers (match validation-run style) ---
-  function authHeaders(userId?: string, token?: string): HeadersInit {
+  useEffect(() => {
+    if (!logsRef.current) return;
+    logsRef.current.scrollTop = logsRef.current.scrollHeight;
+  }, [logLines.length]);
+
+  function authHeaders(): HeadersInit {
     const h: Record<string, string> = {};
-    const uid = userId ?? sessionUserId;
-    const tok = token ?? accessToken;
-    if (uid) h["x-user-id"] = uid;
-    if (tok) h["Authorization"] = `Bearer ${tok}`;
+    if (sessionUserId) h["x-user-id"] = sessionUserId;
+    if (accessToken) h["Authorization"] = `Bearer ${accessToken}`;
     return h;
   }
 
-  async function postJSON<T>(path: string, body: any, headersOverride?: HeadersInit): Promise<T> {
+  async function postJSON<T>(path: string, body: any): Promise<T> {
     const resp = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...(headersOverride ?? authHeaders()) },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(body),
     });
     if (!resp.ok) {
@@ -60,58 +71,47 @@ export default function ValidationPlanPage() {
     return resp.json();
   }
 
-  // --- auth gate ---
+  // Auth gate
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push("/login");
+      setErr(null);
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        router.replace("/login?next=/apps/validation-plan");
         return;
       }
       setSessionUserId(session.user.id);
       setAccessToken(session.access_token);
-      setEmail(session.user.email || null);
       setLoading(false);
     })();
   }, [router]);
 
-  // --- subscribe to workflows updates (logs/phase/status) ---
+  // Live workflow updates
   useEffect(() => {
     if (!workflowId) return;
 
     let isActive = true;
 
     (async () => {
-      // Prime row once (optional)
       const { data, error } = await supabase
         .from("workflows")
         .select("id,status,phase,logs,updated_at")
         .eq("id", workflowId)
         .single();
 
-      if (!isActive) return;
-      if (!error && data) {
-        setWorkflowRow({
-          id: data.id,
-          status: data.status,
-          phase: data.phase,
-          logs: data.logs,
-          updated_at: data.updated_at,
-        });
-      }
+      if (isActive && !error && data) setWorkflowRow(data as any);
     })();
 
     const channel = supabase
       .channel(`wf-${workflowId}`)
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "workflows",
-          filter: `id=eq.${workflowId}`,
-        },
+        { event: "*", schema: "public", table: "workflows", filter: `id=eq.${workflowId}` },
         (payload) => {
           const row = payload.new as any;
           setWorkflowRow({
@@ -131,133 +131,176 @@ export default function ValidationPlanPage() {
     };
   }, [workflowId]);
 
-  const canRun = useMemo(() => datasheetText.trim().length >= 20, [datasheetText]);
+  const canRun = useMemo(() => {
+    if (running) return false;
+    if (!datasheetText.trim()) return false;
+    return true;
+  }, [running, datasheetText]);
 
-  async function runApp() {
-    setRunErr(null);
+  async function runNow() {
+    setErr(null);
     setRunning(true);
-    setWorkflowId(null);
-    setRunId(null);
-    setWorkflowRow(null);
-
     try {
-      const body = {
-        datasheet_text: datasheetText.trim(),
-        goal: goal.trim() || undefined,
-        enable_scope: enableScope,
-        enable_coverage: enableCoverage,
-      };
-
-      const res = await postJSON<{ ok?: boolean; workflow_id: string; run_id?: string }>(
+      const out = await postJSON<{ ok?: boolean; workflow_id: string; run_id?: string }>(
         "/apps/validation-plan/run",
-        body
+        {
+          datasheet_text: datasheetText.trim(),
+          goal: goal.trim() ? goal.trim() : undefined,
+          enable_scope: enableScope,
+          enable_coverage: enableCoverage,
+        }
       );
 
-      setWorkflowId(res.workflow_id);
-      setRunId(res.run_id ?? null);
+      setWorkflowId(out.workflow_id);
+      setRunId(out.run_id || null);
     } catch (e: any) {
-      setRunErr(e?.message || String(e));
+      setErr(e?.message || String(e));
     } finally {
       setRunning(false);
     }
   }
 
-  function downloadZip(full = true) {
+  function downloadZip() {
     if (!workflowId) return;
-    const url = `${API_BASE}/workflow/${workflowId}/download_zip${full ? "?full=1" : ""}`;
-    window.open(url, "_blank");
+    window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
   }
 
-  const phase = workflowRow?.phase ?? "—";
-  const status = workflowRow?.status ?? "—";
-  const logs = workflowRow?.logs ?? "";
-
   if (loading) {
-    return <div className="p-4 text-sm text-neutral-500">Loading…</div>;
+    return (
+      <main className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-slate-300">Loading…</div>
+      </main>
+    );
   }
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="text-xs text-neutral-500">Signed in: {email ?? sessionUserId}</div>
-          <h1 className="text-xl font-semibold">Validation Plan and Coverage</h1>
-          <div className="text-sm text-neutral-500">Datasheet/spec → test plan + coverage map + gaps (one-shot).</div>
-        </div>
-
-        <div className="text-right text-xs text-neutral-500">
-          <div>Phase: {phase}</div>
-          <div>Status: {status}</div>
-        </div>
-      </div>
-
-      {runErr ? (
-        <div className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">{runErr}</div>
-      ) : null}
-
-      <div className="rounded border p-4 space-y-3">
-        <div>
-          <div className="text-sm font-medium">Datasheet / Spec text</div>
-          <textarea
-            className="mt-1 w-full rounded border p-2 text-sm min-h-[180px]"
-            value={datasheetText}
-            onChange={(e) => setDatasheetText(e.target.value)}
-            placeholder="Paste datasheet/spec text here..."
-          />
-        </div>
-
-        <div>
-          <div className="text-sm font-medium">Goal (optional)</div>
-          <input
-            className="mt-1 w-full rounded border p-2 text-sm"
-            value={goal}
-            onChange={(e) => setGoal(e.target.value)}
-            placeholder="e.g., focus on power sequencing and fault handling"
-          />
-        </div>
-
-        <div className="flex flex-wrap gap-4 text-sm">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={enableScope} onChange={(e) => setEnableScope(e.target.checked)} />
-            Enable scope
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={enableCoverage} onChange={(e) => setEnableCoverage(e.target.checked)} />
-            Enable coverage proposal
-          </label>
-        </div>
-
-        <div className="flex items-center gap-2">
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <div className="flex items-center justify-between">
           <button
-            onClick={runApp}
-            disabled={!canRun || running}
-            className="rounded bg-cyan-700 hover:bg-cyan-600 disabled:opacity-50 px-3 py-2 text-sm text-white"
+            onClick={() => router.push("/apps")}
+            className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 transition"
           >
-            {running ? "Running…" : "Run"}
+            ← Back to Apps
           </button>
-
           <button
-            onClick={() => downloadZip(true)}
-            disabled={!workflowId}
-            className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
+            onClick={() => router.push("/workflow")}
+            className="rounded-xl border border-slate-700 px-4 py-2 hover:bg-slate-900 transition"
           >
-            Download ZIP
+            Studio
           </button>
+        </div>
 
-          {workflowId ? <div className="text-xs text-neutral-500">workflow: {workflowId}</div> : null}
-          {runId ? <div className="text-xs text-neutral-500">run: {runId}</div> : null}
+        <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
+          <div className="text-sm text-slate-400">Validation Loop</div>
+          <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">Plan and Coverage</h1>
+          <p className="mt-2 text-slate-300">
+            Datasheet/spec → structured test plan + coverage map + gaps (one-shot).
+          </p>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {/* Left: Form */}
+            <div className="space-y-3">
+              <label className="block text-sm text-slate-300">Goal (optional)</label>
+              <input
+                value={goal}
+                onChange={(e) => setGoal(e.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                placeholder="e.g., focus on fault handling and recovery"
+              />
+
+              <div className="flex items-center gap-6 text-sm text-slate-300">
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={enableScope} onChange={(e) => setEnableScope(e.target.checked)} />
+                  Enable scope
+                </label>
+
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={enableCoverage}
+                    onChange={(e) => setEnableCoverage(e.target.checked)}
+                  />
+                  Enable coverage proposal
+                </label>
+              </div>
+
+              <button
+                onClick={runNow}
+                disabled={!canRun}
+                className={`mt-2 w-full rounded-xl px-5 py-3 font-semibold transition ${
+                  canRun ? "bg-cyan-600 hover:bg-cyan-500" : "bg-slate-700 cursor-not-allowed"
+                }`}
+              >
+                {running ? "Starting…" : "Run Plan and Coverage"}
+              </button>
+
+              {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
+
+              {workflowId ? (
+                <div className="mt-4 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+                  <div>
+                    workflow_id: <span className="text-slate-100">{workflowId}</span>
+                  </div>
+                  <div>
+                    run_id: <span className="text-slate-100">{runId}</span>
+                  </div>
+                  <button
+                    onClick={downloadZip}
+                    className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700"
+                  >
+                    Download ZIP (full=1)
+                  </button>
+                </div>
+              ) : null}
+
+              <div className="rounded-2xl border border-slate-800 bg-black/20 p-4">
+                <div className="text-sm font-semibold text-slate-100">Outputs</div>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                  <li>• validation/test_plan.json</li>
+                  <li>• validation/scoped_test_plan.json (optional)</li>
+                  <li>• validation/coverage_map.json</li>
+                  <li>• validation/coverage_gaps.json</li>
+                  <li>• validation/coverage_summary.md</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Right: Spec text */}
+            <div>
+              <label className="block text-sm text-slate-300">Datasheet / Spec text *</label>
+              <textarea
+                value={datasheetText}
+                onChange={(e) => setDatasheetText(e.target.value)}
+                rows={18}
+                className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                placeholder="Paste datasheet/spec text here…"
+              />
+              <div className="mt-2 text-xs text-slate-500">
+                Tip: start with the key sections (timing, power, interrupts, state machine, fault table).
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
+            <div className="text-sm font-semibold">Live logs</div>
+            <div
+              ref={logsRef}
+              className="mt-3 max-h-[320px] overflow-auto rounded-xl border border-slate-800 bg-black/30 p-3 text-xs text-slate-200"
+            >
+              {logLines.length ? (
+                logLines.map((l, i) => (
+                  <div key={i} className="whitespace-pre-wrap">
+                    {l}
+                  </div>
+                ))
+              ) : (
+                <div className="text-slate-500">No logs yet. Click “Run Plan and Coverage”.</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className="rounded border p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-medium">Live logs</div>
-          <div className="text-xs text-neutral-500">{workflowRow?.updated_at ? `updated: ${workflowRow.updated_at}` : ""}</div>
-        </div>
-        <pre className="text-xs whitespace-pre-wrap max-h-[520px] overflow-auto">
-          {logs?.trim() ? logs : "No logs yet."}
-        </pre>
-      </div>
-    </div>
+    </main>
   );
 }

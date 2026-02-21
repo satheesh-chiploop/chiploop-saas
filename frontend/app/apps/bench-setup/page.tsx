@@ -1,28 +1,43 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-type WorkflowRowLite = {
+type WorkflowRow = {
   id: string;
-  status: string | null;
-  phase: string | null;
-  logs: string | null;
+  status?: string | null;
+  phase?: string | null;
+  logs?: string | null;
   updated_at?: string | null;
 };
 
-export default function BenchSetupPage() {
+function parseLogLines(logs: string | null | undefined): string[] {
+  if (!logs) return [];
+  return logs
+    .split("\n")
+    .map((l) => l.trimEnd())
+    .filter((l) => l.trim().length > 0);
+}
+
+export default function BenchSetupAppPage() {
   const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
   const [sessionUserId, setSessionUserId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
 
+  const [loading, setLoading] = useState(true);
+  const [running, setRunning] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const [workflowId, setWorkflowId] = useState<string | null>(null);
+  const [runId, setRunId] = useState<string | null>(null);
+  const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
+
+  // Intake
   const [benchName, setBenchName] = useState("");
   const [instrumentsJson, setInstrumentsJson] = useState(
     JSON.stringify(
@@ -37,25 +52,25 @@ export default function BenchSetupPage() {
   const [enableSchematic, setEnableSchematic] = useState(true);
   const [enablePreflight, setEnablePreflight] = useState(false);
 
-  const [running, setRunning] = useState(false);
-  const [runErr, setRunErr] = useState<string | null>(null);
-  const [workflowId, setWorkflowId] = useState<string | null>(null);
-  const [runId, setRunId] = useState<string | null>(null);
-  const [workflowRow, setWorkflowRow] = useState<WorkflowRowLite | null>(null);
+  const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const logsRef = useRef<HTMLDivElement | null>(null);
 
-  function authHeaders(userId?: string, token?: string): HeadersInit {
+  useEffect(() => {
+    if (!logsRef.current) return;
+    logsRef.current.scrollTop = logsRef.current.scrollHeight;
+  }, [logLines.length]);
+
+  function authHeaders(): HeadersInit {
     const h: Record<string, string> = {};
-    const uid = userId ?? sessionUserId;
-    const tok = token ?? accessToken;
-    if (uid) h["x-user-id"] = uid;
-    if (tok) h["Authorization"] = `Bearer ${tok}`;
+    if (sessionUserId) h["x-user-id"] = sessionUserId;
+    if (accessToken) h["Authorization"] = `Bearer ${accessToken}`;
     return h;
   }
 
-  async function postJSON<T>(path: string, body: any, headersOverride?: HeadersInit): Promise<T> {
+  async function postJSON<T>(path: string, body: any): Promise<T> {
     const resp = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...(headersOverride ?? authHeaders()) },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(body),
     });
     if (!resp.ok) {
@@ -65,21 +80,27 @@ export default function BenchSetupPage() {
     return resp.json();
   }
 
+  // Auth gate
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push("/login");
+      setErr(null);
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        router.replace("/login?next=/apps/bench-setup");
         return;
       }
       setSessionUserId(session.user.id);
       setAccessToken(session.access_token);
-      setEmail(session.user.email || null);
       setLoading(false);
     })();
   }, [router]);
 
+  // Live workflow updates
   useEffect(() => {
     if (!workflowId) return;
 
@@ -92,16 +113,7 @@ export default function BenchSetupPage() {
         .eq("id", workflowId)
         .single();
 
-      if (!isActive) return;
-      if (!error && data) {
-        setWorkflowRow({
-          id: data.id,
-          status: data.status,
-          phase: data.phase,
-          logs: data.logs,
-          updated_at: data.updated_at,
-        });
-      }
+      if (isActive && !error && data) setWorkflowRow(data as any);
     })();
 
     const channel = supabase
@@ -128,141 +140,200 @@ export default function BenchSetupPage() {
     };
   }, [workflowId]);
 
-  const canRun = useMemo(() => benchName.trim().length >= 3, [benchName]);
+  const canRun = useMemo(() => {
+    if (running) return false;
+    if (!benchName.trim()) return false;
+    // instruments JSON should parse
+    try {
+      const parsed = JSON.parse(instrumentsJson || "[]");
+      if (!Array.isArray(parsed)) return false;
+    } catch {
+      return false;
+    }
+    return true;
+  }, [running, benchName, instrumentsJson]);
 
-  async function runApp() {
-    setRunErr(null);
+  async function runNow() {
+    setErr(null);
     setRunning(true);
-    setWorkflowId(null);
-    setRunId(null);
-    setWorkflowRow(null);
 
     let instruments: any[] = [];
     try {
       instruments = JSON.parse(instrumentsJson || "[]");
-      if (!Array.isArray(instruments)) throw new Error("Instruments JSON must be an array");
+      if (!Array.isArray(instruments)) throw new Error("Instrument list must be a JSON array.");
     } catch (e: any) {
-      setRunErr(e?.message || "Invalid instruments JSON");
+      setErr(e?.message || "Invalid instruments JSON.");
       setRunning(false);
       return;
     }
 
     try {
-      const body = {
-        bench_name: benchName.trim(),
-        instruments,
-        enable_schematic: enableSchematic,
-        enable_preflight: enablePreflight,
-      };
-
-      const res = await postJSON<{ ok?: boolean; workflow_id: string; run_id?: string }>(
+      const out = await postJSON<{ ok?: boolean; workflow_id: string; run_id?: string }>(
         "/apps/bench-setup/run",
-        body
+        {
+          bench_name: benchName.trim(),
+          instruments,
+          enable_schematic: enableSchematic,
+          enable_preflight: enablePreflight,
+        }
       );
 
-      setWorkflowId(res.workflow_id);
-      setRunId(res.run_id ?? null);
+      setWorkflowId(out.workflow_id);
+      setRunId(out.run_id || null);
     } catch (e: any) {
-      setRunErr(e?.message || String(e));
+      setErr(e?.message || String(e));
     } finally {
       setRunning(false);
     }
   }
 
-  function downloadZip(full = true) {
+  function downloadZip() {
     if (!workflowId) return;
-    const url = `${API_BASE}/workflow/${workflowId}/download_zip${full ? "?full=1" : ""}`;
-    window.open(url, "_blank");
+    window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
   }
 
-  const phase = workflowRow?.phase ?? "—";
-  const status = workflowRow?.status ?? "—";
-  const logs = workflowRow?.logs ?? "";
-
-  if (loading) return <div className="p-4 text-sm text-neutral-500">Loading…</div>;
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-slate-300">Loading…</div>
+      </main>
+    );
+  }
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="text-xs text-neutral-500">Signed in: {email ?? sessionUserId}</div>
-          <h1 className="text-xl font-semibold">Bench Setup</h1>
-          <div className="text-sm text-neutral-500">
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => router.push("/apps")}
+            className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 transition"
+          >
+            ← Back to Apps
+          </button>
+          <button
+            onClick={() => router.push("/workflow")}
+            className="rounded-xl border border-slate-700 px-4 py-2 hover:bg-slate-900 transition"
+          >
+            Studio
+          </button>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
+          <div className="text-sm text-slate-400">Validation Loop</div>
+          <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">Bench Setup</h1>
+          <p className="mt-2 text-slate-300">
             Register instruments → create bench → schematic → optional preflight.
+          </p>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {/* Left: Form */}
+            <div className="space-y-3">
+              <label className="block text-sm text-slate-300">Bench name *</label>
+              <input
+                value={benchName}
+                onChange={(e) => setBenchName(e.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                placeholder="e.g., DNSS Bench A"
+              />
+
+              <label className="block text-sm text-slate-300">Instrument list (JSON array) *</label>
+              <textarea
+                value={instrumentsJson}
+                onChange={(e) => setInstrumentsJson(e.target.value)}
+                rows={10}
+                className="w-full rounded-2xl border border-slate-800 bg-black/30 p-4 font-mono text-xs text-slate-100"
+                placeholder='[{"name":"DMM_1","type":"DMM","address":"USB::..."}]'
+              />
+
+              <div className="flex items-center gap-6 text-sm text-slate-300">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={enableSchematic}
+                    onChange={(e) => setEnableSchematic(e.target.checked)}
+                  />
+                  Enable schematic
+                </label>
+
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={enablePreflight}
+                    onChange={(e) => setEnablePreflight(e.target.checked)}
+                  />
+                  Enable preflight
+                </label>
+              </div>
+
+              <button
+                onClick={runNow}
+                disabled={!canRun}
+                className={`mt-2 w-full rounded-xl px-5 py-3 font-semibold transition ${
+                  canRun ? "bg-cyan-600 hover:bg-cyan-500" : "bg-slate-700 cursor-not-allowed"
+                }`}
+              >
+                {running ? "Starting…" : "Run Bench Setup"}
+              </button>
+
+              {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
+
+              {workflowId ? (
+                <div className="mt-4 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+                  <div>
+                    workflow_id: <span className="text-slate-100">{workflowId}</span>
+                  </div>
+                  <div>
+                    run_id: <span className="text-slate-100">{runId}</span>
+                  </div>
+                  <button
+                    onClick={downloadZip}
+                    className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700"
+                  >
+                    Download ZIP (full=1)
+                  </button>
+                </div>
+              ) : null}
+            </div>
+
+            {/* Right: Helpful panel */}
+            <div className="rounded-2xl border border-slate-800 bg-black/20 p-4">
+              <div className="text-sm font-semibold text-slate-100">Outputs</div>
+              <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                <li>• validation/bench_setup.json</li>
+                <li>• validation/bench_schematic.png or .json (optional)</li>
+                <li>• validation/preflight_summary.md (optional)</li>
+              </ul>
+
+              <div className="mt-6 text-sm font-semibold text-slate-100">Notes</div>
+              <div className="mt-2 text-sm text-slate-300">
+                Use stable instrument names (DMM_1, PSU_1). Addresses can be VISA USB/TCPIP strings or your lab abstraction.
+              </div>
+
+              <div className="mt-4 text-xs text-slate-500">
+                Tip: keep the JSON array small and clean for now. We can add preset dropdowns later.
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
+            <div className="text-sm font-semibold">Live logs</div>
+            <div
+              ref={logsRef}
+              className="mt-3 max-h-[320px] overflow-auto rounded-xl border border-slate-800 bg-black/30 p-3 text-xs text-slate-200"
+            >
+              {logLines.length ? (
+                logLines.map((l, i) => (
+                  <div key={i} className="whitespace-pre-wrap">
+                    {l}
+                  </div>
+                ))
+              ) : (
+                <div className="text-slate-500">No logs yet. Click “Run Bench Setup”.</div>
+              )}
+            </div>
           </div>
         </div>
-        <div className="text-right text-xs text-neutral-500">
-          <div>Phase: {phase}</div>
-          <div>Status: {status}</div>
-        </div>
       </div>
-
-      {runErr ? (
-        <div className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">{runErr}</div>
-      ) : null}
-
-      <div className="rounded border p-4 space-y-3">
-        <div>
-          <div className="text-sm font-medium">Bench name</div>
-          <input
-            className="mt-1 w-full rounded border p-2 text-sm"
-            value={benchName}
-            onChange={(e) => setBenchName(e.target.value)}
-            placeholder="e.g., DNSS Bench A"
-          />
-        </div>
-
-        <div>
-          <div className="text-sm font-medium">Instrument list (JSON array)</div>
-          <textarea
-            className="mt-1 w-full rounded border p-2 text-sm min-h-[160px] font-mono"
-            value={instrumentsJson}
-            onChange={(e) => setInstrumentsJson(e.target.value)}
-          />
-        </div>
-
-        <div className="flex flex-wrap gap-4 text-sm">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={enableSchematic} onChange={(e) => setEnableSchematic(e.target.checked)} />
-            Enable schematic
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={enablePreflight} onChange={(e) => setEnablePreflight(e.target.checked)} />
-            Enable preflight
-          </label>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={runApp}
-            disabled={!canRun || running}
-            className="rounded bg-cyan-700 hover:bg-cyan-600 disabled:opacity-50 px-3 py-2 text-sm text-white"
-          >
-            {running ? "Running…" : "Run"}
-          </button>
-
-          <button
-            onClick={() => downloadZip(true)}
-            disabled={!workflowId}
-            className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
-          >
-            Download ZIP
-          </button>
-
-          {workflowId ? <div className="text-xs text-neutral-500">workflow: {workflowId}</div> : null}
-          {runId ? <div className="text-xs text-neutral-500">run: {runId}</div> : null}
-        </div>
-      </div>
-
-      <div className="rounded border p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-medium">Live logs</div>
-          <div className="text-xs text-neutral-500">{workflowRow?.updated_at ? `updated: ${workflowRow.updated_at}` : ""}</div>
-        </div>
-        <pre className="text-xs whitespace-pre-wrap max-h-[520px] overflow-auto">
-          {logs?.trim() ? logs : "No logs yet."}
-        </pre>
-      </div>
-    </div>
+    </main>
   );
 }
