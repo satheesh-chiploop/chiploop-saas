@@ -106,6 +106,43 @@ export default function AppsHomePage() {
       promise: "Assemble IPs into a runnable top",
     },
 
+    {
+      slug: "validation-plan",
+      title: "Validation Plan & Coverage",
+      subtitle: "Datasheet/spec → test plan + coverage map + gaps",
+      loop_type: "validation",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Structured plan + coverage gaps in one shot",
+    },
+    {
+      slug: "bench-setup",
+      title: "Bench Setup",
+      subtitle: "Register instruments → create bench → schematic → preflight",
+      loop_type: "validation",
+      status: "Flagship",
+      nudge: "Recommended",
+      promise: "Get bench ready fast with clean artifacts",
+    },
+    {
+      slug: "preflight",
+      title: "Preflight Only",
+      subtitle: "Quick readiness validation without running tests",
+      loop_type: "validation",
+      status: "Flagship",
+      nudge: "Most used",
+      promise: "Rapid bench sanity check + summary",
+    },
+    {
+      slug: "validation-insights",
+      title: "Validation Insights",
+      subtitle: "Analyze past runs → patterns → evolve plan + coverage",
+      loop_type: "validation",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Turn history into next test improvements",
+    },
+
     // unchanged placeholders
     {
       slug: "analog-insight-explorer",
@@ -140,16 +177,28 @@ export default function AppsHomePage() {
 
   const go = (path: string) => router.push(path);
 
+
+  
+
   const routeForApp = (slug: string) => {
     // ✅ Dedicated pages (apps with custom UX)
+
     const dedicated: Record<string, string> = {
+      // Validation (dedicated pages)
       "validation-run": "/apps/validation-run",
+      "validation-plan": "/apps/validation-plan",
+      "bench-setup": "/apps/bench-setup",
+      "preflight": "/apps/preflight",
+      "validation-insights": "/apps/validation-insights",
+    
+      // Digital (dedicated pages)
       "arch2rtl": "/apps/arch2rtl",
       "integrate": "/apps/integrate",
       "dqa": "/apps/dqa",
       "verify": "/apps/verify",
       "smoke": "/apps/smoke",
     };
+    
     return dedicated[slug] || `/apps/${slug}`;
   };
 
