@@ -79,10 +79,17 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     },
   ],
   analog: [
-    { uiLabel: "Analog Spec Agent", backendLabel: "Analog Spec Agent", desc: "Analog specs & targets" },
-    { uiLabel: "Analog Netlist Agent", backendLabel: "Analog Netlist Agent", desc: "Schematic/topology" },
-    { uiLabel: "Analog Sim Agent", backendLabel: "Analog Sim Agent", desc: "SPICE/AMS runs" },
-    { uiLabel: "Analog Result Agent", backendLabel: "Analog Result Agent", desc: "Summarize results" },
+    { uiLabel: "Analog Spec Builder Agent", backendLabel: "Analog Spec Builder Agent", desc: "Extracts structured analog spec (pins, modes, targets, corners, validation intent)" },
+    { uiLabel: "Analog Netlist Scaffold Agent", backendLabel: "Analog Netlist Scaffold Agent", desc: "Generates SPICE netlist scaffold aligned to spec pins and block intent" },
+    { uiLabel: "Analog Simulation Plan Agent", backendLabel: "Analog Simulation Plan Agent", desc: "Creates sweeps/corners/metrics plan + example run deck template" },
+    { uiLabel: "Analog Behavioral Model Agent", backendLabel: "Analog Behavioral Model Agent", desc: "Creates SV RNM / Verilog-A behavioral model template + tuning parameters" },
+    { uiLabel: "Analog Behavioral Testbench Agent", backendLabel: "Analog Behavioral Testbench Agent", desc: "Generates SystemVerilog testbench stimuli for the behavioral model" },
+    { uiLabel: "Analog Behavioral Assertions Agent", backendLabel: "Analog Behavioral Assertions Agent", desc: "Generates SV assertions/checkers for enable sequencing, limits, settling windows, etc." },
+    { uiLabel: "Analog Behavioral Coverage Agent", backendLabel: "Analog Behavioral Coverage Agent", desc: "Defines scenario/corner/sweep coverage intent for analog validation" },
+    { uiLabel: "Analog Correlation Agent", backendLabel: "Analog Correlation Agent", desc: "Defines stimulus-matched correlation metrics between behavioral and netlist/SPICE" },
+    { uiLabel: "Analog Iteration Proposal Agent", backendLabel: "Analog Iteration Proposal Agent", desc: "Proposes tuning/code patches + re-run plan based on correlation deltas" },
+    { uiLabel: "Analog Abstract Views Agent", backendLabel: "Analog Abstract Views Agent", desc: "Generates LEF + LIB stub + integration notes for physical/timing handoff" },
+    { uiLabel: "Analog Executive Summary Agent", backendLabel: "Analog Executive Summary Agent", desc: "One-page executive summary with risks, status, and next actions" },
   ],
   embedded: [
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware/SoC reqs" },
@@ -169,6 +176,17 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
     { uiLabel: "Embedded Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize hardware + firmware integration" },
+    { uiLabel: "Analog Spec Builder Agent", backendLabel: "Analog Spec Builder Agent", desc: "Extracts structured analog spec (pins, modes, targets, corners, validation intent)" },
+    { uiLabel: "Analog Netlist Scaffold Agent", backendLabel: "Analog Netlist Scaffold Agent", desc: "Generates SPICE netlist scaffold aligned to spec pins and block intent" },
+    { uiLabel: "Analog Simulation Plan Agent", backendLabel: "Analog Simulation Plan Agent", desc: "Creates sweeps/corners/metrics plan + example run deck template" },
+    { uiLabel: "Analog Behavioral Model Agent", backendLabel: "Analog Behavioral Model Agent", desc: "Creates SV RNM / Verilog-A behavioral model template + tuning parameters" },
+    { uiLabel: "Analog Behavioral Testbench Agent", backendLabel: "Analog Behavioral Testbench Agent", desc: "Generates SystemVerilog testbench stimuli for the behavioral model" },
+    { uiLabel: "Analog Behavioral Assertions Agent", backendLabel: "Analog Behavioral Assertions Agent", desc: "Generates SV assertions/checkers for enable sequencing, limits, settling windows, etc." },
+    { uiLabel: "Analog Behavioral Coverage Agent", backendLabel: "Analog Behavioral Coverage Agent", desc: "Defines scenario/corner/sweep coverage intent for analog validation" },
+    { uiLabel: "Analog Correlation Agent", backendLabel: "Analog Correlation Agent", desc: "Defines stimulus-matched correlation metrics between behavioral and netlist/SPICE" },
+    { uiLabel: "Analog Iteration Proposal Agent", backendLabel: "Analog Iteration Proposal Agent", desc: "Proposes tuning/code patches + re-run plan based on correlation deltas" },
+    { uiLabel: "Analog Abstract Views Agent", backendLabel: "Analog Abstract Views Agent", desc: "Generates LEF + LIB stub + integration notes for physical/timing handoff" },
+    { uiLabel: "Analog Executive Summary Agent", backendLabel: "Analog Executive Summary Agent", desc: "One-page executive summary with risks, status, and next actions" },
     { uiLabel: "System CoSim Integration Agent", backendLabel: "System CoSim Integration Agent", desc: "Generates co-sim scaffolding: AXI4-Lite register block template + firmware MMIO header + basic cocotb smoke test" },
     { uiLabel: "System ISS Bridge Agent", backendLabel: "System ISS Bridge Agent", desc: "Generates scaffolding for an ISS<->RTL bridge (MMIO/IRQ contract + Verilator harness skeleton + run notes)" },
   ],
@@ -1224,7 +1242,7 @@ function WorkflowPage() {
   const prebuiltWorkflows = useMemo(() => {
     const all = {
       digital: ["Verify_Loop", "Spec2RTL"],
-      analog: ["Spec2Circuit", "Spec2Sim"],
+      analog: [],
       embedded: ["Spec2Code", "Spec2Sim"],
       system: ["Digital_IP_Prototype_Loop"],
       validation: [],
@@ -1253,18 +1271,18 @@ function WorkflowPage() {
       setEdges(e);
     //  setShowSpecModal(true);
     }
-    if (loop === "analog" && wf.includes("Spec2Circuit")) {
-      const n: Node<AgentNodeData>[] = [
-        { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Analog Spec Agent" } },
-        { id: "netlist", type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "Netlist Agent", backendLabel: "Analog Netlist Agent" } },
-      ];
-      const e: Edge[] = [
-        { id: "e-spec-netlist", source: "spec", target: "netlist", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-      ];
-      setNodes(n);
-      setEdges(e);
+    // if (loop === "analog" && wf.includes("Spec2Circuit")) {
+    //  const n: Node<AgentNodeData>[] = [
+    //    { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Analog Spec Agent" } },
+    //    { id: "netlist", type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "Netlist Agent", backendLabel: "Analog Netlist Agent" } },
+    //  ];
+    //  const e: Edge[] = [
+    //    { id: "e-spec-netlist", source: "spec", target: "netlist", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+    //  ];
+    //  setNodes(n);
+    //  setEdges(e);
     //  setShowSpecModal(true);
-    }
+    //}
     if (loop === "embedded" && wf.includes("Spec2Code")) {
       const n: Node<AgentNodeData>[] = [
         { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Embedded Spec Agent" } },

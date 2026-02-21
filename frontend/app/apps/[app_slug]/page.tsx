@@ -12,14 +12,30 @@ export default function AppSlugRouter() {
     if (!slug) return;
 
     const dedicated: Record<string, string> = {
-      "validation-run": "/apps/validation-run",
 
-      // ✅ NEW
+      // Validation (dedicated pages)
+      "validation-run": "/apps/validation-run",
+      "validation-plan": "/apps/validation-plan",
+      "bench-setup": "/apps/bench-setup",
+      "preflight": "/apps/preflight",
+      "validation-insights": "/apps/validation-insights",
+
+      // Digital (dedicated pages)
       "arch2rtl": "/apps/arch2rtl",
       "integrate": "/apps/integrate",
       "dqa": "/apps/dqa",
       "verify": "/apps/verify",
       "smoke": "/apps/smoke",
+      // ✅ ANALOG
+      "analog-run": "/apps/analog-run",
+      "analog-spec": "/apps/analog-spec",
+      "analog-netlist": "/apps/analog-netlist",
+      "analog-model": "/apps/analog-model",
+      "analog-validate-model": "/apps/analog-validate-model",
+      "analog-correlate": "/apps/analog-correlate",
+      "analog-iterate": "/apps/analog-iterate",
+      "analog-abstracts": "/apps/analog-abstracts",
+
     };
 
     const target = dedicated[slug];
