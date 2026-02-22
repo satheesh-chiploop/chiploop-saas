@@ -216,13 +216,70 @@ export default function AppsHomePage() {
       nudge: "New",
       promise: "PnR/STA handoff",
     },   
+
+    // ✅ EMBEDDED (production firmware chain)
     {
-      slug: "firmware-bringup-assistant",
-      title: "Firmware Bring-Up Assistant",
-      subtitle: "Boot/UART logs → root-cause + next steps",
+      slug: "embedded-run",
+      title: "Embedded Run",
+      subtitle: "End-to-end firmware flow: HAL → Drivers → Boot → Diagnostics → Co-sim → Report",
       loop_type: "embedded",
-      status: "Coming",
-      promise: "Shorten bring-up cycles",
+      status: "Flagship",
+      nudge: "Recommended",
+      promise: "Production-ready firmware package + exec summary",
+    },
+    {
+      slug: "embedded-hal",
+      title: "Embedded HAL",
+      subtitle: "Register extraction → Rust HAL layer → validation",
+      loop_type: "embedded",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Rust register abstraction (HAL)",
+    },
+    {
+      slug: "embedded-driver",
+      title: "Embedded Driver",
+      subtitle: "Driver scaffold + ISR + DMA integration",
+      loop_type: "embedded",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Drivers package + integration contract",
+    },
+    {
+      slug: "embedded-boot",
+      title: "Embedded Boot",
+      subtitle: "Boot sequencing + PLL + reset + power modes",
+      loop_type: "embedded",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Boot plan + init code + timing checks",
+    },
+    {
+      slug: "embedded-diagnostics",
+      title: "Embedded Diagnostics",
+      subtitle: "Register dump + BIST + stress tools",
+      loop_type: "embedded",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Diagnostics toolkit + summary",
+    },
+    {
+      slug: "embedded-log-analyzer",
+      title: "Embedded Log Analyzer",
+      subtitle: "Logs → fault classification → root cause → fix plan",
+      loop_type: "embedded",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Root-cause and recommended actions",
+    },
+    {
+      slug: "embedded-validate",
+      title: "Embedded Validate",
+      subtitle: "RTL + firmware co-simulation + coverage + report",
+      loop_type: "embedded",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Co-sim results + coverage report",
     },
     {
       slug: "system-intelligence-analyzer",
@@ -270,6 +327,15 @@ export default function AppsHomePage() {
       "analog-correlate": "/apps/analog-correlate",
       "analog-iterate": "/apps/analog-iterate",
       "analog-abstracts": "/apps/analog-abstracts",
+
+      // ✅ EMBEDDED (dedicated pages)
+      "embedded-hal": "/apps/embedded-hal",
+      "embedded-driver": "/apps/embedded-driver",
+      "embedded-boot": "/apps/embedded-boot",
+      "embedded-diagnostics": "/apps/embedded-diagnostics",
+      "embedded-log-analyzer": "/apps/embedded-log-analyzer",
+      "embedded-validate": "/apps/embedded-validate",
+      "embedded-run": "/apps/embedded-run",
     };
     
     return dedicated[slug] || `/apps/${slug}`;
@@ -459,7 +525,7 @@ export default function AppsHomePage() {
 
       {/* Loop rows */}
       <section className="mx-auto max-w-6xl px-6 pb-16 space-y-10">
-        {(view === "recommended" ? loops.filter(l => l === "validation" || l === "digital") : loops).map((loop) => {
+        {(view === "recommended" ? loops.filter(l => l === "validation" || l === "digital" || l === "analog" || l === "embedded" ) : loops).map((loop) => {
           const meta = LOOP_META[loop];
           const rowApps = apps.filter((a) => a.loop_type === loop);
           const animatedApps = [...rowApps, ...rowApps, ...rowApps];
