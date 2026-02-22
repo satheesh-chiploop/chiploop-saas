@@ -27,7 +27,7 @@ const LOOP_META: Record<LoopType, { title: string; tagline: string; accent: stri
   digital: { title: "Digital Loop", tagline: "Design → RTL → Verify → Improve", accent: "accent-digital" },
   validation: { title: "Validation Loop", tagline: "Plan → Run → Learn → Improve", accent: "accent-validation" },
   analog: { title: "Analog Loop", tagline: "Analyze → Simulate → Correlate → Improve", accent: "accent-analog" },
-  embedded: { title: "Firmware Loop", tagline: "Code → Run → Observe → Fix", accent: "accent-embedded" },
+  embedded: { title: "Embedded(Firmware) Loop", tagline: "Code → Run → Observe → Fix", accent: "accent-embedded" },
   system: { title: "System Loop", tagline: "Integrate → Analyze → Optimize", accent: "accent-system" },
 };
 
@@ -292,7 +292,27 @@ export default function AppsHomePage() {
   ]), []);
 
   const featured = apps.find(a => a.slug === "validation-run") || apps[0];
-  const flagship = apps.filter(a => a.status === "Flagship");
+
+  const FLAGSHIP_SLUGS = new Set<string>([
+    // Validation (1–2)
+    "validation-run",
+    "bench-setup",
+
+    // Digital (1–2)
+    "arch2rtl",
+    "dqa",
+
+    // Analog (1–2)
+    "analog-run",
+    "analog-model",
+
+    // Embedded (1–2)
+    "embedded-run",
+    "embedded-driver",
+  ]);
+
+  const flagship = apps.filter(a => a.status === "Flagship" && FLAGSHIP_SLUGS.has(a.slug));
+
   const loops: LoopType[] = useMemo(() => (["validation", "digital", "analog", "embedded", "system"]), []);
 
   const go = (path: string) => router.push(path);
@@ -454,14 +474,44 @@ export default function AppsHomePage() {
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
               >
                 <div className="flex items-center justify-between">
-                  <div className="font-semibold">Spec → RTL + handoff</div>
+                  <div className="font-semibold">Digital - Spec → RTL + handoff</div>
                   <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
                     Most used
                   </span>
                 </div>
-                <div className="mt-1 text-sm text-slate-400">Arch2RTL: docs + SV + package</div>
+                <div className="mt-1 text-sm text-slate-400"> Digital - Arch2RTL: docs + SV + package</div>
+              </button>
+
+              {/* ✅ NEW: Analog daily-use */}
+              <button
+                onClick={() => go("/apps/analog-run")}
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold">Run analog loop end-to-end</div>
+                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
+                    Recommended
+                  </span>
+                </div>
+                  <div className="mt-1 text-sm text-slate-400">Analog Run: netlist → model → validate → correlate</div>
+              </button>
+
+              {/* ✅ NEW: Embedded daily-use */}
+              <button
+                onClick={() => go("/apps/embedded-run")}
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold">Run firmware loop end-to-end</div>
+                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
+                    Recommended
+                  </span>
+                </div>
+                  <div className="mt-1 text-sm text-slate-400">Embedded Run: HAL → drivers → boot → diagnostics → report</div>
               </button>
             </div>
+
+
 
             <div className="mt-6 flex items-center gap-2">
               <button
@@ -525,7 +575,7 @@ export default function AppsHomePage() {
 
       {/* Loop rows */}
       <section className="mx-auto max-w-6xl px-6 pb-16 space-y-10">
-        {(view === "recommended" ? loops.filter(l => l === "validation" || l === "digital" || l === "analog" || l === "embedded" ) : loops).map((loop) => {
+        {(view === "recommended" ? loops.filter(l => l === "digital" || l === "analog" || l === "embedded" || l === "validation" ) : loops).map((loop) => {
           const meta = LOOP_META[loop];
           const rowApps = apps.filter((a) => a.loop_type === loop);
           const animatedApps = [...rowApps, ...rowApps, ...rowApps];
@@ -589,7 +639,7 @@ export default function AppsHomePage() {
       <style jsx>{`
         .marquee {
           width: max-content;
-          animation: marquee 38s linear infinite;
+          animation: marquee 90s linear infinite;
         }
         @keyframes marquee {
           0% { transform: translateX(0); }
