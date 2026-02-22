@@ -296,7 +296,7 @@ export default function AppsHomePage() {
   const FLAGSHIP_SLUGS = new Set<string>([
     // Validation (1–2)
     "validation-run",
-    "bench-setup",
+    "validation-plan",
 
     // Digital (1–2)
     "arch2rtl",
@@ -313,7 +313,7 @@ export default function AppsHomePage() {
 
   const flagship = apps.filter(a => a.status === "Flagship" && FLAGSHIP_SLUGS.has(a.slug));
 
-  const loops: LoopType[] = useMemo(() => (["validation", "digital", "analog", "embedded", "system"]), []);
+  const loops: LoopType[] = useMemo(() => (["digital", "analog", "embedded", "validation","system"]), []);
 
   const go = (path: string) => router.push(path);
 
