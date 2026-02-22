@@ -35,6 +35,15 @@ export default function AppSlugRouter() {
       "analog-correlate": "/apps/analog-correlate",
       "analog-iterate": "/apps/analog-iterate",
       "analog-abstracts": "/apps/analog-abstracts",
+      
+      // ✅ EMBEDDED (dedicated pages)
+      "embedded-hal": "/apps/embedded-hal",
+      "embedded-driver": "/apps/embedded-driver",
+      "embedded-boot": "/apps/embedded-boot",
+      "embedded-diagnostics": "/apps/embedded-diagnostics",
+      "embedded-log-analyzer": "/apps/embedded-log-analyzer",
+      "embedded-validate": "/apps/embedded-validate",
+      "embedded-run": "/apps/embedded-run",
 
     };
 

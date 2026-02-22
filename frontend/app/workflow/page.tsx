@@ -96,6 +96,28 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Embedded Code Agent", backendLabel: "Embedded Code Agent", desc: "Drivers & firmware" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
     { uiLabel: "Embedded Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize outputs" },
+    { uiLabel: "Embedded Register Extract Agent", backendLabel: "Embedded Register Extract Agent", desc: "Extract CSR / register definitions" },
+    { uiLabel: "Embedded Rust Register Layer Generator Agent", backendLabel: "Embedded Rust Register Layer Generator Agent", desc: "Generate Rust HAL layer" },
+    { uiLabel: "Embedded Register Validation Agent", backendLabel: "Embedded Register Validation Agent", desc: "Validate register model consistency" },
+    { uiLabel: "Embedded Rust Driver Scaffold Agent", backendLabel: "Embedded Rust Driver Scaffold Agent", desc: "Generate driver skeleton" },
+    { uiLabel: "Embedded Interrupt Mapping Agent", backendLabel: "Embedded Interrupt Mapping Agent", desc: "Map IRQ vectors & handlers" },
+    { uiLabel: "Embedded DMA Integration Agent", backendLabel: "Embedded DMA Integration Agent", desc: "Integrate DMA flows" },
+    { uiLabel: "Embedded Boot Dependency Planner Agent", backendLabel: "Embedded Boot Dependency Planner Agent", desc: "Plan boot sequence & dependencies" },
+    { uiLabel: "Embedded Clock And PLL Configuration Agent", backendLabel: "Embedded Clock And PLL Configuration Agent", desc: "Configure clocks & PLLs" },
+    { uiLabel: "Embedded Reset Sequencing Agent", backendLabel: "Embedded Reset Sequencing Agent", desc: "Define reset ordering" },
+    { uiLabel: "Embedded Power Mode Configuration Agent", backendLabel: "Embedded Power Mode Configuration Agent", desc: "Configure power states" },
+    { uiLabel: "Embedded Boot Timing Validation Agent", backendLabel: "Embedded Boot Timing Validation Agent", desc: "Validate boot timing constraints" },
+    { uiLabel: "Embedded Register Dump Utility Agent", backendLabel: "Embedded Register Dump Utility Agent", desc: "Generate register dump utility" },
+    { uiLabel: "Embedded Built In Self Test Agent", backendLabel: "Embedded Built In Self Test Agent", desc: "Generate BIST routines" },
+    { uiLabel: "Embedded Stress Test Generator Agent", backendLabel: "Embedded Stress Test Generator Agent", desc: "Create firmware stress tests" },
+    { uiLabel: "Embedded ELF Build Agent", backendLabel: "Embedded ELF Build Agent", desc: "Build firmware ELF" },
+    { uiLabel: "Embedded Verilator Build Agent", backendLabel: "Embedded Verilator Build Agent", desc: "Build RTL simulation model" },
+    { uiLabel: "Embedded Cocotb Harness Agent", backendLabel: "Embedded Cocotb Harness Agent", desc: "Generate cocotb test harness" },
+    { uiLabel: "Embedded Co Sim Runner Agent", backendLabel: "Embedded Co Sim Runner Agent", desc: "Run RTL + firmware co-simulation" },
+    { uiLabel: "Embedded Coverage Collector Agent", backendLabel: "Embedded Coverage Collector Agent", desc: "Collect FW + RTL coverage" },
+    { uiLabel: "Embedded Validation Report Agent", backendLabel: "Embedded Validation Report Agent", desc: "Generate validation report" },
+    { uiLabel: "Embedded Firmware Integration Contract Agent", backendLabel: "Embedded Firmware Integration Contract Agent", desc: "Generate integration contract" },
+    { uiLabel: "Embedded Firmware Executive Summary Agent", backendLabel: "Embedded Firmware Executive Summary Agent", desc: "Produce executive summary" },
   ],
   validation:[
     { uiLabel: "Validation Instrument Setup Agent", backendLabel: "Validation Instrument Setup Agent", desc: "Resolves the user's bench setup from registered instruments (or defaults) and writes bench_setup.json for downstream validation agents." },
@@ -176,6 +198,28 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Embedded Spec Agent", backendLabel: "Embedded Spec Agent", desc: "Firmware simulation harness" },
     { uiLabel: "Embedded Sim Agent", backendLabel: "Embedded Sim Agent", desc: "Run harness / co-sim" },
     { uiLabel: "Embedded Result Agent", backendLabel: "Embedded Result Agent", desc: "Summarize hardware + firmware integration" },
+    { uiLabel: "Embedded Register Extract Agent", backendLabel: "Embedded Register Extract Agent", desc: "Extract CSR / register definitions" },
+    { uiLabel: "Embedded Rust Register Layer Generator Agent", backendLabel: "Embedded Rust Register Layer Generator Agent", desc: "Generate Rust HAL layer" },
+    { uiLabel: "Embedded Register Validation Agent", backendLabel: "Embedded Register Validation Agent", desc: "Validate register model consistency" },
+    { uiLabel: "Embedded Rust Driver Scaffold Agent", backendLabel: "Embedded Rust Driver Scaffold Agent", desc: "Generate driver skeleton" },
+    { uiLabel: "Embedded Interrupt Mapping Agent", backendLabel: "Embedded Interrupt Mapping Agent", desc: "Map IRQ vectors & handlers" },
+    { uiLabel: "Embedded DMA Integration Agent", backendLabel: "Embedded DMA Integration Agent", desc: "Integrate DMA flows" },
+    { uiLabel: "Embedded Boot Dependency Planner Agent", backendLabel: "Embedded Boot Dependency Planner Agent", desc: "Plan boot sequence & dependencies" },
+    { uiLabel: "Embedded Clock And PLL Configuration Agent", backendLabel: "Embedded Clock And PLL Configuration Agent", desc: "Configure clocks & PLLs" },
+    { uiLabel: "Embedded Reset Sequencing Agent", backendLabel: "Embedded Reset Sequencing Agent", desc: "Define reset ordering" },
+    { uiLabel: "Embedded Power Mode Configuration Agent", backendLabel: "Embedded Power Mode Configuration Agent", desc: "Configure power states" },
+    { uiLabel: "Embedded Boot Timing Validation Agent", backendLabel: "Embedded Boot Timing Validation Agent", desc: "Validate boot timing constraints" },
+    { uiLabel: "Embedded Register Dump Utility Agent", backendLabel: "Embedded Register Dump Utility Agent", desc: "Generate register dump utility" },
+    { uiLabel: "Embedded Built In Self Test Agent", backendLabel: "Embedded Built In Self Test Agent", desc: "Generate BIST routines" },
+    { uiLabel: "Embedded Stress Test Generator Agent", backendLabel: "Embedded Stress Test Generator Agent", desc: "Create firmware stress tests" },
+    { uiLabel: "Embedded ELF Build Agent", backendLabel: "Embedded ELF Build Agent", desc: "Build firmware ELF" },
+    { uiLabel: "Embedded Verilator Build Agent", backendLabel: "Embedded Verilator Build Agent", desc: "Build RTL simulation model" },
+    { uiLabel: "Embedded Cocotb Harness Agent", backendLabel: "Embedded Cocotb Harness Agent", desc: "Generate cocotb test harness" },
+    { uiLabel: "Embedded Co Sim Runner Agent", backendLabel: "Embedded Co Sim Runner Agent", desc: "Run RTL + firmware co-simulation" },
+    { uiLabel: "Embedded Coverage Collector Agent", backendLabel: "Embedded Coverage Collector Agent", desc: "Collect FW + RTL coverage" },
+    { uiLabel: "Embedded Validation Report Agent", backendLabel: "Embedded Validation Report Agent", desc: "Generate validation report" },
+    { uiLabel: "Embedded Firmware Integration Contract Agent", backendLabel: "Embedded Firmware Integration Contract Agent", desc: "Generate integration contract" },
+    { uiLabel: "Embedded Firmware Executive Summary Agent", backendLabel: "Embedded Firmware Executive Summary Agent", desc: "Produce executive summary" },
     { uiLabel: "Analog Spec Builder Agent", backendLabel: "Analog Spec Builder Agent", desc: "Extracts structured analog spec (pins, modes, targets, corners, validation intent)" },
     { uiLabel: "Analog Netlist Scaffold Agent", backendLabel: "Analog Netlist Scaffold Agent", desc: "Generates SPICE netlist scaffold aligned to spec pins and block intent" },
     { uiLabel: "Analog Simulation Plan Agent", backendLabel: "Analog Simulation Plan Agent", desc: "Creates sweeps/corners/metrics plan + example run deck template" },
@@ -1879,6 +1923,9 @@ function WorkflowPage() {
         <div className="flex items-center gap-6 text-slate-300">
           <button onClick={() => router.push("/")} className="hover:text-cyan-400 transition">
             Home
+          </button>
+          <button onClick={() => router.push("/apps")} className="hover:text-cyan-400 transition">
+            Apps
           </button>
           <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
             Pricing
