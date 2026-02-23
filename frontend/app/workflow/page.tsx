@@ -2241,6 +2241,9 @@ function WorkflowPage() {
                   : "border-slate-700"
               }`}
             >
+              <div className="text-xs text-slate-500 mb-2">
+                    jobId: {jobId || "—"} | tab: {activeTab}
+              </div>
               {jobId && activeTab === "live" && (
                 <WorkflowConsole jobId={jobId} table="workflows,runs" />
               )}
@@ -2283,7 +2286,6 @@ function WorkflowPage() {
                   }`}
                   onClick={() => {
                     setSelectedRunId(r.run_id);
-                    //setJobId(r.run_id); // ✅ load this run in console
                     setJobId(r.workflow_id); 
                     setActiveTab("live");
                   }}

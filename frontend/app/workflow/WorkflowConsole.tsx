@@ -406,38 +406,86 @@ export default function WorkflowConsole({
   useEffect(() => {
     if (!jobId) return;
 
-    // Initial summary fetch
-    const fetchSummary = async () => {
+    let cancelled = false;
+
+    const resolveWorkflowId = async (): Promise<string> => {
+      // Try jobId as workflow id first
+      const wfTry = await supabase
+        .from("workflows")
+        .select("id")
+        .eq("id", jobId)
+        .maybeSingle();
+
+      if (wfTry.data?.id) return jobId;
+
+      // If not found, treat jobId as run id and map -> workflow_id
+      const runTry = await supabase
+        .from("runs")
+        .select("workflow_id")
+        .eq("id", jobId)
+        .maybeSingle();
+
+      return runTry.data?.workflow_id || jobId; // fallback
+    };
+
+    const start = async () => {
+      const resolved = await resolveWorkflowId();
+      if (cancelled) return;
+      setWfId(resolved);
+
+      // Initial fetch from workflows using resolved workflow id
       const { data, error } = await supabase
         .from("workflows")
         .select("id, status, created_at, loop_type, logs, artifacts")
-        .eq("id", jobId)
-        .single<WorkflowRow>();
-      if (error) console.error("❌ Initial fetch error:", error);
+        .eq("id", resolved)
+        .maybeSingle<WorkflowRow>();
+
+      if (error) console.error("❌ Initial workflow fetch error:", error);
       if (data) {
         setWorkflowMeta(data);
-        if (data.logs) setLogs(data.logs.split("\n"));
+        if (typeof data.logs === "string" && data.logs.trim()) setLogs(data.logs.split("\n"));
         if (data.status) setStatus(data.status);
       }
     };
-    fetchSummary();
 
-    // Realtime subscription (if replication active)
+    start();
+
+    // Realtime subscription
     const tables = table.split(",");
     const channels: any[] = [];
 
     try {
       tables.forEach((t) => {
+        const filter =
+          t.trim() === "runs"
+            ? `workflow_id=eq.${wfId || jobId}` // ✅ runs filtered by workflow_id
+            : `id=eq.${wfId || jobId}`;         // ✅ workflows filtered by id
+
         const ch = supabase
           .channel(`realtime:public:${t}`)
           .on(
             "postgres_changes",
-            { event: "*", schema: "public", table: t, filter: `id=eq.${jobId}` },
+            { event: "*", schema: "public", table: t.trim(), filter },
             (payload) => {
-              const updated = payload.new as WorkflowRow;
-              if (updated?.logs) setLogs((updated.logs || "").split("\n"));
-              if (updated?.status) setStatus(updated.status || "unknown");
-              if (updated?.artifacts) setWorkflowMeta(updated);
+              const updated = payload.new as any;
+
+              // If workflow row changes
+              if (t.trim() === "workflows") {
+                if (typeof updated?.logs === "string") setLogs(updated.logs.split("\n"));
+                if (updated?.status) setStatus(updated.status || "unknown");
+                if (updated?.artifacts) setWorkflowMeta(updated);
+              }
+
+              // If run row changes
+              if (t.trim() === "runs") {
+                const runLogs = typeof updated?.logs === "string" ? updated.logs : "";
+                if (runLogs) {
+                  setLogs((prev) => {
+                    const merged = [...prev, ...runLogs.split("\n")].filter(Boolean);
+                    return merged;
+                  });
+                }
+              }
             }
           )
           .subscribe();
@@ -449,18 +497,21 @@ export default function WorkflowConsole({
 
     // Poll fallback (every 1s)
     const poller = setInterval(async () => {
+      const resolved = wfId || jobId;
+
       const [workflowData, runData] = await Promise.all([
         supabase
           .from("workflows")
           .select("status, logs, artifacts, created_at, loop_type")
-          .eq("id", jobId)
-          .single<WorkflowRow>(),
+          .eq("id", resolved)
+          .maybeSingle<WorkflowRow>(),
         supabase
           .from("runs")
           .select("logs")
-          .eq("workflow_id", jobId)
-          .order("created_at", { ascending: true })
-          .maybeSingle<WorkflowRow>(),
+          .eq("workflow_id", resolved)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle<any>(),
       ]);
 
       const wf = workflowData.data || {};
@@ -469,14 +520,16 @@ export default function WorkflowConsole({
 
       if (allLogs) setLogs(allLogs.split("\n"));
       if (wf.status) setStatus(wf.status || "unknown");
-      setWorkflowMeta(wf);
+      if (Object.keys(wf).length) setWorkflowMeta(wf);
     }, 1000);
 
     return () => {
+      cancelled = true;
       clearInterval(poller);
       channels.forEach((ch) => supabase.removeChannel(ch));
     };
-  }, [jobId, table, channelName,refreshKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobId, table, refreshKey, wfId]);
 
   // ---------- 🌀 Auto-scroll ----------
   useEffect(() => {
