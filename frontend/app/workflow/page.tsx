@@ -2241,9 +2241,17 @@ function WorkflowPage() {
                   : "border-slate-700"
               }`}
             >
-              {activeTab === "live" && jobId && <WorkflowConsole jobId={jobId} table="workflows" />}
-              {activeTab === "summary" && <div></div>}
-              {activeTab === "output" && <div></div>}
+              {jobId && activeTab === "live" && (
+                <WorkflowConsole jobId={jobId} table="workflows,runs" />
+              )}
+
+              {jobId && activeTab === "summary" && (
+                <WorkflowConsole jobId={jobId} table="workflows,runs" />
+              )}
+
+              {jobId && activeTab === "output" && (
+                <WorkflowConsole jobId={jobId} table="workflows,runs" />
+              )}
             </div>
           </div>
         </section>
