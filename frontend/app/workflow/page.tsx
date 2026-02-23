@@ -2283,7 +2283,8 @@ function WorkflowPage() {
                   }`}
                   onClick={() => {
                     setSelectedRunId(r.run_id);
-                    setJobId(r.run_id); // ✅ load this run in console
+                    //setJobId(r.run_id); // ✅ load this run in console
+                    setJobId(r.workflow_id); 
                     setActiveTab("live");
                   }}
                 >
