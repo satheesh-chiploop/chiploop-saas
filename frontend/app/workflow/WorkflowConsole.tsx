@@ -401,7 +401,7 @@ export default function WorkflowConsole({
     window.addEventListener("refreshWorkflows", refreshHandler);
     return () => window.removeEventListener("refreshWorkflows", refreshHandler);
   }, []);
-
+  const [wfId, setWfId] = useState<string>(jobId);
   // ---------- 🧠 FETCH + LIVE SYNC ----------
   useEffect(() => {
     if (!jobId) return;
