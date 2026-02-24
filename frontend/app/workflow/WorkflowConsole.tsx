@@ -458,8 +458,8 @@ export default function WorkflowConsole({
       tables.forEach((t) => {
         const filter =
           t.trim() === "runs"
-            ? `workflow_id=eq.${wfId || jobId}` // ✅ runs filtered by workflow_id
-            : `id=eq.${wfId || jobId}`;         // ✅ workflows filtered by id
+            ? `workflow_id=eq.${jobId}` // ✅ runs filtered by workflow_id
+            : `id=eq.${jobId}`;         // ✅ workflows filtered by id
 
         const ch = supabase
           .channel(`realtime:public:${t}`)
