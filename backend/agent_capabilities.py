@@ -266,79 +266,252 @@ AGENT_CAPABILITIES = {
         "requires": [],
     },
 
+    "Digital Foundry Profile Agent": {
+        "domain": "digital",
+        "inputs": ["workflow_id"],
+        "outputs": [
+           "digital/foundry/foundry_profile.json",
+           "digital/foundry/foundry_profile.log"
+        ],
+        "description": "Creates a portable foundry profile (PDK name, PDK_ROOT, corner intent) and validates PDK presence."
+    },
+
+    "Digital Implementation Setup Agent": {
+        "domain": "digital",
+        "inputs": ["digital/foundry/foundry_profile.json", "*_spec.json", "*.v", "*.sv"],
+        "outputs": [
+           "digital/foundry/constraints/base.sdc",
+           "digital/foundry/corners/corners.json",
+           "digital/foundry/openlane/config.json",
+           "digital/foundry/setup/implementation_setup.log"
+        ],
+        "description": "Generates implementation collateral (constraints + corners + OpenLane2 config) using the foundry profile. No P&R stages yet."
+    },
+
+    "Digital Synthesis Agent": {
+        "domain": "digital",
+        "inputs": ["workflow_id", "workflow_dir", "artifact OR artifact_list", "spec_json(optional)", "pdk_variant(optional)"],
+        "outputs": [
+           "digital/synth/config.json",
+           "digital/synth/constraints/top.sdc",
+           "digital/synth/run.sh",
+           "digital/synth/logs/openlane_synth.log",
+           "digital/synth/synth_summary.json",
+           "digital/synth/synth_summary.md"
+        ],
+        "description": "Runs OpenLane2 synthesis (Yosys.Synthesis) inside Docker, generates deterministic rerunnable scripts + minimal constraints, and uploads key artifacts to Supabase.",
+        "tags": ["digital", "openlane2", "synthesis", "yosys", "docker", "sky130"],
+    },
+
     # -------------------------
     # ANALOG
     # -------------------------
     # -------------------------
     # ANALOG (NEW, FRESH)
     # -------------------------
+        # -------------------------
+    # ANALOG (Production Scaffold)
+    # -------------------------
     "Analog Spec Builder Agent": {
         "domain": "analog",
         "inputs": ["datasheet_text", "goal", "scope"],
-        "outputs": ["analog/spec.json", "analog/spec_summary.md"],
-        "description": "Extracts a structured analog block spec (ports, modes, targets, corners, validation intent).",
+        "outputs": [
+            # legacy (keep)
+            "analog/spec.json",
+            "analog/spec_summary.md",
+
+            # new canonical scaffold
+            "analog/spec/spec_source.md",
+            "analog/spec/spec_normalized.json",
+            "analog/spec/requirements.json",
+            "analog/spec/assumptions.md",
+        ],
+        "description": "Extracts structured analog block spec + normalized requirements bundle (PDK-agnostic; avoids invented metrics).",
     },
+
     "Analog Netlist Scaffold Agent": {
         "domain": "analog",
         "inputs": ["analog/spec.json"],
-        "outputs": ["analog/netlist.sp", "analog/netlist_summary.md"],
-        "description": "Generates a SPICE netlist scaffold aligned to spec pins and block intent.",
+        "outputs": [
+            # legacy
+            "analog/netlist.sp",
+            "analog/netlist_summary.md",
+
+            # new canonical scaffold
+            "analog/netlist/ldo_top.sp",
+            "analog/netlist/models/models.placeholder.inc",
+            "analog/netlist/README.md",
+        ],
+        "description": "Generates a PDK-agnostic SPICE netlist scaffold aligned to spec pins and intent, plus model placeholder include + README.",
     },
+
     "Analog Simulation Plan Agent": {
         "domain": "analog",
-        "inputs": ["analog/spec.json", "analog/netlist.sp"],
-        "outputs": ["analog/sim_plan.json", "analog/run_deck.sp"],
-        "description": "Creates sweeps/corners/metrics plan and an example run deck template.",
+        "inputs": [
+            "analog/spec.json",
+            "analog/netlist.sp",          # legacy
+            "analog/netlist/ldo_top.sp",  # canonical
+        ],
+        "outputs": [
+            # legacy
+            "analog/sim_plan.json",
+            "analog/run_deck.sp",
+
+            # new canonical scaffold
+            "analog/sim/sim_plan.json",
+            "analog/sim/env.sh",
+            "analog/sim/run_all.sh",
+
+            "analog/sim/ngspice/run_all.sh",
+            "analog/sim/ngspice/decks/dc_op.sp",
+            "analog/sim/ngspice/decks/dc_sweep_vin.sp",
+            "analog/sim/ngspice/decks/ac_loopgain.sp",
+            "analog/sim/ngspice/decks/ac_psrr.sp",
+            "analog/sim/ngspice/decks/tran_loadstep.sp",
+
+            "analog/sim/spectre/run_all.sh",
+            "analog/sim/spectre/decks/dc_op.sp",
+            "analog/sim/spectre/decks/dc_sweep_vin.sp",
+            "analog/sim/spectre/decks/ac_loopgain.sp",
+            "analog/sim/spectre/decks/ac_psrr.sp",
+            "analog/sim/spectre/decks/tran_loadstep.sp",
+
+            "analog/sim/hspice/run_all.sh",
+            "analog/sim/hspice/decks/dc_op.sp",
+            "analog/sim/hspice/decks/dc_sweep_vin.sp",
+            "analog/sim/hspice/decks/ac_loopgain.sp",
+            "analog/sim/hspice/decks/ac_psrr.sp",
+            "analog/sim/hspice/decks/tran_loadstep.sp",
+
+            "analog/sim/parse/extract_metrics.py",
+            "analog/sim/results/metrics.json",
+        ],
+        "description": "Creates sweeps/corners/metrics plan AND runnable multi-simulator scaffold (ngspice/spectre/hspice) with bash runners + deck templates + metrics extraction stub.",
     },
+
     "Analog Behavioral Model Agent": {
         "domain": "analog",
         "inputs": ["analog/spec.json"],
-        "outputs": ["analog/model.sv", "analog/model.va", "analog/model_params.json", "analog/model_notes.md"],
-        "description": "Creates RNM SystemVerilog or Verilog-A behavioral model template + tuning params.",
+        "outputs": [
+            # deterministic output (production)
+            "analog/model.sv",
+            "analog/model_params.json",
+            "analog/model_notes.md",
+        ],
+        "description": "Creates deterministic RNM SystemVerilog behavioral model template + tuning params + limitations notes (no Verilog-A output in production scaffold).",
     },
+
     "Analog Behavioral Testbench Agent": {
         "domain": "analog",
         "inputs": ["analog/spec.json", "analog/model.sv"],
-        "outputs": ["analog/tb.sv"],
-        "description": "Generates SystemVerilog testbench stimuli for the behavioral model.",
+        "outputs": [
+            # canonical
+            "analog/behavioral/tb_ldo_behavioral.sv",
+            # legacy
+            "analog/tb.sv",
+        ],
+        "description": "Generates RNM SystemVerilog testbench stimuli for the behavioral model (canonical behavioral folder + legacy compatibility).",
     },
+
     "Analog Behavioral Assertions Agent": {
         "domain": "analog",
-        "inputs": ["analog/spec.json", "analog/model.sv"],
-        "outputs": ["analog/sva.sv"],
-        "description": "Generates SV assertions/checkers for enable sequencing, limits, settling windows, etc.",
+        "inputs": ["analog/spec.json", "analog/model.sv", "analog/spec/requirements.json"],
+        "outputs": [
+            # canonical
+            "analog/behavioral/assertions.sv",
+            # legacy
+            "analog/sva.sv",
+        ],
+        "description": "Generates SV assertions/checkers for enable sequencing, limits, settling windows, etc. (canonical behavioral folder + legacy compatibility).",
     },
+
     "Analog Behavioral Coverage Agent": {
         "domain": "analog",
         "inputs": ["analog/spec.json"],
-        "outputs": ["analog/coverage_plan.json", "analog/validation_summary.md"],
-        "description": "Defines scenario/corner/sweep coverage intent for analog validation.",
+        "outputs": [
+            # canonical
+            "analog/behavioral/coverage_plan.json",
+            "analog/behavioral/coverage_summary.md",
+
+            # legacy
+            "analog/coverage_plan.json",
+            "analog/validation_summary.md",
+        ],
+        "description": "Defines scenario/corner/sweep coverage intent for analog validation (PDK-agnostic corner naming).",
     },
+
     "Analog Correlation Agent": {
         "domain": "analog",
-        "inputs": ["analog/spec.json", "analog/sim_plan.json", "analog/model.sv"],
-        "outputs": ["analog/metrics_compare.json", "analog/delta_summary.json", "analog/correlation_report.md"],
-        "description": "Defines metric correlation between behavioral and netlist (stimulus-matched correlation).",
+        "inputs": [
+            "analog/spec.json",
+            # legacy plan
+            "analog/sim_plan.json",
+            # canonical sim metrics
+            "analog/sim/results/metrics.json",
+            "analog/model.sv",
+        ],
+        "outputs": [
+            # canonical
+            "analog/correlation/correlation_plan.md",
+            "analog/correlation/metrics_compare.json",
+            "analog/correlation/deltas.json",
+            "analog/correlation/delta_summary.json",
+            "analog/correlation/correlation_report.md",
+
+            # legacy
+            "analog/metrics_compare.json",
+            "analog/delta_summary.json",
+            "analog/correlation_report.md",
+        ],
+        "description": "Defines metric correlation between behavioral and netlist; produces correlation plan + deltas + report under analog/correlation/ (keeps legacy flat outputs during transition).",
     },
+
     "Analog Iteration Proposal Agent": {
         "domain": "analog",
-        "inputs": ["analog/delta_summary.json", "analog/model.sv"],
-        "outputs": ["analog/iteration_patch.diff", "analog/iteration_rationale.md", "analog/next_run_plan.json"],
-        "description": "Proposes tuning/code patches and re-run plan based on correlation deltas.",
+        "inputs": [
+            # prefer canonical delta summary, keep legacy input too
+            "analog/correlation/delta_summary.json",
+            "analog/delta_summary.json",
+            "analog/model.sv",
+        ],
+        "outputs": [
+            # canonical scaffold outputs
+            "analog/iteration/iteration_proposal.md",
+            "analog/iteration/backlog.yaml",
+            "analog/iteration/next_run_plan.json",
+            "analog/iteration/iteration_patch.diff",
+
+            # legacy compatibility
+            "analog/iteration_rationale.md",
+            "analog/next_run_plan.json",
+            "analog/iteration_patch.diff",
+        ],
+        "description": "Proposes tuning/code patches and re-run plan based on correlation deltas (canonical iteration folder + legacy compatibility).",
     },
+
     "Analog Abstract Views Agent": {
         "domain": "analog",
         "inputs": ["analog/spec.json"],
-        "outputs": ["analog/abstracts/macro.lef", "analog/abstracts/macro_stub.lib", "analog/abstracts/integration_notes.md"],
-        "description": "Generates LEF + LIB stub + integration notes for physical/timing handoff.",
+        "outputs": [
+            # canonical
+            "analog/abstract/macro.lef",
+            "analog/abstract/macro_stub.lib",
+            "analog/abstract/integration_notes.md",
+
+            # legacy mirror (your current agent wrote abstracts/...) :contentReference[oaicite:2]{index=2}
+            "analog/abstracts/macro.lef",
+            "analog/abstracts/macro_stub.lib",
+            "analog/abstracts/integration_notes.md",
+        ],
+        "description": "Generates LEF + LIB stub + integration notes for physical/timing handoff (canonical abstract/ plus legacy abstracts/ mirror).",
     },
+
     "Analog Executive Summary Agent": {
         "domain": "analog",
         "inputs": ["*"],
         "outputs": ["analog/executive_summary.md"],
-        "description": "Creates an executive-style summary for the analog workflow/app.",
+        "description": "Creates exec-style summary with spec compliance table, risks, artifact paths, and run instructions.",
     },
-
     # -------------------------
     # EMBEDDED
     # -------------------------
@@ -469,10 +642,18 @@ AGENT_CAPABILITIES = {
         "outputs": ["firmware/executive_summary.md"],
         "description": "Generate exec summary of produced firmware deliverables.",
     },
+    
     "Embedded ELF Build Agent": {
         "domain": "embedded",
         "inputs": ["spec_text", "toolchain", "toggles"],
-        "outputs": ["firmware/build/build_instructions.md"],
+        "outputs": [
+        "firmware/build/build_instructions.md",
+        "firmware/build/Cargo.toml",
+        "firmware/build/.cargo/config.toml",
+        "firmware/build/memory.x",
+        "firmware/src/main.rs",
+        "firmware/src/panic.rs",
+        ],
         "description": "Generate Cargo build instructions and ELF build steps.",
     },
     "Embedded Verilator Build Agent": {
@@ -490,13 +671,20 @@ AGENT_CAPABILITIES = {
     "Embedded Co Sim Runner Agent": {
         "domain": "embedded",
         "inputs": ["spec_text", "toolchain", "toggles"],
-        "outputs": ["firmware/validate/cosim_run.md"],
+        "outputs": [
+        "firmware/validate/cosim_run.md",
+        "firmware/validate/run_cosim.sh",
+        ],
         "description": "Generate cosim runner steps and expected artifacts.",
     },
     "Embedded Coverage Collector Agent": {
         "domain": "embedded",
         "inputs": ["spec_text", "toolchain", "toggles"],
-        "outputs": ["firmware/validate/coverage.md"],
+        "outputs": [
+        "firmware/validate/coverage.md",
+        "firmware/validate/coverage_fw.md",
+        "firmware/validate/coverage_rtl.md",
+        ],
         "description": "Collect FW and RTL coverage report steps and summaries.",
     },
     "Embedded Validation Report Agent": {

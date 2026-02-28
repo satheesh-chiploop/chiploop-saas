@@ -1,5 +1,12 @@
 import json
-from ._embedded_common import ensure_workflow_dir, llm_chat, write_artifact
+
+
+from ._embedded_common import (
+    ensure_workflow_dir,
+    llm_chat,
+    write_artifact,
+    strip_outer_markdown_fences,
+)
 
 AGENT_NAME = "Embedded Firmware Executive Summary Agent"
 PHASE = "executive"
@@ -11,9 +18,15 @@ def _collect_known_artifacts(state: dict) -> list[str]:
     """
     embedded = state.get("embedded") or {}
     paths = []
+
     for v in embedded.values():
         if isinstance(v, str) and v.strip():
             paths.append(v.strip())
+        elif isinstance(v, (list, tuple)):
+            for p in v:
+                if isinstance(p, str) and p.strip():
+                   paths.append(p.strip())
+
     # de-dup preserve order
     seen = set()
     out = []
@@ -52,11 +65,11 @@ Write an executive summary for this workflow run.
 HARD OUTPUT RULES (IMPORTANT):
 - Include these sections in this exact order:
   1) Overview (5-8 bullets max)
-  2) Artifacts produced (list EXACTLY the provided paths; no additions)
+  2) Artifacts produced (list EXACTLY the provided paths; Do not add any. Do not omit any)
   3) Key assumptions (bullets; keep short)
   4) Risks / Gaps (bullets; actionable)
   5) Next verification steps (bullets; concrete)
-- Do NOT mention Verilator/Cocotb unless they are explicitly in the produced artifacts list.
+ - Do NOT mention Verilator/Cocotb unless they are explicitly in the produced artifacts list.
 - Keep to ~1 page.
 
 OUTPUT PATH:
@@ -70,7 +83,8 @@ OUTPUT PATH:
 
     if not out:
         out = "ERROR: LLM returned empty output."
-
+    # remove outer ```markdown fences if present
+    out = strip_outer_markdown_fences(out)
     write_artifact(state, OUTPUT_PATH, out, key=OUTPUT_PATH.split("/")[-1])
 
     embedded = state.setdefault("embedded", {})

@@ -1,9 +1,20 @@
 import json
-from ._embedded_common import ensure_workflow_dir, llm_chat, write_artifact
+from ._embedded_common import ensure_workflow_dir, llm_chat, write_artifact, strip_markdown_fences_for_code
+
 
 AGENT_NAME = "Embedded ELF Build Agent"
 PHASE = "elf_build"
+
+# IMPORTANT: no trailing spaces
 OUTPUT_PATH = "firmware/build/build_instructions.md"
+
+# Workspace outputs (merged “firmware workspace agent” into this agent)
+OUTPUT_CARGO_TOML = "firmware/build/Cargo.toml"
+OUTPUT_CARGO_CFG  = "firmware/build/.cargo/config.toml"
+OUTPUT_MEMORY_X   = "firmware/build/memory.x"
+OUTPUT_LIB_RS     = "firmware/src/main.rs"
+OUTPUT_PANIC_RS   = "firmware/src/panic.rs"
+
 
 def run_agent(state: dict) -> dict:
     print(f"\n🚀 Running {AGENT_NAME}...")
@@ -26,19 +37,155 @@ TOOLCHAIN (for future extensibility):
 TOGGLES:
 {json.dumps(toggles, indent=2)}
 
-TASK:
-Generate Cargo build instructions and ELF build steps.
-OUTPUT REQUIREMENTS:
-- Write the primary output to match this path: firmware/build/build_instructions.md
-- Keep it implementation-ready and consistent with Rust + Cargo + Verilator + Cocotb assumptions.
-- If information is missing, make reasonable assumptions and clearly list them inside the artifact.
-"""
 
-    out = llm_chat(prompt, system="You are a senior embedded firmware engineer for silicon bring-up and RTL co-simulation. Produce concise, production-quality outputs. Avoid markdown code fences unless explicitly asked.")
+TASK:
+Generate a minimal, buildable embedded Rust workspace + build steps for producing an ELF.
+
+
+MANDATORY:
+- Assume a no_std firmware workspace (crate attributes belong ONLY in crate root).
+- Include linker script reference (memory.x) and cargo target config example.
+- DO NOT hardcode a CPU family (no "riscv", no "cortex", no "thumb") unless explicitly present in USER SPEC or TOOLCHAIN.
+- If TOOLCHAIN includes a target triple (e.g., toolchain["target_triple"]), use it.
+  Otherwise use a placeholder: <TARGET_TRIPLE>.
+- Build instructions must work generically by parameterizing the target triple and output name.
+
+OUTPUT REQUIREMENTS:
+- build_instructions.md MUST be plain markdown (no outer ``` fences).
+- build_instructions.md MUST include:
+  1) exact cargo command(s) to build an ELF (including --release and --target)
+  2) expected build artifact path:
+   - default cargo output: target/<TARGET_TRIPLE>/release/<BIN_NAME>
+   - optional: a post-step that copies/renames to <BIN_NAME>.elf (explicit command)
+  3) how to confirm the ELF exists (ls/path check)
+- If information is missing, add assumptions ONLY as markdown comments at top:
+  <!-- ASSUMPTION: ... -->
+panic.rs must contain the ONLY panic_handler.
+main.rs must NOT define panic_handler.
+main.rs must include: mod panic;
+- Cargo.toml MUST NOT contain [build] section.
+- Target configuration must be generated in: .cargo/config.toml
+
+OUTPUTS (generate ALL using the format below):
+Return multiple files in this exact format:
+
+FILE: firmware/build/build_instructions.md
+<content>
+
+FILE: firmware/build/Cargo.toml
+<content>
+
+FILE: firmware/build/.cargo/config.toml
+<content>
+
+FILE: firmware/build/memory.x
+<content>
+
+FILE: firmware/src/main.rs
+<content>
+
+FILE: firmware/src/panic.rs
+<content>
+"""
+    out = llm_chat(
+        prompt,
+        system="You are a senior embedded firmware engineer. Output ONLY the requested files. Never use markdown fences. No filler."
+    ).strip()
     if not out:
         out = "ERROR: LLM returned empty output."
 
-    write_artifact(state, OUTPUT_PATH, out, key=OUTPUT_PATH.split("/")[-1])
+    out = strip_markdown_fences_for_code(out)
+
+    # Parse FILE: blocks
+    files = {}
+    current = None
+    buf = []
+    for line in out.splitlines():
+        if line.startswith("FILE: "):
+            if current:
+                files[current] = "\n".join(buf).strip() + "\n"
+            current = line.replace("FILE: ", "").strip()
+            buf = []
+        else:
+            buf.append(line)
+    if current:
+        files[current] = "\n".join(buf).strip() + "\n"
+
+    # After writing main.rs
+    if "mod panic;" not in files.get(OUTPUT_LIB_RS, ""):
+        files[OUTPUT_LIB_RS] = "mod panic;\n" + files[OUTPUT_LIB_RS]
+
+    # Ensure panic.rs does not contain crate-level attributes
+    if OUTPUT_PANIC_RS in files:
+        content = files[OUTPUT_PANIC_RS]
+        content = content.replace("#![no_std]", "")
+        content = content.replace("#![no_main]", "")
+        files[OUTPUT_PANIC_RS] = content
+
+    # Ensure main.rs has crate-level attrs
+    if OUTPUT_LIB_RS in files:
+        if "#![no_std]" not in files[OUTPUT_LIB_RS]:
+           files[OUTPUT_LIB_RS] = "#![no_std]\n#![no_main]\n" + files[OUTPUT_LIB_RS]
+    if OUTPUT_LIB_RS in files:
+        content = files[OUTPUT_LIB_RS]
+        if "fn main" in content and "-> !" in content:
+            if "loop {" not in content:
+                content = content.rstrip() + "\n\n    loop {}\n"
+                files[OUTPUT_LIB_RS] = content
+
+        # --- Hardening: sanitize Cargo.toml (keep Embedded_Run stable) ---
+    if OUTPUT_CARGO_TOML in files:
+        ct = files[OUTPUT_CARGO_TOML]
+
+        # 1) Remove any [build] section (belongs in .cargo/config.toml)
+        lines = ct.splitlines()
+        out_lines = []
+        in_build = False
+        for ln in lines:
+            s = ln.strip()
+            if s.startswith("[build]"):
+                in_build = True
+                continue
+            # end build section at next table header
+            if in_build and s.startswith("[") and s.endswith("]") and not s.startswith("[build]"):
+                in_build = False
+            if not in_build:
+                out_lines.append(ln)
+        ct = "\n".join(out_lines).strip() + "\n"
+
+        # 2) Remove fake dependency no_std (attribute, not a crate)
+        ct = ct.replace('no_std = "0.1.0"\n', "")
+        ct = ct.replace('no_std = "0.1"\n', "")
+
+        # 3) Ensure package name is valid (no <BIN_NAME>)
+        # If model used placeholder, default to a safe name.
+        ct_lines = ct.splitlines()
+        new_ct_lines = []
+        for ln in ct_lines:
+            if ln.strip().startswith("name") and ("<" in ln or ">" in ln):
+                new_ct_lines.append('name = "firmware_app"')
+            else:
+                new_ct_lines.append(ln)
+        ct = "\n".join(new_ct_lines).strip() + "\n"
+
+        files[OUTPUT_CARGO_TOML] = ct
+
+    required = [
+        OUTPUT_PATH,
+        OUTPUT_CARGO_TOML,
+        OUTPUT_CARGO_CFG,
+        OUTPUT_MEMORY_X,
+        OUTPUT_LIB_RS,
+        OUTPUT_PANIC_RS,
+    ]
+
+    if all(p in files for p in required):
+        for p in required:
+            write_artifact(state, p, files[p], key=p.split("/")[-1])
+    else:
+        # fallback: at least write build instructions
+        write_artifact(state, OUTPUT_PATH, out, key=OUTPUT_PATH.split("/")[-1])
+
 
     # lightweight state update for downstream agents
     embedded = state.setdefault("embedded", {})

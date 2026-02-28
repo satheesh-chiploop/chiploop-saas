@@ -1,5 +1,5 @@
 import json
-from ._embedded_common import ensure_workflow_dir, llm_chat, write_artifact
+from ._embedded_common import ensure_workflow_dir, llm_chat, write_artifact, strip_markdown_fences_for_code
 
 AGENT_NAME = "Embedded Interrupt Mapping Agent"
 PHASE = "irq_map"
@@ -28,16 +28,47 @@ TOGGLES:
 
 TASK:
 Create interrupt vector mapping and ISR stubs.
+MANDATORY:
+- Include VECTOR_TABLE definition
+ 
+  VECTOR_TABLE entries must have consistent type signature: unsafe extern "C" fn()
+  VECTOR_TABLE must include:
+  #[link_section = ".vector_table"]
+  #[no_mangle]
+  Vector table MUST follow embedded production layout:
+
+pub static VECTOR_TABLE: [usize; N]
+
+Rules:
+- Entry 0 = initial stack pointer
+- Remaining entries = ISR handlers cast as usize
+- Example:
+Reset_Handler as usize
+ 
+- Provide DefaultHandler
+- Provide weak ISR handlers
+- Must compile in no_std firmware environment
+- Provide a Reset_Handler symbol (even as a stub) OR clearly reference firmware/src/lib.rs entry symbol
+- VECTOR_TABLE entries must have consistent type signature: unsafe extern "C" fn()
+- Do not reference undefined symbols
+This file is a Rust MODULE.
+
+DO NOT generate:
+#![no_std]
+#![allow(...)]
+#![feature(...)]
+
+
 OUTPUT REQUIREMENTS:
 - Write the primary output to match this path: firmware/isr/interrupts.rs
 - Keep it implementation-ready and consistent with Rust + Cargo + Verilator + Cocotb assumptions.
-- If information is missing, make reasonable assumptions and clearly list them inside the artifact.
+- If information is missing, Add assumptions only as Rust comments:// ASSUMPTION: ...
 """
 
-    out = llm_chat(prompt, system="You are a senior embedded firmware engineer for silicon bring-up and RTL co-simulation. Produce concise, production-quality outputs. Avoid markdown code fences unless explicitly asked.")
+    out = llm_chat(prompt, system="You are a senior embedded firmware engineer for silicon bring-up and RTL co-simulation. Produce concise, production-quality outputs. Produce compile-ready Rust ISR module only.Produce compile-ready Rust ISR module only.Do not emit crate attributes.")
     if not out:
         out = "ERROR: LLM returned empty output."
-
+    out = strip_markdown_fences_for_code(out)
     write_artifact(state, OUTPUT_PATH, out, key=OUTPUT_PATH.split("/")[-1])
 
     # lightweight state update for downstream agents

@@ -1,5 +1,5 @@
 import json
-from ._embedded_common import ensure_workflow_dir, llm_chat, write_artifact
+from ._embedded_common import ensure_workflow_dir, llm_chat, write_artifact, strip_markdown_fences_for_code
 
 AGENT_NAME = "Embedded Register Dump Utility Agent"
 PHASE = "reg_dump"
@@ -28,16 +28,26 @@ TOGGLES:
 
 TASK:
 Create register dump utility and formatting.
+
 OUTPUT REQUIREMENTS:
 - Write the primary output to match this path: firmware/diagnostics/register_dump.rs
-- Keep it implementation-ready and consistent with Rust + Cargo + Verilator + Cocotb assumptions.
-- If information is missing, make reasonable assumptions and clearly list them inside the artifact.
+- Output MUST be raw, compile-ready Rust MODULE code only (no markdown fences, no prose).
+- This file is a Rust MODULE (not crate root). DO NOT emit crate attributes:
+  - NO #![no_std]
+  - NO #![no_main]
+  - NO #![feature(...)]
+- Do not define main().
+- Do not use undefined logging macros (e.g., debug!).
+- Provide module functions (e.g., pub fn dump_registers(...) -> String / Vec<String>) callable from firmware/src/lib.rs.
+- If information is missing, assumptions only as Rust comments at top:
+  // ASSUMPTION: ...
+
 """
 
-    out = llm_chat(prompt, system="You are a senior embedded firmware engineer for silicon bring-up and RTL co-simulation. Produce concise, production-quality outputs. Avoid markdown code fences unless explicitly asked.")
+    out = llm_chat(prompt, system="You are a senior embedded firmware engineer. Output MUST be raw, compile-ready Rust only. NEVER include markdown fences.")
     if not out:
         out = "ERROR: LLM returned empty output."
-
+    out = strip_markdown_fences_for_code(out)
     write_artifact(state, OUTPUT_PATH, out, key=OUTPUT_PATH.split("/")[-1])
 
     # lightweight state update for downstream agents

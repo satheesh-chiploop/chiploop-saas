@@ -39,8 +39,10 @@ logger = logging.getLogger("chiploop")
 logging.basicConfig(level=logging.INFO)
 
 # Soft limits to avoid PostgREST "payload string too long" on logs/artifacts fields.
-MAX_LOG_CHARS = 7500  # ~200KB
-MAX_WORKFLOW_ARTIFACTS_JSON_CHARS = 200000
+MAX_LOG_CHARS = 850  # ~200KB
+MAX_WORKFLOW_ARTIFACTS_JSON_CHARS = 850
+ENABLE_LEGACY_WORKFLOW_ARTIFACTS_INDEX = False
+MAX_LOG_LINE_CHARS = 400
 
 def _truncate_tail(s: str, max_chars: int) -> str:
     if not s:
@@ -262,7 +264,9 @@ from agents.digital.digital_smoke_exec_summary_agent import run_agent as digital
 from agents.digital.digital_rtl_signature_agent import run_agent as digital_rtl_signature_agent
 from agents.digital.digital_integration_intent_agent import run_agent as digital_integration_intent_agent
 from agents.digital.digital_top_assembly_agent import run_agent as digital_top_assembly_agent
-
+from agents.digital.digital_implementation_setup_agent import run_agent as digital_implementation_setup_agent
+from agents.digital.digital_foundry_profile_agent import run_agent as digital_foundry_profile_agent
+from agents.digital.digital_synthesis_agent import run_agent as digital_synthesis_agent
 
 
 DIGITAL_AGENT_FUNCTIONS: Dict[str, Any] = {
@@ -300,6 +304,9 @@ DIGITAL_AGENT_FUNCTIONS: Dict[str, Any] = {
     "Digital RTL Signature Agent": digital_rtl_signature_agent,
     "Digital Integration Intent Agent": digital_integration_intent_agent,
     "Digital Top Assembly Agent": digital_top_assembly_agent,
+    "Digital Implementation Setup Agent": digital_implementation_setup_agent,
+    "Digital Foundry Profile Agent": digital_foundry_profile_agent,
+    "Digital Synthesis Agent": digital_synthesis_agent,
 }
 
 
@@ -477,8 +484,11 @@ SYSTEM_AGENT_FUNCTIONS: Dict[str,Any] = {
     "Digital RTL Signature Agent": digital_rtl_signature_agent,
     "Digital Integration Intent Agent": digital_integration_intent_agent,
     "Digital Top Assembly Agent": digital_top_assembly_agent,
+    "Digital Implementation Setup Agent": digital_implementation_setup_agent,
+    "Digital Foundry Profile Agent": digital_foundry_profile_agent,
+    "Digital Synthesis Agent": digital_synthesis_agent,
     "Analog Spec Builder Agent": analog_spec_builder_agent,
-    "Analog Netlist Scaffold Agent": analog_netlist_scaffold_agent,
+    "Analog Netlist Scaffold Agent": analog_netlist_scaffold_agent, 
     "Analog Simulation Plan Agent": analog_sim_plan_agent,
     "Analog Behavioral Model Agent": analog_behavioral_model_agent,
     "Analog Behavioral Testbench Agent": analog_behavioral_tb_agent,
@@ -571,19 +581,27 @@ load_custom_agents()
 # ---------- Logging Helpers (ID-based) ----------
 # ==========================================================
 
-
-def append_log_workflow(workflow_id: str, line: str, status: Optional[str] = None,
-                        phase: Optional[str] = None, artifacts: Optional[dict] = None):
+def append_log_workflow(
+    workflow_id: str,
+    line: str,
+    status: Optional[str] = None,
+    phase: Optional[str] = None,
+    artifacts: Optional[dict] = None,
+):
     """
     Append a line to workflows.logs by workflow ID, and optionally update status/phase/artifacts.
 
-    Note: workflows.logs and workflows.artifacts are best-effort UI conveniences.
-    For long runs, they can hit PostgREST payload limits; we truncate/skip to keep the run alive.
+    workflows.logs is best-effort UI convenience and may be VARCHAR-limited.
+    Keep it compact; never let logging kill a run.
     """
     try:
+        # 1) Truncate the incoming line first (prevents single huge log entries)
+        safe_line = _truncate_tail(str(line or ""), MAX_LOG_LINE_CHARS)
+
+        # 2) Load current logs and append
         row = supabase.table("workflows").select("logs").eq("id", workflow_id).single().execute()
         current = (row.data or {}).get("logs") or ""
-        new_logs = (current + ("\n" if current else "") + line).strip()
+        new_logs = (current + ("\n" if current else "") + safe_line).strip()
         new_logs = _truncate_tail(new_logs, MAX_LOG_CHARS)
 
         update = {"logs": new_logs, "updated_at": datetime.utcnow().isoformat()}
@@ -592,10 +610,11 @@ def append_log_workflow(workflow_id: str, line: str, status: Optional[str] = Non
         if phase:
             update["phase"] = phase
 
-        # Avoid pushing huge artifacts JSON through this path.
+        # 3) Avoid pushing large artifacts JSON through this path
         if artifacts is not None:
             try:
-                if len(json.dumps(artifacts, ensure_ascii=False)) <= MAX_WORKFLOW_ARTIFACTS_JSON_CHARS:
+                payload = json.dumps(artifacts, ensure_ascii=False, separators=(",", ":"))
+                if len(payload) <= MAX_WORKFLOW_ARTIFACTS_JSON_CHARS:
                     update["artifacts"] = artifacts
                 else:
                     logger.warning(
@@ -606,9 +625,20 @@ def append_log_workflow(workflow_id: str, line: str, status: Optional[str] = Non
                     f"⚠️ append_log_workflow skipping artifacts update (serialization error) workflow={workflow_id}"
                 )
 
+        # 4) Write
         supabase.table("workflows").update(update).eq("id", workflow_id).execute()
+
     except Exception as e:
-        logger.warning(f"⚠️ append_log_workflow failed: {e}")
+        # Last resort: retry with ultra-small logs (never crash run due to logging)
+        try:
+            fallback = {"logs": _truncate_tail(str(line or ""), 200), "updated_at": datetime.utcnow().isoformat()}
+            if status:
+                fallback["status"] = status
+            if phase:
+                fallback["phase"] = phase
+            supabase.table("workflows").update(fallback).eq("id", workflow_id).execute()
+        except Exception:
+            logger.warning(f"⚠️ append_log_workflow failed: {e}")
 
 
 def append_log_run(run_id: str, line: str, status: Optional[str] = None,
@@ -1247,26 +1277,33 @@ def execute_workflow_background(
                             f.write(str(result.get("artifact") or ""))
 
                     
+                    if ENABLE_LEGACY_WORKFLOW_ARTIFACTS_INDEX:
+                        # Persist artifacts metadata on workflow row
+                        row = supabase.table("workflows").select("artifacts").eq("id", workflow_id).single().execute()
+                        artifacts = (row.data or {}).get("artifacts") or {}
 
-                    # Persist artifacts metadata on workflow row
-                    row = supabase.table("workflows").select("artifacts").eq("id", workflow_id).single().execute()
-                    artifacts = (row.data or {}).get("artifacts") or {}
+                        existing = artifacts.get(step) or {}
+                        if not isinstance(existing, dict):
+                            existing = {}
+                        legacy = {
+                            "artifact": (f"/{out_path}" if out_path else None),
+                        #    "local_artifact_log": result.get("artifact_log"),
+                        #    "log": result.get("log"),
+                        #    "code": result.get("code"),
+                        }
 
-                    existing = artifacts.get(step) or {}
-                    if not isinstance(existing, dict):
-                        existing = {}
-                    legacy = {
-                        "artifact": (f"/{out_path}" if out_path else None),
-                    #    "local_artifact_log": result.get("artifact_log"),
-                    #    "log": result.get("log"),
-                    #    "code": result.get("code"),
-                    }
-
-                    # ✅ Merge legacy fields into existing per-file artifacts (do NOT replace)
-                    existing.update({k: v for k, v in legacy.items() if v is not None})
-                    artifacts[step] = existing    
-                    
-                    supabase.table("workflows").update({"artifacts": artifacts}).eq("id", workflow_id).select("id").execute()
+                        # ✅ Merge legacy fields into existing per-file artifacts (do NOT replace)
+                        existing.update({k: v for k, v in legacy.items() if v is not None})
+                        artifacts[step] = existing    
+                        try:
+                            payload = json.dumps(artifacts, ensure_ascii=False, separators=(",", ":"))
+                            if len(payload) <= 7000:
+                                supabase.table("workflows").update({"artifacts": artifacts}).eq("id", workflow_id).execute()
+                            else:
+                                logger.warning(f"⚠️ Skipping workflows.artifacts update (payload too long) workflow={workflow_id}")
+                        except Exception as e:
+                                logger.warning(f"⚠️ Skipping workflows.artifacts update (error) workflow={workflow_id}: {e}")
+              
 
                 msg = f"✅ {step} done"
                 logger.info(msg)

@@ -77,6 +77,21 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "Digital Top Assembly Agent",
       desc: "Generates top-level assembly RTL (top_module.sv) from integration intent."
     },
+    {
+      uiLabel: "Digital Foundry Profile Agent",
+      backendLabel: "Digital Foundry Profile Agent",
+      desc: "Creates a scalable foundry profile and corner policy. Locks default PVT to ss_100C_1v60 and prepares multi-corner strategy for PostRoute STA."
+    },
+    {
+      uiLabel: "Digital Implementation Setup Agent",
+      backendLabel: "Digital Implementation Setup Agent",
+      desc: "Wires design-provided SDC collateral and generates OpenLane2 configuration. Uses default corner for synthesis→route and enables multi-corner STA for PostRoute."
+    },
+    {
+      uiLabel: "Digital Synthesis Agent",
+      backendLabel: "Digital Synthesis Agent",
+      desc: "Runs OpenLane2 synthesis (Yosys) using the workflow OpenLane config + selected SDC. Produces synth netlist + key reports/logs."
+    },
   ],
   analog: [
     { uiLabel: "Analog Spec Builder Agent", backendLabel: "Analog Spec Builder Agent", desc: "Extracts structured analog spec (pins, modes, targets, corners, validation intent)" },
@@ -176,6 +191,21 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       uiLabel: "Digital Top Assembly Agent",
       backendLabel: "Digital Top Assembly Agent",
       desc: "Generates top-level assembly RTL (top_module.sv) from integration intent."
+    },
+    {
+      uiLabel: "Digital Foundry Profile Agent",
+      backendLabel: "Digital Foundry Profile Agent",
+      desc: "Creates a scalable foundry profile and corner policy. Locks default PVT to ss_100C_1v60 and prepares multi-corner strategy for PostRoute STA."
+    },
+    {
+      uiLabel: "Digital Implementation Setup Agent",
+      backendLabel: "Digital Implementation Setup Agent",
+      desc: "Wires design-provided SDC collateral and generates OpenLane2 configuration. Uses default corner for synthesis→route and enables multi-corner STA for PostRoute."
+    },
+    {
+      uiLabel: "Digital Synthesis Agent",
+      backendLabel: "Digital Synthesis Agent",
+      desc: "Runs OpenLane2 synthesis (Yosys) using the workflow OpenLane config + selected SDC. Produces synth netlist + key reports/logs."
     },
     { uiLabel: "Validation Instrument Setup Agent", backendLabel: "Validation Instrument Setup Agent", desc: "Resolves the user's bench setup from registered instruments (or defaults) and writes bench_setup.json for downstream validation agents." },
     { uiLabel: "Validation Test Plan Agent", backendLabel: "Validation Test Plan Agent", desc: "Generates a structured hardware validation test plan from datasheet/spec text; uses generic instrument types (psu/dmm/scope)." },

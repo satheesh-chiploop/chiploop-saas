@@ -1,5 +1,5 @@
 import json
-from ._embedded_common import ensure_workflow_dir, llm_chat, write_artifact, strip_markdown_fences_for_code
+from ._embedded_common import ensure_workflow_dir, llm_chat, write_artifact, strip_markdown_fences_for_code,strip_outer_markdown_fences
 
 AGENT_NAME = "Embedded Reset Sequencing Agent"
 PHASE = "reset_sequence"
@@ -40,8 +40,10 @@ OUTPUT PATH:
 - {OUTPUT_MD}
 """
     out_md = llm_chat(prompt_md, system="You are a senior embedded firmware engineer. Be specific and deterministic.").strip()
+    out_md = strip_outer_markdown_fences(out_md)
     if not out_md:
         out_md = "ERROR: LLM returned empty output."
+
     write_artifact(state, OUTPUT_MD, out_md, key=OUTPUT_MD.split("/")[-1])
 
     # 2) Implementation skeleton (rs) - raw Rust only
