@@ -43,7 +43,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Digital Architecture Agent", backendLabel: "Digital Architecture Agent", desc: "Derives block-level architecture: interfaces, datapaths/control paths, and high-level tradeoffs from the digital spec" },
     { uiLabel: "Digital Microarchitecture Agent", backendLabel: "Digital Microarchitecture Agent", desc: "Refines architecture into implementable microarchitecture: FSMs, pipelines, queues, arbitration, and latency/throughput notes" },
     { uiLabel: "Digital Register Map Agent", backendLabel: "Digital Register Map Agent", desc: "Generates CSR/register map definitions: address map, fields, access types (RW/RO/WO), reset values, and side effects" },
-    { uiLabel: "Digital Clock & Reset Architecture Agent", backendLabel: "Digital Clock & Reset Architecture AgentDigital Clock & Reset Architecture Agent", desc: "Defines clock/reset intent: clock domains, reset strategies, and CDC-aware intent (no implementation)" },
+    { uiLabel: "Digital Clock & Reset Architecture Agent", backendLabel: "Digital Clock & Reset Architecture Agent", desc: "Defines clock/reset intent: clock domains, reset strategies, and CDC-aware intent (no implementation)" },
     { uiLabel: "Digital RTL Linting Agent", backendLabel: "Digital RTL Linting Agent", desc: "Runs RTL lint-style checks: coding guideline violations, synthesizability red flags, and style issues" },
     { uiLabel: "Digital CDC Analysis Agent", backendLabel: "Digital CDC Analysis Agent", desc: "Analyzes clock-domain crossings and flags required synchronizers/handshakes (intent-level, not tool-specific implementation)" },
     { uiLabel: "Digital Reset Integrity Agent", backendLabel: "Digital Reset Integrity Agent", desc: "Checks reset safety: async/sync usage patterns, deassertion concerns, reset-domain interactions, and common pitfalls" },
@@ -91,6 +91,71 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       uiLabel: "Digital Synthesis Agent",
       backendLabel: "Digital Synthesis Agent",
       desc: "Runs OpenLane2 synthesis (Yosys) using the workflow OpenLane config + selected SDC. Produces synth netlist + key reports/logs."
+    },
+    {
+      uiLabel: "Digital STA PrePlace Agent",
+      backendLabel: "Digital STA PrePlace Agent",
+      desc: "Runs OpenLane2 STA before floorplan/place (early timing sanity). Produces metrics.json."
+    },
+    {
+      uiLabel: "Digital Floorplan Agent",
+      backendLabel: "Digital Floorplan Agent",
+      desc: "Runs OpenLane2 floorplan stage. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital Placement Agent",
+      backendLabel: "Digital Placement Agent",
+      desc: "Runs OpenLane2 placement stage. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital STA PostPlace Agent",
+      backendLabel: "Digital STA PostPlace Agent",
+      desc: "Runs OpenLane2 STA after placement. Produces metrics.json."
+    },
+    {
+      uiLabel: "Digital CTS Agent",
+      backendLabel: "Digital CTS Agent",
+      desc: "Runs OpenLane2 CTS stage. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital STA PostCTS Agent",
+      backendLabel: "Digital STA PostCTS Agent",
+      desc: "Runs OpenLane2 STA after CTS. Produces metrics.json."
+    },
+    {
+      uiLabel: "Digital Route Agent",
+      backendLabel: "Digital Route Agent",
+      desc: "Runs OpenLane2 detailed routing. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital STA PostRoute Agent",
+      backendLabel: "Digital STA PostRoute Agent",
+      desc: "Runs OpenLane2 signoff STA after routing. Produces metrics.json."
+    },
+    {
+      uiLabel: "Digital Fill Agent",
+      backendLabel: "Digital Fill Agent",
+      desc: "Runs OpenLane2 fill insertion. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital DRC Agent",
+      backendLabel: "Digital DRC Agent",
+      desc: "Runs OpenLane2 DRC (KLayout). Produces metrics.json + DRC summary."
+    },
+    {
+      uiLabel: "Digital LVS Agent",
+      backendLabel: "Digital LVS Agent",
+      desc: "Runs OpenLane2 LVS (Netgen). Produces metrics.json + LVS summary."
+    },
+    {
+      uiLabel: "Digital Tapeout Agent",
+      backendLabel: "Digital Tapeout Agent",
+      desc: "Runs OpenLane2 stream-out to GDS (KLayout/Magic) and optional XOR. Produces metrics.json + GDS paths."
+    },
+    {
+      uiLabel: "Digital Executive Summary Agent",
+      backendLabel: "Digital Executive Summary Agent",
+      desc: "Parses metrics across stages and generates executive_summary.md/json. No fake precision."
     },
   ],
   analog: [
@@ -206,6 +271,71 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       uiLabel: "Digital Synthesis Agent",
       backendLabel: "Digital Synthesis Agent",
       desc: "Runs OpenLane2 synthesis (Yosys) using the workflow OpenLane config + selected SDC. Produces synth netlist + key reports/logs."
+    },
+    {
+      uiLabel: "Digital STA PrePlace Agent",
+      backendLabel: "Digital STA PrePlace Agent",
+      desc: "Runs OpenLane2 STA before floorplan/place (early timing sanity). Produces metrics.json."
+    },
+    {
+      uiLabel: "Digital Floorplan Agent",
+      backendLabel: "Digital Floorplan Agent",
+      desc: "Runs OpenLane2 floorplan stage. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital Placement Agent",
+      backendLabel: "Digital Placement Agent",
+      desc: "Runs OpenLane2 placement stage. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital STA PostPlace Agent",
+      backendLabel: "Digital STA PostPlace Agent",
+      desc: "Runs OpenLane2 STA after placement. Produces metrics.json."
+    },
+    {
+      uiLabel: "Digital CTS Agent",
+      backendLabel: "Digital CTS Agent",
+      desc: "Runs OpenLane2 CTS stage. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital STA PostCTS Agent",
+      backendLabel: "Digital STA PostCTS Agent",
+      desc: "Runs OpenLane2 STA after CTS. Produces metrics.json."
+    },
+    {
+      uiLabel: "Digital Route Agent",
+      backendLabel: "Digital Route Agent",
+      desc: "Runs OpenLane2 detailed routing. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital STA PostRoute Agent",
+      backendLabel: "Digital STA PostRoute Agent",
+      desc: "Runs OpenLane2 signoff STA after routing. Produces metrics.json."
+    },
+    {
+      uiLabel: "Digital Fill Agent",
+      backendLabel: "Digital Fill Agent",
+      desc: "Runs OpenLane2 fill insertion. Produces primary.def + metrics.json."
+    },
+    {
+      uiLabel: "Digital DRC Agent",
+      backendLabel: "Digital DRC Agent",
+      desc: "Runs OpenLane2 DRC (KLayout). Produces metrics.json + DRC summary."
+    },
+    {
+      uiLabel: "Digital LVS Agent",
+      backendLabel: "Digital LVS Agent",
+      desc: "Runs OpenLane2 LVS (Netgen). Produces metrics.json + LVS summary."
+    },
+    {
+      uiLabel: "Digital Tapeout Agent",
+      backendLabel: "Digital Tapeout Agent",
+      desc: "Runs OpenLane2 stream-out to GDS (KLayout/Magic) and optional XOR. Produces metrics.json + GDS paths."
+    },
+    {
+      uiLabel: "Digital Executive Summary Agent",
+      backendLabel: "Digital Executive Summary Agent",
+      desc: "Parses metrics across stages and generates executive_summary.md/json. No fake precision."
     },
     { uiLabel: "Validation Instrument Setup Agent", backendLabel: "Validation Instrument Setup Agent", desc: "Resolves the user's bench setup from registered instruments (or defaults) and writes bench_setup.json for downstream validation agents." },
     { uiLabel: "Validation Test Plan Agent", backendLabel: "Validation Test Plan Agent", desc: "Generates a structured hardware validation test plan from datasheet/spec text; uses generic instrument types (psu/dmm/scope)." },
