@@ -70,6 +70,25 @@ export default function AppsHomePage() {
       promise: "Generate RTL + docs + handoff artifacts",
     },
     {
+      slug: "arch2synthesis",
+      title: "Arch2Synthesis",
+      subtitle: "Arch2RTL + Synthesis (or RTL → Synthesis) with reports",
+      loop_type: "digital",
+      status: "Flagship",
+      nudge: "Fast path",
+      promise: "Get clean netlist + timing/area/power reports",
+    },
+    
+    {
+      slug: "arch2tapeout",
+      title: "Arch2Tapeout",
+      subtitle: "Arch2RTL + Synthesis + RTL→GDS pipeline (partial runs supported)",
+      loop_type: "digital",
+      status: "Flagship",
+      nudge: "End-to-end",
+      promise: "Run RTL→GDS with DRC/LVS/Tapeout + exec summary",
+    },
+    {
       slug: "dqa",
       title: "DQA",
       subtitle: "CDC + RDC + Lint + Synthesis readiness quality gate",
@@ -291,7 +310,7 @@ export default function AppsHomePage() {
     },
   ]), []);
 
-  const featured = apps.find(a => a.slug === "validation-run") || apps[0];
+  const featured = apps.find(a => a.slug === "arch2tapeout") || apps[0];
 
   const FLAGSHIP_SLUGS = new Set<string>([
     // Validation (1–2)
@@ -300,6 +319,7 @@ export default function AppsHomePage() {
 
     // Digital (1–2)
     "arch2rtl",
+    "arch2synthesis"
     "dqa",
 
     // Analog (1–2)
@@ -333,6 +353,8 @@ export default function AppsHomePage() {
     
       // Digital (dedicated pages)
       "arch2rtl": "/apps/arch2rtl",
+      "arch2synthesis": "/apps/arch2synthesis",
+      "arch2tapeout": "/apps/arch2tapeout",
       "integrate": "/apps/integrate",
       "dqa": "/apps/dqa",
       "verify": "/apps/verify",
