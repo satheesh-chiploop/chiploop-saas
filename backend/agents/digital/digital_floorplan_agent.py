@@ -3,6 +3,8 @@ import json
 import glob
 import shutil
 import subprocess
+import re
+
 from datetime import datetime
 
 from utils.artifact_utils import save_text_artifact_and_record
@@ -38,8 +40,8 @@ def _run(cmd: list[str], cwd: str) -> tuple[int, str]:
     return p.returncode, out
 
 
-def _latest_run_dir(stage_dir: str) -> str | None:
-    runs_dir = os.path.join(stage_dir, "runs")
+def _latest_run_dir(run_work_dir: str) -> str | None:
+    runs_dir = os.path.join(run_work_dir, "runs")
     if not os.path.isdir(runs_dir):
         return None
     dirs = [os.path.join(runs_dir, d) for d in os.listdir(runs_dir) if os.path.isdir(os.path.join(runs_dir, d))]
@@ -73,12 +75,21 @@ def _copy_primary_def(latest: str | None, stage_dir: str) -> str | None:
     shutil.copy2(candidates[-1], dst)
     return dst
 
+def _infer_top_from_netlist(netlist_path: str) -> str | None:
+    try:
+        txt = open(netlist_path, "r", encoding="utf-8", errors="ignore").read()
+    except Exception:
+        return None
+    m = re.search(r'^\s*module\s+([A-Za-z_][A-Za-z0-9_$]*)\s*\(', txt, flags=re.MULTILINE)
+    return m.group(1) if m else None
+
 
 def run_agent(state: dict) -> dict:
     print(f"\n🏁 Running {AGENT_NAME}...")
 
     workflow_id = state.get("workflow_id", "default")
     workflow_dir = state.get("workflow_dir") or f"backend/workflows/{workflow_id}"
+    workflow_dir = os.path.abspath(workflow_dir)
 
     stage_dir = os.path.join(workflow_dir, "digital", "floorplan")
     logs_dir = os.path.join(stage_dir, "logs")
@@ -104,19 +115,108 @@ def run_agent(state: dict) -> dict:
     if not os.path.exists(base_cfg_path):
         raise RuntimeError("Missing OpenLane config. Expected digital/foundry/openlane/config.json or digital/synth/config.json")
 
-    cfg = _read_json(base_cfg_path)
-    # Force SDC reference to stage-local copy
-    cfg["SYNTH_SDC_FILE"] = "constraints/top.sdc"
-    cfg["PNR_SDC_FILE"] = "constraints/top.sdc"
 
-    config_path = os.path.join(stage_dir, "config.json")
-    _write_text(config_path, json.dumps(cfg, indent=2))
+    # Add near the top with other dirs
+    netlist_dir = os.path.join(stage_dir, "netlist")
+    _ensure_dir(netlist_dir)
+
+    cfg = _read_json(base_cfg_path)
+
+    # 1) Do NOT set SYNTH_SDC_FILE here (OpenLane2 warns unknown in your logs)
+    cfg.pop("SYNTH_SDC_FILE", None)
+
+    # 2) Always stage-local SSOT SDC
+    cfg["PNR_SDC_FILE"] = "inputs/constraints/top.sdc"
+
+    # 3) Ensure netlist exists locally (so VERILOG_FILES resolves inside /work mount)
+    synth_netlists = sorted(glob.glob(os.path.join(workflow_dir, "digital", "synth", "netlist", "*.v")))
+    if not synth_netlists:
+        synth_netlists = sorted(glob.glob(os.path.join(workflow_dir, "digital", "synth", "**", "*.v"), recursive=True))
+    if not synth_netlists:
+        raise RuntimeError("No synthesized netlist found. Expected digital/synth/netlist/*.v")
+
+    for nl in synth_netlists:
+       shutil.copy2(nl, os.path.join(netlist_dir, os.path.basename(nl)))
+
+    stage_netlists = sorted(glob.glob(os.path.join(netlist_dir, "*.v")))
+    if not stage_netlists:
+       raise RuntimeError(f"No netlists copied into {netlist_dir}")
+
+    cfg["VERILOG_FILES"] = [f"inputs/netlist/{os.path.basename(p)}" for p in stage_netlists]
+
+    
+    spec_dir = os.path.join(workflow_dir, "spec")
+    spec_jsons = sorted(glob.glob(os.path.join(spec_dir, "*_spec.json")))
+    spec = _read_json(spec_jsons[0]) if spec_jsons else {}
+
+    top_module = (
+        spec.get("design_name")
+        or spec.get("top_module")
+        or state.get("design_name")
+        or cfg.get("DESIGN_NAME")
+        or "top"
+    )
+    top_module = str(top_module).strip() or "top"
+
+    # If still defaulting to 'top', infer from the synthesized netlist in this stage
+    inferred = None
+    if top_module == "top":
+        stage_netlists = sorted(glob.glob(os.path.join(netlist_dir, "*.v")))
+        inferred = _infer_top_from_netlist(stage_netlists[0]) if stage_netlists else None
+    if inferred:
+        top_module = inferred
+
+    cfg["DESIGN_NAME"] = top_module
+
+ 
 
     # ---- Docker/run.sh ----
     pdk_variant = state.get("pdk_variant") or DEFAULT_PDK_VARIANT
     openlane_image = state.get("openlane_image") or DEFAULT_OPENLANE_IMAGE
     pdk_root_host = os.getenv("CHIPLOOP_PDK_ROOT_HOST") or "/root/chiploop-backend/backend/pdk"
-    run_tag = f"floorplan_{workflow_id}"
+
+    # -------------------------------------------------------
+    # Shared OpenLane run workspace + run tag (generic)
+    # -------------------------------------------------------
+
+    # -------------------------------------------------------
+    # Shared OpenLane run workspace + run tag (generic)
+    # MUST be defined BEFORE using work_stage_dir
+    # -------------------------------------------------------
+    explicit = state.get("run_tag") or state.get("digital_run_tag")
+    wf_name = state.get("workflow_name") or state.get("workflow_type") or state.get("flow_name") or "digital"
+    run_tag = explicit or f"{wf_name}_{workflow_id}"
+    state["digital_run_tag"] = run_tag
+
+    run_work_dir = state.get("digital_run_work_dir") or os.path.join(workflow_dir, "digital", "run_work")
+    run_work_dir = os.path.abspath(run_work_dir)
+    _ensure_dir(run_work_dir)
+    state["digital_run_work_dir"] = run_work_dir
+
+    work_stage_dir = os.path.join(run_work_dir, "floorplan")
+    _ensure_dir(work_stage_dir)
+
+    # Now safe to write execution config into shared workspace
+    exec_config_path = os.path.join(work_stage_dir, "config.json")
+    _write_text(exec_config_path, json.dumps(cfg, indent=2))
+
+    # Also keep a copy in stage_dir for contract/debug
+    config_path = os.path.join(stage_dir, "config.json")
+    _write_text(config_path, json.dumps(cfg, indent=2))
+
+    # Now it is safe to copy constraints/netlists into work_stage_dir
+    # Shared inputs live at /work/inputs so relative paths resolve from cd /work
+    inputs_dir = os.path.join(run_work_dir, "inputs")
+    inputs_constraints_dir = os.path.join(inputs_dir, "constraints")
+    inputs_netlist_dir = os.path.join(inputs_dir, "netlist")
+    _ensure_dir(inputs_constraints_dir)
+    _ensure_dir(inputs_netlist_dir)
+
+    shutil.copy2(stage_sdc, os.path.join(inputs_constraints_dir, "top.sdc"))
+
+    for p in stage_netlists:
+        shutil.copy2(p, os.path.join(inputs_netlist_dir, os.path.basename(p)))
+
 
     run_sh = f"""#!/usr/bin/env bash
 set -euo pipefail
@@ -128,13 +228,15 @@ echo "WORKDIR=/work"
 
 export OPENLANE_NUM_CORES={DEFAULT_NUM_CORES}
 
-docker run --rm \\
-  -v "{pdk_root_host}":/pdk \\
-  -v "$(pwd)":/work \\
-  -e PDK={pdk_variant} \\
-  -e PDK_ROOT=/pdk \\
-  {openlane_image} \\
-  bash -lc 'set -e; echo "PDK listing:"; ls -la /pdk | head -n 50; cd /work && openlane --flow Classic --run-tag {run_tag} --to OpenROAD.Floorplan config.json'
+docker run --rm \
+  -v "{pdk_root_host}":/pdk \
+  -v "{run_work_dir}":/work \
+  -e PDK={pdk_variant} \
+  -e PDK_ROOT=/pdk \
+  {openlane_image} \
+  bash -lc 'set -e; cd /work && openlane --flow Classic --run-tag {run_tag} --to OpenROAD.Floorplan floorplan/config.json'
+
+
 """
     run_sh_path = os.path.join(stage_dir, "run.sh")
     _write_text(run_sh_path, run_sh)
@@ -144,7 +246,7 @@ docker run --rm \\
     log_path = os.path.join(logs_dir, "openlane_floorplan.log")
     _write_text(log_path, out)
 
-    latest = _latest_run_dir(stage_dir)
+    latest = _latest_run_dir(run_work_dir)
     metrics_path = _copy_metrics(latest, stage_dir)
     def_path = _copy_primary_def(latest, stage_dir)
 
