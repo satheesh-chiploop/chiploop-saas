@@ -319,7 +319,7 @@ export default function AppsHomePage() {
 
     // Digital (1–2)
     "arch2rtl",
-    "arch2synthesis"
+    "arch2synthesis",
     "dqa",
 
     // Analog (1–2)
