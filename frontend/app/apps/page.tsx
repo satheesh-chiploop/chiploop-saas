@@ -300,14 +300,44 @@ export default function AppsHomePage() {
       nudge: "New",
       promise: "Co-sim results + coverage report",
     },
+    // ✅ SYSTEM (Tiny Sensor Hub SoC)
     {
-      slug: "system-intelligence-analyzer",
-      title: "System Intelligence Analyzer",
-      subtitle: "Power/perf bottlenecks across blocks",
+      slug: "system-end2end",
+      title: "System End2End",
+      subtitle: "Digital + Analog + SoC integration → Sim + PD + Firmware → ZIP",
       loop_type: "system",
-      status: "Coming",
-      promise: "System-level recommendations",
+      status: "Flagship",
+      nudge: "Recommended",
+      promise: "Tapeout-ready SoC package + reports",
     },
+    {
+      slug: "system-sim",
+      title: "System Sim",
+      subtitle: "Integrate SoC + run simulation + coverage + waveforms",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "Most used",
+      promise: "Simulation report + coverage + waves",
+    },
+    {
+      slug: "system-pd",
+      title: "System PD",
+      subtitle: "SoC RTL2GDS with OpenLane2 pipeline (DRC/LVS/Tapeout)",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "GDS + DRC/LVS + exec summary",
+    },
+    {
+      slug: "system-firmware",
+      title: "System Firmware",
+      subtitle: "Register extract → driver scaffold → build → co-sim results",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Firmware drivers + co-sim report",
+    },
+
   ]), []);
 
   const featured = apps.find(a => a.slug === "arch2tapeout") || apps[0];
@@ -329,6 +359,10 @@ export default function AppsHomePage() {
     // Embedded (1–2)
     "embedded-run",
     "embedded-driver",
+
+    // System 
+    "system-end2end",
+    "system-firmware",
   ]);
 
   const flagship = apps.filter(a => a.status === "Flagship" && FLAGSHIP_SLUGS.has(a.slug));
@@ -378,6 +412,12 @@ export default function AppsHomePage() {
       "embedded-log-analyzer": "/apps/embedded-log-analyzer",
       "embedded-validate": "/apps/embedded-validate",
       "embedded-run": "/apps/embedded-run",
+
+      // ✅ SYSTEM (dedicated pages)
+      "system-end2end": "/apps/system-end2end",
+      "system-sim": "/apps/system-sim",
+      "system-pd": "/apps/system-pd",
+      "system-firmware": "/apps/system-firmware",
     };
     
     return dedicated[slug] || `/apps/${slug}`;

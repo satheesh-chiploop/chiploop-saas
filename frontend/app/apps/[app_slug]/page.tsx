@@ -47,6 +47,12 @@ export default function AppSlugRouter() {
       "embedded-validate": "/apps/embedded-validate",
       "embedded-run": "/apps/embedded-run",
 
+      // ✅ SYSTEM (dedicated pages)
+      "system-end2end": "/apps/system-end2end",
+      "system-sim": "/apps/system-sim",
+      "system-pd": "/apps/system-pd",
+      "system-firmware": "/apps/system-firmware",
+
     };
 
     const target = dedicated[slug];

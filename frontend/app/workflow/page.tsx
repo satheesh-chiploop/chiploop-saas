@@ -393,6 +393,16 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Analog Executive Summary Agent", backendLabel: "Analog Executive Summary Agent", desc: "One-page executive summary with risks, status, and next actions" },
     { uiLabel: "System CoSim Integration Agent", backendLabel: "System CoSim Integration Agent", desc: "Generates co-sim scaffolding: AXI4-Lite register block template + firmware MMIO header + basic cocotb smoke test" },
     { uiLabel: "System ISS Bridge Agent", backendLabel: "System ISS Bridge Agent", desc: "Generates scaffolding for an ISS<->RTL bridge (MMIO/IRQ contract + Verilator harness skeleton + run notes)" },
+    {
+      uiLabel: "System Integration Intent Agent",
+      backendLabel: "System Integration Intent Agent",
+      desc: "Generates SoC-level integration manifest connecting digital subsystem and analog behavioral/macro models."
+    },
+    {
+      uiLabel: "System Top Assembly Agent",
+      backendLabel: "System Top Assembly Agent",
+      desc: "Builds SoC top modules for simulation and physical design (soc_top_sim.sv and soc_top_phys.sv)."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);
