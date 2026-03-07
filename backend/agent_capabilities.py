@@ -46,12 +46,16 @@ AGENT_CAPABILITIES = {
         "outputs": ["regmap.json", "regmap.md", "digital_register_map_agent.log"],
         "description": "Generates CSR/register map definitions: address map, fields, access types (RW/RO/WO), reset values, and side effects.",
     },
-
+    
     "Digital Clock & Reset Architecture Agent": {
         "domain": "digital",
         "inputs": ["*_spec.json", "digital_architecture.json"],
-        "outputs": ["clock_reset_architecture.json", "clock_reset_architecture_agent.log","digital/constraints/top.sdc"],
-        "description": "Defines clock/reset intent: clock domains, reset strategies, and CDC-aware intent (no implementation).",
+        "outputs": [
+            "clock_reset_arch_intent.json",
+            "digital_clock_reset_arch_agent.log",
+            "digital/constraints/top.sdc"
+        ],
+        "description": "Defines clock/reset intent: clock domains, reset strategies, CDC-aware intent, and generates top.sdc for downstream digital implementation flow.",
     },
 
     "Digital RTL Agent": {
@@ -74,17 +78,19 @@ AGENT_CAPABILITIES = {
 
     "Digital CDC Analysis Agent": {
         "domain": "digital",
-        "inputs": ["*_spec.json", "*.v", "*.sv", "clock_reset_architecture.json"],
-        "outputs": ["cdc_report.md", "cdc_findings.json", "cdc_analysis_agent.log"],
-        "description": "Analyzes clock-domain crossings and flags required synchronizers/handshakes (intent-level, not tool-specific implementation).",
+        "inputs": ["*_spec.json", "*.v", "*.sv", "clock_reset_arch_intent.json"],
+        "outputs": ["cdc_report.md", "cdc_findings.json", "digital_cdc_analysis_agent.log"],
+        "description": "Analyzes clock-domain crossings and flags required synchronizers/handshakes using clock/reset intent when available.",
     },
 
     "Digital Reset Integrity Agent": {
         "domain": "digital",
-        "inputs": ["*_spec.json", "*.v", "*.sv", "clock_reset_architecture.json"],
-        "outputs": ["reset_integrity_report.md", "reset_integrity_findings.json", "reset_integrity_agent.log"],
+        "inputs": ["*_spec.json", "*.v", "*.sv", "clock_reset_arch_intent.json"],
+        "outputs": ["reset_integrity_report.md", "reset_integrity_findings.json", "digital_reset_integrity_agent.log"],
         "description": "Checks reset safety: async/sync usage patterns, deassertion concerns, reset-domain interactions, and common pitfalls.",
     },
+
+ 
 
     "Digital RTL Refactoring Agent": {
         "domain": "digital",
@@ -105,16 +111,23 @@ AGENT_CAPABILITIES = {
     # -------------------------
     "Digital Testbench Generator Agent": {
         "domain": "digital",
-        "inputs": ["*_spec.json", "*.v", "*.sv", "digital_architecture.json", "digital_microarchitecture.json", "regmap.json", "clock_reset_architecture.json"],
-        # Generated/uploaded by the agent into vv/tb (filenames are stable except test_<top>.py)
+        "inputs": [
+            "*_spec.json",
+            "*.v",
+            "*.sv",
+            "digital_architecture.json",
+            "digital_microarchitecture.json",
+            "regmap.json",
+            "clock_reset_arch_intent.json"
+        ],
         "outputs": [
             "vv/tb/test_*.py",
             "vv/tb/Makefile",
             "vv/tb/README.md",
             "vv/tb/tb_generation_report.json",
-            "testbench_generator_agent.log",
+            "vv/testbench_generator_agent.log",
         ],
-        "description": "Generates Cocotb testbench skeletons (directed + constrained-random stub) and a Verilator-friendly Makefile using spec-derived clocks/resets/ports.",
+        "description": "Generates Cocotb testbench skeletons and a Verilator-friendly Makefile using auto-discovered spec, RTL, clocks, and resets.",
         "requires": ["cocotb", "verilator"],
     },
 
@@ -596,38 +609,51 @@ AGENT_CAPABILITIES = {
     # -------------------------
         # -------------------------
     # ANALOG (Production Scaffold)
-    # -------------------------
     "Analog Spec Builder Agent": {
         "domain": "analog",
-        "inputs": ["datasheet_text", "goal", "scope"],
+        "inputs": ["datasheet_text", "analog_datasheet", "spec", "spec_text", "goal"],
         "outputs": [
-            # legacy (keep)
             "analog/spec.json",
             "analog/spec_summary.md",
-
-            # new canonical scaffold
-            "analog/spec/spec_source.md",
             "analog/spec/spec_normalized.json",
             "analog/spec/requirements.json",
             "analog/spec/assumptions.md",
         ],
-        "description": "Extracts structured analog block spec + normalized requirements bundle (PDK-agnostic; avoids invented metrics).",
+        "description": "Normalizes a free-text analog datasheet into a structured spec JSON for downstream analog generators. This is the only analog agent that interprets free-text directly.",
     },
 
     "Analog Netlist Scaffold Agent": {
         "domain": "analog",
-        "inputs": ["analog/spec.json"],
+        "inputs": ["analog/spec/spec_normalized.json", "analog/spec.json"],
         "outputs": [
-            # legacy
-            "analog/netlist.sp",
-            "analog/netlist_summary.md",
-
-            # new canonical scaffold
-            "analog/netlist/ldo_top.sp",
+            "analog/netlist/<block_name>_top.sp",
             "analog/netlist/models/models.placeholder.inc",
             "analog/netlist/README.md",
+            "analog/netlist.sp",
+            "analog/netlist_summary.md",
         ],
-        "description": "Generates a PDK-agnostic SPICE netlist scaffold aligned to spec pins and intent, plus model placeholder include + README.",
+        "description": "Creates a spec-driven SPICE interface scaffold using the normalized analog spec. No block-type assumptions are hardcoded.",
+    },
+
+    "Analog Behavioral Model Agent": {
+        "domain": "analog",
+        "inputs": ["analog/spec/spec_normalized.json", "analog/spec.json"],
+        "outputs": [
+            "analog/model.sv",
+            "analog/model_params.json",
+            "analog/model_notes.md",
+        ],
+        "description": "Creates a deterministic behavioral SystemVerilog scaffold from the normalized analog spec, including ports and behavioral contract notes.",
+    },
+
+    "Analog Behavioral Testbench Agent": {
+        "domain": "analog",
+        "inputs": ["analog/spec/spec_normalized.json", "analog/spec.json", "analog/model.sv"],
+        "outputs": [
+            "analog/behavioral/tb_<block_name>_behavioral.sv",
+            "analog/tb.sv",
+        ],
+        "description": "Creates a spec-driven behavioral testbench from the normalized analog spec and generated model. Signal declarations and instance port maps are derived from the spec.",
     },
 
     "Analog Simulation Plan Agent": {
@@ -674,29 +700,7 @@ AGENT_CAPABILITIES = {
         "description": "Creates sweeps/corners/metrics plan AND runnable multi-simulator scaffold (ngspice/spectre/hspice) with bash runners + deck templates + metrics extraction stub.",
     },
 
-    "Analog Behavioral Model Agent": {
-        "domain": "analog",
-        "inputs": ["analog/spec.json"],
-        "outputs": [
-            # deterministic output (production)
-            "analog/model.sv",
-            "analog/model_params.json",
-            "analog/model_notes.md",
-        ],
-        "description": "Creates deterministic RNM SystemVerilog behavioral model template + tuning params + limitations notes (no Verilog-A output in production scaffold).",
-    },
 
-    "Analog Behavioral Testbench Agent": {
-        "domain": "analog",
-        "inputs": ["analog/spec.json", "analog/model.sv"],
-        "outputs": [
-            # canonical
-            "analog/behavioral/tb_ldo_behavioral.sv",
-            # legacy
-            "analog/tb.sv",
-        ],
-        "description": "Generates RNM SystemVerilog testbench stimuli for the behavioral model (canonical behavioral folder + legacy compatibility).",
-    },
 
     "Analog Behavioral Assertions Agent": {
         "domain": "analog",
@@ -1016,16 +1020,29 @@ AGENT_CAPABILITIES = {
     },
 
     "System Integration Intent Agent": {
-        "description": "Generates SoC integration manifest describing how digital subsystem and analog blocks connect at system level.",
+        "domain": "system",
         "inputs": [
-            "system_integration_description",
-            "digital_rtl_signatures",
-            "analog_rtl_signatures"
+           "system_integration_description",
+           "soc_integration_description",
+           "integration_description",
+           "digital_rtl_signatures",
+           "rtl_signatures",
+           "integrate/rtl_signatures.json",
+           "analog_rtl_signatures",
+           "analog_signatures",
+           "analog_behavioral_module(optional)",
+           "analog_macro_module(optional)",
+           "top_module(optional)",
+           "soc_top_name(optional)"
         ],
         "outputs": [
-            "system/integrate/system_integration_intent.json"
-        ]
+           "system/integrate/system_integration_intent.json",
+           "system/integrate/system_integration_intent_raw.txt"
+        ],
+        "description": "Generates a strict SoC integration manifest for top assembly. Supports state-provided or artifact-discovered RTL signatures and sim/phys analog module overrides."
     },
+
+ 
 
     "System Top Assembly Agent": {
         "description": "Generates SoC top modules for simulation and physical design using integration manifest.",

@@ -1558,12 +1558,13 @@ async def apps_validation_run(request: Request, background_tasks: BackgroundTask
 #  SYSTEM APPS ( System_End2End, System_PD, System_Firmware, System_Sim)
 # ======================================================================
 
+
+
 class SystemAppIn(BaseModel):
-    digital_spec: Dict[str, Any]
-    analog_spec: Dict[str, Any]
-    soc_integration_spec: Dict[str, Any]
-
-
+    project_name: Optional[str] = None
+    digital_spec_text: str
+    analog_spec_text: str
+    soc_integration_spec_text: str
 
 # ==========================================================
 # ✅ DIGITAL APPS (Arch2RTL / DQA / Verify) — same pattern as Validation Run App
@@ -4483,22 +4484,47 @@ def execute_system_app_background(
     payload
 ):
     try:
+        os.makedirs(artifact_dir, exist_ok=True)
 
-        append_log_run(run_id, f"Running workflow {template_workflow_name}")
+        shared_state = {
+            "workflow_id": workflow_id,
+            "run_id": run_id,
+            "artifact_dir": artifact_dir,
+            "supabase_client": supabase,
+            "user_id": user_id,
+        }
 
-        run_workflow_template(
-            template_workflow_name,
-            workflow_id,
-            run_id,
-            user_id,
-            artifact_dir,
-            payload
+        # Inject app payload into shared_state (same style as other app executors)
+        for k, v in (payload or {}).items():
+            if v is not None:
+                shared_state[k] = v
+
+        append_log_workflow(workflow_id, f"🚀 Starting System App: {template_workflow_name}", phase="start")
+        append_log_run(run_id, f"🚀 Starting System App: {template_workflow_name}")
+
+        append_log_workflow(workflow_id, f"▶️ Loading Studio workflow: {template_workflow_name}", phase="load")
+        append_log_run(run_id, f"▶️ Loading Studio workflow: {template_workflow_name}")
+
+        # Load Studio workflow and resolve nodes exactly like digital/embedded/validation style
+        defn = _load_workflow_def_by_name(template_workflow_name, user_id=user_id)
+        nodes = _definition_to_executor_nodes(defn)
+
+        # Execute using system loop map
+        _run_nodes_with_shared_state(
+            workflow_id=workflow_id,
+            run_id=run_id,
+            loop_type="system",
+            nodes=nodes,
+            shared_state=shared_state,
         )
 
-        append_log_run(run_id, "✅ System workflow completed")
+        append_log_workflow(workflow_id, f"🎉 System App complete: {template_workflow_name}", status="completed", phase="done")
+        append_log_run(run_id, f"🎉 System App complete: {template_workflow_name}", status="completed")
 
     except Exception as e:
-        append_log_run(run_id, f"❌ System workflow failed: {e}")
+        err = f"❌ System App crashed ({template_workflow_name}): {type(e).__name__}: {e}\n{traceback.format_exc()}"
+        append_log_workflow(workflow_id, err, status="failed", phase="error")
+        append_log_run(run_id, err, status="failed")
 # ---------------- Embedded app endpoints ----------------
 
 @app.post("/apps/embedded/hal/run")
