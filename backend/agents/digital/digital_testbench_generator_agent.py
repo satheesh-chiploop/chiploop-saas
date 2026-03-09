@@ -59,12 +59,13 @@ def _collect_rtl_files(workflow_dir: str) -> List[str]:
     rtl.sort()
     return rtl
 
+
 def _pick_top_module(spec: Dict[str, Any], rtl_files: List[str], state_top: Optional[str]) -> str:
-    if state_top:
-        return state_top
     top = (spec.get("top_module") or {}).get("name")
     if isinstance(top, str) and top.strip():
         return top.strip()
+    if state_top:
+        return state_top
     mod_re = re.compile(r"^\s*module\s+([a-zA-Z_][a-zA-Z0-9_$]*)\b")
     for f in rtl_files:
         try:
@@ -209,7 +210,13 @@ def _gen_cocotb_test(spec: Dict[str, Any], top: str, clocks: List[str], resets: 
 
     init_block = "\n".join(init_lines) if init_lines else "    # No extra input ports found to init."
 
-    port_names = [p.get("name") for p in ports if p.get("name")]
+  
+
+    port_names = [
+        p.get("name")
+        for p in ports
+        if p.get("name") and str(p.get("direction", "")).lower() in ("input", "inout")
+    ]
 
     return f'''"""Auto-generated Cocotb testbench skeleton for: {top}
 
@@ -319,18 +326,43 @@ def run_agent(state: dict) -> dict:
         f.write("Testbench Generator Agent Log\n")
 
 
-    spec_path = state.get("spec_json")
+    spec_path = (
+        state.get("spec_json")
+        or state.get("digital_spec_json")
+    )
 
     if not spec_path:
-       for root, _, files in os.walk(workflow_dir):
+        preferred = []
+        fallback = []
+
+        for root, _, files in os.walk(workflow_dir):
             for fn in files:
-                if fn.endswith("_spec.json"):
-                    spec_path = os.path.join(root, fn)
-                    break
+                if not fn.endswith(".json"):
+                    continue
+                if not fn.endswith("_spec.json") and "spec" not in fn.lower():
+                    continue
+
+                path = os.path.join(root, fn)
+                norm = path.replace("\\", "/").lower()
+
+                if "/digital/" in norm:
+                    preferred.append(path)
+                elif "/analog/" in norm:
+                    continue
+                else:
+                    fallback.append(path)
+
+        spec_path = preferred[0] if preferred else (fallback[0] if fallback else None)
                     
     spec = _safe_read_json(spec_path)
     rtl_files = state.get("rtl_files") or _collect_rtl_files(workflow_dir)
-    top = _pick_top_module(spec, rtl_files, state.get("top_module"))
+    # Prefer assembled SoC sim top when present
+    top = (
+        state.get("soc_top_sim_module")
+        or state.get("soc_top_name")
+        or _pick_top_module(spec, rtl_files, state.get("top_module"))
+    )
+ 
 
     ports = _ports_from_spec(spec)
     clocks, resets = _infer_clocks_resets(spec, ports)
@@ -349,7 +381,7 @@ TOPLEVEL_LANG ?= verilog
 TOPLEVEL      ?= {top}
 MODULE        ?= test_{top}
 
-VERILOG_SOURCES += $(shell find ../.. -name '*.v' -o -name '*.sv')
+VERILOG_SOURCES += $(shell find ../.. -name '*.v' -o -name '*.sv' | sort | uniq)
 
 SIM ?= verilator
 EXTRA_ARGS += --trace --trace-structs
@@ -398,4 +430,6 @@ NUM_ITERS=200 RANDOM_SEED=7 make TESTCASE=constrained_random_sanity
 
     state.setdefault("vv", {})
     state["vv"]["testbench"] = report
+    state["vv_testcases"] = ["smoke_test", "constrained_random_sanity"]
+    state["top_module"] = top
     return state

@@ -626,14 +626,14 @@ AGENT_CAPABILITIES = {
         "domain": "analog",
         "inputs": ["analog/spec/spec_normalized.json", "analog/spec.json"],
         "outputs": [
-            "analog/netlist/<block_name>_top.sp",
-            "analog/netlist/models/models.placeholder.inc",
-            "analog/netlist/README.md",
-            "analog/netlist.sp",
-            "analog/netlist_summary.md",
+           "analog/netlist/<block_name>_top.sp",
+           "analog/netlist.sp",
+           "analog/netlist_summary.md",
         ],
         "description": "Creates a spec-driven SPICE interface scaffold using the normalized analog spec. No block-type assumptions are hardcoded.",
     },
+
+
 
     "Analog Behavioral Model Agent": {
         "domain": "analog",
@@ -659,47 +659,28 @@ AGENT_CAPABILITIES = {
     "Analog Simulation Plan Agent": {
         "domain": "analog",
         "inputs": [
+            "analog/spec/spec_normalized.json",
             "analog/spec.json",
-            "analog/netlist.sp",          # legacy
-            "analog/netlist/ldo_top.sp",  # canonical
+            "analog/netlist.sp",
+            "analog/netlist/<block_name>_top.sp",
         ],
         "outputs": [
-            # legacy
             "analog/sim_plan.json",
             "analog/run_deck.sp",
-
-            # new canonical scaffold
             "analog/sim/sim_plan.json",
             "analog/sim/env.sh",
             "analog/sim/run_all.sh",
-
             "analog/sim/ngspice/run_all.sh",
-            "analog/sim/ngspice/decks/dc_op.sp",
-            "analog/sim/ngspice/decks/dc_sweep_vin.sp",
-            "analog/sim/ngspice/decks/ac_loopgain.sp",
-            "analog/sim/ngspice/decks/ac_psrr.sp",
-            "analog/sim/ngspice/decks/tran_loadstep.sp",
-
+            "analog/sim/ngspice/decks/*.sp",
             "analog/sim/spectre/run_all.sh",
-            "analog/sim/spectre/decks/dc_op.sp",
-            "analog/sim/spectre/decks/dc_sweep_vin.sp",
-            "analog/sim/spectre/decks/ac_loopgain.sp",
-            "analog/sim/spectre/decks/ac_psrr.sp",
-            "analog/sim/spectre/decks/tran_loadstep.sp",
-
+            "analog/sim/spectre/decks/*.sp",
             "analog/sim/hspice/run_all.sh",
-            "analog/sim/hspice/decks/dc_op.sp",
-            "analog/sim/hspice/decks/dc_sweep_vin.sp",
-            "analog/sim/hspice/decks/ac_loopgain.sp",
-            "analog/sim/hspice/decks/ac_psrr.sp",
-            "analog/sim/hspice/decks/tran_loadstep.sp",
-
+            "analog/sim/hspice/decks/*.sp",
             "analog/sim/parse/extract_metrics.py",
             "analog/sim/results/metrics.json",
         ],
-        "description": "Creates sweeps/corners/metrics plan AND runnable multi-simulator scaffold (ngspice/spectre/hspice) with bash runners + deck templates + metrics extraction stub.",
+        "description": "Creates a spec-driven multi-simulator analog simulation plan, runnable deck scaffold, and stub metrics extraction without hardcoded block-type assumptions.",
     },
-
 
 
     "Analog Behavioral Assertions Agent": {
@@ -782,25 +763,21 @@ AGENT_CAPABILITIES = {
         "domain": "analog",
         "inputs": ["analog/spec.json"],
         "outputs": [
-            # canonical
             "analog/abstract/macro.lef",
             "analog/abstract/macro_stub.lib",
             "analog/abstract/integration_notes.md",
-
-            # legacy mirror (your current agent wrote abstracts/...) :contentReference[oaicite:2]{index=2}
-            "analog/abstracts/macro.lef",
-            "analog/abstracts/macro_stub.lib",
-            "analog/abstracts/integration_notes.md",
         ],
         "description": "Generates LEF + LIB stub + integration notes for physical/timing handoff (canonical abstract/ plus legacy abstracts/ mirror).",
     },
 
     "Analog Executive Summary Agent": {
         "domain": "analog",
-        "inputs": ["*"],
+        "inputs": ["analog/spec/spec_normalized.json", "analog/sim/results/metrics.json", "analog/correlation/delta_summary.json", "*"],
         "outputs": ["analog/executive_summary.md"],
-        "description": "Creates exec-style summary with spec compliance table, risks, artifact paths, and run instructions.",
+        "description": "Creates an artifact-aware executive summary with block/module identity, compliance table, correlation risks, and artifact readiness for Analog_Run and System_Sim.",
     },
+
+    
     # -------------------------
     # EMBEDDED
     # -------------------------
@@ -1053,6 +1030,43 @@ AGENT_CAPABILITIES = {
             "system/integrate/soc_top_sim.sv",
             "system/integrate/soc_top_phys.sv"
         ]
+    },
+
+    "System Simulation Execution Agent": {
+        "domain": "system",
+        "inputs": [
+            "system/integrate/soc_top_sim.sv",
+            "vv/tb/Makefile",
+            "vv/tb/test_*.py",
+            "vv/tb/coverage_model.py(optional)",
+            "vv/tb/run_regression.py(optional)",
+            "*.v",
+            "*.sv"
+        ],
+        "outputs": [
+            "system/sim/system_sim_execution.json",
+            "system/sim/system_sim_execution.md",
+            "system/sim/logs/*.log"
+        ],
+        "description": "Runs demo System_SIM execution for 2 testcases × 2 seeds using generated Cocotb/Verilator collateral; captures pass/fail, runtime, waveforms, and raw coverage candidates.",
+        "requires": ["make", "verilator", "cocotb"],
+    },
+
+    "System Simulation Coverage Summary Agent": {
+        "domain": "system",
+        "inputs": [
+            "system/sim/system_sim_execution.json",
+            "vv/tb/coverage_model.py(optional)",
+            "vv/tb/COVERAGE.md(optional)",
+            "assertions.sv(optional)",
+            "*.log(optional)"
+        ],
+        "outputs": [
+            "system/sim/system_sim_dashboard.json",
+            "system/sim/system_sim_dashboard.md"
+        ],
+        "description": "Parses System_SIM execution artifacts and publishes demo-friendly functional/code/assertion coverage plus run summary for UI display.",
+        "requires": [],
     },
 
     # -------------------------

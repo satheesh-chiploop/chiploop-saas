@@ -18,13 +18,23 @@ def run_agent(state: dict) -> dict:
     datasheet = (
         state.get("datasheet_text")
         or state.get("analog_datasheet")
-        or state.get("spec")
+        or state.get("analog_spec_text")
         or state.get("spec_text")
+        or state.get("spec")
+        or state.get("description")
         or ""
     ).strip()
 
+  
+
     if not datasheet:
         raise ValueError("Analog datasheet not provided")
+
+    print(f"[DEBUG] analog state keys = {list(state.keys())}")
+    print(f"[DEBUG] datasheet_text present = {bool(state.get('datasheet_text'))}")
+    print(f"[DEBUG] analog_datasheet present = {bool(state.get('analog_datasheet'))}")
+    print(f"[DEBUG] spec present = {bool(state.get('spec'))}")
+    print(f"[DEBUG] spec_text present = {bool(state.get('spec_text'))}")
 
     prompt = f"""
 You are an analog design architect.
@@ -53,6 +63,13 @@ Datasheet:
         raise RuntimeError("LLM failed to produce valid analog spec")
 
     block = spec.get("block_name", "analog_block")
+
+
+    
+    # 🔧 Canonical naming rule
+    # behavioral model module name must always be <block>_model
+    spec["block_name"] = block
+    spec["module_name"] = f"{block}_model"
 
     spec_path = os.path.join(spec_dir, "spec_normalized.json")
 

@@ -1,5 +1,7 @@
 from utils.artifact_utils import save_text_artifact_and_record
-
+import os
+import json
+import glob
 
 def _fmt(v):
     return "NA" if v is None else str(v)
@@ -42,24 +44,119 @@ def run_agent(state: dict) -> dict:
     spec = state.get("analog_spec") or {}
     req = _get_requirements(state)
 
+
+
     sim_metrics = state.get("analog_sim_metrics") or {}
     beh_metrics = state.get("analog_behavioral_metrics") or {}
 
+    workflow_dir = state.get("workflow_dir", f"backend/workflows/{workflow_id}")
+
+    if not sim_metrics:
+        metrics_path = os.path.join(workflow_dir, "analog", "sim", "results", "metrics.json")
+        if os.path.exists(metrics_path):
+            try:
+                with open(metrics_path) as f:
+                    sim_metrics = json.load(f)
+            except Exception:
+                sim_metrics = {}
+
+    if not beh_metrics:
+        beh_metrics_path = os.path.join(workflow_dir, "analog", "behavioral", "metrics.json")
+        if os.path.exists(beh_metrics_path):
+            try:
+                with open(beh_metrics_path) as f:
+                    beh_metrics = json.load(f)
+            except Exception:
+                beh_metrics = {}
+
+
+
     delta = state.get("analog_delta_summary") or {}
     deltas = state.get("analog_deltas") or []
+
+    if not delta:
+        delta_path = os.path.join(workflow_dir, "analog", "correlation", "delta_summary.json")
+        if os.path.exists(delta_path):
+            try:
+                with open(delta_path) as f:
+                   delta = json.load(f)
+            except Exception:
+                delta = {}
+
+    if not deltas:
+        deltas_path = os.path.join(workflow_dir, "analog", "correlation", "deltas.json")
+        if os.path.exists(deltas_path):
+            try:
+                with open(deltas_path) as f:
+                    deltas = json.load(f)
+            except Exception:
+                deltas = []
 
     open_q = (spec.get("open_questions") or []) if isinstance(spec, dict) else []
     assumptions = (spec.get("assumptions") or []) if isinstance(spec, dict) else []
 
     sim_vals = (sim_metrics.get("metrics") or {}) if isinstance(sim_metrics, dict) else {}
     beh_vals = (beh_metrics.get("metrics") or {}) if isinstance(beh_metrics, dict) else {}
-
+    sim_conf = sim_metrics.get("confidence") if isinstance(sim_metrics, dict) else None
+    beh_conf = beh_metrics.get("confidence") if isinstance(beh_metrics, dict) else None
     lines = []
     lines.append("# Analog Executive Summary")
     lines.append("")
-    lines.append(f"- Block: {((spec.get('block') or {}).get('name')) if isinstance(spec, dict) else '(unknown)'}")
-    lines.append(f"- Type:  {((spec.get('block') or {}).get('type')) if isinstance(spec, dict) else '(unknown)'}")
+    block_name = spec.get("block_name") or ((spec.get("block") or {}).get("name")) or "(unknown)"
+
+    module_name = spec.get("module_name") or (
+        f"{block_name}_model" if block_name and block_name != "(unknown)" else "(unknown)"
+    )
+    
+
+    lines.append(f"- Block: {block_name}")
+    lines.append(f"- Module: {module_name}")
+
+    workflow_dir = state.get("workflow_dir", f"backend/workflows/{workflow_id}")
+
+    model_present = os.path.exists(os.path.join(workflow_dir, "analog", "model.sv"))
+    tb_present = any([
+        os.path.exists(os.path.join(workflow_dir, "analog", "behavioral", f"tb_{block_name}_behavioral.sv")),
+        os.path.exists(os.path.join(workflow_dir, "analog", "tb.sv")),
+    ])
+    netlist_present = any([
+        os.path.exists(os.path.join(workflow_dir, "analog", "netlist", f"{block_name}_top.sp")),
+        os.path.exists(os.path.join(workflow_dir, "analog", "netlist.sp")),
+    ])
+
+    sim_plan_present = (
+        os.path.exists(os.path.join(workflow_dir, "analog", "sim", "sim_plan.json"))
+        or os.path.exists(os.path.join(workflow_dir, "analog", "sim_plan.json"))
+    )
+
+    corr_present = (
+       os.path.exists(os.path.join(workflow_dir, "analog", "correlation", "delta_summary.json"))
+       or os.path.exists(os.path.join(workflow_dir, "analog", "delta_summary.json"))
+    )
+
+
+    abstract_present = bool(
+       glob.glob(os.path.join(workflow_dir, "analog", "abstract", "*.lef")) or
+       glob.glob(os.path.join(workflow_dir, "analog", "abstract", "*.lib"))
+    )
+
+
     lines.append("")
+    lines.append("## Artifact Presence")
+    lines.append(f"- Behavioral model: {'present' if model_present else 'missing'}")
+    lines.append(f"- Behavioral testbench: {'present' if tb_present else 'missing'}")
+    lines.append(f"- Netlist scaffold: {'present' if netlist_present else 'missing'}")
+    lines.append(f"- Simulation plan: {'present' if sim_plan_present else 'missing'}")
+    lines.append(f"- Correlation: {'present' if corr_present else 'missing'}")
+    lines.append(f"- Abstract views: {'present' if abstract_present else 'missing'}")
+    lines.append("")
+
+
+    lines.append("## Metrics Confidence")
+    lines.append(f"- Simulation metrics confidence: {_fmt(sim_conf)}")
+    lines.append(f"- Behavioral metrics confidence: {_fmt(beh_conf)}")
+    lines.append("")
+    
 
     # Compliance table
     lines.append("## Spec Compliance Table")

@@ -403,6 +403,16 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Top Assembly Agent",
       desc: "Builds SoC top modules for simulation and physical design (soc_top_sim.sv and soc_top_phys.sv)."
     },
+    {
+      uiLabel: "System Simulation Execution Agent",
+      backendLabel: "System Simulation Execution Agent",
+      desc: "Runs demo System_SIM execution for 2 testcases × 2 seeds using generated Cocotb/Verilator collateral; captures pass/fail, runtime, waveforms, and raw coverage candidates."
+    },
+    {
+      uiLabel: "System Simulation Coverage Summary Agent",
+      backendLabel: "System Simulation Coverage Summary Agent",
+      desc: "Parses System_SIM execution artifacts and publishes functional/code/assertion coverage plus run summary for UI display."
+    }
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);

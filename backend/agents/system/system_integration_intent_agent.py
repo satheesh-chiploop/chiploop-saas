@@ -7,6 +7,8 @@ from typing import Dict
 from portkey_ai import Portkey
 from openai import OpenAI
 from utils.artifact_utils import save_text_artifact_and_record
+from agents.analog._analog_llm import llm_text, safe_json_load
+
 
 # ---------------------------------------------------------------------
 # System Loop: Integration Intent Agent
@@ -49,50 +51,82 @@ def _clean_llm_output_to_json_text(raw: str) -> str:
 
     return raw.strip()
 
+def _parse_ep(ep: str):
+    if not ep or "." not in ep:
+        return None, None
+    inst, port = ep.split(".", 1)
+    return inst.strip(), port.split("[", 1)[0].strip()
 
-def _llm_generate(prompt: str, timeout_s: int = 600) -> str:
-    """
-    Matches existing repo style:
-    - If USE_LOCAL_OLLAMA: call ollama
-    - Else: Portkey streaming, fallback to ollama
-    """
-    out = ""
 
-    try:
-        if USE_LOCAL_OLLAMA:
-            payload = {"model": "llama3", "prompt": prompt}
-            r = requests.post(OLLAMA_URL, json=payload, timeout=timeout_s)
-            r.raise_for_status()
-            data = r.json()
-            out = data.get("response", "") or ""
-        else:
-            if client_portkey is None:
-                raise RuntimeError("PORTKEY_API_KEY not set and USE_LOCAL_OLLAMA=false")
+def _port_dir_from_sigs(sig_db: dict, module_name: str, port_name: str):
+    if not isinstance(sig_db, dict):
+        return None
 
-            # Portkey passthrough to OpenAI
-            completion = client_portkey.chat.completions.create(
-                model="gpt-4.1-mini",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.2,
-                stream=True,
-                timeout=timeout_s,
-            )
-            for chunk in completion:
-                delta = getattr(chunk.choices[0].delta, "content", None)
-                if delta:
-                    out += delta
-    except Exception as e:
-        # Fallback to ollama if possible
-        try:
-            payload = {"model": "llama3", "prompt": prompt}
-            r = requests.post(OLLAMA_URL, json=payload, timeout=timeout_s)
-            r.raise_for_status()
-            data = r.json()
-            out = data.get("response", "") or out
-        except Exception:
-            out = out or f"{{\"error\":\"LLM generation failed: {e}\"}}"
+    # common shapes
+    if module_name in sig_db and isinstance(sig_db[module_name], dict):
+        ports = sig_db[module_name].get("ports") or sig_db[module_name].get("interface") or []
+        for p in ports:
+            if isinstance(p, dict) and p.get("name") == port_name:
+                return str(p.get("direction") or p.get("dir") or "").lower()
 
+    mods = sig_db.get("modules")
+    if isinstance(mods, dict) and module_name in mods and isinstance(mods[module_name], dict):
+        ports = mods[module_name].get("ports") or mods[module_name].get("interface") or []
+        for p in ports:
+            if isinstance(p, dict) and p.get("name") == port_name:
+                return str(p.get("direction") or p.get("dir") or "").lower()
+
+    return None
+
+
+def _instance_to_module(intent: dict):
+    out = {}
+    for inst in intent.get("instances", []):
+        if isinstance(inst, dict) and inst.get("name") and inst.get("module"):
+            out[inst["name"]] = inst["module"]
     return out
+
+
+def _sanitize_connections(intent: dict, digital_sigs: dict, analog_sigs: dict):
+    inst2mod = _instance_to_module(intent)
+    cleaned = []
+
+    for c in intent.get("connections", []):
+        if not isinstance(c, dict):
+            continue
+        src = c.get("from")
+        dst = c.get("to")
+        if not src or not dst:
+            continue
+
+        si, sp = _parse_ep(src)
+        di, dp = _parse_ep(dst)
+        if not si or not sp or not di or not dp:
+            continue
+
+        # top.* is always allowed
+        if si == "top" or di == "top":
+            cleaned.append(c)
+            continue
+
+        smod = inst2mod.get(si)
+        dmod = inst2mod.get(di)
+
+        sdir = _port_dir_from_sigs(digital_sigs, smod, sp) or _port_dir_from_sigs(analog_sigs, smod, sp)
+        ddir = _port_dir_from_sigs(digital_sigs, dmod, dp) or _port_dir_from_sigs(analog_sigs, dmod, dp)
+
+        # accept only output -> input when both dirs known
+        if sdir and ddir:
+            if sdir == "output" and ddir == "input":
+                cleaned.append(c)
+            continue
+
+        # if directions unknown, keep it
+        cleaned.append(c)
+
+    intent["connections"] = cleaned
+    return intent
+
 
 
 def run_agent(state: dict) -> dict:
@@ -104,12 +138,33 @@ def run_agent(state: dict) -> dict:
     os.makedirs(workflow_dir, exist_ok=True)
 
     # Inputs (accept a few common keys to reduce friction)
+
     integration_description = (
         state.get("system_integration_description")
         or state.get("soc_integration_description")
         or state.get("integration_description")
+        or state.get("soc_integration_spec_text")
+        or state.get("soc_integration_spec")
+        or state.get("soc_spec")
+        or state.get("system_spec")
+        or state.get("description")
         or ""
     ).strip()
+
+
+    if not integration_description:
+        try:
+            save_text_artifact_and_record(
+                workflow_id=workflow_id,
+                agent_name=agent_name,
+                subdir="system/integration",
+                filename="intent_agent_state_keys.txt",
+                content="\n".join(sorted(state.keys())),
+            )
+        except Exception:
+            pass
+        state["status"] = "❌ No system_integration_description provided."
+        return state
 
     # Top module base name (we will produce *_sim and *_phys)
     top_base = (state.get("top_module") or state.get("soc_top_name") or "soc_top").strip()
@@ -144,34 +199,46 @@ def run_agent(state: dict) -> dict:
     # Strict JSON schema for downstream assembly.
     # Includes variant module overrides so we can generate sim/phys tops.
     # -----------------------------------------------------------------
+    digital_module = (
+        state.get("digital_top_module")
+        or state.get("digital_module_name")
+        or "digital_block"
+    ).strip()
+
+    analog_phys_module = (
+        analog_macro_module
+        or state.get("analog_top_module")
+        or state.get("analog_module_name")
+        or "analog_block"
+    ).strip()
+
+    analog_sim_module = (
+       analog_behavioral_module
+       or analog_phys_module
+    ).strip()
+
     schema = {
         "top": {
-            "base_name": "soc_top",
-            "sim_module": "soc_top_sim",
-            "phys_module": "soc_top_phys",
-            "notes": "Single power domain. Option-A: SRAM/ROM inferred inside digital_subsystem. SoC integrates only digital_subsystem + adc."
+            "base_name": top_base,
+            "sim_module": f"{top_base}_sim",
+            "phys_module": f"{top_base}_phys",
+            "notes": "Generic system integration manifest for digital + analog assembly."
         },
         "instances": [
-            {"name": "u_digital", "module": "digital_subsystem"},
-            {"name": "u_adc", "module": "adc_macro"}
+            {"name": "u_digital", "module": digital_module},
+            {"name": "u_analog", "module": analog_phys_module}
         ],
-        "connections": [
-            {"from": "u_digital.adc_start", "to": "u_adc.adc_start"},
-            {"from": "u_adc.adc_done", "to": "u_digital.adc_done"},
-            {"from": "u_adc.adc_data", "to": "u_digital.adc_data"}
-        ],
-        "tieoffs": [
-            {"signal": "u_adc.test_mode", "value": "1'b0"}
-        ],
+        "connections": [],
+        "tieoffs": [],
         "variants": {
             "sim": {
                 "module_overrides": {
-                    "u_adc": "adc_behavioral"
+                    "u_analog": analog_sim_module
                 }
             },
             "phys": {
                 "module_overrides": {
-                    "u_adc": "adc_macro"
+                    "u_analog": analog_phys_module
                 }
             }
         }
@@ -206,14 +273,13 @@ ANALOG RTL SIGNATURES (modules + ports, if available):
 ---
 You are a professional SoC integration engineer.
 
-CONTEXT / CONSTRAINTS (Iteration-1):
-- Integrate ONLY TWO blocks at the SoC top: digital_subsystem and ADC.
-- SRAM + Boot ROM are inside the digital_subsystem as inferred logic (Option A).
-- Single clock/reset and single power domain (keep it simple).
-- Generate an integration manifest that allows generating TWO tops:
-  - *_sim: uses ADC behavioral model
-  - *_phys: uses ADC macro stub (for PD)
-- Prefer keeping the same port names across sim/phys. If module names differ, use variants.module_overrides.
+CONTEXT / CONSTRAINTS:
+- Generate a generic system integration manifest for the blocks described in the provided signatures and integration description.
+- Prefer a minimal top with the fewest required instances and explicit point-to-point connections.
+- Keep sim/phys top port intent consistent. If analog sim/phys module names differ, use variants.module_overrides.
+- Reuse identical port names across blocks whenever appropriate.
+- Do not assume ADC-specific names unless they are present in the input signatures/description.
+
 
 🔒 IMPORTANT OUTPUT FORMAT RULES
 - DO NOT use markdown code fences (no ```json, no ```).
@@ -229,7 +295,7 @@ TARGET JSON SCHEMA EXAMPLE:
 Now output JSON only.
 """.strip()
 
-    raw = _llm_generate(prompt)
+    raw = llm_text(prompt)
     cleaned = _clean_llm_output_to_json_text(raw)
 
     if not cleaned:
@@ -237,14 +303,17 @@ Now output JSON only.
         return state
 
     try:
-        intent = json.loads(cleaned)
+        intent = safe_json_load(cleaned) if cleaned else {}
+        if not isinstance(intent, dict):
+            intent = {}
+        intent = _sanitize_connections(intent, digital_sigs, analog_sigs)
     except Exception as e:
         # Save raw output for debugging
         try:
             save_text_artifact_and_record(
                 workflow_id=workflow_id,
                 agent_name=agent_name,
-                subdir="system/integrate",
+                subdir="system/integration",
                 filename="system_integration_intent_raw.txt",
                 content=raw,
             )
@@ -253,26 +322,46 @@ Now output JSON only.
         state["status"] = f"❌ Failed to parse system integration intent JSON: {e}"
         return state
 
-    # Normalize top naming
-    if isinstance(intent, dict):
-        intent.setdefault("top", {})
-        if isinstance(intent["top"], dict):
-            intent["top"].setdefault("base_name", top_base)
-            intent["top"].setdefault("sim_module", f"{top_base}_sim")
-            intent["top"].setdefault("phys_module", f"{top_base}_phys")
+    if not isinstance(intent, dict):
+        intent = {}
+
+    intent.setdefault("top", {})
+    intent.setdefault("instances", [])
+    intent.setdefault("connections", [])
+    intent.setdefault("tieoffs", [])
+    intent.setdefault("variants", {})
+
+    if isinstance(intent["top"], dict):
+        intent["top"].setdefault("base_name", top_base)
+        intent["top"].setdefault("sim_module", f"{top_base}_sim")
+        intent["top"].setdefault("phys_module", f"{top_base}_phys")
+
+    # Generic fallback if LLM under-specifies the manifest
+    if not intent["instances"]:
+        intent["instances"] = schema["instances"]
+
+    if "sim" not in intent["variants"]:
+        intent["variants"]["sim"] = schema["variants"]["sim"]
+    if "phys" not in intent["variants"]:
+        intent["variants"]["phys"] = schema["variants"]["phys"]
 
     # Persist artifact
     try:
         save_text_artifact_and_record(
             workflow_id=workflow_id,
             agent_name=agent_name,
-            subdir="system/integrate",
+            subdir="system/integration",
             filename="system_integration_intent.json",
             content=json.dumps(intent, indent=2),
         )
     except Exception as e:
         print(f"⚠️ Failed to upload system integration intent artifact: {e}")
-
+    print("DEBUG intent agent file:", __file__)
+    print("DEBUG intent keys:", list(intent.keys()))
+    print("DEBUG intent instances:", intent.get("instances"))
+    print("DEBUG intent connections:", intent.get("connections"))
+    print("DEBUG intent tieoffs:", intent.get("tieoffs"))
     state["system_integration_intent"] = intent
+
     state["status"] = "✅ System integration intent generated"
     return state

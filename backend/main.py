@@ -478,6 +478,8 @@ from agents.system.system_cosim_integration_agent import run_agent as system_cos
 from agents.system.system_iss_bridge_agent import run_agent as system_iss_bridge_agent
 from agents.system.system_integration_intent_agent import run_agent as system_integration_intent
 from agents.system.system_top_assembly_agent import run_agent as system_top_assembly
+from agents.system.system_sim_execution_agent import run_agent as system_sim_execution_agent
+from agents.system.system_sim_coverage_summary_agent import run_agent as system_sim_coverage_summary_agent
 
 SYSTEM_AGENT_FUNCTIONS: Dict[str,Any] = {
     "Digital Spec Agent": digital_spec_agent,
@@ -589,6 +591,8 @@ SYSTEM_AGENT_FUNCTIONS: Dict[str,Any] = {
     "System ISS Bridge Agent": system_iss_bridge_agent,  
     "System Integration Intent Agent": system_integration_intent,
     "System Top Assembly Agent": system_top_assembly,
+    "System Simulation Execution Agent": system_sim_execution_agent,
+    "System Simulation Coverage Summary Agent": system_sim_coverage_summary_agent,
 }
 
 
@@ -902,6 +906,9 @@ def _run_nodes_with_shared_state(
             result = fn(shared_state)
             if isinstance(result, dict):
                 shared_state.update(result)
+                result_status = str(result.get("status", ""))
+                if result_status.startswith("❌"):
+                    raise RuntimeError(result_status)
 
             append_log_workflow(workflow_id, f"✅ {label} done")
             append_log_run(run_id, f"✅ {label} done")
@@ -1080,6 +1087,30 @@ async def run_workflow(
 # ---------- Background executor ----------
 # ==========================================================
 
+def _extract_node_data_fields(obj: dict) -> dict:
+    out = {}
+    if not isinstance(obj, dict):
+        return out
+
+    nodes = obj.get("nodes") or []
+    if not nodes and isinstance(obj.get("definitions"), dict):
+        nodes = obj["definitions"].get("nodes") or []
+
+    for n in nodes:
+        data_block = (n or {}).get("data") or {}
+        if not isinstance(data_block, dict):
+            continue
+
+        for k, v in data_block.items():
+            if v is None:
+                continue
+            if isinstance(v, str) and v.strip():
+                out.setdefault(k, v.strip())
+            elif isinstance(v, (dict, list)) and v:
+                out.setdefault(k, v)
+
+    return out
+
 def execute_workflow_background(
     workflow_id: str,
     run_id: str,
@@ -1155,11 +1186,99 @@ def execute_workflow_background(
             shared_state["user_id"] = user_id
         if upload_path:
             shared_state["uploaded_file"] = upload_path
+
         if spec_text:
+            shared_state["spec_text"] = spec_text
             shared_state["spec"] = spec_text
 
+        # NEW: also inject workflow/app payload fields into shared_state
+        payload = {}
+        if isinstance(data, dict):
+            payload = data.get("payload") or {}
+            definitions = data.get("definitions") or {}
+            if not payload and isinstance(definitions, dict):
+                payload = definitions.get("payload") or {}
+ 
+        if isinstance(payload, dict):
+            for k, v in payload.items():
+                if v is not None:
+                   shared_state[k] = v
+
+        # NEW: also lift node.data fields from workflow definitions / Studio canvas
+        node_fields = _extract_node_data_fields(data)
+        for k, v in node_fields.items():
+            if k not in shared_state and v is not None:
+                shared_state[k] = v
 
 
+                # ---------------------------------------------------------
+        # Domain-specific canonical input normalization
+        # Keep three separate source-of-truth channels:
+        #   - digital_spec_text
+        #   - analog_spec_text
+        #   - system_integration_description
+        # ---------------------------------------------------------
+        digital_text = (
+            shared_state.get("digital_spec_text")
+            or (data.get("digital_spec_text") if isinstance(data, dict) else None)
+            or ""
+        ).strip()
+
+        analog_text = (
+            shared_state.get("analog_spec_text")
+            or shared_state.get("analog_datasheet")
+            or shared_state.get("datasheet_text")
+            or (data.get("analog_spec_text") if isinstance(data, dict) else None)
+            or ""
+        ).strip()
+
+        system_desc = (
+            shared_state.get("system_integration_description")
+            or shared_state.get("soc_integration_description")
+            or shared_state.get("integration_description")
+            or shared_state.get("soc_integration_spec_text")
+            or shared_state.get("soc_integration_spec")
+            or shared_state.get("soc_spec")
+            or shared_state.get("system_spec")
+            or (data.get("system_integration_description") if isinstance(data, dict) else None)
+            or (data.get("soc_integration_description") if isinstance(data, dict) else None)
+            or (data.get("integration_description") if isinstance(data, dict) else None)
+            or (data.get("soc_integration_spec_text") if isinstance(data, dict) else None)
+            or (data.get("soc_integration_spec") if isinstance(data, dict) else None)
+            or (data.get("soc_spec") if isinstance(data, dict) else None)
+            or (data.get("system_spec") if isinstance(data, dict) else None)
+            or ""
+        ).strip()
+
+        if digital_text:
+            shared_state["digital_spec_text"] = digital_text
+            # optional digital compatibility aliases
+            shared_state["digital_spec"] = digital_text
+
+        if analog_text:
+            shared_state["analog_spec_text"] = analog_text
+            shared_state["datasheet_text"] = analog_text
+            shared_state["analog_datasheet"] = analog_text
+
+        if system_desc:
+            shared_state["system_integration_description"] = system_desc
+            shared_state["soc_integration_description"] = system_desc
+            shared_state["integration_description"] = system_desc
+            shared_state["soc_integration_spec_text"] = system_desc
+
+        # IMPORTANT:
+        # Do NOT globally write shared_state["spec"] or ["spec_text"] here.
+        # Those generic aliases are what create cross-domain contamination.
+
+        append_log_workflow(
+            workflow_id,
+            f"[DEBUG] normalized inputs: "
+            f"digital={bool(digital_text)} len={len(digital_text)}, "
+            f"analog={bool(analog_text)} len={len(analog_text)}, "
+            f"soc={bool(system_desc)} len={len(system_desc)}"
+        )
+
+        
         if scope_json:
           try:
             shared_state["scope"] = json.loads(scope_json)
@@ -4475,6 +4594,7 @@ def _start_system_app(background_tasks, request, payload, app_name, template_wor
 
     return {"ok": True, "workflow_id": workflow_id, "run_id": run_id}
 
+
 def execute_system_app_background(
     workflow_id,
     run_id,
@@ -4494,10 +4614,82 @@ def execute_system_app_background(
             "user_id": user_id,
         }
 
-        # Inject app payload into shared_state (same style as other app executors)
+        # ---------------------------------------------------------
+        # 1) Raw payload passthrough
+        # ---------------------------------------------------------
         for k, v in (payload or {}).items():
             if v is not None:
                 shared_state[k] = v
+
+        # ---------------------------------------------------------
+        # 2) Canonical domain-specific normalization
+        #    Keep these three as the source of truth.
+        # ---------------------------------------------------------
+        digital_text = (
+            shared_state.get("digital_spec_text")
+            or shared_state.get("digital_spec")
+            or ""
+        ).strip()
+
+        analog_text = (
+            shared_state.get("analog_spec_text")
+            or shared_state.get("analog_spec")
+            or shared_state.get("analog_datasheet")
+            or ""
+        ).strip()
+
+        soc_text = (
+            shared_state.get("soc_integration_spec_text")
+            or shared_state.get("system_integration_description")
+            or shared_state.get("soc_integration_description")
+            or shared_state.get("integration_description")
+            or shared_state.get("soc_integration_spec")
+            or shared_state.get("soc_spec")
+            or shared_state.get("system_spec")
+            or ""
+        ).strip()
+
+        # Canonical fields
+        if digital_text:
+            shared_state["digital_spec_text"] = digital_text
+
+        if analog_text:
+            shared_state["analog_spec_text"] = analog_text
+
+        if soc_text:
+            shared_state["system_integration_description"] = soc_text
+            shared_state["soc_integration_description"] = soc_text
+            shared_state["integration_description"] = soc_text
+            shared_state["soc_integration_spec_text"] = soc_text
+
+        # ---------------------------------------------------------
+        # 3) Compatibility aliases for existing agents
+        #    IMPORTANT: only derive aliases from the correct domain.
+        # ---------------------------------------------------------
+        if digital_text:
+            shared_state["digital_spec"] = digital_text
+
+        if analog_text:
+            shared_state["datasheet_text"] = analog_text
+            shared_state["analog_datasheet"] = analog_text
+
+        # Do NOT set shared_state["spec"] / ["spec_text"] globally here,
+        # because that causes cross-domain contamination.
+
+        append_log_workflow(
+            workflow_id,
+            f"[DEBUG] SystemApp normalized inputs: "
+            f"digital={bool(digital_text)} len={len(digital_text)}, "
+            f"analog={bool(analog_text)} len={len(analog_text)}, "
+            f"soc={bool(soc_text)} len={len(soc_text)}"
+        )
+        append_log_run(
+            run_id,
+            f"[DEBUG] SystemApp normalized inputs: "
+            f"digital={bool(digital_text)} len={len(digital_text)}, "
+            f"analog={bool(analog_text)} len={len(analog_text)}, "
+            f"soc={bool(soc_text)} len={len(soc_text)}"
+        )
 
         append_log_workflow(workflow_id, f"🚀 Starting System App: {template_workflow_name}", phase="start")
         append_log_run(run_id, f"🚀 Starting System App: {template_workflow_name}")
@@ -4525,6 +4717,8 @@ def execute_system_app_background(
         err = f"❌ System App crashed ({template_workflow_name}): {type(e).__name__}: {e}\n{traceback.format_exc()}"
         append_log_workflow(workflow_id, err, status="failed", phase="error")
         append_log_run(run_id, err, status="failed")
+
+
 # ---------------- Embedded app endpoints ----------------
 
 @app.post("/apps/embedded/hal/run")

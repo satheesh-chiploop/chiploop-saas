@@ -174,7 +174,8 @@ def _record_text(workflow_id: str, agent_name: str, subdir: str, filename: str, 
         )
     except Exception:
         return None
-def _gen_regression_runner(top: str) -> str:
+
+def _gen_regression_runner(top: str, default_tests: list) -> str:
     return f'''"""Regression runner for Cocotb + Verilator."""
 
 import argparse
@@ -183,13 +184,15 @@ import os
 import subprocess
 from datetime import datetime
 
+DEFAULT_TESTS = {json.dumps(default_tests, indent=2)}
+
 def _now():
     return datetime.now().isoformat()
 
 def run_one(testcase: str, seed: int) -> dict:
     env = os.environ.copy()
     env["RANDOM_SEED"] = str(seed)
-    cmd = ["make", f"TESTCASE={testcase}"]
+    cmd = ["make", f"TESTCASE={{testcase}}"]
     p = subprocess.run(cmd, capture_output=True, text=True, env=env)
     return {{
         "testcase": testcase,
@@ -202,7 +205,7 @@ def run_one(testcase: str, seed: int) -> dict:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tests", nargs="+", default=["smoke_test"])
+    ap.add_argument("--tests", nargs="+", default=DEFAULT_TESTS)
     ap.add_argument("--seeds", nargs="+", type=int, default=[1])
     ap.add_argument("--out", default="reports/regression_summary.json")
     args = ap.parse_args()
@@ -216,6 +219,7 @@ def main():
         "type": "simulation_regression",
         "top_module": "{top}",
         "generated_at": _now(),
+        "default_tests": DEFAULT_TESTS,
         "results": results,
         "pass_count": sum(1 for r in results if r["ok"]),
         "fail_count": sum(1 for r in results if not r["ok"]),
@@ -230,6 +234,7 @@ def main():
 if __name__ == "__main__":
     main()
 '''
+
 
 def run_agent(state: dict) -> dict:
     agent_name = "Simulation Control Agent"
@@ -251,8 +256,13 @@ def run_agent(state: dict) -> dict:
     tb_root = os.path.join(workflow_dir, "vv", "tb")
     os.makedirs(tb_root, exist_ok=True)
 
-    runner_py = _gen_regression_runner(top)
+    default_tests = state.get("vv_testcases") or ["smoke_test", "constrained_random_sanity"]
+    state["vv_testcases"] = default_tests
+    state["testcases"] = default_tests
+
+    runner_py = _gen_regression_runner(top, default_tests)
     _write_file(os.path.join(tb_root, "run_regression.py"), runner_py)
+
 
     readme = """# Simulation Control
 
