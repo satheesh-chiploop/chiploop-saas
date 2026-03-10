@@ -422,7 +422,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       uiLabel: "System Firmware Coverage Summary Agent",
       backendLabel: "System Firmware Coverage Summary Agent",
       desc: "Summarizes firmware/RTL/assertion coverage and overall co-simulation health for System_Firmware."
-    }
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);
