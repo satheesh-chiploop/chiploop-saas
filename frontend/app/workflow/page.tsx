@@ -413,6 +413,16 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Simulation Coverage Summary Agent",
       desc: "Parses System_SIM execution artifacts and publishes functional/code/assertion coverage plus run summary for UI display."
     }
+    {
+      uiLabel: "System Firmware CoSim Execution Agent",
+      backendLabel: "System Firmware CoSim Execution Agent",
+      desc: "Runs firmware-aware SoC co-simulation using assembled top, firmware ELF, cocotb/verilator harness, and generated collateral."
+    },
+    {
+      uiLabel: "System Firmware Coverage Summary Agent",
+      backendLabel: "System Firmware Coverage Summary Agent",
+      desc: "Summarizes firmware/RTL/assertion coverage and overall co-simulation health for System_Firmware."
+    }
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);
