@@ -245,7 +245,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "Digital RTL Signature Agent",
       desc: "Scans RTL sources and extracts module + port signatures into rtl_signatures.json for integration planning."
     },
-    
+   
     {
       uiLabel: "Digital Integration Intent Agent",
       backendLabel: "Digital Integration Intent Agent",
@@ -412,7 +412,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       uiLabel: "System Simulation Coverage Summary Agent",
       backendLabel: "System Simulation Coverage Summary Agent",
       desc: "Parses System_SIM execution artifacts and publishes functional/code/assertion coverage plus run summary for UI display."
-    }
+    },
     {
       uiLabel: "System Firmware CoSim Execution Agent",
       backendLabel: "System Firmware CoSim Execution Agent",
