@@ -62,14 +62,16 @@ Datasheet:
     if not spec:
         raise RuntimeError("LLM failed to produce valid analog spec")
 
-    block = spec.get("block_name", "analog_block")
 
+    block = (spec.get("block_name") or "analog_block").strip()
+    module_name = (spec.get("module_name") or block).strip()
 
-    
-    # 🔧 Canonical naming rule
-    # behavioral model module name must always be <block>_model
+    # Canonical naming rule:
+    # preserve explicit module_name from spec if present;
+    # otherwise default module_name = block_name
     spec["block_name"] = block
-    spec["module_name"] = f"{block}_model"
+    spec["module_name"] = module_name
+
 
     spec_path = os.path.join(spec_dir, "spec_normalized.json")
 
@@ -86,6 +88,17 @@ Datasheet:
 
     state["analog_spec"] = spec
     state["analog_block_name"] = block
+
+    # Publish canonical analog module signature for downstream integration
+    analog_signature = {
+        spec["module_name"]: {
+            "ports": spec.get("ports", [])
+        }
+    }
+
+    state["analog_module_signature"] = analog_signature
+    state["analog_signatures"] = analog_signature
+    state["analog_rtl_signatures"] = analog_signature
 
     print(f"✅ Analog spec generated for {block}")
 

@@ -56,6 +56,103 @@ def _infer_top_from_netlist(netlist_path: str) -> str | None:
     m = re.search(r'^\s*module\s+([A-Za-z_][A-Za-z0-9_$]*)\s*\(', txt, flags=re.MULTILINE)
     return m.group(1) if m else None
 
+def _pick_stage_netlist(latest_run: str) -> str | None:
+    if not latest_run:
+        return None
+
+    patterns = [
+        os.path.join(latest_run, "final", "nl", "*.nl.v"),
+        os.path.join(latest_run, "final", "nl", "*.v"),
+        os.path.join(latest_run, "final", "pnl", "*.pnl.v"),
+        os.path.join(latest_run, "final", "pnl", "*.v"),
+    ]
+
+    for pat in patterns:
+        hits = sorted(glob.glob(pat))
+        if hits:
+            return hits[0]
+
+    return None
+
+def _first_existing(paths: list[str]) -> str | None:
+    for p in paths:
+        if p and os.path.exists(p):
+            return p
+    return None
+
+
+def _resolve_config_from_state(state: dict, workflow_dir: str) -> str | None:
+    digital = state.get("digital") or {}
+    place_state = digital.get("place") or {}
+
+    cand = _first_existing([
+        place_state.get("openlane_config"),
+        place_state.get("config_json"),
+        os.path.join(workflow_dir, "digital", "place", "config.json"),
+    ])
+    if cand:
+        return cand
+
+    for cand in [
+        os.path.join(workflow_dir, "digital", "impl_setup", "openlane", "config.json"),
+        os.path.join(workflow_dir, "digital", "synth", "config.json"),
+        os.path.join(workflow_dir, "digital", "foundry", "openlane", "config.json"),
+    ]:
+        if os.path.exists(cand):
+            return cand
+
+    return None
+
+
+def _resolve_sdc_from_state(state: dict, workflow_dir: str) -> str | None:
+    digital = state.get("digital") or {}
+    place_state = digital.get("place") or {}
+
+    cand = _first_existing([
+        place_state.get("constraints_sdc"),
+        os.path.join(workflow_dir, "digital", "place", "constraints", "digital_subsystem.sdc"),
+    ])
+    if cand:
+        return cand
+
+    for stage in ["place", "floorplan", "impl_setup", "synth"]:
+        cand_dir = os.path.join(workflow_dir, "digital", stage, "constraints")
+        for cand in sorted(glob.glob(os.path.join(cand_dir, "*.sdc"))):
+            if os.path.exists(cand):
+                return cand
+
+    legacy = sorted(glob.glob(os.path.join(workflow_dir, "digital", "constraints", "*.sdc")))
+    for cand in legacy:
+        if os.path.exists(cand):
+            return cand
+
+    return None
+
+
+def _resolve_postplace_netlist(state: dict, workflow_dir: str) -> str | None:
+    digital = state.get("digital") or {}
+    place_state = digital.get("place") or {}
+
+    candidates = [
+        place_state.get("netlist"),
+        place_state.get("final_netlist"),
+        place_state.get("place_netlist"),
+    ]
+
+    latest_run = place_state.get("openlane_run_dir")
+    picked = _pick_stage_netlist(latest_run) if latest_run else None
+    if picked:
+        candidates.append(picked)
+
+    candidates.extend([
+        os.path.join(workflow_dir, "digital", "place", "netlist", "digital_subsystem_place.v"),
+        os.path.join(workflow_dir, "digital", "place", "netlist", "digital_subsystem.v"),
+        os.path.join(workflow_dir, "digital", "synth", "netlist", "digital_subsystem_synth.v"),
+    ])
+
+    cand = _first_existing(candidates)
+    return cand
+
 def run_agent(state: dict) -> dict:
     workflow_id = state.get("workflow_id", "default")
     workflow_dir = state.get("workflow_dir") or f"backend/workflows/{workflow_id}"
@@ -65,13 +162,12 @@ def run_agent(state: dict) -> dict:
     logs_dir = os.path.join(stage_dir, "logs")
     _ensure(stage_dir); _ensure(logs_dir)
 
-    impl_cfg = os.path.join(workflow_dir, "digital", "foundry", "openlane", "config.json")
-    synth_cfg = os.path.join(workflow_dir, "digital", "synth", "config.json")
-    base_cfg = impl_cfg if os.path.exists(impl_cfg) else synth_cfg
-    if not os.path.exists(base_cfg):
-        raise RuntimeError("Missing base config.json (foundry/openlane or synth).")
+    base_cfg = _resolve_config_from_state(state, workflow_dir)
+    if not base_cfg:
+        raise RuntimeError("Missing OpenLane config: no config found in place, impl_setup, synth, or foundry.")
 
-    cfg = _read_json(base_cfg)
+    cfg = _read_json(base_cfg)  
+
     cfg.pop("SYNTH_SDC_FILE", None)
 
     run_work_dir = state.get("digital_run_work_dir") or os.path.join(workflow_dir, "digital", "run_work")
@@ -79,26 +175,42 @@ def run_agent(state: dict) -> dict:
     _ensure(run_work_dir)
     state["digital_run_work_dir"] = run_work_dir
 
-    upstream_sdc = os.path.join(workflow_dir, "digital", "constraints", "top.sdc")
-    if not os.path.exists(upstream_sdc):
-        raise RuntimeError("Missing upstream SDC: digital/constraints/top.sdc")
+
+
+    upstream_sdc = _resolve_sdc_from_state(state, workflow_dir)
+    if not upstream_sdc:
+        raise RuntimeError("Missing upstream SDC: no constraints_sdc found in state or prior digital stages.")
+
+    sdc_basename = os.path.basename(upstream_sdc)
 
     inputs_constraints_dir = os.path.join(run_work_dir, "inputs", "constraints")
     _ensure(inputs_constraints_dir)
-    stage_sdc = os.path.join(inputs_constraints_dir, "top.sdc")
+    stage_sdc = os.path.join(inputs_constraints_dir, sdc_basename)
     shutil.copy2(upstream_sdc, stage_sdc)
     sdc_text = open(stage_sdc, "r", encoding="utf-8").read()
 
-    cfg["PNR_SDC_FILE"] = "inputs/constraints/top.sdc"
+    cfg["PNR_SDC_FILE"] = f"inputs/constraints/{sdc_basename}"
 
     inputs_netlist_dir = os.path.join(run_work_dir, "inputs", "netlist")
-    stage_netlists = sorted(glob.glob(os.path.join(inputs_netlist_dir, "*.v")))
-    if not stage_netlists:
-        raise RuntimeError("STA postplace: missing run_work/inputs/netlist/*.v.")
-    cfg["VERILOG_FILES"] = [f"inputs/netlist/{os.path.basename(p)}" for p in stage_netlists]
+    _ensure(inputs_netlist_dir)
+
+    for old_v in glob.glob(os.path.join(inputs_netlist_dir, "*.v")):
+        try:
+            os.remove(old_v)
+        except Exception:
+            pass
+
+    postplace_netlist = _resolve_postplace_netlist(state, workflow_dir)
+    if not postplace_netlist:
+        raise RuntimeError("STA postplace: missing place netlist output.")
+
+    staged_postplace_netlist = os.path.join(inputs_netlist_dir, os.path.basename(postplace_netlist))
+    shutil.copy2(postplace_netlist, staged_postplace_netlist)
+
+    cfg["VERILOG_FILES"] = [f"inputs/netlist/{os.path.basename(staged_postplace_netlist)}"]
 
     if str(cfg.get("DESIGN_NAME", "")).strip() in ["", "top"]:
-        inferred = _infer_top_from_netlist(stage_netlists[0])
+        inferred = _infer_top_from_netlist(staged_postplace_netlist)
         if inferred:
             cfg["DESIGN_NAME"] = inferred
             state["design_name"] = inferred
@@ -120,6 +232,21 @@ def run_agent(state: dict) -> dict:
     work_stage_dir = os.path.join(run_work_dir, STAGE_NAME)
     _ensure(work_stage_dir)
     _write(os.path.join(work_stage_dir, "config.json"), json.dumps(cfg, indent=2))
+
+    input_log = "\n".join([
+        f"{AGENT_NAME}",
+        f"workflow_id={workflow_id}",
+        f"workflow_dir={workflow_dir}",
+        f"base_cfg_path={base_cfg}",
+        f"upstream_sdc={upstream_sdc}",
+        f"stage_sdc={stage_sdc}",
+        f"run_work_dir={run_work_dir}",
+        f"run_tag={run_tag}",
+        f"resolved_postplace_netlist={postplace_netlist}",
+        f"staged_postplace_netlist={staged_postplace_netlist}",
+        f"netlist_count=1",
+    ]) + "\n"
+    _write(os.path.join(logs_dir, "sta_postplace_input_resolution.log"), input_log)
 
     run_sh = f"""#!/usr/bin/env bash
 set -euo pipefail
@@ -160,7 +287,8 @@ docker run --rm \\
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/config.json", json.dumps(cfg, indent=2))
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/run.sh", run_sh)
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/logs/openlane_sta_postplace.log", out)
-        save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/constraints/top.sdc", sdc_text)
+        save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/constraints/{sdc_basename}", sdc_text)
+        save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/logs/sta_postplace_input_resolution.log", input_log)
         if metrics and os.path.exists(metrics):
             save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/metrics.json",
                                           open(metrics, "r", encoding="utf-8").read())
@@ -172,5 +300,10 @@ docker run --rm \\
         "stage_dir": stage_dir,
         "metrics_json": metrics,
         "openlane_run_dir": latest,
+        "constraints_sdc": stage_sdc,
+        "openlane_config": os.path.join(stage_dir, "config.json"),
+        "input_resolution_log": os.path.join(logs_dir, "sta_postplace_input_resolution.log"),
+        "netlist": staged_postplace_netlist,
     }
+    
     return state

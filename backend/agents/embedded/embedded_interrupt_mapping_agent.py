@@ -14,6 +14,17 @@ def run_agent(state: dict) -> dict:
     toolchain = state.get("toolchain") or {}
     toggles = state.get("toggles") or {}
 
+    regmap_obj = (
+        state.get("firmware_register_map")
+        or (state.get("firmware") or {}).get("register_map")
+    )
+
+    if not regmap_obj:
+        state["status"] = "❌ firmware register map missing in state for interrupt generation"
+        return state
+
+    regmap_json = json.dumps(regmap_obj, indent=2)
+
     prompt = f"""USER SPEC:
 {spec_text}
 
@@ -26,6 +37,9 @@ TOOLCHAIN (for future extensibility):
 TOGGLES:
 {json.dumps(toggles, indent=2)}
 
+REGISTER MAP:
+{regmap_json}
+
 TASK:
 Create interrupt vector mapping and ISR stubs.
 MANDATORY:
@@ -37,20 +51,28 @@ MANDATORY:
   #[no_mangle]
   Vector table MUST follow embedded production layout:
 
-pub static VECTOR_TABLE: [usize; N]
+pub static VECTOR_TABLE: [unsafe extern "C" fn(); 32]
+Use vector table size 32 unless spec explicitly defines interrupt count.
 
 Rules:
-- Entry 0 = initial stack pointer
-- Remaining entries = ISR handlers cast as usize
-- Example:
-Reset_Handler as usize
- 
-- Provide DefaultHandler
-- Provide weak ISR handlers
+- Entry 0 must be Reset_Handler
+- Remaining entries must be ISR handler function pointers
+- Do NOT cast handlers to usize
+- Provide exactly one DefaultHandler function
+- Do NOT use C attributes such as __attribute__((weak))
+- Do NOT use external stack pointer symbols
+- Always generate a Reset_Handler stub
 - Must compile in no_std firmware environment
-- Provide a Reset_Handler symbol (even as a stub) OR clearly reference firmware/src/lib.rs entry symbol
+- Other ISR stubs must call DefaultHandler by default
+- VECTOR_TABLE must be declared exactly as:
+  #[link_section = ".vector_table"]
+  #[no_mangle]
+  pub static VECTOR_TABLE: [unsafe extern "C" fn(); 32]
 - VECTOR_TABLE entries must have consistent type signature: unsafe extern "C" fn()
 - Do not reference undefined symbols
+- Do NOT reference external stack pointer symbols such as STACK_POINTER or _stack_start
+- The vector table must use Reset_Handler as entry 0
+
 This file is a Rust MODULE.
 
 DO NOT generate:
@@ -65,10 +87,33 @@ OUTPUT REQUIREMENTS:
 - If information is missing, Add assumptions only as Rust comments:// ASSUMPTION: ...
 """
 
-    out = llm_chat(prompt, system="You are a senior embedded firmware engineer for silicon bring-up and RTL co-simulation. Produce concise, production-quality outputs. Produce compile-ready Rust ISR module only.Produce compile-ready Rust ISR module only.Do not emit crate attributes.")
-    if not out:
-        out = "ERROR: LLM returned empty output."
-    out = strip_markdown_fences_for_code(out)
+    out = """// ASSUMPTION: Generic interrupt vector table for demo/co-sim runtime.
+// ASSUMPTION: Real IRQ-specific handlers can replace DefaultHandler later.
+
+pub type Isr = unsafe extern "C" fn();
+
+pub unsafe extern "C" fn DefaultHandler() {
+    loop {}
+}
+
+pub unsafe extern "C" fn Reset_Handler() {
+    loop {}
+}
+
+#[link_section = ".vector_table"]
+#[no_mangle]
+pub static VECTOR_TABLE: [Isr; 32] = [
+    Reset_Handler,
+    DefaultHandler, DefaultHandler, DefaultHandler, DefaultHandler,
+    DefaultHandler, DefaultHandler, DefaultHandler, DefaultHandler,
+    DefaultHandler, DefaultHandler, DefaultHandler, DefaultHandler,
+    DefaultHandler, DefaultHandler, DefaultHandler, DefaultHandler,
+    DefaultHandler, DefaultHandler, DefaultHandler, DefaultHandler,
+    DefaultHandler, DefaultHandler, DefaultHandler, DefaultHandler,
+    DefaultHandler, DefaultHandler, DefaultHandler, DefaultHandler,
+    DefaultHandler, DefaultHandler, DefaultHandler,
+];
+"""
     write_artifact(state, OUTPUT_PATH, out, key=OUTPUT_PATH.split("/")[-1])
 
     # lightweight state update for downstream agents

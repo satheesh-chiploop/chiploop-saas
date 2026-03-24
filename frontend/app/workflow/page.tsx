@@ -60,6 +60,17 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Digital IP Packaging & Handoff Agent", backendLabel: "Digital IP Packaging & Handoff Agent", desc: "Creates SoC-ready IP package folder layout + manifest + checklist; bundles key RTL/docs/constraints/power/verification collateral." },
     { uiLabel: "Digital Smoke Preflight Agent", backendLabel: "Digital Smoke Preflight Agent", desc: "Normalizes RTL inputs for Smoke, infers top module, and writes a stable smoke_preflight.json manifest." },
     { uiLabel: "Digital Smoke Executive Summary Agent", backendLabel: "Digital Smoke Executive Summary Agent", desc: "Creates one-page Smoke PASS/FAIL summary + next steps using compile + sim control outputs." },
+    { 
+      uiLabel: "Digital Simulation Execution Agent", 
+      backendLabel: "Digital Simulation Execution Agent", 
+      desc: "Executes Cocotb+Verilator simulations using generated regression setup (multi-test, multi-seed), runs make-based flows, and produces execution summaries with per-run logs" 
+    },
+    
+    { 
+      uiLabel: "Digital Simulation Summary Coverage Agent", 
+      backendLabel: "Digital Simulation Summary Coverage Agent", 
+      desc: "Aggregates simulation execution results and functional coverage data to generate a consolidated summary of pass/fail status and coverage metrics for UI visualization" 
+    },
     {
       uiLabel: "Digital RTL Signature Agent",
       backendLabel: "Digital RTL Signature Agent",
@@ -240,6 +251,17 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Digital IP Packaging & Handoff Agent", backendLabel: "Digital IP Packaging & Handoff Agent", desc: "Creates SoC-ready IP package folder layout + manifest + checklist; bundles key RTL/docs/constraints/power/verification collateral." },
     { uiLabel: "Digital Smoke Preflight Agent", backendLabel: "Digital Smoke Preflight Agent", desc: "Normalizes RTL inputs for Smoke, infers top module, and writes a stable smoke_preflight.json manifest." },
     { uiLabel: "Digital Smoke Executive Summary Agent", backendLabel: "Digital Smoke Executive Summary Agent", desc: "Creates one-page Smoke PASS/FAIL summary + next steps using compile + sim control outputs." },
+    { 
+      uiLabel: "Digital Simulation Execution Agent", 
+      backendLabel: "Digital Simulation Execution Agent", 
+      desc: "Executes Cocotb+Verilator simulations using generated regression setup (multi-test, multi-seed), runs make-based flows, and produces execution summaries with per-run logs" 
+    },
+    
+    { 
+      uiLabel: "Digital Simulation Summary Coverage Agent", 
+      backendLabel: "Digital Simulation Summary Coverage Agent", 
+      desc: "Aggregates simulation execution results and functional coverage data to generate a consolidated summary of pass/fail status and coverage metrics for UI visualization" 
+    },
     {
       uiLabel: "Digital RTL Signature Agent",
       backendLabel: "Digital RTL Signature Agent",

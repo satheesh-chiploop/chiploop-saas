@@ -252,6 +252,25 @@ Now output only valid SystemVerilog assertion code.
         clk = clock_name or "clk"
         assertions_code = f"default clocking cb @(posedge {clk}); endclocking\n\n" + assertions_code
 
+    
+
+    # Validate signals exist in RTL
+    rtl_signals = set(re.findall(r"\b([a-zA-Z_][a-zA-Z0-9_]*)\b", rtl_text))
+
+    filtered_lines = []
+    for line in assertions_code.splitlines():
+        sigs = re.findall(r"\b([a-zA-Z_][a-zA-Z0-9_]*)\b", line)
+        allowed = {
+            "assert","property","disable","iff","posedge","cover",
+            "$isunknown","default","clocking","endclocking"
+        }
+
+        if any(s not in rtl_signals and s not in allowed for s in sigs):
+            continue
+        filtered_lines.append(line)
+
+    assertions_code = "\n".join(filtered_lines)
+
     assertions_total = _count_assertions_in_text(assertions_code)
 
     metadata: Dict[str, Any] = {

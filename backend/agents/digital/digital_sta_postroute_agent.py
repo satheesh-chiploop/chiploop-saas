@@ -1,4 +1,14 @@
-import os, json, glob, shutil, subprocess, re
+import os
+import json
+import glob
+import shutil
+import subprocess
+import re
+import logging
+from datetime import datetime
+
+logger = logging.getLogger("chiploop")
+
 from utils.artifact_utils import save_text_artifact_and_record
 
 AGENT_NAME = "Digital STA PostRoute Agent"
@@ -9,7 +19,7 @@ DEFAULT_PDK_VARIANT = os.getenv("CHIPLOOP_PDK_VARIANT", "sky130A")
 DEFAULT_OPENLANE_IMAGE = os.getenv("CHIPLOOP_OPENLANE_IMAGE", "ghcr.io/efabless/openlane2:2.4.0.dev1")
 DEFAULT_NUM_CORES = int(os.getenv("OPENLANE_NUM_CORES", "2"))
 
-def _ensure(p): os.makedirs(p, exist_ok=True)
+
 
 def _read_json(p):
     try:
@@ -18,25 +28,29 @@ def _read_json(p):
     except Exception:
         return {}
 
-def _write(p, s):
-    _ensure(os.path.dirname(p))
-    with open(p, "w", encoding="utf-8") as f:
-        f.write(s)
+
 
 def _run(cmd, cwd):
     p = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     out, _ = p.communicate()
     return p.returncode, out
+def _ensure_dir(path: str) -> None:
+    os.makedirs(path, exist_ok=True)
 
-def _latest_run(run_work_dir):
-    runs = os.path.join(run_work_dir, "runs")
-    if not os.path.isdir(runs):
+def _write_text(path: str, content: str) -> None:
+    _ensure_dir(os.path.dirname(path))
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+def _latest_run_dir(run_work_dir: str) -> str | None:
+    runs_dir = os.path.join(run_work_dir, "runs")
+    if not os.path.isdir(runs_dir):
         return None
-    ds = [os.path.join(runs, d) for d in os.listdir(runs) if os.path.isdir(os.path.join(runs, d))]
-    if not ds:
+    dirs = [os.path.join(runs_dir, d) for d in os.listdir(runs_dir) if os.path.isdir(os.path.join(runs_dir, d))]
+    if not dirs:
         return None
-    ds.sort(key=lambda x: os.path.getmtime(x))
-    return ds[-1]
+    dirs.sort(key=lambda p: os.path.getmtime(p))
+    return dirs[-1]
 
 def _copy_metrics(latest, stage_dir):
     if not latest:
@@ -48,6 +62,38 @@ def _copy_metrics(latest, stage_dir):
         return dst
     return None
 
+def _copy_first_matching(patterns: list[str], dst_dir: str) -> str | None:
+    _ensure_dir(dst_dir)
+    for pat in patterns:
+        hits = sorted(glob.glob(pat))
+        if hits:
+            src = hits[0]
+            dst = os.path.join(dst_dir, os.path.basename(src))
+            shutil.copy2(src, dst)
+            return dst
+    return None
+
+def _collect_generated_postroute_outputs(latest_run: str, stage_dir: str) -> tuple[str | None, str | None]:
+    if not latest_run:
+        return None, None
+
+    netlist_dir = os.path.join(stage_dir, "netlist")
+    spef_dir = os.path.join(stage_dir, "spef")
+
+    netlist_path = _copy_first_matching([
+        os.path.join(latest_run, "final", "nl", "*.nl.v"),
+        os.path.join(latest_run, "final", "nl", "*.v"),
+        os.path.join(latest_run, "final", "pnl", "*.pnl.v"),
+        os.path.join(latest_run, "final", "pnl", "*.v"),
+    ], netlist_dir)
+
+    spef_path = _copy_first_matching([
+        os.path.join(latest_run, "final", "spef", "*.spef"),
+        os.path.join(latest_run, "final", "spef", "*.spef.gz"),
+    ], spef_dir)
+
+    return netlist_path, spef_path
+
 def _infer_top_from_netlist(netlist_path: str) -> str | None:
     try:
         txt = open(netlist_path, "r", encoding="utf-8", errors="ignore").read()
@@ -56,54 +102,222 @@ def _infer_top_from_netlist(netlist_path: str) -> str | None:
     m = re.search(r'^\s*module\s+([A-Za-z_][A-Za-z0-9_$]*)\s*\(', txt, flags=re.MULTILINE)
     return m.group(1) if m else None
 
+
+def _first_existing(paths: list[str]) -> str | None:
+    for p in paths:
+        if p and os.path.exists(p):
+            return p
+    return None
+
+
+def _resolve_sdc_from_state(state: dict, workflow_dir: str) -> str | None:
+    digital = state.get("digital") or {}
+    route_state = digital.get("route") or {}
+
+    cand = _first_existing([
+        route_state.get("constraints_sdc"),
+        os.path.join(workflow_dir, "digital", "route", "constraints", "digital_subsystem.sdc"),
+    ])
+    if cand:
+        logger.info(f"{AGENT_NAME}: selected route SDC -> {cand}")
+        return cand
+
+    for stage in ["route", "cts", "place", "floorplan", "impl_setup", "synth"]:
+        cand_dir = os.path.join(workflow_dir, "digital", stage, "constraints")
+        for cand in sorted(glob.glob(os.path.join(cand_dir, "*.sdc"))):
+            if os.path.exists(cand):
+                logger.info(f"{AGENT_NAME}: selected SDC from {stage} -> {cand}")
+                return cand
+
+    logger.warning(f"{AGENT_NAME}: no upstream SDC found")
+    return None
+
+def _pick_stage_netlist(latest_run: str) -> str | None:
+    if not latest_run:
+        return None
+
+    patterns = [
+        os.path.join(latest_run, "final", "nl", "*.nl.v"),
+        os.path.join(latest_run, "final", "nl", "*.v"),
+        os.path.join(latest_run, "final", "pnl", "*.pnl.v"),
+        os.path.join(latest_run, "final", "pnl", "*.v"),
+    ]
+
+    for pat in patterns:
+        hits = sorted(glob.glob(pat))
+        if hits:
+            logger.info(f"{AGENT_NAME}: selected stage netlist from run dir -> {hits[0]}")
+            return hits[0]
+
+    return None
+
+
+def _resolve_config_from_state(state: dict, workflow_dir: str) -> str | None:
+    digital = state.get("digital") or {}
+    route_state = digital.get("route") or {}
+
+    cand = _first_existing([
+        route_state.get("openlane_config"),
+        route_state.get("config_json"),
+        os.path.join(workflow_dir, "digital", "route", "config.json"),
+    ])
+    if cand:
+        logger.info(f"{AGENT_NAME}: selected route config -> {cand}")
+        return cand
+
+    for cand in [
+        os.path.join(workflow_dir, "digital", "cts", "config.json"),
+        os.path.join(workflow_dir, "digital", "place", "config.json"),
+        os.path.join(workflow_dir, "digital", "impl_setup", "openlane", "config.json"),
+        os.path.join(workflow_dir, "digital", "synth", "config.json"),
+        os.path.join(workflow_dir, "digital", "foundry", "openlane", "config.json"),
+    ]:
+        if os.path.exists(cand):
+            logger.info(f"{AGENT_NAME}: selected config fallback -> {cand}")
+            return cand
+
+    logger.warning(f"{AGENT_NAME}: no OpenLane config found")
+    return None
+
+
+def _resolve_postroute_netlist(state: dict, workflow_dir: str) -> str | None:
+    digital = state.get("digital") or {}
+    route_state = digital.get("route") or {}
+
+    candidates = [
+        route_state.get("netlist"),
+        route_state.get("final_netlist"),
+        route_state.get("route_netlist"),
+    ]
+
+    latest_run = route_state.get("openlane_run_dir")
+    picked = _pick_stage_netlist(latest_run) if latest_run else None
+    if picked:
+        candidates.append(picked)
+
+    candidates.extend([
+        os.path.join(workflow_dir, "digital", "route", "netlist", "digital_subsystem_route.v"),
+        os.path.join(workflow_dir, "digital", "route", "netlist", "digital_subsystem.v"),
+    ])
+
+    cand = _first_existing(candidates)
+    if cand:
+        logger.info(f"{AGENT_NAME}: selected post-route netlist -> {cand}")
+    else:
+        logger.warning(f"{AGENT_NAME}: no route netlist found")
+    return cand
+
+def _resolve_postroute_spef(state: dict, workflow_dir: str) -> str | None:
+    digital = state.get("digital") or {}
+    route_state = digital.get("route") or {}
+
+    candidates = [
+        route_state.get("spef"),
+        route_state.get("final_spef"),
+        route_state.get("route_spef"),
+    ]
+
+    latest_run = route_state.get("openlane_run_dir")
+
+    if latest_run:
+        candidates.extend(sorted(glob.glob(os.path.join(latest_run, "final", "spef", "*.spef"))))
+        candidates.extend(sorted(glob.glob(os.path.join(latest_run, "final", "spef", "*.spef.gz"))))
+
+    candidates.extend(sorted(glob.glob(os.path.join(workflow_dir, "digital", "route", "spef", "*.spef"))))
+    candidates.extend(sorted(glob.glob(os.path.join(workflow_dir, "digital", "route", "spef", "*.spef.gz"))))
+
+
+    cand = _first_existing(candidates)
+    if cand:
+        logger.info(f"{AGENT_NAME}: selected post-route SPEF -> {cand}")
+    else:
+        logger.warning(f"{AGENT_NAME}: no route SPEF found")
+    return cand
+
 def run_agent(state: dict) -> dict:
+
+    print(f"\n🏁 Running {AGENT_NAME}...")
+    logger.info(f"🏁 Running {AGENT_NAME}")
     workflow_id = state.get("workflow_id", "default")
     workflow_dir = state.get("workflow_dir") or f"backend/workflows/{workflow_id}"
     workflow_dir = os.path.abspath(workflow_dir)
 
     stage_dir = os.path.join(workflow_dir, "digital", STAGE_NAME)
     logs_dir = os.path.join(stage_dir, "logs")
-    _ensure(stage_dir); _ensure(logs_dir)
+    _ensure_dir(stage_dir); _ensure_dir(logs_dir)
 
-    impl_cfg = os.path.join(workflow_dir, "digital", "foundry", "openlane", "config.json")
-    synth_cfg = os.path.join(workflow_dir, "digital", "synth", "config.json")
-    base_cfg = impl_cfg if os.path.exists(impl_cfg) else synth_cfg
-    if not os.path.exists(base_cfg):
-        raise RuntimeError("Missing base config.json (foundry/openlane or synth).")
+    base_cfg_path = _resolve_config_from_state(state, workflow_dir)
+    if not base_cfg_path:
+        raise RuntimeError("Missing OpenLane config from state/route/cts/place/impl_setup/synth/foundry.")
 
-    cfg = _read_json(base_cfg)
+    cfg = _read_json(base_cfg_path)
+    logger.info(f"{AGENT_NAME}: base_cfg_path={base_cfg_path}")
+
+
     cfg.pop("SYNTH_SDC_FILE", None)
+    cfg.pop("SPEF_FILE", None)
 
     run_work_dir = state.get("digital_run_work_dir") or os.path.join(workflow_dir, "digital", "run_work")
     run_work_dir = os.path.abspath(run_work_dir)
-    _ensure(run_work_dir)
+    _ensure_dir(run_work_dir)
     state["digital_run_work_dir"] = run_work_dir
 
-    upstream_sdc = os.path.join(workflow_dir, "digital", "constraints", "top.sdc")
-    if not os.path.exists(upstream_sdc):
-        raise RuntimeError("Missing upstream SDC: digital/constraints/top.sdc")
+    upstream_sdc = _resolve_sdc_from_state(state, workflow_dir)
+    if not upstream_sdc:
+        raise RuntimeError("Missing upstream SDC from state/route/cts/place/floorplan/impl_setup/synth/legacy constraints.")
 
-    inputs_constraints_dir = os.path.join(run_work_dir, "inputs", "constraints")
-    _ensure(inputs_constraints_dir)
-    stage_sdc = os.path.join(inputs_constraints_dir, "top.sdc")
+    sdc_basename = os.path.basename(upstream_sdc)
+
+    inputs_dir = os.path.join(run_work_dir, "inputs")
+    inputs_constraints_dir = os.path.join(inputs_dir, "constraints")
+    _ensure_dir(inputs_constraints_dir)
+
+    stage_sdc = os.path.join(inputs_constraints_dir, sdc_basename)
     shutil.copy2(upstream_sdc, stage_sdc)
-    sdc_text = open(stage_sdc, "r", encoding="utf-8").read()
+    with open(stage_sdc, "r", encoding="utf-8") as f:
+        sdc_text = f.read()
 
-    cfg["PNR_SDC_FILE"] = "inputs/constraints/top.sdc"
+    cfg["PNR_SDC_FILE"] = f"inputs/constraints/{sdc_basename}"
 
-    inputs_netlist_dir = os.path.join(run_work_dir, "inputs", "netlist")
-    stage_netlists = sorted(glob.glob(os.path.join(inputs_netlist_dir, "*.v")))
-    if not stage_netlists:
-        raise RuntimeError("STA postroute: missing run_work/inputs/netlist/*.v.")
-    cfg["VERILOG_FILES"] = [f"inputs/netlist/{os.path.basename(p)}" for p in stage_netlists]
+    logger.info(f"{AGENT_NAME}: upstream_sdc={upstream_sdc}")
+    logger.info(f"{AGENT_NAME}: staged_sdc={stage_sdc}")
+
+    # Option A: resumed STA post-route should not restage route netlist into inputs/netlist
+    # and should not overwrite VERILOG_FILES. Keep inherited config lineage.
+
+    postroute_netlist = _resolve_postroute_netlist(state, workflow_dir)
+    if not postroute_netlist:
+        logger.warning(f"{AGENT_NAME}: route netlist artifact not found; continuing with inherited run context")
 
     if str(cfg.get("DESIGN_NAME", "")).strip() in ["", "top"]:
-        inferred = _infer_top_from_netlist(stage_netlists[0])
-        if inferred:
-            cfg["DESIGN_NAME"] = inferred
-            state["design_name"] = inferred
+        state_design_name = state.get("design_name")
+        if state_design_name:
+            cfg["DESIGN_NAME"] = state_design_name
 
-    _write(os.path.join(stage_dir, "config.json"), json.dumps(cfg, indent=2))
+    top_module = str(cfg.get("DESIGN_NAME", "")).strip() or state.get("design_name") or "top"
+    staged_postroute_netlist = None
+
+    postroute_spef = _resolve_postroute_spef(state, workflow_dir)
+    staged_postroute_spef = None
+    if postroute_spef:
+        inputs_spef_dir = os.path.join(run_work_dir, "inputs", "spef")
+        _ensure_dir(inputs_spef_dir)
+
+        for old_spef in glob.glob(os.path.join(inputs_spef_dir, "*")):
+            try:
+                os.remove(old_spef)
+            except Exception:
+                pass
+
+        staged_postroute_spef = os.path.join(inputs_spef_dir, os.path.basename(postroute_spef))
+        shutil.copy2(postroute_spef, staged_postroute_spef)
+
+        cfg["SPEF_FILE"] = f"inputs/spef/{os.path.basename(staged_postroute_spef)}"
+        logger.info(f"{AGENT_NAME}: using existing route SPEF -> {staged_postroute_spef}")
+    else:
+        logger.info(f"{AGENT_NAME}: no incoming route SPEF found; STAPostPNR is expected to generate SPEF")
+
+    _write_text(os.path.join(stage_dir, "config.json"), json.dumps(cfg, indent=2))
 
     explicit = state.get("digital_run_tag") or state.get("run_tag")
     wf_name = state.get("workflow_name") or state.get("workflow_type") or state.get("flow_name") or "digital"
@@ -117,29 +331,76 @@ def run_agent(state: dict) -> dict:
     pdk_root_host = os.path.abspath(pdk_root_host)
     state["pdk_root_host"] = pdk_root_host
 
+
+
     work_stage_dir = os.path.join(run_work_dir, STAGE_NAME)
-    _ensure(work_stage_dir)
-    _write(os.path.join(work_stage_dir, "config.json"), json.dumps(cfg, indent=2))
+    _ensure_dir(work_stage_dir)
+    _write_text(os.path.join(work_stage_dir, "config.json"), json.dumps(cfg, indent=2))
+
+
+
+    inherited_verilog_files = cfg.get("VERILOG_FILES", [])
+    if isinstance(inherited_verilog_files, str):
+        inherited_verilog_files = [inherited_verilog_files]
+
+    input_log = "\n".join([
+        f"[{datetime.utcnow().isoformat()}Z] {AGENT_NAME}",
+        f"workflow_id={workflow_id}",
+        f"workflow_dir={workflow_dir}",
+        f"upstream_sdc={upstream_sdc}",
+        f"sdc_basename={sdc_basename}",
+        f"stage_sdc={stage_sdc}",
+        f"base_cfg_path={base_cfg_path}",
+        f"run_work_dir={run_work_dir}",
+        f"run_tag={run_tag}",
+        f"top_module={top_module}",
+        f"verilog_files_mode=inherited_from_base_config",
+        f"verilog_files={','.join(inherited_verilog_files)}",
+        f"resolved_postroute_netlist={postroute_netlist}",
+        f"staged_postroute_netlist=None",
+        f"resolved_postroute_spef={postroute_spef}",
+        f"staged_postroute_spef={staged_postroute_spef}",
+    ]) + "\n"
+    _write_text(os.path.join(logs_dir, "sta_postroute_input_resolution.log"), input_log)
 
     run_sh = f"""#!/usr/bin/env bash
 set -euo pipefail
+
+echo "== ChipLoop: {AGENT_NAME} =="
+echo "PDK_VARIANT={pdk}"
+echo "OPENLANE_IMAGE={image}"
+echo "WORKDIR=/work"
+
 export OPENLANE_NUM_CORES={DEFAULT_NUM_CORES}
-docker run --rm \\
-  -v "{pdk_root_host}":/pdk \\
-  -v "{run_work_dir}":/work \\
-  -e PDK={pdk} \\
-  -e PDK_ROOT=/pdk \\
-  {image} \\
+
+docker run --rm \
+  -v "{pdk_root_host}":/pdk \
+  -v "{run_work_dir}":/work \
+  -e PDK={pdk} \
+  -e PDK_ROOT=/pdk \
+  {image} \
   bash -lc 'set -e; cd /work && openlane --flow Classic --run-tag {run_tag} --to {OPENLANE_TO} {STAGE_NAME}/config.json'
 """
-    _write(os.path.join(stage_dir, "run.sh"), run_sh)
+    _write_text(os.path.join(stage_dir, "run.sh"), run_sh)
     os.chmod(os.path.join(stage_dir, "run.sh"), 0o755)
 
     rc, out = _run(["bash", "-lc", "./run.sh"], cwd=stage_dir)
-    _write(os.path.join(logs_dir, "openlane_sta_postroute.log"), out)
+    _write_text(os.path.join(logs_dir, "openlane_sta_postroute.log"), out)
 
-    latest = _latest_run(run_work_dir)
-    metrics = _copy_metrics(latest, stage_dir)
+
+    latest = _latest_run_dir(work_stage_dir)
+    metrics_path = _copy_metrics(latest, stage_dir)
+    final_postroute_netlist, final_postroute_spef = _collect_generated_postroute_outputs(latest, stage_dir)
+
+    if final_postroute_netlist:
+        logger.info(f"{AGENT_NAME}: collected generated post-route netlist -> {final_postroute_netlist}")
+    else:
+        logger.warning(f"{AGENT_NAME}: no generated post-route netlist found in final run directory")
+
+    if final_postroute_spef:
+        logger.info(f"{AGENT_NAME}: collected generated post-route SPEF -> {final_postroute_spef}")
+    else:
+        logger.warning(f"{AGENT_NAME}: no generated post-route SPEF found in final run directory")
 
     summary = {
         "workflow_id": workflow_id,
@@ -147,30 +408,78 @@ docker run --rm \\
         "status": "ok" if rc == 0 else "failed",
         "return_code": rc,
         "outputs": {
-            "metrics_json": "digital/sta_postroute/metrics.json" if metrics else None,
-            "log": "digital/sta_postroute/logs/openlane_sta_postroute.log",
+            "sdc": f"digital/{STAGE_NAME}/constraints/{sdc_basename}",
+            "metrics_json": f"digital/{STAGE_NAME}/metrics.json" if metrics_path else None,
+            "log": f"digital/{STAGE_NAME}/logs/openlane_sta_postroute.log",
             "openlane_run_dir": latest,
         },
     }
-    _write(os.path.join(stage_dir, "sta_postroute_summary.json"), json.dumps(summary, indent=2))
-    _write(os.path.join(stage_dir, "sta_postroute_summary.md"),
+    _write_text(os.path.join(stage_dir, "sta_postroute_summary.json"), json.dumps(summary, indent=2))
+    _write_text(os.path.join(stage_dir, "sta_postroute_summary.md"),
            f"# STA PostRoute\n\n- status: `{summary['status']}` (rc={rc})\n")
 
     try:
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/config.json", json.dumps(cfg, indent=2))
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/run.sh", run_sh)
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/logs/openlane_sta_postroute.log", out)
-        save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/constraints/top.sdc", sdc_text)
-        if metrics and os.path.exists(metrics):
-            save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/metrics.json",
-                                          open(metrics, "r", encoding="utf-8").read())
+        save_text_artifact_and_record(
+            workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/constraints/{sdc_basename}", sdc_text
+        )   
+        save_text_artifact_and_record(
+            workflow_id, AGENT_NAME, "digital", f"{STAGE_NAME}/logs/sta_postroute_input_resolution.log", input_log
+        )
+        if final_postroute_netlist and os.path.exists(final_postroute_netlist):
+            save_text_artifact_and_record(
+                workflow_id,
+                AGENT_NAME,
+                "digital",
+                f"{STAGE_NAME}/netlist/{os.path.basename(final_postroute_netlist)}",
+                open(final_postroute_netlist, "r", encoding="utf-8", errors="ignore").read(),
+            )
+
+        if final_postroute_spef and os.path.exists(final_postroute_spef):
+            if final_postroute_spef.endswith(".gz"):
+                save_text_artifact_and_record(
+                    workflow_id,
+                    AGENT_NAME,
+                    "digital",
+                    f"{STAGE_NAME}/spef/{os.path.basename(final_postroute_spef)}",
+                    f"[binary gzip SPEF stored at {final_postroute_spef}]",
+                )
+            else:
+                save_text_artifact_and_record(
+                    workflow_id,
+                    AGENT_NAME,
+                    "digital",
+                    f"{STAGE_NAME}/spef/{os.path.basename(final_postroute_spef)}",
+                    open(final_postroute_spef, "r", encoding="utf-8", errors="ignore").read(),
+                )
+        if metrics_path and os.path.exists(metrics_path):
+            save_text_artifact_and_record(
+                workflow_id,
+                AGENT_NAME,
+                "digital",
+                f"{STAGE_NAME}/metrics.json",
+                open(metrics_path, "r", encoding="utf-8").read(),
+            )
+
     except Exception as e:
         print(f"⚠️ upload failed: {e}")
 
     state.setdefault("digital", {})[STAGE_NAME] = {
         "status": summary["status"],
         "stage_dir": stage_dir,
-        "metrics_json": metrics,
+        "metrics_json": metrics_path,
+        "constraints_sdc": stage_sdc,
+        "openlane_config": os.path.join(work_stage_dir, "config.json"),
+        "input_resolution_log": os.path.join(logs_dir, "sta_postroute_input_resolution.log"),
         "openlane_run_dir": latest,
+        "netlist": final_postroute_netlist or postroute_netlist,
+        "final_netlist": final_postroute_netlist or postroute_netlist,
+        "spef": final_postroute_spef or staged_postroute_spef,
+        "final_spef": final_postroute_spef or staged_postroute_spef,
     }
+
+   
+        
     return state
