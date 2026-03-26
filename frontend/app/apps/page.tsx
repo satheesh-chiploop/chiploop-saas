@@ -329,6 +329,15 @@ export default function AppsHomePage() {
       promise: "GDS + DRC/LVS + exec summary",
     },
     {
+      slug: "system-rtl",
+      title: "System RTL",
+      subtitle: "Digital + Analog + SoC intent → integrated top RTL + handoff package",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Generate integrated system RTL + top assembly artifacts",
+    },
+    {
       slug: "system-firmware",
       title: "System Firmware",
       subtitle: "Register extract → driver scaffold → build → co-sim results",
@@ -418,6 +427,7 @@ export default function AppsHomePage() {
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
+      "system-rtl": "/apps/system-rtl",
     };
     
     return dedicated[slug] || `/apps/${slug}`;

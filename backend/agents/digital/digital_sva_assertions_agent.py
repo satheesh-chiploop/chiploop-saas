@@ -95,14 +95,30 @@ def _write_file(path: str, content: str) -> None:
         f.write(content)
 
 
+
 def _collect_rtl_files(workflow_dir: str) -> List[str]:
     exts = (".v", ".sv", ".vh", ".svh")
-    rtl: List[str] = []
-    for root, _, files in os.walk(workflow_dir):
-        for fn in files:
-            if fn.lower().endswith(exts):
-                rtl.append(os.path.join(root, fn))
-    return sorted({os.path.abspath(p) for p in rtl})
+
+    handoff_dirs = [
+        os.path.join(workflow_dir, "handoff", "digital_subsystem_ip_package", "rtl"),
+        os.path.join(workflow_dir, "handoff", "rtl"),
+    ]
+
+    for d in handoff_dirs:
+        if not os.path.isdir(d):
+            continue
+
+        rtl: List[str] = []
+        for root, _, files in os.walk(d):
+            for fn in files:
+                if fn.lower().endswith(exts):
+                    rtl.append(os.path.abspath(os.path.join(root, fn)))
+
+        rtl = sorted(set(rtl))
+        if rtl:
+            return rtl
+
+    return []
 
 
 def _find_fallback_spec_json(workflow_dir: str) -> Optional[str]:
@@ -243,31 +259,40 @@ def _infer_clocks_resets(spec: Dict[str, Any], ports: List[Dict[str, Any]]) -> T
             if re.search(r"(?:^|_)(rst|reset)(?:$|_)", nm, re.IGNORECASE):
                 resets.append({"name": nm})
 
+
     clocks = [c for c in clocks if isinstance(c, str) and c.strip()]
     clocks = list(dict.fromkeys(clocks))
 
     norm_resets: List[Dict[str, Any]] = []
-    seen = set()
     for r in resets:
         if isinstance(r, dict) and r.get("name"):
-            nm = str(r["name"])
-            if nm in seen:
-                continue
-            seen.add(nm)
-            norm_resets.append(
-                {
-                    "name": nm,
-                    "active_low": bool(
-                        r.get("active_low", False)
-                        or str(r.get("polarity", "")).lower() in ("active_low", "low", "0")
-                    ),
-                    "async": bool(
-                        str(r.get("type", "")).lower() in ("async", "asynchronous")
-                        or r.get("async", False)
-                    ),
-                }
-            )
-    return clocks, norm_resets
+            nm = str(r.get("name"))
+            is_name_active_low = bool(re.search(r"(rst_n|reset_n|por_n)", nm, re.IGNORECASE))
+
+            rr = {
+                "name": nm,
+                "active_low": bool(
+                    r.get("active_low", False)
+                    or is_name_active_low
+                    or str(r.get("polarity", "")).lower() in ("active_low", "low", "0")
+                ),
+                "async": bool(
+                    str(r.get("type", "")).lower() in ("async", "asynchronous")
+                    or r.get("async", False)
+                ),
+            }
+            norm_resets.append(rr)
+
+    # remove duplicates
+    uniq_resets: List[Dict[str, Any]] = []
+    seen = set()
+    for rr in norm_resets:
+        if rr["name"] not in seen:
+            seen.add(rr["name"])
+            uniq_resets.append(rr)
+
+    return clocks, uniq_resets
+
 
 
 def _resolve_sva_mode(state: Dict[str, Any]) -> str:
@@ -373,17 +398,21 @@ def _default_sva_module(module_name: str, sva_spec: Dict[str, Any]) -> str:
     outputs = [p["name"] for p in ports if p.get("direction") == "output"]
 
     module_ports: List[str] = []
-    if primary_clock:
-        module_ports.append(f"  input logic {primary_clock}")
-    if primary_reset:
-        module_ports.append(f"  input logic {primary_reset}")
-    for nm in inputs:
-        if nm not in {primary_clock, primary_reset}:
-            module_ports.append(f"  input logic {nm}")
-    for nm in outputs:
-        if nm not in {primary_clock, primary_reset}:
-            module_ports.append(f"  input logic {nm}")
 
+    all_ports = set()
+
+    if primary_clock:
+        all_ports.add(primary_clock)
+    if primary_reset:
+        all_ports.add(primary_reset)
+
+    for nm in inputs:
+        all_ports.add(nm)
+    for nm in outputs:
+        all_ports.add(nm)
+
+    module_ports = [f"  input logic {nm}" for nm in sorted(all_ports)]
+    
     if not module_ports:
         module_ports.append("  input logic dummy_clk")
 
@@ -494,8 +523,27 @@ def _maybe_llm_expand(spec: Dict[str, Any], sva: str, log_path: str, sva_spec: D
     return sva
 
 
+def _gen_bind_sv(top: str, module_name: str, sva_spec: Dict[str, Any]) -> str:
+    conns: List[str] = []
+    for p in sva_spec.get("ports", []):
+        nm = p.get("name")
+        if nm:
+            conns.append(f"  .{nm}({nm})")
+    joined = ",\n".join(conns)
+    return f"""/*
+ * Auto-generated SVA bind file.
+ * Uses only spec-declared signals.
+ */
+bind {top} {module_name} u_{module_name} (
+{joined}
+);
+"""
+
+
 def run_agent(state: dict) -> dict:
     agent_name = "Digital Assertions (SVA) Agent"
+
+    artifacts: Dict[str, Any] = {}
 
     workflow_id = state.get("workflow_id", "default")
     workflow_dir = state.get("workflow_dir", f"backend/workflows/{workflow_id}")
@@ -506,6 +554,8 @@ def run_agent(state: dict) -> dict:
         f.write("Digital Assertions (SVA) Agent Log\n")
 
     _log(log_path, f"Starting {agent_name}...")
+
+ 
 
     contract = _resolve_sva_contract(state, workflow_dir, log_path)
     mode = contract["mode"]
@@ -539,22 +589,35 @@ def run_agent(state: dict) -> dict:
     os.makedirs(out_dir, exist_ok=True)
 
     module_name = f"{top}_assertions"
+
+
     sva_sv = _default_sva_module(module_name, sva_spec)
-    sva_sv = _maybe_llm_expand(spec, sva_sv, log_path, sva_spec)
+
+    enable_llm_expand = str(os.getenv("CHIPLOOP_ENABLE_LLM_SVA_EXPAND", "0")).strip().lower() in ("1", "true", "yes")
+    if enable_llm_expand:
+        sva_sv = _maybe_llm_expand(spec, sva_sv, log_path, sva_spec)
+    else:
+        _log(log_path, "LLM SVA expansion disabled; using deterministic scaffold.")
+
+    bind_sv = _gen_bind_sv(top, module_name, sva_spec)
 
     bind_readme = f"""# SVA Usage
 
 Generated:
-- `{module_name}.sv` : assertion module derived from spec
-- `sva_spec.json`    : resolved assertion contract
+- `{module_name}.sv`        : assertion module derived from spec
+- `{module_name}_bind.sv`   : bind file for DUT integration
+- `sva_spec.json`           : resolved assertion contract
 - `sva_generation_report.json`
 
-Integration options:
-1. Instantiate `{module_name}` manually in the testbench/DUT wrapper.
-2. Add a project-specific bind file later, using only signals declared in spec.
-
-This agent intentionally avoids inventing bind targets or signal names.
+The bind file uses only spec-declared signals and is intended to be compiled with simulation sources.
 """
+
+    _write_file(os.path.join(out_dir, f"{module_name}_bind.sv"), bind_sv)
+    artifacts["sva_bind_sv"] = _record_text(
+        workflow_id, agent_name, "vv/tb", f"{module_name}_bind.sv", bind_sv
+    )
+
+    state["sva_bind_path"] = os.path.join(out_dir, f"{module_name}_bind.sv")
 
     sva_spec_txt = json.dumps(sva_spec, indent=2)
 
@@ -566,26 +629,36 @@ This agent intentionally avoids inventing bind targets or signal names.
     _log(log_path, "Generated sva_spec.json")
     _log(log_path, "Generated SVA_README.md")
 
-    artifacts: Dict[str, Any] = {}
+
     artifacts["sva_sv"] = _record_text(workflow_id, agent_name, "vv/tb", f"{module_name}.sv", sva_sv)
     artifacts["sva_spec_json"] = _record_text(workflow_id, agent_name, "vv/tb", "sva_spec.json", sva_spec_txt)
     artifacts["sva_readme"] = _record_text(workflow_id, agent_name, "vv/tb", "SVA_README.md", bind_readme)
 
+    primary_reset = resets[0]["name"] if resets else None
+    primary_reset_active_low = bool(resets[0].get("active_low", False)) if resets else False
+    primary_clock = clocks[0] if clocks else None
+
     report = {
         "type": "digital_sva_generation",
-        "version": "1.1",
+        "version": "1.2",
         "mode": mode,
         "top_module": top,
         "spec_path": spec_path,
         "rtl_file_count": len(rtl_files),
         "clock_names": clocks,
         "reset_names": [r["name"] for r in resets],
+        "primary_clock": primary_clock,
+        "primary_reset": primary_reset,
+        "primary_reset_active_low": primary_reset_active_low,
         "generated_dir": "vv/tb",
         "sva_module_name": module_name,
+        "sva_bind_file": f"{module_name}_bind.sv",
         "assertion_output_signals": [p["name"] for p in sva_spec["ports"] if p["direction"] == "output"][:12],
         "artifacts": artifacts,
     }
 
+    if primary_reset and re.search(r"(?:^|_)(rst_n|reset_n|por_n)(?:$|_)", primary_reset, re.IGNORECASE) and not primary_reset_active_low:
+        _log(log_path, f"Reset name suggests active-low but resolved active_low=False: {primary_reset}", level="warning")
     rep_txt = json.dumps(report, indent=2)
     _write_file(os.path.join(out_dir, "sva_generation_report.json"), rep_txt)
     artifacts["report"] = _record_text(workflow_id, agent_name, "vv/tb", "sva_generation_report.json", rep_txt)
@@ -603,6 +676,7 @@ This agent intentionally avoids inventing bind targets or signal names.
 
     state["sva_assertions_path"] = os.path.join(out_dir, f"{module_name}.sv")
     state["sva_spec_json"] = os.path.join(out_dir, "sva_spec.json")
+    state["sva_bind_path"] = os.path.join(out_dir, f"{module_name}_bind.sv")
 
     _log(log_path, f"{agent_name} completed successfully.")
     return state

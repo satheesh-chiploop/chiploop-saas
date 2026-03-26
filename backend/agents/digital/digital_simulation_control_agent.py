@@ -51,13 +51,27 @@ def _ensure_dirs(workflow_id: str, workflow_dir: str) -> Tuple[str, str]:
 
 def _collect_rtl_files(workflow_dir: str) -> List[str]:
     exts = (".v", ".sv", ".vh", ".svh")
-    rtl: List[str] = []
-    for root, _, files in os.walk(workflow_dir):
-        for fn in files:
-            if fn.lower().endswith(exts):
-                rtl.append(os.path.join(root, fn))
-    rtl.sort()
-    return rtl
+
+    handoff_dirs = [
+        os.path.join(workflow_dir, "handoff", "digital_subsystem_ip_package", "rtl"),
+        os.path.join(workflow_dir, "handoff", "rtl"),
+    ]
+
+    for d in handoff_dirs:
+        if not os.path.isdir(d):
+            continue
+
+        rtl: List[str] = []
+        for root, _, files in os.walk(d):
+            for fn in files:
+                if fn.lower().endswith(exts):
+                    rtl.append(os.path.abspath(os.path.join(root, fn)))
+
+        rtl = sorted(set(rtl))
+        if rtl:
+            return rtl
+
+    return []
 
 def _pick_top_module(spec: Dict[str, Any], rtl_files: List[str], state_top: Optional[str]) -> str:
     if state_top:
@@ -236,9 +250,37 @@ if __name__ == "__main__":
 '''
 
 
+def _gen_simulation_manifest(
+    top: str,
+    spec_path: str,
+    rtl_files: List[str],
+    default_tests: List[str],
+    tb_root: str,
+    state: Dict[str, Any],
+) -> Dict[str, Any]:
+    return {
+        "type": "vv_simulation_manifest",
+        "version": "1.1",
+        "top_module": top,
+        "spec_path": spec_path,
+        "rtl_files": rtl_files,
+        "default_tests": default_tests,
+        "runner": os.path.join(tb_root, "run_regression.py"),
+        "makefile": os.path.join(tb_root, "Makefile"),
+        "testcases_json": os.path.join(tb_root, "testcases.json"),
+        "tb_contract_json": os.path.join(tb_root, "tb_contract.json"),
+        "reports_dir": os.path.join(tb_root, "reports"),
+        "simulator": "verilator",
+        "sva_assertions_path": state.get("sva_assertions_path"),
+        "sva_bind_path": state.get("sva_bind_path"),
+        "coverage_model_py": state.get("coverage_model_py"),
+        "functional_coverage_summary_json": state.get("functional_coverage_summary_json"),
+        "functional_coverage_md": state.get("functional_coverage_md"),
+    }
+
 def run_agent(state: dict) -> dict:
-    agent_name = "Simulation Control Agent"
-    print("\n🎛️ Running Simulation Control Agent...")
+    agent_name = "Digital Simulation Control Agent"
+    print("\n🎛️ Running Digital Simulation Control Agent...")
 
     workflow_id = state.get("workflow_id", "default")
     workflow_dir = state.get("workflow_dir", f"backend/workflows/{workflow_id}")
@@ -251,6 +293,9 @@ def run_agent(state: dict) -> dict:
     spec_path = state.get("spec_json") or os.path.join(workflow_dir, "digital", "spec.json")
     spec = _safe_read_json(spec_path)
     rtl_files = state.get("rtl_files") or _collect_rtl_files(workflow_dir)
+    rtl_files = [os.path.abspath(p) for p in rtl_files if isinstance(p, str)]
+    if not rtl_files:
+        raise FileNotFoundError("No handoff RTL files found for simulation control")
     top = _pick_top_module(spec, rtl_files, state.get("top_module"))
 
     tb_root = os.path.join(workflow_dir, "vv", "tb")
@@ -262,6 +307,27 @@ def run_agent(state: dict) -> dict:
 
     runner_py = _gen_regression_runner(top, default_tests)
     _write_file(os.path.join(tb_root, "run_regression.py"), runner_py)
+
+    artifacts: Dict[str, Any] = {}
+    sim_manifest = _gen_simulation_manifest(
+        top=top,
+        spec_path=spec_path,
+        rtl_files=rtl_files,
+        default_tests=default_tests,
+        tb_root=tb_root,
+        state=state,
+    )
+    sim_manifest_txt = json.dumps(sim_manifest, indent=2)
+    sim_manifest_path = os.path.join(tb_root, "simulation_manifest.json")
+    _write_file(sim_manifest_path, sim_manifest_txt)
+
+    artifacts["simulation_manifest"] = _record_text(
+        workflow_id,
+        agent_name,
+        "vv/tb",
+        "simulation_manifest.json",
+        sim_manifest_txt,
+    )
 
 
     readme = """# Simulation Control
@@ -279,25 +345,33 @@ python run_regression.py --tests smoke_test constrained_random_sanity --seeds 1 
 """
     _write_file(os.path.join(tb_root, "SIM_CONTROL.md"), readme)
 
-    artifacts: Dict[str, Any] = {}
+
     artifacts["runner_py"] = _record_text(workflow_id, agent_name, "vv/tb", "run_regression.py", runner_py)
     artifacts["sim_readme"] = _record_text(workflow_id, agent_name, "vv/tb", "SIM_CONTROL.md", readme)
     artifacts["log"] = _record_text(workflow_id, agent_name, "vv", "simulation_control_agent.log", open(log_path, "r", encoding="utf-8").read())
 
     report = {
         "type": "vv_simulation_control_generation",
-        "version": "1.0",
+        "version": "1.1",
         "top_module": top,
         "spec_path": spec_path,
         "rtl_file_count": len(rtl_files),
-        "tools_detected": {"verilator": bool(_which("verilator")), "make": bool(_which("make"))},
+        "default_tests": default_tests,
+        "simulation_manifest_json": sim_manifest_path,
+        "tools_detected": {
+            "verilator": bool(_which("verilator")),
+            "make": bool(_which("make"))
+        },
         "artifacts": artifacts,
     }
 
+    
     rep_txt = json.dumps(report, indent=2)
     _write_file(os.path.join(tb_root, "sim_control_generation_report.json"), rep_txt)
     artifacts["report"] = _record_text(workflow_id, agent_name, "vv/tb", "sim_control_generation_report.json", rep_txt)
 
     state.setdefault("vv", {})
     state["vv"]["sim_control"] = report
+    state["simulation_manifest_json"] = sim_manifest_path
+    state["simulation_runner_py"] = os.path.join(tb_root, "run_regression.py")
     return state
