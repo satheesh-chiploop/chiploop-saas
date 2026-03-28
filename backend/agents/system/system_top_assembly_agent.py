@@ -1,7 +1,9 @@
 import json
 import re
 import os
+import subprocess
 from utils.artifact_utils import save_text_artifact_and_record
+from agents.analog._analog_llm import llm_text, safe_json_load
 
 # ---------------------------------------------------------------------
 # System Loop: Top Assembly Agent
@@ -113,26 +115,67 @@ def _normalize_tieoff_entry(t: dict):
     port = t.get("port")
     return inst, port, t.get("value")
 
+
+
+
 def _collect_module_files(workflow_dir: str):
     rels = []
     if not workflow_dir or not os.path.isdir(workflow_dir):
         return rels
 
     candidate_roots = [
-        os.path.join(workflow_dir, "digital"),
+        os.path.join(workflow_dir, "digital", "rtl_refactored"),
         os.path.join(workflow_dir, "analog"),
         os.path.join(workflow_dir, "system"),
-        os.path.join(workflow_dir, "rtl"),
     ]
     for root in candidate_roots:
         if not os.path.isdir(root):
             continue
         for walk_root, _, files in os.walk(root):
             for name in sorted(files):
-                if name.endswith(".sv") or name.endswith(".v"):
-                    rels.append(os.path.join(walk_root, name).replace("\\", "/"))
+                if not (name.endswith(".sv") or name.endswith(".v")):
+                    continue
+
+                abs_path = os.path.join(walk_root, name)
+                rel_path = os.path.relpath(abs_path, workflow_dir).replace("\\", "/")
+
+                # Do not rediscover generated SoC top assembly outputs.
+                if rel_path.startswith("system/integration/") and (
+                    name.endswith("_sim.sv") or
+                    name.endswith("_phys.sv") or
+                    name.startswith("soc_top_")
+                ):
+                    continue
+
+                rels.append(rel_path)
     return rels
 
+def _collect_lib_files(workflow_dir: str):
+    """
+    Discover Liberty timing library files under the workflow directory.
+    These are for downstream phys/STA handoff only and must NOT be passed
+    to iverilog/verilator.
+    """
+    hits = []
+    if not workflow_dir or not os.path.isdir(workflow_dir):
+        return hits
+
+    for root, _, files in os.walk(workflow_dir):
+        for fn in files:
+            low = fn.lower()
+            if low.endswith(".lib") or low.endswith(".lib.gz") or low.endswith(".db"):
+                abs_path = os.path.join(root, fn)
+                rel_path = os.path.relpath(abs_path, workflow_dir).replace("\\", "/")
+                hits.append(rel_path)
+
+    # stable order, unique
+    deduped = []
+    seen = set()
+    for p in sorted(hits):
+        if p not in seen:
+            seen.add(p)
+            deduped.append(p)
+    return deduped
 
 def _strip_sv_comments(text: str) -> str:
     text = re.sub(r"//.*?$", "", text, flags=re.MULTILINE)
@@ -175,10 +218,10 @@ def _extract_module_ports_from_text(sv_text: str):
 
     return out
 
-
 def _load_module_port_db(workflow_dir: str):
     db = {}
-    for abs_path in _collect_module_files(workflow_dir):
+    for rel_path in _collect_module_files(workflow_dir):
+        abs_path = rel_path if os.path.isabs(rel_path) else os.path.join(workflow_dir, rel_path)
         try:
             with open(abs_path, "r", encoding="utf-8") as f:
                 parsed = _extract_module_ports_from_text(f.read())
@@ -299,7 +342,7 @@ def _assemble_top(top_module: str, intent: dict, variant: str, module_port_db: d
             new_dir = _top_dir_for_endpoint(True)
             if sp in top_ports and top_ports[sp]["dir"] != new_dir:
                 raise ValueError(f"Conflicting directions inferred for top port '{sp}'")
-            top_ports[sp] = {"dir": new_dir, "range": sr_real}
+            top_ports[sp] = {"dir": new_dir, "range": width}
 
             if di in port_map:
                 port_map[di][dp] = sp
@@ -310,11 +353,12 @@ def _assemble_top(top_module: str, intent: dict, variant: str, module_port_db: d
                 raise ValueError(f"Multiple drivers detected for top port '{dp}'")
             driven_top_ports.add(dp)
 
-            top_ports[dp] = {"dir": _top_dir_for_endpoint(False), "range": dr_real}
+            top_ports[dp] = {"dir": _top_dir_for_endpoint(False), "range": width}
             if si in port_map:
                 port_map[si][sp] = dp
             continue
 
+       
         if si == "top" and di == "top":
             continue
 
@@ -388,6 +432,327 @@ def _assemble_top(top_module: str, intent: dict, variant: str, module_port_db: d
     lines.append("endmodule")
     return "\n".join(lines)
 
+def _abs_existing_rtl_files(workflow_dir: str, rels):
+    out = []
+    for p in rels or []:
+        if not isinstance(p, str) or not p.strip():
+            continue
+        abs_p = p if os.path.isabs(p) else os.path.join(workflow_dir, p)
+        if os.path.isfile(abs_p) and abs_p not in out:
+            out.append(abs_p)
+    return out
+
+def _filter_analog_behavioral_for_phys(rel_paths):
+    """
+    Phys compile should exclude analog behavioral RTL.
+    Keep digital RTL, the generated phys top, and only analog stub/wrapper/macro-style RTL
+    when such a physical-facing Verilog view exists.
+    """
+    out = []
+    for p in rel_paths or []:
+        norm = str(p).replace("\\", "/").lower()
+        base = os.path.basename(norm)
+
+        if norm.startswith("analog/"):
+            # Keep only explicit physical-facing analog views in RTL form.
+            keep_analog = (
+                "_stub." in base or
+                "_wrapper." in base or
+                "blackbox" in base or
+                "_macro." in base or
+                base.startswith("macro_")
+            )
+            if not keep_analog:
+                continue
+
+        out.append(p)
+    return out
+
+def _build_system_filelists(workflow_dir: str, existing_rtl, discovered_rtl, sim_top_rel: str, phys_top_rel: str):
+    existing_rtl = existing_rtl or []
+    discovered_rtl = discovered_rtl or []
+
+    base_rel = []
+    for p in existing_rtl + discovered_rtl:
+        if not isinstance(p, str) or not p.strip():
+            continue
+        norm = p.replace("\\", "/")
+        if norm in (sim_top_rel, phys_top_rel):
+            continue
+        if norm not in base_rel:
+            base_rel.append(norm)
+
+    sim_rel = list(base_rel)
+    sim_rel.append(sim_top_rel)
+
+    phys_base = _filter_analog_behavioral_for_phys(base_rel)
+    phys_rel = list(phys_base)
+    phys_rel.append(phys_top_rel)
+
+    sim_abs = _abs_existing_rtl_files(workflow_dir, sim_rel)
+    phys_abs = _abs_existing_rtl_files(workflow_dir, phys_rel)
+
+    return sim_rel, sim_abs, phys_rel, phys_abs
+
+def _build_system_lib_filelist(workflow_dir: str, discovered_libs):
+    discovered_libs = discovered_libs or []
+
+    lib_rel = []
+    for p in discovered_libs:
+        if isinstance(p, str) and p.strip() and p not in lib_rel:
+            lib_rel.append(p)
+
+    lib_abs = []
+    for p in lib_rel:
+        ap = p if os.path.isabs(p) else os.path.join(workflow_dir, p)
+        ap = os.path.abspath(ap)
+        if os.path.exists(ap):
+            lib_abs.append(ap)
+
+    return lib_rel, lib_abs
+
+
+def _has_non_top_analog_rtl(rtl_files, top_abs):
+    top_abs = os.path.abspath(top_abs)
+    for p in rtl_files or []:
+        ap = os.path.abspath(p)
+        norm = ap.replace("\\", "/").lower()
+        if ap == top_abs:
+            continue
+        if "/analog/" in norm and (norm.endswith(".v") or norm.endswith(".sv")):
+            return True
+    return False
+
+
+def _run_full_compile_pair(workflow_id, agent_name, workflow_dir, tag, top_module, rtl_files):
+    iverilog_ok, iverilog_log = _run_iverilog_full_compile(workflow_dir, top_module, rtl_files)
+    verilator_ok, verilator_log = _run_verilator_full_lint(workflow_dir, top_module, rtl_files)
+
+    save_text_artifact_and_record(
+        workflow_id, agent_name, "system/integration",
+        f"system_full_compile_iverilog_{tag}.log", iverilog_log
+    )
+    save_text_artifact_and_record(
+        workflow_id, agent_name, "system/integration",
+        f"system_full_compile_verilator_{tag}.log", verilator_log
+    )
+
+    return iverilog_ok, iverilog_log, verilator_ok, verilator_log
+
+
+def _run_pass2_for_top(
+    workflow_id,
+    agent_name,
+    workflow_dir,
+    rel_path,
+    top_module,
+    top_intent,
+    rtl_files,
+    tag,
+    iverilog_log,
+    verilator_log,
+):
+    top_abs = os.path.join(workflow_dir, rel_path)
+    with open(top_abs, "r", encoding="utf-8") as f:
+        pass1_top_code = f.read()
+
+    repaired_code, repair_prompt = _run_system_top_pass2_repair(
+        top_module=top_module,
+        top_code=pass1_top_code,
+        intent=top_intent,
+        rtl_files=rtl_files,
+        iverilog_log=iverilog_log,
+        verilator_log=verilator_log,
+    )
+
+    save_text_artifact_and_record(
+        workflow_id,
+        agent_name,
+        "system/integration",
+        f"system_top_pass2_repair_prompt_{tag}.txt",
+        repair_prompt
+    )
+
+    save_text_artifact_and_record(
+        workflow_id,
+        agent_name,
+        "system/integration",
+        f"{top_module}_pass2_candidate.sv",
+        repaired_code
+    )
+
+    with open(top_abs, "w", encoding="utf-8") as f:
+        f.write(repaired_code)
+
+    save_text_artifact_and_record(
+        workflow_id,
+        agent_name,
+        "system/integration",
+        f"{top_module}.sv",
+        repaired_code
+    )
+
+    ok_iverilog_2, iverilog_log_2, ok_verilator_2, verilator_log_2 = _run_full_compile_pair(
+        workflow_id=workflow_id,
+        agent_name=agent_name,
+        workflow_dir=workflow_dir,
+        tag=f"{tag}_pass2",
+        top_module=top_module,
+        rtl_files=rtl_files,
+    )
+
+    return {
+        "iverilog_ok_pass2": ok_iverilog_2,
+        "verilator_ok_pass2": ok_verilator_2,
+        "iverilog_log_pass2": iverilog_log_2,
+        "verilator_log_pass2": verilator_log_2,
+    }
+
+def _run_iverilog_full_compile(workflow_dir: str, top_module: str, rtl_files):
+    log_path = os.path.join(workflow_dir, "system", "integration", "system_full_compile_iverilog.log")
+    cmd = [
+        "iverilog",
+        "-g2012",
+        "-s", top_module,
+        "-o", os.path.join(workflow_dir, "system", "integration", f"{top_module}.out"),
+        *rtl_files,
+    ]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, cwd=workflow_dir)
+        text = f"$ {' '.join(cmd)}\n\nSTDOUT:\n{proc.stdout}\n\nSTDERR:\n{proc.stderr}\n"
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        return proc.returncode == 0, text
+    except Exception as e:
+        text = f"Iverilog invocation failed: {e}"
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        return False, text
+
+
+
+
+def _run_verilator_full_lint(workflow_dir: str, top_module: str, rtl_files):
+    log_path = os.path.join(workflow_dir, "system", "integration", "system_full_compile_verilator.log")
+    cmd = [
+        "verilator",
+        "--lint-only",
+        "--timing",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module", top_module,
+        *rtl_files,
+    ]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, cwd=workflow_dir)
+        text = f"$ {' '.join(cmd)}\n\nSTDOUT:\n{proc.stdout}\n\nSTDERR:\n{proc.stderr}\n"
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        return proc.returncode == 0, text
+    except Exception as e:
+        text = f"Verilator invocation failed: {e}"
+        with open(log_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        return False, text
+
+def _tail_text(s: str, max_chars: int = 12000) -> str:
+    s = s or ""
+    return s[-max_chars:] if len(s) > max_chars else s
+
+def _strip_code_fences(text: str) -> str:
+    text = (text or "").strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+    return text
+
+def _build_system_rtl_repair_prompt(
+    top_module: str,
+    top_code: str,
+    intent: dict,
+    rtl_files: list,
+    iverilog_log: str,
+    verilator_log: str,
+) -> str:
+    return f"""
+You are repairing a generated SystemVerilog SoC top module.
+
+GOAL:
+- Fix ONLY the top-level integration module.
+- Do NOT modify digital or analog leaf RTL.
+- Preserve architecture intent.
+- Make the design compile with Icarus Verilog.
+- Make the design pass Verilator lint-only as much as possible.
+- Prefer minimal edits.
+
+TOP MODULE NAME:
+{top_module}
+
+SYSTEM INTEGRATION INTENT JSON:
+{json.dumps(intent, indent=2)}
+
+RTL FILELIST:
+{json.dumps(rtl_files, indent=2)}
+
+CURRENT TOP MODULE CODE:
+```systemverilog
+{top_code}
+```
+
+IVERILOG LOG:
+```text
+{_tail_text(iverilog_log)}
+```
+
+VERILATOR LOG:
+```text
+{_tail_text(verilator_log)}
+```
+
+STRICT RULES:
+- Respect actual port directions.
+- Do not invent new instances.
+- Do not rename u_digital or u_analog.
+- Do not modify leaf module RTL.
+- Keep only one top module in output.
+- Return ONLY corrected SystemVerilog code for the top module.
+"""
+
+
+def _run_system_top_pass2_repair(
+    top_module: str,
+    top_code: str,
+    intent: dict,
+    rtl_files: list,
+    iverilog_log: str,
+    verilator_log: str,
+):
+    prompt = _build_system_rtl_repair_prompt(
+        top_module=top_module,
+        top_code=top_code,
+        intent=intent,
+        rtl_files=rtl_files,
+        iverilog_log=iverilog_log,
+        verilator_log=verilator_log,
+    )
+
+    repaired_code = llm_text(prompt)
+    repaired_code = _strip_code_fences(repaired_code)
+
+    if not repaired_code.strip():
+        raise RuntimeError("System RTL Pass2 repair returned empty output")
+
+    if f"module {top_module}" not in repaired_code:
+        raise RuntimeError(
+            f"System RTL Pass2 repair did not return expected top module '{top_module}'"
+        )
+
+    return repaired_code, prompt
+
 
 
 
@@ -396,7 +761,8 @@ def run_agent(state: dict) -> dict:
     workflow_id = state.get("workflow_id")
 
     top_intent = state.get("system_integration_intent") or {}
-    workflow_dir = state.get("workflow_dir") or ""
+
+    workflow_dir = os.path.abspath(state.get("workflow_dir") or "")
     if not top_intent and workflow_dir:
         intent_abs = os.path.join(workflow_dir, "system", "integration", "system_integration_intent.json")
         if os.path.isfile(intent_abs):
@@ -491,7 +857,7 @@ def run_agent(state: dict) -> dict:
     phys_rel = f"system/integration/{top_phys}.sv"
 
     # 1) Write local files for downstream agents (especially cocotb)
-    workflow_dir = state.get("workflow_dir") or ""
+
     if workflow_dir:
         sim_abs = os.path.join(workflow_dir, sim_rel)
         phys_abs = os.path.join(workflow_dir, phys_rel)
@@ -504,6 +870,23 @@ def run_agent(state: dict) -> dict:
 
         with open(phys_abs, "w", encoding="utf-8") as f:
             f.write(phys_code)
+
+        # ✅ SAVE PASS1 TOP BEFORE ANY COMPILE OR REPAIR
+        save_text_artifact_and_record(
+            workflow_id,
+            agent_name,
+            "system/integration",
+            f"{top_sim}_pass1.sv",
+            sim_code
+        )
+
+        save_text_artifact_and_record(
+            workflow_id,
+            agent_name,
+            "system/integration",
+            f"{top_phys}_pass1.sv",
+            phys_code
+        )
 
     # 2) Upload artifacts
     save_text_artifact_and_record(workflow_id, agent_name, "system/integration", f"{top_sim}.sv", sim_code)
@@ -522,19 +905,239 @@ def run_agent(state: dict) -> dict:
     if not isinstance(existing_rtl, list):
         existing_rtl = [existing_rtl] if existing_rtl else []
 
-    merged_rtl = []
-    for p in existing_rtl + [state["soc_top_sim_path"]]:
-        if isinstance(p, str) and p.strip() and p not in merged_rtl:
-            merged_rtl.append(p)
+    discovered_rtl = []
+    discovered_libs = []
+    if workflow_dir:
+        discovered_rtl = [
+            p.replace("\\", "/")
+            for p in _collect_module_files(workflow_dir)
+        ]
+        save_text_artifact_and_record(
+            workflow_id,
+            agent_name,
+            "system/integration",
+            "system_discovered_rtl.txt",
+            "\n".join(discovered_rtl) if discovered_rtl else "(empty)"
+        )
 
-    state["rtl_inputs"] = merged_rtl
-    state["system_rtl_files"] = merged_rtl
+        discovered_libs = [
+            p.replace("\\", "/")
+            for p in _collect_lib_files(workflow_dir)
+        ]
+        save_text_artifact_and_record(
+            workflow_id,
+            agent_name,
+            "system/integration",
+            "system_discovered_libs.txt",
+            "\n".join(discovered_libs) if discovered_libs else "(empty)"
+        )
+
+    sim_rel_list, sim_abs_list, phys_rel_list, phys_abs_list = _build_system_filelists(
+        workflow_dir=workflow_dir,
+        existing_rtl=existing_rtl,
+        discovered_rtl=discovered_rtl,
+        sim_top_rel=state["soc_top_sim_path"],
+        phys_top_rel=state["soc_top_phys_path"],
+    )
+
+    phys_lib_rel_list, phys_lib_abs_list = _build_system_lib_filelist(
+        workflow_dir=workflow_dir,
+        discovered_libs=discovered_libs,
+    )
+
+    save_text_artifact_and_record(
+        workflow_id,
+        agent_name,
+        "system/integration",
+        "system_rtl_filelist_sim.txt",
+        "\n".join(sim_abs_list) if sim_abs_list else "(empty)"
+    )
+
+    save_text_artifact_and_record(
+        workflow_id,
+        agent_name,
+        "system/integration",
+        "system_rtl_filelist_phys.txt",
+        "\n".join(phys_abs_list) if phys_abs_list else "(empty)"
+    )
+
+    save_text_artifact_and_record(
+        workflow_id,
+        agent_name,
+        "system/integration",
+        "system_lib_filelist_phys.txt",
+        "\n".join(phys_lib_abs_list) if phys_lib_abs_list else "(empty)"
+    )
+
+    state["system_lib_filelist_phys"] = phys_lib_abs_list
+
+    state["system_rtl_filelist_sim"] = sim_abs_list
+    state["system_rtl_filelist_phys"] = phys_abs_list
+
+    if workflow_dir and not sim_abs_list:
+        summary = {
+            "sim": {
+                "top_module": top_sim,
+                "rtl_files": [],
+                "iverilog_ok": False,
+                "verilator_ok": False,
+                "error": "No RTL files found for sim full compile"
+            },
+            "phys": {
+                "top_module": top_phys,
+                "rtl_files": phys_abs_list,
+                "skipped": True,
+                "reason": "Sim filelist missing; phys not attempted"
+            }
+        }
+        save_text_artifact_and_record(
+            workflow_id,
+            agent_name,
+            "system/integration",
+            "system_full_compile_summary.json",
+            json.dumps(summary, indent=2)
+        )
+        state["system_full_compile_ok"] = False
+        state["system_full_compile_summary"] = summary
+        state["status"] = "⚠️ No RTL files found for sim full compile"
+        return state
+
+    summary = {
+        "sim": {
+            "top_module": top_sim,
+            "rtl_files": sim_abs_list,
+        },
+        "phys": {
+            "top_module": top_phys,
+            "rtl_files": phys_abs_list,
+            "lib_files": phys_lib_abs_list,
+        }
+    }
+
+    if workflow_dir and sim_abs_list:
+        sim_iv_ok, sim_iv_log, sim_vlt_ok, sim_vlt_log = _run_full_compile_pair(
+            workflow_id=workflow_id,
+            agent_name=agent_name,
+            workflow_dir=workflow_dir,
+            tag="sim_pass1",
+            top_module=top_sim,
+            rtl_files=sim_abs_list,
+        )
+
+        summary["sim"]["iverilog_ok_pass1"] = sim_iv_ok
+        summary["sim"]["verilator_ok_pass1"] = sim_vlt_ok
+
+        if not sim_iv_ok or not sim_vlt_ok:
+            sim_pass2 = _run_pass2_for_top(
+                workflow_id=workflow_id,
+                agent_name=agent_name,
+                workflow_dir=workflow_dir,
+                rel_path=sim_rel,
+                top_module=top_sim,
+                top_intent=top_intent,
+                rtl_files=sim_abs_list,
+                tag="sim",
+                iverilog_log=sim_iv_log,
+                verilator_log=sim_vlt_log,
+            )
+            summary["sim"].update({
+                "iverilog_ok_pass2": sim_pass2["iverilog_ok_pass2"],
+                "verilator_ok_pass2": sim_pass2["verilator_ok_pass2"],
+            })
+
+    phys_top_abs = os.path.join(workflow_dir, phys_rel) if workflow_dir else ""
+    phys_has_analog_rtl = _has_non_top_analog_rtl(phys_abs_list, phys_top_abs)
+
+    if workflow_dir and phys_abs_list and phys_has_analog_rtl:
+        phys_iv_ok, phys_iv_log, phys_vlt_ok, phys_vlt_log = _run_full_compile_pair(
+            workflow_id=workflow_id,
+            agent_name=agent_name,
+            workflow_dir=workflow_dir,
+            tag="phys_pass1",
+            top_module=top_phys,
+            rtl_files=phys_abs_list,
+        )
+
+        summary["phys"]["iverilog_ok_pass1"] = phys_iv_ok
+        summary["phys"]["verilator_ok_pass1"] = phys_vlt_ok
+
+        if not phys_iv_ok or not phys_vlt_ok:
+            phys_pass2 = _run_pass2_for_top(
+                workflow_id=workflow_id,
+                agent_name=agent_name,
+                workflow_dir=workflow_dir,
+                rel_path=phys_rel,
+                top_module=top_phys,
+                top_intent=top_intent,
+                rtl_files=phys_abs_list,
+                tag="phys",
+                iverilog_log=phys_iv_log,
+                verilator_log=phys_vlt_log,
+            )
+            summary["phys"].update({
+                "iverilog_ok_pass2": phys_pass2["iverilog_ok_pass2"],
+                "verilator_ok_pass2": phys_pass2["verilator_ok_pass2"],
+            })
+    else:
+        summary["phys"]["skipped"] = True
+        summary["phys"]["reason"] = (
+            "Phys compile skipped because no non-top analog RTL/stub/wrapper was found "
+            "after excluding analog behavioral model. Liberty files were emitted in "
+            "system_lib_filelist_phys.txt for downstream handoff/STA flow and must not "
+            "be passed to iverilog/verilator."
+        )
+
+    save_text_artifact_and_record(
+        workflow_id,
+        agent_name,
+        "system/integration",
+        "system_full_compile_summary.json",
+        json.dumps(summary, indent=2)
+    )
+
+    sim_ok = (
+        summary["sim"].get("iverilog_ok_pass2", summary["sim"].get("iverilog_ok_pass1", False))
+        and summary["sim"].get("verilator_ok_pass2", summary["sim"].get("verilator_ok_pass1", False))
+    )
+
+    phys_ok = True
+    if not summary["phys"].get("skipped"):
+        phys_ok = (
+            summary["phys"].get("iverilog_ok_pass2", summary["phys"].get("iverilog_ok_pass1", False))
+            and summary["phys"].get("verilator_ok_pass2", summary["phys"].get("verilator_ok_pass1", False))
+        )
+
+    state["system_full_compile_ok"] = bool(sim_ok and phys_ok)
+    state["system_full_compile_summary"] = summary
+
+    if not sim_ok:
+        state["status"] = (
+            f"⚠️ Generated SoC tops: {top_sim}.sv and {top_phys}.sv, "
+            f"but sim full RTL compile/lint failed after Pass2 repair"
+        )
+        return state
+
+    if not summary["phys"].get("skipped") and not phys_ok:
+        state["status"] = (
+            f"⚠️ Generated SoC tops: {top_sim}.sv and {top_phys}.sv, "
+            f"sim passed, but phys full RTL compile/lint failed after Pass2 repair"
+        )
+        return state
+
+    # Keep sim RTL as the default "rtl_inputs" because downstream simulation-style
+    # consumers typically expect compilable RTL including the analog behavioral model.
+    state["rtl_inputs"] = sim_abs_list
+    state["system_rtl_files"] = sim_abs_list
 
     system_block = state.setdefault("system", {})
-    system_block["rtl_inputs"] = merged_rtl
+    system_block["rtl_inputs"] = sim_abs_list
+    system_block["rtl_filelist_sim"] = sim_abs_list
+    system_block["rtl_filelist_phys"] = phys_abs_list
+    system_block["lib_filelist_phys"] = phys_lib_abs_list
     system_block["soc_top_sim_path"] = state["soc_top_sim_path"]
     system_block["soc_top_phys_path"] = state["soc_top_phys_path"]
 
-    
     state["status"] = f"✅ Generated SoC tops: {top_sim}.sv and {top_phys}.sv"
     return state
+
+    

@@ -445,6 +445,26 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Firmware Coverage Summary Agent",
       desc: "Summarizes firmware/RTL/assertion coverage and overall co-simulation health for System_Firmware."
     },
+    {
+      uiLabel: "System Testbench Generator Agent",
+      backendLabel: "System Testbench Generator Agent",
+      desc: "Generates system-level Cocotb testbench collateral from integration intent, assembled SoC top, system RTL filelist, and optional register/control metadata."
+    },
+    {
+      uiLabel: "System Assertions (SVA) Agent",
+      backendLabel: "System Assertions (SVA) Agent",
+      desc: "Generates top-level system assertions aligned to integration intent, reset behavior, ownership, and observable system behavior."
+    },
+    {
+      uiLabel: "System Functional Coverage Agent",
+      backendLabel: "System Functional Coverage Agent",
+      desc: "Generates lightweight system-level functional coverage from integration intent, observable behaviors, ownership rules, and optional control/register metadata."
+    },
+    {
+      uiLabel: "System Simulation Control Agent",
+      backendLabel: "System Simulation Control Agent",
+      desc: "Generates system-level regression orchestration and simulation manifest for Cocotb/Verilator runs using assembled SoC top and generated verification collateral."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);

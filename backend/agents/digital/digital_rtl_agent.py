@@ -397,7 +397,6 @@ POWER_INTENT_JSON:
 
 IMPLEMENTATION RULES
 
-
 FATAL RTL CORRECTNESS RULES (HIGHEST PRIORITY)
 
 The generated RTL must pass both:
@@ -406,15 +405,108 @@ The generated RTL must pass both:
 
 These rules override stylistic preferences.
 
-A. SINGLE ASSIGNMENT STYLE PER SIGNAL
-For every signal, choose exactly one legal driving style:
-- sequential register/state/output: assigned only with nonblocking <= inside one clocked always @(posedge clk or negedge rst_n) block
-- combinational next-state / combinational output: assigned only with blocking = inside one always @(*) block with full defaults
-- structural connection: driven only by assign or module port wiring, not by procedural blocks
+A. SINGLE LEGAL OWNER PER SIGNAL (MANDATORY)
+Every signal must have exactly one legal owner and exactly one legal driving style.
 
-Never assign the same signal using both = and <= anywhere in the design.
-Never assign the same signal in both a clocked and combinational block.
-Never procedurally drive a signal that is already structurally driven.
+Allowed ownership styles:
+- sequential register/state/output:
+  assigned only with nonblocking <= in exactly one clocked always @(posedge clk or negedge rst_n) block
+- combinational signal/output:
+  assigned only with blocking = in exactly one always @(*) block with full default assignments
+- structural wire:
+  driven only by assign statements or module port connectivity, and never by procedural blocks
+
+Forbidden:
+- assigning the same signal with both = and <=
+- assigning the same signal in both a clocked block and a combinational block
+- assigning the same signal in two different always blocks
+- procedurally driving a signal that is already driven structurally
+- driving a child-owned signal again in the parent/top
+
+If a signal is a child output or an inter-module wire, keep it as structural wiring only.
+If a signal is declared as a stored register/state element, drive it from one clocked block only.
+If a signal is a combinational decode/output, drive it from one always @(*) block only.
+
+B. TOP/HIERARCHY OWNERSHIP DISCIPLINE (MANDATORY)
+In hierarchical designs:
+- the top module must not procedurally assign, reset, or re-drive any signal owned by a child module
+- if signal_ownership says a child owns a signal, the top may only expose it through structural wiring
+- do not convert child outputs into top-level procedural regs unless the spec explicitly requires that
+
+C. FSM / OUTPUT STYLE DISCIPLINE
+For FSM-controlled or decoded outputs, choose exactly one style per signal:
+- registered output in one clocked block only
+OR
+- combinational output in one always @(*) block only
+
+Do not mix reset-time <= assignments with combinational = assignments for the same output.
+
+D. MULTI-DRIVER BAN
+Every signal must have exactly one legal driver.
+No signal may be driven by:
+- two always blocks
+- assign plus always block
+- child output plus top assign
+- child output plus top procedural block
+- two child outputs
+- clocked block plus combinational block
+
+E. COMBINATIONAL SAFETY
+Every combinational always @(*) block must:
+- assign defaults at block entry
+- assign every driven signal on all paths
+- include a default branch in every case
+
+CONCRETE GOOD/BAD EXAMPLES
+
+BAD:
+reg irq;
+always @(posedge clk or negedge rst_n) begin
+  if (!rst_n) irq <= 1'b0;
+  else irq <= done;
+end
+always @(*) begin
+  irq = fault;
+end
+
+GOOD:
+reg irq;
+always @(posedge clk or negedge rst_n) begin
+  if (!rst_n) irq <= 1'b0;
+  else irq <= (done | fault);
+end
+
+BAD:
+wire child_irq;
+assign irq = child_irq;
+always @(*) begin
+  irq = 1'b0;
+end
+
+GOOD:
+wire child_irq;
+assign irq = child_irq;
+
+BAD:
+reg status_reg;
+always @(posedge clk or negedge rst_n) begin
+  if (!rst_n) status_reg <= 8'h00;
+  else if (adc_done) status_reg <= 8'h01;
+end
+always @(posedge clk or negedge rst_n) begin
+  if (!rst_n) status_reg <= 8'h00;
+  else if (ana_fault) status_reg <= 8'h02;
+end
+
+GOOD:
+reg [7:0] status_reg;
+always @(posedge clk or negedge rst_n) begin
+  if (!rst_n) status_reg <= 8'h00;
+  else begin
+    status_reg[0] <= adc_done;
+    status_reg[1] <= ana_fault;
+  end
+end
 
 B. OUTPUT / WIRE / REG ROLE DISCIPLINE
 - If a signal is a pure structural connection between modules, keep it as a wire and do not assign it in always blocks.
@@ -554,6 +646,118 @@ UNUSED SIGNAL HYGIENE
   - Distinguish raw external signals from derived internal signals.
 - If an inter-module signal is owned by a child module according to signal_ownership, the top module MUST NOT recreate, shortcut, alias, or directly assign that signal from a top-level input or any other source.
 - The top module may only connect child-owned internal signals structurally through wires and port connections.
+
+DECLARED PORT COMPLETENESS RULES (MANDATORY)
+
+- Every declared output port must be explicitly driven in the final RTL.
+- Every declared input port must be:
+  - used in functional logic, or
+  - reflected in a specified status/readback path, or
+  - intentionally tied into a benign deterministic condition that is consistent with the spec.
+- Do not leave any declared output undriven.
+- Do not leave any declared input completely unused if the spec gives it behavioral meaning.
+
+For flat single-module register-based peripherals:
+- if a control/output signal is listed in the interface, define its exact register or logic source
+- if a status/data input is listed in the interface, define where it is captured or exposed in readback
+- if a readiness/fault/done input is listed, define whether it affects control gating, status bits, or interrupt generation
+
+DECLARED PORT USAGE EXAMPLES
+
+BAD:
+input        ana_ready;
+output reg   dac_enable;
+// ana_ready never used
+// dac_enable never assigned
+
+GOOD:
+input        ana_ready;
+output reg   dac_enable;
+
+always @(*) begin
+  dac_enable = control_reg[2] & ana_ready;
+end
+
+BAD:
+input  [11:0] adc_data;
+input         adc_done;
+reg    [11:0] adc_data_reg;
+
+// adc_data declared but never captured
+
+GOOD:
+input  [11:0] adc_data;
+input         adc_done;
+reg    [11:0] adc_data_reg;
+
+always @(posedge clk or negedge rst_n) begin
+  if (!rst_n)
+    adc_data_reg <= 12'h000;
+  else if (adc_done)
+    adc_data_reg <= adc_data;
+end
+
+BAD:
+always @(*) begin
+  case (paddr)
+    8'h00: prdata = control_reg;
+    8'h04: prdata = status_reg;
+  endcase
+end
+
+GOOD:
+always @(*) begin
+  prdata = 32'h00000000;
+  case (paddr)
+    8'h00: prdata = control_reg;
+    8'h04: prdata = status_reg;
+    default: prdata = 32'h00000000;
+  endcase
+end
+
+PROCEDURAL OUTPUT DECLARATION RULES (MANDATORY)
+
+- If an output is assigned inside any always @(*) block or any clocked always block, that output must be declared as a reg-style procedural output in Verilog-2005.
+- Do NOT declare an output as a plain wire-style output if it is assigned procedurally.
+- If an output is driven only by a continuous assign statement, it may remain a plain output wire-style port.
+- Never procedurally assign to a wire-style output.
+
+
+GOOD:
+output reg [31:0] prdata;
+always @(*) begin
+  prdata = 32'h00000000;
+  case (paddr)
+    ...
+    default: prdata = 32'h00000000;
+  endcase
+end
+
+GOOD:
+output [31:0] prdata;
+assign prdata = prdata_mux;
+
+BAD:
+output [31:0] prdata;
+always @(*) begin
+  prdata = 32'h00000000;
+end
+
+BAD:
+output [31:0] prdata;
+wire [31:0] prdata_temp;
+always @(*) begin
+  prdata_temp = 32'h0;
+end
+assign prdata = prdata_temp;
+
+GOOD:
+output [31:0] prdata;
+reg [31:0] prdata_temp;
+always @(*) begin
+  prdata_temp = 32'h0;
+end
+assign prdata = prdata_temp;
 
 INTERNAL SIGNAL ROLE SEPARATION RULES (MANDATORY)
 
@@ -743,6 +947,14 @@ SELF-CHECK BEFORE OUTPUT
 29. No decoded control signal is aliased onto an unrelated output.
 30. Every signal has exactly one legal driver.
 31. Structural top modules do not convert child outputs into procedural top-level regs unless required.
+PROCEDURAL OUTPUT CONSISTENCY SELF-CHECK (MANDATORY)
+
+Before returning RTL, verify this exact rule for every output:
+- if the output appears on the left-hand side inside any always block, it must be declared as output reg in Verilog-2005
+- if the output is declared as plain output, it must not appear on the left-hand side inside any always block
+- never return RTL that would cause:
+  - "is not a valid l-value"
+  - PROCASSWIRE
 
 """.strip()
 
@@ -857,13 +1069,71 @@ TARGETED REPAIR PROCEDURE FOR FATAL LINT / COMPILE ERRORS
    - sequential registered signal
 3. Rewrite that signal so it uses exactly one legal driving style:
    - structural wire -> assign / module port wiring only
-   - combinational signal -> blocking = only in one always @(*)
-   - sequential signal -> nonblocking <= only in one clocked always block
+   - combinational signal -> blocking = only in exactly one always @(*)
+   - sequential signal -> nonblocking <= only in exactly one clocked always block
 4. Remove all conflicting assignments to that signal everywhere else.
-5. If a signal is owned by a child module or comes from register decode wiring, do not also reset or procedurally drive it in the parent/top.
-6. If an FSM output currently has both reset-time <= assignments and combinational = assignments, choose one implementation style and rewrite consistently.
-7. If Verilator reports BLKANDNBLK, the repaired RTL is still wrong unless every reported signal has only one assignment style.
-8. If Verilator reports multidriven behavior, the repaired RTL is still wrong unless the duplicate drivers are removed.
+5. If a signal is owned by a child module or by explicit signal_ownership, do not also reset, assign, or procedurally drive it in the parent/top.
+6. If Verilator reports BLKANDNBLK, the repair is incomplete unless every reported signal has only one assignment style in the final RTL.
+7. If Verilator reports MULTIDRIVEN or multiple procedural drivers, the repair is incomplete unless all duplicate drivers are removed from the final RTL.
+
+MANDATORY REPAIR OVERRIDE
+If the previous RTL uses an illegal ownership pattern, you MUST rewrite the affected block structure enough to eliminate the illegal drivers.
+Preserving the previous block structure is NOT allowed if it leaves:
+- one signal assigned in multiple always blocks
+- one signal assigned in both clocked and combinational logic
+- one signal driven both structurally and procedurally
+- a child-owned signal driven again in the parent/top
+
+SPECIAL REPAIR RULE FOR HIERARCHICAL TOPS
+In hierarchical mode, if a top-level signal is sourced from a child output or child-owned internal signal:
+- keep that signal as structural wiring only
+- remove any top-level reset assignment, combinational assignment, or extra assign to that same signal
+
+SPECIAL REPAIR RULE FOR REGISTER/STATUS LOGIC
+If multiple clocked blocks update the same stored register or status/output register:
+- merge those updates into one legal clocked always block
+- do not keep separate clocked writers for the same signal
+
+WARNING CLEANUP RULE FOR DECLARED PORTS
+If Verilator reports:
+- UNDRIVEN on a declared output, the repair is incomplete until that output has an explicit legal driver.
+- UNUSEDSIGNAL on a declared input with behavioral meaning from the spec, the repair is incomplete until that input is functionally consumed or exposed through status/readback.
+- CASEINCOMPLETE, the repair is incomplete until a default branch is present.
+
+GOOD/BAD REPAIR EXAMPLES
+
+BAD REPAIR:
+always @(posedge clk or negedge rst_n) irq <= done;
+always @(*) irq = fault;
+
+GOOD REPAIR:
+always @(posedge clk or negedge rst_n) begin
+  if (!rst_n) irq <= 1'b0;
+  else irq <= (done | fault);
+end
+
+BAD REPAIR:
+assign irq = child_irq;
+always @(*) irq = masked_irq;
+
+GOOD REPAIR:
+assign irq = child_irq;
+
+BAD REPAIR:
+always @(posedge clk or negedge rst_n) status_reg <= next_status_a;
+always @(posedge clk or negedge rst_n) status_reg <= next_status_b;
+
+GOOD REPAIR:
+always @(posedge clk or negedge rst_n) begin
+  if (!rst_n) status_reg <= RESET_VALUE;
+  else status_reg <= merged_next_status;
+end
+
+PROCEDURAL OUTPUT REPAIR RULE
+- If compile or lint shows PROCASSWIRE, rewrite the affected signal so that:
+  - either it becomes a reg-style procedural output and remains procedurally assigned
+  - or it is moved to a continuous assign path and is no longer assigned in always blocks
+- The repair is incomplete if a procedurally assigned signal remains declared as a wire-style output.
 
 REPAIR PRIORITY ORDER
 1. BLKANDNBLK
@@ -878,7 +1148,9 @@ WARNING-ONLY LINT REPAIR RULE
 - Prefer minimal local fixes only if they are straightforward and preserve behavior.
 - Do not perform broad rewrites for warning-only lint.
 
+
 When repairing RTL, fix these classes of issues first:
+
 
 1. FSM / latch issues
 - Eliminate latch-prone combinational FSM logic.
