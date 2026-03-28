@@ -465,6 +465,11 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Simulation Control Agent",
       desc: "Generates system-level regression orchestration and simulation manifest for Cocotb/Verilator runs using assembled SoC top and generated verification collateral."
     },
+    {
+      uiLabel: "System Implementation Setup Agent",
+      backendLabel: "System Implementation Setup Agent",
+      desc: "Prepares System PD inputs for downstream Digital PD by selecting soc_top_phys RTL, canonical SDC, and analog macro LEF/LIB/GDS collateral, then normalizes digital handoff for synthesis and backend PD stages."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);

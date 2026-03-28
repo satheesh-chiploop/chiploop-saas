@@ -151,17 +151,37 @@ def _normalize_path_list(items: Any) -> List[str]:
     return list(dict.fromkeys(out))
 
 
+def _rel_to_workflow(workflow_dir: str, path: Optional[str]) -> Optional[str]:
+    if not path or not isinstance(path, str):
+        return path
+    try:
+        return os.path.relpath(path, workflow_dir).replace("\\", "/")
+    except Exception:
+        return path.replace("\\", "/")
+
+
+def _rel_list_to_workflow(workflow_dir: str, paths: List[str]) -> List[str]:
+    out: List[str] = []
+    for p in paths or []:
+        if isinstance(p, str) and p.strip():
+            out.append(_rel_to_workflow(workflow_dir, p))
+    return list(dict.fromkeys(out))
+
+
+
+
+
 def _collect_system_rtl_files(workflow_dir: str, state: Dict[str, Any]) -> List[str]:
     candidates: List[str] = []
-    for key in ("system_rtl_files", "rtl_inputs", "rtl_files"):
-        candidates.extend(_normalize_path_list(state.get(key)))
 
+    # 1) Canonical source: top-assembly-generated sim filelist
     filelist_value = state.get("system_rtl_filelist_sim")
     if isinstance(filelist_value, list):
         candidates.extend(_normalize_path_list(filelist_value))
     elif isinstance(filelist_value, str) and filelist_value.strip():
         candidates.extend(_normalize_path_list(filelist_value))
 
+    # 2) On-disk canonical filelist
     filelist_path = _find_system_rtl_filelist(workflow_dir)
     if filelist_path:
         candidates.extend(_normalize_path_list(filelist_path))
@@ -169,21 +189,14 @@ def _collect_system_rtl_files(workflow_dir: str, state: Dict[str, Any]) -> List[
     if candidates:
         return list(dict.fromkeys(candidates))
 
-    exts = (".v", ".sv", ".vh", ".svh")
-    scan_dirs = [
-        os.path.join(workflow_dir, "digital", "rtl_refactored"),
-        os.path.join(workflow_dir, "analog"),
-        os.path.join(workflow_dir, "system", "integration"),
-    ]
-    out: List[str] = []
-    for d in scan_dirs:
-        if not os.path.isdir(d):
-            continue
-        for root, _, files in os.walk(d):
-            for fn in files:
-                if fn.lower().endswith(exts):
-                    out.append(os.path.abspath(os.path.join(root, fn)))
-    return sorted(set(out))
+    # 3) Legacy fallbacks only after canonical filelist sources
+    for key in ("system_rtl_files", "rtl_inputs", "rtl_files"):
+        candidates.extend(_normalize_path_list(state.get(key)))
+
+    if candidates:
+        return list(dict.fromkeys(candidates))
+
+    return []
 
 
 def _infer_top_module(state: Dict[str, Any], integration: Dict[str, Any], soc_top_sim_path: Optional[str], rtl_files: List[str]) -> str:
@@ -300,8 +313,6 @@ def main():
 if __name__ == "__main__":
     main()
 '''
-
-
 def _gen_simulation_manifest(
     top: str,
     workflow_dir: str,
@@ -312,32 +323,62 @@ def _gen_simulation_manifest(
     tb_root: str,
     state: Dict[str, Any],
 ) -> Dict[str, Any]:
+    tb_makefile = state.get("tb_makefile") or os.path.join(tb_root, "Makefile")
+    tb_test_py = state.get("tb_test_py") or os.path.join(tb_root, f"test_{top}.py")
+    tb_testcases_json = state.get("tb_testcases_json") or os.path.join(tb_root, "testcases.json")
+    tb_contract_json = state.get("tb_contract_json") or os.path.join(tb_root, "tb_contract.json")
+    reports_dir = os.path.join(tb_root, "reports")
+
     return {
         "type": "vv_system_simulation_manifest",
-        "version": "1.0",
+        "version": "1.1",
         "top_module": top,
-        "workflow_dir": workflow_dir,
-        "system_integration_intent_json": system_integration_intent_json,
-        "soc_top_sim_path": soc_top_sim_path,
-        "system_rtl_filelist_sim": state.get("system_rtl_filelist_sim") or _find_system_rtl_filelist(workflow_dir),
-        "rtl_files": rtl_files,
+        "system_integration_intent_json": _rel_to_workflow(workflow_dir, system_integration_intent_json),
+        "soc_top_sim_path": _rel_to_workflow(workflow_dir, soc_top_sim_path),
+        # canonical resolved RTL set only; do not duplicate filelist path into manifest
+        "rtl_files": _rel_list_to_workflow(workflow_dir, rtl_files),
         "default_tests": default_tests,
-        "runner": os.path.join(tb_root, "run_regression.py"),
-        "makefile": state.get("tb_makefile") or os.path.join(tb_root, "Makefile"),
-        "test_py": state.get("tb_test_py"),
-        "testcases_json": state.get("tb_testcases_json") or os.path.join(tb_root, "testcases.json"),
-        "tb_contract_json": state.get("tb_contract_json") or os.path.join(tb_root, "tb_contract.json"),
-        "reports_dir": os.path.join(tb_root, "reports"),
+        "runner": _rel_to_workflow(workflow_dir, os.path.join(tb_root, "run_regression.py")),
+        "makefile": _rel_to_workflow(workflow_dir, tb_makefile),
+        "test_py": _rel_to_workflow(workflow_dir, tb_test_py),
+        "testcases_json": _rel_to_workflow(workflow_dir, tb_testcases_json),
+        "tb_contract_json": _rel_to_workflow(workflow_dir, tb_contract_json),
+        "reports_dir": _rel_to_workflow(workflow_dir, reports_dir),
         "simulator": "verilator",
-        "regmap_json": state.get("digital_regmap_json") or state.get("regmap_json") or _find_regmap_json(workflow_dir),
-        "sva_assertions_path": state.get("system_sva_assertions_path") or state.get("sva_assertions_path"),
-        "sva_bind_path": state.get("system_sva_bind_path") or state.get("sva_bind_path"),
-        "coverage_model_py": state.get("system_coverage_model_py") or state.get("coverage_model_py"),
-        "coverage_spec_json": state.get("system_coverage_spec_json") or state.get("coverage_spec_json"),
-        "functional_coverage_summary_json": state.get("system_functional_coverage_summary_json") or state.get("functional_coverage_summary_json"),
-        "functional_coverage_md": state.get("system_functional_coverage_md") or state.get("functional_coverage_md"),
-        "verification_sources_mk": state.get("tb_verification_sources_mk"),
+        "regmap_json": _rel_to_workflow(
+            workflow_dir,
+            state.get("digital_regmap_json") or state.get("regmap_json") or _find_regmap_json(workflow_dir),
+        ),
+        "sva_assertions_path": _rel_to_workflow(
+            workflow_dir,
+            state.get("system_sva_assertions_path") or state.get("sva_assertions_path"),
+        ),
+        "sva_bind_path": _rel_to_workflow(
+            workflow_dir,
+            state.get("system_sva_bind_path") or state.get("sva_bind_path"),
+        ),
+        "coverage_model_py": _rel_to_workflow(
+            workflow_dir,
+            state.get("system_coverage_model_py") or state.get("coverage_model_py"),
+        ),
+        "coverage_spec_json": _rel_to_workflow(
+            workflow_dir,
+            state.get("system_coverage_spec_json") or state.get("coverage_spec_json"),
+        ),
+        "functional_coverage_summary_json": _rel_to_workflow(
+            workflow_dir,
+            state.get("system_functional_coverage_summary_json") or state.get("functional_coverage_summary_json"),
+        ),
+        "functional_coverage_md": _rel_to_workflow(
+            workflow_dir,
+            state.get("system_functional_coverage_md") or state.get("functional_coverage_md"),
+        ),
+        "verification_sources_mk": _rel_to_workflow(
+            workflow_dir,
+            state.get("tb_verification_sources_mk"),
+        ),
     }
+
 
 
 def run_agent(state: dict) -> dict:
@@ -372,7 +413,10 @@ def run_agent(state: dict) -> dict:
     os.makedirs(tb_root, exist_ok=True)
 
     testcases_json_path = state.get("tb_testcases_json") or os.path.join(tb_root, "testcases.json")
-    default_tests = state.get("vv_testcases") or _default_tests_from_testcases_json(testcases_json_path)
+
+    default_tests = _default_tests_from_testcases_json(testcases_json_path)
+    if not default_tests:
+        default_tests = state.get("vv_testcases") or ["system_smoke_test", "integrated_input_sanity"]
     if not default_tests:
         default_tests = ["system_smoke_test"]
     default_tests = [str(t) for t in default_tests if str(t).strip()]
@@ -384,6 +428,7 @@ def run_agent(state: dict) -> dict:
     _log(log_path, f"top_module={top}")
     _log(log_path, f"rtl_file_count={len(rtl_files)}")
     _log(log_path, f"default_tests={default_tests}")
+    _log(log_path, f"rtl_files={json.dumps(rtl_files, indent=2)}")
 
     artifacts: Dict[str, Any] = {}
 
@@ -445,18 +490,18 @@ python run_regression.py --tests {' '.join(default_tests)} --seeds 1 2 3 4 5
 
     report = {
         "type": "vv_system_simulation_control_generation",
-        "version": "1.0",
+        "version": "1.1",
         "top_module": top,
-        "system_integration_intent_json": integration_json_path,
-        "soc_top_sim_path": soc_top_sim_path,
+        "system_integration_intent_json": _rel_to_workflow(workflow_dir, integration_json_path),
+        "soc_top_sim_path": _rel_to_workflow(workflow_dir, soc_top_sim_path),
         "rtl_file_count": len(rtl_files),
-        "rtl_files": rtl_files,
+        "rtl_files": _rel_list_to_workflow(workflow_dir, rtl_files),
         "default_tests": default_tests,
-        "simulation_manifest_json": sim_manifest_path,
-        "tb_makefile": state.get("tb_makefile") or os.path.join(tb_root, "Makefile"),
-        "tb_test_py": state.get("tb_test_py"),
-        "tb_testcases_json": testcases_json_path,
-        "tb_contract_json": state.get("tb_contract_json") or os.path.join(tb_root, "tb_contract.json"),
+        "simulation_manifest_json": _rel_to_workflow(workflow_dir, sim_manifest_path),
+        "tb_makefile": _rel_to_workflow(workflow_dir, state.get("tb_makefile") or os.path.join(tb_root, "Makefile")),
+        "tb_test_py": _rel_to_workflow(workflow_dir, state.get("tb_test_py") or os.path.join(tb_root, f"test_{top}.py")),
+        "tb_testcases_json": _rel_to_workflow(workflow_dir, testcases_json_path),
+        "tb_contract_json": _rel_to_workflow(workflow_dir, state.get("tb_contract_json") or os.path.join(tb_root, "tb_contract.json")),
         "tools_detected": tools_detected,
         "artifacts": artifacts,
     }
@@ -488,4 +533,6 @@ python run_regression.py --tests {' '.join(default_tests)} --seeds 1 2 3 4 5
     state["vv_testcases"] = default_tests
     state["testcases"] = default_tests
     state["top_module"] = top
+    state["system_sim_testcases"] = list(default_tests)
+    state["simulation_testcases"] = list(default_tests)
     return state

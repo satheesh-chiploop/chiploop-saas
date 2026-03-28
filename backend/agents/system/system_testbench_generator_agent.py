@@ -115,9 +115,25 @@ def _record_text(
     except Exception:
         return None
 
-
 def _which(binname: str) -> Optional[str]:
     return shutil.which(binname)
+
+
+def _rel_to_workflow(workflow_dir: str, path: Optional[str]) -> Optional[str]:
+    if not path or not isinstance(path, str):
+        return path
+    try:
+        return os.path.relpath(path, workflow_dir).replace("\\", "/")
+    except Exception:
+        return path.replace("\\", "/")
+
+
+def _rel_list_to_workflow(workflow_dir: str, paths: List[str]) -> List[str]:
+    out: List[str] = []
+    for p in paths or []:
+        if isinstance(p, str) and p.strip():
+            out.append(_rel_to_workflow(workflow_dir, p))
+    return list(dict.fromkeys(out))
 
 
 # -----------------------------------------------------------------------------
@@ -382,54 +398,28 @@ def _bit_mask(lsb: Any, msb: Any) -> int:
 
 
 def _build_control_model(regmap: Dict[str, Any], ports: List[Dict[str, Any]]) -> Dict[str, Any]:
-    top_inputs = {str(p.get("name")): p for p in ports if _normalize_direction(p.get("direction")) in ("input", "inout")}
-    top_outputs = {str(p.get("name")): p for p in ports if _normalize_direction(p.get("direction")) in ("output", "out", "inout")}
-
+    """
+    Keep this metadata-only and protocol-agnostic.
+    Do NOT infer APB/I2C/SPI/custom bus behavior in code.
+    Downstream LLM prompt can consume this as optional context.
+    """
     rm = regmap.get("regmap") if isinstance(regmap, dict) else {}
-    bus_name = str((rm or {}).get("bus", "")).strip().lower()
     regs = (rm or {}).get("registers") or []
 
     by_name: Dict[str, Dict[str, Any]] = {}
     for r in regs:
         if isinstance(r, dict) and r.get("name"):
-            by_name[str(r["name"]).upper()] = r
-
-    register_model = {
-        "base_address": _parse_int((rm or {}).get("base_address"), 0),
-        "addr_width": _parse_int((rm or {}).get("addr_width"), 8),
-        "data_width": _parse_int((rm or {}).get("data_width"), 32),
-        "registers": by_name,
-    }
-
-    port_names = set(top_inputs.keys()) | set(top_outputs.keys())
-
-    # Keep the public contract generic. The concrete adapter is derived from ports.
-    adapter_type = "none"
-    signal_map: Dict[str, str] = {}
-
-    apb_like_inputs = {"paddr", "pwdata", "pwrite", "psel", "penable"}
-    apb_like_outputs = {"prdata", "pready"}
-    if apb_like_inputs.issubset(top_inputs.keys()) and apb_like_outputs.issubset(top_outputs.keys()):
-        adapter_type = "register_bus"
-        signal_map = {
-            "address": "paddr",
-            "write_data": "pwdata",
-            "write_enable": "pwrite",
-            "select": "psel",
-            "enable": "penable",
-            "read_data": "prdata",
-            "ready": "pready",
-        }
-        if "pslverr" in port_names:
-            signal_map["error"] = "pslverr"
+            by_name[str(r["name"])] = r
 
     return {
-        "control_type": "register_bus" if by_name else "direct_pins",
-        "register_model": register_model,
-        "transport_hint": bus_name,
-        "adapter_type": adapter_type,
-        "signal_map": signal_map,
+        "has_regmap": bool(by_name),
+        "register_count": len(by_name),
+        "register_names": sorted(list(by_name.keys())),
+        "top_input_ports": sorted([str(p.get("name")) for p in ports if _normalize_direction(p.get("direction")) in ("input", "inout")]),
+        "top_output_ports": sorted([str(p.get("name")) for p in ports if _normalize_direction(p.get("direction")) in ("output", "out", "inout")]),
     }
+
+
 
 
 def _field_mask(reg: Optional[Dict[str, Any]], field_name: str) -> int:
@@ -442,41 +432,18 @@ def _field_mask(reg: Optional[Dict[str, Any]], field_name: str) -> int:
 
 
 def _system_scenarios_from_regmap(regmap: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Keep only lightweight, design-neutral metadata.
+    Scenario meaning should come from LLM/system intent, not fixed register names.
+    """
     rm = (regmap or {}).get("regmap") or {}
     regs = rm.get("registers") or []
-    by_name = {str(r.get("name", "")).upper(): r for r in regs if isinstance(r, dict) and r.get("name")}
-
-    ctrl = by_name.get("CTRL")
-    status = by_name.get("STATUS")
-    adc_data = by_name.get("ADC_DATA")
-    dac_code = by_name.get("DAC_CODE")
-
-    ctrl_offset = _parse_int((ctrl or {}).get("offset"), 0)
-    status_offset = _parse_int((status or {}).get("offset"), 0)
-    adc_data_offset = _parse_int((adc_data or {}).get("offset"), 0)
-    dac_code_offset = _parse_int((dac_code or {}).get("offset"), 0)
-
-    ctrl_enable_mask = _field_mask(ctrl, "ENABLE")
-    ctrl_start_mask = _field_mask(ctrl, "ADC_START")
-    ctrl_dac_enable_mask = _field_mask(ctrl, "DAC_ENABLE")
-    status_done_mask = _field_mask(status, "ADC_DONE")
-    status_ready_mask = _field_mask(status, "ANA_READY")
-    status_fault_mask = _field_mask(status, "ANA_FAULT")
 
     return {
-        "ctrl_offset": ctrl_offset,
-        "status_offset": status_offset,
-        "adc_data_offset": adc_data_offset,
-        "dac_code_offset": dac_code_offset,
-        "ctrl_enable_mask": ctrl_enable_mask,
-        "ctrl_start_mask": ctrl_start_mask,
-        "ctrl_dac_enable_mask": ctrl_dac_enable_mask,
-        "status_done_mask": status_done_mask,
-        "status_ready_mask": status_ready_mask,
-        "status_fault_mask": status_fault_mask,
-        "has_regmap": bool(by_name),
+        "has_regmap": bool(regs),
+        "register_count": len(regs),
+        "register_names": [str(r.get("name")) for r in regs if isinstance(r, dict) and r.get("name")],
     }
-
 
 # -----------------------------------------------------------------------------
 # Contract resolution
@@ -498,15 +465,38 @@ def _resolve_tb_contract(state: Dict[str, Any], workflow_dir: str, log_path: str
     integration = _safe_read_json(integration_json_path)
     top_module = _pick_top_module(integration, state.get("top_module"), top_sv_path)
 
-    rtl_files = state.get("rtl_files")
-    rtl_source = "state.rtl_files"
-    if not isinstance(rtl_files, list) or not rtl_files:
+    filelist_value = state.get("system_rtl_filelist_sim")
+
+    rtl_files: List[str] = []
+    rtl_source = ""
+
+    # 1) Always prefer top-assembly-generated sim filelist
+    if isinstance(filelist_value, list) and filelist_value:
+        rtl_files = [os.path.abspath(p) for p in filelist_value if isinstance(p, str) and p.strip()]
+        rtl_source = "state.system_rtl_filelist_sim"
+    elif isinstance(filelist_value, str) and filelist_value.strip():
+        rtl_files = _collect_rtl_files_from_filelist(filelist_value)
+        rtl_source = "state.system_rtl_filelist_sim"
+
+    # 2) Then fallback to on-disk filelist text
+    if not rtl_files and rtl_filelist_path:
         rtl_files = _collect_rtl_files_from_filelist(rtl_filelist_path)
         rtl_source = "system_rtl_filelist_sim"
+
+    # 3) Only after that consider generic fallback keys
+    if not rtl_files:
+        legacy_rtl = state.get("system_rtl_files") or state.get("rtl_inputs") or state.get("rtl_files") or []
+        if not isinstance(legacy_rtl, list):
+            legacy_rtl = [legacy_rtl] if legacy_rtl else []
+        rtl_files = [os.path.abspath(p) for p in legacy_rtl if isinstance(p, str) and p.strip()]
+        if rtl_files:
+            rtl_source = "legacy_state_rtl"
+
+    # 4) Final fallback: scan
     if not rtl_files:
         rtl_files = _collect_system_rtl_files(workflow_dir)
         rtl_source = "fallback_scan"
-    rtl_files = [os.path.abspath(p) for p in rtl_files if isinstance(p, str)]
+
 
     ports_from_sv = _ports_from_top_sv(top_sv_path, top_module)
     ports_from_intent = _ports_from_integration_json(integration)
@@ -544,9 +534,9 @@ def _resolve_tb_contract(state: Dict[str, Any], workflow_dir: str, log_path: str
             "port_names": [p.get("name") for p in ports],
             "clock_names": clocks,
             "reset_names": [r.get("name") for r in resets],
-            "control_type": control_model.get("control_type"),
-            "adapter_type": control_model.get("adapter_type"),
-            "transport_hint": control_model.get("transport_hint"),
+            "has_regmap": control_model.get("has_regmap"),
+            "register_count": control_model.get("register_count"),
+            "register_names": control_model.get("register_names"),
         },
     )
     return contract
@@ -654,7 +644,8 @@ def _gen_cocotb_test(
 Generated by ChipLoop System Testbench Generator Agent.
 - Uses system integration intent as the source of truth for system structure
 - Uses upstream control/register metadata when available
-- Keeps test intent generic; concrete transport is inferred from available top-level ports
+- Keeps test intent generic; no protocol-specific transport is hardcoded in the agent
+
 """
 
 import os
@@ -706,87 +697,23 @@ def _safe_drive_random(sig, width_expr: str):
     sig.value = random.getrandbits(width)
 
 
-def _adapter_kind() -> str:
-    return str(CONTROL_MODEL.get("adapter_type", "none") or "none")
 
 
-async def bus_write(dut, address: int, data: int):
-    """Generic register-bus write helper.
-
-    The helper stays protocol-agnostic at the call site. The concrete transport is
-    inferred from CONTROL_MODEL and current DUT top-level ports.
+async def apply_control_sequence(dut):
     """
-    kind = _adapter_kind()
-    signal_map = CONTROL_MODEL.get("signal_map") or {}
-
-    if kind == "register_bus":
-        addr_sig = signal_map.get("address")
-        wdata_sig = signal_map.get("write_data")
-        wen_sig = signal_map.get("write_enable")
-        sel_sig = signal_map.get("select")
-        en_sig = signal_map.get("enable")
-        ready_sig = signal_map.get("ready")
-
-        for req in [addr_sig, wdata_sig, wen_sig, sel_sig, en_sig]:
-            if not req or not hasattr(dut, req):
-                raise RuntimeError(f"register_bus adapter selected but missing DUT signal: {req}")
-
-        getattr(dut, addr_sig).value = address
-        getattr(dut, wdata_sig).value = data
-        getattr(dut, wen_sig).value = 1
-        getattr(dut, sel_sig).value = 1
-        getattr(dut, en_sig).value = 0
-        await _advance_time(dut)
-        getattr(dut, en_sig).value = 1
-
-        if ready_sig and hasattr(dut, ready_sig):
-            while int(getattr(dut, ready_sig).value) == 0:
-                await _advance_time(dut)
-
-        await _advance_time(dut)
-        getattr(dut, sel_sig).value = 0
-        getattr(dut, en_sig).value = 0
-        getattr(dut, wen_sig).value = 0
-        return
-
-    raise RuntimeError("No supported register transport adapter was inferred for this integrated top")
+    Placeholder for system-level stimulus.
+    The concrete behavior should be generated from integration intent / spec,
+    not hardcoded in the agent.
+    """
+    await _advance_time(dut)
 
 
-async def bus_read(dut, address: int) -> int:
-    kind = _adapter_kind()
-    signal_map = CONTROL_MODEL.get("signal_map") or {}
-
-    if kind == "register_bus":
-        addr_sig = signal_map.get("address")
-        wen_sig = signal_map.get("write_enable")
-        sel_sig = signal_map.get("select")
-        en_sig = signal_map.get("enable")
-        rdata_sig = signal_map.get("read_data")
-        ready_sig = signal_map.get("ready")
-
-        for req in [addr_sig, wen_sig, sel_sig, en_sig, rdata_sig]:
-            if not req or not hasattr(dut, req):
-                raise RuntimeError(f"register_bus adapter selected but missing DUT signal: {req}")
-
-        getattr(dut, addr_sig).value = address
-        getattr(dut, wen_sig).value = 0
-        getattr(dut, sel_sig).value = 1
-        getattr(dut, en_sig).value = 0
-        await _advance_time(dut)
-        getattr(dut, en_sig).value = 1
-
-        if ready_sig and hasattr(dut, ready_sig):
-            while int(getattr(dut, ready_sig).value) == 0:
-                await _advance_time(dut)
-
-        data = int(getattr(dut, rdata_sig).value)
-        await _advance_time(dut)
-        getattr(dut, sel_sig).value = 0
-        getattr(dut, en_sig).value = 0
-        return data
-
-    raise RuntimeError("No supported register transport adapter was inferred for this integrated top")
-
+async def observe_system_response(dut):
+    """
+    Placeholder for system-level observation.
+    The concrete checks should be derived from system intent / assertions / coverage.
+    """
+    await _advance_time(dut)
 
 @cocotb.test()
 async def system_smoke_test(dut):
@@ -810,49 +737,19 @@ async def system_smoke_test(dut):
     if cov:
         cov.start(dut)
 
-    if SCENARIO_MODEL.get("has_regmap") and _adapter_kind() == "register_bus":
-        ctrl_offset = int(SCENARIO_MODEL.get("ctrl_offset", 0))
-        status_offset = int(SCENARIO_MODEL.get("status_offset", 0))
-        adc_data_offset = int(SCENARIO_MODEL.get("adc_data_offset", 0))
-        dac_code_offset = int(SCENARIO_MODEL.get("dac_code_offset", 0))
-        ctrl_enable_mask = int(SCENARIO_MODEL.get("ctrl_enable_mask", 0))
-        ctrl_start_mask = int(SCENARIO_MODEL.get("ctrl_start_mask", 0))
-        ctrl_dac_enable_mask = int(SCENARIO_MODEL.get("ctrl_dac_enable_mask", 0))
+    # System-level smoke test should remain generic here.
+    # Concrete behavior should come from LLM-derived test intent, not hardcoded register names or transport assumptions.
+    await apply_control_sequence(dut)
 
-        # The sequence remains generic at the scenario level: program control fields,
-        # optionally program a data register, then observe the integrated response.
-        if dac_code_offset or hasattr(dut, "pwdata"):
-            await bus_write(dut, dac_code_offset, 0x155)
+    for _ in range(20):
+        await _advance_time(dut)
+        if cov:
+            try:
+                cov.sample()
+            except Exception:
+                pass
 
-        ctrl_value = ctrl_enable_mask | ctrl_dac_enable_mask | ctrl_start_mask
-        await bus_write(dut, ctrl_offset, ctrl_value)
-
-        for _ in range(20):
-            await _advance_time(dut)
-            if cov:
-                try:
-                    cov.sample()
-                except Exception:
-                    pass
-
-        # Readback paths are optional; avoid hard failing when the design chooses not to expose them.
-        try:
-            _ = await bus_read(dut, status_offset)
-        except Exception:
-            pass
-
-        try:
-            _ = await bus_read(dut, adc_data_offset)
-        except Exception:
-            pass
-    else:
-        for _ in range(10):
-            await _advance_time(dut)
-            if cov:
-                try:
-                    cov.sample()
-                except Exception:
-                    pass
+    await observe_system_response(dut)
 
     if cov:
         try:
@@ -862,8 +759,12 @@ async def system_smoke_test(dut):
             pass
 
     if sb:
-        sb.stop()
+        try:
+            sb.stop()
+        except Exception:
+            pass
 
+   
 
 @cocotb.test()
 async def integrated_input_sanity(dut):
@@ -908,15 +809,18 @@ async def integrated_input_sanity(dut):
         except Exception:
             pass
 '''
-    return template.format(
-        top=top,
-        control_model_json=json.dumps(control_model, indent=2),
-        scenario_model_json=json.dumps(scenario_model, indent=2),
-        clocks_json=json.dumps(clocks, indent=2),
-        clock_start=clock_start.rstrip(),
-        reset_seq=reset_seq.rstrip(),
-        input_init=input_init,
-        randomizable_inputs_json=json.dumps(randomizable_inputs, indent=2),
+    def _to_python_literal(obj):
+        return repr(obj)
+    return (
+        template
+        .replace("{top}", top)
+        .replace("{control_model_json}", _to_python_literal(control_model))
+        .replace("{scenario_model_json}", _to_python_literal(scenario_model))
+        .replace("{clocks_json}", json.dumps(clocks, indent=2))
+        .replace("{clock_start}", clock_start.rstrip())
+        .replace("{reset_seq}", reset_seq.rstrip())
+        .replace("{input_init}", input_init)
+        .replace("{randomizable_inputs_json}", json.dumps(randomizable_inputs, indent=2))
     )
 
 
@@ -998,7 +902,7 @@ unexport PYTHON
 override export PYTHON_BIN := {python_exe}
 override export PYTHON     := {python_exe}
 override SIM := verilator
-EXTRA_ARGS += --trace --trace-structs
+EXTRA_ARGS += --trace --trace-structs --coverage --assert
 EXTRA_ARGS += -Wno-fatal
 EXTRA_ARGS += -Wno-CASEINCOMPLETE
 EXTRA_ARGS += -Wno-WIDTH
@@ -1039,6 +943,8 @@ def run_agent(state: dict) -> dict:
     top_sv_path = contract["top_sv_path"]
     regmap_json_path = contract["regmap_json_path"]
     rtl_files = contract["rtl_files"]
+    if not rtl_files:
+        raise FileNotFoundError("Resolved System_Sim RTL filelist is empty")
     top = contract["top_module"]
     ports = contract["ports"]
     clocks = contract["clock_names"]
@@ -1075,16 +981,17 @@ def run_agent(state: dict) -> dict:
         if p and os.path.exists(p)
     ]
 
+
     tb_contract = {
         "type": "vv_tb_contract",
-        "version": "1.0",
+        "version": "1.1",
         "top_module": top,
-        "integration_json_path": integration_json_path,
-        "top_sv_path": top_sv_path,
-        "regmap_json_path": regmap_json_path,
-        "rtl_files": rtl_files,
+        "integration_json_path": _rel_to_workflow(workflow_dir, integration_json_path),
+        "top_sv_path": _rel_to_workflow(workflow_dir, top_sv_path),
+        "regmap_json_path": _rel_to_workflow(workflow_dir, regmap_json_path),
+        "rtl_files": _rel_list_to_workflow(workflow_dir, rtl_files),
         "rtl_source": contract["rtl_source"],
-        "verification_files": verification_files,
+        "verification_files": _rel_list_to_workflow(workflow_dir, verification_files),
         "ports": ports,
         "clock_names": clocks,
         "reset_names": [r["name"] for r in resets],
@@ -1143,6 +1050,7 @@ NUM_ITERS=200 RANDOM_SEED=7 make TESTCASE=integrated_input_sanity
     _log(log_path, "Generated testcases.json")
     _log(log_path, "Generated tb_contract.json")
     _log_kv(log_path, "generated_testcases", testcase_manifest["default_tests"])
+    _log_kv(log_path, "resolved_rtl_files", rtl_files)
 
     artifacts["tb_test_py"] = _record_text(workflow_id, agent_name, "vv/tb", f"test_{top}.py", test_py)
     artifacts["tb_makefile"] = _record_text(workflow_id, agent_name, "vv/tb", "Makefile", makefile)
@@ -1151,14 +1059,18 @@ NUM_ITERS=200 RANDOM_SEED=7 make TESTCASE=integrated_input_sanity
     artifacts["testcases_manifest"] = _record_text(workflow_id, agent_name, "vv/tb", "testcases.json", testcase_manifest_txt)
     artifacts["tb_contract"] = _record_text(workflow_id, agent_name, "vv/tb", "tb_contract.json", tb_contract_txt)
 
+    
+
     report = {
         "type": "vv_system_testbench_generation",
-        "version": "1.0",
+        "version": "1.1",
         "top_module": top,
-        "integration_json_path": integration_json_path,
-        "top_sv_path": top_sv_path,
-        "regmap_json_path": regmap_json_path,
+        "integration_json_path": _rel_to_workflow(workflow_dir, integration_json_path),
+        "top_sv_path": _rel_to_workflow(workflow_dir, top_sv_path),
+        "regmap_json_path": _rel_to_workflow(workflow_dir, regmap_json_path),
         "rtl_file_count": len(rtl_files),
+        "rtl_files": _rel_list_to_workflow(workflow_dir, rtl_files),
+        "verification_files": _rel_list_to_workflow(workflow_dir, verification_files),
         "clocks": clocks,
         "resets": resets,
         "control_model": control_model,
