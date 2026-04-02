@@ -470,6 +470,11 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Implementation Setup Agent",
       desc: "Prepares System PD inputs for downstream Digital PD by selecting soc_top_phys RTL, canonical SDC, and analog macro LEF/LIB/GDS collateral, then normalizes digital handoff for synthesis and backend PD stages."
     },
+    {
+      uiLabel: "System Software Handoff Package Agent",
+      backendLabel: "System Software Handoff Package Agent",
+      desc: "Builds the software-facing handoff package from System_Firmware outputs, including machine-readable manifest, summary, and artifact file list for downstream System_Software development."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);

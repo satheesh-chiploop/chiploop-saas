@@ -1,9 +1,12 @@
-import os, json, glob, shutil, subprocess, re
+import os, json, glob, shutil, subprocess, re, logging
 from utils.artifact_utils import save_text_artifact_and_record
+
+logger = logging.getLogger("chiploop")
 
 AGENT_NAME = "Digital STA PostPlace Agent"
 STAGE_NAME = "sta_postplace"
 OPENLANE_TO = "OpenROAD.STAMidPNR"
+EXEC_STAGE_DIR = "place"
 
 DEFAULT_PDK_VARIANT = os.getenv("CHIPLOOP_PDK_VARIANT", "sky130A")
 DEFAULT_OPENLANE_IMAGE = os.getenv("CHIPLOOP_OPENLANE_IMAGE", "ghcr.io/efabless/openlane2:2.4.0.dev1")
@@ -144,14 +147,66 @@ def _resolve_postplace_netlist(state: dict, workflow_dir: str) -> str | None:
     if picked:
         candidates.append(picked)
 
+    # Also inspect shared run_work/place runs directly
+    run_work_dir = state.get("digital_run_work_dir") or os.path.join(workflow_dir, "digital", "run_work")
+    place_runs = sorted(
+        glob.glob(os.path.join(run_work_dir, "place", "runs", "*")),
+        key=os.path.getmtime
+    )
+    if place_runs:
+        picked = _pick_stage_netlist(place_runs[-1])
+        if picked:
+            candidates.append(picked)
+
     candidates.extend([
         os.path.join(workflow_dir, "digital", "place", "netlist", "digital_subsystem_place.v"),
         os.path.join(workflow_dir, "digital", "place", "netlist", "digital_subsystem.v"),
-        os.path.join(workflow_dir, "digital", "synth", "netlist", "digital_subsystem_synth.v"),
     ])
 
     cand = _first_existing(candidates)
+    if cand:
+        logger.info(f"{AGENT_NAME}: selected post-place netlist -> {cand}")
+    else:
+        logger.warning(f"{AGENT_NAME}: no post-place netlist found")
     return cand
+    
+
+def _stage_macro_inputs(state: dict, work_stage_dir: str):
+    digital = state.get("digital") or {}
+
+    macro_lefs = [p for p in (digital.get("macro_lefs") or []) if p and os.path.exists(p)]
+    macro_libs = [p for p in (digital.get("macro_libs") or []) if p and os.path.exists(p)]
+    macro_gds  = [p for p in (digital.get("macro_gds") or []) if p and os.path.exists(p)]
+
+    inputs_macros_dir = os.path.join(work_stage_dir, "inputs", "macros")
+    lef_dir = os.path.join(inputs_macros_dir, "lef")
+    lib_dir = os.path.join(inputs_macros_dir, "lib")
+    gds_dir = os.path.join(inputs_macros_dir, "gds")
+
+    _ensure(lef_dir)
+    _ensure(lib_dir)
+    _ensure(gds_dir)
+
+    staged_lefs = []
+    staged_libs = []
+    staged_gds = []
+
+    for src in macro_lefs:
+        dst = os.path.join(lef_dir, os.path.basename(src))
+        shutil.copy2(src, dst)
+        staged_lefs.append(f"dir::inputs/macros/lef/{os.path.basename(src)}")
+
+    for src in macro_libs:
+        dst = os.path.join(lib_dir, os.path.basename(src))
+        shutil.copy2(src, dst)
+        staged_libs.append(f"dir::inputs/macros/lib/{os.path.basename(src)}")
+
+    for src in macro_gds:
+        dst = os.path.join(gds_dir, os.path.basename(src))
+        shutil.copy2(src, dst)
+        staged_gds.append(f"dir::inputs/macros/gds/{os.path.basename(src)}")
+
+    return staged_lefs, staged_libs, staged_gds
 
 def run_agent(state: dict) -> dict:
     workflow_id = state.get("workflow_id", "default")
@@ -169,11 +224,23 @@ def run_agent(state: dict) -> dict:
     cfg = _read_json(base_cfg)  
 
     cfg.pop("SYNTH_SDC_FILE", None)
+    cfg["RUN_LINTER"] = False
 
     run_work_dir = state.get("digital_run_work_dir") or os.path.join(workflow_dir, "digital", "run_work")
     run_work_dir = os.path.abspath(run_work_dir)
     _ensure(run_work_dir)
     state["digital_run_work_dir"] = run_work_dir
+
+    work_stage_dir = os.path.join(run_work_dir, EXEC_STAGE_DIR)
+    _ensure(work_stage_dir)
+    staged_lefs, staged_libs, staged_gds = _stage_macro_inputs(state, work_stage_dir)
+
+    if staged_lefs:
+        cfg["EXTRA_LEFS"] = staged_lefs
+    if staged_libs:
+        cfg["EXTRA_LIBS"] = staged_libs
+    if staged_gds:
+        cfg["EXTRA_GDS_FILES"] = staged_gds
 
 
 
@@ -229,8 +296,7 @@ def run_agent(state: dict) -> dict:
     pdk_root_host = os.path.abspath(pdk_root_host)
     state["pdk_root_host"] = pdk_root_host
 
-    work_stage_dir = os.path.join(run_work_dir, STAGE_NAME)
-    _ensure(work_stage_dir)
+
     _write(os.path.join(work_stage_dir, "config.json"), json.dumps(cfg, indent=2))
 
     input_log = "\n".join([
@@ -245,6 +311,9 @@ def run_agent(state: dict) -> dict:
         f"resolved_postplace_netlist={postplace_netlist}",
         f"staged_postplace_netlist={staged_postplace_netlist}",
         f"netlist_count=1",
+        f"macro_lef_count={len(staged_lefs)}",
+        f"macro_lib_count={len(staged_libs)}",
+        f"macro_gds_count={len(staged_gds)}",
     ]) + "\n"
     _write(os.path.join(logs_dir, "sta_postplace_input_resolution.log"), input_log)
 
@@ -257,7 +326,7 @@ docker run --rm \\
   -e PDK={pdk} \\
   -e PDK_ROOT=/pdk \\
   {image} \\
-  bash -lc 'set -e; cd /work && openlane --flow Classic --run-tag {run_tag} --to {OPENLANE_TO} {STAGE_NAME}/config.json'
+  bash -lc 'set -e; cd /work && openlane --flow Classic --run-tag {run_tag} --override-config RUN_LINTER=False --to {OPENLANE_TO} {EXEC_STAGE_DIR}/config.json'
 """
     _write(os.path.join(stage_dir, "run.sh"), run_sh)
     os.chmod(os.path.join(stage_dir, "run.sh"), 0o755)

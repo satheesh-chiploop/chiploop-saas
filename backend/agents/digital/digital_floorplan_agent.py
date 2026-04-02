@@ -135,6 +135,99 @@ def _resolve_config_from_state(state: dict, workflow_dir: str) -> str | None:
     logger.warning(f"{AGENT_NAME}: no OpenLane config found")
     return None
 
+def _resolve_macro_files_from_workflow(workflow_dir: str, exts: tuple[str, ...]) -> list[str]:
+    hits = []
+    for ext in exts:
+        hits.extend(glob.glob(os.path.join(workflow_dir, "**", f"*{ext}"), recursive=True))
+
+    out = []
+    seen = set()
+    for p in sorted(hits):
+        base = os.path.basename(p).lower()
+
+        # reject debug/raw scratch artifacts
+        if base.endswith("_llm_lef_raw.lef"):
+            continue
+        if base.endswith("_raw.lef"):
+            continue
+        if "debug" in base:
+            continue
+
+        ap = os.path.abspath(p)
+        if ap in seen:
+            continue
+        seen.add(ap)
+        out.append(ap)
+    return out
+def _stage_macro_inputs(state: dict, workflow_dir: str, work_stage_dir: str) -> tuple[list[str], list[str], list[str]]:
+    digital = state.get("digital") or {}
+
+    macro_lefs = [p for p in (digital.get("macro_lefs") or []) if p and os.path.exists(p)]
+    macro_libs = [p for p in (digital.get("macro_libs") or []) if p and os.path.exists(p)]
+    macro_gds  = [p for p in (digital.get("macro_gds") or []) if p and os.path.exists(p)]
+
+    if not macro_lefs:
+        macro_lefs = _resolve_macro_files_from_workflow(workflow_dir, (".lef",))
+    if not macro_libs:
+        macro_libs = _resolve_macro_files_from_workflow(workflow_dir, (".lib", ".lib.gz", ".db"))
+    if not macro_gds:
+        macro_gds = _resolve_macro_files_from_workflow(workflow_dir, (".gds", ".gds.gz"))
+
+    inputs_dir = os.path.join(work_stage_dir, "inputs", "macros")
+    lef_dir = os.path.join(inputs_dir, "lef")
+    lib_dir = os.path.join(inputs_dir, "lib")
+    gds_dir = os.path.join(inputs_dir, "gds")
+    _ensure_dir(lef_dir)
+    _ensure_dir(lib_dir)
+    _ensure_dir(gds_dir)
+
+    staged_lefs, staged_libs, staged_gds = [], [], []
+
+    for src in macro_lefs:
+        dst = os.path.join(lef_dir, os.path.basename(src))
+        if os.path.abspath(src) != os.path.abspath(dst):
+            shutil.copy2(src, dst)
+        staged_lefs.append(f"dir::inputs/macros/lef/{os.path.basename(src)}")
+
+    for src in macro_libs:
+        dst = os.path.join(lib_dir, os.path.basename(src))
+        if os.path.abspath(src) != os.path.abspath(dst):
+            shutil.copy2(src, dst)
+        staged_libs.append(f"dir::inputs/macros/lib/{os.path.basename(src)}")
+
+    for src in macro_gds:
+        dst = os.path.join(gds_dir, os.path.basename(src))
+        if os.path.abspath(src) != os.path.abspath(dst):
+            shutil.copy2(src, dst)
+        staged_gds.append(f"dir::inputs/macros/gds/{os.path.basename(src)}")
+
+    return staged_lefs, staged_libs, staged_gds
+
+
+
+def _generate_macro_placement(macro_master: str, macro_name: str = "u_analog") -> str:
+    """
+    Generate a simple DEF fragment for macro placement.
+    macro_name   = instance name in the top netlist
+    macro_master = LEF macro/master cell name
+    """
+    return f"""VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN floorplan_macro_template ;
+UNITS DISTANCE MICRONS 1000 ;
+COMPONENTS 1 ;
+- {macro_name} {macro_master} + FIXED ( 100 100 ) N ;
+END COMPONENTS
+END DESIGN
+"""
+
+def _generate_macro_placement_cfg(macro_name: str = "u_analog") -> str:
+    """
+    OpenLane macro placement config format:
+    <instance_name> <x> <y> <orientation>
+    """
+    return f"{macro_name} 100 100 N\n"
 
 def run_agent(state: dict) -> dict:
     print(f"\n🏁 Running {AGENT_NAME}...")
@@ -150,6 +243,9 @@ def run_agent(state: dict) -> dict:
     _ensure_dir(stage_dir)
     _ensure_dir(logs_dir)
     _ensure_dir(constraints_dir)
+
+
+    
 
     # Single source-of-truth SDC from Arch2RTL
 
@@ -186,6 +282,9 @@ def run_agent(state: dict) -> dict:
 
     # 2) Always stage-local SSOT SDC
     cfg["PNR_SDC_FILE"] = f"inputs/constraints/{sdc_basename}"
+
+    # 3) Skip Verilator lint for macro-backed mixed-signal/system PD reuse
+    cfg["RUN_LINTER"] = False
 
     # 3) Ensure netlist exists locally (so VERILOG_FILES resolves inside /work mount)
     synth_netlists = sorted(glob.glob(os.path.join(workflow_dir, "digital", "synth", "netlist", "*.v")))
@@ -255,6 +354,57 @@ def run_agent(state: dict) -> dict:
     work_stage_dir = os.path.join(run_work_dir, "floorplan")
     _ensure_dir(work_stage_dir)
 
+
+
+    staged_lefs, staged_libs, staged_gds = _stage_macro_inputs(state, workflow_dir, work_stage_dir)
+
+    if staged_lefs:
+        cfg["EXTRA_LEFS"] = staged_lefs
+    if staged_libs:
+        cfg["EXTRA_LIBS"] = staged_libs
+    if staged_gds:
+        cfg["EXTRA_GDS_FILES"] = staged_gds
+
+    logger.info(f"{AGENT_NAME}: staged macro LEFs -> {staged_lefs}")
+    logger.info(f"{AGENT_NAME}: staged macro LIBs -> {staged_libs}")
+    logger.info(f"{AGENT_NAME}: staged macro GDS -> {staged_gds}")
+
+    # DEBUG HARDCODE: prove macro handoff works first
+    macro_inst_name = "u_analog"
+    macro_master_name = "analog_subsystem"
+    macro_x = 100
+    macro_y = 100
+    macro_orient = "N"
+
+    # 1) legacy macro placement cfg
+    macro_cfg_path = os.path.join(work_stage_dir, "macro_placement.cfg")
+    macro_cfg = f"{macro_inst_name} {macro_x} {macro_y} {macro_orient}\n"
+    _write_text(macro_cfg_path, macro_cfg)
+
+   
+
+    logger.info(f"{AGENT_NAME}: macro placement CFG generated -> {macro_cfg_path}")
+    
+
+    # Force all three for debug
+    cfg["MACRO_PLACEMENT_CFG"] = "floorplan/macro_placement.cfg"
+    cfg["PL_SKIP_INITIAL_PLACEMENT"] = True
+    cfg.pop("FP_DEF_TEMPLATE", None)
+
+    # Optional: also force MACROS for debug only
+    #cfg["MACROS"] = {
+    #   macro_inst_name: {
+    #        "location": [macro_x, macro_y],
+    #       "orientation": macro_orient
+    #   }
+    #}
+    cfg.pop("MACROS", None)
+
+    logger.info(f"{AGENT_NAME}: cfg['MACRO_PLACEMENT_CFG']={cfg.get('MACRO_PLACEMENT_CFG')}")
+    logger.info(f"{AGENT_NAME}: cfg['FP_DEF_TEMPLATE']={cfg.get('FP_DEF_TEMPLATE')}")
+    logger.info(f"{AGENT_NAME}: cfg['PL_SKIP_INITIAL_PLACEMENT']={cfg.get('PL_SKIP_INITIAL_PLACEMENT')}")
+    logger.info(f"{AGENT_NAME}: cfg['MACROS']={cfg.get('MACROS')}")
+
     # Now safe to write execution config into shared workspace
     exec_config_path = os.path.join(work_stage_dir, "config.json")
     _write_text(exec_config_path, json.dumps(cfg, indent=2))
@@ -288,6 +438,9 @@ def run_agent(state: dict) -> dict:
         f"run_tag={run_tag}",
         f"top_module={top_module}",
         f"netlist_count={len(stage_netlists)}",
+        f"macro_lef_count={len(staged_lefs)}",
+        f"macro_lib_count={len(staged_libs)}",
+        f"macro_gds_count={len(staged_gds)}",
     ]) + "\n"
     _write_text(os.path.join(logs_dir, "floorplan_input_resolution.log"), input_log)
 
@@ -308,7 +461,7 @@ docker run --rm \
   -e PDK={pdk_variant} \
   -e PDK_ROOT=/pdk \
   {openlane_image} \
-  bash -lc 'set -e; cd /work && openlane --flow Classic --run-tag {run_tag} --to OpenROAD.Floorplan floorplan/config.json'
+  bash -lc 'set -e; cd /work && openlane --flow Classic --run-tag {run_tag} --override-config RUN_LINTER=False --to OpenROAD.Floorplan floorplan/config.json'
 
 
 """
@@ -348,6 +501,7 @@ docker run --rm \
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", "floorplan/run.sh", run_sh)
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", "floorplan/logs/openlane_floorplan.log", out)
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", "floorplan/floorplan_summary.json", json.dumps(summary, indent=2))
+        save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", "floorplan/macro_placement.cfg", macro_cfg)
         if metrics_path and os.path.exists(metrics_path):
             with open(metrics_path, "r", encoding="utf-8") as f:
                 save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", "floorplan/metrics.json", f.read())

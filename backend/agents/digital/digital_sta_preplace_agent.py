@@ -157,6 +157,43 @@ def _resolve_preplace_netlist(state: dict, workflow_dir: str) -> str | None:
     logger.warning(f"{AGENT_NAME}: no deterministic synth netlist found")
     return None
 
+def _stage_macro_inputs(state: dict, work_stage_dir: str):
+    digital = state.get("digital") or {}
+
+    macro_lefs = [p for p in (digital.get("macro_lefs") or []) if p and os.path.exists(p)]
+    macro_libs = [p for p in (digital.get("macro_libs") or []) if p and os.path.exists(p)]
+    macro_gds  = [p for p in (digital.get("macro_gds") or []) if p and os.path.exists(p)]
+
+    inputs_macros_dir = os.path.join(work_stage_dir, "inputs", "macros")
+    lef_dir = os.path.join(inputs_macros_dir, "lef")
+    lib_dir = os.path.join(inputs_macros_dir, "lib")
+    gds_dir = os.path.join(inputs_macros_dir, "gds")
+
+    _ensure_dir(lef_dir)
+    _ensure_dir(lib_dir)
+    _ensure_dir(gds_dir)
+
+    staged_lefs = []
+    staged_libs = []
+    staged_gds = []
+
+    for src in macro_lefs:
+        dst = os.path.join(lef_dir, os.path.basename(src))
+        shutil.copy2(src, dst)
+        staged_lefs.append(f"dir::inputs/macros/lef/{os.path.basename(src)}")
+
+    for src in macro_libs:
+        dst = os.path.join(lib_dir, os.path.basename(src))
+        shutil.copy2(src, dst)
+        staged_libs.append(f"dir::inputs/macros/lib/{os.path.basename(src)}")
+
+    for src in macro_gds:
+        dst = os.path.join(gds_dir, os.path.basename(src))
+        shutil.copy2(src, dst)
+        staged_gds.append(f"dir::inputs/macros/gds/{os.path.basename(src)}")
+
+    return staged_lefs, staged_libs, staged_gds
+
 def run_agent(state: dict) -> dict:
     workflow_id = state.get("workflow_id", "default")
     workflow_dir = state.get("workflow_dir") or f"backend/workflows/{workflow_id}"
@@ -173,6 +210,7 @@ def run_agent(state: dict) -> dict:
     run_work_dir = os.path.abspath(run_work_dir)
     _ensure_dir(run_work_dir)
     state["digital_run_work_dir"] = run_work_dir
+
 
 
     inputs_dir = os.path.join(run_work_dir, "inputs")
@@ -196,6 +234,20 @@ def run_agent(state: dict) -> dict:
  
     cfg = _read_json(base_cfg_path)
     cfg.pop("SYNTH_SDC_FILE", None)
+    cfg["RUN_LINTER"] = False
+
+    work_stage_dir = os.path.join(run_work_dir, STAGE_NAME)
+    _ensure_dir(work_stage_dir)
+
+    staged_lefs, staged_libs, staged_gds = _stage_macro_inputs(state, work_stage_dir)
+
+    if staged_lefs:
+        cfg["EXTRA_LEFS"] = staged_lefs
+    if staged_libs:
+        cfg["EXTRA_LIBS"] = staged_libs
+    if staged_gds:
+        cfg["EXTRA_GDS_FILES"] = staged_gds
+
 
     # ---- SSOT SDC -> run_work/inputs/constraints/top.sdc ----
     upstream_sdc = _resolve_sdc_from_state(state, workflow_dir)
@@ -238,11 +290,7 @@ def run_agent(state: dict) -> dict:
     top_module = str(cfg.get("DESIGN_NAME", "")).strip() or "top"
 
     # Write contract config (visible under digital/sta_preplace/config.json)
-    _write_text(os.path.join(stage_dir, "config.json"), json.dumps(cfg, indent=2))
-
-    # Write exec config under /work/sta_preplace/config.json
-    work_stage_dir = os.path.join(run_work_dir, STAGE_NAME)
-    _ensure_dir(work_stage_dir)
+    
     _write_text(os.path.join(work_stage_dir, "config.json"), json.dumps(cfg, indent=2))
 
     # ---- Docker/run.sh (mount run_work_dir) ----
@@ -271,6 +319,9 @@ def run_agent(state: dict) -> dict:
         f"resolved_preplace_netlist={preplace_netlist}",
         f"staged_preplace_netlist={staged_preplace_netlist}",
         f"netlist_count=1",
+        f"macro_lef_count={len(staged_lefs)}",
+        f"macro_lib_count={len(staged_libs)}",
+        f"macro_gds_count={len(staged_gds)}",
     ]) + "\n"
     _write_text(os.path.join(logs_dir, "sta_preplace_input_resolution.log"), input_log)
 
@@ -290,7 +341,7 @@ docker run --rm \\
   -e PDK={pdk_variant} \\
   -e PDK_ROOT=/pdk \\
   {openlane_image} \\
-  bash -lc 'set -e; cd /work && openlane --flow Classic --run-tag {run_tag} --to {OPENLANE_TO} {STAGE_NAME}/config.json'
+  bash -lc 'set -e; cd /work && openlane --flow Classic --run-tag {run_tag} --override-config RUN_LINTER=False --to {OPENLANE_TO} {STAGE_NAME}/config.json'
 """
     run_sh_path = os.path.join(stage_dir, "run.sh")
     _write_text(run_sh_path, run_sh)
