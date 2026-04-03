@@ -659,7 +659,7 @@ export default function AppsHomePage() {
 
       {/* Loop rows */}
       <section className="mx-auto max-w-6xl px-6 pb-16 space-y-10">
-        {(view === "recommended" ? loops.filter(l => l === "digital" || l === "analog" || l === "embedded" || l === "validation" ) : loops).map((loop) => {
+        {(view === "recommended" ? loops.filter(l => l === "digital" || l === "analog" || l === "embedded" || l === "validation" || l === "system") : loops).map((loop) => {
           const meta = LOOP_META[loop];
           const rowApps = apps.filter((a) => a.loop_type === loop);
           const animatedApps = [...rowApps, ...rowApps, ...rowApps];
