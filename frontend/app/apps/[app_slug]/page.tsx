@@ -52,6 +52,7 @@ export default function AppSlugRouter() {
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
+      "system-software": "/apps/system-software",
       "system-rtl": "/apps/system-rtl",
 
     };

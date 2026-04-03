@@ -475,6 +475,26 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Software Handoff Package Agent",
       desc: "Builds the software-facing handoff package from System_Firmware outputs, including machine-readable manifest, summary, and artifact file list for downstream System_Software development."
     },
+    {
+      uiLabel: "System Software Handoff Ingest Agent",
+      backendLabel: "System Software Handoff Ingest Agent",
+      desc: "Consumes the System_Firmware software handoff package, validates it, and produces the normalized input contract for System_Software."
+    },
+    {
+      uiLabel: "System Software Capability Model Agent",
+      backendLabel: "System Software Capability Model Agent",
+      desc: "Builds the software-facing platform capability model from the validated software input contract."
+    },
+    {
+      uiLabel: "System Software API Contract Agent",
+      backendLabel: "System Software API Contract Agent",
+      desc: "Defines the public and internal System_Software API surface from the capability model."
+    },
+    {
+      uiLabel: "System Software SDK Scaffold Agent",
+      backendLabel: "System Software SDK Scaffold Agent",
+      desc: "Generates the initial System_Software SDK scaffold, including public header, Rust façade, example app, and build metadata."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);

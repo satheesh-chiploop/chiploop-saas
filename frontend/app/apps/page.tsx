@@ -346,6 +346,15 @@ export default function AppsHomePage() {
       nudge: "New",
       promise: "Firmware drivers + co-sim report",
     },
+    {
+      slug: "system-software",
+      title: "System Software",
+      subtitle: "Firmware handoff → SDK → API → applications",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Generate SDK + APIs + software package",
+    },
 
   ]), []);
 
@@ -370,8 +379,10 @@ export default function AppsHomePage() {
     "embedded-driver",
 
     // System 
-    "system-end2end",
+    "system-rtl",
     "system-firmware",
+    "system-software",
+
   ]);
 
   const flagship = apps.filter(a => a.status === "Flagship" && FLAGSHIP_SLUGS.has(a.slug));
@@ -427,6 +438,7 @@ export default function AppsHomePage() {
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
+      "system-software": "/apps/system-software",
       "system-rtl": "/apps/system-rtl",
     };
     
