@@ -495,6 +495,31 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Software SDK Scaffold Agent",
       desc: "Generates the initial System_Software SDK scaffold, including public header, Rust façade, example app, and build metadata."
     },
+    {
+      uiLabel: "System Software HAL/Driver Adapter Agent",
+      backendLabel: "System Software HAL/Driver Adapter Agent",
+      desc: "Builds a stable adapter layer over firmware HAL, drivers, and register access for use by SDK and services."
+    },
+    {
+      uiLabel: "System Software Config Schema Agent",
+      backendLabel: "System Software Config Schema Agent",
+      desc: "Defines runtime configuration schema, defaults, and the software configuration contract."
+    },
+    {
+      uiLabel: "System Software Service Architecture Agent",
+      backendLabel: "System Software Service Architecture Agent",
+      desc: "Defines the software architecture split across services, daemons, libraries, tools, and app-facing layers."
+    },
+    {
+      uiLabel: "System Software Core Service Agent",
+      backendLabel: "System Software Core Service Agent",
+      desc: "Generates core platform services such as init manager, health monitor, telemetry, diagnostics, and control service."
+    },
+    {
+      uiLabel: "System Software Application Scaffold Agent",
+      backendLabel: "System Software Application Scaffold Agent",
+      desc: "Generates sample applications and app templates using the SDK, APIs, configuration, and service architecture."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);
