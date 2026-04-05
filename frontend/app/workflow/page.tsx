@@ -520,6 +520,31 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Software Application Scaffold Agent",
       desc: "Generates sample applications and app templates using the SDK, APIs, configuration, and service architecture."
     },
+    {
+      uiLabel: "System Software CLI / Tooling Agent",
+      backendLabel: "System Software CLI / Tooling Agent",
+      desc: "Generates developer and operator CLI tools over the SDK (register viewer, diagnostics CLI, debug utilities)."
+    },
+    {
+      uiLabel: "System Software Build System Agent",
+      backendLabel: "System Software Build System Agent",
+      desc: "Creates workspace-level build system (Cargo workspace, Makefile, dependency graph) for SDK, services, apps, and tools."
+    },
+    {
+      uiLabel: "System Software Unit Test Agent",
+      backendLabel: "System Software Unit Test Agent",
+      desc: "Generates unit tests and smoke tests for SDK APIs, services, and applications."
+    },
+    {
+      uiLabel: "System Software Mock Runtime Agent",
+      backendLabel: "System Software Mock Runtime Agent",
+      desc: "Builds a mock runtime environment to simulate hardware, firmware, and registers for software-only testing."
+    },
+    {
+      uiLabel: "System Software Packaging Agent",
+      backendLabel: "System Software Packaging Agent",
+      desc: "Bundles SDK, apps, tools, configs, build system, and tests into a final system software package."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);
