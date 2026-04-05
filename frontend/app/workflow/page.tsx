@@ -545,6 +545,11 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Software Packaging Agent",
       desc: "Bundles SDK, apps, tools, configs, build system, and tests into a final system software package."
     },
+    {
+      uiLabel: "System Software Executive Summary Agent",
+      backendLabel: "System Software Executive Summary Agent",
+      desc: "Generates the final executive summary for System_Software, including readiness, risks, delivery scope, and recommended next steps."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);
