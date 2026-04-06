@@ -585,6 +585,11 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Software Validation Summary Agent",
       desc: "Produces final readiness decision."
     },
+    {
+      uiLabel: "System RTL Package Agent",
+      backendLabel: "System RTL Handoff Package Agent",
+      desc: "Restores System RTL workflow and builds reusable RTL handoff package (tops, filelists, libs, compile evidence) for co-simulation."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);

@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import shutil
 import subprocess
 from typing import Any, Dict, Optional
 
@@ -11,6 +12,7 @@ OUTPUT_SUBDIR = "system/software_validation/build"
 
 REPORT_JSON = "build_validation_report.json"
 SUMMARY_MD = "build_validation_summary.md"
+DEBUG_JSON = "build_validation_debug.json"
 
 
 def _now():
@@ -30,6 +32,14 @@ def _record(workflow_id, filename, content):
         return None
 
 
+def _tail(text: str, limit: int = 4000) -> str:
+    return text[-limit:] if isinstance(text, str) else ""
+
+
+def _find_cargo() -> str:
+    return shutil.which("cargo") or ""
+
+
 def _run_cmd(cmd, cwd):
     try:
         result = subprocess.run(
@@ -42,8 +52,8 @@ def _run_cmd(cmd, cwd):
         )
         return {
             "returncode": result.returncode,
-            "stdout": result.stdout[-4000:],
-            "stderr": result.stderr[-4000:],
+            "stdout": _tail(result.stdout),
+            "stderr": _tail(result.stderr),
         }
     except Exception as e:
         return {
@@ -53,20 +63,88 @@ def _run_cmd(cmd, cwd):
         }
 
 
+def _resolve_build_root(state: Dict[str, Any]) -> str:
+    explicit = state.get("system_software_build_root")
+    if isinstance(explicit, str) and explicit.strip() and os.path.isdir(explicit.strip()):
+        return explicit.strip()
+
+    validation_manifest = state.get("system_software_validation_manifest") or {}
+    discovered = validation_manifest.get("discovered_assets") or {}
+    build_info = discovered.get("build_manifest") or {}
+
+    resolved_manifest_path = str(build_info.get("resolved_path") or "").strip()
+    if resolved_manifest_path:
+        candidate = os.path.dirname(resolved_manifest_path)
+        if os.path.isdir(candidate):
+            return candidate
+
+    workflow_dir = str(state.get("workflow_dir") or "").strip()
+    if workflow_dir:
+        fallback = os.path.join(workflow_dir, "system/software/build")
+        if os.path.isdir(fallback):
+            return fallback
+
+    return ""
+
+
 def run_agent(state: dict) -> dict:
     workflow_id = state.get("workflow_id") or "default"
-    workflow_dir = state.get("workflow_dir") or ""
 
     print(f"\n⚙️ Running {AGENT_NAME}")
 
     build_manifest = state.get("system_software_build_manifest") or {}
-    build_root = os.path.join(workflow_dir, "system/software/build")
+    build_root = _resolve_build_root(state)
 
-    if not os.path.isdir(build_root):
+    if not build_root:
+        debug = {
+            "agent": AGENT_NAME,
+            "generated_at": _now(),
+            "reason": "build_root_missing",
+            "workflow_dir": state.get("workflow_dir") or "",
+            "resolved_build_manifest_path": (
+                ((state.get("system_software_validation_manifest") or {})
+                 .get("discovered_assets") or {})
+                .get("build_manifest", {})
+                .get("resolved_path", "")
+            ),
+        }
+        _record(workflow_id, DEBUG_JSON, json.dumps(debug, indent=2))
         state["status"] = "❌ build root missing"
         return state
 
-    result = _run_cmd(["cargo", "build", "--workspace"], build_root)
+    cargo_bin = _find_cargo()
+    if not cargo_bin:
+        report = {
+            "agent": AGENT_NAME,
+            "generated_at": _now(),
+            "build_root": build_root,
+            "workspace_members": build_manifest.get("workspace_members") or [],
+            "build_status": "environment_missing",
+            "message": "cargo not found on PATH",
+        }
+        _record(workflow_id, REPORT_JSON, json.dumps(report, indent=2))
+        _record(
+            workflow_id,
+            SUMMARY_MD,
+            "# Build Validation Summary\n\n"
+            "- Status: **environment_missing**\n"
+            f"- Build root: `{build_root}`\n"
+            "- Message: `cargo not found on PATH`\n",
+        )
+        _record(workflow_id, DEBUG_JSON, json.dumps({
+            "agent": AGENT_NAME,
+            "generated_at": _now(),
+            "build_root": build_root,
+            "cargo_bin": cargo_bin,
+            "PATH": os.environ.get("PATH", ""),
+        }, indent=2))
+        state["system_software_build_validation"] = report
+        state["system_software_build_root"] = build_root
+        state["build_status"] = "fail"
+        state["status"] = "⚠️ build environment missing"
+        return state
+
+    result = _run_cmd([cargo_bin, "build", "--workspace"], build_root)
     build_status = "pass" if result["returncode"] == 0 else "fail"
 
     report = {
@@ -74,18 +152,32 @@ def run_agent(state: dict) -> dict:
         "generated_at": _now(),
         "build_root": build_root,
         "workspace_members": build_manifest.get("workspace_members") or [],
+        "cargo_bin": cargo_bin,
         "returncode": result["returncode"],
         "build_status": build_status,
         "stdout_tail": result["stdout"],
         "stderr_tail": result["stderr"],
     }
 
-    summary = f"# Build Validation Summary\n\n- Status: **{build_status}**\n- Return code: {result['returncode']}\n"
+    summary = (
+        "# Build Validation Summary\n\n"
+        f"- Status: **{build_status}**\n"
+        f"- Build root: `{build_root}`\n"
+        f"- Cargo: `{cargo_bin}`\n"
+        f"- Return code: `{result['returncode']}`\n"
+    )
 
     _record(workflow_id, REPORT_JSON, json.dumps(report, indent=2))
     _record(workflow_id, SUMMARY_MD, summary)
+    _record(workflow_id, DEBUG_JSON, json.dumps({
+        "agent": AGENT_NAME,
+        "generated_at": _now(),
+        "build_root": build_root,
+        "cargo_bin": cargo_bin,
+    }, indent=2))
 
     state["system_software_build_validation"] = report
+    state["system_software_build_root"] = build_root
     state["build_status"] = build_status
     state["status"] = "✅ build validation complete" if build_status == "pass" else "⚠️ build failed"
     return state

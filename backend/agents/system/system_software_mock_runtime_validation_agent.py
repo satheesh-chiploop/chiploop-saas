@@ -1,7 +1,7 @@
-
 import datetime
 import json
 import os
+import shutil
 import subprocess
 from typing import Any, Dict, List, Optional
 
@@ -40,6 +40,10 @@ def _tail(text: str, limit: int = 4000) -> str:
     return text[-limit:] if isinstance(text, str) else ""
 
 
+def _find_cargo() -> str:
+    return shutil.which("cargo") or ""
+
+
 def _run_cmd(cmd: List[str], cwd: str, timeout_sec: int = 600) -> Dict[str, Any]:
     try:
         result = subprocess.run(
@@ -63,21 +67,23 @@ def _run_cmd(cmd: List[str], cwd: str, timeout_sec: int = 600) -> Dict[str, Any]
         }
 
 
-def _candidate_mock_targets(mock_manifest: Dict[str, Any]) -> List[List[str]]:
+def _candidate_mock_targets(mock_manifest: Dict[str, Any], cargo_bin: str) -> List[List[str]]:
     candidates: List[List[str]] = []
 
     explicit = mock_manifest.get("commands") or []
     if isinstance(explicit, list):
         for item in explicit:
             if isinstance(item, list) and item:
-                candidates.append([str(x) for x in item])
+                normalized = [str(x) for x in item]
+                if normalized and normalized[0] == "cargo" and cargo_bin:
+                    normalized[0] = cargo_bin
+                candidates.append(normalized)
             elif _is_nonempty_str(item):
                 candidates.append([str(item)])
 
-    # deterministic fallbacks
     candidates.extend([
-        ["cargo", "test", "--workspace", "--features", "mock"],
-        ["cargo", "test", "--workspace"],
+        [cargo_bin, "test", "--workspace", "--features", "mock"],
+        [cargo_bin, "test", "--workspace"],
     ])
 
     seen = set()
@@ -90,23 +96,49 @@ def _candidate_mock_targets(mock_manifest: Dict[str, Any]) -> List[List[str]]:
     return deduped
 
 
+def _resolve_dir_from_manifest(state: Dict[str, Any], asset_key: str) -> str:
+    validation_manifest = state.get("system_software_validation_manifest") or {}
+    discovered = validation_manifest.get("discovered_assets") or {}
+    info = discovered.get(asset_key) or {}
+    resolved_manifest_path = str(info.get("resolved_path") or "").strip()
+    if resolved_manifest_path:
+        candidate = os.path.dirname(resolved_manifest_path)
+        if os.path.isdir(candidate):
+            return candidate
+    return ""
+
+
 def run_agent(state: dict) -> dict:
     workflow_id = state.get("workflow_id") or "default"
-    workflow_dir = os.path.abspath(state.get("workflow_dir") or "")
 
     print(f"\n🧪 Running {AGENT_NAME}")
 
     validation_manifest = state.get("system_software_validation_manifest") or {}
     mock_manifest = state.get("system_software_mock_manifest") or {}
 
-    build_root = os.path.join(workflow_dir, "system/software/build")
-    mock_root = os.path.join(workflow_dir, "system/software/mock")
+    build_root = state.get("system_software_build_root") or _resolve_dir_from_manifest(state, "build_manifest")
+    mock_root = state.get("system_software_mock_root") or _resolve_dir_from_manifest(state, "mock_manifest")
 
-    if not os.path.isdir(build_root):
+    if not build_root:
+        _record_text(workflow_id, DEBUG_JSON, json.dumps({
+            "agent": AGENT_NAME,
+            "generated_at": _now(),
+            "reason": "mock_runtime_validation_build_root_missing",
+            "resolved_build_manifest_path": (
+                ((validation_manifest.get("discovered_assets") or {})
+                 .get("build_manifest") or {})
+                .get("resolved_path", "")
+            ),
+            "resolved_mock_manifest_path": (
+                ((validation_manifest.get("discovered_assets") or {})
+                 .get("mock_manifest") or {})
+                .get("resolved_path", "")
+            ),
+        }, indent=2))
         state["status"] = "❌ mock runtime validation build root missing"
         return state
 
-    if not mock_manifest and not os.path.isdir(mock_root):
+    if not mock_manifest and not mock_root:
         report = {
             "agent": AGENT_NAME,
             "generated_at": _now(),
@@ -128,9 +160,43 @@ def run_agent(state: dict) -> dict:
         state["status"] = "⚠️ mock runtime not present"
         return state
 
+    cargo_bin = _find_cargo()
+    if not cargo_bin:
+        report = {
+            "agent": AGENT_NAME,
+            "generated_at": _now(),
+            "validation_scope": "software_only",
+            "co_sim_enabled": False,
+            "build_root": build_root,
+            "mock_root": mock_root,
+            "mock_runtime_status": "environment_missing",
+            "message": "cargo not found on PATH",
+        }
+        _record_text(workflow_id, REPORT_JSON, json.dumps(report, indent=2))
+        _record_text(
+            workflow_id,
+            SUMMARY_MD,
+            "# Mock Runtime Validation\n\n"
+            "- Status: **environment_missing**\n"
+            f"- Build root: `{build_root}`\n"
+            "- Message: `cargo not found on PATH`\n",
+        )
+        _record_text(workflow_id, DEBUG_JSON, json.dumps({
+            "agent": AGENT_NAME,
+            "generated_at": _now(),
+            "build_root": build_root,
+            "mock_root": mock_root,
+            "cargo_bin": cargo_bin,
+            "PATH": os.environ.get("PATH", ""),
+        }, indent=2))
+        state["system_software_mock_runtime_validation"] = report
+        state["mock_runtime_status"] = "fail"
+        state["status"] = "⚠️ mock runtime environment missing"
+        return state
+
     attempts = []
     selected = None
-    for cmd in _candidate_mock_targets(mock_manifest):
+    for cmd in _candidate_mock_targets(mock_manifest, cargo_bin):
         result = _run_cmd(cmd, cwd=build_root)
         attempts.append({
             "command": cmd,
@@ -158,6 +224,7 @@ def run_agent(state: dict) -> dict:
         "co_sim_enabled": False,
         "build_root": build_root,
         "mock_root": mock_root,
+        "cargo_bin": cargo_bin,
         "mock_runtime_status": mock_runtime_status,
         "selected_command": final_attempt["command"],
         "returncode": final_attempt["returncode"],
@@ -169,6 +236,8 @@ def run_agent(state: dict) -> dict:
     summary = (
         "# Mock Runtime Validation\n\n"
         f"- Status: **{mock_runtime_status}**\n"
+        f"- Build root: `{build_root}`\n"
+        f"- Cargo: `{cargo_bin}`\n"
         f"- Command: `{ ' '.join(final_attempt['command']) }`\n"
         f"- Return code: `{final_attempt['returncode']}`\n"
     )
@@ -178,6 +247,7 @@ def run_agent(state: dict) -> dict:
         "generated_at": _now(),
         "validation_manifest_present": bool(validation_manifest),
         "mock_manifest_present": bool(mock_manifest),
+        "cargo_bin": cargo_bin,
         "attempts": attempts,
     }
 
