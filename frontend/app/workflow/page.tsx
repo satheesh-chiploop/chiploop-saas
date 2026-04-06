@@ -588,7 +588,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     {
       uiLabel: "System RTL Package Agent",
       backendLabel: "System RTL Handoff Package Agent",
-      desc: "Restores System RTL workflow and builds reusable RTL handoff package (tops, filelists, libs, compile evidence) for co-simulation."
+      desc: "Builds the final System RTL handoff package from integration intent, assembled SoC tops, sim/phys filelists, physical libs, and compile evidence for downstream co-simulation and handoff flows."
     },
   ],
 };
