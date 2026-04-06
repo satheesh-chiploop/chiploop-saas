@@ -53,6 +53,7 @@ export default function AppSlugRouter() {
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
       "system-software": "/apps/system-software",
+      "system-software-validation": "/apps/system-software-validation",
       "system-rtl": "/apps/system-rtl",
 
     };

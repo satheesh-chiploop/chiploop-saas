@@ -550,6 +550,41 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System Software Executive Summary Agent",
       desc: "Generates the final executive summary for System_Software, including readiness, risks, delivery scope, and recommended next steps."
     },
+    {
+      uiLabel: "System Software Validation Ingest Agent",
+      backendLabel: "System Software Validation Ingest Agent",
+      desc: "Loads system software artifacts from storage and prepares validation manifest."
+    },
+    {
+      uiLabel: "System Software Build Validation Agent",
+      backendLabel: "System Software Build Validation Agent",
+      desc: "Validates cargo build across software stack."
+    },
+    {
+      uiLabel: "System Software Test Execution Agent",
+      backendLabel: "System Software Test Execution Agent",
+      desc: "Executes unit/integration tests."
+    },
+    {
+      uiLabel: "System Software Contract Consistency Agent",
+      backendLabel: "System Software Contract Consistency Agent",
+      desc: "Checks API, SDK, and app consistency."
+    },
+    {
+      uiLabel: "System Software Mock Runtime Validation Agent",
+      backendLabel: "System Software Mock Runtime Validation Agent",
+      desc: "Validates runtime behavior using mock environment."
+    },
+    {
+      uiLabel: "System Software Package Audit Agent",
+      backendLabel: "System Software Package Audit Agent",
+      desc: "Ensures package completeness."
+    },
+    {
+      uiLabel: "System Software Validation Summary Agent",
+      backendLabel: "System Software Validation Summary Agent",
+      desc: "Produces final readiness decision."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);

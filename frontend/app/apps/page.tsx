@@ -355,6 +355,15 @@ export default function AppsHomePage() {
       nudge: "New",
       promise: "Generate SDK + APIs + software package",
     },
+    {
+      slug: "system-software-validation",
+      title: "System Software Validation",
+      subtitle: "Validate software package or run full software → firmware → RTL co-simulation",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Build + test + contract + package validation or full co-sim proof",
+    },
 
   ]), []);
 
@@ -439,6 +448,7 @@ export default function AppsHomePage() {
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
       "system-software": "/apps/system-software",
+      "system-software-validation": "/apps/system-software-validation",
       "system-rtl": "/apps/system-rtl",
     };
     
@@ -594,6 +604,21 @@ export default function AppsHomePage() {
                   <div className="mt-1 text-sm text-slate-400">Embedded Run: HAL → drivers → boot → diagnostics → report</div>
               </button>
             </div>
+
+            <button
+              onClick={() => go("/apps/system-software-validation")}
+              className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
+            >
+              <div className="flex items-center justify-between">
+                <div className="font-semibold">Validate system software stack</div>
+                <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
+                  New
+                </span>
+              </div>
+              <div className="mt-1 text-sm text-slate-400">
+                Software validation or full co-simulation (SW → FW → RTL)
+              </div>
+            </button>
 
 
 
