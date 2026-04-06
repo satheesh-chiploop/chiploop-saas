@@ -590,6 +590,21 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System RTL Handoff Package Agent",
       desc: "Builds the final System RTL handoff package from integration intent, assembled SoC tops, sim/phys filelists, physical libs, and compile evidence for downstream co-simulation and handoff flows."
     },
+    {
+      uiLabel: "System CoSim Ingest Agent",
+      backendLabel: "System CoSim Ingest Agent",
+      desc: "Restores and normalizes System_Software, System_Firmware, and System_RTL packages into a unified co-simulation manifest for L2 validation."
+    },
+    {
+      uiLabel: "System CoSim Contract Agent",
+      backendLabel: "System CoSim Contract Agent",
+      desc: "Validates cross-layer consistency across software, firmware, and RTL, including register map alignment, interrupts, DMA expectations, and execution readiness."
+    },
+    {
+      uiLabel: "System CoSim Scenario Generator Agent",
+      backendLabel: "System CoSim Scenario Generator Agent",
+      desc: "Generates deterministic L2 scenarios such as boot, register read/write, and interrupt propagation for full-stack software-to-firmware-to-RTL co-simulation."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);
