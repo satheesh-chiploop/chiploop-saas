@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ApiClientError, apiPost } from "@/lib/apiClient";
 import AgentFactoryDryRunModal from "./AgentFactoryDryRunModal";
+import type { GeneratedAgentReviewItem } from "./GeneratedAgentReviewModal";
 
 const LOOP_OPTIONS = ["digital", "analog", "embedded", "system", "validation"];
 
@@ -111,9 +112,11 @@ function ChipList({ title, items }: { title: string; items: string[] }) {
 
 export default function StudioAgentPlannerModal({
   initialLoop,
+  onFactoryDryRunResult,
   onClose,
 }: {
   initialLoop: string;
+  onFactoryDryRunResult?: (item: GeneratedAgentReviewItem) => void;
   onClose: () => void;
 }) {
   const [requestText, setRequestText] = useState("");
@@ -339,6 +342,7 @@ export default function StudioAgentPlannerModal({
             required_hooks: result.reusable_hooks || [],
             allow_extension: result.recommendation !== "create_new",
           }}
+          onDryRunResult={onFactoryDryRunResult}
           onClose={() => setShowFactoryDryRun(false)}
         />
       ) : null}

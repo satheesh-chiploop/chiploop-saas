@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ApiClientError, apiPost } from "@/lib/apiClient";
+import type { GeneratedAgentReviewItem } from "./GeneratedAgentReviewModal";
 
 const LOOP_OPTIONS = ["digital", "analog", "embedded", "system", "validation"];
 
@@ -109,9 +110,11 @@ function ListSection({ title, items }: { title: string; items?: string[] }) {
 
 export default function AgentFactoryDryRunModal({
   initialRequest,
+  onDryRunResult,
   onClose,
 }: {
   initialRequest: FactoryInitialRequest;
+  onDryRunResult?: (item: GeneratedAgentReviewItem) => void;
   onClose: () => void;
 }) {
   const [name, setName] = useState(initialRequest.name || "");
@@ -156,6 +159,14 @@ export default function AgentFactoryDryRunModal({
         },
       });
       setResult(response.result);
+      onDryRunResult?.({
+        agentName: name.trim(),
+        request: requestText.trim(),
+        loopType,
+        domain: domain.trim() || undefined,
+        createdAt: new Date().toISOString(),
+        result: response.result,
+      });
     } catch (err) {
       setError(errorMessage(err));
     } finally {
