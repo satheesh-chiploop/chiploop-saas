@@ -24,6 +24,7 @@ import AgentNode from "./AgentNode";
 import WorkflowConsole from "./WorkflowConsole";
 import PlannerModal from "@/components/PlannerModal";
 import AgentPlannerModal from "@/components/AgentPlannerModal";
+import PlannerPanel from "@/components/studio/PlannerPanel";
 /* =========================
    Types & Constants
 ========================= */
@@ -1555,6 +1556,44 @@ function WorkflowPage() {
     return nds.reduce((acc, n) => (n.position.x > acc.position.x ? n : acc), nds[0]);
   };
 
+  const addPlannedAgentToCanvas = useCallback(
+    (agentName: string) => {
+      const trimmed = agentName.trim();
+      if (!trimmed) return;
+
+      const id = `${trimmed}-${Date.now()}`;
+      setNodes((currentNodes) => {
+        const lastNode = currentNodes.length
+          ? currentNodes.reduce((acc, node) => (node.position.x > acc.position.x ? node : acc), currentNodes[0])
+          : null;
+        const position = lastNode
+          ? { x: lastNode.position.x + 260, y: lastNode.position.y }
+          : { x: 120, y: 180 };
+        const newNode: Node<AgentNodeData> = {
+          id,
+          type: "agentNode",
+          position,
+          data: { uiLabel: trimmed, backendLabel: trimmed },
+        };
+
+        if (lastNode) {
+          setEdges((currentEdges) =>
+            currentEdges.concat({
+              id: `e-${lastNode.id}-${id}`,
+              source: lastNode.id,
+              target: id,
+              animated: true,
+              style: { stroke: "#22d3ee", strokeWidth: 2 },
+            })
+          );
+        }
+
+        return currentNodes.concat(newNode);
+      });
+    },
+    [setEdges, setNodes]
+  );
+
   const onConnect = useCallback(
     (params: Connection | Edge) => setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: "#22d3ee" } }, eds)),
     [setEdges]
@@ -2657,7 +2696,11 @@ function WorkflowPage() {
 
       {/* ===== Right Panel: Run Management ===== */}
       <aside className="w-[420px] bg-slate-900/60 border-l border-slate-800 p-4 flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between mb-3">
+        <div className="mb-4 min-h-0 flex-[1.15]">
+          <PlannerPanel loopType={loop} onUseAgent={addPlannedAgentToCanvas} />
+        </div>
+
+        <div className="flex items-center justify-between mb-3 border-t border-slate-800 pt-4">
           <div>
             <h3 className="text-lg font-bold text-cyan-400">Runs</h3>
             <div className="text-xs text-slate-400">
@@ -2666,7 +2709,7 @@ function WorkflowPage() {
           </div>
         </div>
         {/* Runs list */}
-        <div className="rounded-lg border border-slate-800 bg-black/30 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div className="min-h-0 flex-1 rounded-lg border border-slate-800 bg-black/30 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {runs.length === 0 ? (
             <div className="p-3 text-slate-400 text-sm italic">
               No runs yet. Click <b>Run</b> to create one.
