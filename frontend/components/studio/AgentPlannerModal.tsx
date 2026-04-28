@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ApiClientError, apiPost } from "@/lib/apiClient";
+import AgentFactoryDryRunModal from "./AgentFactoryDryRunModal";
 
 const LOOP_OPTIONS = ["digital", "analog", "embedded", "system", "validation"];
 
@@ -121,12 +122,17 @@ export default function StudioAgentPlannerModal({
   const [name, setName] = useState("");
   const [result, setResult] = useState<AgentPlanResult | null>(null);
   const [savedPlans, setSavedPlans] = useState<SavedPlan[]>([]);
+  const [showFactoryDryRun, setShowFactoryDryRun] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   const canSubmit = useMemo(() => requestText.trim().length > 0 && !loading, [requestText, loading]);
   const canSave = Boolean(result);
+  const canOpenFactory = Boolean(
+    result &&
+      ["create_new", "extend_existing", "extend_or_create_variant"].includes(result.recommendation)
+  );
 
   async function runPlanner() {
     if (!canSubmit) return;
@@ -305,18 +311,37 @@ export default function StudioAgentPlannerModal({
                   )}
                 </section>
 
-                <button
-                  type="button"
-                  onClick={() => alert("Agent Factory dry-run UI is planned for Phase 7D.")}
-                  className="w-full rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:bg-slate-900"
-                >
-                  Generate Agent (dry-run)
-                </button>
+                {canOpenFactory ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowFactoryDryRun(true)}
+                    className="w-full rounded-lg border border-cyan-700 bg-cyan-950/30 px-3 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-900/40"
+                  >
+                    Generate Agent Dry Run
+                  </button>
+                ) : null}
               </div>
             ) : null}
           </section>
         </div>
       </div>
+      {showFactoryDryRun && result ? (
+        <AgentFactoryDryRunModal
+          initialRequest={{
+            name: name.trim() || result.missing_capabilities?.[0] || "Planned Agent",
+            natural_language_request: requestText.trim() || result.requested_capability,
+            loop_type: loopType,
+            domain: domain.trim() || undefined,
+            inputs: [],
+            outputs: result.missing_capabilities || [],
+            required_skills: result.reusable_skills || [],
+            required_tools: result.reusable_tools || [],
+            required_hooks: result.reusable_hooks || [],
+            allow_extension: result.recommendation !== "create_new",
+          }}
+          onClose={() => setShowFactoryDryRun(false)}
+        />
+      ) : null}
     </div>
   );
 }
