@@ -31,12 +31,22 @@ from utils.notion_utils import append_to_notion, get_or_create_notion_page
 from fastapi import WebSocket
 import asyncio
 from planner.auto_fill_missing import auto_fill_missing_fields
+from agents.runtime import AgentContext, configure_runtime_logging, execute_legacy_agent, log_runtime_event
 from utils.artifact_utils import save_text_artifact_and_record
+from auth_api_keys.middleware import require_sdk_api_key
+from auth_api_keys.service import get_api_key_service
+from studio_contract.registry import load_registry
+from studio_factory.generate_agent import run_factory as run_studio_factory
+from studio_factory.models import AgentFactoryRequest
+from studio_planner.models import AgentPlanRequest
+from studio_planner.planner import plan_agent as plan_studio_agent
+from browser_routes import router as browser_router
 
 
 import logging
 logger = logging.getLogger("chiploop")
 logging.basicConfig(level=logging.INFO)
+configure_runtime_logging()
 
 # Soft limits to avoid PostgREST "payload string too long" on logs/artifacts fields.
 MAX_LOG_CHARS = 850  # ~200KB
@@ -215,6 +225,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.state.supabase = supabase
+app.state.api_key_service = get_api_key_service(supabase)
+app.include_router(browser_router)
 
 
 
@@ -518,6 +531,10 @@ from agents.system.system_rtl_handoff_package_agent import run_agent as system_r
 from agents.system.system_cosim_ingest_agent import run_agent as system_cosim_ingest_agent
 from agents.system.system_cosim_contract_agent import run_agent as system_cosim_contract_agent
 from agents.system.system_cosim_scenario_generator_agent import run_agent as system_cosim_scenario_generator_agent
+from agents.system.system_software_cosim_harness_agent import run_agent as system_cosim_harness_agent
+from agents.system.system_software_cosim_execution_agent import run_agent as system_cosim_execution_agent
+from agents.system.system_software_cosim_trace_validation_agent import run_agent as system_cosim_trace_validation_agent
+from agents.system.system_software_validation_summary_l2_agent import run_agent as system_software_validation_summary_l2_agent
 
 SYSTEM_AGENT_FUNCTIONS: Dict[str,Any] = {
     "Digital Spec Agent": digital_spec_agent,
@@ -667,6 +684,10 @@ SYSTEM_AGENT_FUNCTIONS: Dict[str,Any] = {
     "System CoSim Ingest Agent": system_cosim_ingest_agent,
     "System CoSim Contract Agent": system_cosim_contract_agent,
     "System CoSim Scenario Generator Agent": system_cosim_scenario_generator_agent,
+    "System Software CoSim Harness Agent": system_cosim_harness_agent,
+    "System Software CoSim Execution Agent": system_cosim_execution_agent,
+    "System Software CoSim Trace Validation Agent": system_cosim_trace_validation_agent,
+    "System Software Validation Summary (L2)": system_software_validation_summary_l2_agent,
 }
 
 
@@ -813,38 +834,51 @@ def _require_user_id(request: Request) -> str:
 
 from typing import Tuple
 
+
 def _load_workflow_def_by_name(name: str, user_id: Optional[str]) -> Dict[str, Any]:
     """
-    Loads workflow template from public.workflows by exact name.
-    Prefer user-owned workflow if present; fallback to prebuilt.
-    Returns dict: {"nodes": [...], "edges": [...]}
+      Loads workflow template from public.workflows by exact name.
+      Prefer user-owned workflow if present; fallback to global prebuilt.
+      For prebuilt workflows, user_id is intentionally ignored.
     """
-    q = supabase.table("workflows").select(
-        "id,name,definitions,nodes,edges,loop_type,is_prebuilt,user_id"
-    ).eq("name", name)
+    select_cols = "id,name,definitions,nodes,edges,loop_type,is_prebuilt,user_id"
 
-    # Prefer user-owned
-    if user_id:
-        r = q.eq("user_id", user_id).limit(1).execute()
-        if r.data:
-            row = r.data[0]
-            defn = row.get("definitions") or {}
-            return {
-                "nodes": (defn.get("nodes") if isinstance(defn, dict) else None) or row.get("nodes") or [],
-                "edges": (defn.get("edges") if isinstance(defn, dict) else None) or row.get("edges") or [],
-            }
-
-    # Fallback to prebuilt
-    r2 = q.eq("is_prebuilt", True).limit(1).execute()
-    if r2.data:
-        row = r2.data[0]
+    def unpack(row: Dict[str, Any]) -> Dict[str, Any]:
         defn = row.get("definitions") or {}
         return {
-            "nodes": (defn.get("nodes") if isinstance(defn, dict) else None) or row.get("nodes") or [],
-            "edges": (defn.get("edges") if isinstance(defn, dict) else None) or row.get("edges") or [],
+              "nodes": (defn.get("nodes") if isinstance(defn, dict) else None) or row.get("nodes") or [],
+              "edges": (defn.get("edges") if isinstance(defn, dict) else None) or row.get("edges") or [],
         }
 
+    # 1) User-owned custom workflow.
+    if user_id:
+        r = (
+            supabase.table("workflows")
+            .select(select_cols)
+            .eq("name", name)
+            .eq("user_id", user_id)
+            .eq("is_prebuilt", False)
+            .limit(1)
+            .execute()
+        )
+        if r.data:
+            return unpack(r.data[0])
+
+    # 2) Global prebuilt workflow. user_id is intentionally ignored.
+    r2 = (
+        supabase.table("workflows")
+        .select(select_cols)
+        .eq("name", name)
+        .eq("is_prebuilt", True)
+        .limit(1)
+        .execute()
+    )
+    if r2.data:
+        return unpack(r2.data[0])
+
     raise HTTPException(status_code=404, detail=f"Workflow template not found: {name}")
+
+
 
 
 def _toposort_nodes(defn: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -896,6 +930,33 @@ def _definition_to_executor_nodes(defn: Dict[str, Any]) -> List[Dict[str, Any]]:
         if label:
             out.append({"label": label})
     return out
+
+
+def _execute_agent_with_runtime(
+    agent_name: str,
+    agent_fn: Any,
+    shared_state: Dict[str, Any],
+    workflow_id: str,
+    run_id: Optional[str],
+    loop_type: str,
+) -> Dict[str, Any]:
+    """
+    Route legacy run_agent(state) functions through Agent Runtime Contract v1.
+
+    The returned value remains the legacy state/result dict so existing workflow
+    artifact indexing, run logging, and downstream state merging stay unchanged.
+    """
+    context = AgentContext(
+        agent_name=agent_name,
+        state=shared_state,
+        workflow_id=str(workflow_id or shared_state.get("workflow_id") or "default"),
+        run_id=run_id or shared_state.get("run_id"),
+        loop_type=loop_type or shared_state.get("loop_type"),
+        artifact_dir=shared_state.get("artifact_dir"),
+        user_id=shared_state.get("user_id"),
+    )
+    runtime_result = execute_legacy_agent(agent_fn, context)
+    return runtime_result.raw or runtime_result.to_state_update()
 
 
 
@@ -977,7 +1038,14 @@ def _run_nodes_with_shared_state(
             continue
 
         try:
-            result = fn(shared_state)
+            result = _execute_agent_with_runtime(
+                label,
+                fn,
+                shared_state,
+                workflow_id,
+                run_id,
+                loop_type,
+            )
             if isinstance(result, dict):
                 shared_state.update(result)
                 result_status = str(result.get("status", ""))
@@ -1455,6 +1523,21 @@ def execute_workflow_background(
 
             # Queue to external runner at Simulation phase (for any loop)
             if " sim agent" in step.lower():
+                log_runtime_event(
+                    AgentContext(
+                        agent_name=step,
+                        state=shared_state,
+                        workflow_id=workflow_id,
+                        run_id=run_id,
+                        loop_type=loop_type,
+                        artifact_dir=artifact_dir,
+                        user_id=user_id,
+                    ),
+                    "agent.queue_handoff",
+                    status="queued",
+                    artifacts_produced={"artifacts_path": artifact_dir},
+                    phase="simulation",
+                )
                 # Mark workflow queued for simulation runner
                 supabase.table("workflows").update({
                     "status": "queued",
@@ -1482,7 +1565,14 @@ def execute_workflow_background(
                 # Execute agent function; start from shared_state snapshot
 
 
-                result = fn(shared_state)  # your agents accept a dict 'state'
+                result = _execute_agent_with_runtime(
+                    step,
+                    fn,
+                    shared_state,
+                    workflow_id,
+                    run_id,
+                    loop_type,
+                )  # agents accept legacy dict state through runtime adapter
 
                 # Save artifacts if provided
                 if isinstance(result, dict):
@@ -1656,7 +1746,14 @@ def execute_validation_run_app_background(
                     shared_state["bench_id"] = bench_id
                     fn = VALIDATION_AGENT_FUNCTIONS.get("Validation Bench Schematic Agent")
                     if fn:
-                        out = fn(shared_state)
+                        out = _execute_agent_with_runtime(
+                            "Validation Bench Schematic Agent",
+                            fn,
+                            shared_state,
+                            workflow_id,
+                            run_id,
+                            "validation",
+                        )
                         if isinstance(out, dict):
                             shared_state.update(out)
                     else:
@@ -2547,6 +2644,61 @@ async def list_agents():
         "graph": serialize_graph(G)
     }
 
+
+@app.get("/sdk/agents", dependencies=[Depends(require_sdk_api_key("sdk_agents_list"))])
+def sdk_list_agents():
+    registry = load_registry("registry")
+    return {
+        "status": "ok",
+        "agents": [agent.__dict__ for agent in registry.agents.values()],
+        "count": len(registry.agents),
+    }
+
+
+@app.get("/sdk/workflows", dependencies=[Depends(require_sdk_api_key("sdk_workflows_list"))])
+def sdk_list_workflows():
+    registry = load_registry("registry")
+    return {
+        "status": "ok",
+        "workflows": [workflow.__dict__ for workflow in registry.workflows.values()],
+        "count": len(registry.workflows),
+    }
+
+
+@app.get("/sdk/workflows/{workflow_id}/status", dependencies=[Depends(require_sdk_api_key("sdk_workflow_status"))])
+def sdk_workflow_status(workflow_id: str):
+    row = (
+        supabase.table("workflows")
+        .select("id,name,status,phase,loop_type,logs,artifacts,created_at,updated_at")
+        .eq("id", workflow_id)
+        .single()
+        .execute()
+    )
+    if not row.data:
+        raise HTTPException(status_code=404, detail="workflow not found")
+    data = dict(row.data)
+    data["workflow_id"] = data.get("id")
+    return data
+
+
+@app.post("/sdk/studio/plan-agent", dependencies=[Depends(require_sdk_api_key("sdk_studio_plan_agent"))])
+async def sdk_studio_plan_agent(request: Request):
+    data = await request.json()
+    result = plan_studio_agent(AgentPlanRequest.from_dict(data))
+    return result.to_dict()
+
+
+@app.post("/sdk/studio/generate-agent", dependencies=[Depends(require_sdk_api_key("sdk_studio_generate_agent"))])
+async def sdk_studio_generate_agent(request: Request):
+    data = await request.json()
+    request_data = data.get("request") if isinstance(data.get("request"), dict) else data
+    dry_run = bool(data.get("dry_run", True))
+    entitlement = getattr(request.state, "entitlement", None)
+    if not dry_run and not getattr(entitlement, "agent_factory_write_enabled", False):
+        raise HTTPException(status_code=403, detail="agent_factory_write_not_enabled")
+    result = run_studio_factory(AgentFactoryRequest.from_dict(request_data), dry_run=dry_run)
+    return result.to_dict()
+
 from planner.ai_work_planner import plan_workflow
 
 
@@ -2557,11 +2709,13 @@ async def plan_workflow_api(request: Request):
     workflow_id = data.get("workflow_id", "manual_plan")
     structured_spec_final = data.get("structured_spec_final")
     user_id = data.get("user_id") or data.get("uid") or "anonymous"
+    output_mode = data.get("workflow_mode") or data.get("output_mode") or "serial"
 
     plan = await plan_workflow(
        user_prompt,
        structured_spec_final=structured_spec_final,
        user_id=user_id,
+       output_mode=output_mode,
     )
     return {"status": "ok", "plan": plan}
 
@@ -4250,8 +4404,16 @@ async def validation_test_plan_preview(request: Request):
         "datasheet_text": datasheet_text,
         "goal": goal,
         "preview_only": True,
+        "loop_type": "validation",
     }
-    out_state = validation_test_plan_agent(state)
+    out_state = _execute_agent_with_runtime(
+        "Validation Test Plan Agent",
+        validation_test_plan_agent,
+        state,
+        workflow_id,
+        state.get("run_id"),
+        "validation",
+    )
 
     plan = out_state.get("test_plan") or {}
     return {"status": "ok", "test_plan": plan}

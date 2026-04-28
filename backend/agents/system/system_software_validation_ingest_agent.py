@@ -20,7 +20,7 @@ SOFTWARE_PACKAGE_SUFFIX_CANDIDATES = [
 ]
 
 BUILD_MANIFEST_SUFFIX_CANDIDATES = [
-    "system/software/build/system_software_build_manifest.json",
+    "system/software/system_software_build_manifest.json",
 ]
 
 TEST_MANIFEST_SUFFIX_CANDIDATES = [
@@ -395,6 +395,10 @@ def _workspace_members(build_manifest: Dict[str, Any]) -> List[str]:
     members = build_manifest.get("workspace_members") or []
     return [str(x).strip() for x in members if _is_nonempty_str(x)]
 
+def _software_entry(package_manifest: Dict[str, Any]) -> Dict[str, Any]:
+    entry = package_manifest.get("entry") or {}
+    return entry if isinstance(entry, dict) else {}
+
 
 def _status_for_required_asset(name: str, exists: bool) -> Dict[str, Any]:
     return {
@@ -484,7 +488,7 @@ def _build_validation_manifest(
             "software_root": "system/software",
             "validation_root": OUTPUT_SUBDIR,
             "package_root": "system/software/package",
-            "build_root": "system/software/build",
+            "build_root": "system/software",
             "tests_root": "system/software/tests",
             "mock_root": "system/software/mock",
         },
@@ -678,8 +682,8 @@ def _restore_package_files_locally(
         "restored_root": restored_root,
         "restored_files": restored_files,
         "failed_files": failed_files,
-        "build_root": os.path.join(restored_root, "system/software/build"),
-        "test_root": os.path.join(restored_root, "system/software/build"),
+        "build_root": os.path.join(restored_root, "system/software"),
+        "test_root": os.path.join(restored_root, "system/software"),
         "mock_root": os.path.join(restored_root, "system/software/mock"),
     }
 
@@ -860,6 +864,26 @@ def run_agent(state: dict) -> dict:
         package_file_checks=package_file_checks,
     )
 
+
+
+    software_entry = _software_entry(package_manifest)
+    app_manifest = app_manifest or {}
+
+    applications = app_manifest.get("applications") if isinstance(app_manifest, dict) else []
+
+    # Inject into co-sim manifest
+    state["system_cosim_manifest"] = state.get("system_cosim_manifest") or {}
+
+    if isinstance(state["system_cosim_manifest"], dict):
+        sw = state["system_cosim_manifest"].setdefault("software", {})
+
+        if isinstance(sw, dict):
+            if software_entry:
+                sw["entry"] = software_entry
+
+            # ✅ CRITICAL FIX
+            if isinstance(applications, list) and applications:
+                sw["applications"] = applications
     
     manifest = _build_validation_manifest(
         source_workflow_id=source_workflow_id,
@@ -945,6 +969,18 @@ def run_agent(state: dict) -> dict:
 
     state["system_software_validation_package_file_checks"] = package_file_checks
 
+    state["system_software_entry"] = software_entry
+    state["system_software_entry_command"] = (software_entry.get("command") or []) if isinstance(software_entry, dict) else []
+
+    state["system_software_cosim_ingest"] = {
+        "software_assets": {
+            "package_manifest_path": (manifest.get("discovered_assets") or {}).get("software_package_manifest", {}).get("resolved_path", ""),
+            "build_root": restore_info.get("build_root") or "",
+            "software_root": restore_info.get("restored_root") or "",
+        },
+        "software_entry": software_entry,
+    }
+
     state["system_software_validation_local_root"] = restore_info.get("restored_root") or ""
     state["system_software_build_root"] = restore_info.get("build_root") or ""
     state["system_software_test_root"] = restore_info.get("test_root") or ""
@@ -961,6 +997,7 @@ def run_agent(state: dict) -> dict:
         system_block["system_software_build_root"] = state["system_software_build_root"]
         system_block["system_software_test_root"] = state["system_software_test_root"]
         system_block["system_software_mock_root"] = state["system_software_mock_root"]
+        system_block["system_software_entry"] = software_entry
 
     ingest_status = ((manifest.get("validation_readiness") or {}).get("overall_ingest_status")) or "not_ready"
     state["status"] = (

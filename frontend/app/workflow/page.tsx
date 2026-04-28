@@ -605,6 +605,26 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       backendLabel: "System CoSim Scenario Generator Agent",
       desc: "Generates deterministic L2 scenarios such as boot, register read/write, and interrupt propagation for full-stack software-to-firmware-to-RTL co-simulation."
     },
+    {
+      uiLabel: "System Software CoSim Harness Agent",
+      backendLabel: "System Software CoSim Harness Agent",
+      desc: "Connects software runtime, firmware, and RTL into unified co-simulation harness."
+    },
+    {
+      uiLabel: "System Software CoSim Execution Agent",
+      backendLabel: "System Software CoSim Execution Agent",
+      desc: "Executes co-simulation scenarios across software, firmware, and RTL."
+    },
+    {
+      uiLabel: "System Software CoSim Trace Validation Agent",
+      backendLabel: "System Software CoSim Trace Validation Agent",
+      desc: "Validates co-simulation traces: registers, interrupts, signals."
+    },
+    {
+      uiLabel: "System Software Validation Summary (L2)",
+      backendLabel: "System Software Validation Summary (L2)",
+      desc: "Generates final L2 system validation summary and correctness verdict."
+    },
   ],
 };
 //const [showPlanner, setShowPlanner] = useState(false);

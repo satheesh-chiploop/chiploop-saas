@@ -102,7 +102,6 @@ def _tool_names(state: Dict[str, Any]) -> List[str]:
     out = [str(x).strip() for x in raw if str(x).strip()]
     return out or ["reg_viewer", "diag_cli"]
 
-
 def _render_tool_main(crate_name: str, tool_name: str) -> str:
     if tool_name == "reg_viewer":
         return f'''use clap::{{Parser, Subcommand}};
@@ -118,7 +117,7 @@ struct Cli {{
 #[derive(Subcommand)]
 enum Commands {{
     Read {{ register: String }},
-    Write {{ register: String, value: u32 }},
+    Write {{ register: String, value: u64 }},
 }}
 
 fn main() {{
@@ -130,6 +129,7 @@ fn main() {{
     }}
 }}
 '''
+
     return f'''use clap::{{Parser, Subcommand}};
 use {crate_name}::Sdk;
 
@@ -155,21 +155,32 @@ fn main() {{
     }}
 }}
 '''
+def _tool_package_name(tool_name: str) -> str:
+    return f"ss_tool_{_crate_name(tool_name)}"
+
 
 
 def _render_tool_cargo(crate_name: str, tool_name: str) -> str:
+    package_name = _tool_package_name(tool_name)
     return f'''[package]
-name = "{tool_name}"
+name = "{package_name}"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = {{ version = "4", features = ["derive"] }}
+clap = {{ version = "=4.5.20", features = ["derive"] }}
 {crate_name} = {{ path = "../../sdk/{crate_name}" }}
 '''
 
-
 def _build_manifest(source_workflow_id: str, crate_name: str, tool_names: List[str], files: List[str]) -> Dict[str, Any]:
+    tools = [
+        {
+            "tool_name": name,
+            "package_name": _tool_package_name(name),
+            "path": f"{OUTPUT_SUBDIR}/{name}",
+        }
+        for name in tool_names
+    ]
     return {
         "package_type": "system_software_tools_manifest",
         "package_version": "1.0",
@@ -177,9 +188,9 @@ def _build_manifest(source_workflow_id: str, crate_name: str, tool_names: List[s
         "source_workflow_id": source_workflow_id,
         "crate_name": crate_name,
         "tool_names": tool_names,
+        "tools": tools,
         "files": files,
     }
-
 
 
 def _markdown_summary(manifest: Dict[str, Any]) -> str:
@@ -193,8 +204,8 @@ def _markdown_summary(manifest: Dict[str, Any]) -> str:
         "## Tools",
         "",
     ]
-    for name in manifest.get("tool_names") or []:
-        lines.append(f"- `{name}`")
+    for item in manifest.get("tools") or []:
+        lines.append(f"- `{item.get('tool_name')}` → package `{item.get('package_name')}`")
     lines.extend(["", "## Files", ""])
     for item in manifest.get("files") or []:
         lines.append(f"- `{item}`")

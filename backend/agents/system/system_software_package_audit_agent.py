@@ -1,6 +1,7 @@
 
 import datetime
 import json
+import os
 from typing import Any, Dict, List, Optional
 
 from utils.artifact_utils import save_text_artifact_and_record
@@ -34,8 +35,47 @@ def _present(item: Dict[str, Any]) -> bool:
     return bool((item or {}).get("exists"))
 
 
+def _norm(path: str) -> str:
+    return str(path or "").strip().replace("\\", "/")
+
+
+def _derive_adapter_required_files(package_manifest: Dict[str, Any], discovered_assets: Dict[str, Any]) -> List[str]:
+    adapter_manifest = discovered_assets.get("adapter_manifest") or {}
+    adapter_path = (
+        adapter_manifest.get("path")
+        or adapter_manifest.get("artifact_path")
+        or adapter_manifest.get("resolved_path")
+        or ""
+    )
+    adapter_path = _norm(adapter_path)
+
+    if adapter_path.endswith(".json"):
+        adapter_path = adapter_path.rsplit("/", 1)[0]
+
+    adapter_crate = str(
+        adapter_manifest.get("adapter_crate")
+        or package_manifest.get("adapter_crate")
+        or adapter_manifest.get("adapter_package_name")
+        or ""
+    ).strip()
+
+    if not adapter_path:
+        adapter_path = f"system/software/adapter/{adapter_crate}"
+    elif adapter_path.endswith("/adapter"):
+        adapter_path = f"{adapter_path}/{adapter_crate}"
+    elif adapter_crate and not adapter_path.endswith(f"/{adapter_crate}"):    
+        adapter_path = f"system/software/adapter/{adapter_crate}"
+
+    adapter_path = adapter_path.rstrip("/")
+    return [
+        f"{adapter_path}/Cargo.toml",
+        f"{adapter_path}/src/lib.rs",
+    ]
+
+
 def run_agent(state: dict) -> dict:
     workflow_id = state.get("workflow_id") or "default"
+    workflow_dir = str(state.get("workflow_dir") or "").strip()
 
     print(f"\n📦 Running {AGENT_NAME}")
 
@@ -49,6 +89,7 @@ def run_agent(state: dict) -> dict:
 
     missing_required_assets = [x.get("name") for x in required_assets if x.get("status") == "missing_required"]
     missing_optional_assets = [x.get("name") for x in optional_assets if x.get("status") == "missing_optional"]
+
     missing_required_files = [x.get("path") for x in package_file_checks if x.get("required") and not x.get("exists")]
     missing_optional_files = [x.get("path") for x in package_file_checks if (not x.get("required")) and not x.get("exists")]
 
@@ -66,8 +107,19 @@ def run_agent(state: dict) -> dict:
         "executive_summary": _present(discovered_assets.get("executive_summary") or {}),
     }
 
+    package_files = {_norm(p) for p in (package_manifest.get("files") or []) if _norm(p)}
+    required_adapter_files = _derive_adapter_required_files(package_manifest, discovered_assets)
+    missing_adapter_package_files = []
+
+    for path in required_adapter_files:
+        if workflow_dir:
+            full_path = os.path.join(workflow_dir, path)
+            if not os.path.isfile(full_path):
+                missing_adapter_package_files.append(path)
+
+
     package_status = "complete"
-    if missing_required_assets or missing_required_files:
+    if missing_required_assets or missing_required_files or missing_adapter_package_files:
         package_status = "incomplete"
 
     report = {
@@ -79,6 +131,8 @@ def run_agent(state: dict) -> dict:
         "missing_optional_assets": missing_optional_assets,
         "missing_required_package_files": missing_required_files,
         "missing_optional_package_files": missing_optional_files,
+        "missing_required_adapter_package_files": missing_adapter_package_files,
+        "required_adapter_package_files": required_adapter_files,
         "expected_sections": expected_sections,
     }
 
@@ -101,12 +155,20 @@ def run_agent(state: dict) -> dict:
     else:
         summary_lines.append("- none")
 
+    summary_lines.extend(["", "## Missing required adapter package files"])
+    if missing_adapter_package_files:
+        summary_lines.extend([f"- `{x}`" for x in missing_adapter_package_files])
+    else:
+        summary_lines.append("- none")
+
     debug_payload = {
         "agent": AGENT_NAME,
         "generated_at": _now(),
         "package_manifest_present": bool(package_manifest),
         "package_file_check_count": len(package_file_checks),
         "expected_sections": expected_sections,
+        "required_adapter_package_files": required_adapter_files,
+        "missing_required_adapter_package_files": missing_adapter_package_files,
     }
 
     _record_text(workflow_id, REPORT_JSON, json.dumps(report, indent=2))
