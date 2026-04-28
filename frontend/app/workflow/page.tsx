@@ -25,6 +25,7 @@ import WorkflowConsole from "./WorkflowConsole";
 import PlannerModal from "@/components/PlannerModal";
 import AgentPlannerModal from "@/components/AgentPlannerModal";
 import StudioAgentPlannerModal from "@/components/studio/AgentPlannerModal";
+import DagPreviewModal from "@/components/studio/DagPreviewModal";
 /* =========================
    Types & Constants
 ========================= */
@@ -712,6 +713,7 @@ function WorkflowPage() {
   const [showPlanner, setShowPlanner] = useState(false);
   const [showAgentPlanner, setShowAgentPlanner] = useState(false);
   const [showStudioAgentPlanner, setShowStudioAgentPlanner] = useState(false);
+  const [showDagPreview, setShowDagPreview] = useState(false);
   const [selectedWorkflowName, setSelectedWorkflowName] = useState<string | null>(null);
   const {fitView} = useReactFlow();
 
@@ -2362,6 +2364,12 @@ function WorkflowPage() {
           >
             Agent Planner
           </button>
+          <button
+            onClick={() => setShowDagPreview(true)}
+            className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
+          >
+            DAG Preview
+          </button>
           <div className="border-t border-slate-800 my-3" />
           {/* 🔁 Loop Selector */}
           <div className="mb-4">
@@ -3497,6 +3505,14 @@ function WorkflowPage() {
         <StudioAgentPlannerModal
           initialLoop={loop}
           onClose={() => setShowStudioAgentPlanner(false)}
+        />
+      )}
+      {showDagPreview && (
+        <DagPreviewModal
+          loopType={loop}
+          nodes={nodes}
+          edges={edges}
+          onClose={() => setShowDagPreview(false)}
         />
       )}
     </main>
