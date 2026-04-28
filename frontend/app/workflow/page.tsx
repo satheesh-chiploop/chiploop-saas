@@ -2302,6 +2302,9 @@ function WorkflowPage() {
           <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
             Pricing
           </button>
+          <button onClick={() => router.push("/settings/api-keys")} className="hover:text-cyan-400 transition">
+            Settings
+          </button>
           <button
             onClick={async () => {
               await supabase.auth.signOut();

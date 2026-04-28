@@ -479,6 +479,12 @@ export default function AppsHomePage() {
               Studio
             </button>
             <button
+              onClick={() => go("/settings/api-keys")}
+              className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 hover:bg-slate-900 transition"
+            >
+              Settings
+            </button>
+            <button
               onClick={async () => {
                 await supabase.auth.signOut();
                 go("/");

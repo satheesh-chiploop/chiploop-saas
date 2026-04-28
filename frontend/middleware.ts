@@ -4,7 +4,7 @@ import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
-  // Avoid caching protected pages (prevents stale/blank cached HTML)
+  // Avoid caching protected pages to prevent stale authenticated HTML.
   res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   res.headers.set("Pragma", "no-cache");
   res.headers.set("Expires", "0");
@@ -18,9 +18,10 @@ export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
   const isProtected =
-    pathname.startsWith("/apps") || pathname.startsWith("/workflow");
+    pathname.startsWith("/apps") ||
+    pathname.startsWith("/workflow") ||
+    pathname.startsWith("/settings");
 
-  // ✅ Only protect /apps and /workflow
   if (isProtected && !session) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
@@ -40,6 +41,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // ✅ IMPORTANT: do NOT include "/login" here
-  matcher: ["/apps/:path*", "/workflow/:path*"],
+  // Do not include /login here.
+  matcher: ["/apps/:path*", "/workflow/:path*", "/settings/:path*"],
 };
