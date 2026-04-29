@@ -33,7 +33,21 @@ import GeneratedAgentReviewModal, { type GeneratedAgentReviewItem } from "@/comp
 type LoopKey = "digital" | "analog" | "embedded" | "system" |"validation";
 type AgentNodeData = { uiLabel: string; backendLabel: string; desc?: string };
 
-type CatalogItem = { uiLabel: string; backendLabel: string; desc?: string };
+type CatalogItem = {
+  id?: string;
+  uiLabel: string;
+  backendLabel: string;
+  desc?: string;
+  status?: string;
+  visibility?: string;
+};
+type PrivateAgentResponseItem = {
+  id?: string;
+  agent_name?: string;
+  description?: string;
+  status?: string;
+  visibility?: string;
+};
 
 // if (typeof window !== "undefined" && !localStorage.getItem("anon_user_id")) {
 //  localStorage.setItem("anon_user_id", crypto.randomUUID());
@@ -957,7 +971,7 @@ function WorkflowPage() {
 
       const j = await res.json();
       if (j.status !== "ok") {
-        alert(`⚠️ Publish failed: ${j.message || "Unknown error"}`);
+        alert(`Publish failed: ${j.message || "Unknown error"}`);
         return;
       }
 
@@ -1045,7 +1059,7 @@ function WorkflowPage() {
   
   
   // NEW: agent context menu state
-  const [agentMenu, setAgentMenu] = useState<{ x: number; y: number; name: string } | null>(null);
+  const [agentMenu, setAgentMenu] = useState<{ x: number; y: number; name: string; id?: string; status?: string } | null>(null);
 
     // 🌿 Design Intent context menu
   const [designIntentMenu, setDesignIntentMenu] = useState<{
@@ -1062,11 +1076,35 @@ function WorkflowPage() {
   const closeDesignIntentMenu = () => setDesignIntentMenu(null);
   
 
-  const openAgentMenu = (e: React.MouseEvent, name: string) => {
+  const openAgentMenu = (e: React.MouseEvent, agent: CatalogItem) => {
     e.preventDefault();
-    setAgentMenu({ x: e.clientX, y: e.clientY, name });
+    setAgentMenu({ x: e.clientX, y: e.clientY, name: agent.backendLabel, id: agent.id, status: agent.status });
   };
   const closeAgentMenu = () => setAgentMenu(null);
+
+  const authHeaders = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      "Content-Type": "application/json",
+      ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+    };
+  }, [supabase]);
+
+  const loadPrivateAgents = useCallback(async () => {
+    const res = await fetch("/api/studio/user-agents", {
+      headers: await authHeaders(),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    return ((data.agents || []) as PrivateAgentResponseItem[]).map((a) => ({
+      id: a.id,
+      uiLabel: a.agent_name || "Untitled private agent",
+      backendLabel: a.agent_name || "Untitled private agent",
+      desc: a.description || "",
+      status: a.status,
+      visibility: a.visibility,
+    }));
+  }, [authHeaders]);
 
 // NEW: API calls
   const renameCustomAgent = async (oldName: string) => {
@@ -1089,9 +1127,15 @@ function WorkflowPage() {
   const deleteCustomAgent = async (name: string) => {
     const userId = await getStableUserId(supabase);  // ✅ unify ID
 
-    const res = await fetch(`${API_BASE}/delete_custom_agent?name=${encodeURIComponent(name)}&user_id=${userId}`, {
-      method: "DELETE"
-    });
+    const agent = customAgents.find((item) => item.backendLabel === name);
+    const res = agent?.id
+      ? await fetch(`/api/studio/user-agents/${agent.id}`, {
+          method: "DELETE",
+          headers: await authHeaders(),
+        })
+      : await fetch(`${API_BASE}/delete_custom_agent?name=${encodeURIComponent(name)}&user_id=${userId}`, {
+          method: "DELETE"
+        });
 
     const j = await res.json();
     if (j.status !== "ok") {
@@ -1107,25 +1151,32 @@ function WorkflowPage() {
     try {
       const userId = await getStableUserId(supabase);  // ✅ unified ID
 
-      const res = await fetch(`${API_BASE}/publish_custom_agent`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          agent_name: name,
-          user_id: userId,
-        }),
-      });
+      const agent = customAgents.find((item) => item.backendLabel === name);
+      const res = agent?.id
+        ? await fetch(`/api/studio/user-agents/${agent.id}/submit`, {
+            method: "POST",
+            headers: await authHeaders(),
+          })
+        : await fetch(`${API_BASE}/publish_custom_agent`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              agent_name: name,
+              user_id: userId,
+            }),
+          });
 
       const j = await res.json();
       if (j.status !== "ok") {
-        alert(`⚠️ Publish failed: ${j.message || "Unknown error"}`);
+        alert(`Submit failed: ${j.message || "Unknown error"}`);
         return;
       }
 
-      alert("✅ Agent submitted to marketplace for review.");
+      alert("Agent submitted for marketplace review.");
+      window.dispatchEvent(new Event("refreshAgents"));
     } catch (err) {
       console.error("Publish custom agent failed", err);
-      alert("❌ Could not publish agent.");
+      alert("Could not submit agent.");
     } finally {
       closeAgentMenu();
     }
@@ -1321,24 +1372,11 @@ function WorkflowPage() {
         
         const savedWF = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
         // ✅ Load custom agents per user from Supabase
-        const { data: { session } } = await supabase.auth.getSession();
-        const userId = session?.user?.id || localStorage.getItem("anon_user_id") || "anonymous";
-
-        const { data } = await supabase
-          .from("agents")
-          .select("*")
-          .eq("owner_id", userId)
-          .order("created_at", { ascending: false });
+        const privateAgents = await loadPrivateAgents();
 
         await loadIntents()
 
-        setCustomAgents(
-            (data || []).map(a => ({
-              uiLabel: a.agent_name,
-              backendLabel: a.agent_name,
-              desc: a.description || "",
-            }))
-        );
+        setCustomAgents(privateAgents);
 
         setCustomWorkflows(
           savedWF.map((k) => {
@@ -1358,7 +1396,7 @@ function WorkflowPage() {
         setLoadingWorkflows(false);
       }
     })();
-  }, [supabase, router]);
+  }, [supabase, router, loadPrivateAgents]);
 
   
 
@@ -1371,7 +1409,7 @@ function WorkflowPage() {
     };
     window.addEventListener("refreshWorkflows", refreshHandler);
     return () => window.removeEventListener("refreshWorkflows", refreshHandler);
-  }, []);
+  }, [loadPrivateAgents]);
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -1412,22 +1450,8 @@ function WorkflowPage() {
 
   useEffect(() => {
     const refreshAgents = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id || localStorage.getItem("anon_user_id") || "anonymous";
-  
-      const { data } = await supabase
-        .from("agents")
-        .select("*")
-        .eq("owner_id", userId)
-        .order("created_at", { ascending: false });
-  
-      setCustomAgents(
-        (data || []).map(a => ({
-          uiLabel: a.agent_name,
-          backendLabel: a.agent_name,
-          desc: a.description || "",
-        }))
-      );
+      const privateAgents = await loadPrivateAgents();
+      setCustomAgents(privateAgents);
     };
   
     window.addEventListener("refreshAgents", refreshAgents);
@@ -2478,7 +2502,7 @@ function WorkflowPage() {
                 ))}
               </ul>
   
-              <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
+              <p className="text-sm text-cyan-400 font-medium mb-1">My Agents</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-48 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {customAgents.length ? (
                   customAgents.map((a, idx) => (
@@ -2486,14 +2510,19 @@ function WorkflowPage() {
                       key={`${a.backendLabel}-${idx}`}
                       draggable
                       onDragStart={(e) => onDragStartAgent(e, a)}
-                      onContextMenu={(e) => openAgentMenu(e, a.backendLabel)}
+                      onContextMenu={(e) => openAgentMenu(e, a)}
                       className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
                     >
                       {a.uiLabel}
+                      {a.status === "submitted" && (
+                        <span className="ml-2 rounded border border-amber-700 px-1 text-[10px] text-amber-200">
+                          Submitted
+                        </span>
+                      )}
                     </li>
                   ))
                 ) : (
-                  <p className="text-xs text-slate-400">No custom agents yet</p>
+                  <p className="text-xs text-slate-400">No private agents yet</p>
                 )}
               </ul>
             </div>
@@ -2851,10 +2880,11 @@ function WorkflowPage() {
               ✏️ Rename
             </button>
             <button
-              className="px-4 py-1 hover:bg-slate-700 w-full text-left"
+              className="px-4 py-1 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 w-full text-left"
               onClick={() => publishCustomAgent(agentMenu.name)}
+              disabled={agentMenu.status === "submitted"}
             >
-              📤 Publish to Marketplace
+              {agentMenu.status === "submitted" ? "Submitted for Review" : "Submit to Marketplace"}
             </button>
             <button
               className="px-4 py-1 hover:bg-slate-700 w-full text-left text-red-400"

@@ -4,10 +4,17 @@ import React, { useState,useEffect } from "react";
 import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 import { Special_Elite } from "next/font/google";
 import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
+import MissingAgentsResolverModal from "@/components/studio/MissingAgentsResolverModal";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 const supabase = createClientComponentClient();
 import WorkflowConsole from "@/app/workflow/WorkflowConsole";
 import { getStableUserId } from "@/utils/userId";
+
+type PreplanResult = {
+  loop_type?: string;
+  agents?: string[];
+  missing_agents?: string[];
+};
 
 
 function autoLayoutHorizontal(nodes, spacing = 350, startX = 100, startY = 200) {
@@ -52,9 +59,10 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   const [finalizedSpec, setFinalizedSpec] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
   const [missingFieldEdits, setMissingFieldEdits] = useState({});
-  const [preplan, setPreplan] = useState(null);
+  const [preplan, setPreplan] = useState<PreplanResult | null>(null);
   const [stage, setStage] = useState<"initial" | "analyzed" | "autofill" | "finalized" | "workflow">("initial");
   const [showNamingDialog, setShowNamingDialog] = useState(false);
+  const [showMissingResolver, setShowMissingResolver] = useState(false);
   const [namingTargets, setNamingTargets] = useState<string[]>([]);
   // ADD this new state near your other state declarations:
   const [workflowGraph, setWorkflowGraph] = useState<any | null>(null);
@@ -315,13 +323,13 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   
         // 👇 Open naming dialog with missing agents
         setNamingTargets(newPlan.missing_agents || []);
-        setShowNamingDialog(true);
+        setShowMissingResolver(true);
         return;
       }
   
       // Case 2: User already ran Select Agents → just open naming dialog
       setNamingTargets(missingAgents);
-      setShowNamingDialog(true);
+      setShowMissingResolver(true);
 
       window.dispatchEvent(new Event("refreshAgents"));
 
@@ -698,7 +706,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
             disabled={isGeneratingAgent || !goal.trim()}
             className="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded disabled:opacity-40 transition"
           >
-            {isGeneratingAgent  ? "Planning..." : "Generate Missing Agent"}
+            {isGeneratingAgent  ? "Planning..." : "Resolve Missing Agents"}
           </button>
 
           <button
@@ -972,6 +980,37 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
               }
             
               setIsGeneratingAgent(false);
+            }}
+          />
+        )}
+        {showMissingResolver && (
+          <MissingAgentsResolverModal
+            missingAgents={namingTargets.length ? namingTargets : missingAgents}
+            goal={goal}
+            loopType={(spec?.loop_type || preplan?.loop_type || "system").toLowerCase()}
+            domain={(spec?.domain || spec?.loop_type || preplan?.loop_type || "system").toLowerCase()}
+            spec={spec}
+            baseAgents={preplan?.agents || selectedAgents || []}
+            onClose={() => setShowMissingResolver(false)}
+            onResolved={(resolvedNames) => {
+              const base = preplan?.agents || selectedAgents || [];
+              const mergedAgents = [...base, ...resolvedNames];
+              setFinalAgents(mergedAgents);
+              setSelectedAgents(mergedAgents);
+              setRecentlyGenerated(resolvedNames);
+              setMissingAgents([]);
+              setNamingTargets([]);
+              setPreplan(prev =>
+                prev
+                  ? { ...prev, agents: mergedAgents, missing_agents: [] }
+                  : {
+                      loop_type: (spec?.loop_type || "system").toLowerCase(),
+                      agents: mergedAgents,
+                      missing_agents: [],
+                    }
+              );
+              setShowMissingResolver(false);
+              window.dispatchEvent(new Event("refreshAgents"));
             }}
           />
         )}

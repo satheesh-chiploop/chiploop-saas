@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ApiClientError, apiPost } from "@/lib/apiClient";
 
 export type GeneratedAgentReviewItem = {
   agentName: string;
@@ -88,11 +89,54 @@ export default function GeneratedAgentReviewModal({
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [savedStatus, setSavedStatus] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   async function copyText(label: string, text: string) {
     await navigator.clipboard.writeText(text);
     setCopied(label);
     window.setTimeout(() => setCopied(null), 1500);
+  }
+
+  function errorMessage(error: unknown): string {
+    if (error instanceof ApiClientError && error.status === 401) {
+      return "Your session expired. Please sign in again.";
+    }
+    if (error instanceof Error) return error.message;
+    return "Failed to save private agent.";
+  }
+
+  async function savePrivateAgent() {
+    if (!latestItem) return;
+    setSaving(true);
+    setSaveError(null);
+    setSavedStatus(null);
+    try {
+      const plan = latestItem.result.plan;
+      const spec = plan.proposed_agent_spec || {};
+      const response = await apiPost<{ status: string; agent: { agent_name?: string; status?: string } }>("/studio/user-agents", {
+        name: latestItem.agentName,
+        loop_type: latestItem.loopType,
+        domain: latestItem.domain || latestItem.loopType,
+        description: String(spec.description || latestItem.request),
+        agent_spec: spec,
+        skills: plan.proposed_skill_specs || [],
+        tools: plan.proposed_tool_refs || [],
+        hooks: plan.proposed_hook_refs || [],
+        generated_files: plan.files_to_generate || [],
+        registry_patch: plan.registry_patch || {},
+        source: "studio_factory",
+        status: "private",
+        visibility: "private",
+      });
+      setSavedStatus(`Saved ${response.agent?.agent_name || latestItem.agentName} as a private agent.`);
+      window.dispatchEvent(new Event("refreshAgents"));
+    } catch (error) {
+      setSaveError(errorMessage(error));
+    } finally {
+      setSaving(false);
+    }
   }
 
   const plan = latestItem?.result.plan;
@@ -128,6 +172,16 @@ export default function GeneratedAgentReviewModal({
                   Copied {copied}.
                 </div>
               ) : null}
+              {savedStatus ? (
+                <div className="rounded-lg border border-emerald-900/70 bg-emerald-950/30 p-3 text-sm text-emerald-200">
+                  {savedStatus}
+                </div>
+              ) : null}
+              {saveError ? (
+                <div className="rounded-lg border border-red-900/70 bg-red-950/30 p-3 text-sm text-red-200">
+                  {saveError}
+                </div>
+              ) : null}
 
               <section className="rounded-lg border border-amber-800/60 bg-amber-950/20 p-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -144,6 +198,13 @@ export default function GeneratedAgentReviewModal({
                   </div>
                 </div>
                 <p className="mt-3 text-sm text-slate-300">{latestItem.request}</p>
+                <button
+                  onClick={savePrivateAgent}
+                  disabled={saving}
+                  className="mt-4 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+                >
+                  {saving ? "Saving..." : "Save as Private Agent"}
+                </button>
               </section>
 
               <JsonReviewBlock
