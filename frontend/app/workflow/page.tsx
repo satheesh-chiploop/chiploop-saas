@@ -2371,7 +2371,7 @@ function WorkflowPage() {
             onClick={() => setShowDagPreview(true)}
             className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
           >
-            DAG Preview
+            Optimize Workflow
           </button>
           <button
             onClick={() => setShowGeneratedAgentReview(true)}
@@ -3522,6 +3522,8 @@ function WorkflowPage() {
           loopType={loop}
           nodes={nodes}
           edges={edges}
+          savedWorkflows={customWorkflows}
+          selectedWorkflowName={selectedWorkflowName}
           onClose={() => setShowDagPreview(false)}
         />
       )}
