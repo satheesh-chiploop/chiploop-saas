@@ -126,6 +126,7 @@ export default function MissingAgentsResolverModal({
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<"planner" | "factory" | "save" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showAdvancedFactoryDetails, setShowAdvancedFactoryDetails] = useState(false);
 
   const currentMissing = missingAgents[index] || "";
   const complete = index >= missingAgents.length;
@@ -146,6 +147,7 @@ export default function MissingAgentsResolverModal({
     setFactoryResult(null);
     setSavedMessage(null);
     setError(null);
+    setShowAdvancedFactoryDetails(false);
   }, [currentMissing, loopType]);
 
   useEffect(() => {
@@ -377,14 +379,14 @@ export default function MissingAgentsResolverModal({
                 <section className="rounded-lg border border-slate-800 bg-black/30 p-4">
                   <h4 className="mb-3 text-sm font-bold text-cyan-300">Create Private Agent</h4>
                   <p className="text-xs leading-5 text-slate-300">
-                    If no existing agent is suitable, run a safe factory dry run and save the reviewed result as a private agent.
+                    If no existing agent is suitable, generate a safe draft and save the reviewed result as a private agent.
                   </p>
                   <button
                     onClick={runFactoryDryRun}
                     disabled={Boolean(loading) || !canCreate}
                     className="mt-3 rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
                   >
-                    {loading === "factory" ? "Running dry run..." : "Generate Agent Dry Run"}
+                    {loading === "factory" ? "Generating draft..." : "Generate Draft Agent"}
                   </button>
                 </section>
 
@@ -392,7 +394,7 @@ export default function MissingAgentsResolverModal({
                   <section className="rounded-lg border border-slate-800 bg-black/30 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <div className="text-xs uppercase text-slate-500">Factory decision</div>
+                        <div className="text-xs uppercase text-slate-500">Draft decision</div>
                         <div className="mt-1 text-sm font-semibold text-slate-100">
                           {factoryResult.plan?.decision || "unknown"}
                         </div>
@@ -401,16 +403,34 @@ export default function MissingAgentsResolverModal({
                         Review required
                       </div>
                     </div>
-                    <pre className="mt-3 max-h-52 overflow-auto rounded bg-slate-950 p-3 text-xs text-slate-200">
-                      {JSON.stringify(factoryResult.plan?.proposed_agent_spec || {}, null, 2)}
-                    </pre>
-                    <button
-                      onClick={savePrivateAgent}
-                      disabled={loading === "save"}
-                      className="mt-3 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
-                    >
-                      {loading === "save" ? "Saving..." : "Save as Private Agent"}
-                    </button>
+                    <div className="mt-3 rounded-lg border border-slate-800 bg-slate-950 p-3">
+                      <div className="text-xs uppercase text-slate-500">Draft agent</div>
+                      <div className="mt-1 text-sm font-semibold text-slate-100">{plannedName}</div>
+                      <div className="mt-2 text-xs leading-5 text-slate-300">
+                        {String(factoryResult.plan?.proposed_agent_spec?.description || currentMissing)}
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        onClick={savePrivateAgent}
+                        disabled={loading === "save"}
+                        className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+                      >
+                        {loading === "save" ? "Saving..." : "Save as Private Agent"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowAdvancedFactoryDetails((current) => !current)}
+                        className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900"
+                      >
+                        {showAdvancedFactoryDetails ? "Hide Advanced Details" : "Advanced Details"}
+                      </button>
+                    </div>
+                    {showAdvancedFactoryDetails ? (
+                      <pre className="mt-3 max-h-52 overflow-auto rounded bg-slate-950 p-3 text-xs text-slate-200">
+                        {JSON.stringify(factoryResult.plan?.proposed_agent_spec || {}, null, 2)}
+                      </pre>
+                    ) : null}
                   </section>
                 ) : null}
               </div>
