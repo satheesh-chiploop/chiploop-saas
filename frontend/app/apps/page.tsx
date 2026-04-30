@@ -1,10 +1,12 @@
-// ✅ AFTER: app_apps_page.tsx (minimal edits only)
+﻿// âœ… AFTER: app_apps_page.tsx (minimal edits only)
 
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
+import { apiGet, apiPost } from "@/lib/apiClient";
+import { LowCreditBanner, PlanCreditBadge } from "@/components/PlanCreditStatus";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,6 +14,38 @@ const supabase = createClient(
 );
 
 type LoopType = "digital" | "validation" | "analog" | "embedded" | "system";
+
+type OnboardingResponse = {
+  status: string;
+  onboarding: {
+    completed: boolean;
+    completed_at?: string | null;
+    skipped_at?: string | null;
+  };
+};
+
+const ONBOARDING_DEMO_KEY = "chiploop_arch2rtl_onboarding_demo";
+
+const ARCH2RTL_ONBOARDING_SPEC = `Design a parameterized PWM controller.
+
+Inputs:
+- clk
+- reset_n
+- enable
+- duty_cycle[7:0]
+- period[7:0]
+
+Outputs:
+- pwm_out
+- counter_value[7:0]
+
+Behavior:
+- Counter increments every clock when enable is high.
+- Counter resets to zero when it reaches period.
+- pwm_out is high when counter_value is less than duty_cycle.
+- All registers reset to zero when reset_n is low.
+
+Generate synthesizable SystemVerilog, timing constraints, UPF-lite power intent, and a handoff package.`;
 
 type AppCard = {
   slug: string;
@@ -24,16 +58,19 @@ type AppCard = {
 };
 
 const LOOP_META: Record<LoopType, { title: string; tagline: string; accent: string }> = {
-  digital: { title: "Digital Loop", tagline: "Design → RTL → Verify → Improve", accent: "accent-digital" },
-  validation: { title: "Validation Loop", tagline: "Plan → Run → Learn → Improve", accent: "accent-validation" },
-  analog: { title: "Analog Loop", tagline: "Analyze → Simulate → Correlate → Improve", accent: "accent-analog" },
-  embedded: { title: "Embedded(Firmware) Loop", tagline: "Code → Run → Observe → Fix", accent: "accent-embedded" },
-  system: { title: "System Loop", tagline: "Integrate → Analyze → Optimize", accent: "accent-system" },
+  digital: { title: "Digital Loop", tagline: "Design â†’ RTL â†’ Verify â†’ Improve", accent: "accent-digital" },
+  validation: { title: "Validation Loop", tagline: "Plan â†’ Run â†’ Learn â†’ Improve", accent: "accent-validation" },
+  analog: { title: "Analog Loop", tagline: "Analyze â†’ Simulate â†’ Correlate â†’ Improve", accent: "accent-analog" },
+  embedded: { title: "Embedded(Firmware) Loop", tagline: "Code â†’ Run â†’ Observe â†’ Fix", accent: "accent-embedded" },
+  system: { title: "System Loop", tagline: "Integrate â†’ Analyze â†’ Optimize", accent: "accent-system" },
 };
 
 export default function AppsHomePage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [onboardingLoading, setOnboardingLoading] = useState(true);
+  const [onboardingComplete, setOnboardingComplete] = useState(true);
+  const [onboardingBusy, setOnboardingBusy] = useState(false);
 
   const [view, setView] = useState<"recommended" | "all">("recommended");
 
@@ -43,11 +80,28 @@ export default function AppsHomePage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!mounted) return;
       setUserEmail(user?.email ?? null);
+
+      if (!user) {
+        setOnboardingComplete(true);
+        setOnboardingLoading(false);
+        return;
+      }
+
+      try {
+        const response = await apiGet<OnboardingResponse>("/settings/onboarding");
+        if (!mounted) return;
+        setOnboardingComplete(Boolean(response.onboarding.completed));
+      } catch {
+        if (!mounted) return;
+        setOnboardingComplete(true);
+      } finally {
+        if (mounted) setOnboardingLoading(false);
+      }
     })();
     return () => { mounted = false; };
   }, []);
 
-  // ✅ updated apps list (only change is digital apps)
+  // âœ… updated apps list (only change is digital apps)
   const apps: AppCard[] = useMemo(() => ([
     {
       slug: "validation-run",
@@ -59,11 +113,11 @@ export default function AppsHomePage() {
       promise: "Get run results + gaps + exec report",
     },
 
-    // ✅ NEW DIGITAL FLAGSHIPS
+    // âœ… NEW DIGITAL FLAGSHIPS
     {
       slug: "arch2rtl",
       title: "Arch2RTL",
-      subtitle: "Spec → Architecture → Microarch → RTL → Handoff package",
+      subtitle: "Spec â†’ Architecture â†’ Microarch â†’ RTL â†’ Handoff package",
       loop_type: "digital",
       status: "Flagship",
       nudge: "Most used",
@@ -72,7 +126,7 @@ export default function AppsHomePage() {
     {
       slug: "arch2synthesis",
       title: "Arch2Synthesis",
-      subtitle: "Arch2RTL + Synthesis (or RTL → Synthesis) with reports",
+      subtitle: "Arch2RTL + Synthesis (or RTL â†’ Synthesis) with reports",
       loop_type: "digital",
       status: "Flagship",
       nudge: "Fast path",
@@ -82,11 +136,11 @@ export default function AppsHomePage() {
     {
       slug: "arch2tapeout",
       title: "Arch2Tapeout",
-      subtitle: "Arch2RTL + Synthesis + RTL→GDS pipeline (partial runs supported)",
+      subtitle: "Arch2RTL + Synthesis + RTLâ†’GDS pipeline (partial runs supported)",
       loop_type: "digital",
       status: "Flagship",
       nudge: "End-to-end",
-      promise: "Run RTL→GDS with DRC/LVS/Tapeout + exec summary",
+      promise: "Run RTLâ†’GDS with DRC/LVS/Tapeout + exec summary",
     },
     {
       slug: "dqa",
@@ -118,7 +172,7 @@ export default function AppsHomePage() {
     {
       slug: "integrate",
       title: "Integrate",
-      subtitle: "Text → Integration intent → Top RTL + report",
+      subtitle: "Text â†’ Integration intent â†’ Top RTL + report",
       loop_type: "digital",
       status: "Flagship",
       nudge: "New",
@@ -128,7 +182,7 @@ export default function AppsHomePage() {
     {
       slug: "validation-plan",
       title: "Validation Plan & Coverage",
-      subtitle: "Datasheet/spec → test plan + coverage map + gaps",
+      subtitle: "Datasheet/spec â†’ test plan + coverage map + gaps",
       loop_type: "validation",
       status: "Flagship",
       nudge: "New",
@@ -137,7 +191,7 @@ export default function AppsHomePage() {
     {
       slug: "bench-setup",
       title: "Bench Setup",
-      subtitle: "Register instruments → create bench → schematic → preflight",
+      subtitle: "Register instruments â†’ create bench â†’ schematic â†’ preflight",
       loop_type: "validation",
       status: "Flagship",
       nudge: "Recommended",
@@ -155,18 +209,18 @@ export default function AppsHomePage() {
     {
       slug: "validation-insights",
       title: "Validation Insights",
-      subtitle: "Analyze past runs → patterns → evolve plan + coverage",
+      subtitle: "Analyze past runs â†’ patterns â†’ evolve plan + coverage",
       loop_type: "validation",
       status: "Flagship",
       nudge: "New",
       promise: "Turn history into next test improvements",
     },
 
-    // ✅ NEW ANALOG APPS
+    // âœ… NEW ANALOG APPS
     {
       slug: "analog-run",
       title: "Analog Run",
-      subtitle: "Spec → Netlist → Model → Validate → Correlate → Iterate",
+      subtitle: "Spec â†’ Netlist â†’ Model â†’ Validate â†’ Correlate â†’ Iterate",
       loop_type: "analog",
       status: "Flagship",
       nudge: "Recommended",
@@ -175,7 +229,7 @@ export default function AppsHomePage() {
     {
       slug: "analog-spec",
       title: "Analog Spec",
-      subtitle: "Text → structured spec + open questions",
+      subtitle: "Text â†’ structured spec + open questions",
       loop_type: "analog",
       status: "Flagship",
       nudge: "Most used",
@@ -184,7 +238,7 @@ export default function AppsHomePage() {
     {
       slug: "analog-netlist",
       title: "Analog Netlist",
-      subtitle: "Spec → SPICE scaffold + sim plan",
+      subtitle: "Spec â†’ SPICE scaffold + sim plan",
       loop_type: "analog",
       status: "Flagship",
       nudge: "New",
@@ -193,7 +247,7 @@ export default function AppsHomePage() {
     {
       slug: "analog-model",
       title: "Analog Model",
-      subtitle: "Spec → SV RNM / Verilog-A behavioral model",
+      subtitle: "Spec â†’ SV RNM / Verilog-A behavioral model",
       loop_type: "analog",
       status: "Flagship",
       nudge: "Most used",
@@ -236,11 +290,11 @@ export default function AppsHomePage() {
       promise: "PnR/STA handoff",
     },   
 
-    // ✅ EMBEDDED (production firmware chain)
+    // âœ… EMBEDDED (production firmware chain)
     {
       slug: "embedded-run",
       title: "Embedded Run",
-      subtitle: "End-to-end firmware flow: HAL → Drivers → Boot → Diagnostics → Co-sim → Report",
+      subtitle: "End-to-end firmware flow: HAL â†’ Drivers â†’ Boot â†’ Diagnostics â†’ Co-sim â†’ Report",
       loop_type: "embedded",
       status: "Flagship",
       nudge: "Recommended",
@@ -249,7 +303,7 @@ export default function AppsHomePage() {
     {
       slug: "embedded-hal",
       title: "Embedded HAL",
-      subtitle: "Register extraction → Rust HAL layer → validation",
+      subtitle: "Register extraction â†’ Rust HAL layer â†’ validation",
       loop_type: "embedded",
       status: "Flagship",
       nudge: "New",
@@ -285,7 +339,7 @@ export default function AppsHomePage() {
     {
       slug: "embedded-log-analyzer",
       title: "Embedded Log Analyzer",
-      subtitle: "Logs → fault classification → root cause → fix plan",
+      subtitle: "Logs â†’ fault classification â†’ root cause â†’ fix plan",
       loop_type: "embedded",
       status: "Flagship",
       nudge: "New",
@@ -300,11 +354,11 @@ export default function AppsHomePage() {
       nudge: "New",
       promise: "Co-sim results + coverage report",
     },
-    // ✅ SYSTEM (Tiny Sensor Hub SoC)
+    // âœ… SYSTEM (Tiny Sensor Hub SoC)
     {
       slug: "system-end2end",
       title: "System End2End",
-      subtitle: "Digital + Analog + SoC integration → Sim + PD + Firmware → ZIP",
+      subtitle: "Digital + Analog + SoC integration â†’ Sim + PD + Firmware â†’ ZIP",
       loop_type: "system",
       status: "Flagship",
       nudge: "Recommended",
@@ -331,7 +385,7 @@ export default function AppsHomePage() {
     {
       slug: "system-rtl",
       title: "System RTL",
-      subtitle: "Digital + Analog + SoC intent → integrated top RTL + handoff package",
+      subtitle: "Digital + Analog + SoC intent â†’ integrated top RTL + handoff package",
       loop_type: "system",
       status: "Flagship",
       nudge: "New",
@@ -340,7 +394,7 @@ export default function AppsHomePage() {
     {
       slug: "system-firmware",
       title: "System Firmware",
-      subtitle: "Register extract → driver scaffold → build → co-sim results",
+      subtitle: "Register extract â†’ driver scaffold â†’ build â†’ co-sim results",
       loop_type: "system",
       status: "Flagship",
       nudge: "New",
@@ -349,7 +403,7 @@ export default function AppsHomePage() {
     {
       slug: "system-software",
       title: "System Software",
-      subtitle: "Firmware handoff → SDK → API → applications",
+      subtitle: "Firmware handoff â†’ SDK â†’ API â†’ applications",
       loop_type: "system",
       status: "Flagship",
       nudge: "New",
@@ -358,7 +412,7 @@ export default function AppsHomePage() {
     {
       slug: "system-software-validation",
       title: "System Software Validation",
-      subtitle: "Validate software package or run full software → firmware → RTL co-simulation",
+      subtitle: "Validate software package or run full software â†’ firmware â†’ RTL co-simulation",
       loop_type: "system",
       status: "Flagship",
       nudge: "New",
@@ -370,20 +424,20 @@ export default function AppsHomePage() {
   const featured = apps.find(a => a.slug === "arch2tapeout") || apps[0];
 
   const FLAGSHIP_SLUGS = new Set<string>([
-    // Validation (1–2)
+    // Validation (1â€“2)
     "validation-run",
     "validation-plan",
 
-    // Digital (1–2)
+    // Digital (1â€“2)
     "arch2rtl",
     "arch2synthesis",
     "dqa",
 
-    // Analog (1–2)
+    // Analog (1â€“2)
     "analog-run",
     "analog-model",
 
-    // Embedded (1–2)
+    // Embedded (1â€“2)
     "embedded-run",
     "embedded-driver",
 
@@ -400,11 +454,44 @@ export default function AppsHomePage() {
 
   const go = (path: string) => router.push(path);
 
+  async function startArch2RtlOnboarding() {
+    setOnboardingBusy(true);
+    try {
+      window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
+        projectName: "pwm_controller_onboarding",
+        topModule: "pwm_controller",
+        designLanguage: "systemverilog",
+        specText: ARCH2RTL_ONBOARDING_SPEC,
+        toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+      }));
+      await apiPost("/settings/onboarding", {
+        action: "start",
+        last_step: "arch2rtl_demo_started",
+        metadata: { demo: "arch2rtl", source: "apps_onboarding" },
+      });
+      go("/apps/arch2rtl?guided=1");
+    } catch {
+      go("/apps/arch2rtl?guided=1");
+    } finally {
+      setOnboardingBusy(false);
+    }
+  }
+
+  async function skipOnboarding() {
+    setOnboardingBusy(true);
+    try {
+      await apiPost("/settings/onboarding", { action: "skip", last_step: "skipped_from_apps" });
+    } finally {
+      setOnboardingComplete(true);
+      setOnboardingBusy(false);
+    }
+  }
+
 
   
 
   const routeForApp = (slug: string) => {
-    // ✅ Dedicated pages (apps with custom UX)
+    // âœ… Dedicated pages (apps with custom UX)
 
     const dedicated: Record<string, string> = {
       // Validation (dedicated pages)
@@ -423,7 +510,7 @@ export default function AppsHomePage() {
       "verify": "/apps/verify",
       "smoke": "/apps/smoke",
 
-      // ✅ ANALOG
+      // âœ… ANALOG
       "analog-run": "/apps/analog-run",
       "analog-spec": "/apps/analog-spec",
       "analog-netlist": "/apps/analog-netlist",
@@ -433,7 +520,7 @@ export default function AppsHomePage() {
       "analog-iterate": "/apps/analog-iterate",
       "analog-abstracts": "/apps/analog-abstracts",
 
-      // ✅ EMBEDDED (dedicated pages)
+      // âœ… EMBEDDED (dedicated pages)
       "embedded-hal": "/apps/embedded-hal",
       "embedded-driver": "/apps/embedded-driver",
       "embedded-boot": "/apps/embedded-boot",
@@ -442,7 +529,7 @@ export default function AppsHomePage() {
       "embedded-validate": "/apps/embedded-validate",
       "embedded-run": "/apps/embedded-run",
 
-      // ✅ SYSTEM (dedicated pages)
+      // âœ… SYSTEM (dedicated pages)
       "system-end2end": "/apps/system-end2end",
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
@@ -454,6 +541,82 @@ export default function AppsHomePage() {
     
     return dedicated[slug] || `/apps/${slug}`;
   };
+
+  if (!onboardingLoading && !onboardingComplete) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
+        <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <button className="flex items-center gap-2 text-xl font-extrabold" onClick={() => go("/apps")}>
+              <span className="text-cyan-400">CHIPLOOP</span>
+              <span className="text-slate-400">/</span>
+              <span className="text-slate-200">First Run</span>
+            </button>
+            <button
+              onClick={skipOnboarding}
+              disabled={onboardingBusy}
+              className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 hover:bg-slate-900 disabled:opacity-60"
+            >
+              Skip for now
+            </button>
+          </div>
+        </div>
+
+        <section className="mx-auto grid max-w-6xl gap-6 px-6 py-10 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="rounded-2xl border border-cyan-900/50 bg-slate-900/40 p-7 shadow-2xl">
+            <div className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Welcome to ChipLoop</div>
+            <h1 className="mt-3 text-4xl font-extrabold leading-tight text-white">
+              Complete your first chip workflow in a few minutes.
+            </h1>
+            <p className="mt-4 max-w-2xl text-slate-300">
+              We will run a guided Arch2RTL demo using a simple PWM controller spec. You will generate RTL, constraints, UPF-lite power intent, and a downloadable handoff package.
+            </p>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {[
+                ["1", "Review the spec", "A simple PWM design is pre-filled."],
+                ["2", "Run Arch2RTL", "Watch the workflow produce artifacts."],
+                ["3", "Inspect and download", "Open RTL, SDC, UPF, then download ZIP."],
+              ].map(([step, title, copy]) => (
+                <div key={step} className="rounded-xl border border-slate-800 bg-black/30 p-4">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-600 text-sm font-bold">{step}</div>
+                  <div className="mt-3 font-semibold text-slate-100">{title}</div>
+                  <div className="mt-1 text-sm text-slate-400">{copy}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-7 flex flex-wrap gap-3">
+              <button
+                onClick={startArch2RtlOnboarding}
+                disabled={onboardingBusy}
+                className="rounded-xl bg-cyan-600 px-6 py-3 font-bold text-white hover:bg-cyan-500 disabled:opacity-60"
+              >
+                {onboardingBusy ? "Starting..." : "Start Arch2RTL Demo"}
+              </button>
+              <button
+                onClick={skipOnboarding}
+                disabled={onboardingBusy}
+                className="rounded-xl border border-slate-700 bg-slate-950/40 px-6 py-3 font-semibold text-slate-200 hover:bg-slate-950 disabled:opacity-60"
+              >
+                Go to Apps
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-800 bg-black/35 p-6">
+            <div className="text-sm font-semibold text-slate-300">Demo spec preview</div>
+            <pre className="mt-4 max-h-[460px] overflow-auto whitespace-pre-wrap rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-200">
+              {ARCH2RTL_ONBOARDING_SPEC}
+            </pre>
+            <div className="mt-4 rounded-xl border border-emerald-900/50 bg-emerald-950/20 p-4 text-sm text-emerald-100">
+              You only need to click run, review the generated files, and download the package. Studio remains available after this for advanced customization.
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
@@ -471,6 +634,7 @@ export default function AppsHomePage() {
           </button>
 
           <div className="flex items-center gap-3">
+            <PlanCreditBadge />
             <button
               onClick={() => go("/workflow")}
               className="rounded-xl bg-slate-800 px-4 py-2 text-slate-200 hover:bg-slate-700 transition"
@@ -496,6 +660,7 @@ export default function AppsHomePage() {
           </div>
         </div>
       </div>
+      <LowCreditBanner />
 
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-6 pt-10 pb-6">
@@ -504,7 +669,7 @@ export default function AppsHomePage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-xs text-slate-400">
-                  Welcome{userEmail ? `, ${userEmail}` : ""} • <span className="text-cyan-300">Start here</span>
+                  Welcome{userEmail ? `, ${userEmail}` : ""} â€¢ <span className="text-cyan-300">Start here</span>
                 </div>
                 <h1 className="mt-2 text-3xl font-extrabold leading-tight">
                   Run outcomes, not workflows.
@@ -542,7 +707,7 @@ export default function AppsHomePage() {
                   </div>
 
                   <div className="mt-4 text-xs text-slate-500">
-                    Progressive outputs • Executive summary • ZIP artifacts
+                    Progressive outputs â€¢ Executive summary â€¢ ZIP artifacts
                   </div>
                 </div>
               </div>
@@ -565,16 +730,16 @@ export default function AppsHomePage() {
                     Recommended
                   </span>
                 </div>
-                <div className="mt-1 text-sm text-slate-400">Bench → instruments → preflight → run → report</div>
+                <div className="mt-1 text-sm text-slate-400">Bench â†’ instruments â†’ preflight â†’ run â†’ report</div>
               </button>
 
-              {/* ✅ change this to Arch2RTL */}
+              {/* âœ… change this to Arch2RTL */}
               <button
                 onClick={() => go("/apps/arch2rtl")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
               >
                 <div className="flex items-center justify-between">
-                  <div className="font-semibold">Digital - Spec → RTL + handoff</div>
+                  <div className="font-semibold">Digital - Spec â†’ RTL + handoff</div>
                   <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
                     Most used
                   </span>
@@ -582,7 +747,7 @@ export default function AppsHomePage() {
                 <div className="mt-1 text-sm text-slate-400"> Digital - Arch2RTL: docs + SV + package</div>
               </button>
 
-              {/* ✅ NEW: Analog daily-use */}
+              {/* âœ… NEW: Analog daily-use */}
               <button
                 onClick={() => go("/apps/analog-run")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
@@ -593,10 +758,10 @@ export default function AppsHomePage() {
                     Recommended
                   </span>
                 </div>
-                  <div className="mt-1 text-sm text-slate-400">Analog Run: netlist → model → validate → correlate</div>
+                  <div className="mt-1 text-sm text-slate-400">Analog Run: netlist â†’ model â†’ validate â†’ correlate</div>
               </button>
 
-              {/* ✅ NEW: Embedded daily-use */}
+              {/* âœ… NEW: Embedded daily-use */}
               <button
                 onClick={() => go("/apps/embedded-run")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
@@ -607,7 +772,7 @@ export default function AppsHomePage() {
                     Recommended
                   </span>
                 </div>
-                  <div className="mt-1 text-sm text-slate-400">Embedded Run: HAL → drivers → boot → diagnostics → report</div>
+                  <div className="mt-1 text-sm text-slate-400">Embedded Run: HAL â†’ drivers â†’ boot â†’ diagnostics â†’ report</div>
               </button>
             </div>
 
@@ -622,7 +787,7 @@ export default function AppsHomePage() {
                 </span>
               </div>
               <div className="mt-1 text-sm text-slate-400">
-                Software validation or full co-simulation (SW → FW → RTL)
+                Software validation or full co-simulation (SW â†’ FW â†’ RTL)
               </div>
             </button>
 
@@ -682,7 +847,7 @@ export default function AppsHomePage() {
                   Outcome: <span className="text-slate-200">{app.promise}</span>
                 </div>
               ) : null}
-              <div className="mt-4 text-xs text-slate-500">One click → progressive outputs → ZIP</div>
+              <div className="mt-4 text-xs text-slate-500">One click â†’ progressive outputs â†’ ZIP</div>
             </button>
           ))}
         </div>
@@ -740,7 +905,7 @@ export default function AppsHomePage() {
                           </span>
                         ) : <span />}
 
-                        <span className="text-xs text-slate-500">Open →</span>
+                        <span className="text-xs text-slate-500">Open â†’</span>
                       </div>
                     </button>
                   ))}
@@ -764,3 +929,9 @@ export default function AppsHomePage() {
     </main>
   );
 }
+
+
+
+
+
+

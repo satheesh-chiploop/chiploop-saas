@@ -26,6 +26,7 @@ import PlannerModal from "@/components/PlannerModal";
 import AgentPlannerModal from "@/components/AgentPlannerModal";
 import StudioAgentPlannerModal from "@/components/studio/AgentPlannerModal";
 import DagPreviewModal from "@/components/studio/DagPreviewModal";
+import { LowCreditBanner, PlanCreditBadge } from "@/components/PlanCreditStatus";
 /* =========================
    Types & Constants
 ========================= */
@@ -2337,6 +2338,7 @@ function WorkflowPage() {
           <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
             Pricing
           </button>
+          <PlanCreditBadge />
           <button onClick={() => router.push("/settings/api-keys")} className="hover:text-cyan-400 transition">
             Settings
           </button>
@@ -2351,6 +2353,7 @@ function WorkflowPage() {
           </button>
         </div>
       </nav>
+      <LowCreditBanner />
   
       <div className="flex flex-1 overflow-hidden">
         {/* ===== Sidebar ===== */}
@@ -3632,4 +3635,7 @@ function CreateAgentModal({ onClose, onSubmit }: { onClose: () => void; onSubmit
     </div>
   );
 }
+
+
+
 

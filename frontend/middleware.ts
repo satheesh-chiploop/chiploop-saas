@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+﻿import { NextResponse, type NextRequest } from "next/server";
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
 export async function middleware(req: NextRequest) {
@@ -20,7 +20,9 @@ export async function middleware(req: NextRequest) {
   const isProtected =
     pathname.startsWith("/apps") ||
     pathname.startsWith("/workflow") ||
-    pathname.startsWith("/settings");
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/marketplace") ||
+    pathname.startsWith("/admin");
 
   if (isProtected && !session) {
     const url = req.nextUrl.clone();
@@ -42,5 +44,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   // Do not include /login here.
-  matcher: ["/apps/:path*", "/workflow/:path*", "/settings/:path*"],
+  matcher: ["/apps/:path*", "/workflow/:path*", "/settings/:path*", "/marketplace/:path*", "/admin/:path*"],
 };
+
