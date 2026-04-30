@@ -1,9 +1,11 @@
-"use client";
+﻿"use client";
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { usePathname, useRouter } from "next/navigation";
+import UpgradeNudge from "@/components/UpgradeNudge";
 
 const tabs = [
+  { label: "Plan", href: "/settings/plan" },
   { label: "API Keys", href: "/settings/api-keys" },
   { label: "Usage", href: "/settings/usage" },
 ];
@@ -29,13 +31,13 @@ export default function SettingsNav({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/apps")}
-              className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 transition hover:bg-slate-900"
+              className="rounded-lg border border-slate-700 px-4 py-2 text-slate-300 transition hover:bg-slate-900"
             >
               Apps
             </button>
             <button
               onClick={() => router.push("/workflow")}
-              className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 transition hover:bg-slate-900"
+              className="rounded-lg border border-slate-700 px-4 py-2 text-slate-300 transition hover:bg-slate-900"
             >
               Studio
             </button>
@@ -44,7 +46,7 @@ export default function SettingsNav({ children }: { children: React.ReactNode })
                 await supabase.auth.signOut();
                 router.push("/");
               }}
-              className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 transition hover:bg-slate-900"
+              className="rounded-lg border border-slate-700 px-4 py-2 text-slate-300 transition hover:bg-slate-900"
             >
               Logout
             </button>
@@ -57,18 +59,18 @@ export default function SettingsNav({ children }: { children: React.ReactNode })
           <div>
             <h1 className="text-3xl font-extrabold">Settings</h1>
             <p className="mt-2 text-sm text-slate-400">
-              Developer access and usage for SDK and CLI workflows.
+              Plan, developer access, and usage for SDK and CLI workflows.
             </p>
           </div>
 
-          <div className="flex rounded-xl border border-slate-800 bg-slate-950/70 p-1">
+          <div className="flex rounded-lg border border-slate-800 bg-slate-950/70 p-1">
             {tabs.map((tab) => {
               const active = pathname === tab.href;
               return (
                 <button
                   key={tab.href}
                   onClick={() => router.push(tab.href)}
-                  className={`rounded-lg px-4 py-2 text-sm transition ${
+                  className={`rounded-md px-4 py-2 text-sm transition ${
                     active
                       ? "bg-cyan-700 text-white"
                       : "text-slate-300 hover:bg-slate-900"
@@ -81,8 +83,11 @@ export default function SettingsNav({ children }: { children: React.ReactNode })
           </div>
         </div>
 
+        <UpgradeNudge />
         {children}
       </section>
     </main>
   );
 }
+
+

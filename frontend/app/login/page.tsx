@@ -1,11 +1,9 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import toast, { Toaster } from "react-hot-toast";
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,8 +13,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [trialIntent, setTrialIntent] = useState(false);
 
-  // ✅ NEW: prevent flash by waiting until auth is checked
+  // âœ… NEW: prevent flash by waiting until auth is checked
   const [authChecked, setAuthChecked] = useState(false);
 
   const getNext = () => {
@@ -32,6 +31,10 @@ export default function LoginPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!mounted) return;
   
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("mode") === "signup") setMode("signup");
+      if (params.get("trial") === "1") setTrialIntent(true);
+
       setAuthChecked(true);
   
       if (user) router.replace(getNext());
@@ -43,16 +46,16 @@ export default function LoginPage() {
   }, [supabase, router]);
   
   
-  // ✅ NEW: show a lightweight loading screen until session is known
+  // âœ… NEW: show a lightweight loading screen until session is known
   if (!authChecked) {
     return (
       <main className="min-h-screen flex flex-col justify-center items-center bg-[#0b0b0c] text-white">
-        <div className="text-slate-300">Checking session…</div>
+        <div className="text-slate-300">Checking sessionâ€¦</div>
       </main>
     );
   }
 
-  // 🔹 Email/Password sign-in or sign-up
+  // ðŸ”¹ Email/Password sign-in or sign-up
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -63,7 +66,7 @@ export default function LoginPage() {
         result = await supabase.auth.signUp({
           email,
           password,
-          // ✅ small improvement: keep consistent apps-first landing after confirm
+          // âœ… small improvement: keep consistent apps-first landing after confirm
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback?next=/apps`,
           },
@@ -76,13 +79,16 @@ export default function LoginPage() {
 
       toast.success(
         mode === "signup"
-          ? "✅ Account created! Check your email to confirm."
-          : "✅ Welcome back!"
+          ? trialIntent
+            ? "Account created. Complete Stripe trial checkout before paid usage."
+            : "Account created! Check your email to confirm."
+          : "Welcome back!"
       );
 
-      if (mode === "signin") router.replace(getNext()); // ✅ replace
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong.");
+      if (mode === "signin") router.replace(getNext()); // âœ… replace
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Something went wrong.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -90,17 +96,17 @@ export default function LoginPage() {
 
   
 
-  // 🔹 Magic Link
+  // ðŸ”¹ Magic Link
   const handleMagicLink = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      // ✅ small improvement: apps-first return
+      // âœ… small improvement: apps-first return
       options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(getNext())}` },
     });
     setLoading(false);
     if (error) toast.error(error.message);
-    else toast.success("✅ Magic link sent! Check your inbox.");
+    else toast.success("âœ… Magic link sent! Check your inbox.");
   };
 
   return (
@@ -108,7 +114,7 @@ export default function LoginPage() {
       <Toaster position="top-center" reverseOrder={false} />
       <div className="bg-slate-900 border border-slate-700 p-8 rounded-2xl shadow-2xl w-96">
         <h1 className="text-3xl font-extrabold text-cyan-400 text-center mb-4">
-          CHIPLOOP Login
+          {mode === "signup" && trialIntent ? "Start ChipLoop Trial" : "CHIPLOOP Login"}
         </h1>
 
         {/* Toggle between Sign In / Sign Up */}
@@ -134,6 +140,12 @@ export default function LoginPage() {
             Sign Up
           </button>
         </div>
+
+        {mode === "signup" && trialIntent ? (
+          <div className="mb-5 rounded-lg border border-cyan-700/60 bg-cyan-950/30 p-3 text-sm text-cyan-100">
+            Free 30-day trial. $4.99/month after 30 days. Credit card required via Stripe. Cancel anytime before trial ends.
+          </div>
+        ) : null}
 
         {/* Email form */}
         <form onSubmit={handleEmailAuth} className="flex flex-col space-y-4">
@@ -168,7 +180,7 @@ export default function LoginPage() {
                 ? "Creating..."
                 : "Signing in..."
               : mode === "signup"
-              ? "Create Account"
+              ? trialIntent ? "Start free trial" : "Create Account"
               : "Sign In"}
           </button>
         </form>
@@ -187,8 +199,11 @@ export default function LoginPage() {
       </div>
 
       <p className="text-gray-500 text-xs mt-6">
-        Secure login powered by Supabase Auth
+        Secure login powered by Supabase Auth. Trial billing will be handled by Stripe.
       </p>
     </main>
   );
 }
+
+
+

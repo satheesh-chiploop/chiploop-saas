@@ -1,315 +1,281 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useMemo, useState, Suspense } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+import { ApiClientError, apiGet } from "@/lib/apiClient";
 
-// ✅ Supabase init
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+type PlanKey = "trial" | "starter" | "pro" | "pro_max" | "enterprise";
 
-type PlanKey = "freemium" | "single" | "double" | "all";
-
-const BASE_PRICES: Record<PlanKey, number> = {
-  freemium: 0,
-  single: 19.99,
-  double: 29.99,
-  all: 39.99,
+type Plan = {
+  key: PlanKey;
+  name: string;
+  price: string;
+  discountPrice?: string;
+  credits: string;
+  cta: string;
+  note: string;
+  popular?: boolean;
+  features: Record<string, string>;
 };
 
-const prettyPlanName: Record<PlanKey, string> = {
-  freemium: "Freemium",
-  single: "Single Loop",
-  double: "Double Loop",
-  all: "All Loops",
+type PlanResponse = {
+  status: string;
+  plan?: {
+    current_plan?: { id?: string; name?: string; display_name?: string };
+  };
 };
+
+const featureRows = [
+  "App workflows",
+  "SDK/CLI",
+  "API keys",
+  "Agent Planner",
+  "Agent Factory dry-run",
+  "Private agents",
+  "DAG optimization",
+  "Marketplace submission",
+  "Support",
+];
+
+const plans: Plan[] = [
+  {
+    key: "trial",
+    name: "Trial",
+    price: "Free for 30 days",
+    credits: "100 trial credits",
+    cta: "Start free trial",
+    note: "Credit card required. No charge during trial. Auto-converts to Starter unless canceled.",
+    features: {
+      "App workflows": "Trial access",
+      "SDK/CLI": "Limited test access",
+      "API keys": "1 test key",
+      "Agent Planner": "Included",
+      "Agent Factory dry-run": "Limited",
+      "Private agents": "1 private agent",
+      "DAG optimization": "Not included",
+      "Marketplace submission": "Not included",
+      Support: "Standard",
+    },
+  },
+  {
+    key: "starter",
+    name: "Starter",
+    price: "$19.99/month",
+    discountPrice: "$14.99/month for first 3 months",
+    credits: "2,000 credits/month",
+    cta: "Coming soon",
+    note: "For individual developers starting production workflows.",
+    features: {
+      "App workflows": "Included",
+      "SDK/CLI": "Included",
+      "API keys": "1 key",
+      "Agent Planner": "Included",
+      "Agent Factory dry-run": "Included",
+      "Private agents": "5 private agents",
+      "DAG optimization": "Limited",
+      "Marketplace submission": "Not included",
+      Support: "Standard",
+    },
+  },
+  {
+    key: "pro",
+    name: "Pro",
+    price: "$39.99/month",
+    discountPrice: "$29.99/month for first 3 months",
+    credits: "5,000 credits/month",
+    cta: "Coming soon",
+    note: "For regular Studio users building custom workflows and agents.",
+    popular: true,
+    features: {
+      "App workflows": "Included",
+      "SDK/CLI": "Included",
+      "API keys": "3 keys",
+      "Agent Planner": "Included",
+      "Agent Factory dry-run": "Included",
+      "Private agents": "25 private agents",
+      "DAG optimization": "Included",
+      "Marketplace submission": "Included",
+      Support: "Priority",
+    },
+  },
+  {
+    key: "pro_max",
+    name: "Pro Max",
+    price: "$59.99/month",
+    discountPrice: "$44.99/month for first 3 months",
+    credits: "12,000 credits/month",
+    cta: "Coming soon",
+    note: "For heavier automation and larger Studio usage.",
+    features: {
+      "App workflows": "Higher limits",
+      "SDK/CLI": "Included",
+      "API keys": "10 keys",
+      "Agent Planner": "Included",
+      "Agent Factory dry-run": "Included",
+      "Private agents": "100 private agents",
+      "DAG optimization": "Included",
+      "Marketplace submission": "Included",
+      Support: "Priority",
+    },
+  },
+  {
+    key: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    credits: "Custom credits",
+    cta: "Contact sales",
+    note: "For organizations needing custom limits, support, and deployment review.",
+    features: {
+      "App workflows": "Custom limits",
+      "SDK/CLI": "Included",
+      "API keys": "Custom",
+      "Agent Planner": "Included",
+      "Agent Factory dry-run": "Included",
+      "Private agents": "Custom",
+      "DAG optimization": "Included",
+      "Marketplace submission": "Included",
+      Support: "Dedicated",
+    },
+  },
+];
+
+function normalizePlanId(value?: string): PlanKey | null {
+  if (!value) return null;
+  const key = value.toLowerCase().replace(/\s+/g, "_") as PlanKey;
+  return plans.some((plan) => plan.key === key) ? key : null;
+}
 
 function PricingContent() {
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [isStudent, setIsStudent] = useState(false);
-  const [currentPlan, setCurrentPlan] = useState<PlanKey>("freemium");
-  const [loadingPortal, setLoadingPortal] = useState(false);
-  const [subscribing, setSubscribing] = useState<PlanKey | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<PlanKey | null>(null);
 
-  // 🧑‍💻 Session & current plan (best-effort from "workflows" table)
   useEffect(() => {
-    const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const email = session?.user?.email ?? null;
-      setUserEmail(email);
-
-      if (!email) return;
-
+    let cancelled = false;
+    async function loadPlan() {
       try {
-        // Try to read current plan from the "workflows" table
-        // Expecting optional columns like "current_plan" or "subscription_status"
-        const { data, error } = await supabase
-          .from("workflows")
-          .select("current_plan, subscription_status")
-          .eq("user_id", email)
-          .limit(1)
-          .maybeSingle();
-
-        if (!error && data) {
-          const planFromDB =
-            (data.current_plan as PlanKey | null) ||
-            (data.subscription_status as PlanKey | null);
-
-          if (
-            planFromDB &&
-            ["freemium", "single", "double", "all"].includes(planFromDB)
-          ) {
-            setCurrentPlan(planFromDB as PlanKey);
-          } else {
-            setCurrentPlan("freemium");
-          }
-        }
-      } catch {
-        // ignore and keep default
+        const response = await apiGet<PlanResponse>("/settings/plan");
+        const planId = normalizePlanId(response.plan?.current_plan?.id || response.plan?.current_plan?.name);
+        if (!cancelled) setCurrentPlan(planId);
+      } catch (error) {
+        if (error instanceof ApiClientError && error.status === 401) return;
+        console.warn("Plan lookup unavailable", error);
       }
+    }
+    loadPlan();
+    return () => {
+      cancelled = true;
     };
-    init();
   }, []);
 
-  // 🎚️ Student discount
-  const priceFor = (plan: PlanKey) => {
-    const base = BASE_PRICES[plan];
-    if (base === 0) return "Free";
-    if (!isStudent) return `$${base.toFixed(2)}/mo`;
-    const discounted = Math.max(0, base * 0.75);
-    return `$${discounted.toFixed(2)}/mo`;
-  };
+  const currentPlanName = useMemo(() => {
+    if (!currentPlan) return null;
+    return plans.find((plan) => plan.key === currentPlan)?.name || null;
+  }, [currentPlan]);
 
-  // 🧭 Top-right button logic
-  const topCtaText = userEmail ? "🚀 Go to Workflow" : "🔑 Login";
-  const onTopCta = () => (userEmail ? router.push("/workflow") : router.push("/login"));
-
-  // 🧾 Subscribe handler
-  const subscribe = async (plan: PlanKey) => {
-    if (plan === "freemium") {
-      // For freemium, just send them to login or workflow
-      onTopCta();
+  function handlePlanAction(plan: Plan) {
+    if (plan.key === "enterprise") {
+      window.location.href = "mailto:sales@chiploop.com?subject=ChipLoop%20Enterprise";
       return;
     }
-    try {
-      setSubscribing(plan);
-      // Must have a user session to start checkout
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
-      const res = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          plan,         // "single" | "double" | "all"
-          student: isStudent,
-        }),
-      });
-
-      const data = await res.json();
-      if (data?.url) window.location.href = data.url;
-      else alert("❌ Failed to start checkout.");
-    } catch (err) {
-      console.error(err);
-      alert("❌ Error starting checkout.");
-    } finally {
-      setSubscribing(null);
+    if (plan.key === "trial") {
+      router.push("/login?mode=signup&trial=1");
+      return;
     }
-  };
-
-  // ⚙️ Manage subscription (Stripe customer portal)
-  const openPortal = async () => {
-    try {
-      setLoadingPortal(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-      const res = await fetch("/api/create-customer-portal-session", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data?.url) window.location.href = data.url;
-      else alert("❌ Failed to open customer portal.");
-    } catch (e) {
-      console.error(e);
-      alert("❌ Error opening customer portal.");
-    } finally {
-      setLoadingPortal(false);
-    }
-  };
-
-  // 🔲 Plan cards config
-  const plans: Array<{
-    key: PlanKey;
-    features: string[];
-    cta: string;
-  }> = useMemo(
-    () => [
-      {
-        key: "freemium",
-        features: ["1 Agent", "1 Workflow"],
-        cta: userEmail ? "Start Free" : "Login to Start",
-      },
-      {
-        key: "single",
-        features: ["Any 1 Loop (Digital / Analog / Embedded)"],
-        cta: "Subscribe",
-      },
-      {
-        key: "double",
-        features: ["Any 2 Loops"],
-        cta: "Subscribe",
-      },
-      {
-        key: "all",
-        features: ["All 3 Loops (Full Platform Access)"],
-        cta: "Subscribe",
-      },
-    ],
-    [userEmail]
-  );
+    router.push("/settings/plan");
+  }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white">
-      {/* 🧭 Header */}
-      <nav className="w-full flex justify-between items-center px-8 py-5 bg-black/70 backdrop-blur border-b border-slate-800 fixed top-0 left-0 z-50">
-        <div
-          onClick={() => router.push("/")}
-          className="text-2xl font-extrabold text-cyan-400 cursor-pointer"
-        >
-          CHIPLOOP ⚡
-        </div>
-        <div className="flex space-x-8 text-slate-300 font-medium">
-          <button onClick={() => router.push("/")} className="hover:text-cyan-400 transition">
-            Home
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
+      <nav className="sticky top-0 z-50 border-b border-slate-800 bg-black/70 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <button onClick={() => router.push("/")} className="text-2xl font-extrabold text-cyan-400">
+            CHIPLOOP
           </button>
-          <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
-            Pricing
-          </button>
+          <div className="flex items-center gap-5 text-sm font-medium text-slate-300">
+            <button onClick={() => router.push("/apps")} className="hover:text-cyan-300">Apps</button>
+            <button onClick={() => router.push("/workflow")} className="hover:text-cyan-300">Studio</button>
+            <button onClick={() => router.push("/settings/plan")} className="hover:text-cyan-300">Settings</button>
+          </div>
         </div>
-        <button
-          onClick={onTopCta}
-          className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-5 py-2 rounded-lg shadow-lg"
-        >
-          {topCtaText}
-        </button>
       </nav>
 
-      {/* 💳 Hero */}
-      <section className="w-full max-w-5xl mx-auto text-center px-6 mt-32 mb-10">
-        <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4">
-          Choose Your Plan
-        </h1>
-        <p className="text-slate-300">
-          Upgrade, downgrade, or manage your ChipLoop subscription anytime.
-        </p>
-        <div className="mt-3 text-sm text-slate-400">
-          Current Plan:&nbsp;
-          <span className="text-cyan-400 font-semibold">
-            {prettyPlanName[currentPlan]}
-          </span>
-        </div>
-      </section>
-
-      {/* 🎚️ Regular ↔ Student toggle */}
-      <section className="mb-10">
-        <div className="flex items-center gap-4 bg-slate-800/70 px-4 py-2 rounded-full border border-slate-700">
-          <span className={!isStudent ? "text-cyan-400 font-semibold" : "text-slate-300"}>
-            Regular
-          </span>
-          <label className="inline-flex items-center cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={isStudent}
-              onChange={(e) => setIsStudent(e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-14 h-8 bg-slate-700 rounded-full peer-checked:bg-cyan-500 transition relative">
-              <span className="absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition peer-checked:translate-x-6" />
+      <section className="mx-auto max-w-7xl px-6 py-12">
+        <div className="max-w-3xl">
+          <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">Pricing</h1>
+          <p className="mt-4 text-lg text-slate-300">
+            Start with a free 30-day trial. Paid plans get 25% off for the first 3 months. Cancel before trial ends to avoid conversion.
+          </p>
+          {currentPlanName ? (
+            <div className="mt-4 inline-flex rounded-lg border border-cyan-700/60 bg-cyan-950/30 px-3 py-2 text-sm text-cyan-100">
+              Current plan: {currentPlanName}
             </div>
-          </label>
-          <span className={isStudent ? "text-cyan-400 font-semibold" : "text-slate-300"}>
-            Student&nbsp;🎓&nbsp;25% Off
-          </span>
+          ) : null}
         </div>
-      </section>
 
-      {/* 💠 Plan Cards */}
-      <section className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-6 px-6 mb-16">
-        {plans.map(({ key, features, cta }) => {
-          const isCurrent = currentPlan === key;
-          return (
-            <div
-              key={key}
-              className={`p-6 rounded-xl shadow-lg border ${
-                isCurrent ? "border-cyan-400" : "border-slate-700"
-              } bg-slate-800/70 hover:bg-slate-700 transition`}
-            >
-              <div className="mb-4">
-                <h3 className="text-2xl font-bold text-white">{prettyPlanName[key]}</h3>
-                <p className="text-cyan-400 text-xl mt-2">{priceFor(key)}</p>
-              </div>
-
-              <ul className="text-slate-300 text-sm space-y-2 mb-6">
-                {features.map((f) => (
-                  <li key={f}>✅ {f}</li>
-                ))}
-                {key === "freemium" && <li>✅ Free forever</li>}
-              </ul>
-
-              {isCurrent ? (
-                <div className="text-center">
-                  <div className="text-cyan-400 font-semibold mb-3">Current Plan</div>
-                  <button
-                    onClick={openPortal}
-                    disabled={loadingPortal}
-                    className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white font-bold py-2 rounded-lg"
-                  >
-                    {loadingPortal ? "Opening..." : "Manage Subscription"}
-                  </button>
+        <section className="mt-10 grid gap-4 lg:grid-cols-5">
+          {plans.map((plan) => {
+            const isCurrent = currentPlan === plan.key;
+            return (
+              <article key={plan.key} className={`relative rounded-lg border p-5 ${plan.popular ? "border-cyan-500 bg-cyan-950/20" : isCurrent ? "border-cyan-500 bg-slate-950/70" : "border-slate-800 bg-slate-950/70"}`}>
+                {plan.popular ? (
+                  <div className="absolute right-3 top-3 rounded-full bg-cyan-500 px-3 py-1 text-xs font-bold text-black">Most Popular</div>
+                ) : null}
+                <div className="min-h-48 pt-2">
+                  <h2 className="text-xl font-bold text-white">{plan.name}</h2>
+                  <div className="mt-3 text-2xl font-extrabold text-cyan-200">{plan.discountPrice || plan.price}</div>
+                  {plan.discountPrice ? <div className="mt-1 text-sm text-slate-400">Then {plan.price}</div> : null}
+                  <div className="mt-2 text-sm font-semibold text-slate-300">{plan.credits}</div>
+                  <p className="mt-4 text-sm leading-6 text-slate-400">{plan.note}</p>
                 </div>
-              ) : (
                 <button
-                  onClick={() => subscribe(key)}
-                  disabled={subscribing === key}
-                  className="w-full bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 text-black font-bold py-2 rounded-lg"
+                  onClick={() => handlePlanAction(plan)}
+                  className={`mt-5 w-full rounded-lg px-4 py-2 text-sm font-bold transition ${plan.key === "enterprise" ? "border border-slate-600 text-slate-100 hover:bg-slate-900" : "bg-cyan-600 text-white hover:bg-cyan-500"}`}
                 >
-                  {subscribing === key ? "Processing..." : cta}
+                  {isCurrent ? "Current plan" : plan.cta}
                 </button>
-              )}
-            </div>
-          );
-        })}
-      </section>
+              </article>
+            );
+          })}
+        </section>
 
-      {/* Footer */}
-      <footer className="w-full border-t border-slate-800 py-8 text-center text-slate-400 text-sm bg-black/70">
-        <p>© 2025 ChipLoop</p>
-        <div className="mt-2 space-x-4 text-slate-500">
-          <button onClick={() => router.push("/privacy")}>Privacy</button>
-          <button onClick={() => router.push("/terms")}>Terms</button>
-        </div>
-      </footer>
+        <section className="mt-10 overflow-hidden rounded-lg border border-slate-800 bg-slate-950/70">
+          <div className="border-b border-slate-800 px-5 py-4">
+            <h2 className="text-xl font-bold">Feature comparison</h2>
+            <p className="mt-1 text-sm text-slate-400">Trial checkout will require a credit card through Stripe. Paid-plan checkout is enabled only after server-side Stripe price IDs and coupons are configured.</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[980px] text-left text-sm">
+              <thead className="bg-slate-900/80 text-slate-300">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Feature</th>
+                  {plans.map((plan) => (
+                    <th key={plan.key} className="px-4 py-3 font-semibold">{plan.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800">
+                {featureRows.map((feature) => (
+                  <tr key={feature} className="text-slate-200">
+                    <td className="px-4 py-3 font-semibold text-slate-100">{feature}</td>
+                    {plans.map((plan) => (
+                      <td key={`${plan.key}-${feature}`} className="px-4 py-3 text-slate-300">
+                        {plan.features[feature]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
     </main>
   );
 }
 
 export default function PricingPage() {
   return (
-    <Suspense fallback={<div className="text-center p-10 text-white">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-black p-10 text-center text-white">Loading...</div>}>
       <PricingContent />
     </Suspense>
   );

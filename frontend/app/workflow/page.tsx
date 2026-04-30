@@ -713,7 +713,23 @@ function WorkflowPage() {
   // local catalog states
   const [customAgents, setCustomAgents] = useState<CatalogItem[]>([]);
 
-  type CustomWorkflowRow = { name: string; loop_type?: string | null };
+  type CustomWorkflowRow = {
+    id?: string;
+    name: string;
+    loop_type?: string | null;
+    is_prebuilt?: boolean | null;
+  };
+  type WorkflowRecord = {
+    id?: string;
+    name: string;
+    loop_type?: string | null;
+    definitions?: {
+      nodes?: unknown[];
+      edges?: unknown[];
+    } | null;
+    is_prebuilt?: boolean | null;
+  };
+  const [prebuiltWorkflows, setPrebuiltWorkflows] = useState<CustomWorkflowRow[]>([]);
   const [customWorkflows, setCustomWorkflows] = useState<CustomWorkflowRow[]>([]);
 
 
@@ -934,11 +950,13 @@ function WorkflowPage() {
       //  prev.map((n) => (n === renameTarget.oldName ? renameTarget.newName : n))
       //);
   
+      const userId = await getStableUserId(supabase);
+
       // backend rename
       const res = await fetch(`${API_BASE}/rename_custom_workflow`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(renameTarget),
+        body: JSON.stringify({ ...renameTarget, user_id: userId }),
       });
       const j = await res.json();
       if (j.status !== "ok") {
@@ -1378,6 +1396,8 @@ function WorkflowPage() {
 
         setCustomAgents(privateAgents);
 
+        await loadPrebuiltWorkflowsFromDB();
+
         setCustomWorkflows(
           savedWF.map((k) => {
             const name = k.replace("workflow_", "");
@@ -1388,7 +1408,10 @@ function WorkflowPage() {
         // setCustomWorkflows(savedWF.map((k) => k.replace("workflow_", "")));
   
         // Load from Supabase after local cache
-        setTimeout(() => loadCustomWorkflowsFromDB(), 600);
+        setTimeout(() => {
+          loadPrebuiltWorkflowsFromDB();
+          loadCustomWorkflowsFromDB();
+        }, 600);
       } catch (err) {
         console.error("❌ Error loading user or workflows:", err);
       } finally {
@@ -1405,6 +1428,7 @@ function WorkflowPage() {
   useEffect(() => {
     const refreshHandler = () => {
       console.log("🔄 Refreshing workflows (global trigger)");
+      loadPrebuiltWorkflowsFromDB();
       loadCustomWorkflowsFromDB();
     };
     window.addEventListener("refreshWorkflows", refreshHandler);
@@ -1706,80 +1730,8 @@ function WorkflowPage() {
   /* ---------- Derived ---------- */
   const prebuiltAgents = useMemo(() => LOOP_AGENTS[loop], [loop]);
 
-  const prebuiltWorkflows = useMemo(() => {
-    const all = {
-      digital: ["Verify_Loop", "Spec2RTL"],
-      analog: [],
-      embedded: ["Spec2Code", "Spec2Sim"],
-      system: ["Digital_IP_Prototype_Loop"],
-      validation: [],
-    };
-    return all[loop] ?? [];
-  }, [loop]);
-
-  const loadPrebuiltWorkflow = (wf: string) => {
-
-    setSelectedWorkflowName(wf);
-    setSelectedWorkflowId(null);
-    setSelectedWorkflowLoopType(loop);
-    // clear existing canvas
-    setNodes([]);
-    setEdges([]);
-  
-    if (loop === "digital" && wf.includes("Spec2RTL")) {
-      const n: Node<AgentNodeData>[] = [
-        { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
-        { id: "rtl",  type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
-      ];
-      const e: Edge[] = [
-        { id: "e-spec-rtl", source: "spec", target: "rtl", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-      ];
-      setNodes(n);
-      setEdges(e);
-    //  setShowSpecModal(true);
-    }
-    // if (loop === "analog" && wf.includes("Spec2Circuit")) {
-    //  const n: Node<AgentNodeData>[] = [
-    //    { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Analog Spec Agent" } },
-    //    { id: "netlist", type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "Netlist Agent", backendLabel: "Analog Netlist Agent" } },
-    //  ];
-    //  const e: Edge[] = [
-    //    { id: "e-spec-netlist", source: "spec", target: "netlist", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-    //  ];
-    //  setNodes(n);
-    //  setEdges(e);
-    //  setShowSpecModal(true);
-    //}
-    if (loop === "embedded" && wf.includes("Spec2Code")) {
-      const n: Node<AgentNodeData>[] = [
-        { id: "spec", type: "agentNode", position: { x: 100, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Embedded Spec Agent" } },
-        { id: "code", type: "agentNode", position: { x: 360, y: 200 }, data: { uiLabel: "Firmware Agent", backendLabel: "Embedded Code Agent" } },
-      ];
-      const e: Edge[] = [{ id: "e-spec-code", source: "spec", target: "code", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } }];
-      setNodes(n);
-      setEdges(e);
-    // setShowSpecModal(true);
-    }
-    if (loop === "system" && wf.includes("Digital_IP_Prototype_Loop")) {
-      const n: Node<AgentNodeData>[] = [
-        { id: "spec", type: "agentNode", position: { x: 80, y: 200 }, data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
-        { id: "rtl", type: "agentNode", position: { x: 300, y: 200 }, data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
-        { id: "code", type: "agentNode", position: { x: 520, y: 200 }, data: { uiLabel: "Firmware Agent", backendLabel: "Embedded Code Agent" } },
-        { id: "sim", type: "agentNode", position: { x: 740, y: 200 }, data: { uiLabel: "Sim Agent", backendLabel: "Embedded Sim Agent" } },
-        { id: "result", type: "agentNode", position: { x: 960, y: 200 }, data: { uiLabel: "Result Agent", backendLabel: "Embedded Result Agent" } },
-      ];
-    
-      const e: Edge[] = [
-        { id: "e1", source: "spec", target: "rtl", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-        { id: "e2", source: "rtl", target: "code", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-        { id: "e3", source: "code", target: "sim", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-        { id: "e4", source: "sim", target: "result", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-      ];
-    
-      setNodes(n);
-      setEdges(e);
-    //  setShowSpecModal(true);
-    }
+  const loadPrebuiltWorkflow = (wf: CustomWorkflowRow) => {
+    loadWorkflowFromDB(wf);
   };
 
   const loadCustomWorkflow = (wfName: string) => {
@@ -1791,6 +1743,29 @@ function WorkflowPage() {
     fitView({ padding: 0.2 });
   };
 
+  const workflowRowFromRecord = (w: WorkflowRecord): CustomWorkflowRow => ({
+    id: w.id,
+    name: w.name,
+    loop_type: w.loop_type || inferLoopTypeFromName(w.name),
+    is_prebuilt: w.is_prebuilt,
+  });
+
+  const loadPrebuiltWorkflowsFromDB = async () => {
+    const { data, error } = await supabase
+      .from("workflows")
+      .select("id, name, loop_type, is_prebuilt, status")
+      .eq("is_prebuilt", true)
+      .eq("status", "saved")
+      .order("name", { ascending: true });
+
+    if (error) {
+      console.error("Error loading prebuilt workflows:", error);
+      return;
+    }
+
+    setPrebuiltWorkflows(((data || []) as WorkflowRecord[]).map(workflowRowFromRecord));
+  };
+
   const loadCustomWorkflowsFromDB = async () => {
 
     const userId = await getStableUserId(supabase);
@@ -1798,9 +1773,10 @@ function WorkflowPage() {
 
     const { data, error } = await supabase
       .from("workflows")
-      .select("name, created_at, status")
+      .select("id, name, created_at, status, loop_type, is_prebuilt")
       .eq("user_id", userId)
       .eq("status", "saved")                 // ✅ ONLY show saved templates
+      .or("is_prebuilt.eq.false,is_prebuilt.is.null")
       .order("created_at", { ascending: false });
 
 
@@ -1837,10 +1813,7 @@ function WorkflowPage() {
   
     //const dbNames = (data || []).map((wf) => wf.name || `workflow_${wf.id}`);
 
-    const dbRows = (data || []).map((w: any) => ({
-      name: w.name,
-      loop_type: w.loop_type || inferLoopTypeFromName(w.name),
-    }));
+    const dbRows = ((data || []) as WorkflowRecord[]).map(workflowRowFromRecord);
     
     setCustomWorkflows(dbRows);
     
@@ -1855,54 +1828,66 @@ function WorkflowPage() {
     //console.log("📁 Loaded workflows:", union);
     //setCustomWorkflows(union);
   };
-  const loadWorkflowFromDB = async (wfName: string) => {
+  const loadWorkflowFromDB = async (workflow: string | CustomWorkflowRow) => {
     try {
-      // 1) Get user ID (session → anon → fail)
-      const userId = await getStableUserId(supabase);  // ✅ unified identity
+      const userId = await getStableUserId(supabase);
+      const wfName = typeof workflow === "string" ? workflow : workflow.name;
+      const wfId = typeof workflow === "string" ? undefined : workflow.id;
 
-      console.log(`🧠 Loading workflow: ${wfName} for user: ${userId}`);
- 
-      if (!userId) {
-        console.warn("⚠️ No user ID detected.");
-        return;
-      }
-  
+      console.log(`Loading workflow: ${wfName} for user: ${userId}`);
 
-  
-      // 2) Fetch workflow record
-      const { data, error } = await supabase
-        .from("workflows")
-        .select("id,loop_type,definitions")
-        .eq("user_id", userId)
-        .eq("name", wfName)
-        .maybeSingle();
+      let data: WorkflowRecord | null = null;
+      let error: { message?: string } | null = null;
 
-        if (!error && data) {
-          setSelectedWorkflowId(data.id);
-          setSelectedWorkflowLoopType(data.loop_type || null);
-        
-          // keep your existing logic that loads `definitions` into nodes/edges
+      if (wfId) {
+        const result = await supabase
+          .from("workflows")
+          .select("id,name,loop_type,definitions,is_prebuilt")
+          .eq("id", wfId)
+          .maybeSingle();
+        data = result.data as WorkflowRecord | null;
+        error = result.error;
+      } else {
+        const mine = await supabase
+          .from("workflows")
+          .select("id,name,loop_type,definitions,is_prebuilt")
+          .eq("user_id", userId)
+          .eq("name", wfName)
+          .eq("status", "saved")
+          .maybeSingle();
+
+        if (mine.data) {
+          data = mine.data as WorkflowRecord;
+          error = mine.error;
+        } else {
+          const prebuilt = await supabase
+            .from("workflows")
+            .select("id,name,loop_type,definitions,is_prebuilt")
+            .eq("name", wfName)
+            .eq("is_prebuilt", true)
+            .eq("status", "saved")
+            .maybeSingle();
+          data = prebuilt.data as WorkflowRecord | null;
+          error = prebuilt.error;
         }
-  
-      console.log("📦 Returned from Supabase:", data);
-  
+      }
+
+      console.log("Returned from Supabase:", data);
+
       if (error) {
-        console.error("❌ Supabase fetch error:", error.message);
+        console.error("Supabase fetch error:", error.message);
         return;
       }
       if (!data || !data.definitions) {
-        console.warn("⚠️ No definitions found for:", wfName);
+        console.warn("No definitions found for:", wfName);
         return;
       }
-  
+
       const defs = data.definitions;
-      const nodes = defs.nodes || [];
-      const edges = defs.edges || [];
-  
-      // 3) Normalize nodes for ReactFlow rendering
+
       const parsedNodes = (defs.nodes || []).map((n: any, i: number) => ({
         id: n.id || `n${i}`,
-        type: "agentNode", // <----- IMPORTANT!!!
+        type: "agentNode",
         position: n.position || { x: 100 + i * 220, y: 200 },
         data: {
           uiLabel: n.data?.uiLabel || n.data?.label || n.data?.backendLabel || "Agent",
@@ -1910,8 +1895,7 @@ function WorkflowPage() {
           desc: n.data?.desc || "",
         },
       }));
-  
-      // 4) Normalize edges
+
       const parsedEdges = (defs.edges || []).map((e: any, i: number) => ({
         id: e.id || `e${i}`,
         source: e.source || e.from,
@@ -1919,23 +1903,26 @@ function WorkflowPage() {
         animated: true,
         style: { stroke: "#22d3ee", strokeWidth: 2 },
       }));
-  
-      console.log(`✅ Parsed ${parsedNodes.length} nodes & ${parsedEdges.length} edges`);
-  
-      // 5) Update canvas
+
+      setSelectedWorkflowName(data.name || wfName);
+      setSelectedWorkflowId(data.id || null);
+      setSelectedWorkflowLoopType(data.loop_type || null);
+      if (data.loop_type && ["digital", "analog", "embedded", "system", "validation"].includes(data.loop_type)) {
+        setLoop(data.loop_type as LoopKey);
+      }
+
+      console.log(`Parsed ${parsedNodes.length} nodes & ${parsedEdges.length} edges`);
       setNodes(parsedNodes);
       setEdges(parsedEdges);
-  
+
       setTimeout(() => {
         fitView({ padding: 0.25, duration: 600 });
-        console.log("🎨 fitView executed — workflow rendered");
+        console.log("fitView executed - workflow rendered");
       }, 50);
-  
     } catch (err) {
-      console.error("🔥 Unexpected load error:", err);
+      console.error("Unexpected load error:", err);
     }
   };
-
 
   const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string,testPlanName?:string,previewTestPlanOverride?: any) => {
     const formData = new FormData();
@@ -2430,32 +2417,34 @@ function WorkflowPage() {
             <div className="pl-2">
               <p className="text-sm text-cyan-400 font-medium mb-1">Prebuilt</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
-                {prebuiltWorkflows.map((wf) => (
+                {prebuiltWorkflows
+                  .filter((w) => (w.loop_type || inferLoopTypeFromName(w.name)) === loop)
+                  .map((wf) => (
                   <li
-                    key={wf}
+                    key={wf.id || wf.name}
                     onClick={() => loadPrebuiltWorkflow(wf)}
                     className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
                   >
-                    {wf}
+                    {wf.name}
                   </li>
                 ))}
               </ul>
           {customWorkflows && customWorkflows.length > 0 && (
             <>
-              <p className="text-sm text-cyan-400 font-medium mb-1">Custom</p>
+              <p className="text-sm text-cyan-400 font-medium mb-1">My Workflows</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
 
                 {customWorkflows
                   .filter((w) => (w.loop_type || inferLoopTypeFromName(w.name)) === loop)
                   .map((w) => (
                     <button
-                      key={w.name}
+                      key={w.id || w.name}
                       className={`w-full text-left px-2 py-1 rounded text-xs hover:bg-slate-700 ${
                         selectedWorkflowName === w.name ? "bg-slate-700 border border-cyan-400" : ""
                       }`}
                       onClick={() => {
                         setSelectedWorkflowName(w.name);
-                        loadWorkflowFromDB(w.name);
+                        loadWorkflowFromDB(w);
                         // ✅ load runs for this workflow (localStorage)
                         const loaded = loadRunsForWorkflow(w.name);
                         setRuns(loaded);
@@ -2637,12 +2626,14 @@ function WorkflowPage() {
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     user_id: userId,
-                    name: workflowName.trim(),
-                    goal: "",
-                    summary: `Workflow created from canvas: ${workflowName}`,
-                    loop_type: loop.toLowerCase(),   // ✅ correct loop
-                    definitions: { nodes, edges },   // ✅ actual workflow graph!
-                    status: "saved",
+                    workflow: {
+                      workflow_name: workflowName.trim(),
+                      goal: "",
+                      summary: `Workflow created from canvas: ${workflowName}`,
+                      loop_type: loop.toLowerCase(),
+                      nodes,
+                      edges,
+                    },
                   }),
                 });
             
