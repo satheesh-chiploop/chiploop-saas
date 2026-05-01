@@ -197,7 +197,7 @@ export default function SystemSoftwareAppPage() {
             onClick={() => router.push("/apps")}
             className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700"
           >
-            ← Back to Apps
+            Back to Apps
           </button>
           <button
             onClick={() => router.push("/workflow")}

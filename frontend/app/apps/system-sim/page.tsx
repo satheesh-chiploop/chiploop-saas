@@ -163,7 +163,7 @@ export default function SystemSimAppPage() {
       <div className="mx-auto max-w-6xl px-6 py-10">
         <div className="flex items-center justify-between">
           <button onClick={() => router.push("/apps")} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
-            ← Back to Apps
+            Back to Apps
           </button>
           <button onClick={() => router.push("/workflow")} className="rounded-xl border border-slate-700 px-4 py-2 hover:bg-slate-900">
             Studio

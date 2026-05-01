@@ -1,4 +1,4 @@
-﻿// âœ… AFTER: app_apps_page.tsx (minimal edits only)
+// ✅ AFTER: app_apps_page.tsx (minimal edits only)
 
 "use client";
 
@@ -59,11 +59,11 @@ type AppCard = {
 };
 
 const LOOP_META: Record<LoopType, { title: string; tagline: string; accent: string }> = {
-  digital: { title: "Digital Loop", tagline: "Design â†’ RTL â†’ Verify â†’ Improve", accent: "accent-digital" },
-  validation: { title: "Validation Loop", tagline: "Plan â†’ Run â†’ Learn â†’ Improve", accent: "accent-validation" },
-  analog: { title: "Analog Loop", tagline: "Analyze â†’ Simulate â†’ Correlate â†’ Improve", accent: "accent-analog" },
-  embedded: { title: "Embedded(Firmware) Loop", tagline: "Code â†’ Run â†’ Observe â†’ Fix", accent: "accent-embedded" },
-  system: { title: "System Loop", tagline: "Integrate â†’ Analyze â†’ Optimize", accent: "accent-system" },
+  digital: { title: "Digital Loop", tagline: "Design to RTL to Verify to Improve", accent: "accent-digital" },
+  validation: { title: "Validation Loop", tagline: "Plan to Run to Learn to Improve", accent: "accent-validation" },
+  analog: { title: "Analog Loop", tagline: "Analyze to Simulate to Correlate to Improve", accent: "accent-analog" },
+  embedded: { title: "Embedded(Firmware) Loop", tagline: "Code to Run to Observe to Fix", accent: "accent-embedded" },
+  system: { title: "System Loop", tagline: "Integrate to Analyze to Optimize", accent: "accent-system" },
 };
 
 export default function AppsHomePage() {
@@ -102,7 +102,7 @@ export default function AppsHomePage() {
     return () => { mounted = false; };
   }, []);
 
-  // âœ… updated apps list (only change is digital apps)
+  // ✅ updated apps list (only change is digital apps)
   const apps: AppCard[] = useMemo(() => ([
     {
       slug: "validation-run",
@@ -114,11 +114,11 @@ export default function AppsHomePage() {
       promise: "Get run results + gaps + exec report",
     },
 
-    // âœ… NEW DIGITAL FLAGSHIPS
+    // ✅ NEW DIGITAL FLAGSHIPS
     {
       slug: "arch2rtl",
       title: "Arch2RTL",
-      subtitle: "Spec â†’ Architecture â†’ Microarch â†’ RTL â†’ Handoff package",
+      subtitle: "Spec to Architecture to Microarch to RTL to Handoff package",
       loop_type: "digital",
       status: "Flagship",
       nudge: "Most used",
@@ -127,7 +127,7 @@ export default function AppsHomePage() {
     {
       slug: "arch2synthesis",
       title: "Arch2Synthesis",
-      subtitle: "Arch2RTL + Synthesis (or RTL â†’ Synthesis) with reports",
+      subtitle: "Arch2RTL + Synthesis (or RTL to Synthesis) with reports",
       loop_type: "digital",
       status: "Flagship",
       nudge: "Fast path",
@@ -137,11 +137,11 @@ export default function AppsHomePage() {
     {
       slug: "arch2tapeout",
       title: "Arch2Tapeout",
-      subtitle: "Arch2RTL + Synthesis + RTLâ†’GDS pipeline (partial runs supported)",
+      subtitle: "Arch2RTL + Synthesis + RTL->GDS pipeline (partial runs supported)",
       loop_type: "digital",
       status: "Flagship",
       nudge: "End-to-end",
-      promise: "Run RTLâ†’GDS with DRC/LVS/Tapeout + exec summary",
+      promise: "Run RTL->GDS with DRC/LVS/Tapeout + exec summary",
     },
     {
       slug: "dqa",
@@ -173,7 +173,7 @@ export default function AppsHomePage() {
     {
       slug: "integrate",
       title: "Integrate",
-      subtitle: "Text â†’ Integration intent â†’ Top RTL + report",
+      subtitle: "Text to Integration intent to Top RTL + report",
       loop_type: "digital",
       status: "Flagship",
       nudge: "New",
@@ -183,7 +183,7 @@ export default function AppsHomePage() {
     {
       slug: "validation-plan",
       title: "Validation Plan & Coverage",
-      subtitle: "Datasheet/spec â†’ test plan + coverage map + gaps",
+      subtitle: "Datasheet/spec to test plan + coverage map + gaps",
       loop_type: "validation",
       status: "Flagship",
       nudge: "New",
@@ -192,7 +192,7 @@ export default function AppsHomePage() {
     {
       slug: "bench-setup",
       title: "Bench Setup",
-      subtitle: "Register instruments â†’ create bench â†’ schematic â†’ preflight",
+      subtitle: "Register instruments to create bench to schematic to preflight",
       loop_type: "validation",
       status: "Flagship",
       nudge: "Recommended",
@@ -210,18 +210,18 @@ export default function AppsHomePage() {
     {
       slug: "validation-insights",
       title: "Validation Insights",
-      subtitle: "Analyze past runs â†’ patterns â†’ evolve plan + coverage",
+      subtitle: "Analyze past runs to patterns to evolve plan + coverage",
       loop_type: "validation",
       status: "Flagship",
       nudge: "New",
       promise: "Turn history into next test improvements",
     },
 
-    // âœ… NEW ANALOG APPS
+    // ✅ NEW ANALOG APPS
     {
       slug: "analog-run",
       title: "Analog Run",
-      subtitle: "Spec â†’ Netlist â†’ Model â†’ Validate â†’ Correlate â†’ Iterate",
+      subtitle: "Spec to Netlist to Model to Validate to Correlate to Iterate",
       loop_type: "analog",
       status: "Flagship",
       nudge: "Recommended",
@@ -230,7 +230,7 @@ export default function AppsHomePage() {
     {
       slug: "analog-spec",
       title: "Analog Spec",
-      subtitle: "Text â†’ structured spec + open questions",
+      subtitle: "Text to structured spec + open questions",
       loop_type: "analog",
       status: "Flagship",
       nudge: "Most used",
@@ -239,7 +239,7 @@ export default function AppsHomePage() {
     {
       slug: "analog-netlist",
       title: "Analog Netlist",
-      subtitle: "Spec â†’ SPICE scaffold + sim plan",
+      subtitle: "Spec to SPICE scaffold + sim plan",
       loop_type: "analog",
       status: "Flagship",
       nudge: "New",
@@ -248,7 +248,7 @@ export default function AppsHomePage() {
     {
       slug: "analog-model",
       title: "Analog Model",
-      subtitle: "Spec â†’ SV RNM / Verilog-A behavioral model",
+      subtitle: "Spec to SV RNM / Verilog-A behavioral model",
       loop_type: "analog",
       status: "Flagship",
       nudge: "Most used",
@@ -291,11 +291,11 @@ export default function AppsHomePage() {
       promise: "PnR/STA handoff",
     },   
 
-    // âœ… EMBEDDED (production firmware chain)
+    // ✅ EMBEDDED (production firmware chain)
     {
       slug: "embedded-run",
       title: "Embedded Run",
-      subtitle: "End-to-end firmware flow: HAL â†’ Drivers â†’ Boot â†’ Diagnostics â†’ Co-sim â†’ Report",
+      subtitle: "End-to-end firmware flow: HAL to Drivers to Boot to Diagnostics to Co-sim to Report",
       loop_type: "embedded",
       status: "Flagship",
       nudge: "Recommended",
@@ -304,7 +304,7 @@ export default function AppsHomePage() {
     {
       slug: "embedded-hal",
       title: "Embedded HAL",
-      subtitle: "Register extraction â†’ Rust HAL layer â†’ validation",
+      subtitle: "Register extraction to Rust HAL layer to validation",
       loop_type: "embedded",
       status: "Flagship",
       nudge: "New",
@@ -340,7 +340,7 @@ export default function AppsHomePage() {
     {
       slug: "embedded-log-analyzer",
       title: "Embedded Log Analyzer",
-      subtitle: "Logs â†’ fault classification â†’ root cause â†’ fix plan",
+      subtitle: "Logs to fault classification to root cause to fix plan",
       loop_type: "embedded",
       status: "Flagship",
       nudge: "New",
@@ -355,11 +355,11 @@ export default function AppsHomePage() {
       nudge: "New",
       promise: "Co-sim results + coverage report",
     },
-    // âœ… SYSTEM (Tiny Sensor Hub SoC)
+    // ✅ SYSTEM (Tiny Sensor Hub SoC)
     {
       slug: "system-end2end",
       title: "System End2End",
-      subtitle: "Digital + Analog + SoC integration â†’ Sim + PD + Firmware â†’ ZIP",
+      subtitle: "Digital + Analog + SoC integration to Sim + PD + Firmware to ZIP",
       loop_type: "system",
       status: "Flagship",
       nudge: "Recommended",
@@ -386,7 +386,7 @@ export default function AppsHomePage() {
     {
       slug: "system-rtl",
       title: "System RTL",
-      subtitle: "Digital + Analog + SoC intent â†’ integrated top RTL + handoff package",
+      subtitle: "Digital + Analog + SoC intent to integrated top RTL + handoff package",
       loop_type: "system",
       status: "Flagship",
       nudge: "New",
@@ -395,7 +395,7 @@ export default function AppsHomePage() {
     {
       slug: "system-firmware",
       title: "System Firmware",
-      subtitle: "Register extract â†’ driver scaffold â†’ build â†’ co-sim results",
+      subtitle: "Register extract to driver scaffold to build to co-sim results",
       loop_type: "system",
       status: "Flagship",
       nudge: "New",
@@ -404,7 +404,7 @@ export default function AppsHomePage() {
     {
       slug: "system-software",
       title: "System Software",
-      subtitle: "Firmware handoff â†’ SDK â†’ API â†’ applications",
+      subtitle: "Firmware handoff to SDK to API to applications",
       loop_type: "system",
       status: "Flagship",
       nudge: "New",
@@ -413,7 +413,7 @@ export default function AppsHomePage() {
     {
       slug: "system-software-validation",
       title: "System Software Validation",
-      subtitle: "Validate software package or run full software â†’ firmware â†’ RTL co-simulation",
+      subtitle: "Validate software package or run full software to firmware to RTL co-simulation",
       loop_type: "system",
       status: "Flagship",
       nudge: "New",
@@ -425,20 +425,20 @@ export default function AppsHomePage() {
   const featured = apps.find(a => a.slug === "arch2tapeout") || apps[0];
 
   const FLAGSHIP_SLUGS = new Set<string>([
-    // Validation (1â€“2)
+    // Validation (1–2)
     "validation-run",
     "validation-plan",
 
-    // Digital (1â€“2)
+    // Digital (1–2)
     "arch2rtl",
     "arch2synthesis",
     "dqa",
 
-    // Analog (1â€“2)
+    // Analog (1–2)
     "analog-run",
     "analog-model",
 
-    // Embedded (1â€“2)
+    // Embedded (1–2)
     "embedded-run",
     "embedded-driver",
 
@@ -492,7 +492,7 @@ export default function AppsHomePage() {
   
 
   const routeForApp = (slug: string) => {
-    // âœ… Dedicated pages (apps with custom UX)
+    // ✅ Dedicated pages (apps with custom UX)
 
     const dedicated: Record<string, string> = {
       // Validation (dedicated pages)
@@ -511,7 +511,7 @@ export default function AppsHomePage() {
       "verify": "/apps/verify",
       "smoke": "/apps/smoke",
 
-      // âœ… ANALOG
+      // ✅ ANALOG
       "analog-run": "/apps/analog-run",
       "analog-spec": "/apps/analog-spec",
       "analog-netlist": "/apps/analog-netlist",
@@ -521,7 +521,7 @@ export default function AppsHomePage() {
       "analog-iterate": "/apps/analog-iterate",
       "analog-abstracts": "/apps/analog-abstracts",
 
-      // âœ… EMBEDDED (dedicated pages)
+      // ✅ EMBEDDED (dedicated pages)
       "embedded-hal": "/apps/embedded-hal",
       "embedded-driver": "/apps/embedded-driver",
       "embedded-boot": "/apps/embedded-boot",
@@ -530,7 +530,7 @@ export default function AppsHomePage() {
       "embedded-validate": "/apps/embedded-validate",
       "embedded-run": "/apps/embedded-run",
 
-      // âœ… SYSTEM (dedicated pages)
+      // ✅ SYSTEM (dedicated pages)
       "system-end2end": "/apps/system-end2end",
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
@@ -631,7 +631,7 @@ export default function AppsHomePage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-xs text-slate-400">
-                  Welcome{userEmail ? `, ${userEmail}` : ""} â€¢ <span className="text-cyan-300">Start here</span>
+                  Welcome{userEmail ? `, ${userEmail}` : ""} • <span className="text-cyan-300">Start here</span>
                 </div>
                 <h1 className="mt-2 text-3xl font-extrabold leading-tight">
                   Run outcomes, not workflows.
@@ -669,7 +669,7 @@ export default function AppsHomePage() {
                   </div>
 
                   <div className="mt-4 text-xs text-slate-500">
-                    Progressive outputs â€¢ Executive summary â€¢ ZIP artifacts
+                    Progressive outputs • Executive summary • ZIP artifacts
                   </div>
                 </div>
               </div>
@@ -692,16 +692,16 @@ export default function AppsHomePage() {
                     Recommended
                   </span>
                 </div>
-                <div className="mt-1 text-sm text-slate-400">Bench â†’ instruments â†’ preflight â†’ run â†’ report</div>
+                <div className="mt-1 text-sm text-slate-400">Bench to instruments to preflight to run to report</div>
               </button>
 
-              {/* âœ… change this to Arch2RTL */}
+              {/* ✅ change this to Arch2RTL */}
               <button
                 onClick={() => go("/apps/arch2rtl")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
               >
                 <div className="flex items-center justify-between">
-                  <div className="font-semibold">Digital - Spec â†’ RTL + handoff</div>
+                  <div className="font-semibold">Digital - Spec to RTL + handoff</div>
                   <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
                     Most used
                   </span>
@@ -709,7 +709,7 @@ export default function AppsHomePage() {
                 <div className="mt-1 text-sm text-slate-400"> Digital - Arch2RTL: docs + SV + package</div>
               </button>
 
-              {/* âœ… NEW: Analog daily-use */}
+              {/* ✅ NEW: Analog daily-use */}
               <button
                 onClick={() => go("/apps/analog-run")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
@@ -720,10 +720,10 @@ export default function AppsHomePage() {
                     Recommended
                   </span>
                 </div>
-                  <div className="mt-1 text-sm text-slate-400">Analog Run: netlist â†’ model â†’ validate â†’ correlate</div>
+                  <div className="mt-1 text-sm text-slate-400">Analog Run: netlist to model to validate to correlate</div>
               </button>
 
-              {/* âœ… NEW: Embedded daily-use */}
+              {/* ✅ NEW: Embedded daily-use */}
               <button
                 onClick={() => go("/apps/embedded-run")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
@@ -734,7 +734,7 @@ export default function AppsHomePage() {
                     Recommended
                   </span>
                 </div>
-                  <div className="mt-1 text-sm text-slate-400">Embedded Run: HAL â†’ drivers â†’ boot â†’ diagnostics â†’ report</div>
+                  <div className="mt-1 text-sm text-slate-400">Embedded Run: HAL to drivers to boot to diagnostics to report</div>
               </button>
             </div>
 
@@ -749,7 +749,7 @@ export default function AppsHomePage() {
                 </span>
               </div>
               <div className="mt-1 text-sm text-slate-400">
-                Software validation or full co-simulation (SW â†’ FW â†’ RTL)
+                Software validation or full co-simulation (SW to FW to RTL)
               </div>
             </button>
 
@@ -809,7 +809,7 @@ export default function AppsHomePage() {
                   Outcome: <span className="text-slate-200">{app.promise}</span>
                 </div>
               ) : null}
-              <div className="mt-4 text-xs text-slate-500">One click â†’ progressive outputs â†’ ZIP</div>
+              <div className="mt-4 text-xs text-slate-500">One click to progressive outputs to ZIP</div>
             </button>
           ))}
         </div>
@@ -867,7 +867,7 @@ export default function AppsHomePage() {
                           </span>
                         ) : <span />}
 
-                        <span className="text-xs text-slate-500">Open â†’</span>
+                        <span className="text-xs text-slate-500">Open</span>
                       </div>
                     </button>
                   ))}
@@ -891,6 +891,7 @@ export default function AppsHomePage() {
     </main>
   );
 }
+
 
 
 

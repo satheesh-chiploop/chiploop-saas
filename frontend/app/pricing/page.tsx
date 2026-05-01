@@ -163,7 +163,7 @@ function PricingContent() {
 
   const currentPlanName = useMemo(() => {
     if (!currentPlan) return null;
-    if (currentPlan === "trial") return "Trial / Beta";
+    if (currentPlan === "trial") return "7-day Trial";
     return plans.find((plan) => plan.key === currentPlan)?.name || null;
   }, [currentPlan]);
 
@@ -187,7 +187,7 @@ function PricingContent() {
             Developer automation with SDK and CLI starts at Pro.
           </p>
           <p className="mt-3 text-sm text-cyan-100">
-            Starter, Pro, and Pro Max receive 25% off for the first 3 months after checkout is connected.
+            Start with a 7-day trial, then auto-convert to Starter at $19.99/month unless canceled. Starter, Pro, and Pro Max receive 25% off for the first 3 months after checkout is connected.
           </p>
           {currentPlanName ? (
             <div className="mt-4 inline-flex rounded-lg border border-cyan-700/60 bg-cyan-950/30 px-3 py-2 text-sm text-cyan-100">
@@ -195,6 +195,23 @@ function PricingContent() {
             </div>
           ) : null}
         </div>
+
+        <section className="mt-8 rounded-lg border border-cyan-800/70 bg-cyan-950/25 p-5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">7-day trial</div>
+              <p className="mt-2 text-sm leading-6 text-cyan-50">
+                Start with 100 credits. No charge during trial. Converts to Starter at $19.99/month after 7 days unless canceled.
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/login?mode=signup&trial=1")}
+              className="rounded-lg bg-cyan-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-cyan-500"
+            >
+              Start 7-day trial
+            </button>
+          </div>
+        </section>
 
         <section className="mt-10 grid gap-4 lg:grid-cols-4">
           {plans.map((plan) => {

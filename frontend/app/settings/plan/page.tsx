@@ -167,7 +167,7 @@ export default function SettingsPlanPage() {
                 <div className="text-sm font-semibold text-cyan-100">Trial status</div>
                 <div className="mt-2 text-sm text-cyan-100/85">
                   {trial.status === "active"
-                    ? `${trial.days_remaining ?? "-"} days remaining. Starter is $19.99/month after trial/beta access. Cancel anytime before paid conversion.`
+                    ? `${trial.days_remaining ?? "-"} days remaining. Starter is $19.99/month after the 7-day trial. Cancel anytime before paid conversion.`
                     : `Trial ${trial.status}.`}
                 </div>
               </section>

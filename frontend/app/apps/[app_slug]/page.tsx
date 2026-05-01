@@ -70,7 +70,7 @@ export default function AppSlugRouter() {
             className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 transition"
             onClick={() => router.push("/apps")}
           >
-            ← Back to Apps
+            Back to Apps
           </button>
           <button
             className="rounded-xl border border-slate-700 px-4 py-2 hover:bg-slate-900 transition"

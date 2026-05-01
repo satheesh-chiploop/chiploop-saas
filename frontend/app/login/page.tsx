@@ -50,7 +50,7 @@ export default function LoginPage() {
   if (!authChecked) {
     return (
       <main className="min-h-screen flex flex-col justify-center items-center bg-[#0b0b0c] text-white">
-        <div className="text-slate-300">Checking sessionâ€¦</div>
+        <div className="text-slate-300">Checking session...</div>
       </main>
     );
   }
@@ -80,7 +80,7 @@ export default function LoginPage() {
       toast.success(
         mode === "signup"
           ? trialIntent
-            ? "Account created. Complete Stripe trial checkout before paid usage."
+            ? "Account created. Complete Stripe trial checkout to start your 7-day trial."
             : "Account created! Check your email to confirm."
           : "Welcome back!"
       );
@@ -106,7 +106,7 @@ export default function LoginPage() {
     });
     setLoading(false);
     if (error) toast.error(error.message);
-    else toast.success("âœ… Magic link sent! Check your inbox.");
+    else toast.success("Magic link sent. Check your inbox.");
   };
 
   return (
@@ -114,7 +114,7 @@ export default function LoginPage() {
       <Toaster position="top-center" reverseOrder={false} />
       <div className="bg-slate-900 border border-slate-700 p-8 rounded-2xl shadow-2xl w-96">
         <h1 className="text-3xl font-extrabold text-cyan-400 text-center mb-4">
-          {mode === "signup" && trialIntent ? "Start ChipLoop Trial" : "ChipLoop Login"}
+          {mode === "signup" && trialIntent ? "Start ChipLoop 7-Day Trial" : "ChipLoop Login"}
         </h1>
 
         {/* Toggle between Sign In / Sign Up */}
@@ -143,7 +143,7 @@ export default function LoginPage() {
 
         {mode === "signup" && trialIntent ? (
           <div className="mb-5 rounded-lg border border-cyan-700/60 bg-cyan-950/30 p-3 text-sm text-cyan-100">
-            Free 30-day trial. $4.99/month after 30 days. Credit card required via Stripe. Cancel anytime before trial ends.
+            Free 7-day trial. Starter is $19.99/month after 7 days. Credit card required via Stripe. Cancel anytime before trial ends.
           </div>
         ) : null}
 
@@ -199,7 +199,7 @@ export default function LoginPage() {
       </div>
 
       <p className="text-gray-500 text-xs mt-6">
-        Secure login powered by Supabase Auth. Trial billing will be handled by Stripe.
+        Secure login powered by Supabase Auth. Trial billing is handled by Stripe.
       </p>
     </main>
   );
