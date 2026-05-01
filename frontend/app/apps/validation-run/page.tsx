@@ -467,7 +467,7 @@ export default function ValidationRunAppPage() {
       <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/apps")} className="flex items-center gap-2 text-xl font-extrabold">
-            <span className="text-cyan-400">CHIPLOOP</span>
+            <span className="text-cyan-400">ChipLoop</span>
             <span className="text-slate-400">/</span>
             <span className="text-slate-200">Validation Run</span>
           </button>

@@ -1,8 +1,9 @@
 ﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { apiGet, apiPost } from "@/lib/apiClient";
+import TopNav from "@/components/TopNav";
 
 type Listing = {
   id: string;
@@ -26,7 +27,6 @@ type DetailResponse = { status: string; agent: Listing };
 type InstallResponse = { status: string; installed_agent?: { agent_name?: string } };
 
 export default function MarketplaceAgentDetailPage() {
-  const router = useRouter();
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
   const [agent, setAgent] = useState<Listing | null>(null);
@@ -83,12 +83,7 @@ export default function MarketplaceAgentDetailPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <button onClick={() => router.push("/marketplace")} className="text-xl font-extrabold text-cyan-400">Marketplace</button>
-          <button onClick={() => router.push("/workflow")} className="rounded-xl border border-slate-700 px-4 py-2 text-slate-200 hover:bg-slate-900">Studio</button>
-        </div>
-      </div>
+      <TopNav current="marketplace" showMarketplace maxWidthClass="max-w-6xl" />
 
       <section className="mx-auto max-w-6xl px-6 py-8">
         {loading ? <div className="text-slate-400">Loading...</div> : null}

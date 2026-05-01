@@ -114,7 +114,7 @@ export default function LoginPage() {
       <Toaster position="top-center" reverseOrder={false} />
       <div className="bg-slate-900 border border-slate-700 p-8 rounded-2xl shadow-2xl w-96">
         <h1 className="text-3xl font-extrabold text-cyan-400 text-center mb-4">
-          {mode === "signup" && trialIntent ? "Start ChipLoop Trial" : "CHIPLOOP Login"}
+          {mode === "signup" && trialIntent ? "Start ChipLoop Trial" : "ChipLoop Login"}
         </h1>
 
         {/* Toggle between Sign In / Sign Up */}

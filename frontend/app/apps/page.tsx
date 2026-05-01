@@ -6,7 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { apiGet, apiPost } from "@/lib/apiClient";
-import { LowCreditBanner, PlanCreditBadge } from "@/components/PlanCreditStatus";
+import { LowCreditBanner } from "@/components/PlanCreditStatus";
+import TopNav from "@/components/TopNav";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -548,7 +549,7 @@ export default function AppsHomePage() {
         <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <button className="flex items-center gap-2 text-xl font-extrabold" onClick={() => go("/apps")}>
-              <span className="text-cyan-400">CHIPLOOP</span>
+              <span className="text-cyan-400">ChipLoop</span>
               <span className="text-slate-400">/</span>
               <span className="text-slate-200">First Run</span>
             </button>
@@ -620,52 +621,7 @@ export default function AppsHomePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      {/* Top bar */}
-      <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <button
-            className="flex items-center gap-2 text-xl font-extrabold"
-            onClick={() => go("/")}
-            title="Home"
-          >
-            <span className="text-cyan-400">CHIPLOOP</span>
-            <span className="text-slate-400">/</span>
-            <span className="text-slate-200">Apps</span>
-          </button>
-
-          <div className="flex items-center gap-3">
-            <PlanCreditBadge />
-            <button
-              onClick={() => go("/")}
-              className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 hover:bg-slate-900 transition"
-            >
-              Home
-            </button>
-            <button
-              onClick={() => go("/workflow")}
-              className="rounded-xl bg-slate-800 px-4 py-2 text-slate-200 hover:bg-slate-700 transition"
-              title="Advanced Builder"
-            >
-              Studio
-            </button>
-            <button
-              onClick={() => go("/settings/api-keys")}
-              className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 hover:bg-slate-900 transition"
-            >
-              Settings
-            </button>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                go("/");
-              }}
-              className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 hover:bg-slate-900 transition"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
+      <TopNav current="apps" showPlanBadge maxWidthClass="max-w-6xl" />
       <LowCreditBanner />
 
       {/* Hero */}
@@ -935,6 +891,7 @@ export default function AppsHomePage() {
     </main>
   );
 }
+
 
 
 

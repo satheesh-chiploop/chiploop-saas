@@ -1,8 +1,8 @@
 ﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { apiGet, apiPost } from "@/lib/apiClient";
+import TopNav from "@/components/TopNav";
 
 type Submission = {
   id?: string;
@@ -27,7 +27,6 @@ function agentName(item: Submission): string {
 }
 
 export default function AdminMarketplacePage() {
-  const router = useRouter();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selected, setSelected] = useState<Submission | null>(null);
   const [notes, setNotes] = useState("");
@@ -69,12 +68,7 @@ export default function AdminMarketplacePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <button onClick={() => router.push("/apps")} className="text-xl font-extrabold text-cyan-400">CHIPLOOP / Admin Marketplace</button>
-          <button onClick={() => router.push("/marketplace")} className="rounded-xl border border-slate-700 px-4 py-2 text-slate-200 hover:bg-slate-900">Marketplace</button>
-        </div>
-      </div>
+      <TopNav current="admin" showMarketplace showAdmin showPlanBadge maxWidthClass="max-w-7xl" />
 
       <section className="mx-auto grid max-w-7xl gap-5 px-6 py-8 lg:grid-cols-[360px_1fr]">
         <aside className="rounded-2xl border border-slate-800 bg-slate-950/55 p-4">

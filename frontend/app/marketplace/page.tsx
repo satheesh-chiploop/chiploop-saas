@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiGet } from "@/lib/apiClient";
+import TopNav from "@/components/TopNav";
 
 type Listing = {
   id: string;
@@ -57,15 +58,7 @@ export default function MarketplacePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <button onClick={() => router.push("/apps")} className="text-xl font-extrabold text-cyan-400">CHIPLOOP / Marketplace</button>
-          <div className="flex gap-3">
-            <button onClick={() => router.push("/workflow")} className="rounded-xl border border-slate-700 px-4 py-2 text-slate-200 hover:bg-slate-900">Studio</button>
-            <button onClick={() => router.push("/settings/plan")} className="rounded-xl border border-slate-700 px-4 py-2 text-slate-200 hover:bg-slate-900">Settings</button>
-          </div>
-        </div>
-      </div>
+      <TopNav current="marketplace" showMarketplace maxWidthClass="max-w-6xl" />
 
       <section className="mx-auto max-w-6xl px-6 py-8">
         <div className="rounded-2xl border border-slate-800 bg-slate-900/35 p-6">

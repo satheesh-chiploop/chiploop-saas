@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import TopNav from "@/components/TopNav";
 
 type FormState = {
   name: string;
@@ -60,17 +61,9 @@ export default function WebinarRegistrationPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
-      <div className="mx-auto max-w-5xl">
-        <nav className="mb-10 flex items-center justify-between">
-          <button onClick={() => router.push("/")} className="text-xl font-extrabold text-cyan-300">
-            ChipLoop
-          </button>
-          <button onClick={() => router.push("/")} className="text-sm font-semibold text-slate-300 hover:text-cyan-300">
-            Back to home
-          </button>
-        </nav>
-
+    <main className="min-h-screen bg-slate-950 text-white">
+      <TopNav current="webinar" showWebinar showSettings={false} maxWidthClass="max-w-5xl" />
+      <div className="mx-auto max-w-5xl px-6 py-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-8">
             <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Weekly ChipLoop Webinar</p>

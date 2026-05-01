@@ -170,7 +170,7 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
             onClick={() => router.push("/apps")}
             title="Apps Home"
           >
-            <span className="text-cyan-400">CHIPLOOP</span>
+            <span className="text-cyan-400">ChipLoop</span>
             <span className="text-slate-400">/</span>
             <span className="text-slate-200">{title}</span>
           </button>

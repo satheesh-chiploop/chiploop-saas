@@ -26,7 +26,8 @@ import PlannerModal from "@/components/PlannerModal";
 import AgentPlannerModal from "@/components/AgentPlannerModal";
 import StudioAgentPlannerModal from "@/components/studio/AgentPlannerModal";
 import DagPreviewModal from "@/components/studio/DagPreviewModal";
-import { LowCreditBanner, PlanCreditBadge } from "@/components/PlanCreditStatus";
+import { LowCreditBanner } from "@/components/PlanCreditStatus";
+import TopNav from "@/components/TopNav";
 /* =========================
    Types & Constants
 ========================= */
@@ -2320,39 +2321,7 @@ function WorkflowPage() {
   ========================= */
   return (
     <main className="h-screen overflow-hidden bg-[#0b0b0c] text-white flex flex-col">
-      {/* ===== Top bar ===== */}
-      <nav className="w-full flex justify-between items-center px-6 py-4 bg-black/70 backdrop-blur border-b border-slate-800">
-        <div
-          onClick={() => router.push("/")}
-          className="text-2xl font-extrabold text-cyan-400 cursor-pointer"
-        >
-          CHIPLOOP âš¡
-        </div>
-        <div className="flex items-center gap-6 text-slate-300">
-          <PlanCreditBadge />
-          <button onClick={() => router.push("/")} className="hover:text-cyan-400 transition">
-            Home
-          </button>
-          <button onClick={() => router.push("/apps")} className="hover:text-cyan-400 transition">
-            Apps
-          </button>
-          <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
-            Pricing
-          </button>
-          <button onClick={() => router.push("/settings/api-keys")} className="hover:text-cyan-400 transition">
-            Settings
-          </button>
-          <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              router.push("/");
-            }}
-            className="rounded-lg bg-slate-800 px-4 py-2 hover:bg-slate-700"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+      <TopNav current="studio" showPlanBadge showMarketplace />
       <LowCreditBanner />
   
       <div className="flex flex-1 overflow-hidden">
@@ -3635,6 +3604,7 @@ function CreateAgentModal({ onClose, onSubmit }: { onClose: () => void; onSubmit
     </div>
   );
 }
+
 
 
 
