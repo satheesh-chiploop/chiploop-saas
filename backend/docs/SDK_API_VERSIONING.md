@@ -1,4 +1,4 @@
-# ChipLoop SDK/API Versioning
+﻿# ChipLoop SDK/API Versioning
 
 ## Current Version
 
@@ -54,6 +54,7 @@ The SDK remains `0.x` while the public API is still being validated with users. 
 
 - quickstart examples are stable
 - artifact download behavior is validated
-- API key setup is proven
+- API key setup is proven for Pro, Pro Max, and Enterprise users
 - error model is consistent
 - at least one external automation user has tested the flow
+

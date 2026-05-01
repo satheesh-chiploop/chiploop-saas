@@ -53,13 +53,13 @@ type PlanResponse = {
 };
 
 const featureLabels: Record<string, string> = {
-  sdk_cli_enabled: "SDK/CLI",
+  sdk_cli_enabled: "Developer Automation: SDK + CLI",
   agent_planner_enabled: "Agent Planner",
-  agent_factory_dry_run_enabled: "Agent Factory dry-run",
-  private_agent_save_enabled: "Private agent save",
-  dag_optimization_enabled: "DAG optimization",
-  marketplace_submit_enabled: "Marketplace submission",
-  agent_factory_write_enabled: "Agent Factory write mode",
+  agent_factory_dry_run_enabled: "Draft Agent Generation",
+  private_agent_save_enabled: "Private Agent Save",
+  dag_optimization_enabled: "Optimize Workflow",
+  marketplace_submit_enabled: "Submit to Marketplace",
+  agent_factory_write_enabled: "Agent Factory Write Mode",
   higher_workflow_limits: "Higher workflow limits",
   custom_limits: "Custom limits",
 };
@@ -129,7 +129,7 @@ export default function SettingsPlanPage() {
             <div>
               <h2 className="text-xl font-bold">Plan</h2>
               <p className="mt-1 text-sm text-slate-400">
-                Your current plan, monthly credits, and enabled Phase 8 features.
+                Your current plan, monthly credits, and enabled ChipLoop features.
               </p>
             </div>
             <div className="flex gap-2">
@@ -167,7 +167,7 @@ export default function SettingsPlanPage() {
                 <div className="text-sm font-semibold text-cyan-100">Trial status</div>
                 <div className="mt-2 text-sm text-cyan-100/85">
                   {trial.status === "active"
-                    ? `${trial.days_remaining ?? "-"} days remaining. Starter is $19.99/month after 30 days. Cancel anytime before trial ends.`
+                    ? `${trial.days_remaining ?? "-"} days remaining. Starter is $19.99/month after trial/beta access. Cancel anytime before paid conversion.`
                     : `Trial ${trial.status}.`}
                 </div>
               </section>
@@ -244,7 +244,7 @@ export default function SettingsPlanPage() {
             <section className="rounded-lg border border-amber-700/40 bg-amber-950/20 p-5">
               <h3 className="font-bold text-amber-100">Upgrade placeholder</h3>
               <p className="mt-1 text-sm text-amber-100/80">
-Trial checkout will require Stripe card setup. Starter is $19.99/month after 30 days. Starter, Pro, and Pro Max receive 25% off for the first 3 billing cycles after checkout is connected. Enterprise remains contact-sales only.
+Stripe checkout will support Starter, Pro, and Pro Max. Pro and Pro Max include SDK/CLI developer automation. Enterprise remains contact-sales for pilots, beta programs, custom limits, and private deployment discussions.
               </p>
             </section>
           </>
@@ -253,6 +253,7 @@ Trial checkout will require Stripe card setup. Starter is $19.99/month after 30 
     </SettingsNav>
   );
 }
+
 
 
 

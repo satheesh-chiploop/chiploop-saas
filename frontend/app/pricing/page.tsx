@@ -4,7 +4,8 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiClientError, apiGet } from "@/lib/apiClient";
 
-type PlanKey = "trial" | "starter" | "pro" | "pro_max" | "enterprise";
+type PlanKey = "starter" | "pro" | "pro_max" | "enterprise";
+type CurrentPlanKey = PlanKey | "trial";
 
 type Plan = {
   key: PlanKey;
@@ -26,54 +27,39 @@ type PlanResponse = {
 };
 
 const featureRows = [
-  "App workflows",
-  "SDK/CLI",
-  "API keys",
+  "Guided Apps",
+  "Studio Access",
   "Agent Planner",
-  "Agent Factory dry-run",
-  "Private agents",
-  "DAG optimization",
-  "Marketplace submission",
+  "Draft Agent Generation",
+  "Private Agents",
+  "Optimize Workflow",
+  "Developer Automation: SDK + CLI",
+  "API Keys",
+  "Marketplace Access",
+  "Submit to Marketplace",
   "Support",
 ];
 
 const plans: Plan[] = [
-  {
-    key: "trial",
-    name: "Trial",
-    price: "Free for 30 days",
-    credits: "100 trial credits",
-    cta: "Start free trial",
-    note: "Credit card required. No charge during trial. Auto-converts to Starter unless canceled.",
-    features: {
-      "App workflows": "Trial access",
-      "SDK/CLI": "Limited test access",
-      "API keys": "1 test key",
-      "Agent Planner": "Included",
-      "Agent Factory dry-run": "Limited",
-      "Private agents": "1 private agent",
-      "DAG optimization": "Not included",
-      "Marketplace submission": "Not included",
-      Support: "Standard",
-    },
-  },
   {
     key: "starter",
     name: "Starter",
     price: "$19.99/month",
     discountPrice: "$14.99/month for first 3 months",
     credits: "2,000 credits/month",
-    cta: "Coming soon",
-    note: "For individual developers starting production workflows.",
+    cta: "Start Starter",
+    note: "For users running guided Apps and basic Studio workflows from the browser.",
     features: {
-      "App workflows": "Included",
-      "SDK/CLI": "Included",
-      "API keys": "1 key",
+      "Guided Apps": "Included",
+      "Studio Access": "Basic",
       "Agent Planner": "Included",
-      "Agent Factory dry-run": "Included",
-      "Private agents": "5 private agents",
-      "DAG optimization": "Limited",
-      "Marketplace submission": "Not included",
+      "Draft Agent Generation": "Included",
+      "Private Agents": "5 private agents",
+      "Optimize Workflow": "Limited",
+      "Developer Automation: SDK + CLI": "Not included",
+      "API Keys": "Not included",
+      "Marketplace Access": "Browse + install",
+      "Submit to Marketplace": "Not included",
       Support: "Standard",
     },
   },
@@ -83,18 +69,20 @@ const plans: Plan[] = [
     price: "$39.99/month",
     discountPrice: "$29.99/month for first 3 months",
     credits: "5,000 credits/month",
-    cta: "Coming soon",
-    note: "For regular Studio users building custom workflows and agents.",
+    cta: "Start Pro",
+    note: "For developers and teams automating ChipLoop with Studio, SDK, and CLI.",
     popular: true,
     features: {
-      "App workflows": "Included",
-      "SDK/CLI": "Included",
-      "API keys": "3 keys",
+      "Guided Apps": "Included",
+      "Studio Access": "Full",
       "Agent Planner": "Included",
-      "Agent Factory dry-run": "Included",
-      "Private agents": "25 private agents",
-      "DAG optimization": "Included",
-      "Marketplace submission": "Included",
+      "Draft Agent Generation": "Included",
+      "Private Agents": "25 private agents",
+      "Optimize Workflow": "Included",
+      "Developer Automation: SDK + CLI": "Included",
+      "API Keys": "3 keys",
+      "Marketplace Access": "Browse + install",
+      "Submit to Marketplace": "Included",
       Support: "Priority",
     },
   },
@@ -104,17 +92,19 @@ const plans: Plan[] = [
     price: "$59.99/month",
     discountPrice: "$44.99/month for first 3 months",
     credits: "12,000 credits/month",
-    cta: "Coming soon",
-    note: "For heavier automation and larger Studio usage.",
+    cta: "Start Pro Max",
+    note: "For heavier automation, more private agents, and higher usage limits.",
     features: {
-      "App workflows": "Higher limits",
-      "SDK/CLI": "Included",
-      "API keys": "10 keys",
+      "Guided Apps": "Higher limits",
+      "Studio Access": "Full",
       "Agent Planner": "Included",
-      "Agent Factory dry-run": "Included",
-      "Private agents": "100 private agents",
-      "DAG optimization": "Included",
-      "Marketplace submission": "Included",
+      "Draft Agent Generation": "Included",
+      "Private Agents": "100 private agents",
+      "Optimize Workflow": "Included",
+      "Developer Automation: SDK + CLI": "Included",
+      "API Keys": "10 keys",
+      "Marketplace Access": "Browse + install",
+      "Submit to Marketplace": "Included",
       Support: "Priority",
     },
   },
@@ -123,31 +113,34 @@ const plans: Plan[] = [
     name: "Enterprise",
     price: "Custom",
     credits: "Custom credits",
-    cta: "Contact sales",
-    note: "For organizations needing custom limits, support, and deployment review.",
+    cta: "Contact Sales",
+    note: "For pilots, beta programs, custom limits, governance, and private deployment review.",
     features: {
-      "App workflows": "Custom limits",
-      "SDK/CLI": "Included",
-      "API keys": "Custom",
+      "Guided Apps": "Custom limits",
+      "Studio Access": "Full",
       "Agent Planner": "Included",
-      "Agent Factory dry-run": "Included",
-      "Private agents": "Custom",
-      "DAG optimization": "Included",
-      "Marketplace submission": "Included",
-      Support: "Dedicated",
+      "Draft Agent Generation": "Included",
+      "Private Agents": "Custom",
+      "Optimize Workflow": "Included",
+      "Developer Automation: SDK + CLI": "Included",
+      "API Keys": "Custom",
+      "Marketplace Access": "Optional / governed",
+      "Submit to Marketplace": "Optional / governed",
+      Support: "Enterprise SLA / pilot support",
     },
   },
 ];
 
-function normalizePlanId(value?: string): PlanKey | null {
+function normalizePlanId(value?: string): CurrentPlanKey | null {
   if (!value) return null;
-  const key = value.toLowerCase().replace(/\s+/g, "_") as PlanKey;
+  const key = value.toLowerCase().replace(/\s+/g, "_") as CurrentPlanKey;
+  if (key === "trial" || key === "free") return "trial";
   return plans.some((plan) => plan.key === key) ? key : null;
 }
 
 function PricingContent() {
   const router = useRouter();
-  const [currentPlan, setCurrentPlan] = useState<PlanKey | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<CurrentPlanKey | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -169,19 +162,16 @@ function PricingContent() {
 
   const currentPlanName = useMemo(() => {
     if (!currentPlan) return null;
+    if (currentPlan === "trial") return "Trial / Beta";
     return plans.find((plan) => plan.key === currentPlan)?.name || null;
   }, [currentPlan]);
 
   function handlePlanAction(plan: Plan) {
     if (plan.key === "enterprise") {
-      window.location.href = "mailto:sales@chiploop.com?subject=ChipLoop%20Enterprise";
+      window.location.href = "mailto:sales@chiploop.com?subject=ChipLoop%20Enterprise%20Pilot";
       return;
     }
-    if (plan.key === "trial") {
-      router.push("/login?mode=signup&trial=1");
-      return;
-    }
-    router.push("/settings/plan");
+    router.push(`/login?mode=signup&plan=${plan.key}`);
   }
 
   return (
@@ -203,7 +193,11 @@ function PricingContent() {
         <div className="max-w-3xl">
           <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">Pricing</h1>
           <p className="mt-4 text-lg text-slate-300">
-            Start with a free 30-day trial. Paid plans get 25% off for the first 3 months. Cancel before trial ends to avoid conversion.
+            Choose the plan that matches how you use ChipLoop. Guided Apps and Studio start with Starter.
+            Developer automation with SDK and CLI starts at Pro.
+          </p>
+          <p className="mt-3 text-sm text-cyan-100">
+            Starter, Pro, and Pro Max receive 25% off for the first 3 months after checkout is connected.
           </p>
           {currentPlanName ? (
             <div className="mt-4 inline-flex rounded-lg border border-cyan-700/60 bg-cyan-950/30 px-3 py-2 text-sm text-cyan-100">
@@ -212,7 +206,7 @@ function PricingContent() {
           ) : null}
         </div>
 
-        <section className="mt-10 grid gap-4 lg:grid-cols-5">
+        <section className="mt-10 grid gap-4 lg:grid-cols-4">
           {plans.map((plan) => {
             const isCurrent = currentPlan === plan.key;
             return (
@@ -241,7 +235,9 @@ function PricingContent() {
         <section className="mt-10 overflow-hidden rounded-lg border border-slate-800 bg-slate-950/70">
           <div className="border-b border-slate-800 px-5 py-4">
             <h2 className="text-xl font-bold">Feature comparison</h2>
-            <p className="mt-1 text-sm text-slate-400">Trial checkout will require a credit card through Stripe. Paid-plan checkout is enabled only after server-side Stripe price IDs and coupons are configured.</p>
+            <p className="mt-1 text-sm text-slate-400">
+              SDK and CLI are premium developer automation features for Pro, Pro Max, and Enterprise. Enterprise can be used for pilots, beta programs, and custom deployment discussions.
+            </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[980px] text-left text-sm">

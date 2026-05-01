@@ -1,4 +1,4 @@
-# Phase 13 Developer Ecosystem
+﻿# Phase 13 Developer Ecosystem
 
 ChipLoop is now programmable through a small, stable SDK/CLI surface. The browser App and Studio continue to use their existing browser-safe endpoints; external automation should use `/sdk/v1/*`.
 
@@ -35,7 +35,7 @@ Browser endpoints are not public API. SDK/CLI integrations should use `/sdk/v1`.
 
 ## Authentication
 
-Use an API key:
+Use an API key. SDK and CLI access are available on Pro, Pro Max, and Enterprise plans:
 
 ```bash
 set CHIPLOOP_BASE_URL=https://your-backend.example
@@ -114,3 +114,4 @@ Beta endpoints may change with notice:
 - No public plugin marketplace API yet.
 - Browser `/studio/*` and `/settings/*` endpoints are not SDK API.
 - API reference is intentionally markdown-first until the surface is proven by usage.
+
