@@ -3,6 +3,11 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiClientError, apiGet } from "@/lib/apiClient";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 type PlanKey = "starter" | "pro" | "pro_max" | "enterprise";
 type CurrentPlanKey = PlanKey | "trial";
@@ -141,9 +146,17 @@ function normalizePlanId(value?: string): CurrentPlanKey | null {
 function PricingContent() {
   const router = useRouter();
   const [currentPlan, setCurrentPlan] = useState<CurrentPlanKey | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    async function loadSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!cancelled) setUserEmail(session?.user?.email || null);
+    }
+
     async function loadPlan() {
       try {
         const response = await apiGet<PlanResponse>("/settings/plan");
@@ -154,6 +167,7 @@ function PricingContent() {
         console.warn("Plan lookup unavailable", error);
       }
     }
+    loadSession();
     loadPlan();
     return () => {
       cancelled = true;
@@ -182,9 +196,25 @@ function PricingContent() {
             CHIPLOOP
           </button>
           <div className="flex items-center gap-5 text-sm font-medium text-slate-300">
+            <button onClick={() => router.push("/")} className="hover:text-cyan-300">Home</button>
             <button onClick={() => router.push("/apps")} className="hover:text-cyan-300">Apps</button>
             <button onClick={() => router.push("/workflow")} className="hover:text-cyan-300">Studio</button>
+            <button onClick={() => router.push("/pricing")} className="hover:text-cyan-300">Pricing</button>
             <button onClick={() => router.push("/settings/plan")} className="hover:text-cyan-300">Settings</button>
+            {userEmail ? (
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  setUserEmail(null);
+                  router.push("/");
+                }}
+                className="hover:text-cyan-300"
+              >
+                Logout
+              </button>
+            ) : (
+              <button onClick={() => router.push("/login?next=/pricing")} className="hover:text-cyan-300">Login</button>
+            )}
           </div>
         </div>
       </nav>
@@ -276,4 +306,6 @@ export default function PricingPage() {
     </Suspense>
   );
 }
+
+
 

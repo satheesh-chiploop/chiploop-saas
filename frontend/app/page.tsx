@@ -129,13 +129,30 @@ function LandingPageContent() {
             <button onClick={() => router.push("/marketplace")} className="hover:text-cyan-300">Marketplace</button>
             <button onClick={() => router.push("/pricing")} className="hover:text-cyan-300">Pricing</button>
             <button onClick={() => router.push("/webinar/register")} className="hover:text-cyan-300">Webinar</button>
+            {!userEmail ? (
+              <button onClick={() => router.push("/login?next=/apps")} className="hover:text-cyan-300">Login</button>
+            ) : null}
           </div>
-          <button
-            onClick={goToApps}
-            className="rounded-lg bg-cyan-400 px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
-          >
-            {userEmail ? "Enter Apps" : "Start Free Trial"}
-          </button>
+          <div className="flex items-center gap-3">
+            {userEmail ? (
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  setUserEmail(null);
+                  router.push("/");
+                }}
+                className="hidden rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-slate-900 md:inline-flex"
+              >
+                Logout
+              </button>
+            ) : null}
+            <button
+              onClick={goToApps}
+              className="rounded-lg bg-cyan-400 px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+            >
+              {userEmail ? "Enter Apps" : "Start Free Trial"}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -322,5 +339,7 @@ export default function LandingPage() {
     </Suspense>
   );
 }
+
+
 
 

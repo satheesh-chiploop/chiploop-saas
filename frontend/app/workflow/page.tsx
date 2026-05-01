@@ -2329,6 +2329,7 @@ function WorkflowPage() {
           CHIPLOOP âš¡
         </div>
         <div className="flex items-center gap-6 text-slate-300">
+          <PlanCreditBadge />
           <button onClick={() => router.push("/")} className="hover:text-cyan-400 transition">
             Home
           </button>
@@ -2338,7 +2339,6 @@ function WorkflowPage() {
           <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
             Pricing
           </button>
-          <PlanCreditBadge />
           <button onClick={() => router.push("/settings/api-keys")} className="hover:text-cyan-400 transition">
             Settings
           </button>
@@ -3635,6 +3635,7 @@ function CreateAgentModal({ onClose, onSubmit }: { onClose: () => void; onSubmit
     </div>
   );
 }
+
 
 
 

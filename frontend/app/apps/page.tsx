@@ -634,13 +634,13 @@ export default function AppsHomePage() {
           </button>
 
           <div className="flex items-center gap-3">
+            <PlanCreditBadge />
             <button
               onClick={() => go("/")}
               className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 hover:bg-slate-900 transition"
             >
               Home
             </button>
-            <PlanCreditBadge />
             <button
               onClick={() => go("/workflow")}
               className="rounded-xl bg-slate-800 px-4 py-2 text-slate-200 hover:bg-slate-700 transition"
@@ -935,6 +935,7 @@ export default function AppsHomePage() {
     </main>
   );
 }
+
 
 
 
