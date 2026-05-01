@@ -625,8 +625,8 @@ export default function AppsHomePage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <button
             className="flex items-center gap-2 text-xl font-extrabold"
-            onClick={() => go("/apps")}
-            title="Apps Home"
+            onClick={() => go("/")}
+            title="Home"
           >
             <span className="text-cyan-400">CHIPLOOP</span>
             <span className="text-slate-400">/</span>
@@ -634,6 +634,12 @@ export default function AppsHomePage() {
           </button>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => go("/")}
+              className="rounded-xl border border-slate-700 px-4 py-2 text-slate-300 hover:bg-slate-900 transition"
+            >
+              Home
+            </button>
             <PlanCreditBadge />
             <button
               onClick={() => go("/workflow")}
@@ -929,6 +935,7 @@ export default function AppsHomePage() {
     </main>
   );
 }
+
 
 
 
