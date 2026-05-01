@@ -1,204 +1,197 @@
-"use client";
+﻿"use client";
 
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// ✅ Supabase init
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+const loops = [
+  "Digital",
+  "Embedded",
+  "Software",
+  "Validation",
+  "Analog",
+  "Physical Design",
+  "System",
+  "Still exploring",
+];
+
 function LandingPageContent() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [loginLoading, setLoginLoading] = useState(false);
 
-  // ✅ Get Supabase session
   useEffect(() => {
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      const email = session?.user?.email || null;
-      setUserEmail(email);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setUserEmail(session?.user?.email || null);
     };
     getSession();
   }, []);
 
-  const [loginLoading, setLoginLoading] = useState(false);
-
-  const handleMainButton = async () => {
-
-    // Email-only login flow
+  const goToApps = async () => {
     setLoginLoading(true);
-
     if (userEmail) {
       router.push("/apps");
       return;
     }
-    // ✅ Avoid flash: check session right now (userEmail might not be loaded yet)
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (session) {
       router.push("/apps");
       return;
     }
     router.push("/login?next=/apps");
+  };
 
+  const startGuidedDemo = async () => {
+    setLoginLoading(true);
+    const next = "/apps/arch2rtl?guided=1";
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    router.push(session ? next : `/login?next=${encodeURIComponent(next)}`);
   };
 
   if (loginLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="text-slate-300">Redirecting…</div>
+      <main className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
+        <div className="text-slate-300">Redirecting...</div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-br from-slate-900 via-slate-950 to-black text-white">
-      
-      {/* 🧭 Top Navigation */}
-      <nav className="w-full flex justify-between items-center px-8 py-5 bg-black/70 backdrop-blur border-b border-slate-800 fixed top-0 left-0 z-50">
-        <div
-          onClick={() => router.push("/")}
-          className="text-2xl font-extrabold text-cyan-400 cursor-pointer"
-        >
-          CHIPLOOP ⚡
-        </div>
-        <div className="flex space-x-8 text-slate-300 font-medium">
-          <button onClick={() => router.push("/")} className="hover:text-cyan-400 transition">
-            Home
+    <main className="min-h-screen bg-slate-950 text-white">
+      <nav className="fixed left-0 top-0 z-50 w-full border-b border-slate-800 bg-slate-950/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <button onClick={() => router.push("/")} className="text-xl font-extrabold text-cyan-300">
+            ChipLoop
           </button>
-          <button onClick={() => router.push("/academy")} className="hover:text-cyan-400 transition">
-            Academy
-          </button>
-          <button onClick={() => router.push("/pricing")} className="hover:text-cyan-400 transition">
-            Pricing
-          </button>
+          <div className="hidden items-center gap-7 text-sm font-medium text-slate-300 md:flex">
+            <button onClick={() => router.push("/apps")} className="hover:text-cyan-300">Apps</button>
+            <button onClick={() => router.push("/workflow")} className="hover:text-cyan-300">Studio</button>
+            <button onClick={() => router.push("/marketplace")} className="hover:text-cyan-300">Marketplace</button>
+            <button onClick={() => router.push("/pricing")} className="hover:text-cyan-300">Pricing</button>
+            <button onClick={() => router.push("/webinar/register")} className="hover:text-cyan-300">Webinar</button>
+          </div>
           <button
-            onClick={() => router.push("/apps")}
-            className="hover:text-cyan-400 transition"
+            onClick={goToApps}
+            className="rounded-lg bg-cyan-400 px-5 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
           >
-            Apps
-          </button>
-        </div>
-        <div>
-          <button
-            onClick={handleMainButton}
-            disabled={loginLoading}
-            className={`rounded-xl px-5 py-3 font-semibold transition ${
-             loginLoading
-              ? "bg-slate-700 cursor-not-allowed"
-              : "bg-cyan-600 hover:bg-cyan-500 text-black"
-            }`}
-          >
-            {loginLoading ? "Redirecting…" : userEmail ? "Enter Apps" : "Login"}
+            {userEmail ? "Enter Apps" : "Start Free Trial"}
           </button>
         </div>
       </nav>
 
-      {/* 🚀 Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center px-6 mt-32 mb-16">
-        <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6">
-          Build, Automate, and Orchestrate
-          <br /> Chip Design Workflows
+      <section className="mx-auto flex max-w-7xl flex-col items-center px-6 pb-16 pt-32 text-center">
+        <div className="mb-5 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200">
+          Weekly live demo starts May 23, 2026
+        </div>
+        <h1 className="max-w-5xl text-5xl font-extrabold tracking-tight text-white md:text-7xl">
+          Agentic AI for Connected Chip Design Loops
         </h1>
-        <p className="text-lg text-slate-300 max-w-3xl mb-10">
-          An Agentic AI Platform unifying Digital, Analog,Embedded and Validation Loops in one platform.
+        <p className="mt-7 max-w-3xl text-lg leading-8 text-slate-300">
+          Build chip workflows across Digital, Embedded, Software, Validation, Analog, and Physical Design in one platform.
+          ChipLoop helps teams share specs, generated artifacts, and design context across loops instead of working in disconnected tools.
         </p>
-        <button
-          onClick={handleMainButton}
-          className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-8 py-3 rounded-xl shadow-lg transition"
-        >
-          Get Started
-        </button>
+        <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+          <button
+            onClick={startGuidedDemo}
+            className="rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300"
+          >
+            Start Guided Arch2RTL Demo
+          </button>
+          <button
+            onClick={() => router.push("/webinar/register")}
+            className="rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200"
+          >
+            Register for Saturday Webinar
+          </button>
+        </div>
       </section>
 
-      {/* 💠 Loops Section */}
-      <section className="w-full max-w-6xl px-6 mb-16 text-center">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              name: "Digital Frontend Loop",
-              desc: "Accelerate digital design and verification",
-            },
-            {
-              name: "Digital Implementation Loop",
-              desc: "Accelerate digital Implementation",
-            },
-            
-            {
-              name: "Analog Loop",
-              desc: "Automate analog circuit optimization",
-            },
-            {
-              name: "Embedded Loop",
-              desc: "Streamline embedded systems development",
-            },
-            {
-              name: "Validation Loop",
-              desc: "Automate Hardware/Lab testing/validation",
-            },
-            { name: "System Loop",
-              desc: "Connecting loops ( Digital/Analog/Firmware/Validation) for system level execution ",
-            }
-          ].map((loop) => (
-            <div
-              key={loop.name}
-              className="p-8 bg-slate-800/70 rounded-xl shadow-lg hover:bg-slate-700 transition"
-            >
-              <div className="text-5xl mb-3">{loop.icon}</div>
-              <h4 className="font-bold text-2xl mb-3 text-cyan-400">{loop.name}</h4>
-              <p className="text-slate-300 mb-5">{loop.desc}</p>
-              <button
-                onClick={handleMainButton}
-                className="border border-cyan-400 text-cyan-400 hover:bg-cyan-500 hover:text-black px-5 py-2 rounded-lg transition"
-              >
-                Explore
-              </button>
+      <section className="mx-auto max-w-7xl px-6 py-14">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold">One Platform. Many Chip Design Loops.</h2>
+          <p className="mt-3 text-slate-400">Keep engineering context connected as work moves across loops.</p>
+        </div>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {loops.slice(0, 6).map((loop) => (
+            <div key={loop} className="rounded-xl border border-slate-800 bg-slate-900/70 p-6">
+              <h3 className="text-xl font-bold text-cyan-300">{loop} Loop</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                Plan, generate, validate, and hand off artifacts while preserving shared design context.
+              </p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ⚡ Agentic AI Tagline */}
-      <section className="w-full max-w-4xl text-center mb-16">
-        <div className="bg-slate-800/70 text-cyan-400 py-4 rounded-xl font-semibold shadow-lg flex items-center justify-center gap-2">
-          ⚡ Agentic AI at the Core of Every Loop
+      <section className="mx-auto max-w-7xl px-6 py-14">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {[
+            ["Connected Design Data", "Specs, generated files, reports, and workflow results stay connected across loops."],
+            ["Agentic AI Workflows", "AI agents help plan, generate, validate, repair, and document chip design tasks."],
+            ["Real Engineering Outputs", "Generate RTL, testbenches, firmware stubs, SDK files, SDC, UPF, reports, and reviewable artifacts."],
+          ].map(([title, body]) => (
+            <div key={title} className="rounded-xl bg-slate-900 p-6 ring-1 ring-slate-800">
+              <h3 className="font-bold text-white">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-300">{body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* 🧩 Testimonials + Use Cases */}
-      <section className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 px-6 mb-20">
-        <div className="p-6 bg-slate-800/70 rounded-xl shadow-lg">
-          <h3 className="text-xl font-bold mb-4 text-cyan-400">Testimonials</h3>
-          <p className="text-slate-300">
-            Coming soon.
-          </p>
-        </div>
-        <div className="p-6 bg-slate-800/70 rounded-xl shadow-lg">
-          <h3 className="text-xl font-bold mb-4 text-cyan-400">Use Cases</h3>
-          <p className="text-slate-300">
-            From RTL verification to mixed-signal simulation — ChipLoop unifies your entire flow.
-          </p>
+      <section className="mx-auto max-w-6xl px-6 py-14">
+        <div className="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-8 md:p-10">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-[1.3fr_0.7fr] md:items-center">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-wide text-cyan-200">Weekly ChipLoop Webinar</p>
+              <h2 className="mt-3 text-3xl font-extrabold text-white">30-minute walkthrough and live demo every Saturday</h2>
+              <p className="mt-4 leading-7 text-slate-300">
+                Starting May 23, join at 9:00 AM PST or 9:00 PM PST. We will cover ChipLoop Apps, Studio, connected Loops,
+                the guided Arch2RTL demo, generated RTL, SDC, UPF, downloadable artifacts, and Q&A.
+              </p>
+            </div>
+            <div className="rounded-xl border border-slate-700 bg-slate-950/70 p-5">
+              <div className="text-sm text-slate-400">Sessions</div>
+              <div className="mt-2 font-semibold text-white">Saturday 9:00 AM PST</div>
+              <div className="mt-1 font-semibold text-white">Saturday 9:00 PM PST</div>
+              <button
+                onClick={() => router.push("/webinar/register")}
+                className="mt-5 w-full rounded-lg bg-cyan-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-cyan-300"
+              >
+                Register for Webinar
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 📞 Footer */}
-      <footer className="w-full border-t border-slate-800 py-8 text-center text-slate-400 text-sm bg-black/70">
-        <div className="mb-4">
-          <button
-            onClick={() => router.push("/pricing")}
-            className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-2 rounded-lg shadow"
-          >
-            Book a Demo
+      <section className="mx-auto max-w-5xl px-6 py-16 text-center">
+        <h2 className="text-3xl font-extrabold">Start Building Connected Chip Workflows</h2>
+        <p className="mt-4 text-slate-300">
+          Begin with the guided Arch2RTL demo, then explore more Loops inside Apps and Studio.
+        </p>
+        <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+          <button onClick={startGuidedDemo} className="rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300">
+            Run Guided Demo
+          </button>
+          <button onClick={goToApps} className="rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300">
+            Explore Apps
           </button>
         </div>
-        <p>© 2026 ChipLoop </p>
-        <div className="mt-2 space-x-4 text-slate-500">
-          <button onClick={() => router.push("/contact")}>Contact</button>
-          <button onClick={() => router.push("/careers")}>Careers</button>
-          <button onClick={() => router.push("/privacy")}>Privacy</button>
-          <button onClick={() => router.push("/terms")}>Terms</button>
-        </div>
+      </section>
+
+      <footer className="border-t border-slate-800 bg-slate-950 px-6 py-8 text-center text-sm text-slate-500">
+        <p>Copyright 2026 ChipLoop</p>
       </footer>
     </main>
   );
@@ -206,7 +199,7 @@ function LandingPageContent() {
 
 export default function LandingPage() {
   return (
-    <Suspense fallback={<div className="text-center p-10">Loading...</div>}>
+    <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
       <LandingPageContent />
     </Suspense>
   );
