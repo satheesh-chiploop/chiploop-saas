@@ -9,6 +9,35 @@ const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const ONBOARDING_DEMO_KEY = "chiploop_arch2rtl_onboarding_demo";
 
+const ARCH2RTL_ONBOARDING_SPEC = `Design a parameterized PWM controller.
+
+Inputs:
+- clk
+- reset_n
+- enable
+- duty_cycle[7:0]
+- period[7:0]
+
+Outputs:
+- pwm_out
+- counter_value[7:0]
+
+Behavior:
+- Counter increments every clock when enable is high.
+- Counter resets to zero when it reaches period.
+- pwm_out is high when counter_value is less than duty_cycle.
+- All registers reset to zero when reset_n is low.
+
+Generate synthesizable SystemVerilog, timing constraints, UPF-lite power intent, and a handoff package.`;
+
+const ARCH2RTL_ONBOARDING_DEFAULTS = {
+  projectName: "pwm_controller_onboarding",
+  topModule: "pwm_controller",
+  designLanguage: "systemverilog" as const,
+  specText: ARCH2RTL_ONBOARDING_SPEC,
+  toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+};
+
 type WorkflowRow = {
   id: string;
   status?: string | null;
@@ -83,7 +112,10 @@ export default function Arch2RTLAppPage() {
       setErr(null);
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) {
-        router.replace("/login?next=/apps/arch2rtl");
+        const next = typeof window !== "undefined"
+          ? `${window.location.pathname}${window.location.search}`
+          : "/apps/arch2rtl";
+        router.replace(`/login?next=${encodeURIComponent(next)}`);
         return;
       }
       setSessionUserId(session.user.id);
@@ -98,27 +130,29 @@ export default function Arch2RTLAppPage() {
     if (!guided) return;
 
     setGuidedOnboarding(true);
+    let demo = ARCH2RTL_ONBOARDING_DEFAULTS;
     const raw = window.localStorage.getItem(ONBOARDING_DEMO_KEY);
-    if (!raw) return;
 
-    try {
-      const demo = JSON.parse(raw) as {
-        projectName?: string;
-        topModule?: string;
-        designLanguage?: "systemverilog" | "verilog";
-        specText?: string;
-        toggles?: { genRegmap?: boolean; genUpfLite?: boolean; genPackaging?: boolean };
-      };
-      setProjectName(demo.projectName || "pwm_controller_onboarding");
-      setTopModule(demo.topModule || "pwm_controller");
-      setDesignLanguage(demo.designLanguage || "systemverilog");
-      setSpecText(demo.specText || "");
-      setGenRegmap(demo.toggles?.genRegmap ?? true);
-      setGenUpfLite(demo.toggles?.genUpfLite ?? true);
-      setGenPackaging(demo.toggles?.genPackaging ?? true);
-    } catch {
-      window.localStorage.removeItem(ONBOARDING_DEMO_KEY);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as Partial<typeof ARCH2RTL_ONBOARDING_DEFAULTS>;
+        demo = {
+          ...ARCH2RTL_ONBOARDING_DEFAULTS,
+          ...parsed,
+          toggles: { ...ARCH2RTL_ONBOARDING_DEFAULTS.toggles, ...parsed.toggles },
+        };
+      } catch {
+        window.localStorage.removeItem(ONBOARDING_DEMO_KEY);
+      }
     }
+
+    setProjectName(demo.projectName);
+    setTopModule(demo.topModule);
+    setDesignLanguage(demo.designLanguage);
+    setSpecText(demo.specText);
+    setGenRegmap(demo.toggles.genRegmap);
+    setGenUpfLite(demo.toggles.genUpfLite);
+    setGenPackaging(demo.toggles.genPackaging);
   }, [loading]);
 
   // Live workflow updates
