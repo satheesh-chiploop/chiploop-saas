@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { User } from "@supabase/supabase-js";
 import { PlanCreditBadge } from "@/components/PlanCreditStatus";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 type NavKey = "home" | "apps" | "studio" | "marketplace" | "pricing" | "settings" | "admin" | "webinar";
 
@@ -25,6 +22,20 @@ type TopNavProps = {
 const navButtonClass = "text-sm font-medium text-slate-300 transition hover:text-cyan-300";
 const activeNavButtonClass = "text-sm font-semibold text-cyan-200 transition hover:text-cyan-100";
 
+
+function getDisplayName(user: User | null): string | null {
+  if (!user) return null;
+  const metadata = user.user_metadata || {};
+  const rawName =
+    typeof metadata.full_name === "string" ? metadata.full_name :
+    typeof metadata.name === "string" ? metadata.name :
+    typeof metadata.first_name === "string" ? metadata.first_name :
+    user.email || "";
+  const trimmed = rawName.trim();
+  if (!trimmed) return null;
+  return trimmed.includes("@") ? trimmed.split("@")[0] : trimmed.split(/\s+/)[0];
+}
+
 export default function TopNav({
   current,
   showPlanBadge = false,
@@ -37,25 +48,37 @@ export default function TopNav({
 }: TopNavProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const supabase = createClientComponentClient();
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     let mounted = true;
+
     async function loadSession() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       if (mounted) {
-        setUserEmail(session?.user?.email || null);
+        setDisplayName(getDisplayName(session?.user || null));
         setAuthChecked(true);
       }
     }
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      setDisplayName(getDisplayName(session?.user || null));
+      setAuthChecked(true);
+    });
+
     loadSession();
     return () => {
       mounted = false;
+      subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   const links: Array<{ key: NavKey; label: string; href: string; show: boolean }> = [
     { key: "home", label: "Home", href: "/", show: true },
@@ -92,16 +115,16 @@ export default function TopNav({
               {link.label}
             </button>
           ))}
-          {authChecked ? userEmail ? (
+          {authChecked ? displayName ? (
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
-                setUserEmail(null);
-                router.push("/");
+                setDisplayName(null);
+                router.push("/login");
               }}
               className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-cyan-200"
             >
-              Logout
+              <span className="mr-2 text-cyan-200">Hi, {displayName}</span>Logout
             </button>
           ) : (
             <button
