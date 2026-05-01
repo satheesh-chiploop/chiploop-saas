@@ -19,10 +19,51 @@ const loops = [
   "Still exploring",
 ];
 
+const automationSnippets = {
+  cli: [
+    {
+      title: "Install",
+      code: "pip install chiploop-sdk",
+    },
+    {
+      title: "Check setup",
+      code: "chiploop doctor",
+    },
+    {
+      title: "Run Arch2RTL",
+      code: "chiploop run arch2rtl --spec spec.md",
+    },
+    {
+      title: "Download artifacts",
+      code: "chiploop artifacts download <workflow_id> --name rtl/top.v --out ./outputs",
+    },
+  ],
+  sdk: [
+    {
+      title: "Create client",
+      code: "from chiploop_sdk import ChipLoopClient\n\nclient = ChipLoopClient()",
+    },
+    {
+      title: "Run workflow",
+      code: "run = client.run_workflow(\n    \"arch2rtl\",\n    spec_text=\"Create a PWM controller.\"\n)",
+    },
+    {
+      title: "Check status",
+      code: "status = client.get_workflow_status(run.workflow_id)\nprint(status.status)",
+    },
+    {
+      title: "List artifacts",
+      code: "artifacts = client.list_artifacts(run.workflow_id)\nprint(artifacts)",
+    },
+  ],
+};
+
 function LandingPageContent() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loginLoading, setLoginLoading] = useState(false);
+  const [automationMode, setAutomationMode] = useState<"cli" | "sdk">("cli");
+  const [automationStep, setAutomationStep] = useState(0);
 
   useEffect(() => {
     const getSession = async () => {
@@ -33,6 +74,14 @@ function LandingPageContent() {
     };
     getSession();
   }, []);
+
+  useEffect(() => {
+    setAutomationStep(0);
+    const timer = window.setInterval(() => {
+      setAutomationStep((current) => (current + 1) % automationSnippets[automationMode].length);
+    }, 2600);
+    return () => window.clearInterval(timer);
+  }, [automationMode]);
 
   const goToApps = async () => {
     setLoginLoading(true);
@@ -175,6 +224,75 @@ function LandingPageContent() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 py-14">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-8 md:p-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Developer Automation</p>
+              <h2 className="mt-3 text-3xl font-extrabold text-white">Use ChipLoop from CLI or Python SDK</h2>
+              <p className="mt-4 leading-7 text-slate-300">
+                Start in Apps from the browser. When your workflow needs scripts, CI, or internal automation,
+                Pro and Pro Max include CLI and Python SDK access.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button
+                  onClick={() => setAutomationMode("cli")}
+                  className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
+                    automationMode === "cli"
+                      ? "bg-cyan-400 text-slate-950"
+                      : "border border-slate-700 text-slate-300 hover:border-cyan-300 hover:text-cyan-200"
+                  }`}
+                >
+                  CLI
+                </button>
+                <button
+                  onClick={() => setAutomationMode("sdk")}
+                  className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
+                    automationMode === "sdk"
+                      ? "bg-cyan-400 text-slate-950"
+                      : "border border-slate-700 text-slate-300 hover:border-cyan-300 hover:text-cyan-200"
+                  }`}
+                >
+                  Python SDK
+                </button>
+                <button
+                  onClick={() => router.push("/pricing")}
+                  className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-300 transition hover:border-cyan-300 hover:text-cyan-200"
+                >
+                  View Pricing
+                </button>
+              </div>
+              <p className="mt-4 text-sm text-slate-400">SDK and CLI access are available on Pro and Pro Max plans.</p>
+            </div>
+            <div className="overflow-hidden rounded-xl border border-slate-700 bg-slate-950 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
+                <div className="flex gap-2">
+                  <span className="h-3 w-3 rounded-full bg-red-400" />
+                  <span className="h-3 w-3 rounded-full bg-yellow-400" />
+                  <span className="h-3 w-3 rounded-full bg-emerald-400" />
+                </div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  {automationSnippets[automationMode][automationStep].title}
+                </div>
+              </div>
+              <pre className="min-h-44 whitespace-pre-wrap px-5 py-5 text-left text-sm leading-7 text-cyan-100">
+                <code>{automationSnippets[automationMode][automationStep].code}</code>
+              </pre>
+              <div className="flex gap-2 border-t border-slate-800 px-4 py-3">
+                {automationSnippets[automationMode].map((item, index) => (
+                  <button
+                    key={item.title}
+                    onClick={() => setAutomationStep(index)}
+                    aria-label={`Show ${item.title}`}
+                    className={`h-2 flex-1 rounded-full transition ${index === automationStep ? "bg-cyan-400" : "bg-slate-800"}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-5xl px-6 py-16 text-center">
         <h2 className="text-3xl font-extrabold">Start Building Connected Chip Workflows</h2>
         <p className="mt-4 text-slate-300">
@@ -204,3 +322,5 @@ export default function LandingPage() {
     </Suspense>
   );
 }
+
+

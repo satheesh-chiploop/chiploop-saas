@@ -136,6 +136,11 @@ ACTION_CREDIT_COSTS: Dict[str, int] = {
     "sdk_agents_list": 1,
     "sdk_workflows_list": 1,
     "sdk_workflow_status": 1,
+    "sdk_workflow_run": 50,
+    "sdk_artifacts_list": 1,
+    "sdk_artifact_download": 1,
+    "sdk_usage": 0,
+    "sdk_plan": 0,
     "sdk_studio_plan_agent": 5,
     "sdk_studio_generate_agent": 25,
 }
@@ -145,6 +150,11 @@ SDK_EVENT_TO_FEATURE: Dict[str, str] = {
     "sdk_agents_list": "sdk_cli_enabled",
     "sdk_workflows_list": "sdk_cli_enabled",
     "sdk_workflow_status": "sdk_cli_enabled",
+    "sdk_workflow_run": "sdk_cli_enabled",
+    "sdk_artifacts_list": "sdk_cli_enabled",
+    "sdk_artifact_download": "sdk_cli_enabled",
+    "sdk_usage": "sdk_cli_enabled",
+    "sdk_plan": "sdk_cli_enabled",
     "sdk_studio_plan_agent": "agent_planner_enabled",
     "sdk_studio_generate_agent": "agent_factory_dry_run_enabled",
 }
