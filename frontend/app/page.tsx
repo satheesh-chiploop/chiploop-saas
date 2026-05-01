@@ -56,13 +56,49 @@ const automationSnippets = {
       code: "artifacts = client.list_artifacts(run.workflow_id)\nprint(artifacts)",
     },
   ],
+  ide: [
+    {
+      title: "VS Code",
+      code: "ChipLoop: Configure\nChipLoop: Run Arch2RTL",
+    },
+    {
+      title: "Current file",
+      code: "Open specs/pwm.md\nRun: ChipLoop: Run Workflow from Current File",
+    },
+    {
+      title: "Artifacts",
+      code: "ChipLoop: Check Workflow Status\nChipLoop: Download Artifacts",
+    },
+    {
+      title: "Cursor",
+      code: "Use the Cursor terminal:\nchiploop run arch2rtl --spec specs/pwm.md",
+    },
+  ],
+  github: [
+    {
+      title: "Action",
+      code: "uses: ./backend/integrations/github-action\nwith:\n  workflow: arch2rtl\n  spec: specs/pwm.md",
+    },
+    {
+      title: "Secrets",
+      code: "CHIPLOOP_BASE_URL\nCHIPLOOP_API_KEY",
+    },
+    {
+      title: "Outputs",
+      code: "Upload generated RTL, SDC, UPF, and reports\nas GitHub workflow artifacts",
+    },
+    {
+      title: "Review",
+      code: "Run ChipLoop on PR specs\nReview artifacts before merging",
+    },
+  ],
 };
 
 function LandingPageContent() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loginLoading, setLoginLoading] = useState(false);
-  const [automationMode, setAutomationMode] = useState<"cli" | "sdk">("cli");
+  const [automationMode, setAutomationMode] = useState<"cli" | "sdk" | "ide" | "github">("cli");
   const [automationStep, setAutomationStep] = useState(0);
 
   useEffect(() => {
@@ -246,10 +282,10 @@ function LandingPageContent() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
               <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Developer Automation</p>
-              <h2 className="mt-3 text-3xl font-extrabold text-white">Use ChipLoop from CLI or Python SDK</h2>
+              <h2 className="mt-3 text-3xl font-extrabold text-white">Use ChipLoop from CLI, SDK, IDE, or GitHub</h2>
               <p className="mt-4 leading-7 text-slate-300">
-                Start in Apps from the browser. When your workflow needs scripts, CI, or internal automation,
-                Pro and Pro Max include CLI and Python SDK access.
+                Start in Apps from the browser. When your workflow needs scripts, CI, local editor workflows, or repo automation,
+                Pro, Pro Max, and Enterprise include developer automation access.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
@@ -273,13 +309,33 @@ function LandingPageContent() {
                   Python SDK
                 </button>
                 <button
+                  onClick={() => setAutomationMode("ide")}
+                  className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
+                    automationMode === "ide"
+                      ? "bg-cyan-400 text-slate-950"
+                      : "border border-slate-700 text-slate-300 hover:border-cyan-300 hover:text-cyan-200"
+                  }`}
+                >
+                  VS Code / Cursor
+                </button>
+                <button
+                  onClick={() => setAutomationMode("github")}
+                  className={`rounded-lg px-4 py-2 text-sm font-bold transition ${
+                    automationMode === "github"
+                      ? "bg-cyan-400 text-slate-950"
+                      : "border border-slate-700 text-slate-300 hover:border-cyan-300 hover:text-cyan-200"
+                  }`}
+                >
+                  GitHub
+                </button>
+                <button
                   onClick={() => router.push("/pricing")}
                   className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-300 transition hover:border-cyan-300 hover:text-cyan-200"
                 >
                   View Pricing
                 </button>
               </div>
-              <p className="mt-4 text-sm text-slate-400">SDK and CLI access are available on Pro and Pro Max plans.</p>
+              <p className="mt-4 text-sm text-slate-400">Developer automation is available on Pro, Pro Max, and Enterprise plans.</p>
             </div>
             <div className="overflow-hidden rounded-xl border border-slate-700 bg-slate-950 shadow-2xl">
               <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
@@ -339,6 +395,8 @@ export default function LandingPage() {
     </Suspense>
   );
 }
+
+
 
 
 
