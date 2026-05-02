@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ApiClientError, apiGet } from "@/lib/apiClient";
+import { ApiClientError, apiGet, apiPost } from "@/lib/apiClient";
 import TopNav from "@/components/TopNav";
 
 type PlanKey = "starter" | "pro" | "pro_max" | "enterprise";
@@ -142,6 +142,8 @@ function normalizePlanId(value?: string): CurrentPlanKey | null {
 function PricingContent() {
   const router = useRouter();
   const [currentPlan, setCurrentPlan] = useState<CurrentPlanKey | null>(null);
+  const [checkoutPlan, setCheckoutPlan] = useState<PlanKey | "trial" | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,12 +169,30 @@ function PricingContent() {
     return plans.find((plan) => plan.key === currentPlan)?.name || null;
   }, [currentPlan]);
 
+  async function startCheckout(planId: PlanKey) {
+    setCheckoutPlan(planId);
+    setCheckoutError(null);
+    try {
+      const response = await apiPost<{ status: string; url?: string }>("/settings/billing/checkout", { plan_id: planId });
+      if (!response.url) throw new Error("Checkout URL was not returned.");
+      window.location.href = response.url;
+    } catch (error) {
+      if (error instanceof ApiClientError && error.status === 401) {
+        router.push(`/login?mode=signup&trial=1&plan=${planId}&next=${encodeURIComponent("/pricing")}`);
+        return;
+      }
+      setCheckoutError(error instanceof Error ? error.message : "Checkout is unavailable right now.");
+    } finally {
+      setCheckoutPlan(null);
+    }
+  }
+
   function handlePlanAction(plan: Plan) {
     if (plan.key === "enterprise") {
       window.location.href = "mailto:sales@chiploop.com?subject=ChipLoop%20Enterprise%20Pilot";
       return;
     }
-    router.push(`/login?mode=signup&plan=${plan.key}`);
+    startCheckout(plan.key);
   }
 
   return (
@@ -194,6 +214,11 @@ function PricingContent() {
               Current plan: {currentPlanName}
             </div>
           ) : null}
+          {checkoutError ? (
+            <div className="mt-4 rounded-lg border border-red-900/70 bg-red-950/30 px-3 py-2 text-sm text-red-200">
+              {checkoutError}
+            </div>
+          ) : null}
         </div>
 
         <section className="mt-8 rounded-lg border border-cyan-800/70 bg-cyan-950/25 p-5">
@@ -205,10 +230,11 @@ function PricingContent() {
               </p>
             </div>
             <button
-              onClick={() => router.push("/login?mode=signup&trial=1")}
-              className="rounded-lg bg-cyan-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-cyan-500"
+              onClick={() => startCheckout("starter")}
+              disabled={checkoutPlan !== null}
+              className="rounded-lg bg-cyan-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
             >
-              Start 7-day trial
+              {checkoutPlan === "starter" ? "Opening checkout..." : "Start 7-day trial"}
             </button>
           </div>
         </section>
@@ -230,9 +256,10 @@ function PricingContent() {
                 </div>
                 <button
                   onClick={() => handlePlanAction(plan)}
-                  className={`mt-5 w-full rounded-lg px-4 py-2 text-sm font-bold transition ${plan.key === "enterprise" ? "border border-slate-600 text-slate-100 hover:bg-slate-900" : "bg-cyan-600 text-white hover:bg-cyan-500"}`}
+                  disabled={checkoutPlan !== null || isCurrent}
+                  className={`mt-5 w-full rounded-lg px-4 py-2 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-70 ${plan.key === "enterprise" ? "border border-slate-600 text-slate-100 hover:bg-slate-900" : "bg-cyan-600 text-white hover:bg-cyan-500"}`}
                 >
-                  {isCurrent ? "Current plan" : plan.cta}
+                  {isCurrent ? "Current plan" : checkoutPlan === plan.key ? "Opening checkout..." : plan.cta}
                 </button>
               </article>
             );

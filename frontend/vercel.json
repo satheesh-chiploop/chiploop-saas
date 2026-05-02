@@ -1,6 +1,7 @@
+
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "http://209.38.74.151/$1" },
-    { "source": "/api", "destination": "http://209.38.74.151" }
+    { "source": "/api/(.*)", "destination": "https://api.getchiploop.com/$1" },
+    { "source": "/api", "destination": "https://api.getchiploop.com" }
   ]
 }

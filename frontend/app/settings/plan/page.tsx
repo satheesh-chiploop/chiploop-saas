@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import SettingsNav from "../SettingsNav";
-import { ApiClientError, apiGet } from "@/lib/apiClient";
+import { ApiClientError, apiGet, apiPost } from "@/lib/apiClient";
 
 type Entitlements = Record<string, boolean | number | string | null | undefined>;
 
@@ -82,6 +82,7 @@ export default function SettingsPlanPage() {
   const [plan, setPlan] = useState<PlanSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [billingBusy, setBillingBusy] = useState(false);
 
   async function loadPlan() {
     setLoading(true);
@@ -99,6 +100,20 @@ export default function SettingsPlanPage() {
   useEffect(() => {
     loadPlan();
   }, []);
+
+  async function openBillingPortal() {
+    setBillingBusy(true);
+    setError(null);
+    try {
+      const response = await apiPost<{ status: string; url?: string }>("/settings/billing/portal");
+      if (!response.url) throw new Error("Billing portal URL was not returned.");
+      window.location.href = response.url;
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBillingBusy(false);
+    }
+  }
 
   const entitlements = useMemo(() => plan?.entitlements || {}, [plan?.entitlements]);
   const enabledFeatures = useMemo(
@@ -145,6 +160,13 @@ export default function SettingsPlanPage() {
                 className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-600"
               >
                 View plans
+              </button>
+              <button
+                onClick={openBillingPortal}
+                disabled={billingBusy}
+                className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-500"
+              >
+                {billingBusy ? "Opening..." : "Update payment"}
               </button>
             </div>
           </div>
@@ -242,9 +264,9 @@ export default function SettingsPlanPage() {
             </section>
 
             <section className="rounded-lg border border-amber-700/40 bg-amber-950/20 p-5">
-              <h3 className="font-bold text-amber-100">Upgrade placeholder</h3>
+              <h3 className="font-bold text-amber-100">Billing</h3>
               <p className="mt-1 text-sm text-amber-100/80">
-Stripe checkout will support Starter, Pro, and Pro Max. Pro and Pro Max include SDK/CLI developer automation. Enterprise remains contact-sales for pilots, beta programs, custom limits, and private deployment discussions.
+Stripe Checkout and the Stripe Customer Portal handle subscriptions and payment method updates securely. Card details are never stored in ChipLoop.
               </p>
             </section>
           </>
