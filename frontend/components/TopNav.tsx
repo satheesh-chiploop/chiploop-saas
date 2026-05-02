@@ -19,8 +19,8 @@ type TopNavProps = {
   className?: string;
 };
 
-const navButtonClass = "text-sm font-medium text-slate-300 transition hover:text-cyan-300";
-const activeNavButtonClass = "text-sm font-semibold text-cyan-200 transition hover:text-cyan-100";
+const navButtonClass = "whitespace-nowrap text-sm font-medium text-slate-300 transition hover:text-cyan-300";
+const activeNavButtonClass = "whitespace-nowrap text-sm font-semibold text-cyan-200 transition hover:text-cyan-100";
 
 
 function getDisplayName(user: User | null): string | null {
@@ -95,16 +95,16 @@ export default function TopNav({
 
   return (
     <nav className={`${className} border-b border-slate-800 bg-slate-950/90 backdrop-blur`}>
-      <div className={`mx-auto flex ${maxWidthClass} items-center justify-between px-6 py-4`}>
+      <div className={`mx-auto flex ${maxWidthClass} flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4`}>
         <button
           onClick={() => router.push("/")}
-          className="text-xl font-extrabold text-cyan-300"
+          className="self-start text-xl font-extrabold text-cyan-300 sm:self-auto"
           aria-label="ChipLoop home"
         >
           ChipLoop
         </button>
 
-        <div className="flex flex-wrap items-center justify-end gap-5">
+        <div className="flex w-full items-center gap-4 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:justify-end sm:gap-5 sm:overflow-visible sm:pb-0">
           {showPlanBadge ? <PlanCreditBadge /> : null}
           {links.filter((link) => link.show).map((link) => (
             <button
@@ -122,14 +122,14 @@ export default function TopNav({
                 setDisplayName(null);
                 router.push("/login");
               }}
-              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-cyan-200"
+              className="whitespace-nowrap rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-cyan-200 sm:px-4"
             >
               <span className="mr-2 text-cyan-200">Hi, {displayName}</span>Logout
             </button>
           ) : (
             <button
               onClick={() => router.push(`/login?next=${encodeURIComponent(next)}`)}
-              className="text-sm font-medium text-slate-300 transition hover:text-cyan-300"
+              className="whitespace-nowrap text-sm font-medium text-slate-300 transition hover:text-cyan-300"
             >
               Login
             </button>

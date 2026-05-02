@@ -157,34 +157,34 @@ function LandingPageContent() {
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="home" showMarketplace showWebinar showSettings={false} className="fixed left-0 top-0 z-50 w-full" />
 
-      <section className="mx-auto flex max-w-7xl flex-col items-center px-6 pb-16 pt-32 text-center">
-        <div className="mb-5 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200">
+      <section className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-12 pt-36 text-center sm:px-6 sm:pb-16 sm:pt-32">
+        <div className="mb-5 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-semibold text-cyan-200 sm:text-sm">
           Weekly live demo starts May 23, 2026
         </div>
-        <h1 className="max-w-5xl text-5xl font-extrabold tracking-tight text-white md:text-7xl">
+        <h1 className="max-w-5xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-7xl">
           Agentic AI for Connected Chip Design Loops
         </h1>
-        <p className="mt-7 max-w-3xl text-lg leading-8 text-slate-300">
+        <p className="mt-6 max-w-3xl text-base leading-7 text-slate-300 sm:mt-7 sm:text-lg sm:leading-8">
           Build chip workflows across Digital, Embedded, Software, Validation, Analog, and Physical Design in one platform.
           ChipLoop helps teams share specs, generated artifacts, and design context across loops instead of working in disconnected tools.
         </p>
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+        <div className="mt-8 flex w-full flex-col gap-4 sm:mt-10 sm:w-auto sm:flex-row">
           <button
             onClick={startGuidedDemo}
-            className="rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300"
+            className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto"
           >
             Start Guided Arch2RTL Demo
           </button>
           <button
             onClick={() => router.push("/webinar/register")}
-            className="rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200"
+            className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto"
           >
             Register for Saturday Webinar
           </button>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-14">
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold">One Platform. Many Chip Design Loops.</h2>
           <p className="mt-3 text-slate-400">Keep engineering context connected as work moves across loops.</p>
@@ -201,7 +201,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-14">
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {[
             ["Connected Design Data", "Specs, generated files, reports, and workflow results stay connected across loops."],
@@ -216,12 +216,12 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-14">
-        <div className="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-8 md:p-10">
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-8 md:p-10">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-[1.3fr_0.7fr] md:items-center">
             <div>
               <p className="text-sm font-bold uppercase tracking-wide text-cyan-200">Weekly ChipLoop Webinar</p>
-              <h2 className="mt-3 text-3xl font-extrabold text-white">30-minute walkthrough and live demo every Saturday</h2>
+              <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">30-minute walkthrough and live demo every Saturday</h2>
               <p className="mt-4 leading-7 text-slate-300">
                 Starting May 23, join at 9:00 AM PST or 9:00 PM PST. We will cover ChipLoop Apps, Studio, connected Loops,
                 the guided Arch2RTL demo, generated RTL, SDC, UPF, downloadable artifacts, and Q&A.
@@ -242,12 +242,12 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-14">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-8 md:p-10">
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 sm:p-8 md:p-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
               <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Developer Automation</p>
-              <h2 className="mt-3 text-3xl font-extrabold text-white">Use ChipLoop from CLI, SDK, IDE, or GitHub</h2>
+              <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">Use ChipLoop from CLI, SDK, IDE, or GitHub</h2>
               <p className="mt-4 leading-7 text-slate-300">
                 Start in Apps from the browser. When your workflow needs scripts, CI, local editor workflows, or repo automation,
                 Pro, Pro Max, and Enterprise include developer automation access.
@@ -313,7 +313,7 @@ function LandingPageContent() {
                   {automationSnippets[automationMode][automationStep].title}
                 </div>
               </div>
-              <pre className="min-h-44 whitespace-pre-wrap px-5 py-5 text-left text-sm leading-7 text-cyan-100">
+              <pre className="min-h-36 overflow-x-auto whitespace-pre-wrap break-words px-4 py-4 text-left text-xs leading-6 text-cyan-100 sm:min-h-44 sm:px-5 sm:py-5 sm:text-sm sm:leading-7">
                 <code>{automationSnippets[automationMode][automationStep].code}</code>
               </pre>
               <div className="flex gap-2 border-t border-slate-800 px-4 py-3">
@@ -331,16 +331,16 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-16 text-center">
-        <h2 className="text-3xl font-extrabold">Start Building Connected Chip Workflows</h2>
+      <section className="mx-auto max-w-5xl px-4 py-12 text-center sm:px-6 sm:py-16">
+        <h2 className="text-2xl font-extrabold sm:text-3xl">Start Building Connected Chip Workflows</h2>
         <p className="mt-4 text-slate-300">
           Begin with the guided Arch2RTL demo, then explore more Loops inside Apps and Studio.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-          <button onClick={startGuidedDemo} className="rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300">
+          <button onClick={startGuidedDemo} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
             Run Guided Demo
           </button>
-          <button onClick={goToApps} className="rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300">
+          <button onClick={goToApps} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
             Explore Apps
           </button>
         </div>
