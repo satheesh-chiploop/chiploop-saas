@@ -155,7 +155,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="px-4 py-2 rounded-md text-black focus:ring-2 focus:ring-cyan-400"
+            className="px-4 py-2 rounded-md border border-slate-700 bg-slate-950 text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-cyan-400"
           />
           <input
             type="password"
@@ -163,7 +163,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="px-4 py-2 rounded-md text-white focus:ring-2 focus:ring-cyan-400"
+            className="px-4 py-2 rounded-md border border-slate-700 bg-slate-950 text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-cyan-400"
           />
 
           <button
