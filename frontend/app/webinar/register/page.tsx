@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "@/components/TopNav";
 
@@ -14,13 +14,22 @@ type FormState = {
   questions: string;
 };
 
+type WebinarSession = {
+  id: string;
+  label: string;
+  capacity: number;
+  booked: number;
+  remaining: number;
+  full: boolean;
+};
+
 const initialForm: FormState = {
   name: "",
   email: "",
   company: "",
   role: "",
   loop_interest: "Digital",
-  preferred_session: "9am_pst",
+  preferred_session: "",
   questions: "",
 };
 
@@ -30,8 +39,38 @@ export default function WebinarRegistrationPage() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>(initialForm);
   const [loading, setLoading] = useState(false);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [sessions, setSessions] = useState<WebinarSession[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const selectedSession = useMemo(
+    () => sessions.find((session) => session.id === form.preferred_session),
+    [form.preferred_session, sessions]
+  );
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const response = await fetch("/api/webinar/sessions", { cache: "no-store" });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error("Unable to load webinar sessions");
+        const loadedSessions = Array.isArray(data?.sessions) ? data.sessions as WebinarSession[] : [];
+        if (!mounted) return;
+        setSessions(loadedSessions);
+        const firstOpen = loadedSessions.find((session) => !session.full);
+        if (firstOpen) {
+          setForm((current) => current.preferred_session ? current : { ...current, preferred_session: firstOpen.id });
+        }
+      } catch (err) {
+        if (mounted) setError(err instanceof Error ? err.message : "Unable to load webinar sessions");
+      } finally {
+        if (mounted) setSessionsLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const update = (field: keyof FormState, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -50,7 +89,8 @@ export default function WebinarRegistrationPage() {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(typeof data?.detail === "string" ? data.detail : "Registration failed");
+        const detail = typeof data?.detail === "string" ? data.detail : "Registration failed";
+        throw new Error(detail === "preferred_session_full" ? "That session just filled up. Please choose another slot." : detail);
       }
       setSuccess(true);
     } catch (err) {
@@ -90,7 +130,7 @@ export default function WebinarRegistrationPage() {
                 <div className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-800 w-fit">Registration received</div>
                 <h2 className="mt-6 text-3xl font-extrabold">You are registered.</h2>
                 <p className="mt-4 leading-7 text-slate-600">
-                  Thanks for registering. We captured your preferred session and will use your email for webinar updates.
+                  Thanks for registering. We captured your preferred session{selectedSession ? `: ${selectedSession.label}` : ""}. We will use your email for webinar updates.
                 </p>
                 <button
                   onClick={() => router.push("/")}
@@ -171,10 +211,17 @@ export default function WebinarRegistrationPage() {
                       onChange={(event) => update("preferred_session", event.target.value)}
                       className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-cyan-500"
                     >
-                      <option value="9am_pst">Saturday 9:00 AM PST</option>
-                      <option value="9pm_pst">Saturday 9:00 PM PST</option>
-                      <option value="either">Either session works</option>
+                      {sessionsLoading ? <option value="">Loading sessions...</option> : null}
+                      {!sessionsLoading && !sessions.length ? <option value="">No sessions available</option> : null}
+                      {sessions.map((session) => (
+                        <option key={session.id} value={session.id} disabled={session.full}>
+                          {session.label} - {session.full ? "Full" : `${session.remaining} seats left`}
+                        </option>
+                      ))}
                     </select>
+                    <p className="mt-2 text-xs text-slate-500">
+                      Each session is capped at 10 people so Q&A stays useful.
+                    </p>
                   </label>
                 </div>
 
@@ -191,7 +238,7 @@ export default function WebinarRegistrationPage() {
                 {error && <div className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div>}
 
                 <button
-                  disabled={loading}
+                  disabled={loading || sessionsLoading || !form.preferred_session || Boolean(selectedSession?.full)}
                   className="w-full rounded-lg bg-cyan-500 px-5 py-3 font-bold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
                   {loading ? "Registering..." : "Register for Webinar"}
