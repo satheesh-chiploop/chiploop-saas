@@ -46,6 +46,19 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
+type DemoUsage = {
+  limit: number;
+  runs_used: number;
+  runs_remaining: number;
+  can_run: boolean;
+};
+
+type TrialPrompt = {
+  message: string;
+  runsRemaining?: number;
+  blocking?: boolean;
+};
+
 type VoiceNote = {
   id: string;
   transcript: string;
@@ -71,6 +84,8 @@ export default function Arch2RTLAppPage() {
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
   const [guidedOnboarding, setGuidedOnboarding] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+  const [trialPrompt, setTrialPrompt] = useState<TrialPrompt | null>(null);
+  const [pendingTrialPrompt, setPendingTrialPrompt] = useState<TrialPrompt | null>(null);
 
   // Intake
   const [projectName, setProjectName] = useState("");
@@ -96,6 +111,13 @@ export default function Arch2RTLAppPage() {
     logsRef.current.scrollTop = logsRef.current.scrollHeight;
   }, [logLines.length]);
 
+  useEffect(() => {
+    if (pendingTrialPrompt && workflowRow?.status === "completed") {
+      setTrialPrompt(pendingTrialPrompt);
+      setPendingTrialPrompt(null);
+    }
+  }, [pendingTrialPrompt, workflowRow?.status]);
+
   function authHeaders(): HeadersInit {
     const h: Record<string, string> = {};
     if (sessionUserId) h["x-user-id"] = sessionUserId;
@@ -109,11 +131,26 @@ export default function Arch2RTLAppPage() {
       headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(body),
     });
-    if (!resp.ok) {
-      const txt = await resp.text().catch(() => "");
-      throw new Error(`${resp.status} ${resp.statusText}${txt ? ` - ${txt}` : ""}`);
+    const text = await resp.text().catch(() => "");
+    let data: unknown = null;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = { detail: text };
     }
-    return resp.json();
+    if (!resp.ok) {
+      const detail = data && typeof data === "object" ? (data as Record<string, unknown>).detail : data;
+      const detailObject = detail && typeof detail === "object" ? (detail as Record<string, unknown>) : null;
+      const message =
+        (detailObject && typeof detailObject.message === "string" ? detailObject.message : null) ||
+        (typeof detail === "string" ? detail : null) ||
+        `${resp.status} ${resp.statusText}`;
+      const error = new Error(message) as Error & { status?: number; payload?: unknown };
+      error.status = resp.status;
+      error.payload = data;
+      throw error;
+    }
+    return data as T;
   }
 
   async function postVoiceForm<T>(path: string, body: FormData): Promise<T> {
@@ -335,9 +372,17 @@ export default function Arch2RTLAppPage() {
 
   async function runNow() {
     setErr(null);
+    setTrialPrompt(null);
+    setPendingTrialPrompt(null);
     setRunning(true);
     try {
-      const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>(
+      const out = await postJSON<{
+        ok: boolean;
+        workflow_id: string;
+        run_id: string;
+        demo?: DemoUsage;
+        trial_cta?: { show?: boolean; message?: string };
+      }>(
         "/apps/arch2rtl/run",
         {
           project_name: projectName || undefined,
@@ -353,6 +398,13 @@ export default function Arch2RTLAppPage() {
       );
       setWorkflowId(out.workflow_id);
       setRunId(out.run_id);
+      if (out.trial_cta?.show) {
+        setPendingTrialPrompt({
+          message: out.trial_cta.message || "Start your 7-day trial to run your own specs. No charge today.",
+          runsRemaining: out.demo?.runs_remaining,
+          blocking: false,
+        });
+      }
       if (guidedOnboarding) {
         apiPost("/settings/onboarding", {
           action: "start",
@@ -362,7 +414,21 @@ export default function Arch2RTLAppPage() {
         }).catch(() => undefined);
       }
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : String(e));
+      const error = e as Error & { status?: number; payload?: unknown };
+      const payload = error.payload && typeof error.payload === "object" ? (error.payload as Record<string, unknown>) : null;
+      const detail = payload?.detail && typeof payload.detail === "object" ? (payload.detail as Record<string, unknown>) : null;
+      if (error.status === 402 && detail?.requires_checkout) {
+        setTrialPrompt({
+          message:
+            typeof detail.message === "string"
+              ? detail.message
+              : "Start your 7-day trial to keep using ChipLoop.",
+          blocking: true,
+        });
+        setErr(null);
+      } else {
+        setErr(e instanceof Error ? e.message : String(e));
+      }
     } finally {
       setRunning(false);
     }
@@ -487,6 +553,31 @@ export default function Arch2RTLAppPage() {
               </button>
 
               {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
+
+              {trialPrompt ? (
+                <div className={`mt-4 rounded-xl border p-4 text-sm ${
+                  trialPrompt.blocking
+                    ? "border-amber-700 bg-amber-950/30 text-amber-100"
+                    : "border-cyan-800 bg-cyan-950/20 text-cyan-100"
+                }`}>
+                  <div className="font-semibold">
+                    {trialPrompt.blocking ? "Trial required to continue" : "Ready to run your own spec?"}
+                  </div>
+                  <div className="mt-1 leading-6 text-slate-200">{trialPrompt.message}</div>
+                  {typeof trialPrompt.runsRemaining === "number" ? (
+                    <div className="mt-1 text-xs text-slate-400">
+                      Demo runs remaining: {trialPrompt.runsRemaining}
+                    </div>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => router.push("/pricing")}
+                    className="mt-3 rounded-lg bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500"
+                  >
+                    Start 7-day trial
+                  </button>
+                </div>
+              ) : null}
 
               {workflowId ? (
                 <div className="mt-4 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">

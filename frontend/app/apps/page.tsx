@@ -570,7 +570,7 @@ export default function AppsHomePage() {
               Complete your first chip workflow in a few minutes.
             </h1>
             <p className="mt-4 max-w-2xl text-slate-300">
-              We will run a guided Arch2RTL demo using a simple PWM controller spec. You will generate RTL, constraints, UPF-lite power intent, and a downloadable handoff package.
+              We will run a guided Arch2RTL demo using a simple PWM controller spec. No credit card is required for demo mode. You can run this demo up to 3 times, then start a 7-day trial when you are ready to use your own specs.
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -611,7 +611,7 @@ export default function AppsHomePage() {
               {ARCH2RTL_ONBOARDING_SPEC}
             </pre>
             <div className="mt-4 rounded-xl border border-emerald-900/50 bg-emerald-950/20 p-4 text-sm text-emerald-100">
-              You only need to click run, review the generated files, and download the package. Studio remains available after this for advanced customization.
+              You only need to click run, review the generated files, and download the package. After each demo run, ChipLoop will offer a 7-day trial for custom specs without blocking until the demo limit is used.
             </div>
           </div>
         </section>
