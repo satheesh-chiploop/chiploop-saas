@@ -46,6 +46,11 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
+type VoiceNote = {
+  id: string;
+  transcript: string;
+};
+
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
   return logs.split("\n").map(l => l.trimEnd()).filter(l => l.trim().length > 0);
@@ -76,6 +81,12 @@ export default function Arch2RTLAppPage() {
   const [genRegmap, setGenRegmap] = useState(true);
   const [genUpfLite, setGenUpfLite] = useState(false);
   const [genPackaging, setGenPackaging] = useState(true);
+  const [voiceOpen, setVoiceOpen] = useState(false);
+  const [voiceRecording, setVoiceRecording] = useState(false);
+  const [voiceBusy, setVoiceBusy] = useState(false);
+  const [voiceErr, setVoiceErr] = useState<string | null>(null);
+  const [voiceNotes, setVoiceNotes] = useState<VoiceNote[]>([]);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -103,6 +114,54 @@ export default function Arch2RTLAppPage() {
       throw new Error(`${resp.status} ${resp.statusText}${txt ? ` - ${txt}` : ""}`);
     }
     return resp.json();
+  }
+
+  async function postVoiceForm<T>(path: string, body: FormData): Promise<T> {
+    const headers: Record<string, string> = {};
+    if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+    const resp = await fetch(`/api${path}`, {
+      method: "POST",
+      headers,
+      body,
+      cache: "no-store",
+    });
+    const text = await resp.text();
+    const data = text ? JSON.parse(text) : null;
+    if (!resp.ok) {
+      const detail = data?.detail ?? data;
+      const message =
+        typeof detail === "string"
+          ? detail
+          : typeof detail?.message === "string"
+          ? detail.message
+          : `Voice request failed with status ${resp.status}`;
+      throw new Error(message);
+    }
+    return data as T;
+  }
+
+  async function postVoiceJSON<T>(path: string, body: unknown): Promise<T> {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+    const resp = await fetch(`/api${path}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+    const text = await resp.text();
+    const data = text ? JSON.parse(text) : null;
+    if (!resp.ok) {
+      const detail = data?.detail ?? data;
+      const message =
+        typeof detail === "string"
+          ? detail
+          : typeof detail?.message === "string"
+          ? detail.message
+          : `Voice request failed with status ${resp.status}`;
+      throw new Error(message);
+    }
+    return data as T;
   }
 
   // Auth gate
@@ -201,6 +260,78 @@ export default function Arch2RTLAppPage() {
     if (!topModule.trim()) return false;
     return true;
   }, [running, specText, topModule]);
+
+  async function startStopVoiceRecording() {
+    setVoiceErr(null);
+    if (voiceRecording && mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setVoiceRecording(false);
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setVoiceErr("Voice recording is not supported in this browser.");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: BlobPart[] = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunks.push(event.data);
+      };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+        mediaRecorderRef.current = null;
+        setVoiceBusy(true);
+        try {
+          const blob = new Blob(chunks, { type: "audio/webm" });
+          const form = new FormData();
+          form.append("file", blob, `voice-note-${Date.now()}.webm`);
+          const result = await postVoiceForm<{ transcript?: string }>("/studio/voice/transcribe", form);
+          const transcript = (result.transcript || "").trim();
+          if (!transcript) throw new Error("No transcript returned.");
+          setVoiceNotes((current) => current.concat({ id: crypto.randomUUID(), transcript }));
+        } catch (error) {
+          setVoiceErr(error instanceof Error ? error.message : "Voice transcription failed.");
+        } finally {
+          setVoiceBusy(false);
+        }
+      };
+
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setVoiceRecording(true);
+    } catch (error) {
+      setVoiceErr(error instanceof Error ? error.message : "Microphone permission was not granted.");
+      setVoiceRecording(false);
+    }
+  }
+
+  async function generateSpecFromVoice() {
+    if (!voiceNotes.length) return;
+    setVoiceErr(null);
+    setVoiceBusy(true);
+    try {
+      const result = await postVoiceJSON<{ spec_draft?: string }>("/studio/voice/spec-draft", {
+        transcripts: voiceNotes.map((note) => note.transcript),
+        loop_type: "digital",
+        target: "Arch2RTL",
+      });
+      const draft = (result.spec_draft || "").trim();
+      if (!draft) throw new Error("No spec draft returned.");
+      setSpecText(draft);
+      if (!topModule.trim()) {
+        const moduleMatch = draft.match(/(?:top module|module|block name)\s*[:\-]\s*([a-zA-Z_][a-zA-Z0-9_]*)/i);
+        if (moduleMatch?.[1]) setTopModule(moduleMatch[1]);
+      }
+    } catch (error) {
+      setVoiceErr(error instanceof Error ? error.message : "Spec draft generation failed.");
+    } finally {
+      setVoiceBusy(false);
+    }
+  }
 
   async function runNow() {
     setErr(null);
@@ -369,6 +500,77 @@ export default function Arch2RTLAppPage() {
             </div>
 
             <div>
+              <div className="mb-4 rounded-2xl border border-cyan-900/50 bg-cyan-950/15 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-cyan-200">Voice Design Session</div>
+                    <div className="mt-1 text-xs leading-5 text-slate-400">
+                      Speak your design idea in short notes. ChipLoop transcribes them, then drafts a spec you can edit before running.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setVoiceOpen((current) => !current)}
+                    className="rounded-lg border border-cyan-800 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-900/30"
+                  >
+                    {voiceOpen ? "Hide Voice" : "Use Voice"}
+                  </button>
+                </div>
+
+                {voiceOpen ? (
+                  <div className="mt-4 space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={startStopVoiceRecording}
+                        disabled={voiceBusy}
+                        className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                          voiceRecording
+                            ? "bg-red-600 text-white hover:bg-red-500"
+                            : "bg-cyan-600 text-white hover:bg-cyan-500"
+                        } disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500`}
+                      >
+                        {voiceRecording ? "Stop Recording" : voiceBusy ? "Processing..." : "Record Voice Note"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={generateSpecFromVoice}
+                        disabled={!voiceNotes.length || voiceBusy || voiceRecording}
+                        className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-500"
+                      >
+                        Generate Spec
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVoiceNotes([]);
+                          setVoiceErr(null);
+                        }}
+                        disabled={!voiceNotes.length || voiceBusy || voiceRecording}
+                        className="rounded-lg px-4 py-2 text-sm text-slate-400 transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-600"
+                      >
+                        Clear
+                      </button>
+                    </div>
+
+                    {voiceErr ? <div className="rounded-lg border border-red-900/70 bg-red-950/30 p-3 text-xs text-red-200">{voiceErr}</div> : null}
+
+                    <div className="max-h-44 space-y-2 overflow-auto">
+                      {voiceNotes.length ? voiceNotes.map((note, index) => (
+                        <div key={note.id} className="rounded-xl border border-slate-800 bg-black/25 p-3 text-xs leading-5 text-slate-200">
+                          <div className="mb-1 font-semibold text-cyan-200">Voice note {index + 1}</div>
+                          {note.transcript}
+                        </div>
+                      )) : (
+                        <div className="rounded-xl border border-slate-800 bg-black/20 p-3 text-xs text-slate-500">
+                          No voice notes yet. Record one or more short notes, then generate a spec draft.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+
               <label className="block text-sm text-slate-300">Spec text *</label>
               <textarea
                 value={specText}
