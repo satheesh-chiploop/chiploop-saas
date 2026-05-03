@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -322,6 +323,14 @@ export default function SystemSoftwareValidationAppPage() {
               ) : null}
 
               <div>
+                <VoiceSpecDraft
+                  title="Validation Goal Voice Spec"
+                  loopType="validation"
+                  target="System Software Validation goal"
+                  compact
+                  onApply={setGoal}
+                />
+
                 <label className="block text-sm text-slate-300">Goal (optional)</label>
                 <textarea
                   value={goal}

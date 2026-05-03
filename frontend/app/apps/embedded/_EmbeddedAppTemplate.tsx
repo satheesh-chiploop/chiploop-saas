@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -205,6 +206,8 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-6 space-y-4">
             <div className="text-lg font-bold">One-shot input</div>
+            <VoiceSpecDraft title="Voice Spec Draft" loopType="embedded" target="Embedded App spec" onApply={setSpecText} />
+
 
             <label className="block text-sm text-slate-300">Spec / context</label>
             <textarea

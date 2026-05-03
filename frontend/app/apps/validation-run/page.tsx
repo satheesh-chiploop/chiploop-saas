@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 //import { createClient } from "@supabase/supabase-js";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 
 const supabase = createClientComponentClient();
 //const supabase = createClient(
@@ -803,6 +804,13 @@ export default function ValidationRunAppPage() {
 
             {planMode === "type_name" ? (
               <div className="mt-3">
+                <VoiceSpecDraft
+                  title="Voice Spec Draft"
+                  loopType="validation"
+                  target="Validation App spec"
+                  onApply={setDatasheetText}
+                />
+
                 <div className="text-xs text-slate-300 mb-1">
                   Datasheet / spec text (required to generate a new test plan)
                 </div>

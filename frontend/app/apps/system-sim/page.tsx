@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -209,16 +210,22 @@ export default function SystemSimAppPage() {
 
             <div className="space-y-4">
               <div>
+                <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
+
                 <label className="block text-sm text-slate-300">Digital specification *</label>
                 <textarea value={digitalSpecText} onChange={(e) => setDigitalSpecText(e.target.value)} rows={6}
                   className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100" />
               </div>
               <div>
+                <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
+
                 <label className="block text-sm text-slate-300">Analog specification *</label>
                 <textarea value={analogSpecText} onChange={(e) => setAnalogSpecText(e.target.value)} rows={6}
                   className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100" />
               </div>
               <div>
+                <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
+
                 <label className="block text-sm text-slate-300">SoC integration specification *</label>
                 <textarea value={socIntegrationSpecText} onChange={(e) => setSocIntegrationSpecText(e.target.value)} rows={6}
                   className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100" />

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -263,6 +264,14 @@ export default function VerifyAppPage() {
                   />
                 </>
               ) : null}
+
+              <VoiceSpecDraft
+                title="Verification Voice Spec"
+                loopType="validation"
+                target="Verification test intent"
+                compact
+                onApply={setTestIntent}
+              />
 
               <label className="block text-sm text-slate-300">Test intent *</label>
               <textarea
