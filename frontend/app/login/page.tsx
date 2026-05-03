@@ -68,7 +68,7 @@ export default function LoginPage() {
           password,
           // âœ… small improvement: keep consistent apps-first landing after confirm
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=/apps`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(getNext())}`,
           },
         });
       } else {

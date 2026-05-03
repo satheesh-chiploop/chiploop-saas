@@ -45,6 +45,8 @@ type PlanSummary = {
     target_plan?: string | null;
     message?: string;
   };
+  requires_checkout?: boolean;
+  can_run_workflows?: boolean;
 };
 
 type PlanResponse = {
@@ -184,6 +186,21 @@ export default function SettingsPlanPage() {
           </div>
         ) : plan ? (
           <>
+            {plan.requires_checkout ? (
+              <section className="rounded-lg border border-cyan-700/50 bg-cyan-950/20 p-5">
+                <div className="text-sm font-semibold text-cyan-100">Trial checkout required</div>
+                <div className="mt-2 text-sm text-cyan-100/85">
+                  Your account is created. Start the 7-day trial with a credit card when you are ready to run workflows.
+                </div>
+                <button
+                  onClick={() => router.push("/pricing")}
+                  className="mt-4 rounded-lg bg-cyan-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-600"
+                >
+                  Start 7-day trial
+                </button>
+              </section>
+            ) : null}
+
             {trial?.status ? (
               <section className="rounded-lg border border-cyan-700/50 bg-cyan-950/20 p-5">
                 <div className="text-sm font-semibold text-cyan-100">Trial status</div>

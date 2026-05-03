@@ -19,6 +19,8 @@ type PlanSummary = {
     days_remaining?: number | null;
   };
   trial_days_remaining?: number | null;
+  requires_checkout?: boolean;
+  can_run_workflows?: boolean;
 };
 
 type PlanResponse = {
@@ -185,9 +187,18 @@ export function LowCreditBanner() {
 
   const details = useMemo(() => {
     if (!plan) return null;
+    if (plan.requires_checkout) {
+      return {
+        type: "checkout" as const,
+        name: planName(plan),
+        percent: null,
+        remaining: plan.credits_remaining,
+      };
+    }
     const percent = creditPercentRemaining(plan);
     if (percent === null || percent >= 20) return null;
     return {
+      type: "low_credit" as const,
       name: planName(plan),
       percent,
       remaining: plan.credits_remaining,
@@ -198,7 +209,26 @@ export function LowCreditBanner() {
     setDismissed(dismissalActive());
   }, []);
 
-  if (loading || error || !details || dismissed) return null;
+  if (loading || error || !details || (details.type === "low_credit" && dismissed)) return null;
+
+  if (details.type === "checkout") {
+    return (
+      <div className="border-b border-cyan-800/50 bg-cyan-950/20 px-4 py-2 text-sm text-cyan-100">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div>
+            FYI: You can browse Apps and Studio. Start the 7-day trial with a credit card when you are ready to run workflows.
+          </div>
+          <button
+            type="button"
+            onClick={() => router.push("/pricing")}
+            className="w-fit rounded-lg border border-cyan-700/70 px-3 py-1 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-900/30"
+          >
+            Start trial
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="border-b border-amber-800/50 bg-amber-950/20 px-4 py-2 text-sm text-amber-100">

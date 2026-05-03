@@ -47,9 +47,17 @@ async function request<T>(method: "GET" | "POST", path: string, body?: unknown):
 
   if (!response.ok) {
     const detail = data?.detail ?? data;
+    const detailMessage =
+      detail && typeof detail === "object" && "message" in detail && typeof detail.message === "string"
+        ? detail.message
+        : null;
     const message =
       typeof detail === "string"
         ? detail
+        : detailMessage
+        ? detailMessage
+        : typeof data?.error === "string"
+        ? data.error
         : `Request failed with status ${response.status}`;
     throw new ApiClientError(message, response.status, detail);
   }
