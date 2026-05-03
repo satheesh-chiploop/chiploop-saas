@@ -43,10 +43,18 @@ async function request<T>(method: "GET" | "POST", path: string, body?: unknown):
   });
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+  let data: unknown = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { detail: text };
+    }
+  }
 
   if (!response.ok) {
-    const detail = data?.detail ?? data;
+    const responseObject = data && typeof data === "object" ? (data as Record<string, unknown>) : null;
+    const detail = responseObject && "detail" in responseObject ? responseObject.detail : data;
     const detailMessage =
       detail && typeof detail === "object" && "message" in detail && typeof detail.message === "string"
         ? detail.message
@@ -56,8 +64,8 @@ async function request<T>(method: "GET" | "POST", path: string, body?: unknown):
         ? detail
         : detailMessage
         ? detailMessage
-        : typeof data?.error === "string"
-        ? data.error
+        : responseObject && typeof responseObject.error === "string"
+        ? responseObject.error
         : `Request failed with status ${response.status}`;
     throw new ApiClientError(message, response.status, detail);
   }
