@@ -169,16 +169,20 @@ function PricingContent() {
     return plans.find((plan) => plan.key === currentPlan)?.name || null;
   }, [currentPlan]);
 
-  async function startCheckout(planId: PlanKey) {
-    setCheckoutPlan(planId);
+  async function startCheckout(planId: PlanKey, options: { trial?: boolean } = {}) {
+    setCheckoutPlan(options.trial ? "trial" : planId);
     setCheckoutError(null);
     try {
-      const response = await apiPost<{ status: string; url?: string }>("/settings/billing/checkout", { plan_id: planId });
+      const response = await apiPost<{ status: string; url?: string }>("/settings/billing/checkout", {
+        plan_id: planId,
+        trial: Boolean(options.trial),
+      });
       if (!response.url) throw new Error("Checkout URL was not returned.");
       window.location.href = response.url;
     } catch (error) {
       if (error instanceof ApiClientError && error.status === 401) {
-        router.push(`/login?mode=signup&trial=1&plan=${planId}&next=${encodeURIComponent("/pricing")}`);
+        const trialParam = options.trial ? "&trial=1" : "";
+        router.push(`/login?mode=signup${trialParam}&plan=${planId}&next=${encodeURIComponent("/pricing")}`);
         return;
       }
       setCheckoutError(error instanceof Error ? error.message : "Checkout is unavailable right now.");
@@ -230,11 +234,11 @@ function PricingContent() {
               </p>
             </div>
             <button
-              onClick={() => startCheckout("starter")}
+              onClick={() => startCheckout("starter", { trial: true })}
               disabled={checkoutPlan !== null}
               className="rounded-lg bg-cyan-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
             >
-              {checkoutPlan === "starter" ? "Opening checkout..." : "Start 7-day trial"}
+              {checkoutPlan === "trial" ? "Opening checkout..." : "Start 7-day trial"}
             </button>
           </div>
         </section>
