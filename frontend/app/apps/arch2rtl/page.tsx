@@ -57,6 +57,8 @@ type TrialPrompt = {
   message: string;
   runsRemaining?: number;
   blocking?: boolean;
+  checkoutUrl?: string;
+  checkoutLabel?: string;
 };
 
 type VoiceNote = {
@@ -100,6 +102,7 @@ export default function Arch2RTLAppPage() {
   const [voiceRecording, setVoiceRecording] = useState(false);
   const [voiceBusy, setVoiceBusy] = useState(false);
   const [voiceErr, setVoiceErr] = useState<string | null>(null);
+  const [voiceTrialPrompt, setVoiceTrialPrompt] = useState<TrialPrompt | null>(null);
   const [voiceNotes, setVoiceNotes] = useState<VoiceNote[]>([]);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
@@ -166,6 +169,17 @@ export default function Arch2RTLAppPage() {
     const data = text ? JSON.parse(text) : null;
     if (!resp.ok) {
       const detail = data?.detail ?? data;
+      if (detail?.requires_checkout) {
+        setVoiceTrialPrompt({
+          message:
+            typeof detail.message === "string"
+              ? detail.message
+              : "Start your 7-day trial to use voice design sessions.",
+          checkoutUrl: typeof detail.checkout_url === "string" ? detail.checkout_url : "/pricing?trial=1",
+          checkoutLabel: typeof detail.checkout_label === "string" ? detail.checkout_label : "Start 7-day trial",
+          blocking: true,
+        });
+      }
       const message =
         typeof detail === "string"
           ? detail
@@ -190,6 +204,17 @@ export default function Arch2RTLAppPage() {
     const data = text ? JSON.parse(text) : null;
     if (!resp.ok) {
       const detail = data?.detail ?? data;
+      if (detail?.requires_checkout) {
+        setVoiceTrialPrompt({
+          message:
+            typeof detail.message === "string"
+              ? detail.message
+              : "Start your 7-day trial to use voice design sessions.",
+          checkoutUrl: typeof detail.checkout_url === "string" ? detail.checkout_url : "/pricing?trial=1",
+          checkoutLabel: typeof detail.checkout_label === "string" ? detail.checkout_label : "Start 7-day trial",
+          blocking: true,
+        });
+      }
       const message =
         typeof detail === "string"
           ? detail
@@ -300,6 +325,7 @@ export default function Arch2RTLAppPage() {
 
   async function startStopVoiceRecording() {
     setVoiceErr(null);
+    setVoiceTrialPrompt(null);
     if (voiceRecording && mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setVoiceRecording(false);
@@ -349,6 +375,7 @@ export default function Arch2RTLAppPage() {
   async function generateSpecFromVoice() {
     if (!voiceNotes.length) return;
     setVoiceErr(null);
+    setVoiceTrialPrompt(null);
     setVoiceBusy(true);
     try {
       const result = await postVoiceJSON<{ spec_draft?: string }>("/studio/voice/spec-draft", {
@@ -423,6 +450,8 @@ export default function Arch2RTLAppPage() {
             typeof detail.message === "string"
               ? detail.message
               : "Start your 7-day trial to keep using ChipLoop.",
+          checkoutUrl: typeof detail.checkout_url === "string" ? detail.checkout_url : "/pricing?trial=1",
+          checkoutLabel: typeof detail.checkout_label === "string" ? detail.checkout_label : "Start 7-day trial",
           blocking: true,
         });
         setErr(null);
@@ -571,10 +600,10 @@ export default function Arch2RTLAppPage() {
                   ) : null}
                   <button
                     type="button"
-                    onClick={() => router.push("/pricing")}
+                    onClick={() => router.push(trialPrompt.checkoutUrl || "/pricing?trial=1")}
                     className="mt-3 rounded-lg bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500"
                   >
-                    Start 7-day trial
+                    {trialPrompt.checkoutLabel || "Start 7-day trial"}
                   </button>
                 </div>
               ) : null}
@@ -636,6 +665,7 @@ export default function Arch2RTLAppPage() {
                         onClick={() => {
                           setVoiceNotes([]);
                           setVoiceErr(null);
+                          setVoiceTrialPrompt(null);
                         }}
                         disabled={!voiceNotes.length || voiceBusy || voiceRecording}
                         className="rounded-lg px-4 py-2 text-sm text-slate-400 transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-600"
@@ -644,7 +674,20 @@ export default function Arch2RTLAppPage() {
                       </button>
                     </div>
 
-                    {voiceErr ? <div className="rounded-lg border border-red-900/70 bg-red-950/30 p-3 text-xs text-red-200">{voiceErr}</div> : null}
+                    {voiceErr ? (
+                      <div className="rounded-lg border border-red-900/70 bg-red-950/30 p-3 text-xs text-red-200">
+                        <div>{voiceErr}</div>
+                        {voiceTrialPrompt ? (
+                          <button
+                            type="button"
+                            onClick={() => router.push(voiceTrialPrompt.checkoutUrl || "/pricing?trial=1")}
+                            className="mt-3 rounded-lg bg-cyan-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-cyan-500"
+                          >
+                            {voiceTrialPrompt.checkoutLabel || "Start 7-day trial"}
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
 
                     <div className="max-h-44 space-y-2 overflow-auto">
                       {voiceNotes.length ? voiceNotes.map((note, index) => (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 type VoiceNote = {
@@ -15,6 +16,12 @@ type VoiceSpecDraftProps = {
   target?: string;
   compact?: boolean;
   onApply: (draft: string) => void;
+};
+
+type TrialCheckoutPrompt = {
+  message: string;
+  checkoutUrl: string;
+  checkoutLabel: string;
 };
 
 function makeId(): string {
@@ -41,6 +48,21 @@ function errorMessage(data: unknown, fallback: string): string {
   return fallback;
 }
 
+function trialCheckoutPrompt(data: unknown): TrialCheckoutPrompt | null {
+  const responseObject = data && typeof data === "object" ? (data as Record<string, unknown>) : null;
+  const detail = responseObject && "detail" in responseObject ? responseObject.detail : data;
+  const detailObject = detail && typeof detail === "object" ? (detail as Record<string, unknown>) : null;
+  if (!detailObject || detailObject.requires_checkout !== true) return null;
+  return {
+    message:
+      typeof detailObject.message === "string"
+        ? detailObject.message
+        : "Start your 7-day trial to use voice design sessions.",
+    checkoutUrl: typeof detailObject.checkout_url === "string" ? detailObject.checkout_url : "/pricing?trial=1",
+    checkoutLabel: typeof detailObject.checkout_label === "string" ? detailObject.checkout_label : "Start 7-day trial",
+  };
+}
+
 export default function VoiceSpecDraft({
   title = "Voice Design Session",
   subtitle = "Speak short notes. ChipLoop transcribes them, drafts a spec, and lets you review before running.",
@@ -49,11 +71,13 @@ export default function VoiceSpecDraft({
   compact = false,
   onApply,
 }: VoiceSpecDraftProps) {
+  const router = useRouter();
   const supabase = createClientComponentClient();
   const [open, setOpen] = useState(false);
   const [recording, setRecording] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [trialPrompt, setTrialPrompt] = useState<TrialCheckoutPrompt | null>(null);
   const [notes, setNotes] = useState<VoiceNote[]>([]);
   const recorderRef = useRef<MediaRecorder | null>(null);
 
@@ -66,6 +90,7 @@ export default function VoiceSpecDraft({
 
   async function startStopRecording() {
     setError(null);
+    setTrialPrompt(null);
     if (recording && recorderRef.current) {
       recorderRef.current.stop();
       setRecording(false);
@@ -98,7 +123,14 @@ export default function VoiceSpecDraft({
             cache: "no-store",
           });
           const data = await parseResponse(response);
-          if (!response.ok) throw new Error(errorMessage(data, `Transcription failed with status ${response.status}.`));
+          if (!response.ok) {
+            const prompt = trialCheckoutPrompt(data);
+            if (prompt) {
+              setTrialPrompt(prompt);
+              throw new Error(prompt.message);
+            }
+            throw new Error(errorMessage(data, `Transcription failed with status ${response.status}.`));
+          }
           const responseObject = data && typeof data === "object" ? (data as Record<string, unknown>) : null;
           const transcript = String(responseObject?.transcript || "").trim();
           if (!transcript) throw new Error("No transcript returned.");
@@ -122,6 +154,7 @@ export default function VoiceSpecDraft({
   async function generateSpec() {
     if (!notes.length) return;
     setError(null);
+    setTrialPrompt(null);
     setBusy(true);
     try {
       const response = await fetch("/api/studio/voice/spec-draft", {
@@ -135,7 +168,14 @@ export default function VoiceSpecDraft({
         cache: "no-store",
       });
       const data = await parseResponse(response);
-      if (!response.ok) throw new Error(errorMessage(data, `Spec draft failed with status ${response.status}.`));
+      if (!response.ok) {
+        const prompt = trialCheckoutPrompt(data);
+        if (prompt) {
+          setTrialPrompt(prompt);
+          throw new Error(prompt.message);
+        }
+        throw new Error(errorMessage(data, `Spec draft failed with status ${response.status}.`));
+      }
       const responseObject = data && typeof data === "object" ? (data as Record<string, unknown>) : null;
       const draft = String(responseObject?.spec_draft || "").trim();
       if (!draft) throw new Error("No spec draft returned.");
@@ -189,6 +229,7 @@ export default function VoiceSpecDraft({
               onClick={() => {
                 setNotes([]);
                 setError(null);
+                setTrialPrompt(null);
               }}
               disabled={!notes.length || busy || recording}
               className="rounded-lg px-4 py-2 text-sm text-slate-400 transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-600"
@@ -197,7 +238,20 @@ export default function VoiceSpecDraft({
             </button>
           </div>
 
-          {error ? <div className="rounded-lg border border-red-900/70 bg-red-950/30 p-3 text-xs text-red-200">{error}</div> : null}
+          {error ? (
+            <div className="rounded-lg border border-red-900/70 bg-red-950/30 p-3 text-xs text-red-200">
+              <div>{error}</div>
+              {trialPrompt ? (
+                <button
+                  type="button"
+                  onClick={() => router.push(trialPrompt.checkoutUrl)}
+                  className="mt-3 rounded-lg bg-cyan-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-cyan-500"
+                >
+                  {trialPrompt.checkoutLabel}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="max-h-44 space-y-2 overflow-auto">
             {notes.length ? notes.map((note, index) => (

@@ -570,7 +570,7 @@ export default function AppsHomePage() {
               Complete your first chip workflow in a few minutes.
             </h1>
             <p className="mt-4 max-w-2xl text-slate-300">
-              We will run a guided Arch2RTL demo using a simple PWM controller spec. No credit card is required for demo mode. You can run this demo up to 3 times, then start a 7-day trial when you are ready to use your own specs.
+              We will run a guided Arch2RTL demo using a simple PWM controller spec. Demo mode does not require trial checkout. You can run this demo up to 3 times, then start a 7-day trial when you are ready to use your own specs.
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">

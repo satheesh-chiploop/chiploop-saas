@@ -143,7 +143,7 @@ export default function LoginPage() {
 
         {mode === "signup" && trialIntent ? (
           <div className="mb-5 rounded-lg border border-cyan-700/60 bg-cyan-950/30 p-3 text-sm text-cyan-100">
-            Free 7-day trial. Starter is $19.99/month after 7 days. Credit card required via Stripe. Cancel anytime before trial ends.
+            Free 7-day trial. Starter is $19.99/month after 7 days. Billing is handled securely by Stripe. Cancel anytime before trial ends.
           </div>
         ) : null}
 
