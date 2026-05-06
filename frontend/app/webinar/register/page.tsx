@@ -35,6 +35,14 @@ const initialForm: FormState = {
 
 const loopOptions = ["Digital", "Embedded", "Software", "Validation", "Analog", "Physical Design", "System", "Still exploring"];
 
+function sessionOptionLabel(session: WebinarSession): string {
+  if (session.full) return `${session.label} - Full`;
+  if (session.remaining > 0 && session.remaining <= 4) {
+    return `${session.label} - ${session.remaining} seat${session.remaining === 1 ? "" : "s"} left`;
+  }
+  return session.label;
+}
+
 export default function WebinarRegistrationPage() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>(initialForm);
@@ -102,7 +110,7 @@ export default function WebinarRegistrationPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <TopNav current="webinar" showWebinar showSettings={false} maxWidthClass="max-w-5xl" />
+      <TopNav current="webinar" showWebinar showWorkshop showSettings={false} maxWidthClass="max-w-5xl" />
       <div className="mx-auto max-w-5xl px-6 py-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-8">
@@ -114,13 +122,25 @@ export default function WebinarRegistrationPage() {
             <div className="mt-8 rounded-xl border border-slate-700 bg-slate-950/70 p-5 text-sm text-slate-300">
               <div className="font-bold text-white">We will cover:</div>
               <ul className="mt-3 space-y-2">
-                <li>What ChipLoop is and how Loops work</li>
-                <li>Apps vs Studio</li>
-                <li>Connected design data across domains</li>
-                <li>Guided Arch2RTL demo</li>
-                <li>Generated RTL, SDC, UPF, and downloadable artifacts</li>
-                <li>Q&A</li>
+                <li>- What ChipLoop is and how connected Loops work</li>
+                <li>- Apps vs Studio, and when to use each</li>
+                <li>- Connected design data across domains</li>
+                <li>- Guided Arch2RTL demo from spec to artifacts</li>
+                <li>- Generated RTL, SDC, UPF, and downloadable packages</li>
+                <li>- Live Q&A</li>
               </ul>
+            </div>
+            <div className="mt-5 rounded-xl border border-cyan-800 bg-cyan-950/25 p-5 text-sm text-cyan-100">
+              <div className="font-bold text-white">Want hands-on training?</div>
+              <p className="mt-2 leading-6 text-cyan-100/85">
+                Join the 2-day ChipLoop Agentic AI Workshop across two Saturdays for $99.
+              </p>
+              <button
+                onClick={() => router.push("/workshop")}
+                className="mt-4 rounded-lg bg-cyan-400 px-4 py-2 font-bold text-slate-950 transition hover:bg-cyan-300"
+              >
+                View paid workshop
+              </button>
             </div>
           </section>
 
@@ -215,7 +235,7 @@ export default function WebinarRegistrationPage() {
                       {!sessionsLoading && !sessions.length ? <option value="">No sessions available</option> : null}
                       {sessions.map((session) => (
                         <option key={session.id} value={session.id} disabled={session.full}>
-                          {session.label} - {session.full ? "Full" : `${session.remaining} seats left`}
+                          {sessionOptionLabel(session)}
                         </option>
                       ))}
                     </select>

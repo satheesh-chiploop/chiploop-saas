@@ -6,13 +6,14 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { User } from "@supabase/supabase-js";
 import { PlanCreditBadge } from "@/components/PlanCreditStatus";
 
-type NavKey = "home" | "apps" | "studio" | "marketplace" | "pricing" | "settings" | "admin" | "webinar";
+type NavKey = "home" | "apps" | "studio" | "marketplace" | "pricing" | "settings" | "admin" | "webinar" | "workshop";
 
 type TopNavProps = {
   current?: NavKey;
   showPlanBadge?: boolean;
   showMarketplace?: boolean;
   showWebinar?: boolean;
+  showWorkshop?: boolean;
   showSettings?: boolean;
   showAdmin?: boolean;
   maxWidthClass?: string;
@@ -41,6 +42,7 @@ export default function TopNav({
   showPlanBadge = false,
   showMarketplace = false,
   showWebinar = false,
+  showWorkshop = false,
   showSettings = true,
   showAdmin = false,
   maxWidthClass = "max-w-7xl",
@@ -89,6 +91,7 @@ export default function TopNav({
     { key: "settings", label: "Settings", href: "/settings/plan", show: showSettings },
     { key: "admin", label: "Admin", href: "/admin/marketplace", show: showAdmin },
     { key: "webinar", label: "Webinar", href: "/webinar/register", show: showWebinar },
+    { key: "workshop", label: "Workshop", href: "/workshop", show: showWorkshop },
   ];
 
   const next = current === "home" ? "/apps" : pathname || "/apps";
