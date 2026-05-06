@@ -133,7 +133,7 @@ export default function WebinarRegistrationPage() {
             <div className="mt-5 rounded-xl border border-cyan-800 bg-cyan-950/25 p-5 text-sm text-cyan-100">
               <div className="font-bold text-white">Want hands-on training?</div>
               <p className="mt-2 leading-6 text-cyan-100/85">
-                Join the 2-day ChipLoop Agentic AI Workshop across two Saturdays for $99.
+                Join the 2-day ChipLoop Agentic AI Workshop across two Saturdays.
               </p>
               <button
                 onClick={() => router.push("/workshop")}

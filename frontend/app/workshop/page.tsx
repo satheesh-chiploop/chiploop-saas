@@ -172,12 +172,13 @@ function WorkshopContent() {
             <h1 className="mt-4 text-4xl font-extrabold leading-tight">Agentic AI in Chip Design</h1>
             <p className="mt-5 leading-7 text-slate-300">
               A hands-on 2-day workshop across two consecutive Saturdays. Each session runs for 2 hours.
-              Choose the 9:30 AM PST or 9:30 PM PST batch. New cohorts open every other Saturday.
+              Choose the 9:30 AM PST or 9:30 PM PST batch. The first cohort starts June 6, 2026, and new cohorts open every other Saturday.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <span className="rounded-full border border-cyan-700 bg-cyan-950/40 px-4 py-2 text-sm font-semibold text-cyan-100">$99 per workshop</span>
+              <span className="rounded-full border border-cyan-700 bg-cyan-950/40 px-4 py-2 text-sm font-semibold text-cyan-100">$149 per workshop</span>
               <span className="rounded-full border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-semibold text-slate-200">2 Saturdays</span>
               <span className="rounded-full border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-semibold text-slate-200">2 hours each day</span>
+              <span className="rounded-full border border-emerald-700 bg-emerald-950/30 px-4 py-2 text-sm font-semibold text-emerald-100">Completion certificate</span>
             </div>
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
@@ -193,6 +194,13 @@ function WorkshopContent() {
                   {dayTwo.map((item) => <li key={item}>- {item}</li>)}
                 </ul>
               </div>
+            </div>
+
+            <div className="mt-8 rounded-xl border border-emerald-800/60 bg-emerald-950/20 p-5">
+              <div className="font-bold text-emerald-100">Certificate for students</div>
+              <p className="mt-2 text-sm leading-6 text-emerald-100/85">
+                Complete both workshop sessions and receive a ChipLoop completion certificate you can add to your resume, LinkedIn, or student portfolio.
+              </p>
             </div>
 
             <div className="mt-8 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-5">
@@ -217,6 +225,7 @@ function WorkshopContent() {
                 <p className="mt-4 leading-7 text-slate-600">
                   Stripe payment completed. Confirmation is finalized by the payment webhook.
                   {registration?.paid ? " Your registration is confirmed." : " If this page still says pending, refresh in a few seconds."}
+                  {" "}After completing both sessions, you will receive a ChipLoop completion certificate.
                 </p>
                 {registration ? (
                   <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
@@ -295,7 +304,7 @@ function WorkshopContent() {
                 {error ? <div className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div> : null}
 
                 <button disabled={loading || batchesLoading || !form.batch_id || Boolean(selectedBatch?.full)} className="w-full rounded-lg bg-cyan-500 px-5 py-3 font-bold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-300">
-                  {loading ? "Opening Stripe..." : "Pay $99 and reserve seat"}
+                  {loading ? "Opening Stripe..." : "Pay $149 and reserve seat"}
                 </button>
               </form>
             )}

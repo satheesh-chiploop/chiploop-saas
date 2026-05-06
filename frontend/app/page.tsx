@@ -241,7 +241,7 @@ function LandingPageContent() {
                 onClick={() => router.push("/workshop")}
                 className="mt-3 w-full rounded-lg border border-slate-700 px-5 py-3 font-bold text-slate-100 transition hover:border-cyan-400 hover:text-cyan-200"
               >
-                View $99 Workshop
+                View Workshop
               </button>
             </div>
           </div>
