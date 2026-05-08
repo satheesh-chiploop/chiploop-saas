@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { apiPost } from "@/lib/apiClient";
+import AskThisRunPanel from "@/components/AskThisRunPanel";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -609,12 +610,15 @@ export default function Arch2RTLAppPage() {
               ) : null}
 
               {workflowId ? (
-                <div className="mt-4 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
-                  <div>workflow_id: <span className="text-slate-100">{workflowId}</span></div>
-                  <div>run_id: <span className="text-slate-100">{runId}</span></div>
-                  <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
-                    {guidedOnboarding ? "Download ZIP and finish" : "Download ZIP (full=1)"}
-                  </button>
+                <div className="mt-4 space-y-4">
+                  <div className="rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+                    <div>workflow_id: <span className="text-slate-100">{workflowId}</span></div>
+                    <div>run_id: <span className="text-slate-100">{runId}</span></div>
+                    <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
+                      {guidedOnboarding ? "Download ZIP and finish" : "Download ZIP (full=1)"}
+                    </button>
+                  </div>
+                  <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}
             </div>

@@ -1,9 +1,12 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import AskThisRunPanel from "@/components/AskThisRunPanel";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -294,6 +297,7 @@ export default function IntegrateAppPage() {
                   >
                     Download ZIP (full=1)
                   </button>
+                    <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}
             </div>

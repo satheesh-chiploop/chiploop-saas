@@ -1,10 +1,13 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 //import { createClient } from "@supabase/supabase-js";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import AskThisRunPanel from "@/components/AskThisRunPanel";
 
 const supabase = createClientComponentClient();
 //const supabase = createClient(
@@ -1052,11 +1055,14 @@ export default function ValidationRunAppPage() {
             </div>
 
             {workflowId ? (
-              <div className="mt-4 rounded-xl border border-slate-800 bg-black/30 p-4 text-xs text-slate-300">
-                <div><span className="text-slate-500">workflow_id:</span> {workflowId}</div>
-                {runId ? <div className="mt-1"><span className="text-slate-500">run_id:</span> {runId}</div> : null}
-                {workflowRow?.status ? <div className="mt-1"><span className="text-slate-500">status:</span> {workflowRow.status}</div> : null}
-                {workflowRow?.phase ? <div className="mt-1"><span className="text-slate-500">phase:</span> {workflowRow.phase}</div> : null}
+              <div className="mt-4 space-y-4">
+                <div className="rounded-xl border border-slate-800 bg-black/30 p-4 text-xs text-slate-300">
+                  <div><span className="text-slate-500">workflow_id:</span> {workflowId}</div>
+                  {runId ? <div className="mt-1"><span className="text-slate-500">run_id:</span> {runId}</div> : null}
+                  {workflowRow?.status ? <div className="mt-1"><span className="text-slate-500">status:</span> {workflowRow.status}</div> : null}
+                  {workflowRow?.phase ? <div className="mt-1"><span className="text-slate-500">phase:</span> {workflowRow.phase}</div> : null}
+                </div>
+                <AskThisRunPanel workflowId={workflowId} compact />
               </div>
             ) : (
               <div className="mt-4 rounded-xl border border-slate-800 bg-black/20 p-4 text-sm text-slate-400">

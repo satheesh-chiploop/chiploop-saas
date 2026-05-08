@@ -1,9 +1,12 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import AskThisRunPanel from "@/components/AskThisRunPanel";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -26,8 +29,6 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
-
   const [specText, setSpecText] = useState("");
   const [goal, setGoal] = useState("");
 
@@ -77,7 +78,6 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
       setLoading(true);
       const { data } = await supabase.auth.getUser();
       const uid = data?.user?.id ?? null;
-      setUserId(uid);
       setLoading(false);
       if (!uid) router.push("/");
     })();
@@ -260,6 +260,7 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
                 ) : null}
               </div>
             ) : null}
+            {workflowId ? <AskThisRunPanel workflowId={workflowId} compact /> : null}
           </div>
 
           {/* Toolchain + toggles */}
