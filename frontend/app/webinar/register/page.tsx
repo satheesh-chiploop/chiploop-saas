@@ -117,7 +117,7 @@ export default function WebinarRegistrationPage() {
             <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Weekly ChipLoop Webinar</p>
             <h1 className="mt-4 text-4xl font-extrabold leading-tight">Register for the Saturday ChipLoop demo</h1>
             <p className="mt-5 leading-7 text-slate-300">
-              Join a 30-minute walkthrough every Saturday starting May 23, 2026. Choose 9:00 AM PST or 9:00 PM PST.
+              Join a 30-minute walkthrough every Saturday starting May 30, 2026. Choose 9:00 AM PST or 9:00 PM PST.
             </p>
             <div className="mt-8 rounded-xl border border-slate-700 bg-slate-950/70 p-5 text-sm text-slate-300">
               <div className="font-bold text-white">We will cover:</div>
