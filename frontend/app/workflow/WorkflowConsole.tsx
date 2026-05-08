@@ -1,7 +1,10 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiPost } from "@/lib/apiClient";
 //import { createClient } from "@supabase/supabase-js";
 
 // 🧩 Supabase client
@@ -22,6 +25,14 @@ interface WorkflowRow {
   loop_type?: string;
 }
 
+type AskThisRunResponse = {
+  workflow_id: string;
+  question: string;
+  answer: string;
+  sources?: Array<{ type: string; path: string }>;
+  source_count?: number;
+};
+
 
 
 type TableName = "workflows" | "runs";
@@ -34,7 +45,7 @@ export default function WorkflowConsole({
   table?: TableName | string;
 }) {
   const supabase = createClientComponentClient();
-  const [activeTab, setActiveTab] = useState<"summary" | "live" | "outputs">("live");
+  const [activeTab, setActiveTab] = useState<"summary" | "live" | "outputs" | "ask">("live");
   const [logs, setLogs] = useState<string[]>([]);
   const [status, setStatus] = useState("starting");
   const [workflowMeta, setWorkflowMeta] = useState<WorkflowRow | null>(null);
@@ -45,6 +56,10 @@ export default function WorkflowConsole({
 
   const [validationManifest, setValidationManifest] = useState<any | null>(null);
   const [validationManifestError, setValidationManifestError] = useState<string | null>(null);
+  const [askQuestion, setAskQuestion] = useState("");
+  const [askLoading, setAskLoading] = useState(false);
+  const [askError, setAskError] = useState<string | null>(null);
+  const [askHistory, setAskHistory] = useState<AskThisRunResponse[]>([]);
 
     // ✅ Schematic / Mapping viewer
   const [viewOpen, setViewOpen] = useState(false);
@@ -604,6 +619,23 @@ export default function WorkflowConsole({
   };
   
 
+  const askThisRun = async (questionOverride?: string) => {
+    const question = (questionOverride || askQuestion).trim();
+    if (!question || askLoading) return;
+    setAskLoading(true);
+    setAskError(null);
+    try {
+      const response = await apiPost<AskThisRunResponse>(`/workflow/${wfId || jobId}/ask`, { question });
+      setAskHistory((current) => [response, ...current].slice(0, 10));
+      setAskQuestion("");
+      setActiveTab("ask");
+    } catch (err: any) {
+      setAskError(err?.message || "Ask This Run failed.");
+    } finally {
+      setAskLoading(false);
+    }
+  };
+
   // ---------- 🧩 Render ----------
   const renderSummary = () => (
     <div className="space-y-2">
@@ -683,6 +715,94 @@ export default function WorkflowConsole({
       )}
     </div>
   );
+
+  const renderAsk = () => {
+    const suggestions = [
+      "Summarize this run and the key artifacts.",
+      "What should I inspect first?",
+      "Are there warnings, failures, or missing outputs?",
+      "What is the recommended next step?",
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg border border-cyan-800/60 bg-cyan-950/20 p-4">
+          <div className="font-semibold text-cyan-200">Ask This Run</div>
+          <p className="mt-1 text-sm text-cyan-100/80">
+            Ask questions about this workflow&apos;s logs, reports, and artifact index. Answers are generated with AI from this run&apos;s available context.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {suggestions.map((suggestion) => (
+              <button
+                key={suggestion}
+                type="button"
+                disabled={askLoading}
+                onClick={() => askThisRun(suggestion)}
+                className="rounded border border-cyan-700 px-3 py-1 text-xs text-cyan-100 hover:bg-cyan-900/40 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            askThisRun();
+          }}
+          className="space-y-3"
+        >
+          <textarea
+            value={askQuestion}
+            onChange={(event) => setAskQuestion(event.target.value)}
+            placeholder="Ask about failures, warnings, generated files, coverage, handoff readiness..."
+            className="min-h-24 w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-slate-100 outline-none focus:border-cyan-500"
+          />
+          <button
+            type="submit"
+            disabled={askLoading || askQuestion.trim().length < 3}
+            className="rounded bg-cyan-700 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+          >
+            {askLoading ? "Inspecting..." : "Ask this run"}
+          </button>
+        </form>
+
+        {askError ? (
+          <div className="rounded border border-red-800 bg-red-950/40 p-3 text-sm text-red-200">{askError}</div>
+        ) : null}
+
+        {askHistory.length === 0 && !askLoading ? (
+          <div className="rounded border border-slate-700 bg-slate-900/40 p-4 text-sm text-slate-400">
+            No questions asked yet.
+          </div>
+        ) : null}
+
+        <div className="space-y-3">
+          {askHistory.map((item, index) => (
+            <div key={`${item.question}-${index}`} className="rounded-lg border border-slate-700 bg-slate-900/50 p-4">
+              <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Question</div>
+              <div className="mt-1 text-slate-100">{item.question}</div>
+              <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-cyan-300">Answer</div>
+              <div className="mt-2 whitespace-pre-wrap leading-6 text-slate-200">{item.answer}</div>
+              {item.sources && item.sources.length > 0 ? (
+                <div className="mt-4">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Sources</div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {item.sources.slice(0, 8).map((source) => (
+                      <span key={`${source.type}-${source.path}`} className="rounded bg-slate-800 px-2 py-1 text-xs text-slate-300">
+                        {source.path}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const renderOutputs = () => {
     const artifacts = workflowMeta?.artifacts;
@@ -917,12 +1037,13 @@ export default function WorkflowConsole({
   
     
   
+  };
 
   return (
     <div className="mt-4 rounded-lg border border-slate-700 bg-slate-800/80 p-3 text-sm text-slate-200 shadow-md">
       {/* Tabs */}
       <div className="flex space-x-2 border-b border-slate-700 pb-2 mb-2">
-        {["summary", "live", "outputs"].map((tab) => (
+        {["summary", "live", "outputs", "ask"].map((tab) => (
           <button
             key={tab}
             className={`px-3 py-1 rounded-t-lg ${
@@ -935,6 +1056,7 @@ export default function WorkflowConsole({
             {tab === "summary" && "📘 Summary"}
             {tab === "live" && "🔴 Live Feed"}
             {tab === "outputs" && "📦 Outputs"}
+            {tab === "ask" && "Ask"}
           </button>
         ))}
       </div>
@@ -943,6 +1065,7 @@ export default function WorkflowConsole({
       {activeTab === "summary" && renderSummary()}
       {activeTab === "live" && renderLogs()}
       {activeTab === "outputs" && renderOutputs()}
+      {activeTab === "ask" && renderAsk()}
 
             {/* ✅ Artifact Viewer Modal */}
             {viewOpen && (

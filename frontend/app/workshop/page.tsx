@@ -175,7 +175,8 @@ function WorkshopContent() {
               Choose the 9:30 AM PST or 9:30 PM PST batch. The first cohort starts June 6, 2026, and new cohorts open every other Saturday.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <span className="rounded-full border border-cyan-700 bg-cyan-950/40 px-4 py-2 text-sm font-semibold text-cyan-100">$149 per workshop</span>
+              <span className="rounded-full border border-cyan-700 bg-cyan-950/40 px-4 py-2 text-sm font-semibold text-cyan-100">$49.99 per day</span>
+              <span className="rounded-full border border-cyan-700 bg-cyan-950/40 px-4 py-2 text-sm font-semibold text-cyan-100">$99.98 total</span>
               <span className="rounded-full border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-semibold text-slate-200">2 Saturdays</span>
               <span className="rounded-full border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-semibold text-slate-200">2 hours each day</span>
               <span className="rounded-full border border-emerald-700 bg-emerald-950/30 px-4 py-2 text-sm font-semibold text-emerald-100">Completion certificate</span>
@@ -304,7 +305,7 @@ function WorkshopContent() {
                 {error ? <div className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div> : null}
 
                 <button disabled={loading || batchesLoading || !form.batch_id || Boolean(selectedBatch?.full)} className="w-full rounded-lg bg-cyan-500 px-5 py-3 font-bold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-300">
-                  {loading ? "Opening Stripe..." : "Pay $149 and reserve seat"}
+                  {loading ? "Opening Stripe..." : "Pay $99.98 and reserve seat"}
                 </button>
               </form>
             )}
