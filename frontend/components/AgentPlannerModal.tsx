@@ -610,7 +610,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
         )}
 
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">Agent Planner</h2>
+          <h2 className="text-xl font-bold text-white">System Planner</h2>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-white transition"
