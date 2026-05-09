@@ -165,8 +165,8 @@ export default function StudioAgentPlannerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="flex max-h-[88vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-white shadow-2xl">
-        <div className="flex items-start justify-between gap-4 border-b border-slate-800 p-5">
+      <div className="flex h-[calc(100vh-2rem)] max-h-[900px] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-white shadow-2xl">
+        <div className="shrink-0 flex items-start justify-between gap-4 border-b border-slate-800 p-5">
           <div>
             <h2 className="text-2xl font-extrabold text-cyan-300">Agent Planner</h2>
             <p className="mt-1 text-sm text-slate-400">
@@ -184,8 +184,8 @@ export default function StudioAgentPlannerModal({
           </button>
         </div>
 
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-0 md:grid-cols-[360px_1fr]">
-          <section className="border-b border-slate-800 p-5 md:border-b-0 md:border-r">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-0 md:grid-cols-[minmax(320px,380px)_1fr]">
+          <section className="min-h-0 overflow-y-auto border-b border-slate-800 p-5 pb-24 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent md:border-b-0 md:border-r">
             <label className="block text-sm font-semibold text-slate-200">Planned agent name</label>
             <input
               value={name}
@@ -238,7 +238,7 @@ export default function StudioAgentPlannerModal({
               placeholder="Describe the capability you need..."
             />
 
-            <div className="mt-4 flex gap-2">
+            <div className="sticky bottom-0 -mx-5 mt-4 flex gap-2 border-t border-slate-800 bg-slate-950/95 px-5 py-4 backdrop-blur">
               <button
                 onClick={runPlanner}
                 disabled={!canSubmit}
