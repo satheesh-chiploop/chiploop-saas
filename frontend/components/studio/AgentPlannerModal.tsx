@@ -172,6 +172,9 @@ export default function StudioAgentPlannerModal({
             <p className="mt-1 text-sm text-slate-400">
               Find reusable agents, or create a private draft when you want a new agent.
             </p>
+            <div className="mt-3 inline-flex rounded-full border border-emerald-800 bg-emerald-950/30 px-3 py-1 text-xs font-semibold text-emerald-200">
+              New: private agent creation mode
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -212,6 +215,21 @@ export default function StudioAgentPlannerModal({
               placeholder="Optional domain"
             />
 
+            <label className="mt-4 flex items-start gap-3 rounded-lg border border-emerald-800/70 bg-emerald-950/20 p-3">
+              <input
+                type="checkbox"
+                checked={createPrivateAgent}
+                onChange={(event) => setCreatePrivateAgent(event.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-950 text-emerald-600 focus:ring-emerald-700"
+              />
+              <span>
+                <span className="block text-sm font-semibold text-emerald-100">Create a new private agent</span>
+                <span className="mt-1 block text-xs leading-5 text-emerald-100/75">
+                  Skip duplicate blocking. Existing agents will be shown only as references.
+                </span>
+              </span>
+            </label>
+
             <label className="mt-4 block text-sm font-semibold text-slate-200">Requirement</label>
             <textarea
               value={requestText}
@@ -219,21 +237,6 @@ export default function StudioAgentPlannerModal({
               className="mt-2 h-40 w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-3 text-sm outline-none focus:border-cyan-600"
               placeholder="Describe the capability you need..."
             />
-
-            <label className="mt-4 flex items-start gap-3 rounded-lg border border-slate-800 bg-black/30 p-3">
-              <input
-                type="checkbox"
-                checked={createPrivateAgent}
-                onChange={(event) => setCreatePrivateAgent(event.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-950 text-cyan-600 focus:ring-cyan-700"
-              />
-              <span>
-                <span className="block text-sm font-semibold text-slate-100">Create a new private agent</span>
-                <span className="mt-1 block text-xs leading-5 text-slate-400">
-                  Existing matches are shown as references only and will not block draft generation.
-                </span>
-              </span>
-            </label>
 
             <div className="mt-4 flex gap-2">
               <button
