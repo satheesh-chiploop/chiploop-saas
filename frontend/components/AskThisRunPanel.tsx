@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { apiPost } from "@/lib/apiClient";
 
 type AskThisRunResponse = {
@@ -24,10 +25,47 @@ const suggestions = [
 ];
 
 export default function AskThisRunPanel({ workflowId, compact = false }: Props) {
+  const supabase = useMemo(() => createClientComponentClient(), []);
+  const [status, setStatus] = useState<string | null>(null);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<AskThisRunResponse[]>([]);
+
+  useEffect(() => {
+    if (!workflowId) {
+      setStatus(null);
+      return;
+    }
+
+    let active = true;
+
+    (async () => {
+      const { data } = await supabase
+        .from("workflows")
+        .select("status")
+        .eq("id", workflowId)
+        .maybeSingle<{ status?: string | null }>();
+      if (active) setStatus(data?.status || null);
+    })();
+
+    const channel = supabase
+      .channel(`ask-this-run-${workflowId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "workflows", filter: `id=eq.${workflowId}` },
+        (payload) => {
+          const row = payload.new as { status?: string | null };
+          setStatus(row.status || null);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, workflowId]);
 
   async function ask(questionOverride?: string) {
     const text = (questionOverride || question).trim();
@@ -50,7 +88,10 @@ export default function AskThisRunPanel({ workflowId, compact = false }: Props) 
     ask();
   }
 
-  if (!workflowId) return null;
+  const normalizedStatus = (status || "").toLowerCase();
+  const finished = ["completed", "complete", "success", "succeeded", "failed", "error", "cancelled", "canceled"].includes(normalizedStatus);
+
+  if (!workflowId || !finished) return null;
 
   return (
     <div className={`rounded-xl border border-cyan-900/60 bg-cyan-950/20 ${compact ? "p-4" : "p-5"}`}>
