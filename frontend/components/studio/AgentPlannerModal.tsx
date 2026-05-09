@@ -120,6 +120,7 @@ export default function StudioAgentPlannerModal({
   const [loopType, setLoopType] = useState(initialLoop || "digital");
   const [domain, setDomain] = useState("");
   const [name, setName] = useState("");
+  const [createPrivateAgent, setCreatePrivateAgent] = useState(false);
   const [result, setResult] = useState<AgentPlanResult | null>(null);
   const [savedPlans, setSavedPlans] = useState<SavedPlan[]>([]);
   const [showFactoryDryRun, setShowFactoryDryRun] = useState(false);
@@ -130,8 +131,9 @@ export default function StudioAgentPlannerModal({
   const canSubmit = useMemo(() => requestText.trim().length > 0 && !loading, [requestText, loading]);
   const canSave = Boolean(result);
   const canOpenFactory = Boolean(
-    result &&
-      ["create_new", "extend_existing", "extend_or_create_variant"].includes(result.recommendation)
+    (createPrivateAgent && requestText.trim().length > 0) ||
+      (result &&
+        ["create_new", "extend_existing", "extend_or_create_variant"].includes(result.recommendation))
   );
 
   async function runPlanner() {
@@ -168,7 +170,7 @@ export default function StudioAgentPlannerModal({
           <div>
             <h2 className="text-2xl font-extrabold text-cyan-300">Agent Planner</h2>
             <p className="mt-1 text-sm text-slate-400">
-              Find reusable agents before creating anything new.
+              Find reusable agents, or create a private draft when you want a new agent.
             </p>
           </div>
           <button
@@ -217,6 +219,21 @@ export default function StudioAgentPlannerModal({
               className="mt-2 h-40 w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-3 text-sm outline-none focus:border-cyan-600"
               placeholder="Describe the capability you need..."
             />
+
+            <label className="mt-4 flex items-start gap-3 rounded-lg border border-slate-800 bg-black/30 p-3">
+              <input
+                type="checkbox"
+                checked={createPrivateAgent}
+                onChange={(event) => setCreatePrivateAgent(event.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-950 text-cyan-600 focus:ring-cyan-700"
+              />
+              <span>
+                <span className="block text-sm font-semibold text-slate-100">Create a new private agent</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-400">
+                  Existing matches are shown as references only and will not block draft generation.
+                </span>
+              </span>
+            </label>
 
             <div className="mt-4 flex gap-2">
               <button
@@ -317,7 +334,7 @@ export default function StudioAgentPlannerModal({
                     onClick={() => setShowFactoryDryRun(true)}
                     className="w-full rounded-lg border border-cyan-700 bg-cyan-950/30 px-3 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-900/40"
                   >
-                    Generate Draft Agent
+                    {createPrivateAgent ? "Create Private Draft Agent" : "Generate Draft Agent"}
                   </button>
                 ) : null}
               </div>
@@ -337,7 +354,25 @@ export default function StudioAgentPlannerModal({
             required_skills: result.reusable_skills || [],
             required_tools: result.reusable_tools || [],
             required_hooks: result.reusable_hooks || [],
-            allow_extension: result.recommendation !== "create_new",
+            allow_extension: result.recommendation !== "create_new" || createPrivateAgent,
+            force_create_private: createPrivateAgent,
+          }}
+          onClose={() => setShowFactoryDryRun(false)}
+        />
+      ) : showFactoryDryRun && createPrivateAgent ? (
+        <AgentFactoryDryRunModal
+          initialRequest={{
+            name: name.trim() || "Private Agent",
+            natural_language_request: requestText.trim(),
+            loop_type: loopType,
+            domain: domain.trim() || undefined,
+            inputs: [],
+            outputs: [],
+            required_skills: [],
+            required_tools: [],
+            required_hooks: [],
+            allow_extension: true,
+            force_create_private: true,
           }}
           onClose={() => setShowFactoryDryRun(false)}
         />

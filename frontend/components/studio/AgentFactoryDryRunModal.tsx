@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useMemo, useState } from "react";
-import { ApiClientError, apiPost } from "@/lib/apiClient";
+import { ApiClientError, apiGet, apiPatch, apiPost } from "@/lib/apiClient";
 
 const LOOP_OPTIONS = ["digital", "analog", "embedded", "system", "validation"];
 
@@ -16,6 +16,7 @@ type FactoryInitialRequest = {
   required_tools?: string[];
   required_hooks?: string[];
   allow_extension?: boolean;
+  force_create_private?: boolean;
 };
 
 type FactoryPlan = {
@@ -42,7 +43,12 @@ type FactoryResponse = { status: string; result: FactoryResult };
 
 type SavePrivateAgentResponse = {
   status: string;
-  agent?: { agent_name?: string; status?: string };
+  agent?: { id?: string; agent_name?: string; status?: string };
+};
+
+type PrivateAgentListResponse = {
+  status: string;
+  agents?: Array<{ id?: string; agent_name?: string }>;
 };
 
 function errorMessage(error: unknown): string {
@@ -68,6 +74,17 @@ function ChipList({ title, items }: { title: string; items?: string[] }) {
       )}
     </div>
   );
+}
+
+function parseList(value: string): string[] {
+  return value
+    .split(/[\n,]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function listText(value?: string[]): string {
+  return (value || []).join("\n");
 }
 
 function AdvancedBlock({ title, value, onCopy }: { title: string; value: unknown; onCopy: (label: string, text: string) => void }) {
@@ -96,6 +113,11 @@ export default function AgentFactoryDryRunModal({
   const [requestText, setRequestText] = useState(initialRequest.natural_language_request || "");
   const [loopType, setLoopType] = useState(initialRequest.loop_type || "digital");
   const [domain, setDomain] = useState(initialRequest.domain || "");
+  const [inputsText, setInputsText] = useState(listText(initialRequest.inputs));
+  const [outputsText, setOutputsText] = useState(listText(initialRequest.outputs));
+  const [skillsText, setSkillsText] = useState(listText(initialRequest.required_skills));
+  const [toolsText, setToolsText] = useState(listText(initialRequest.required_tools));
+  const [hooksText, setHooksText] = useState(listText(initialRequest.required_hooks));
   const [result, setResult] = useState<FactoryResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -108,6 +130,11 @@ export default function AgentFactoryDryRunModal({
   const plan = result?.plan;
   const spec = plan?.proposed_agent_spec || {};
   const risks = (plan?.risk_notes || []).concat(result?.errors || []);
+  const inputs = useMemo(() => parseList(inputsText), [inputsText]);
+  const outputs = useMemo(() => parseList(outputsText), [outputsText]);
+  const requiredSkills = useMemo(() => parseList(skillsText), [skillsText]);
+  const requiredTools = useMemo(() => parseList(toolsText), [toolsText]);
+  const requiredHooks = useMemo(() => parseList(hooksText), [hooksText]);
 
   async function copyText(label: string, text: string) {
     await navigator.clipboard.writeText(text);
@@ -129,12 +156,13 @@ export default function AgentFactoryDryRunModal({
           natural_language_request: requestText.trim(),
           loop_type: loopType,
           domain: domain.trim() || undefined,
-          inputs: initialRequest.inputs || [],
-          outputs: initialRequest.outputs || [],
-          required_skills: initialRequest.required_skills || [],
-          required_tools: initialRequest.required_tools || [],
-          required_hooks: initialRequest.required_hooks || [],
+          inputs,
+          outputs,
+          required_skills: requiredSkills,
+          required_tools: requiredTools,
+          required_hooks: requiredHooks,
           allow_extension: Boolean(initialRequest.allow_extension),
+          force_create_private: Boolean(initialRequest.force_create_private),
         },
       });
       setResult(response.result);
@@ -151,7 +179,7 @@ export default function AgentFactoryDryRunModal({
     setError(null);
     setSavedMessage(null);
     try {
-      const response = await apiPost<SavePrivateAgentResponse>("/studio/user-agents", {
+      const payload = {
         name: name.trim(),
         loop_type: loopType,
         domain: domain.trim() || loopType,
@@ -165,8 +193,27 @@ export default function AgentFactoryDryRunModal({
         source: "studio_factory",
         status: "private",
         visibility: "private",
-      });
-      setSavedMessage(`Saved ${response.agent?.agent_name || name.trim()} as a private agent.`);
+      };
+      const existing = await apiGet<PrivateAgentListResponse>("/studio/user-agents");
+      const match = existing.agents?.find(
+        (agent) => (agent.agent_name || "").trim().toLowerCase() === name.trim().toLowerCase()
+      );
+      const shouldUpdate = match?.id
+        ? window.confirm(`A private agent named "${name.trim()}" already exists. Update it? Select Cancel to save another copy.`)
+        : false;
+      let savePayload = payload;
+      if (match?.id && !shouldUpdate) {
+        const copyName = window.prompt("Copy name:", `${name.trim()} Copy`);
+        if (copyName?.trim()) {
+          savePayload = { ...payload, name: copyName.trim() };
+        }
+      }
+      const response = shouldUpdate && match?.id
+        ? await apiPatch<SavePrivateAgentResponse>(`/studio/user-agents/${match.id}`, savePayload)
+        : await apiPost<SavePrivateAgentResponse>("/studio/user-agents", savePayload);
+      setSavedMessage(
+        `${shouldUpdate ? "Updated" : "Saved"} ${response.agent?.agent_name || savePayload.name} as a private agent.`
+      );
       window.dispatchEvent(new Event("refreshAgents"));
     } catch (err) {
       setError(errorMessage(err));
@@ -201,6 +248,29 @@ export default function AgentFactoryDryRunModal({
 
             <label className="mt-4 block text-sm font-semibold text-slate-200">Description</label>
             <textarea value={requestText} onChange={(event) => setRequestText(event.target.value)} className="mt-2 h-40 w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-3 text-sm outline-none focus:border-cyan-600" placeholder="Describe the agent to draft..." />
+
+            <div className="mt-4 grid gap-3">
+              <label className="block text-sm font-semibold text-slate-200">
+                Inputs
+                <textarea value={inputsText} onChange={(event) => setInputsText(event.target.value)} className="mt-2 h-20 w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-3 text-xs font-normal outline-none focus:border-cyan-600" placeholder="One input per line" />
+              </label>
+              <label className="block text-sm font-semibold text-slate-200">
+                Outputs
+                <textarea value={outputsText} onChange={(event) => setOutputsText(event.target.value)} className="mt-2 h-20 w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-3 text-xs font-normal outline-none focus:border-cyan-600" placeholder="One output per line" />
+              </label>
+              <label className="block text-sm font-semibold text-slate-200">
+                Skills
+                <textarea value={skillsText} onChange={(event) => setSkillsText(event.target.value)} className="mt-2 h-20 w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-3 text-xs font-normal outline-none focus:border-cyan-600" placeholder="rtl_generation" />
+              </label>
+              <label className="block text-sm font-semibold text-slate-200">
+                Tools / MCP
+                <textarea value={toolsText} onChange={(event) => setToolsText(event.target.value)} className="mt-2 h-20 w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-3 text-xs font-normal outline-none focus:border-cyan-600" placeholder="python&#10;supabase" />
+              </label>
+              <label className="block text-sm font-semibold text-slate-200">
+                Hooks
+                <textarea value={hooksText} onChange={(event) => setHooksText(event.target.value)} className="mt-2 h-20 w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-3 text-xs font-normal outline-none focus:border-cyan-600" placeholder="pre_run_validate_inputs" />
+              </label>
+            </div>
 
             <button onClick={runDryRun} disabled={!canRun} className="mt-4 w-full rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500">
               {loading ? "Generating draft..." : "Generate Draft Agent"}
