@@ -59,7 +59,7 @@ const featureLabels: Record<string, string> = {
   agent_planner_enabled: "Agent Planner",
   agent_factory_dry_run_enabled: "Draft Agent Generation",
   private_agent_save_enabled: "Private Agent Save",
-  dag_optimization_enabled: "Optimize Workflow",
+  dag_optimization_enabled: "Workflow Composer",
   marketplace_submit_enabled: "Submit to Marketplace",
   agent_factory_write_enabled: "Agent Factory Write Mode",
   higher_workflow_limits: "Higher workflow limits",

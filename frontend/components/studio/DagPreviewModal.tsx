@@ -49,7 +49,7 @@ function errorMessage(error: unknown): string {
     return "Your session expired. Please sign in again.";
   }
   if (error instanceof Error) return error.message;
-  return "Workflow optimization request failed.";
+  return "Workflow Composer request failed.";
 }
 
 function graphPayloadFromNodes(nodes: Node[], edges: Edge[], loopType: string) {
@@ -101,7 +101,7 @@ function JsonBlock({ title, value }: { title: string; value: unknown }) {
 function EmptyState() {
   return (
     <div className="rounded-lg border border-slate-800 bg-black/30 p-5 text-sm text-slate-400">
-      Choose a workflow source and click Analyze Parallelism. ChipLoop will look for safe steps that can run together.
+      Choose a saved or current workflow and click Analyze Parallelism. ChipLoop will show which existing graph stages can run together.
     </div>
   );
 }
@@ -225,9 +225,9 @@ export default function DagPreviewModal({
       <div className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-white shadow-2xl">
         <div className="flex items-start justify-between gap-4 border-b border-slate-800 p-5">
           <div>
-            <h2 className="text-2xl font-extrabold text-cyan-300">Optimize Workflow</h2>
+            <h2 className="text-2xl font-extrabold text-cyan-300">Workflow Composer</h2>
             <p className="mt-1 text-sm text-slate-400">
-              Analyze a workflow for safe parallel steps without executing agents or changing serial behavior.
+              Start from a current or saved workflow, inspect its dependency structure, and analyze safe parallel stages before running.
             </p>
           </div>
           <button
@@ -297,7 +297,16 @@ export default function DagPreviewModal({
           </section>
 
           <div className="mt-4 rounded-lg border border-amber-800/60 bg-amber-950/20 p-3 text-xs text-amber-100/80">
-            Preview only. DAG execution remains opt-in and this UI does not run workflows.
+            Preview only. Composer analysis does not execute agents or modify saved workflows.
+          </div>
+
+          <div className="mt-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-300">
+            <div className="font-bold text-cyan-200">Example flow</div>
+            <p className="mt-2">
+              Use System Planner to build and save a first serial draft, then open Workflow Composer to analyze it. If a System Sim draft is still
+              Digital steps followed by Analog steps followed by Simulation steps, the analyzer will report mostly serial stages. To expose
+              parallelism, the workflow graph needs Digital and Analog branches that join at System Top Assembly before simulation.
+            </p>
           </div>
 
           {error ? (
@@ -355,7 +364,7 @@ export default function DagPreviewModal({
                 </div>
 
                 <div className="rounded-lg border border-slate-800 bg-black/30 p-4">
-                  <h3 className="mb-3 text-sm font-bold text-cyan-300">Recommended Parallel Groups</h3>
+                  <h3 className="mb-3 text-sm font-bold text-cyan-300">Parallel Stages Found</h3>
                   {parallelGroupAgents.length ? (
                     <div className="space-y-3 text-sm text-slate-300">
                       {parallelGroupAgents.map((group, index) => (
@@ -389,7 +398,7 @@ export default function DagPreviewModal({
                   </ul>
                 ) : (
                   <div className="text-sm text-slate-400">
-                    No blocking warnings returned. Review the suggested groups before saving any future DAG version.
+                    No blocking warnings returned. Review the stages before creating any future composed workflow version.
                   </div>
                 )}
               </section>

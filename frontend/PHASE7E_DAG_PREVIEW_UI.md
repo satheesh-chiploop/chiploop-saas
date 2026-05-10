@@ -31,7 +31,7 @@ Added component:
 
 - `components/studio/DagPreviewModal.tsx`
 
-Studio sidebar now includes `DAG Preview` near the existing planner buttons.
+Studio sidebar now includes `Workflow Composer` near the existing planner buttons.
 
 The modal supports:
 
@@ -68,7 +68,7 @@ Manual checks:
 
 - `/workflow` loads.
 - Left sidebar remains tidy.
-- `DAG Preview` opens a modal.
+- `Workflow Composer` opens a modal.
 - `Use sample` then `Run Preview` returns a preview.
 - `Validate` returns validation status/errors.
 - `Use current Studio workflow` populates JSON from the canvas when nodes exist.

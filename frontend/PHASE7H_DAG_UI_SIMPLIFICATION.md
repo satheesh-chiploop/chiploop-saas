@@ -4,7 +4,7 @@ Date: 2026-04-28
 
 ## Purpose
 
-The previous DAG Preview modal exposed workflow JSON, DAG nodes, edges, dependency graph, and parallel groups by default. This update keeps the same backend preview/validate APIs but changes the frontend experience into a simpler Optimize Workflow flow.
+The previous DAG Preview modal exposed workflow JSON, DAG nodes, edges, dependency graph, and parallel groups by default. This update keeps the same backend preview/validate APIs but changes the frontend experience into a simpler Workflow Composer flow.
 
 ## Routes And Components
 
@@ -13,7 +13,7 @@ Updated:
 - `frontend/app/workflow/page.tsx`
 - `frontend/components/studio/DagPreviewModal.tsx`
 
-The Studio sidebar button is now labeled `Optimize Workflow`.
+The Studio sidebar button is now labeled `Workflow Composer`.
 
 ## UI Behavior
 
@@ -61,8 +61,8 @@ Because no backend DAG save endpoint exists yet and backend changes were out of 
 ## Manual Test Steps
 
 1. Open `/workflow`.
-2. Confirm the left panel shows `Optimize Workflow`.
-3. Click `Optimize Workflow`.
+2. Confirm the left panel shows `Workflow Composer`.
+3. Click `Workflow Composer`.
 4. Confirm JSON is not shown by default.
 5. Select `Current workflow`.
 6. Click `Analyze Parallelism`.

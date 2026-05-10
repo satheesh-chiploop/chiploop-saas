@@ -28,7 +28,7 @@ A separate Generated Agents panel makes users think generated code is a primary 
 ## Validation
 
 - `/workflow` loads with the left sidebar kept tidy.
-- Buttons remain focused on Design Intent Planner, System Planner, Agent Planner, and Optimize Workflow.
+- Buttons remain focused on Design Intent Planner, System Planner, Agent Planner, and Workflow Composer.
 - Agent Planner can open the draft flow.
 - Draft review can save a private agent.
 - Existing workflow execution is unchanged.

@@ -86,7 +86,7 @@ Studio is the advanced workflow workspace.
 - Workflows connect agents
 - Agents perform scoped engineering tasks
 - Design intent captures requirements and assumptions
-- Optimize Workflow improves graph quality before execution
+- Workflow Composer inspects saved workflows and analyzes parallel stages before execution
 
 ## Slide 10: Agent Planner
 Agent Planner creates private agents from requirements.

@@ -2635,7 +2635,7 @@ function WorkflowPage() {
             onClick={() => setShowDagPreview(true)}
             className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
           >
-            Optimize Workflow
+            Workflow Composer
           </button>
           <div className="border-t border-slate-800 my-3" />
           {/* ðŸ” Loop Selector */}
