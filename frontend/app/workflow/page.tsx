@@ -70,9 +70,33 @@ const APP_PREBUILT_WORKFLOWS: CustomWorkflowRow[] = [
   { name: "Digital_Smoke", displayName: "Smoke", loop_type: "digital", is_prebuilt: true },
   { name: "Digital_Integrate", displayName: "Integrate", loop_type: "digital", is_prebuilt: true },
   { name: "Analog_Run", displayName: "Analog Run", loop_type: "analog", is_prebuilt: true },
+  { name: "Analog_SpecBuilder", displayName: "Analog Spec", loop_type: "analog", is_prebuilt: true },
+  { name: "Analog_NetlistScaffold", displayName: "Analog Netlist", loop_type: "analog", is_prebuilt: true },
+  { name: "Analog_BehavioralModel", displayName: "Analog Model", loop_type: "analog", is_prebuilt: true },
+  { name: "Analog_ModelValidation", displayName: "Analog Model Validation", loop_type: "analog", is_prebuilt: true },
+  { name: "Analog_Correlation", displayName: "Analog Correlate", loop_type: "analog", is_prebuilt: true },
+  { name: "Analog_Iterate", displayName: "Analog Iterate", loop_type: "analog", is_prebuilt: true },
+  { name: "Analog_Abstracts", displayName: "Analog Abstract Views", loop_type: "analog", is_prebuilt: true },
   { name: "Embedded_Run", displayName: "Embedded Run", loop_type: "embedded", is_prebuilt: true },
+  { name: "Embedded_HAL", displayName: "Embedded HAL", loop_type: "embedded", is_prebuilt: true },
+  { name: "Embedded_Driver", displayName: "Embedded Driver", loop_type: "embedded", is_prebuilt: true },
+  { name: "Embedded_Boot", displayName: "Embedded Boot", loop_type: "embedded", is_prebuilt: true },
+  { name: "Embedded_Diagnostics", displayName: "Embedded Diagnostics", loop_type: "embedded", is_prebuilt: true },
+  { name: "Embedded_LogAnalyzer", displayName: "Embedded Log Analyzer", loop_type: "embedded", is_prebuilt: true },
+  { name: "Embedded_Validate", displayName: "Embedded Validate", loop_type: "embedded", is_prebuilt: true },
   { name: "System_End2End", displayName: "System End2End", loop_type: "system", is_prebuilt: true },
+  { name: "System_Sim", displayName: "System Sim", loop_type: "system", is_prebuilt: true },
+  { name: "System_RTL", displayName: "System RTL", loop_type: "system", is_prebuilt: true },
+  { name: "System_PD", displayName: "System PD", loop_type: "system", is_prebuilt: true },
+  { name: "System_Firmware", displayName: "System Firmware", loop_type: "system", is_prebuilt: true },
+  { name: "System_Software", displayName: "System Software", loop_type: "system", is_prebuilt: true },
+  { name: "System_Software_Validation_L1", displayName: "System Software Validation L1", loop_type: "system", is_prebuilt: true },
+  { name: "System_Software_Validation_L2", displayName: "System Software Validation L2", loop_type: "system", is_prebuilt: true },
   { name: "Validation_Run", displayName: "Validation Run", loop_type: "validation", is_prebuilt: true },
+  { name: "Validation_PlanCoverage", displayName: "Validation Plan & Coverage", loop_type: "validation", is_prebuilt: true },
+  { name: "Validation_BenchSetup", displayName: "Bench Setup", loop_type: "validation", is_prebuilt: true },
+  { name: "Validation_Preflight", displayName: "Preflight", loop_type: "validation", is_prebuilt: true },
+  { name: "Validation_Insights", displayName: "Validation Insights", loop_type: "validation", is_prebuilt: true },
 ];
 
 function linearWorkflowDefinition(agentNames: string[]): WorkflowGraphDefinition {
@@ -158,6 +182,13 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Analog Model Agent",
     "Analog Executive Summary Agent",
   ]),
+  Analog_SpecBuilder: linearWorkflowDefinition(["Analog Spec Builder Agent"]),
+  Analog_NetlistScaffold: linearWorkflowDefinition(["Analog Spec Builder Agent", "Analog Netlist Scaffold Agent", "Analog Simulation Plan Agent"]),
+  Analog_BehavioralModel: linearWorkflowDefinition(["Analog Spec Builder Agent", "Analog Model Agent", "Analog Executive Summary Agent"]),
+  Analog_ModelValidation: linearWorkflowDefinition(["Analog Model Agent", "Analog Model Validation Agent", "Analog Executive Summary Agent"]),
+  Analog_Correlation: linearWorkflowDefinition(["Analog Simulation Plan Agent", "Analog Correlation Agent", "Analog Executive Summary Agent"]),
+  Analog_Iterate: linearWorkflowDefinition(["Analog Correlation Agent", "Analog Iterate Agent", "Analog Executive Summary Agent"]),
+  Analog_Abstracts: linearWorkflowDefinition(["Analog Abstract Views Agent", "Analog Executive Summary Agent"]),
   Embedded_Run: linearWorkflowDefinition([
     "Embedded HAL Agent",
     "Embedded Driver Agent",
@@ -165,12 +196,68 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Embedded Diagnostics Agent",
     "Embedded Sim Agent",
   ]),
+  Embedded_HAL: linearWorkflowDefinition(["Embedded Register Extract Agent", "Embedded HAL Agent"]),
+  Embedded_Driver: linearWorkflowDefinition(["Embedded HAL Agent", "Embedded Driver Agent", "Embedded DMA Integration Agent"]),
+  Embedded_Boot: linearWorkflowDefinition(["Embedded Boot Agent", "Embedded Firmware Integration Contract Agent"]),
+  Embedded_Diagnostics: linearWorkflowDefinition(["Embedded Diagnostics Agent", "Embedded CLI Tooling Agent"]),
+  Embedded_LogAnalyzer: linearWorkflowDefinition(["Embedded Log Analyzer Agent", "Embedded Diagnostics Agent"]),
+  Embedded_Validate: linearWorkflowDefinition(["Embedded Sim Agent", "Embedded Firmware Coverage Agent", "Embedded Executive Summary Agent"]),
   System_End2End: linearWorkflowDefinition([
     "System Integration Agent",
     "System RTL Agent",
     "System Sim Agent",
     "System Firmware Agent",
     "System Software Handoff Package Agent",
+  ]),
+  System_Sim: linearWorkflowDefinition([
+    "System Integration Agent",
+    "System RTL Agent",
+    "System Testbench Generator Agent",
+    "System Simulation Control Agent",
+    "System Simulation Execution Agent",
+    "System Simulation Coverage Summary Agent",
+  ]),
+  System_RTL: linearWorkflowDefinition([
+    "System Integration Intent Agent",
+    "System Top Assembly Agent",
+    "System Assertions Agent",
+    "System IP Packaging & Handoff Agent",
+  ]),
+  System_PD: linearWorkflowDefinition([
+    "System Integration Agent",
+    "System RTL Agent",
+    "Digital Implementation Setup Agent",
+    "Digital Floorplan Agent",
+    "Digital Route Agent",
+    "Digital Tapeout Agent",
+  ]),
+  System_Firmware: linearWorkflowDefinition([
+    "System Integration Agent",
+    "System RTL Agent",
+    "Embedded HAL Agent",
+    "Embedded Driver Agent",
+    "System Software Handoff Package Agent",
+  ]),
+  System_Software: linearWorkflowDefinition([
+    "System Software Handoff Ingest Agent",
+    "System Software Capability Model Agent",
+    "System Software API Contract Agent",
+    "System Software SDK Scaffold Agent",
+    "System Software Application Scaffold Agent",
+    "System Software Packaging Agent",
+  ]),
+  System_Software_Validation_L1: linearWorkflowDefinition([
+    "System Software Validation Ingest Agent",
+    "System Software Contract Consistency Agent",
+    "System Software Unit Test Agent",
+    "System Software Executive Summary Agent",
+  ]),
+  System_Software_Validation_L2: linearWorkflowDefinition([
+    "System Software Validation Ingest Agent",
+    "System Software CoSim Harness Agent",
+    "System Software CoSim Execution Agent",
+    "System Software Contract Consistency Agent",
+    "System Software Executive Summary Agent",
   ]),
   Validation_Run: linearWorkflowDefinition([
     "Validation Test Plan Agent",
@@ -179,7 +266,35 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Validation Execution Orchestrator Agent",
     "Validation Analytics Agent",
   ]),
+  Validation_PlanCoverage: linearWorkflowDefinition(["Validation Test Plan Agent", "Validation Coverage Agent", "Validation Gap Agent"]),
+  Validation_BenchSetup: linearWorkflowDefinition(["Validation Bench Setup Agent", "Validation Wiring Instructions Agent", "Validation Preflight Agent"]),
+  Validation_Preflight: linearWorkflowDefinition(["Validation Preflight Agent", "Validation Executive Summary Agent"]),
+  Validation_Insights: linearWorkflowDefinition(["Validation Analytics Agent", "Validation Pattern Detection Agent", "Validation Evolution Proposal Agent"]),
 };
+
+function inferLoopTypeFromName(name: string): string {
+  if (!name) return "digital";
+  const normalized = name.trim();
+  if (normalized.startsWith("Validation_") || normalized.startsWith("App: Validation")) return "validation";
+  if (normalized.startsWith("System_") || normalized.startsWith("App: System")) return "system";
+  if (normalized.startsWith("Analog_") || normalized.startsWith("App: Analog")) return "analog";
+  if (normalized.startsWith("Embedded_") || normalized.startsWith("App: Embedded")) return "embedded";
+  return "digital";
+}
+
+function normalizeLoopType(value?: string | null, fallbackName?: string): LoopKey {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (["digital", "analog", "embedded", "system", "validation"].includes(normalized)) {
+    return normalized as LoopKey;
+  }
+  return inferLoopTypeFromName(fallbackName || "") as LoopKey;
+}
+
+function workflowDisplayName(workflow: CustomWorkflowRow): string {
+  const staticMatch = APP_PREBUILT_WORKFLOWS.find((item) => item.name === workflow.name);
+  return workflow.displayName || staticMatch?.displayName || workflow.name.replace(/^App:\s*/, "");
+}
+
 type PrivateAgentResponseItem = {
   id?: string;
   agent_name?: string;
@@ -859,6 +974,8 @@ function WorkflowPage() {
     definitions?: {
       nodes?: unknown[];
       edges?: unknown[];
+      app_intent?: unknown;
+      template_workflow?: unknown;
     } | null;
     is_prebuilt?: boolean | null;
   };
@@ -927,16 +1044,6 @@ function WorkflowPage() {
   const [benchSchematicObj, setBenchSchematicObj] = useState<any | null>(null);
   const [benchSchematicErr, setBenchSchematicErr] = useState<string | null>(null);
   const [benchSchematicModalLoading, setBenchSchematicModalLoading] = useState(false);
-
-  const inferLoopTypeFromName = (name: string): string => {
-    if (!name) return "digital";
-    if (name.startsWith("Validation_")) return "validation";
-    if (name.startsWith("System_")) return "system";
-    if (name.startsWith("Analog_")) return "analog";
-    if (name.startsWith("Embedded_")) return "embedded";
-    return "digital"; // default
-  };
-  
 
   const openBenchSchematic = async (benchId: string) => {
     setBenchSchematicErr(null);
@@ -1870,19 +1977,19 @@ function WorkflowPage() {
   const prebuiltAgents = useMemo(() => LOOP_AGENTS[loop], [loop]);
   const visiblePrebuiltWorkflows = useMemo(() => {
     const byName = new Map<string, CustomWorkflowRow>();
-    const appDisplayNames = new Map(APP_PREBUILT_WORKFLOWS.map((item) => [item.name, item.displayName]));
     for (const workflow of APP_PREBUILT_WORKFLOWS) {
       byName.set(workflow.name, workflow);
     }
     for (const workflow of prebuiltWorkflows) {
       byName.set(workflow.name, {
         ...workflow,
-        displayName: workflow.displayName || appDisplayNames.get(workflow.name),
+        loop_type: normalizeLoopType(workflow.loop_type, workflow.name),
+        displayName: workflowDisplayName(workflow),
       });
     }
     return Array.from(byName.values())
-      .filter((workflow) => (workflow.loop_type || inferLoopTypeFromName(workflow.name)) === loop)
-      .sort((a, b) => (a.displayName || a.name).localeCompare(b.displayName || b.name));
+      .filter((workflow) => normalizeLoopType(workflow.loop_type, workflow.name) === loop)
+      .sort((a, b) => workflowDisplayName(a).localeCompare(workflowDisplayName(b)));
   }, [loop, prebuiltWorkflows]);
 
   const loadPrebuiltWorkflow = (wf: CustomWorkflowRow) => {
@@ -1900,17 +2007,21 @@ function WorkflowPage() {
 
   const workflowRowFromRecord = (w: WorkflowRecord): CustomWorkflowRow => ({
     id: w.id,
-    name: w.name,
-    loop_type: w.loop_type || inferLoopTypeFromName(w.name),
+    name:
+      typeof w.definitions?.app_intent === "string"
+        ? w.definitions.app_intent
+        : typeof w.definitions?.template_workflow === "string"
+        ? w.definitions.template_workflow
+        : w.name,
+    loop_type: normalizeLoopType(w.loop_type, w.name),
     is_prebuilt: w.is_prebuilt,
   });
 
   const loadPrebuiltWorkflowsFromDB = async () => {
     const { data, error } = await supabase
       .from("workflows")
-      .select("id, name, loop_type, is_prebuilt, status")
+      .select("id, name, loop_type, definitions, is_prebuilt, status")
       .eq("is_prebuilt", true)
-      .eq("status", "saved")
       .order("name", { ascending: true });
 
     if (error) {
@@ -2033,7 +2144,15 @@ function WorkflowPage() {
         console.error("Supabase fetch error:", error.message);
         return;
       }
-      const fallbackDefinitions = APP_PREBUILT_WORKFLOW_DEFINITIONS[wfName];
+      const templateWorkflowName =
+        typeof data?.definitions?.app_intent === "string"
+          ? data.definitions.app_intent
+          : typeof data?.definitions?.template_workflow === "string"
+          ? data.definitions.template_workflow
+          : undefined;
+      const fallbackDefinitions =
+        APP_PREBUILT_WORKFLOW_DEFINITIONS[wfName] ||
+        (templateWorkflowName ? APP_PREBUILT_WORKFLOW_DEFINITIONS[templateWorkflowName] : undefined);
       if (!data && fallbackDefinitions) {
         data = {
           name: wfName,
@@ -2072,10 +2191,9 @@ function WorkflowPage() {
 
       setSelectedWorkflowName(data.name || wfName);
       setSelectedWorkflowId(data.id || null);
-      setSelectedWorkflowLoopType(data.loop_type || null);
-      if (data.loop_type && ["digital", "analog", "embedded", "system", "validation"].includes(data.loop_type)) {
-        setLoop(data.loop_type as LoopKey);
-      }
+      const resolvedLoop = normalizeLoopType(data.loop_type, data.name || wfName);
+      setSelectedWorkflowLoopType(resolvedLoop);
+      setLoop(resolvedLoop);
 
       console.log(`Parsed ${parsedNodes.length} nodes & ${parsedEdges.length} edges`);
       setNodes(parsedNodes);
@@ -2551,8 +2669,9 @@ function WorkflowPage() {
                     key={wf.id || wf.name}
                     onClick={() => loadPrebuiltWorkflow(wf)}
                     className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
+                    title={wf.name}
                   >
-                    {wf.displayName || wf.name}
+                    {workflowDisplayName(wf)}
                   </li>
                 ))}
               </ul>
@@ -2562,7 +2681,7 @@ function WorkflowPage() {
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
 
                 {customWorkflows
-                  .filter((w) => (w.loop_type || inferLoopTypeFromName(w.name)) === loop)
+                  .filter((w) => normalizeLoopType(w.loop_type, w.name) === loop)
                   .map((w) => (
                     <button
                       key={w.id || w.name}
