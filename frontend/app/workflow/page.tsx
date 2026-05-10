@@ -33,6 +33,15 @@ import TopNav from "@/components/TopNav";
 ========================= */
 type LoopKey = "digital" | "analog" | "embedded" | "system" |"validation";
 type AgentNodeData = { uiLabel: string; backendLabel: string; desc?: string };
+type WorkflowGraphDefinition = {
+  nodes: Array<{
+    id: string;
+    type: "agentNode";
+    position: { x: number; y: number };
+    data: AgentNodeData;
+  }>;
+  edges: Array<{ id: string; source: string; target: string }>;
+};
 
 type CatalogItem = {
   id?: string;
@@ -64,6 +73,112 @@ const APP_PREBUILT_WORKFLOWS: CustomWorkflowRow[] = [
   { name: "System_End2End", displayName: "System End2End", loop_type: "system", is_prebuilt: true },
   { name: "Validation_Run", displayName: "Validation Run", loop_type: "validation", is_prebuilt: true },
 ];
+
+function linearWorkflowDefinition(agentNames: string[]): WorkflowGraphDefinition {
+  return {
+    nodes: agentNames.map((name, index) => ({
+      id: `n${index + 1}`,
+      type: "agentNode",
+      position: { x: 80 + index * 240, y: 180 },
+      data: { uiLabel: name.replace(/^Digital /, ""), backendLabel: name },
+    })),
+    edges: agentNames.slice(1).map((_, index) => ({
+      id: `e${index + 1}`,
+      source: `n${index + 1}`,
+      target: `n${index + 2}`,
+    })),
+  };
+}
+
+const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition> = {
+  Digital_Arch2RTL: linearWorkflowDefinition([
+    "Digital Spec Agent",
+    "Digital Architecture Agent",
+    "Digital Microarchitecture Agent",
+    "Digital RTL Agent",
+    "Digital Power Intent (UPF-lite) Agent",
+    "Digital IP Packaging & Handoff Agent",
+  ]),
+  Digital_Arch2Synthesis: linearWorkflowDefinition([
+    "Digital Spec Agent",
+    "Digital Architecture Agent",
+    "Digital Microarchitecture Agent",
+    "Digital RTL Agent",
+    "Digital Synthesis Readiness Agent",
+    "Digital Synthesis Agent",
+    "Digital Executive Summary Agent",
+  ]),
+  Digital_Arch2Tapeout: linearWorkflowDefinition([
+    "Digital Spec Agent",
+    "Digital Architecture Agent",
+    "Digital Microarchitecture Agent",
+    "Digital RTL Agent",
+    "Digital Synthesis Agent",
+    "Digital Floorplan Agent",
+    "Digital Placement Agent",
+    "Digital Route Agent",
+    "Digital DRC Agent",
+    "Digital LVS Agent",
+    "Digital Tapeout Agent",
+  ]),
+  Digital_DQA: linearWorkflowDefinition([
+    "Digital RTL Linting Agent",
+    "Digital CDC Analysis Agent",
+    "Digital Reset Integrity Agent",
+    "Digital Synthesis Readiness Agent",
+    "Digital Executive Summary Agent",
+  ]),
+  Digital_Verify: linearWorkflowDefinition([
+    "Digital Spec Agent",
+    "Digital RTL Agent",
+    "Digital Testbench Generator Agent",
+    "Digital Assertions (SVA) Agent",
+    "Digital Simulation Control Agent",
+    "Digital Simulation Execution Agent",
+    "Digital Simulation Summary Coverage Agent",
+  ]),
+  Digital_Smoke: linearWorkflowDefinition([
+    "Digital Smoke Preflight Agent",
+    "Digital RTL Linting Agent",
+    "Digital Simulation Control Agent",
+    "Digital Simulation Execution Agent",
+    "Digital Smoke Executive Summary Agent",
+  ]),
+  Digital_Integrate: linearWorkflowDefinition([
+    "Digital Integration Intent Agent",
+    "Digital Top Assembly Agent",
+    "Digital RTL Signature Agent",
+    "Digital IP Packaging & Handoff Agent",
+  ]),
+  Analog_Run: linearWorkflowDefinition([
+    "Analog Spec Builder Agent",
+    "Analog Netlist Scaffold Agent",
+    "Analog Simulation Plan Agent",
+    "Analog Model Agent",
+    "Analog Executive Summary Agent",
+  ]),
+  Embedded_Run: linearWorkflowDefinition([
+    "Embedded HAL Agent",
+    "Embedded Driver Agent",
+    "Embedded Boot Agent",
+    "Embedded Diagnostics Agent",
+    "Embedded Sim Agent",
+  ]),
+  System_End2End: linearWorkflowDefinition([
+    "System Integration Agent",
+    "System RTL Agent",
+    "System Sim Agent",
+    "System Firmware Agent",
+    "System Software Handoff Package Agent",
+  ]),
+  Validation_Run: linearWorkflowDefinition([
+    "Validation Test Plan Agent",
+    "Validation Bench Setup Agent",
+    "Validation Preflight Agent",
+    "Validation Execution Orchestrator Agent",
+    "Validation Analytics Agent",
+  ]),
+};
 type PrivateAgentResponseItem = {
   id?: string;
   agent_name?: string;
@@ -1917,12 +2032,23 @@ function WorkflowPage() {
         console.error("Supabase fetch error:", error.message);
         return;
       }
+      const fallbackDefinitions = APP_PREBUILT_WORKFLOW_DEFINITIONS[wfName];
+      if (!data && fallbackDefinitions) {
+        data = {
+          name: wfName,
+          loop_type: typeof workflow === "string" ? inferLoopTypeFromName(wfName) : workflow.loop_type,
+          definitions: fallbackDefinitions,
+          is_prebuilt: true,
+        };
+      }
       if (!data || !data.definitions) {
         console.warn("No definitions found for:", wfName);
         return;
       }
 
-      const defs = data.definitions;
+      const defs =
+        ((data.definitions.nodes || []).length > 0 ? data.definitions : fallbackDefinitions) ||
+        data.definitions;
 
       const parsedNodes = (defs.nodes || []).map((n: any, i: number) => ({
         id: n.id || `n${i}`,
