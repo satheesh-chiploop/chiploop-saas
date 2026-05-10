@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import SettingsNav from "../../../SettingsNav";
 import { ApiClientError, apiPost } from "@/lib/apiClient";
@@ -11,7 +11,7 @@ function errorMessage(error: unknown): string {
   return "Could not connect GitHub.";
 }
 
-export default function GitHubCallbackPage() {
+function GitHubCallbackContent() {
   const router = useRouter();
   const params = useSearchParams();
   const [message, setMessage] = useState("Connecting GitHub...");
@@ -46,5 +46,22 @@ export default function GitHubCallbackPage() {
         ) : null}
       </section>
     </SettingsNav>
+  );
+}
+
+export default function GitHubCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <SettingsNav>
+          <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-6">
+            <h2 className="text-xl font-bold">GitHub Connection</h2>
+            <p className="mt-2 text-sm text-slate-300">Connecting GitHub...</p>
+          </section>
+        </SettingsNav>
+      }
+    >
+      <GitHubCallbackContent />
+    </Suspense>
   );
 }
