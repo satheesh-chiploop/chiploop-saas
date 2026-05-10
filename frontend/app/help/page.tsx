@@ -26,6 +26,34 @@ function topicMatches(topic: HelpTopic, query: string): boolean {
   return text.includes(query.toLowerCase());
 }
 
+function renderHelpBodyLine(text: string) {
+  const commandPrefixes = ["Command:", "macOS/Linux example:", "Windows PowerShell example:"];
+  const commandPrefix = commandPrefixes.find((prefix) => text.startsWith(prefix));
+  if (commandPrefix) {
+    const command = text.slice(commandPrefix.length).trim();
+    return (
+      <div key={text} className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+        <p className="text-xs font-bold uppercase tracking-wide text-cyan-300">{commandPrefix.replace(":", "")}</p>
+        <pre className="mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-sm font-bold leading-6 text-cyan-100">
+          {command}
+        </pre>
+      </div>
+    );
+  }
+
+  const stepMatch = text.match(/^(Step \d+:)(.*)$/);
+  if (stepMatch) {
+    return (
+      <p key={text}>
+        <span className="font-bold text-white">{stepMatch[1]}</span>
+        {stepMatch[2]}
+      </p>
+    );
+  }
+
+  return <p key={text}>{text}</p>;
+}
+
 export default function HelpPage() {
   const [selectedSlug, setSelectedSlug] = useState(helpTopics[0].slug);
   const [query, setQuery] = useState("");
@@ -141,9 +169,7 @@ export default function HelpPage() {
           </div>
 
           <div className="mt-6 space-y-4 text-sm leading-6 text-slate-300">
-            {selectedTopic.body.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
+            {selectedTopic.body.map((paragraph) => renderHelpBodyLine(paragraph))}
           </div>
 
           <div className="mt-7 grid gap-4 md:grid-cols-2">
