@@ -125,7 +125,7 @@ export default function ApiKeysPage() {
             <div>
               <h2 className="text-xl font-bold">API Keys</h2>
               <p className="mt-1 text-sm text-slate-400">
-                Use these keys with the ChipLoop SDK and CLI. Active keys: {activeKeys}.
+                Use these keys with the ChipLoop SDK, CLI, Cursor, VS Code, and GitHub Actions. Active keys: {activeKeys}.
               </p>
             </div>
 
@@ -174,6 +174,28 @@ export default function ApiKeysPage() {
             {error}
           </div>
         ) : null}
+
+        <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-5">
+          <h3 className="font-bold text-slate-100">Use this key from an IDE</h3>
+          <div className="mt-3 grid gap-4 text-sm text-slate-300 lg:grid-cols-2">
+            <div className="rounded-lg border border-slate-800 bg-black/30 p-4">
+              <p className="font-semibold text-slate-100">Cursor terminal</p>
+              <code className="mt-3 block overflow-x-auto whitespace-pre rounded-lg bg-slate-950 p-3 text-xs text-cyan-100">{`pip install chiploop-sdk
+set CHIPLOOP_BASE_URL=https://api.chiploop.com
+set CHIPLOOP_API_KEY=cl_live_...
+chiploop run arch2rtl --spec specs/pwm.md`}</code>
+            </div>
+            <div className="rounded-lg border border-slate-800 bg-black/30 p-4">
+              <p className="font-semibold text-slate-100">VS Code</p>
+              <p className="mt-2">
+                Use the command palette flow: `ChipLoop: Configure`, `ChipLoop: Run Workflow from Current File`, then download artifacts into your workspace.
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                Store keys in the IDE secret store or shell environment, not in source files.
+              </p>
+            </div>
+          </div>
+        </section>
 
         <section className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/60">
           {loading ? (
