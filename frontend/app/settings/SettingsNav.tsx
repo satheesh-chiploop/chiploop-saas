@@ -8,6 +8,7 @@ const tabs = [
   { label: "Plan", href: "/settings/plan" },
   { label: "API Keys", href: "/settings/api-keys" },
   { label: "Usage", href: "/settings/usage" },
+  { label: "Integrations", href: "/settings/integrations" },
 ];
 
 export default function SettingsNav({ children }: { children: React.ReactNode }) {

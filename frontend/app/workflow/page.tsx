@@ -28,6 +28,7 @@ import StudioAgentPlannerModal from "@/components/studio/AgentPlannerModal";
 import DagPreviewModal from "@/components/studio/DagPreviewModal";
 import { LowCreditBanner } from "@/components/PlanCreditStatus";
 import TopNav from "@/components/TopNav";
+import GitHubImportPanel from "@/components/GitHubImportPanel";
 /* =========================
    Types & Constants
 ========================= */
@@ -3720,6 +3721,14 @@ function SpecInputModal({ loop, onClose, onSubmit,showTestPlanName,testPlanName,
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
+        <div className="mb-4">
+          <GitHubImportPanel
+            compact
+            onImport={(importedText) => {
+              setText((current) => [current.trim(), importedText.trim()].filter(Boolean).join("\n\n"));
+            }}
+          />
+        </div>
         <div className="mb-4">
           <label className="mb-2 block text-sm font-medium">Upload Spec Document</label>
           <label htmlFor="file-upload" className="flex w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-slate-600 bg-slate-800 px-4 py-6 hover:bg-slate-700">

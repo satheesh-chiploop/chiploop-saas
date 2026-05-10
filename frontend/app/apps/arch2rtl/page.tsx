@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { apiPost } from "@/lib/apiClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import GitHubImportPanel from "@/components/GitHubImportPanel";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -717,6 +718,14 @@ export default function Arch2RTLAppPage() {
                 className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
                 placeholder="Paste your spec here..."
               />
+              <div className="mt-3">
+                <GitHubImportPanel
+                  compact
+                  onImport={(importedText) => {
+                    setSpecText((current) => [current.trim(), importedText.trim()].filter(Boolean).join("\n\n"));
+                  }}
+                />
+              </div>
               <div className="mt-2 text-xs text-slate-500">Tip: keep it structured (interfaces, clocks, resets, targets).</div>
             </div>
           </div>
