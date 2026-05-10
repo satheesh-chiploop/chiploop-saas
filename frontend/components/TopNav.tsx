@@ -6,7 +6,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { User } from "@supabase/supabase-js";
 import { PlanCreditBadge } from "@/components/PlanCreditStatus";
 
-type NavKey = "home" | "apps" | "studio" | "marketplace" | "pricing" | "settings" | "admin" | "webinar" | "workshop";
+type NavKey = "home" | "apps" | "studio" | "marketplace" | "pricing" | "help" | "settings" | "admin" | "webinar" | "workshop";
 
 type TopNavProps = {
   current?: NavKey;
@@ -88,6 +88,7 @@ export default function TopNav({
     { key: "studio", label: "Studio", href: "/workflow", show: true },
     { key: "marketplace", label: "Marketplace", href: "/marketplace", show: showMarketplace },
     { key: "pricing", label: "Pricing", href: "/pricing", show: true },
+    { key: "help", label: "Help", href: "/help", show: true },
     { key: "settings", label: "Settings", href: "/settings/plan", show: showSettings },
     { key: "admin", label: "Admin", href: "/admin/marketplace", show: showAdmin },
     { key: "webinar", label: "Webinar", href: "/webinar/register", show: showWebinar },

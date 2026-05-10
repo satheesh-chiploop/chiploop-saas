@@ -7,6 +7,7 @@ type GitHubStatusResponse = {
   status: string;
   github: {
     configured: boolean;
+    connected?: boolean;
     connect_url?: string | null;
     message?: string | null;
   };
@@ -96,7 +97,7 @@ export default function GitHubImportPanel({
 
       {configured === false ? (
         <div className="mt-3 rounded-md border border-amber-800/60 bg-amber-950/20 p-2 text-xs text-amber-100">
-          GitHub is not configured yet. Set `GITHUB_TOKEN` or GitHub App credentials on the backend.
+          Connect GitHub in Settings to import files from your repositories.
         </div>
       ) : null}
 
