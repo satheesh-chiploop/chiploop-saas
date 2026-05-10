@@ -20,6 +20,7 @@ function topicMatches(topic: HelpTopic, query: string): boolean {
     topic.summary,
     ...topic.body,
     ...topic.actions,
+    ...topic.exampleQuestions,
     ...topic.keywords,
   ].join(" ").toLowerCase();
   return text.includes(query.toLowerCase());
@@ -174,26 +175,6 @@ export default function HelpPage() {
             </section>
           </div>
 
-          <section className="mt-7 rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-            <h3 className="text-sm font-semibold text-white">Example questions</h3>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {[
-                "How do I connect GitHub?",
-                "When does Ask This Run appear?",
-                "How do I create a private agent?",
-                "What should I try first in Arch2RTL?",
-              ].map((sample) => (
-                <button
-                  key={sample}
-                  type="button"
-                  onClick={() => setQuestion(sample)}
-                  className="rounded-md bg-slate-800 px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-700"
-                >
-                  {sample}
-                </button>
-              ))}
-            </div>
-          </section>
         </article>
 
         <aside className="rounded-lg border border-cyan-400/30 bg-cyan-950/20 p-4">
@@ -209,6 +190,21 @@ export default function HelpPage() {
             placeholder="Example: How do I import GitHub context into Studio?"
             className="mt-4 min-h-28 w-full resize-y rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none transition focus:border-cyan-400"
           />
+          <div className="mt-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Example questions</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {selectedTopic.exampleQuestions.map((sample) => (
+                <button
+                  key={sample}
+                  type="button"
+                  onClick={() => setQuestion(sample)}
+                  className="rounded-md bg-slate-800 px-3 py-2 text-left text-xs text-slate-200 transition hover:bg-slate-700"
+                >
+                  {sample}
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             type="button"
             onClick={askHelp}
