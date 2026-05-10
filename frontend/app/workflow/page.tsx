@@ -1123,6 +1123,14 @@ function WorkflowPage() {
     };
   }, [supabase]);
 
+  const authHeadersForFormData = useCallback(async (extra: Record<string, string> = {}) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      ...extra,
+      ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+    };
+  }, [supabase]);
+
   const loadPrivateAgents = useCallback(async () => {
     const res = await fetch("/api/studio/user-agents", {
       headers: await authHeaders(),
@@ -1999,9 +2007,7 @@ function WorkflowPage() {
     
     const res = await fetch(`${API_BASE}/run_workflow`, {
       method: "POST",
-      headers: {
-        "x-user-id": userId,
-      },
+      headers: await authHeadersForFormData({ "x-user-id": userId }),
       body: formData,
     });
     
@@ -2165,6 +2171,7 @@ function WorkflowPage() {
   
       const res = await fetch(`${API_BASE}/run_workflow`, {
         method: "POST",
+        headers: await authHeadersForFormData(),
         body: formData,
       });
   
