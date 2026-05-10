@@ -42,6 +42,28 @@ type CatalogItem = {
   status?: string;
   visibility?: string;
 };
+
+type CustomWorkflowRow = {
+  id?: string;
+  name: string;
+  displayName?: string;
+  loop_type?: string | null;
+  is_prebuilt?: boolean | null;
+};
+
+const APP_PREBUILT_WORKFLOWS: CustomWorkflowRow[] = [
+  { name: "Digital_Arch2RTL", displayName: "Arch2RTL", loop_type: "digital", is_prebuilt: true },
+  { name: "Digital_Arch2Synthesis", displayName: "Arch2Synthesis", loop_type: "digital", is_prebuilt: true },
+  { name: "Digital_Arch2Tapeout", displayName: "Arch2Tapeout", loop_type: "digital", is_prebuilt: true },
+  { name: "Digital_DQA", displayName: "DQA", loop_type: "digital", is_prebuilt: true },
+  { name: "Digital_Verify", displayName: "Verify", loop_type: "digital", is_prebuilt: true },
+  { name: "Digital_Smoke", displayName: "Smoke", loop_type: "digital", is_prebuilt: true },
+  { name: "Digital_Integrate", displayName: "Integrate", loop_type: "digital", is_prebuilt: true },
+  { name: "Analog_Run", displayName: "Analog Run", loop_type: "analog", is_prebuilt: true },
+  { name: "Embedded_Run", displayName: "Embedded Run", loop_type: "embedded", is_prebuilt: true },
+  { name: "System_End2End", displayName: "System End2End", loop_type: "system", is_prebuilt: true },
+  { name: "Validation_Run", displayName: "Validation Run", loop_type: "validation", is_prebuilt: true },
+];
 type PrivateAgentResponseItem = {
   id?: string;
   agent_name?: string;
@@ -714,12 +736,6 @@ function WorkflowPage() {
   // local catalog states
   const [customAgents, setCustomAgents] = useState<CatalogItem[]>([]);
 
-  type CustomWorkflowRow = {
-    id?: string;
-    name: string;
-    loop_type?: string | null;
-    is_prebuilt?: boolean | null;
-  };
   type WorkflowRecord = {
     id?: string;
     name: string;
@@ -1728,6 +1744,22 @@ function WorkflowPage() {
 
   /* ---------- Derived ---------- */
   const prebuiltAgents = useMemo(() => LOOP_AGENTS[loop], [loop]);
+  const visiblePrebuiltWorkflows = useMemo(() => {
+    const byName = new Map<string, CustomWorkflowRow>();
+    const appDisplayNames = new Map(APP_PREBUILT_WORKFLOWS.map((item) => [item.name, item.displayName]));
+    for (const workflow of APP_PREBUILT_WORKFLOWS) {
+      byName.set(workflow.name, workflow);
+    }
+    for (const workflow of prebuiltWorkflows) {
+      byName.set(workflow.name, {
+        ...workflow,
+        displayName: workflow.displayName || appDisplayNames.get(workflow.name),
+      });
+    }
+    return Array.from(byName.values())
+      .filter((workflow) => (workflow.loop_type || inferLoopTypeFromName(workflow.name)) === loop)
+      .sort((a, b) => (a.displayName || a.name).localeCompare(b.displayName || b.name));
+  }, [loop, prebuiltWorkflows]);
 
   const loadPrebuiltWorkflow = (wf: CustomWorkflowRow) => {
     loadWorkflowFromDB(wf);
@@ -2380,15 +2412,13 @@ function WorkflowPage() {
             <div className="pl-2">
               <p className="text-sm text-cyan-400 font-medium mb-1">Prebuilt</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
-                {prebuiltWorkflows
-                  .filter((w) => (w.loop_type || inferLoopTypeFromName(w.name)) === loop)
-                  .map((wf) => (
+                {visiblePrebuiltWorkflows.map((wf) => (
                   <li
                     key={wf.id || wf.name}
                     onClick={() => loadPrebuiltWorkflow(wf)}
                     className="px-2 py-1 rounded hover:bg-slate-800 cursor-pointer"
                   >
-                    {wf.name}
+                    {wf.displayName || wf.name}
                   </li>
                 ))}
               </ul>
