@@ -12,6 +12,7 @@ type SavedWorkflowOption = {
   displayName?: string;
   loop_type?: string | null;
   is_prebuilt?: boolean | null;
+  definitions?: { nodes?: Node[]; edges?: Edge[] } | null;
 };
 
 type DagPreviewModalProps = {
@@ -310,6 +311,14 @@ export default function DagPreviewModal({
   }
 
   async function loadSavedWorkflowDefinition(workflow: SavedWorkflowOption) {
+    if (workflow.definitions?.nodes?.length) {
+      return {
+        workflow,
+        definitions: workflow.definitions,
+        loopType: workflow.loop_type || loopType,
+      };
+    }
+
     const userId = await getStableUserId();
     let data: SavedWorkflowRecord | null = null;
     let dbError: { message?: string } | null = null;

@@ -59,6 +59,7 @@ type CustomWorkflowRow = {
   displayName?: string;
   loop_type?: string | null;
   is_prebuilt?: boolean | null;
+  definitions?: WorkflowGraphDefinition | null;
 };
 
 const APP_PREBUILT_WORKFLOWS: CustomWorkflowRow[] = [
@@ -1988,7 +1989,10 @@ function WorkflowPage() {
   const visiblePrebuiltWorkflows = useMemo(() => {
     const byName = new Map<string, CustomWorkflowRow>();
     for (const workflow of APP_PREBUILT_WORKFLOWS) {
-      byName.set(workflow.name, workflow);
+      byName.set(workflow.name, {
+        ...workflow,
+        definitions: APP_PREBUILT_WORKFLOW_DEFINITIONS[workflow.name] || null,
+      });
     }
     for (const workflow of prebuiltWorkflows) {
       byName.set(workflow.name, {
@@ -2001,6 +2005,31 @@ function WorkflowPage() {
       .filter((workflow) => normalizeLoopType(workflow.loop_type, workflow.name) === loop)
       .sort((a, b) => workflowDisplayName(a).localeCompare(workflowDisplayName(b)));
   }, [loop, prebuiltWorkflows]);
+
+  const composerWorkflows = useMemo(() => {
+    const byName = new Map<string, CustomWorkflowRow>();
+    for (const workflow of APP_PREBUILT_WORKFLOWS) {
+      byName.set(workflow.name, {
+        ...workflow,
+        definitions: APP_PREBUILT_WORKFLOW_DEFINITIONS[workflow.name] || null,
+      });
+    }
+    for (const workflow of prebuiltWorkflows) {
+      byName.set(workflow.name, {
+        ...workflow,
+        loop_type: normalizeLoopType(workflow.loop_type, workflow.name),
+        displayName: workflowDisplayName(workflow),
+      });
+    }
+    for (const workflow of customWorkflows) {
+      byName.set(`custom:${workflow.id || workflow.name}`, workflow);
+    }
+    return Array.from(byName.values()).sort((a, b) => {
+      const prebuiltDelta = Number(Boolean(b.is_prebuilt)) - Number(Boolean(a.is_prebuilt));
+      if (prebuiltDelta) return prebuiltDelta;
+      return workflowDisplayName(a).localeCompare(workflowDisplayName(b));
+    });
+  }, [customWorkflows, prebuiltWorkflows]);
 
   const loadPrebuiltWorkflow = (wf: CustomWorkflowRow) => {
     loadWorkflowFromDB(wf);
@@ -3820,7 +3849,7 @@ function WorkflowPage() {
           loopType={loop}
           nodes={nodes}
           edges={edges}
-          savedWorkflows={[...prebuiltWorkflows, ...customWorkflows]}
+          savedWorkflows={composerWorkflows}
           selectedWorkflowName={selectedWorkflowName}
           onOpenComposedWorkflow={(workflow) => {
             setNodes(workflow.nodes as Node<AgentNodeData>[]);
