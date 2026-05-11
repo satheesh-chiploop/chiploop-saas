@@ -61,6 +61,19 @@ type ComposedWorkflow = {
   sourceNames: string[];
 };
 
+const REGISTERED_AGENT_ALIASES: Record<string, string> = {
+  "System Integration Agent": "System Integration Intent Agent",
+  "System RTL Agent": "System Top Assembly Agent",
+  "System Sim Agent": "System Simulation Control Agent",
+  "System Firmware Agent": "System Firmware CoSim Execution Agent",
+  "System Assertions Agent": "System Assertions (SVA) Agent",
+  "System IP Packaging & Handoff Agent": "System RTL Handoff Package Agent",
+};
+
+function normalizeAgentName(name: string): string {
+  return REGISTERED_AGENT_ALIASES[name] || name;
+}
+
 function errorMessage(error: unknown): string {
   if (error instanceof ApiClientError && error.status === 401) {
     return "Your session expired. Please sign in again.";
@@ -75,8 +88,8 @@ function graphPayloadFromNodes(nodes: Node[], edges: Edge[], loopType: string) {
       nodes: nodes.map((node) => ({
         id: node.id,
         data: {
-          uiLabel: String(node.data?.uiLabel || node.data?.backendLabel || node.id),
-          backendLabel: String(node.data?.backendLabel || node.data?.uiLabel || node.id),
+          uiLabel: normalizeAgentName(String(node.data?.uiLabel || node.data?.backendLabel || node.id)),
+          backendLabel: normalizeAgentName(String(node.data?.backendLabel || node.data?.uiLabel || node.id)),
         },
       })),
       edges: edges.map((edge) => ({
@@ -130,7 +143,7 @@ function suggestBranchWorkflowFromCurrent(nodes: Node[], loopType: string): Comp
     type: node.type || "agentNode",
     data: {
       uiLabel: String(node.data?.uiLabel || node.data?.backendLabel || node.id),
-      backendLabel: String(node.data?.backendLabel || node.data?.uiLabel || node.id),
+      backendLabel: normalizeAgentName(String(node.data?.backendLabel || node.data?.uiLabel || node.id)),
       desc: node.data?.desc,
     },
   }));
@@ -251,7 +264,7 @@ function composeWorkflowFromDefinitions(
     let workflowHasSystemAgent = false;
 
     nodes.forEach((node) => {
-      const backendLabel = String(node.data?.backendLabel || node.data?.uiLabel || node.id);
+      const backendLabel = normalizeAgentName(String(node.data?.backendLabel || node.data?.uiLabel || node.id));
       const labelLower = backendLabel.toLowerCase();
       const composedId = `${prefix}__${node.id}`;
       prefixedNodeIds.push(composedId);
@@ -332,7 +345,7 @@ function graphPayloadFromComposedWorkflow(composed: ComposedWorkflow, suggestCom
         id: node.id,
         data: {
           uiLabel: String(node.data?.uiLabel || node.data?.backendLabel || node.id),
-          backendLabel: String(node.data?.backendLabel || node.data?.uiLabel || node.id),
+          backendLabel: normalizeAgentName(String(node.data?.backendLabel || node.data?.uiLabel || node.id)),
         },
       })),
       edges: composed.edges.map((edge) => ({
