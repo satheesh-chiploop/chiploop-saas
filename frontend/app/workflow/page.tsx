@@ -59,7 +59,12 @@ type CustomWorkflowRow = {
   displayName?: string;
   loop_type?: string | null;
   is_prebuilt?: boolean | null;
-  definitions?: WorkflowGraphDefinition | null;
+  definitions?: {
+    nodes?: WorkflowGraphDefinition["nodes"];
+    edges?: WorkflowGraphDefinition["edges"];
+    app_intent?: unknown;
+    template_workflow?: unknown;
+  } | null;
 };
 
 const APP_PREBUILT_WORKFLOWS: CustomWorkflowRow[] = [
@@ -2008,12 +2013,6 @@ function WorkflowPage() {
 
   const composerWorkflows = useMemo(() => {
     const byName = new Map<string, CustomWorkflowRow>();
-    for (const workflow of APP_PREBUILT_WORKFLOWS) {
-      byName.set(workflow.name, {
-        ...workflow,
-        definitions: APP_PREBUILT_WORKFLOW_DEFINITIONS[workflow.name] || null,
-      });
-    }
     for (const workflow of prebuiltWorkflows) {
       byName.set(workflow.name, {
         ...workflow,
@@ -2054,6 +2053,15 @@ function WorkflowPage() {
         : w.name,
     loop_type: normalizeLoopType(w.loop_type, w.name),
     is_prebuilt: w.is_prebuilt,
+    definitions:
+      w.definitions && Array.isArray(w.definitions.nodes)
+        ? {
+            nodes: w.definitions.nodes as WorkflowGraphDefinition["nodes"],
+            edges: (w.definitions.edges || []) as WorkflowGraphDefinition["edges"],
+            app_intent: w.definitions.app_intent,
+            template_workflow: w.definitions.template_workflow,
+          }
+        : null,
   });
 
   const loadPrebuiltWorkflowsFromDB = async () => {
@@ -2078,7 +2086,7 @@ function WorkflowPage() {
 
     const { data, error } = await supabase
       .from("workflows")
-      .select("id, name, created_at, status, loop_type, is_prebuilt")
+      .select("id, name, created_at, status, loop_type, is_prebuilt, definitions")
       .eq("user_id", userId)
       .eq("status", "saved")                 // âœ… ONLY show saved templates
       .or("is_prebuilt.eq.false,is_prebuilt.is.null")
