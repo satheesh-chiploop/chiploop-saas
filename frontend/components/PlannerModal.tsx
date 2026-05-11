@@ -1,736 +1,489 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
-import { getStableUserId } from "@/utils/userId";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-const supabase = createClientComponentClient();
+
+import { useEffect, useMemo, useState } from "react";
 import Editor from "@monaco-editor/react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { getStableUserId } from "@/utils/userId";
 
-export default function PlannerModal({ onClose }) {
-    const [goal, setGoal] = useState("");
-    const [plan, setPlan] = useState<any | null>(null);
-    const [coverage, setCoverage] = useState<any | null>(null);
-    const [liveCoverage, setLiveCoverage] = useState(0);
-    const [clarifications, setClarifications] = useState<string[]>([]);
-    const [analyzing, setAnalyzing] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [autoLoading, setAutoLoading] = useState(false);
+const supabase = createClientComponentClient();
 
-    const [isRecording, setIsRecording] = useState(false);
-    const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+type DesignIntentHandoff = {
+  id?: string;
+  title: string;
+  refined_prompt: string;
+  structured_intent: Record<string, string>;
+  qa_pairs: Record<string, string>;
+  full_intent: Record<string, unknown>;
+};
 
-    const [summary, setSummary] = useState<any>(null);
-    const [voiceMode, setVoiceMode] = useState(false);
+type PlannerModalProps = {
+  onClose: () => void;
+  onBuildWorkflow?: (intent: DesignIntentHandoff) => void;
+};
 
-    const [designIntents, setDesignIntents] = useState<any[]>([]);
-    const [loadedIntent, setLoadedIntent] = useState<any | null>(null);
+type LoopInterpretation = {
+  digital?: string;
+  embedded?: string;
+  analog?: string;
+  system?: string;
+  validation?: string;
+};
 
+type SavedDesignIntent = Partial<DesignIntentHandoff> & {
+  id?: string;
+  title?: string;
+  refined_prompt?: string;
+  structured_intent?: LoopInterpretation;
+  qa_pairs?: Record<string, string>;
+  full_intent?: {
+    refined_prompt?: string;
+    [key: string]: unknown;
+  };
+};
 
-    const [jsonEditMode, setJsonEditMode] = useState(false);
-    const [jsonContent, setJsonContent] = useState("");
+export default function PlannerModal({ onClose, onBuildWorkflow }: PlannerModalProps) {
+  const [activeStep, setActiveStep] = useState<"describe" | "clarify" | "review">("describe");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loadedIntent, setLoadedIntent] = useState<SavedDesignIntent | null>(null);
+  const [titleHint, setTitleHint] = useState("My Design");
+  const [ideaText, setIdeaText] = useState("");
+  const [initialIdea, setInitialIdea] = useState("");
+  const [roundNumber, setRoundNumber] = useState(1);
+  const [clarifyQuestions, setClarifyQuestions] = useState<string[]>([]);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [allQaPairs, setAllQaPairs] = useState<Record<string, string>>({});
+  const [refinedPrompts, setRefinedPrompts] = useState<string[]>([]);
+  const [loopInterpretation, setLoopInterpretation] = useState<LoopInterpretation>({});
+  const [interpretationHistory, setInterpretationHistory] = useState<LoopInterpretation[]>([]);
+  const [consolidatedSpec, setConsolidatedSpec] = useState("");
+  const [loadingRound, setLoadingRound] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [jsonEditMode, setJsonEditMode] = useState(false);
+  const [jsonContent, setJsonContent] = useState("");
 
-    useEffect(() => {
-      const handler = (e) => {
-          setLoadedIntent(e.detail);
-      };
-      window.addEventListener("loadDesignIntent", handler);
-      return () => window.removeEventListener("loadDesignIntent", handler);
-    }, []);
+  useEffect(() => {
+    (async () => {
+      const id = await getStableUserId(supabase);
+      setUserId(id);
+    })();
+  }, []);
 
-    useEffect(() => {
-      if (!loadedIntent) return;
-    
-      console.log("📥 Hydrating planner with loaded intent:", loadedIntent);
-    
-      if (loadedIntent.refined_prompt) {
-        setRefinedPrompt(loadedIntent.refined_prompt);
-      }
-      if (loadedIntent.structured_intent) {
-        setLoopInterpretation(loadedIntent.structured_intent);
-      }
-      if (loadedIntent.qa_pairs) {
-        setAnswers(loadedIntent.qa_pairs);
-        setClarifyQuestions(Object.keys(loadedIntent.qa_pairs));
-      }
-    }, [loadedIntent]);
-
-    useEffect(() => {
-      const handleOpenJsonEditor = (e: any) => {
-        console.log("🟢 PlannerModal RECEIVED event:", e.detail);
-        const intent = e.detail;
-        setJsonContent(JSON.stringify(intent, null, 2)); // pretty JSON
-        setJsonEditMode(true);
-      };
-    
-      window.addEventListener("openJsonEditorForDesignIntent", handleOpenJsonEditor);
-    
-      return () => {
-        window.removeEventListener("openJsonEditorForDesignIntent", handleOpenJsonEditor);
-      };
-    }, []);
-    
-
-    const mergeAnswersIntoPrompt = () => {
-      let merged = refinedPrompt;
-      console.log("🧩 mergeAnswersIntoPrompt – clarifyQuestions:", clarifyQuestions);
-      console.log("🧩 mergeAnswersIntoPrompt – answers:", answers);
-      clarifyQuestions.forEach((q) => {
-        const ans = answers[q];
-        if (ans) {
-          merged += `\n\n${q}\n${ans}`;
-        }
-      });
-      return merged;
+  useEffect(() => {
+    const handleLoadIntent = (event: Event) => setLoadedIntent((event as CustomEvent<SavedDesignIntent>).detail);
+    const handleJsonEdit = (event: Event) => {
+      setJsonContent(JSON.stringify((event as CustomEvent<unknown>).detail, null, 2));
+      setJsonEditMode(true);
     };
 
-  
-    
-
-    // When user clicks an item, hydrate the planner with it
-    const handleLoadIntentIntoPlanner = (intent: any) => {
-      console.log("📥 Loading design intent into planner:", intent?.id);
-      if (intent?.refined_prompt) {
-        setRefinedPrompt(intent.refined_prompt);
-      }
-      if (intent?.structured_intent) {
-        setLoopInterpretation(intent.structured_intent);
-      }
-
-      // Optional: future-proof for qa_pairs if you add that column later
-      const maybeQa = (intent as any).qa_pairs;
-      if (maybeQa && typeof maybeQa === "object") {
-        setClarifyQuestions(Object.keys(maybeQa));
-        setAnswers(maybeQa);
-      }
+    window.addEventListener("loadDesignIntent", handleLoadIntent);
+    window.addEventListener("openJsonEditorForDesignIntent", handleJsonEdit);
+    return () => {
+      window.removeEventListener("loadDesignIntent", handleLoadIntent);
+      window.removeEventListener("openJsonEditorForDesignIntent", handleJsonEdit);
     };
+  }, []);
 
-    // -----------------------------
-    // 🧩 Design Intent Planner state
-    // -----------------------------
-    const [isDesignIntentMode, setIsDesignIntentMode] = useState(true); // temporary toggle
-    const [roundNumber, setRoundNumber] = useState(1);
-    const [clarifyQuestions, setClarifyQuestions] = useState<string[]>([]);
-    const [suggestedAnswers, setSuggestedAnswers] = useState<Record<string, string>>({});
-    const [refinedPrompt, setRefinedPrompt] = useState("");
-    const [loopInterpretation, setLoopInterpretation] = useState<{
-        digital?: string;
-        embedded?: string;
-        analog?: string;
-        system?: string;
-    } | null>(null);
-    const [isLoadingRound, setIsLoadingRound] = useState(false);
-    const [answers, setAnswers] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!loadedIntent) return;
 
-    const [userId, setUserId] = useState(null);
-    const [allRoundsQA, setAllRoundsQA] = useState({});
-    const [allRefinedPrompts, setAllRefinedPrompts] = useState([]);
-    const [allInterpretations, setAllInterpretations] = useState([]);
-    const [initialUserIntent, setInitialUserIntent] = useState("");
+    setTitleHint(loadedIntent.title || "My Design");
+    setIdeaText(loadedIntent.refined_prompt || loadedIntent.full_intent?.refined_prompt || "");
+    setConsolidatedSpec(loadedIntent.refined_prompt || loadedIntent.full_intent?.refined_prompt || "");
+    setLoopInterpretation(loadedIntent.structured_intent || {});
+    setInterpretationHistory(loadedIntent.structured_intent ? [loadedIntent.structured_intent] : []);
 
-    useEffect(() => {
-      (async () => {
-        const id = await getStableUserId(supabase);
-        setUserId(id);
-      })();
-    }, []);
+    const qa = loadedIntent.qa_pairs && typeof loadedIntent.qa_pairs === "object" ? loadedIntent.qa_pairs : {};
+    setAnswers(qa);
+    setAllQaPairs(qa);
+    setClarifyQuestions(Object.keys(qa));
+    setActiveStep("review");
+  }, [loadedIntent]);
 
- 
-    async function startStopRecording() {
-        if (isRecording && mediaRecorder) {
-          mediaRecorder.stop();
-          setIsRecording(false);
-          return;
-        }
-      
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          const rec = new MediaRecorder(stream);
-          const chunks: BlobPart[] = [];
-      
-          rec.ondataavailable = (e) => chunks.push(e.data);
-          rec.onstop = async () => {
-            const blob = new Blob(chunks, { type: "audio/webm" });
-            const formData = new FormData();
-            formData.append("file", blob);
-      
-            // Send audio to backend
-            await fetch("/voice_stream", {
-              method: "POST",
-              body: formData,
-            });
-            setVoiceMode(true);
-          };
-      
-          rec.start();
-          setMediaRecorder(rec);
-          setIsRecording(true);
-        } catch (err) {
-          console.error("🎙️ Voice recording failed:", err);
-        }
+  const qaPairs = useMemo(() => ({ ...allQaPairs, ...answers }), [allQaPairs, answers]);
+
+  function mergedInterpretation(): Required<Pick<LoopInterpretation, "digital" | "embedded" | "analog" | "system">> {
+    const merged = { digital: "", embedded: "", analog: "", system: "" };
+    for (const item of interpretationHistory) {
+      merged.digital = merged.digital || item.digital || "";
+      merged.embedded = merged.embedded || item.embedded || "";
+      merged.analog = merged.analog || item.analog || "";
+      merged.system = merged.system || item.system || item.validation || "";
     }
-    function toggleVoiceMode() {
-        startStopRecording();
-    }
-
-    const handlePlan = async () => {
-        setLoading(true);
-        setPlan(null);
-        try {
-          
-            const res = await fetch("/api/plan_workflow", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    prompt:goal,
-                    structured_spec_final: coverage?.structured_spec_final || summary?.structured_spec_final,
-                }),
-            });
-            const data = await res.json();
-
-            // ✅ capture the proper preplan structure only
-          
-            setPlan(data);
-
-            console.log("🧠 Stored Preplan:", data);
-            alert("✅ Plan generated successfully! Check for missing agents below.");
-        } catch (err) {
-            alert("⚠️ Failed to generate workflow plan");
-        } finally {
-            setLoading(false);
-        }
+    return {
+      digital: merged.digital || loopInterpretation.digital || "",
+      embedded: merged.embedded || loopInterpretation.embedded || "",
+      analog: merged.analog || loopInterpretation.analog || "",
+      system: merged.system || loopInterpretation.system || loopInterpretation.validation || "",
     };
-    const handleAutoCompose = async () => {
-        setAutoLoading(true);
-        try {
-          const res = await fetch("/api/auto_compose_workflow", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              goal,
-              preplan: plan || null,
-              structured_spec_final: coverage?.structured_spec_final || summary?.structured_spec_final,
-            }),
-          });
-      
-          const data = await res.json();
-      
-          if (data.status === "ok" || data.nodes) {
-            // ✅ Update plan state for canvas rendering
-            setPlan({
-              summary: data.summary,
-              nodes: data.nodes,
-              edges: data.edges,
-            });
-      
-            // ✅ Save workflow to DB
-            const workflowName = prompt(
-              "💾 Enter a name to save this workflow:",
-              `AI_Composed_${new Date().toISOString().slice(0, 10)}`
-            );
-            const loopType = prompt(
-              "🔁 Enter loop type (digital / analog / embedded / system):",
-              "digital"
-            );
-      
-                        
-            
-      
-            alert(`✅ Auto-composed workflow:\n${data.summary}`);
-            alert("✅ Auto-Compose complete!\n🔍 Missing Agents → Auto-created if required.");
-            window.dispatchEvent(new Event("workflow-saved"));
-          } else {
-            alert(`⚠️ ${data.message || "Auto-compose failed."}`);
-          }
-        } catch (err) {
-          console.error(err);
-          alert("❌ Could not connect to backend");
-        } finally {
-          setAutoLoading(false);
-        }
-    };
-      
-    
+  }
 
-    const handleVoiceInput = async (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
-      
-        const res = await fetch("/api/voice_to_spec", { method: "POST", body: formData });
-        const data = await res.json();
-        setSummary(data.summary || "");
-        setCoverage(data.coverage || 0);
-        setVoiceMode(true);
-      };
+  function cumulativePrompt() {
+    const original = initialIdea || ideaText;
+    const sections = [`### Original User Intent\n${original}`];
+    refinedPrompts.forEach((prompt, index) => {
+      if (prompt) sections.push(`### Refined Prompt Round ${index + 1}\n${prompt}`);
+    });
+    const qaText = Object.entries(qaPairs)
+      .map(([question, answer]) => `Q: ${question}\nA: ${answer}`)
+      .join("\n\n");
+    if (qaText) sections.push(`### All Questions and Answers So Far\n${qaText}`);
+    return sections.join("\n\n").trim();
+  }
 
-    const handleAnalyzeSpec = async () => {
-        setAnalyzing(true);
-        try {
-          // 🧩 Unified payload — use voice summary if voiceMode is active
-          const payload = voiceMode
-            ? { voice_summary: summary, user_id: "anonymous" }
-            : { goal, user_id: "anonymous" };
-      
-          const res = await fetch("/api/analyze_spec", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-      
-          const data = await res.json();
-          if (data.status === "ok") {
-            setCoverage(data.coverage);
-            setClarifications(data.coverage.questions || []);
-            alert("✅ Spec analyzed successfully!");
-          } else {
-            console.warn("⚠️ Spec analysis failed:", data.message);
-            alert("⚠️ Spec analysis failed.");
-          }
-        } catch (err) {
-          console.error("❌ Analyzer error:", err);
-          alert("❌ Could not connect to backend.");
-        } finally {
-          setAnalyzing(false);
-        }
-      };
-    // -----------------------------
-    // 🧩 Phase 1 placeholder handlers
-    // -----------------------------
-    const handleContinueRound = async () => {
-      try {
+  function promptForNextRound() {
+    const currentAnswers = Object.entries(answers)
+      .filter(([, answer]) => answer.trim())
+      .map(([question, answer]) => `${question}\n${answer}`)
+      .join("\n\n");
+    return [cumulativePrompt(), currentAnswers].filter(Boolean).join("\n\n").trim();
+  }
 
-        const nextPrompt = mergeAnswersIntoPrompt();
+  function buildConsolidatedDesignSpec() {
+    const interpretation = mergedInterpretation();
+    const answeredItems = Object.entries(qaPairs)
+      .filter(([, answer]) => String(answer || "").trim())
+      .map(([question, answer]) => `- ${question}\n  Answer: ${answer}`)
+      .join("\n");
+    const openItems = clarifyQuestions
+      .filter((question) => !String(qaPairs[question] || "").trim())
+      .map((question) => `- ${question}`)
+      .join("\n");
 
-        // Capture original refinedPrompt only during ROUND 1
-        if (roundNumber === 1 && initialUserIntent === "") {
-          setInitialUserIntent(refinedPrompt);
-        }
+    return [
+      "# Consolidated Design Spec",
+      "",
+      "## Purpose",
+      (ideaText || initialIdea || "Not specified.").trim(),
+      "",
+      "## Functional Intent",
+      "Describe the required behavior, state transitions, data movement, and user-visible outcomes based on the captured requirements below.",
+      "",
+      "## Domain Interpretation",
+      `- Digital: ${interpretation.digital || "Not specified"}`,
+      `- Embedded: ${interpretation.embedded || "Not specified"}`,
+      `- Analog: ${interpretation.analog || "Not specified"}`,
+      `- System: ${interpretation.system || "Not specified"}`,
+      "",
+      "## Captured Requirements and Decisions",
+      answeredItems || "- No clarifying answers captured yet.",
+      "",
+      "## Assumptions and Open Questions",
+      openItems || "- No open questions currently captured.",
+      "",
+      "## Verification Intent",
+      "Define checks, expected outputs, corner cases, and pass/fail criteria before running implementation workflows.",
+      "",
+      "## Recommended Next Step",
+      "Use this saved design intent in System Planner to select agents and build an executable workflow.",
+    ].join("\n");
+  }
 
-        const res = await fetch("/api/clarify_intent_round", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            round: roundNumber,
-            prompt:  buildCumulativePrompt(),
-            previous_loop_interpretation: buildMergedLoopInterpretation(),
-          })
-        });
-    
-        const data = await res.json();
-    
-        if (data.status === "ok") {
-          // update state from backend response
-          setClarifyQuestions(data.questions || []);
-          
-          // suggested_answers is an array → convert to { question: answer }
-          // FIX: map suggested answers into answers
+  function refreshConsolidatedSpec() {
+    const spec = buildConsolidatedDesignSpec();
+    setConsolidatedSpec(spec);
+    setActiveStep("review");
+    return spec;
+  }
 
-          const qs = data.questions || [];
-          const sas = data.suggested_answers || [];   // ARRAY from backend
+  async function continueQuestions() {
+    const prompt = promptForNextRound();
+    if (!prompt.trim()) return;
 
-          console.log("🟢 Questions:", qs);
-          console.log("🟢 Suggested answers array:", sas);
+    setLoadingRound(true);
+    setError(null);
+    try {
+      if (!initialIdea) setInitialIdea(ideaText);
 
-          const mappedAnswers: Record<string, string> = {};
-
-          qs.forEach((q, idx) => {
-            mappedAnswers[q] = sas[idx] || "";
-          });
-
-          console.log("🟢 Final mappedAnswers:", mappedAnswers);
-          setSuggestedAnswers(prev => ({ ...prev, ...mappedAnswers }));
-          setAnswers(mappedAnswers);
-          
-
-          setAllRoundsQA(prev => ({
-           ...prev,
-           ...mappedAnswers,
-          }));
-
-
-
-          
-         
-          setRefinedPrompt(data.refined_prompt || refinedPrompt);
-
-          setAllRefinedPrompts(prev => [...prev, data.refined_prompt]);
-
-          setLoopInterpretation(data.loop_interpretation || loopInterpretation);
-          setAllInterpretations(prev => [...prev, data.loop_interpretation]);
-          // Next round
-          setRoundNumber(prev => prev + 1);
-        } else {
-          console.error("Backend error:", data.message);
-        }
-      } catch (err) {
-        console.error("Network error:", err);
-      }
-    };
-
-    const buildCumulativePrompt = () => {
-      let final = "### Original User Intent\n" + initialUserIntent + "\n\n";
-    
-      let i = 1;
-      for (const prompt of allRefinedPrompts) {
-        final += `### Refined Prompt Round ${i}\n${prompt}\n\n`;
-        i++;
-      }
-    
-      final += "### All Questions and Answers So Far\n";
-      for (const [q, a] of Object.entries(allRoundsQA)) {
-        final += `Q: ${q}\nA: ${a}\n\n`;
-      }
-    
-      return final.trim();
-    };
-
-    const buildMergedLoopInterpretation = () => {
-      const merged = { digital: "", embedded: "", analog: "", system: "" };
-    
-      allInterpretations.forEach(int => {
-        if (!int) return;
-        merged.digital = merged.digital || int.digital || "";
-        merged.embedded = merged.embedded || int.embedded || "";
-        merged.analog = merged.analog || int.analog || "";
-        merged.system = merged.system || int.system || "";
+      const response = await fetch("/api/clarify_intent_round", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: userId || "anonymous",
+          round: roundNumber,
+          prompt,
+          previous_loop_interpretation: mergedInterpretation(),
+        }),
       });
-    
-      return merged;
+      const data = await response.json();
+      if (data.status !== "ok") throw new Error(data.message || "Clarification failed.");
+
+      const questions = data.questions || [];
+      const suggested = data.suggested_answers || [];
+      const mappedAnswers: Record<string, string> = {};
+      questions.forEach((question: string, index: number) => {
+        mappedAnswers[question] = suggested[index] || "";
+      });
+
+      setAllQaPairs((current) => ({ ...current, ...answers, ...mappedAnswers }));
+      setAnswers(mappedAnswers);
+      setClarifyQuestions(questions);
+      setRefinedPrompts((current) => current.concat(data.refined_prompt || ""));
+      setIdeaText(data.refined_prompt || ideaText);
+      setLoopInterpretation(data.loop_interpretation || {});
+      setInterpretationHistory((current) => current.concat(data.loop_interpretation || {}));
+      setRoundNumber((current) => current + 1);
+      setActiveStep("clarify");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not connect to backend.");
+    } finally {
+      setLoadingRound(false);
+    }
+  }
+
+  async function saveDesignIntent(continueToSystemPlanner: boolean) {
+    const specText = consolidatedSpec.trim() ? consolidatedSpec : refreshConsolidatedSpec();
+    const effectiveUserId = userId || (await getStableUserId(supabase));
+    const title = window.prompt("Enter a name for this Design Intent:", titleHint) || titleHint || "Untitled Design Intent";
+    const structuredIntent = mergedInterpretation();
+    const payload = {
+      user_id: effectiveUserId,
+      title,
+      refined_prompt: specText,
+      implementation_strategy: [
+        `Digital: ${structuredIntent.digital || ""}`,
+        `Embedded: ${structuredIntent.embedded || ""}`,
+        `Analog: ${structuredIntent.analog || ""}`,
+        `System: ${structuredIntent.system || ""}`,
+      ].join("\n"),
+      structured_intent: structuredIntent,
+      qa_pairs: qaPairs,
+      full_intent: {
+        refined_prompt: specText,
+        raw_history: cumulativePrompt(),
+        structured_intent: structuredIntent,
+        qa_pairs: qaPairs,
+        round: roundNumber - 1,
+      },
+      version: 1,
     };
-    
-    const handleFinalizeDesignIntent = async () => {
-      try {
 
-        const effectiveUserId = userId || (await getStableUserId(supabase));
-        if (!userId && effectiveUserId) {
-          setUserId(effectiveUserId);
-        }
-        // If we loaded an existing intent, use its title as default
-        const existingTitle = loadedIntent?.title || "My Design";
-        let title = prompt("Enter a name for this Design Intent:", existingTitle);
-        if (!title) title = existingTitle || "Untitled Design Intent";
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/save_design_intent_draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (data.status !== "ok") throw new Error(data.message || "Save failed.");
 
-
-        const payload = {
-          user_id: effectiveUserId,
-          title,
-          refined_prompt: buildCumulativePrompt(),
-          implementation_strategy: `
-            Digital: ${buildMergedLoopInterpretation().digital || ""}
-            Embedded: ${buildMergedLoopInterpretation().embedded || ""}
-            Analog: ${buildMergedLoopInterpretation().analog || ""}
-            System: ${buildMergedLoopInterpretation().system || ""}
-          `.trim(),
-          structured_intent: buildMergedLoopInterpretation(),
-          qa_pairs: allRoundsQA,                       // NEW
-          full_intent: {                           // NEW (optional)
-            refined_prompt:buildCumulativePrompt(),
-            structured_intent: buildMergedLoopInterpretation(),
-            qa_pairs: allRoundsQA,
-            round: roundNumber-1
-          },
-          version: 1,
-        };
-        
-        const response = await fetch("/api/save_design_intent_draft", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-    
-        const data = await response.json();
-        console.log("Save design intent:", data);
-    
-        if (data.status === "ok") {
-          alert("Design Intent Draft saved successfully!");
-          onClose(); // Close modal after save
-        } else {
-          console.error("Save failed:", data.message);
-        }
-        window.dispatchEvent(new CustomEvent("refreshDesignIntents"));
-
-      } catch (err) {
-        console.error("Save intent network error:", err);
+      const savedIntent = data.data || payload;
+      window.dispatchEvent(new CustomEvent("refreshDesignIntents"));
+      if (continueToSystemPlanner && onBuildWorkflow) {
+        onBuildWorkflow(savedIntent);
+      } else {
+        onClose();
       }
-    };
-    
-    
-    useEffect(() => {
-        const ws = new WebSocket("wss://209.38.74.151/spec_live_feedback");
-      
-        ws.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
-            if (data.summary) setSummary(data.summary);
-            if (data.coverage) setLiveCoverage(data.coverage);
-          } catch (err) {
-            console.error("⚠️ Error parsing WebSocket data", err);
-          }
-        };
-      
-        return () => ws.close();
-    }, []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save design intent.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
-    if (jsonEditMode) {
-      return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-slate-900 p-4 rounded w-[90%] h-[90%] flex flex-col">
-            <h2 className="text-lg font-bold mb-3">Edit Design Intent (JSON)</h2>
-    
-            <div className="flex-1 border border-slate-700 rounded">
-              <Editor
-                height="100%"
-                defaultLanguage="json"
-                value={jsonContent}
-                onChange={(value) => setJsonContent(value ?? "")}
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  scrollBeyondLastLine: false,
-                  smoothScrolling: true,
-                }}
-              />
-            </div>
-    
-            <div className="mt-3 flex justify-end gap-3">
-              <button
-                className="px-3 py-1 bg-slate-600 rounded"
-                onClick={() => {
+  if (jsonEditMode) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="flex h-[90vh] w-[90vw] flex-col rounded-lg bg-slate-900 p-4 text-white">
+          <h2 className="mb-3 text-lg font-bold">Edit Design Intent JSON</h2>
+          <div className="min-h-0 flex-1 rounded border border-slate-700">
+            <Editor
+              height="100%"
+              defaultLanguage="json"
+              value={jsonContent}
+              onChange={(value) => setJsonContent(value ?? "")}
+              options={{ minimap: { enabled: false }, fontSize: 14, scrollBeyondLastLine: false, smoothScrolling: true }}
+            />
+          </div>
+          <div className="mt-3 flex justify-end gap-3">
+            <button className="rounded bg-slate-700 px-3 py-2 text-sm" onClick={() => setJsonEditMode(false)}>
+              Cancel
+            </button>
+            <button
+              className="rounded bg-emerald-700 px-3 py-2 text-sm font-semibold"
+              onClick={async () => {
+                try {
+                  const parsed = JSON.parse(jsonContent);
+                  const { error: updateError } = await supabase.from("design_intent_drafts").update(parsed).eq("id", parsed.id);
+                  if (updateError) throw updateError;
+                  window.dispatchEvent(new Event("refreshDesignIntents"));
                   setJsonEditMode(false);
                   onClose();
-                }}
-              >
-                Cancel
-              </button>
-    
-              <button
-                className="px-3 py-1 bg-green-600 rounded"
-                onClick={async () => {
-                  try {
-                    const parsed = JSON.parse(jsonContent);
-    
-                    const { error } = await supabase
-                      .from("design_intent_drafts")
-                      .update(parsed)
-                      .eq("id", parsed.id);
-    
-                    if (error) {
-                      alert("Save failed: " + error.message);
-                      return;
-                    }
-    
-                    window.dispatchEvent(new Event("refreshDesignIntents"));
-                    setJsonEditMode(false);
-                    onClose();
-
-                  } catch (err) {
-                    alert("JSON Error — fix before saving.");
-                  }
-                }}
-              >
-                Save
-              </button>
-            </div>
+                } catch {
+                  window.alert("JSON error. Fix before saving.");
+                }
+              }}
+            >
+              Save
+            </button>
           </div>
         </div>
-      );
-    }
-
-    return (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-            <div className="bg-slate-800 relative rounded-xl p-6 w-[600px] shadow-xl text-white">
-                <h2 className="text-cyan-400 font-bold text-lg mb-3">
-                  {isDesignIntentMode ? "Design Intent Planner" : "Workflow Builder"} 
-                </h2>
-
-                {isDesignIntentMode && (
-                  <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-slate-300 hover:text-white"
-                    aria-label="Close"
-                  >
-                    ✕
-                  </button>
-                )}
-
-
-                {coverage && (
-                    <div
-                        className={`absolute top-6 right-8 px-3 py-1 rounded-full text-xs font-semibold ${
-                            coverage.total_score >= 80
-                                ? "bg-green-600 text-white"
-                                : coverage.total_score >= 60
-                                ? "bg-yellow-500 text-black"
-                                : "bg-red-600 text-white"
-                        }`}
-                    >
-                        Spec Coverage: {coverage.total_score}%
-                    </div>
-                )}
-
-                <textarea
-                    className="w-full bg-slate-800 text-slate-200 rounded-md p-2"
-                    rows={4}
-                    value={refinedPrompt}
-                    onChange={(e) => setRefinedPrompt(e.target.value)}
-                    placeholder="Describe your design idea..."
-                />
-                {/* 🧩 DESIGN INTENT PLANNER PANEL */}
-                {isDesignIntentMode && (
-                  <div className="mt-4">
-                    <h3 className="text-xl font-semibold text-emerald-400 mb-3">
-                      Design Intent Planner – Round {roundNumber}
-                    </h3>
-
-                    {/* 📝 Current Understanding */}
-                    <div className="mb-4">
-                      <label className="block text-sm text-slate-400 mb-1">
-                        Current Understanding
-                      </label>
-                    </div>
-
-                    {/* 🔍 Loop Interpretation */}
-                    {loopInterpretation && (
-                      <div className="mb-4">
-                        <p className="text-sm text-slate-400 mb-1">
-                          Interpretation Across Domains
-                        </p>
-                        <ul className="text-xs text-slate-300 list-disc ml-4 space-y-1">
-                          <li><strong>Digital:</strong> {loopInterpretation.digital}</li>
-                          <li><strong>Embedded:</strong> {loopInterpretation.embedded}</li>
-                          <li><strong>Analog:</strong> {loopInterpretation.analog}</li>
-                          <li><strong>System:</strong> {loopInterpretation.system}</li>
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* ❓ Clarifying Questions */}
-                    <div className="space-y-3">
-                      {clarifyQuestions.map((q, i) => (
-                        <div key={i} className="bg-slate-800 p-3 rounded-md">
-                          <p className="text-sm font-semibold text-slate-300 mb-1">
-                            {i + 1}. {q}
-                          </p>
-                          <input
-                            className="w-full bg-slate-900 text-slate-200 rounded-md px-2 py-1"
-                            value={answers[q] || ""}
-                            onChange={(e) => setAnswers({ ...answers, [q]: e.target.value })}
-                            placeholder="Type or edit your answer"
-                          />
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* ⚙️ Footer Buttons */}
-                    <div className="flex gap-3 mt-5 justify-end">
-                      <button
-                        onClick={handleContinueRound}
-                        disabled={isLoadingRound}
-                        className="bg-emerald-600 hover:bg-emerald-500 text-black font-semibold px-4 py-2 rounded"
-                      >
-                        {isLoadingRound ? "Thinking..." : "Continue Asking Questions"}
-                      </button>
-                      <button
-                        onClick={handleFinalizeDesignIntent}
-                        className="bg-cyan-600 hover:bg-cyan-500 text-black font-semibold px-4 py-2 rounded"
-                      >
-                        Done – Generate Final Spec
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-
-                {!isDesignIntentMode && coverage && (
-                    <div className="mt-4 bg-slate-900 rounded-lg p-3 border border-slate-700">
-                        <div className="w-full bg-gray-700 rounded-full h-2.5 mb-2">
-                            <div
-                                className={`h-2.5 rounded-full ${
-                                    coverage.total_score >= 80
-                                        ? "bg-green-500"
-                                        : coverage.total_score >= 60
-                                        ? "bg-yellow-400"
-                                        : "bg-red-500"
-                                }`}
-                                style={{ width: `${coverage.total_score}%` }}
-                            ></div>
-                        </div>
-                        <p className="text-sm text-slate-300">
-                            Spec Coverage: {coverage.total_score}% (Intent {coverage.intent}, I/O {coverage.io}, Constraints {coverage.constraints}, Verification {coverage.verification})
-                        </p>
-
-                        {coverage.total_score < 80 && (
-                            <p className="text-xs mt-1 text-yellow-400">
-                                ⚠️ Recommended: Improve details or answer clarifying questions to reach ≥80% for best planning consistency.
-                            </p>
-                        )}
-
-                        {clarifications.length > 0 && (
-                            <div className="mt-2 text-xs text-slate-400">
-                                <strong className="text-slate-200">🔍 Clarifying Questions:</strong>
-                                <ul className="list-disc list-inside">
-                                    {clarifications.map((q, i) => (
-                                        <li key={i}>{q}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {!isDesignIntentMode && plan?.missing_agents?.length > 0 && (
-                    <div className="mt-4 bg-amber-900/40 border border-amber-600 rounded-lg p-3">
-                        <h4 className="font-semibold text-amber-300">⚠️ Missing Agents</h4>
-                        <ul className="list-disc list-inside text-sm text-amber-200">
-                            {plan.missing_agents.map((a: string) => (
-                                <li key={a}>{a}</li>
-                            ))}
-                        </ul>
-                        <p className="text-xs mt-2 text-amber-300">
-                            These agents don't exist yet. You can create them manually or click <strong>Auto-Compose Flow</strong> to let ChipLoop generate and register them automatically.
-                        </p>
-                    </div>
-                )}
-
-                {!isDesignIntentMode && plan && (
-                    <div className="mt-4 bg-slate-900 rounded p-3 font-mono text-xs text-slate-200 overflow-auto max-h-64">
-                        <pre>{JSON.stringify(plan, null, 2)}</pre>
-                    </div>
-                )}
-
-                
-
-               
-
-                {/* Floating Notion Summary */}
-                {!isDesignIntentMode && summary && (
-                    <div className="absolute bottom-4 right-4 w-80 bg-gray-900 text-white p-4 rounded-xl shadow-lg">
-                        <h3  className="font-bold text-sm mb-2">🧾 Spec Summary Preview</h3>
-                        <pre className="text-xs whitespace-pre-wrap bg-gray-800 p-2 rounded-md max-h-48 overflow-auto">
-                           {JSON.stringify(summary, null, 2)}
-                        </pre>
-                        <div className="mt-2">
-                          <div className="w-full bg-gray-700 rounded-full h-2.5">
-                             <div 
-                                className={`h-2.5 rounded-full ${
-                                coverage >= 80
-                                  ? "bg-green-500"
-                                  : coverage >= 60
-                                  ? "bg-yellow-400"
-                                  : "bg-red-500"
-                                }`}
-                                style={{ width: `${liveCoverage}%` }}
-                             />
-                          </div>
-                          <p className="text-xs mt-1 text-gray-400">Coverage: {liveCoverage}%</p>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
+      </div>
     );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className="flex h-[calc(100vh-2rem)] max-h-[920px] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-white shadow-2xl">
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-800 p-5">
+          <div>
+            <h2 className="text-2xl font-extrabold text-cyan-300">Design Intent Planner</h2>
+            <p className="mt-1 text-sm text-slate-400">
+              Capture an idea, clarify missing engineering details, and save a reusable design spec.
+            </p>
+          </div>
+          <button onClick={onClose} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:bg-slate-900">
+            Close
+          </button>
+        </div>
+
+        <div className="shrink-0 border-b border-slate-800 px-5 py-3">
+          <div className="flex flex-wrap gap-2">
+            {[
+              ["describe", "Describe"],
+              ["clarify", "Clarify"],
+              ["review", "Review"],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  if (key === "review" && !consolidatedSpec) refreshConsolidatedSpec();
+                  else setActiveStep(key as "describe" | "clarify" | "review");
+                }}
+                className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${
+                  activeStep === key ? "bg-cyan-600 text-white" : "border border-slate-700 text-slate-300 hover:bg-slate-900"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto p-5 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          {error ? <div className="mb-4 rounded-lg border border-red-900/70 bg-red-950/30 p-3 text-sm text-red-200">{error}</div> : null}
+
+          {activeStep === "describe" ? (
+            <section className="grid gap-5 lg:grid-cols-[1fr_320px]">
+              <div>
+                <label className="block text-lg font-bold text-slate-100">Design Your Idea</label>
+                <textarea
+                  className="mt-3 h-72 w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-4 text-sm leading-6 text-slate-100 outline-none focus:border-cyan-600"
+                  value={ideaText}
+                  onChange={(event) => setIdeaText(event.target.value)}
+                  placeholder="Example: Design a 4-bit counter with enable, active-low reset, terminal count output, and wrap-around behavior."
+                />
+              </div>
+              <aside className="rounded-lg border border-slate-800 bg-black/30 p-4">
+                <h3 className="text-sm font-bold text-cyan-300">Good inputs</h3>
+                <ul className="mt-3 space-y-2 text-sm leading-5 text-slate-300">
+                  <li>Design a 4-bit counter with enable, reset, and terminal count.</li>
+                  <li>Create an SPI controller with APB interface and interrupt support.</li>
+                  <li>Build a mixed-signal sensor readout with ADC, firmware driver, and validation plan.</li>
+                </ul>
+              </aside>
+            </section>
+          ) : null}
+
+          {activeStep === "clarify" ? (
+            <section className="grid gap-5 lg:grid-cols-[1fr_320px]">
+              <div>
+                <h3 className="text-lg font-bold text-slate-100">Clarifying Questions</h3>
+                <p className="mt-1 text-sm text-slate-400">Edit the suggested answers so the saved design intent reflects your actual requirement.</p>
+                <div className="mt-4 space-y-3">
+                  {clarifyQuestions.length ? (
+                    clarifyQuestions.map((question, index) => (
+                      <div key={question} className="rounded-lg border border-slate-800 bg-black/30 p-3">
+                        <p className="text-sm font-semibold text-slate-200">
+                          {index + 1}. {question}
+                        </p>
+                        <input
+                          className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-600"
+                          value={answers[question] || ""}
+                          onChange={(event) => setAnswers({ ...answers, [question]: event.target.value })}
+                          placeholder="Type or edit your answer"
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded-lg border border-slate-800 bg-black/30 p-4 text-sm text-slate-400">
+                      Click Continue Asking Questions to generate the first clarification set.
+                    </div>
+                  )}
+                </div>
+              </div>
+              <aside className="rounded-lg border border-slate-800 bg-black/30 p-4">
+                <h3 className="text-sm font-bold text-cyan-300">Domain Interpretation</h3>
+                <dl className="mt-3 space-y-3 text-sm">
+                  <div><dt className="text-slate-500">Digital</dt><dd className="text-slate-200">{mergedInterpretation().digital || "Not specified"}</dd></div>
+                  <div><dt className="text-slate-500">Embedded</dt><dd className="text-slate-200">{mergedInterpretation().embedded || "Not specified"}</dd></div>
+                  <div><dt className="text-slate-500">Analog</dt><dd className="text-slate-200">{mergedInterpretation().analog || "Not specified"}</dd></div>
+                  <div><dt className="text-slate-500">System</dt><dd className="text-slate-200">{mergedInterpretation().system || "Not specified"}</dd></div>
+                </dl>
+              </aside>
+            </section>
+          ) : null}
+
+          {activeStep === "review" ? (
+            <section>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-100">Review Consolidated Design Spec</h3>
+                  <p className="mt-1 text-sm text-slate-400">Edit this spec before saving it to the Design Intent Library or building a workflow.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={refreshConsolidatedSpec}
+                  className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900"
+                >
+                  Regenerate Spec
+                </button>
+              </div>
+              <textarea
+                className="mt-4 h-[52vh] w-full resize-none rounded-lg border border-slate-700 bg-black/40 p-4 font-mono text-xs leading-5 text-slate-100 outline-none focus:border-cyan-600"
+                value={consolidatedSpec}
+                onChange={(event) => setConsolidatedSpec(event.target.value)}
+              />
+            </section>
+          ) : null}
+        </div>
+
+        <div className="flex shrink-0 flex-wrap justify-between gap-3 border-t border-slate-800 bg-slate-950/95 p-4">
+          <button
+            onClick={continueQuestions}
+            disabled={loadingRound || !ideaText.trim()}
+            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+          >
+            {loadingRound ? "Thinking..." : "Continue Asking Questions"}
+          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={refreshConsolidatedSpec}
+              disabled={!ideaText.trim() && !Object.keys(qaPairs).length}
+              className="rounded-lg border border-cyan-700 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/40 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+            >
+              Generate Consolidated Spec
+            </button>
+            <button
+              onClick={() => saveDesignIntent(false)}
+              disabled={saving || activeStep !== "review" || !consolidatedSpec.trim()}
+              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-500"
+            >
+              {saving ? "Saving..." : "Save Design Intent"}
+            </button>
+            <button
+              onClick={() => saveDesignIntent(true)}
+              disabled={saving || activeStep !== "review" || !consolidatedSpec.trim()}
+              className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+            >
+              Save & Build Workflow
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -16,6 +16,14 @@ type PreplanResult = {
   missing_agents?: string[];
 };
 
+type InitialDesignIntent = {
+  id?: string;
+  refined_prompt?: string;
+  full_intent?: {
+    refined_prompt?: string;
+  };
+};
+
 
 function autoLayoutHorizontal(nodes, spacing = 350, startX = 100, startY = 200) {
   return nodes.map((node, index) => ({
@@ -37,7 +45,13 @@ function getValueFromSpec(obj, path) {
 }
 
 
-export default function AgentPlannerModal({ onClose }: { onClose: () => void }) {
+export default function AgentPlannerModal({
+  onClose,
+  initialDesignIntent,
+}: {
+  onClose: () => void;
+  initialDesignIntent?: InitialDesignIntent | null;
+}) {
   const [goal, setGoal] = useState("");
   const [agent, setAgent] = useState<any>(null);
   const [backendSource, setBackendSource] = useState("");
@@ -74,6 +88,20 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
 
   const [voiceSummary, setVoiceSummary] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!initialDesignIntent) return;
+    const intentText =
+      initialDesignIntent.refined_prompt ||
+      initialDesignIntent.full_intent?.refined_prompt ||
+      "";
+    setSelectedIntentId(initialDesignIntent.id || "");
+    setGoal(intentText);
+    setFinalizedSpec(null);
+    setImprovedSpec(null);
+    setSpec(null);
+    setStage("initial");
+  }, [initialDesignIntent]);
 
 
 
@@ -600,8 +628,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
   }, [stage, workflowGraph, onClose]);
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="bg-slate-800 relative rounded-xl p-6 w-[800px] shadow-xl text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className="relative flex h-[calc(100vh-2rem)] max-h-[920px] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-6 text-white shadow-2xl">
         {/* Floating Spec Coverage Badge */}
         {stage === "analyzed" && coverage !== null && coverage !== undefined && (
           <div className="absolute top-4 right-6 bg-purple-600/80 text-xs px-2 py-1 rounded shadow-md">
@@ -609,7 +637,7 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </div>
         )}
 
-        <div className="flex justify-between items-center mb-4">
+        <div className="mb-4 flex shrink-0 items-center justify-between">
           <h2 className="text-xl font-bold text-white">System Planner</h2>
           <button
             onClick={onClose}
@@ -619,10 +647,12 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
           </button>
         </div>
 
-        <p className="text-sm text-slate-400 mb-4">
+        <p className="mb-4 shrink-0 text-sm text-slate-400">
           Enter a goal or description. The planner will analyze the spec,
           leverage memory, and design a new agent if required.
         </p>
+
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
 
 
         {/* Optional: Start from existing Design Intent (only in initial stage) */}
@@ -1017,7 +1047,8 @@ export default function AgentPlannerModal({ onClose }: { onClose: () => void }) 
 
  
 
-        
+        </div>
+
         {summary && (
           <div className="absolute bottom-4 right-4 w-80 bg-gray-900 text-white p-4 rounded-xl shadow-lg">
               <h3 className="font-bold text-sm mb-2">🧾 Spec Summary Preview</h3>

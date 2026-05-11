@@ -349,7 +349,7 @@ export default function AgentFactoryDryRunModal({
 
                 {((plan?.proposed_skill_specs || []).length || (plan?.proposed_tool_specs || []).length || (plan?.proposed_hook_specs || []).length) ? (
                   <section className="rounded-lg border border-amber-800/60 bg-amber-950/20 p-3 text-xs leading-5 text-amber-100/85">
-                    Missing dependencies were generated as private draft specs and will be saved with this agent. The agent remains draft-only until those specs are reviewed and promoted or implemented.
+                    Missing dependencies were generated as private draft specs and will be saved with this agent. The agent remains draft-only until those specs are reviewed and enabled or implemented.
                   </section>
                 ) : (
                   <section className="rounded-lg border border-emerald-900/60 bg-emerald-950/20 p-3 text-xs leading-5 text-emerald-100/85">

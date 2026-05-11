@@ -13,6 +13,7 @@ type Plan = {
   name: string;
   price: string;
   discountPrice?: string;
+  studentDiscountLink?: boolean;
   credits: string;
   cta: string;
   note: string;
@@ -47,6 +48,7 @@ const plans: Plan[] = [
     name: "Starter",
     price: "$19.99/month",
     discountPrice: "$14.99/month for first 3 months",
+    studentDiscountLink: true,
     credits: "2,000 credits/month",
     cta: "Start Starter",
     note: "For users running guided Apps and basic Studio workflows from the browser.",
@@ -199,6 +201,11 @@ function PricingContent() {
     startCheckout(plan.key);
   }
 
+  function openStudentVerification() {
+    window.location.href =
+      "mailto:chiploop.agx@gmail.com?subject=Student%20Starter%20verification&body=Hi%20ChipLoop%2C%0A%0AI%20would%20like%20to%20verify%20my%20school%20email%20for%2025%25%20off%20Starter.%0A%0ASchool%20email%3A%20%0ASchool%20name%3A%20%0A";
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
       <TopNav current="pricing" showMarketplace showSettings={false} />
@@ -255,6 +262,15 @@ function PricingContent() {
                   <h2 className="text-xl font-bold text-white">{plan.name}</h2>
                   <div className="mt-3 text-2xl font-extrabold text-cyan-200">{plan.discountPrice || plan.price}</div>
                   {plan.discountPrice ? <div className="mt-1 text-sm text-slate-400">Then {plan.price}</div> : null}
+                  {plan.studentDiscountLink ? (
+                    <button
+                      type="button"
+                      onClick={openStudentVerification}
+                      className="mt-3 text-left text-sm font-semibold text-cyan-300 underline decoration-cyan-700 underline-offset-4 hover:text-cyan-200"
+                    >
+                      Student? Verify school email for 25% off Starter.
+                    </button>
+                  ) : null}
                   <div className="mt-2 text-sm font-semibold text-slate-300">{plan.credits}</div>
                   <p className="mt-4 text-sm leading-6 text-slate-400">{plan.note}</p>
                 </div>

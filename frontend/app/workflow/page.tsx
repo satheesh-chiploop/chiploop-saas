@@ -51,6 +51,14 @@ type CatalogItem = {
   desc?: string;
   status?: string;
   visibility?: string;
+  loop_type?: string;
+  agent_spec?: Record<string, unknown>;
+  skills?: unknown[];
+  tools?: unknown[];
+  hooks?: unknown[];
+  generated_files?: unknown[];
+  registry_patch?: Record<string, unknown>;
+  source?: string;
 };
 
 type CustomWorkflowRow = {
@@ -304,9 +312,17 @@ function workflowDisplayName(workflow: CustomWorkflowRow): string {
 type PrivateAgentResponseItem = {
   id?: string;
   agent_name?: string;
+  loop_type?: string;
   description?: string;
   status?: string;
   visibility?: string;
+  agent_spec?: Record<string, unknown>;
+  skills?: unknown[];
+  tools?: unknown[];
+  hooks?: unknown[];
+  generated_files?: unknown[];
+  registry_patch?: Record<string, unknown>;
+  source?: string;
 };
 
 // if (typeof window !== "undefined" && !localStorage.getItem("anon_user_id")) {
@@ -985,8 +1001,16 @@ function WorkflowPage() {
       app_intent?: unknown;
       template_workflow?: unknown;
     } | null;
-    is_prebuilt?: boolean | null;
+  is_prebuilt?: boolean | null;
+};
+
+type SystemPlannerIntent = {
+  id?: string;
+  refined_prompt?: string;
+  full_intent?: {
+    refined_prompt?: string;
   };
+};
   const [prebuiltWorkflows, setPrebuiltWorkflows] = useState<CustomWorkflowRow[]>([]);
   const [customWorkflows, setCustomWorkflows] = useState<CustomWorkflowRow[]>([]);
 
@@ -1002,6 +1026,7 @@ function WorkflowPage() {
   const [showPlanner, setShowPlanner] = useState(false);
   const [showAgentPlanner, setShowAgentPlanner] = useState(false);
   const [showStudioAgentPlanner, setShowStudioAgentPlanner] = useState(false);
+  const [systemPlannerIntent, setSystemPlannerIntent] = useState<SystemPlannerIntent | null>(null);
   const [showDagPreview, setShowDagPreview] = useState(false);
   const [selectedWorkflowName, setSelectedWorkflowName] = useState<string | null>(null);
   const {fitView} = useReactFlow();
@@ -1324,6 +1349,21 @@ function WorkflowPage() {
   
   // NEW: agent context menu state
   const [agentMenu, setAgentMenu] = useState<{ x: number; y: number; name: string; id?: string; status?: string } | null>(null);
+  const [agentEditor, setAgentEditor] = useState<{
+    agent: CatalogItem;
+    name: string;
+    description: string;
+    loopType: string;
+    status: string;
+    agentSpecText: string;
+    skillsText: string;
+    toolsText: string;
+    hooksText: string;
+    generatedFilesText: string;
+    registryPatchText: string;
+    saving: boolean;
+    error: string | null;
+  } | null>(null);
 
     // Design Intent context menu
   const [designIntentMenu, setDesignIntentMenu] = useState<{
@@ -1375,10 +1415,93 @@ function WorkflowPage() {
       desc: a.description || "",
       status: a.status,
       visibility: a.visibility,
+      loop_type: a.loop_type,
+      agent_spec: a.agent_spec || {},
+      skills: a.skills || [],
+      tools: a.tools || [],
+      hooks: a.hooks || [],
+      generated_files: a.generated_files || [],
+      registry_patch: a.registry_patch || {},
+      source: a.source,
     }));
   }, [authHeaders]);
 
 // NEW: API calls
+  const openAgentEditor = (name: string) => {
+    const agent = customAgents.find((item) => item.backendLabel === name);
+    if (!agent?.id) {
+      alert("This agent cannot be edited from My Agents. Try refreshing Studio.");
+      closeAgentMenu();
+      return;
+    }
+    setAgentEditor({
+      agent,
+      name: agent.backendLabel,
+      description: agent.desc || "",
+      loopType: agent.loop_type || loop.toLowerCase(),
+      status: agent.status || "private",
+      agentSpecText: JSON.stringify(agent.agent_spec || {}, null, 2),
+      skillsText: JSON.stringify(agent.skills || [], null, 2),
+      toolsText: JSON.stringify(agent.tools || [], null, 2),
+      hooksText: JSON.stringify(agent.hooks || [], null, 2),
+      generatedFilesText: JSON.stringify(agent.generated_files || [], null, 2),
+      registryPatchText: JSON.stringify(agent.registry_patch || {}, null, 2),
+      saving: false,
+      error: null,
+    });
+    closeAgentMenu();
+  };
+
+  const parseAgentEditorJson = (label: string, value: string) => {
+    try {
+      return JSON.parse(value || (label === "registry_patch" || label === "agent_spec" ? "{}" : "[]"));
+    } catch {
+      throw new Error(`${label} must be valid JSON.`);
+    }
+  };
+
+  const saveAgentEditor = async () => {
+    if (!agentEditor?.agent.id) return;
+    try {
+      const agent_spec = parseAgentEditorJson("agent_spec", agentEditor.agentSpecText);
+      const skills = parseAgentEditorJson("skills", agentEditor.skillsText);
+      const tools = parseAgentEditorJson("tools", agentEditor.toolsText);
+      const hooks = parseAgentEditorJson("hooks", agentEditor.hooksText);
+      const generated_files = parseAgentEditorJson("generated_files", agentEditor.generatedFilesText);
+      const registry_patch = parseAgentEditorJson("registry_patch", agentEditor.registryPatchText);
+      if (!Array.isArray(skills) || !Array.isArray(tools) || !Array.isArray(hooks) || !Array.isArray(generated_files)) {
+        throw new Error("skills, tools, hooks, and generated_files must be JSON arrays.");
+      }
+      setAgentEditor((current) => current ? { ...current, saving: true, error: null } : current);
+      const res = await fetch(`/api/studio/user-agents/${agentEditor.agent.id}`, {
+        method: "PATCH",
+        headers: await authHeaders(),
+        body: JSON.stringify({
+          name: agentEditor.name.trim(),
+          loop_type: agentEditor.loopType.trim() || "system",
+          description: agentEditor.description,
+          status: agentEditor.status || "private",
+          visibility: "private",
+          agent_spec,
+          skills,
+          tools,
+          hooks,
+          generated_files,
+          registry_patch,
+          source: agentEditor.agent.source || "studio_factory",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.status !== "ok") {
+        throw new Error(data.detail || data.message || "Could not save private draft.");
+      }
+      window.dispatchEvent(new Event("refreshAgents"));
+      setAgentEditor(null);
+    } catch (err) {
+      setAgentEditor((current) => current ? { ...current, saving: false, error: err instanceof Error ? err.message : "Could not save private draft." } : current);
+    }
+  };
+
   const renameCustomAgent = async (oldName: string) => {
     const newName = prompt("New agent name:", oldName) || "";
     if (!newName || newName === oldName) return;
@@ -3181,6 +3304,13 @@ function WorkflowPage() {
           >
             <button
               className="px-4 py-1 hover:bg-slate-700 w-full text-left"
+              onClick={() => openAgentEditor(agentMenu.name)}
+            >
+              View / Edit Draft
+            </button>
+            <div className="my-1 border-t border-slate-700" />
+            <button
+              className="px-4 py-1 hover:bg-slate-700 w-full text-left"
               onClick={() => renameCustomAgent(agentMenu.name)}
             >
               Rename
@@ -3199,6 +3329,106 @@ function WorkflowPage() {
               Delete
             </button>
           </div>
+      )}
+
+      {agentEditor && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4">
+          <div className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-slate-700 bg-slate-950 text-white shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-800 p-5">
+              <div>
+                <h3 className="text-xl font-bold text-cyan-300">Private Draft Agent</h3>
+                <p className="mt-1 text-sm text-slate-400">View and edit the saved draft content. JSON fields must remain valid before saving.</p>
+              </div>
+              <button className="rounded border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:bg-slate-900" onClick={() => setAgentEditor(null)}>
+                Close
+              </button>
+            </div>
+
+            <div className="min-h-0 overflow-y-auto p-5 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+              {agentEditor.error ? (
+                <div className="mb-4 rounded border border-red-800 bg-red-950/30 p-3 text-sm text-red-200">{agentEditor.error}</div>
+              ) : null}
+
+              <section className="grid gap-4 md:grid-cols-3">
+                <label className="text-sm font-semibold text-slate-200">
+                  Name
+                  <input
+                    value={agentEditor.name}
+                    onChange={(event) => setAgentEditor((current) => current ? { ...current, name: event.target.value } : current)}
+                    className="mt-2 w-full rounded border border-slate-700 bg-black/40 px-3 py-2 text-sm font-normal outline-none focus:border-cyan-600"
+                  />
+                </label>
+                <label className="text-sm font-semibold text-slate-200">
+                  Loop
+                  <select
+                    value={agentEditor.loopType}
+                    onChange={(event) => setAgentEditor((current) => current ? { ...current, loopType: event.target.value } : current)}
+                    className="mt-2 w-full rounded border border-slate-700 bg-black/40 px-3 py-2 text-sm font-normal outline-none focus:border-cyan-600"
+                  >
+                    {["digital", "analog", "embedded", "system", "validation"].map((item) => (
+                      <option key={item} value={item}>{item[0].toUpperCase() + item.slice(1)}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-sm font-semibold text-slate-200">
+                  Status
+                  <select
+                    value={agentEditor.status}
+                    onChange={(event) => setAgentEditor((current) => current ? { ...current, status: event.target.value } : current)}
+                    className="mt-2 w-full rounded border border-slate-700 bg-black/40 px-3 py-2 text-sm font-normal outline-none focus:border-cyan-600"
+                  >
+                    {["draft", "private", "submitted"].map((item) => (
+                      <option key={item} value={item}>{item[0].toUpperCase() + item.slice(1)}</option>
+                    ))}
+                  </select>
+                </label>
+              </section>
+
+              <label className="mt-4 block text-sm font-semibold text-slate-200">
+                Description
+                <textarea
+                  value={agentEditor.description}
+                  onChange={(event) => setAgentEditor((current) => current ? { ...current, description: event.target.value } : current)}
+                  className="mt-2 h-24 w-full resize-none rounded border border-slate-700 bg-black/40 p-3 text-sm font-normal outline-none focus:border-cyan-600"
+                />
+              </label>
+
+              <section className="mt-4 grid gap-4 lg:grid-cols-2">
+                {[
+                  ["Agent spec", "agentSpecText", "h-72"],
+                  ["Skills", "skillsText", "h-40"],
+                  ["Tools / MCP", "toolsText", "h-40"],
+                  ["Hooks", "hooksText", "h-40"],
+                  ["Generated files", "generatedFilesText", "h-56"],
+                  ["Registry patch", "registryPatchText", "h-56"],
+                ].map(([label, key, height]) => (
+                  <label key={key} className="block text-sm font-semibold text-slate-200">
+                    {label}
+                    <textarea
+                      value={String(agentEditor[key as keyof typeof agentEditor] || "")}
+                      onChange={(event) => setAgentEditor((current) => current ? { ...current, [key]: event.target.value } : current)}
+                      spellCheck={false}
+                      className={`mt-2 ${height} w-full resize-none rounded border border-slate-700 bg-black/40 p-3 font-mono text-xs font-normal outline-none focus:border-cyan-600`}
+                    />
+                  </label>
+                ))}
+              </section>
+            </div>
+
+            <div className="flex justify-end gap-2 border-t border-slate-800 p-4">
+              <button className="rounded border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-900" onClick={() => setAgentEditor(null)}>
+                Cancel
+              </button>
+              <button
+                className="rounded bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+                onClick={saveAgentEditor}
+                disabled={agentEditor.saving}
+              >
+                {agentEditor.saving ? "Saving..." : "Save Draft"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {designIntentMenu && (
@@ -3844,8 +4074,25 @@ function WorkflowPage() {
 
       
   
-      {showPlanner && <PlannerModal onClose={() => setShowPlanner(false)} />}
-      {showAgentPlanner && <AgentPlannerModal onClose={() => setShowAgentPlanner(false)} />}
+      {showPlanner && (
+        <PlannerModal
+          onClose={() => setShowPlanner(false)}
+          onBuildWorkflow={(intent) => {
+            setSystemPlannerIntent(intent);
+            setShowPlanner(false);
+            setShowAgentPlanner(true);
+          }}
+        />
+      )}
+      {showAgentPlanner && (
+        <AgentPlannerModal
+          initialDesignIntent={systemPlannerIntent}
+          onClose={() => {
+            setShowAgentPlanner(false);
+            setSystemPlannerIntent(null);
+          }}
+        />
+      )}
       {showStudioAgentPlanner && (
         <StudioAgentPlannerModal
           initialLoop={loop}
