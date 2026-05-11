@@ -373,7 +373,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     {
       uiLabel: "Digital Implementation Setup Agent",
       backendLabel: "Digital Implementation Setup Agent",
-      desc: "Wires design-provided SDC collateral and generates OpenLane2 configuration. Uses default corner for synthesisâ†’route and enables multi-corner STA for PostRoute."
+      desc: "Wires design-provided SDC collateral and generates OpenLane2 configuration. Uses default corner for synthesis to route and enables multi-corner STA for PostRoute."
     },
     {
       uiLabel: "Digital Synthesis Agent",
@@ -564,7 +564,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     {
       uiLabel: "Digital Implementation Setup Agent",
       backendLabel: "Digital Implementation Setup Agent",
-      desc: "Wires design-provided SDC collateral and generates OpenLane2 configuration. Uses default corner for synthesisâ†’route and enables multi-corner STA for PostRoute."
+      desc: "Wires design-provided SDC collateral and generates OpenLane2 configuration. Uses default corner for synthesis to route and enables multi-corner STA for PostRoute."
     },
     {
       uiLabel: "Digital Synthesis Agent",
@@ -952,7 +952,7 @@ function WorkflowPage() {
   const supabase = createClientComponentClient();
   const rf = useReactFlow();
 
-  // âœ… Move anon id init into effect (avoids module init / bundler ordering issues)
+  // Move anon id init into effect (avoids module init / bundler ordering issues)
   useEffect(() => {
     try {
       if (typeof window === "undefined") return;
@@ -1036,7 +1036,7 @@ function WorkflowPage() {
   const [validationBenches, setValidationBenches] = useState<any[]>([]);
   const [selectedBenchId, setSelectedBenchId] = useState<string>("");
 
-    // âœ… Bench schematic viewer (bench picker)
+    // Bench schematic viewer (bench picker)
 
  
   const [benchSchematicError, setBenchSchematicError] = useState<string | null>(null);
@@ -1144,7 +1144,7 @@ function WorkflowPage() {
   
   const deleteCustomWorkflow = async (name: string) => {
     try {
-      const userId = await getStableUserId(supabase);  // âœ… unified ID
+      const userId = await getStableUserId(supabase);  // unified ID
 
       const res = await fetch(`${API_BASE}/delete_custom_workflow?name=${encodeURIComponent(name)}&user_id=${userId}`, {
         method: "DELETE"
@@ -1156,13 +1156,13 @@ function WorkflowPage() {
         return;
       }
 
-      await loadCustomWorkflowsFromDB();  // âœ… refresh sidebar list
+      await loadCustomWorkflowsFromDB();  // refresh sidebar list
       if (name === selectedWorkflowName) {
         setSelectedWorkflowName(null);
       }
     } catch (err) {
       console.error("Delete failed", err);
-      alert("âŒ Could not delete workflow.");
+      alert("Could not delete workflow.");
     } finally {
       closeContextMenu();
     }
@@ -1206,7 +1206,7 @@ function WorkflowPage() {
       });
       const j = await res.json();
       if (j.status !== "ok") {
-        alert(`âš ï¸ Rename failed: ${j.message || "Unknown error"}`);
+        alert(`Rename failed: ${j.message || "Unknown error"}`);
         await loadCustomWorkflowsFromDB();
         return;
       }
@@ -1214,7 +1214,7 @@ function WorkflowPage() {
       await loadCustomWorkflowsFromDB();
     } catch (err) {
       console.error("Rename failed", err);
-      alert("âŒ Could not rename workflow.");
+      alert("Could not rename workflow.");
     } finally {
       setRenameTarget({ oldName: "", newName: "" });
       closeContextMenu();
@@ -1222,7 +1222,7 @@ function WorkflowPage() {
   };
   const publishCustomWorkflow = async (name: string) => {
     try {
-      const userId = await getStableUserId(supabase);  // âœ… unified ID
+      const userId = await getStableUserId(supabase);  // unified ID
 
       const res = await fetch(`${API_BASE}/publish_custom_workflow`, {
         method: "POST",
@@ -1239,22 +1239,22 @@ function WorkflowPage() {
         return;
       }
 
-      alert("âœ… Workflow submitted to marketplace for review.");
+      alert("Workflow submitted to marketplace for review.");
     } catch (err) {
       console.error("Publish custom workflow failed", err);
-      alert("âŒ Could not publish workflow.");
+      alert("Could not publish workflow.");
     } finally {
       closeContextMenu();
     }
   };
 
   const openDesignIntentJsonEditor = (intent: any) => {
-    console.log("ðŸ§¾ Edit Design Intent via JSON editor:", intent?.id, intent?.title);
+    console.log("Edit Design Intent via JSON editor:", intent?.id, intent?.title);
   
-    // 1ï¸âƒ£ Ensure the planner modal is visible
+    // 1) Ensure the planner modal is visible
     setShowPlanner(true);
   
-    // 2ï¸âƒ£ After the modal mounts and attaches the listener, fire the event
+    // 2) After the modal mounts and attaches the listener, fire the event
     setTimeout(() => {
       window.dispatchEvent(
         new CustomEvent("openJsonEditorForDesignIntent", {
@@ -1325,7 +1325,7 @@ function WorkflowPage() {
   // NEW: agent context menu state
   const [agentMenu, setAgentMenu] = useState<{ x: number; y: number; name: string; id?: string; status?: string } | null>(null);
 
-    // ðŸŒ¿ Design Intent context menu
+    // Design Intent context menu
   const [designIntentMenu, setDesignIntentMenu] = useState<{
       x: number;
       y: number;
@@ -1389,7 +1389,7 @@ function WorkflowPage() {
     });
     const j = await res.json();
     if (j.status !== "ok") {
-      alert(`âš ï¸ Rename failed: ${j.message || "Unknown error"}`);
+      alert(`Rename failed: ${j.message || "Unknown error"}`);
     } else {
       window.dispatchEvent(new Event("refreshAgents")); // reuse your existing refresh pattern
     }
@@ -1397,7 +1397,7 @@ function WorkflowPage() {
   };
 
   const deleteCustomAgent = async (name: string) => {
-    const userId = await getStableUserId(supabase);  // âœ… unify ID
+    const userId = await getStableUserId(supabase);  // unify ID
 
     const agent = customAgents.find((item) => item.backendLabel === name);
     const res = agent?.id
@@ -1421,7 +1421,7 @@ function WorkflowPage() {
   };
   const publishCustomAgent = async (name: string) => {
     try {
-      const userId = await getStableUserId(supabase);  // âœ… unified ID
+      const userId = await getStableUserId(supabase);  // unified ID
 
       const agent = customAgents.find((item) => item.backendLabel === name);
       const res = agent?.id
@@ -1470,13 +1470,13 @@ function WorkflowPage() {
         .eq("id", intent.id);
 
       if (error) {
-        console.error("âŒ Rename design intent failed:", error.message);
+        console.error("Rename design intent failed:", error.message);
         alert("Rename failed. Please try again.");
       } else {
         await loadIntents(); // refresh sidebar list
       }
     } catch (err) {
-      console.error("âŒ Rename design intent error:", err);
+      console.error("Rename design intent error:", err);
     } finally {
       closeDesignIntentMenu();
     }
@@ -1541,7 +1541,7 @@ function WorkflowPage() {
         setBenchSchematicRow(data[0]);
       }
     } catch (e: any) {
-      console.error("âŒ loadBenchSchematic failed:", e);
+      console.error("loadBenchSchematic failed:", e);
       setBenchSchematicError(e?.message || "Failed to load bench schematic");
     } finally {
       setBenchSchematicLoading(false);
@@ -1563,20 +1563,20 @@ function WorkflowPage() {
         .eq("id", intent.id);
 
       if (error) {
-        console.error("âŒ Delete design intent failed:", error.message);
+        console.error("Delete design intent failed:", error.message);
         alert("Delete failed. Please try again.");
       } else {
         await loadIntents(); // refresh sidebar list
       }
     } catch (err) {
-      console.error("âŒ Delete design intent error:", err);
+      console.error("Delete design intent error:", err);
     } finally {
       closeDesignIntentMenu();
     }
   };
 
 
-  // ðŸ” Ensure sidebar visible once agents/workflows are loaded
+  // Ensure sidebar visible once agents/workflows are loaded
   useEffect(() => {
     if (customAgents.length > 0 || customWorkflows.length > 0) {
       setLoadingAgents(false);
@@ -1643,7 +1643,7 @@ function WorkflowPage() {
       try {
         
         const savedWF = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
-        // âœ… Load custom agents per user from Supabase
+        // Load custom agents per user from Supabase
         const privateAgents = await loadPrivateAgents();
 
         await loadIntents()
@@ -1667,7 +1667,7 @@ function WorkflowPage() {
           loadCustomWorkflowsFromDB();
         }, 600);
       } catch (err) {
-        console.error("âŒ Error loading user or workflows:", err);
+        console.error("Error loading user or workflows:", err);
       } finally {
         setLoadingAgents(false);
         setLoadingWorkflows(false);
@@ -1677,11 +1677,11 @@ function WorkflowPage() {
 
   
 
-  // ðŸ” Listen for new workflows saved by PlannerModal
-  // ðŸ” Listen for global refresh events (Planner or Save)
+  // Listen for new workflows saved by PlannerModal
+  // Listen for global refresh events (Planner or Save)
   useEffect(() => {
     const refreshHandler = () => {
-      console.log("ðŸ”„ Refreshing workflows (global trigger)");
+      console.log("Refreshing workflows (global trigger)");
       loadPrebuiltWorkflowsFromDB();
       loadCustomWorkflowsFromDB();
     };
@@ -1694,7 +1694,7 @@ function WorkflowPage() {
       const graph = e.detail;
       if (!graph) return;
   
-      console.log("ðŸŽ¯ Received workflow graph from System Planner:", graph);
+      console.log("Received workflow graph from System Planner:", graph);
   
       // Normalize nodes to match ReactFlow agentNode structure
       const newNodes = (graph.nodes || []).map((n: any, idx: number) => ({
@@ -1736,7 +1736,7 @@ function WorkflowPage() {
     return () => window.removeEventListener("refreshAgents", refreshAgents);
   }, []);
   
-  // ðŸ”¹ Auto-load latest custom workflow after save/generate
+  // Auto-load latest custom workflow after save/generate
   useEffect(() => {
     const onSaved = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -1892,9 +1892,9 @@ function WorkflowPage() {
       await loadWorkflowFromDB(wfName);
     }
 
-    // âœ… Save-as prompt for every run
+    // Save-as prompt for every run
     const proposed = defaultRunName(selectedWorkflowName);
-    const rn = prompt("ðŸ’¾ Save this run as:", proposed) || "";
+    const rn = prompt("Save this run as:", proposed) || "";
     const runName = rn.trim();
     if (!runName) return;
 
@@ -1905,10 +1905,10 @@ function WorkflowPage() {
     const loopLower = ((selectedWorkflowLoopType || loop) || "").toLowerCase();
 
 
-    // âœ… special-case: create bench does NOT require spec and does NOT need bench picker
+    // Special-case: create bench does NOT require spec and does NOT need bench picker
     const isCreateBench = wfNameLower.includes("validation_create_bench");
 
-    // âœ… bench picker is only for preflight/hardware run workflows (not create-bench)
+    // Bench picker is only for preflight/hardware run workflows (not create-bench)
     const needsBench =
       wfNameLower.includes("validation_hardware_test_run") ||
       wfNameLower.includes("preflight") ||
@@ -1938,17 +1938,17 @@ function WorkflowPage() {
         id: selectedWorkflowId,
       });
 
-     // âœ… no spec for create-bench
+     // No spec for create-bench
       setPendingSpecText("");
       setPendingSpecFile(undefined);
 
-      // âœ… go straight to instrument picker
+      // Go straight to instrument picker
       setShowInstrumentPicker(true);
       return;
     }
 
     if (loopLower === "validation" && needsBench) {
-      // âœ… existing bench-picker workflows (preflight/hardware_test_run)
+      // Existing bench-picker workflows (preflight/hardware_test_run)
       if (!selectedWorkflowId) {
         alert("Please save/select the workflow first (missing workflow_id).");
         return;
@@ -1974,7 +1974,7 @@ function WorkflowPage() {
       return;
     }
 
-  // âœ… WF-1 unchanged (spec-driven)
+  // WF-1 unchanged (spec-driven)
     setShowSpecModal(true);
 
   };
@@ -2082,20 +2082,20 @@ function WorkflowPage() {
   const loadCustomWorkflowsFromDB = async () => {
 
     const userId = await getStableUserId(supabase);
-    console.log("ðŸ§  (CustomWork) Loading workflows for:", userId);
+    console.log("(CustomWork) Loading workflows for:", userId);
 
     const { data, error } = await supabase
       .from("workflows")
       .select("id, name, created_at, status, loop_type, is_prebuilt, definitions")
       .eq("user_id", userId)
-      .eq("status", "saved")                 // âœ… ONLY show saved templates
+      .eq("status", "saved")                 // ONLY show saved templates
       .or("is_prebuilt.eq.false,is_prebuilt.is.null")
       .order("created_at", { ascending: false });
 
 
 
     if (error) {
-      console.error("âŒ Error loading workflows:", error);
+      console.error("Error loading workflows:", error);
       return;
     }
    
@@ -2118,7 +2118,7 @@ function WorkflowPage() {
 
     //const { data, error } = await q;
     //if (error) {
-     // console.error("âŒ Error loading workflows:", error);
+     // console.error("Error loading workflows:", error);
       // fallback to local only
      // setCustomWorkflows([...new Set(localNames)]);
      // return;
@@ -2133,12 +2133,12 @@ function WorkflowPage() {
 
     // const dbNames = (data || []).map(w => w.name);
 
-    console.log("ðŸ“ Loaded workflows:", dbRows);
+    console.log("Loaded workflows:", dbRows);
     // setCustomWorkflows(dbNames);
   
-    // 3) Union (DB âŠŽ local), DB first
+    // 3) Union (DB + local), DB first
     //const union = Array.from(new Set([...dbNames, ...localNames]));
-    //console.log("ðŸ“ Loaded workflows:", union);
+    //console.log("Loaded workflows:", union);
     //setCustomWorkflows(union);
   };
   const loadWorkflowFromDB = async (workflow: string | CustomWorkflowRow) => {
@@ -2258,7 +2258,7 @@ function WorkflowPage() {
   const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string,testPlanName?:string,previewTestPlanOverride?: any) => {
     const formData = new FormData();
 
-    // âœ… unwrap if caller passed { workflow: {...}, workflow_id: ... }
+    // Unwrap if caller passed { workflow: {...}, workflow_id: ... }
     const wf = workflowPayload?.workflow ? workflowPayload.workflow : workflowPayload;
 
     formData.append("workflow", JSON.stringify(wf));
@@ -2269,20 +2269,20 @@ function WorkflowPage() {
 
     const userId = await getStableUserId(supabase); // or however you already do it in this file
   
-    // âœ… Step 4: attach selected instruments (validation only)
+    // Step 4: attach selected instruments (validation only)
     if (instrumentIds?.length) {
       formData.append("instrument_ids", JSON.stringify(instrumentIds));
     }
-    // âœ… NEW: scope selection
+    // NEW: scope selection
     if (scopePayload) {
       formData.append("scope_json", JSON.stringify(scopePayload));
     }
 
-    // âœ… NEW: WF1 override â€” use preview plan as authoritative test_plan
+    // NEW: WF1 override - use preview plan as authoritative test_plan
     if (previewTestPlanOverride) {
       formData.append("preview_test_plan_json", JSON.stringify(previewTestPlanOverride));
     }
-    // âœ… NEW: only for WF-2/WF-3
+    // NEW: only for WF-2/WF-3
     if (benchId) {
       formData.append("bench_id", benchId);
     }
@@ -2325,7 +2325,7 @@ function WorkflowPage() {
   
       setPendingRunName(null);
     } else {
-      console.error("âŒ Workflow run error:", result);
+      console.error("Workflow run error:", result);
     }
   };
   
@@ -2334,7 +2334,7 @@ function WorkflowPage() {
   const handleSpecSubmit = async (text: string, file?: File) => {
     try {
       if (!nodes.length) {
-        alert("Workflow canvas is empty â€” nothing to run.");
+        alert("Workflow canvas is empty - nothing to run.");
         return;
       }
 
@@ -2346,7 +2346,7 @@ function WorkflowPage() {
         setPendingSpecText("");
         setPendingSpecFile(undefined);
 
-        // if payload wasnâ€™t set (e.g., modal opened unexpectedly), set it now
+        // if payload was not set (e.g., modal opened unexpectedly), set it now
         if (!pendingWorkflowPayload && selectedWorkflowId) {
           const workflow = {
             loop_type: "validation",
@@ -2395,7 +2395,7 @@ function WorkflowPage() {
         if (domains.size === 1) {
           finalLoopType = Array.from(domains)[0] as string;
         } else {
-          finalLoopType = "system"; // multiple domains â†’ system loop
+          finalLoopType = "system"; // multiple domains -> system loop
         }
       }
   
@@ -2411,8 +2411,8 @@ function WorkflowPage() {
         })),
       };
 
-      // âœ… Step 3: if validation loop â†’ open picker first, do NOT run yet
-      // âœ… Step 3: if validation loop â†’ open picker first, do NOT run yet
+      // Step 3: if validation loop -> open picker first, do NOT run yet
+      // Step 3: if validation loop -> open picker first, do NOT run yet
       if (finalLoopType === "validation") {
   // IMPORTANT: preview endpoint needs a REAL workflow_id (saved workflow row)
         const savedWorkflowId = selectedWorkflowId;
@@ -2432,7 +2432,7 @@ function WorkflowPage() {
           id: savedWorkflowId, // keep if your fallback uses it
         });
 
-        // âœ… NEW: WF-2/WF-3 should go Bench-first, WF-1 stays Instrument-first
+        // NEW: WF-2/WF-3 should go Bench-first, WF-1 stays Instrument-first
         const wfName = (selectedWorkflowName || "").toLowerCase();
 
         const needsBench =
@@ -2474,7 +2474,7 @@ function WorkflowPage() {
         setJobId(newJobId);
         setActiveTab("live");
       
-        // âœ… append run record (localStorage)
+        // Append run record (localStorage)
         if (selectedWorkflowName) {
           const rec: RunRecord = {
             run_id: newJobId,
@@ -2491,11 +2491,11 @@ function WorkflowPage() {
       
         setPendingRunName(null);
       } else {
-        console.error("âŒ Workflow run error:", result);
+        console.error("Workflow run error:", result);
       }
 
     } catch (err) {
-      console.error("âŒ API call failed:", err);
+      console.error("API call failed:", err);
     }
   };
   
@@ -2528,7 +2528,7 @@ function WorkflowPage() {
           <div className="text-zinc-200 text-sm">
             <span className="text-cyan-300 font-semibold">Bench:</span>{" "}
             {bench?.name || "Unknown"}
-            {bench?.location ? <span className="text-zinc-500"> â€” {bench.location}</span> : null}
+            {bench?.location ? <span className="text-zinc-500"> - {bench.location}</span> : null}
           </div>
           <div className="text-zinc-200 text-sm mt-1">
             <span className="text-cyan-300 font-semibold">DUT:</span>{" "}
@@ -2641,7 +2641,7 @@ function WorkflowPage() {
   if (!authChecked) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-black text-white">
-        <div className="text-slate-300">Loading Studioâ€¦</div>
+        <div className="text-slate-300">Loading Studio...</div>
       </main>
     );
   }
@@ -2658,7 +2658,7 @@ function WorkflowPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* ===== Sidebar ===== */}
         <aside className="w-96 bg-slate-900/70 border-r border-slate-800 p-4 flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-          {/* ðŸ§  Agentic Tools */}
+          {/* Agentic Tools */}
           <h2 className="text-lg font-bold mb-3 text-cyan-400">Agentic Tools</h2>
           <button
             onClick={() => setShowPlanner(true)}
@@ -2685,7 +2685,7 @@ function WorkflowPage() {
             Workflow Composer
           </button>
           <div className="border-t border-slate-800 my-3" />
-          {/* ðŸ” Loop Selector */}
+          {/* Loop Selector */}
           <div className="mb-4">
             <label className="block text-xs uppercase text-cyan-400 mb-2">Loop</label>
             <select
@@ -2704,7 +2704,7 @@ function WorkflowPage() {
           {/* ===== Divider before Workflows ===== */}
           <div className="border-t border-slate-800 my-3" />
   
-          {/* âš™ï¸ Workflows */}
+          {/* Workflows */}
           <section className="mb-6">
             <h3 className="text-lg font-bold mb-3 text-cyan-400">Workflows</h3>
   
@@ -2738,7 +2738,7 @@ function WorkflowPage() {
                       onClick={() => {
                         setSelectedWorkflowName(w.name);
                         loadWorkflowFromDB(w);
-                        // âœ… load runs for this workflow (localStorage)
+                        // Load runs for this workflow (localStorage)
                         const loaded = loadRunsForWorkflow(w.name);
                         setRuns(loaded);
                         // optional: auto-select latest run if exists
@@ -2764,7 +2764,7 @@ function WorkflowPage() {
           {/* ===== Divider before Agents ===== */}
           <div className="border-t border-slate-800 my-3" />
   
-          {/* ðŸ¤– Agents */}
+          {/* Agents */}
           <section className="mb-6">
             <h3 className="text-lg font-bold mb-3 text-cyan-400">Agents</h3>
   
@@ -2777,7 +2777,7 @@ function WorkflowPage() {
                     draggable
                     onDragStart={(e) => onDragStartAgent(e, a)}
                     className="cursor-grab active:cursor-grabbing px-2 py-1 rounded hover:bg-slate-800"
-                    title={`${a.uiLabel} â€” ${a.desc || ""}`}
+                    title={`${a.uiLabel} - ${a.desc || ""}`}
                   >
                     {a.uiLabel}
                   </li>
@@ -2810,7 +2810,7 @@ function WorkflowPage() {
             </div>
           </section>
 
-          {/* ðŸ§  Design Intent Library */}
+          {/* Design Intent Library */}
           <div className="border-t border-slate-800 my-3" />
 
           <section className="mb-6">
@@ -2844,7 +2844,7 @@ function WorkflowPage() {
           </section>
 
   
-          {/* ðŸ› Marketplace */}
+          {/* Marketplace */}
           <div className="mt-auto border-t border-slate-700 pt-3">
             <h3 className="text-lg font-bold mb-3 text-cyan-400">Marketplace</h3>
   
@@ -2927,7 +2927,7 @@ function WorkflowPage() {
             </button>
             <button
               onClick={async () => {
-                const workflowName = prompt("ðŸ’¾ Enter a name for this workflow:", `CanvasFlow_${new Date().toISOString().slice(0, 10)}`);
+                const workflowName = prompt("Enter a name for this workflow:", `CanvasFlow_${new Date().toISOString().slice(0, 10)}`);
 
 
                 //const { data: sessionData } = await supabase.auth.getSession();
@@ -2953,7 +2953,7 @@ function WorkflowPage() {
                 });
             
                 window.dispatchEvent(new Event("refreshWorkflows"));
-                alert(`âœ… Workflow "${workflowName}" saved successfully.`);
+                alert(`Workflow "${workflowName}" saved successfully.`);
               }}
               className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
             >
@@ -2966,7 +2966,7 @@ function WorkflowPage() {
   
           {/* Workflow Execution Tabs */}
           <div className="border-t border-slate-800 bg-black/70 p-4 mt-2 rounded-md overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-            <h3 className="mb-2 text-cyan-400 font-semibold">âš¡ Workflow Run updates </h3>
+            <h3 className="mb-2 text-cyan-400 font-semibold">Workflow run updates</h3>
   
             <div className="flex gap-4 border-b border-slate-800 mb-4">
               <button
@@ -2997,7 +2997,7 @@ function WorkflowPage() {
               }`}
             >
               <div className="text-xs text-slate-500 mb-2">
-                    jobId: {jobId || "â€”"} | tab: {activeTab}
+                    jobId: {jobId || "-"} | tab: {activeTab}
               </div>
               {jobId && activeTab === "live" && (
                 <WorkflowConsole jobId={jobId} table="workflows,runs" />
@@ -3073,7 +3073,7 @@ function WorkflowPage() {
                             a.click();
                             window.URL.revokeObjectURL(url);
                           } catch (err) {
-                            console.error("âŒ ZIP download failed:", err);
+                            console.error("ZIP download failed:", err);
                             alert("Failed to download ZIP for this run.");
                           }
                         }}
@@ -3124,20 +3124,20 @@ function WorkflowPage() {
             onClick={() => setRenameTarget({ oldName: contextMenu.name, newName: "" })}
             className="block w-full text-left px-3 py-2 text-sky-300 hover:bg-slate-700"
           >
-           âœï¸ Rename â€œ{contextMenu.name}â€
+           Rename &quot;{contextMenu.name}&quot;
           </button>
 
           <button
             onClick={() => publishCustomWorkflow(contextMenu.name)}
             className="block w-full text-left px-3 py-2 text-sky-300 hover:bg-slate-700"
           >
-            ðŸ“¤ Publish â€œ{contextMenu.name}â€ to Marketplace
+            Publish &quot;{contextMenu.name}&quot; to Marketplace
           </button>
           <button
             onClick={() => deleteCustomWorkflow(contextMenu.name)}
             className="block w-full text-left px-3 py-2 text-red-400 hover:bg-slate-700"
           >
-            ðŸ—‘ Delete â€œ{contextMenu.name}â€
+            Delete &quot;{contextMenu.name}&quot;
           </button>
         </div>
       )}
@@ -3183,7 +3183,7 @@ function WorkflowPage() {
               className="px-4 py-1 hover:bg-slate-700 w-full text-left"
               onClick={() => renameCustomAgent(agentMenu.name)}
             >
-              âœï¸ Rename
+              Rename
             </button>
             <button
               className="px-4 py-1 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 w-full text-left"
@@ -3196,7 +3196,7 @@ function WorkflowPage() {
               className="px-4 py-1 hover:bg-slate-700 w-full text-left text-red-400"
               onClick={() => deleteCustomAgent(agentMenu.name)}
             >
-              ðŸ—‘ Delete
+              Delete
             </button>
           </div>
       )}
@@ -3258,7 +3258,7 @@ function WorkflowPage() {
                 className="rounded px-2 py-1 bg-zinc-800 hover:bg-zinc-700"
                 onClick={() => setShowInstrumentPicker(false)}
               >
-                âœ•
+                x
               </button>
             </div>
 
@@ -3279,7 +3279,7 @@ function WorkflowPage() {
                       {inst.nickname} {inst.is_default ? <span className="text-xs text-cyan-300">(default)</span> : null}
                     </div>
                     <div className="text-xs text-zinc-300">
-                      {inst.vendor} {inst.model} â€¢ {inst.instrument_type} â€¢ {inst.interface} â€¢ {inst.resource_string}
+                      {inst.vendor} {inst.model} - {inst.instrument_type} - {inst.interface} - {inst.resource_string}
                     </div>
                     {inst.scpi_idn && <div className="text-xs text-zinc-400 mt-1">IDN: {inst.scpi_idn}</div>}
                   </div>
@@ -3375,7 +3375,7 @@ function WorkflowPage() {
                     wfNameLower.includes("preflight") ||
                     wfNameLower.includes("hardware_test_run");
                 
-                  // âœ… Create Bench: NO spec required, NO preview, run immediately
+                  // Create Bench: NO spec required, NO preview, run immediately
                   if (isCreateBench) {
                     if (!benchName || !benchName.trim()) {
                       alert("Bench name is required.");
@@ -3403,7 +3403,7 @@ function WorkflowPage() {
                     return;
                   }
 
-                  //âœ… Bench runs: also skip spec + preview
+                  // Bench runs: also skip spec + preview
                   if (isBenchRun) {
                     if (!pendingWorkflowPayload) {
                       alert("Missing pending workflow payload. Please click Run Workflow again.");
@@ -3424,7 +3424,7 @@ function WorkflowPage() {
                     return;
                   }
                 
-                  // âœ… Existing Validation run flow (WF-1): preview â†’ scope modal
+                  // Existing Validation run flow (WF-1): preview -> scope modal
                   setShowInstrumentPicker(false);
                 
                   if (!pendingWorkflowPayload) {
@@ -3433,13 +3433,13 @@ function WorkflowPage() {
                   }
 
                   setShowInstrumentPicker(false);
-                  // âœ… trigger actual workflow execution now
+                  // Trigger actual workflow execution now
                   if (!pendingWorkflowPayload) {
                     alert("Missing pending workflow payload. Please click Run Workflow again.");
                     return;
                   }
 
-                  // âœ… Phase-0 (Option 1): generate test plan preview, then open scope modal
+                  // Phase-0 (Option 1): generate test plan preview, then open scope modal
                   const selectedInstrumentRows = (validationInstruments || []).filter((i: any) =>
                     selectedInstrumentIds.includes(i.id)
                   );
@@ -3524,7 +3524,7 @@ function WorkflowPage() {
           <div className="w-[700px] max-w-[95vw] rounded-lg bg-zinc-900 p-4 border border-zinc-700">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-white">Select Bench</h3>
-              <button className="text-zinc-300 hover:text-white" onClick={() => setShowBenchPicker(false)}>âœ•</button>
+              <button className="text-zinc-300 hover:text-white" onClick={() => setShowBenchPicker(false)}>x</button>
             </div>
 
             <div className="mt-3">
@@ -3536,7 +3536,7 @@ function WorkflowPage() {
                 <option value="">-- choose a bench --</option>
                 {validationBenches.map((b) => (
                   <option key={b.id} value={b.id}>
-                    {b.name} â€” {b.location || "NA"} ({b.status})
+                    {b.name} - {b.location || "NA"} ({b.status})
                   </option>
                 ))}
               </select>
@@ -3551,12 +3551,12 @@ function WorkflowPage() {
                   }}
                   title={!selectedBenchId ? "Select a bench first" : "View bench schematic"}
                 >
-                  ðŸ‘ View Schematic
+                  View Schematic
                 </button>
               </div>
             </div>
 
-            {/* âœ… WF4 only: Select Test Plan Name from saved plans */}
+            {/* WF4 only: Select Test Plan Name from saved plans */}
 
             
 
@@ -3573,7 +3573,7 @@ function WorkflowPage() {
 
                     const picked = validationTestPlans.find((p) => p.id === id);
                     if (picked?.name) {
-                      setTestPlanName(picked.name); // âœ… this is what backend expects (test_plan_name)
+                      setTestPlanName(picked.name); // this is what backend expects (test_plan_name)
                     }
                   }}
                 >
@@ -3627,7 +3627,7 @@ function WorkflowPage() {
                     undefined,
                     [],                 // instruments not required here
                     null,               // scope_json optional
-                    selectedBenchId,      // âœ… add as new param
+                    selectedBenchId,      // add as new param
                     testPlanName,
                     previewTestPlan 
                   );
@@ -3662,12 +3662,12 @@ function WorkflowPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           <div className="w-[1100px] max-w-[96vw] max-h-[92vh] overflow-auto rounded-xl border border-zinc-700 bg-zinc-900 p-4 shadow-2xl">
             <div className="flex items-center justify-between mb-3">
-              <div className="text-cyan-300 font-semibold">ðŸ”Œ Bench Schematic</div>
+              <div className="text-cyan-300 font-semibold">Bench Schematic</div>
               <button
                 className="text-zinc-300 hover:text-white"
                 onClick={() => setShowBenchSchematicModal(false)}
               >
-                âœ•
+                x
               </button>
             </div>
 
@@ -3678,18 +3678,18 @@ function WorkflowPage() {
             )}
 
             {!benchSchematicErr && benchSchematicModalLoading && (
-              <div className="text-zinc-400 text-sm">Loading schematicâ€¦</div>
+              <div className="text-zinc-400 text-sm">Loading schematic...</div>
             )}
 
             {!benchSchematicErr && !benchSchematicModalLoading && benchSchematicObj && (
               <div className="space-y-3">
-                {/* Minimal â€œvisualâ€ summary first */}
+                {/* Minimal visual summary first */}
                 <div className="rounded-lg border border-zinc-700 bg-black/30 p-3">
                   <div className="text-zinc-200 text-sm">
                     <span className="text-cyan-300 font-semibold">Bench:</span>{" "}
                     {benchSchematicObj?.bench?.name || "Unknown"}{" "}
                     <span className="text-zinc-500">
-                      {benchSchematicObj?.bench?.location ? `â€” ${benchSchematicObj.bench.location}` : ""}
+                      {benchSchematicObj?.bench?.location ? `- ${benchSchematicObj.bench.location}` : ""}
                     </span>
                   </div>
                   <div className="text-zinc-200 text-sm mt-1">
@@ -3732,7 +3732,7 @@ function WorkflowPage() {
           <div className="w-[900px] max-w-[95vw] rounded-lg bg-zinc-900 p-4 border border-zinc-700">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-white">Validation Scope for this Run</h3>
-              <button className="text-zinc-300 hover:text-white" onClick={() => setShowScopeModal(false)}>âœ•</button>
+              <button className="text-zinc-300 hover:text-white" onClick={() => setShowScopeModal(false)}>x</button>
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-4">
@@ -3776,10 +3776,10 @@ function WorkflowPage() {
                 <div className="text-sm text-zinc-200 mb-2">Instrument coverage</div>
 
                 {missingInstrumentTypes.length === 0 ? (
-                  <div className="text-green-400 text-sm">âœ… Your selected instruments cover this scope.</div>
+                  <div className="text-green-400 text-sm">Your selected instruments cover this scope.</div>
                 ) : (
                   <div className="text-yellow-300 text-sm">
-                    âš  Missing instrument types for selected scope: <b>{missingInstrumentTypes.join(", ")}</b>
+                    Missing instrument types for selected scope: <b>{missingInstrumentTypes.join(", ")}</b>
                     <div className="text-xs text-zinc-400 mt-2">
                       Either (1) deselect tests requiring these instruments, or (2) register/select matching instruments.
                     </div>
@@ -3933,7 +3933,7 @@ function SpecInputModal({ loop, onClose, onSubmit,showTestPlanName,testPlanName,
             <span className="text-slate-300">Click to upload</span>
             <input id="file-upload" type="file" accept=".txt,md,pdf" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
           </label>
-          {file && <p className="mt-2 text-sm text-green-400">ðŸ“„ {file.name} selected</p>}
+          {file && <p className="mt-2 text-sm text-green-400">{file.name} selected</p>}
         </div>
         <div className="flex justify-end space-x-3">
           <button onClick={onClose} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">Cancel</button>

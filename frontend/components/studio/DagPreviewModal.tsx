@@ -944,7 +944,7 @@ export default function DagPreviewModal({
                   onClick={() => setAdvancedOpen((open) => !open)}
                   className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900"
                 >
-                  {advancedOpen ? "Hide Advanced" : "Advanced"}
+                  {advancedOpen ? "Hide JSON Details" : "JSON Details"}
                 </button>
               </section>
             </div>
@@ -955,12 +955,15 @@ export default function DagPreviewModal({
               onClick={() => setAdvancedOpen((open) => !open)}
               className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold text-slate-200 hover:bg-slate-900"
             >
-              <span>Advanced JSON and Dependency Details</span>
+              <span>JSON Details and Dependency Debug</span>
               <span className="text-slate-500">{advancedOpen ? "Hide" : "Show"}</span>
             </button>
 
             {advancedOpen ? (
               <div className="space-y-4 border-t border-slate-800 p-4">
+                <p className="text-sm text-slate-400">
+                  Optional: inspect or validate the workflow JSON sent to the analyzer. Most users can use Analyze Parallelism and Save as Private Workflow above.
+                </p>
                 <div>
                   <label className="block text-sm font-semibold text-slate-200">Workflow plan JSON</label>
                   <textarea
@@ -994,7 +997,7 @@ export default function DagPreviewModal({
                       disabled={Boolean(loading) || !jsonText.trim()}
                       className="rounded-lg bg-cyan-600 px-3 py-2 text-xs font-bold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
                     >
-                      Run Advanced Preview
+                      Preview from JSON
                     </button>
                     <button
                       onClick={runValidate}
