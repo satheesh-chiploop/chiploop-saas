@@ -1,14 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Edge, Node } from "reactflow";
 import { ApiClientError, apiPost } from "@/lib/apiClient";
 import { getStableUserId } from "@/utils/userId";
 
 type SavedWorkflowOption = {
+  id?: string;
   name: string;
+  displayName?: string;
   loop_type?: string | null;
+  is_prebuilt?: boolean | null;
 };
 
 type DagPreviewModalProps = {
@@ -17,6 +20,7 @@ type DagPreviewModalProps = {
   edges: Edge[];
   savedWorkflows?: SavedWorkflowOption[];
   selectedWorkflowName?: string | null;
+  onOpenComposedWorkflow?: (workflow: { nodes: Node[]; edges: Edge[]; name?: string; loopType?: string }) => void;
   onClose: () => void;
 };
 
@@ -44,6 +48,18 @@ type DagValidateResponse = {
   warnings?: string[];
 };
 
+type SavedWorkflowRecord = {
+  definitions?: { nodes?: Node[]; edges?: Edge[] } | null;
+  loop_type?: string | null;
+};
+
+type ComposedWorkflow = {
+  nodes: Node[];
+  edges: Edge[];
+  loopType: string;
+  sourceNames: string[];
+};
+
 function errorMessage(error: unknown): string {
   if (error instanceof ApiClientError && error.status === 401) {
     return "Your session expired. Please sign in again.";
@@ -68,6 +84,135 @@ function graphPayloadFromNodes(nodes: Node[], edges: Edge[], loopType: string) {
       })),
     },
     loop_type: loopType,
+  };
+}
+
+function workflowKey(workflow: SavedWorkflowOption): string {
+  return workflow.id || workflow.name;
+}
+
+function workflowLabel(workflow: SavedWorkflowOption): string {
+  const label = workflow.displayName || workflow.name;
+  return workflow.is_prebuilt ? `${label} (Prebuilt)` : label;
+}
+
+function composeWorkflowFromDefinitions(
+  workflows: Array<{ workflow: SavedWorkflowOption; definitions: { nodes?: Node[]; edges?: Edge[] } }>,
+  loopType: string,
+  suggestCompositionEdges: boolean,
+): ComposedWorkflow {
+  const composedNodes: Node[] = [];
+  const composedEdges: Edge[] = [];
+  const branchTerminalIds: string[] = [];
+  let joinNodeId = "";
+
+  workflows.forEach(({ workflow, definitions }, workflowIndex) => {
+    const prefix = workflowKey(workflow).replace(/[^a-zA-Z0-9_-]/g, "_") || `workflow_${workflowIndex + 1}`;
+    const nodes = definitions.nodes || [];
+    const edges = definitions.edges || [];
+    const outgoing = new Set(edges.map((edge) => edge.source));
+    const xOffset = workflowIndex * 80;
+    const yOffset = workflowIndex * 220;
+    const prefixedNodeIds: string[] = [];
+    let workflowJoinNodeId = "";
+    let workflowHasSystemAgent = false;
+
+    nodes.forEach((node) => {
+      const backendLabel = String(node.data?.backendLabel || node.data?.uiLabel || node.id);
+      const labelLower = backendLabel.toLowerCase();
+      const composedId = `${prefix}__${node.id}`;
+      prefixedNodeIds.push(composedId);
+      workflowHasSystemAgent = workflowHasSystemAgent || labelLower.includes("system");
+      if (
+        !workflowJoinNodeId &&
+        (
+          labelLower.includes("system top assembly") ||
+          labelLower.includes("system integration") ||
+          labelLower.includes("system testbench") ||
+          labelLower.includes("system simulation")
+        )
+      ) {
+        workflowJoinNodeId = composedId;
+      }
+      composedNodes.push({
+        id: composedId,
+        type: "agentNode",
+        position: {
+          x: Number(node.position?.x || 80) + xOffset,
+          y: Number(node.position?.y || 120) + yOffset,
+        },
+        data: {
+          uiLabel: String(node.data?.uiLabel || node.data?.backendLabel || node.id),
+          backendLabel,
+        },
+      });
+    });
+
+    edges.forEach((edge) => {
+      composedEdges.push({
+        id: `e-${prefix}__${edge.source}-${prefix}__${edge.target}`,
+        source: `${prefix}__${edge.source}`,
+        target: `${prefix}__${edge.target}`,
+        animated: true,
+        style: { stroke: "#22d3ee", strokeWidth: 2 },
+      });
+    });
+
+    if (workflowHasSystemAgent && !joinNodeId) {
+      joinNodeId = workflowJoinNodeId || prefixedNodeIds[0] || "";
+    }
+
+    if (!workflowHasSystemAgent) {
+      nodes
+        .filter((node) => !outgoing.has(node.id))
+        .forEach((node) => branchTerminalIds.push(`${prefix}__${node.id}`));
+    }
+  });
+
+  if (suggestCompositionEdges && workflows.length > 1 && joinNodeId) {
+    branchTerminalIds.forEach((terminalId) => {
+      const duplicate = composedEdges.some((edge) => edge.source === terminalId && edge.target === joinNodeId);
+      if (!duplicate && terminalId !== joinNodeId) {
+        composedEdges.push({
+          id: `e-composer-${terminalId}-${joinNodeId}`,
+          source: terminalId,
+          target: joinNodeId,
+          animated: true,
+          style: { stroke: "#f59e0b", strokeWidth: 2 },
+        });
+      }
+    });
+  }
+
+  return {
+    nodes: composedNodes,
+    edges: composedEdges,
+    loopType,
+    sourceNames: workflows.map(({ workflow }) => workflow.name),
+  };
+}
+
+function graphPayloadFromComposedWorkflow(composed: ComposedWorkflow, suggestCompositionEdges: boolean) {
+  return {
+    graph: {
+      nodes: composed.nodes.map((node) => ({
+        id: node.id,
+        data: {
+          uiLabel: String(node.data?.uiLabel || node.data?.backendLabel || node.id),
+          backendLabel: String(node.data?.backendLabel || node.data?.uiLabel || node.id),
+        },
+      })),
+      edges: composed.edges.map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+      })),
+    },
+    loop_type: composed.loopType,
+    metadata: {
+      composer_mode: "saved_workflows",
+      suggested_composition_edges: suggestCompositionEdges,
+      workflow_names: composed.sourceNames,
+    },
   };
 }
 
@@ -112,24 +257,39 @@ export default function DagPreviewModal({
   edges,
   savedWorkflows = [],
   selectedWorkflowName,
+  onOpenComposedWorkflow,
   onClose,
 }: DagPreviewModalProps) {
   const supabase = createClientComponentClient();
   const [source, setSource] = useState<"current" | "saved">("current");
-  const [selectedSavedWorkflow, setSelectedSavedWorkflow] = useState(selectedWorkflowName || savedWorkflows[0]?.name || "");
+  const [selectedSavedWorkflowKeys, setSelectedSavedWorkflowKeys] = useState<string[]>(() => {
+    const selected = savedWorkflows.find((workflow) => workflow.name === selectedWorkflowName);
+    const first = selected || savedWorkflows[0];
+    return first ? [workflowKey(first)] : [];
+  });
   const [jsonText, setJsonText] = useState(() => JSON.stringify(graphPayloadFromNodes(nodes, edges, loopType), null, 2));
   const [preview, setPreview] = useState<DagPreviewResponse | null>(null);
   const [validation, setValidation] = useState<DagValidateResponse | null>(null);
   const [loading, setLoading] = useState<"preview" | "validate" | "saved" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [suggestCompositionEdges, setSuggestCompositionEdges] = useState(true);
+  const [composedWorkflow, setComposedWorkflow] = useState<ComposedWorkflow | null>(null);
+
+  useEffect(() => {
+    if (selectedSavedWorkflowKeys.length || !savedWorkflows.length) return;
+    const selected = savedWorkflows.find((workflow) => workflow.name === selectedWorkflowName);
+    const first = selected || savedWorkflows[0];
+    setSelectedSavedWorkflowKeys(first ? [workflowKey(first)] : []);
+  }, [savedWorkflows, selectedSavedWorkflowKeys.length, selectedWorkflowName]);
 
   const hasCanvasWorkflow = nodes.length > 0;
   const canAnalyze = useMemo(() => {
     if (loading) return false;
     if (source === "current") return hasCanvasWorkflow;
-    return Boolean(selectedSavedWorkflow);
-  }, [hasCanvasWorkflow, loading, selectedSavedWorkflow, source]);
+    return selectedSavedWorkflowKeys.length > 0;
+  }, [hasCanvasWorkflow, loading, selectedSavedWorkflowKeys.length, source]);
 
   const dependencyGraph = preview?.preview?.dependency_graph || {};
   const executionOrder = preview?.preview?.execution_order || [];
@@ -146,27 +306,64 @@ export default function DagPreviewModal({
     setPreview(null);
     setValidation(null);
     setError(null);
+    setSaveStatus(null);
+  }
+
+  async function loadSavedWorkflowDefinition(workflow: SavedWorkflowOption) {
+    const userId = await getStableUserId();
+    let data: SavedWorkflowRecord | null = null;
+    let dbError: { message?: string } | null = null;
+
+    if (workflow.id) {
+      const result = await supabase
+        .from("workflows")
+        .select("name,loop_type,definitions")
+        .eq("id", workflow.id)
+        .maybeSingle();
+      data = result.data as SavedWorkflowRecord | null;
+      dbError = result.error;
+    } else if (workflow.is_prebuilt) {
+      const result = await supabase
+        .from("workflows")
+        .select("name,loop_type,definitions")
+        .eq("name", workflow.name)
+        .eq("is_prebuilt", true)
+        .maybeSingle();
+      data = result.data as SavedWorkflowRecord | null;
+      dbError = result.error;
+    } else {
+      const result = await supabase
+        .from("workflows")
+        .select("name,loop_type,definitions")
+        .eq("user_id", userId)
+        .eq("name", workflow.name)
+        .maybeSingle();
+      data = result.data as SavedWorkflowRecord | null;
+      dbError = result.error;
+    }
+
+    if (dbError) throw new Error(dbError.message);
+    if (!data?.definitions) throw new Error(`${workflow.name} has no graph definitions.`);
+
+    return {
+      workflow,
+      definitions: data.definitions,
+      loopType: data.loop_type || workflow.loop_type || loopType,
+    };
   }
 
   async function buildSavedWorkflowPayload() {
-    if (!selectedSavedWorkflow) {
-      throw new Error("Choose a saved workflow first.");
+    const selected = savedWorkflows.filter((workflow) => selectedSavedWorkflowKeys.includes(workflowKey(workflow)));
+    if (!selected.length) {
+      throw new Error("Choose one or more saved workflows first.");
     }
 
     setLoading("saved");
-    const userId = await getStableUserId(supabase);
-    const { data, error: dbError } = await supabase
-      .from("workflows")
-      .select("name,loop_type,definitions")
-      .eq("user_id", userId)
-      .eq("name", selectedSavedWorkflow)
-      .maybeSingle();
-
-    if (dbError) throw new Error(dbError.message);
-    if (!data?.definitions) throw new Error("Saved workflow has no graph definitions.");
-
-    const definitions = data.definitions as { nodes?: Node[]; edges?: Edge[] };
-    return graphPayloadFromNodes(definitions.nodes || [], definitions.edges || [], data.loop_type || loopType);
+    const loaded = await Promise.all(selected.map((workflow) => loadSavedWorkflowDefinition(workflow)));
+    const payloadLoopType = loaded[0]?.loopType || loopType;
+    const composed = composeWorkflowFromDefinitions(loaded, payloadLoopType, suggestCompositionEdges);
+    setComposedWorkflow(composed);
+    return graphPayloadFromComposedWorkflow(composed, suggestCompositionEdges);
   }
 
   async function runPreview(payloadOverride?: unknown) {
@@ -212,12 +409,66 @@ export default function DagPreviewModal({
     }
   }
 
-  function showSaveUnavailable(mode: "copy" | "same") {
-    if (mode === "same") {
-      const ok = window.confirm("Save to the same workflow will require backend DAG save support. Continue?");
-      if (!ok) return;
+  function currentComposedWorkflow(): ComposedWorkflow | null {
+    if (source === "saved") return composedWorkflow;
+    if (!nodes.length) return null;
+    return {
+      nodes: nodes as Node[],
+      edges: edges as Edge[],
+      loopType,
+      sourceNames: selectedWorkflowName ? [selectedWorkflowName] : ["Current workflow"],
+    };
+  }
+
+  function openComposedWorkflow() {
+    const composed = currentComposedWorkflow();
+    if (!composed || !onOpenComposedWorkflow) return;
+    const name = `Composed_${composed.sourceNames.join("_").replace(/[^a-zA-Z0-9_-]/g, "_")}`.slice(0, 80);
+    onOpenComposedWorkflow({
+      nodes: composed.nodes,
+      edges: composed.edges,
+      name,
+      loopType: composed.loopType,
+    });
+    onClose();
+  }
+
+  async function saveComposedWorkflow() {
+    const composed = currentComposedWorkflow();
+    if (!composed) {
+      setError("Analyze or compose a workflow before saving.");
+      return;
     }
-    alert("DAG save is not enabled yet. This preview did not modify or execute the workflow.");
+    const defaultName = `Composed_${composed.sourceNames.join("_").replace(/[^a-zA-Z0-9_-]/g, "_")}`.slice(0, 80);
+    const workflowName = window.prompt("Save composed workflow as:", defaultName);
+    if (!workflowName?.trim()) return;
+
+    setSaveStatus("Saving composed workflow...");
+    setError(null);
+    try {
+      const userId = await getStableUserId();
+      const response = await fetch("/api/save_custom_workflow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: userId,
+          workflow: {
+            workflow_name: workflowName.trim(),
+            goal: "Composed workflow",
+            summary: `Composed from: ${composed.sourceNames.join(", ")}`,
+            loop_type: composed.loopType.toLowerCase(),
+            nodes: composed.nodes,
+            edges: composed.edges,
+          },
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to save composed workflow.");
+      window.dispatchEvent(new Event("refreshWorkflows"));
+      setSaveStatus(`Saved "${workflowName.trim()}".`);
+    } catch (err) {
+      setError(errorMessage(err));
+      setSaveStatus(null);
+    }
   }
 
   return (
@@ -257,31 +508,53 @@ export default function DagPreviewModal({
 
             <div>
               <label className="mb-2 block text-xs font-semibold uppercase text-slate-500">
-                {source === "current" ? "Canvas workflow" : "Saved workflow"}
+                {source === "current" ? "Canvas workflow" : "Saved workflows"}
               </label>
               {source === "current" ? (
                 <div className="rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-300">
                   {hasCanvasWorkflow ? `${nodes.length} agents on canvas` : "No agents on canvas"}
                 </div>
               ) : (
-                <select
-                  value={selectedSavedWorkflow}
-                  onChange={(event) => {
-                    setSelectedSavedWorkflow(event.target.value);
-                    resetResults();
-                  }}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 outline-none focus:border-cyan-600"
-                >
-                  {savedWorkflows.length ? (
-                    savedWorkflows.map((workflow) => (
-                      <option key={workflow.name} value={workflow.name}>
-                        {workflow.name}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="">No saved workflows</option>
-                  )}
-                </select>
+                <div>
+                  <div className="max-h-40 overflow-y-auto rounded-lg border border-slate-700 bg-slate-950 p-2">
+                    {savedWorkflows.length ? (
+                      savedWorkflows.map((workflow) => {
+                        const key = workflowKey(workflow);
+                        const checked = selectedSavedWorkflowKeys.includes(key);
+                        return (
+                          <label key={key} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm text-slate-200 hover:bg-slate-900">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={(event) => {
+                                setSelectedSavedWorkflowKeys((prev) =>
+                                  event.target.checked ? Array.from(new Set([...prev, key])) : prev.filter((item) => item !== key),
+                                );
+                                resetResults();
+                              }}
+                              className="h-4 w-4 accent-cyan-500"
+                            />
+                            <span>{workflowLabel(workflow)}</span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <div className="px-2 py-1.5 text-sm text-slate-500">No saved workflows</div>
+                    )}
+                  </div>
+                  <label className="mt-2 flex items-center gap-2 text-xs text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={suggestCompositionEdges}
+                      onChange={(event) => {
+                        setSuggestCompositionEdges(event.target.checked);
+                        resetResults();
+                      }}
+                      className="h-4 w-4 accent-cyan-500"
+                    />
+                    Suggest branch join edges when multiple workflows are selected
+                  </label>
+                </div>
               )}
             </div>
 
@@ -297,21 +570,18 @@ export default function DagPreviewModal({
           </section>
 
           <div className="mt-4 rounded-lg border border-amber-800/60 bg-amber-950/20 p-3 text-xs text-amber-100/80">
-            Preview only. Composer analysis does not execute agents or modify saved workflows.
-          </div>
-
-          <div className="mt-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-300">
-            <div className="font-bold text-cyan-200">Example flow</div>
-            <p className="mt-2">
-              Use System Planner to build and save a first serial draft, then open Workflow Composer to analyze it. If a System Sim draft is still
-              Digital steps followed by Analog steps followed by Simulation steps, the analyzer will report mostly serial stages. To expose
-              parallelism, the workflow graph needs Digital and Analog branches that join at System Top Assembly before simulation.
-            </p>
+            Composer analysis does not execute agents. Save as Private Workflow or Open on Canvas when the suggested graph looks right.
           </div>
 
           {error ? (
             <div className="mt-4 rounded-lg border border-red-900/70 bg-red-950/30 p-3 text-sm text-red-200">
               {error}
+            </div>
+          ) : null}
+
+          {saveStatus ? (
+            <div className="mt-4 rounded-lg border border-emerald-900/70 bg-emerald-950/30 p-3 text-sm text-emerald-200">
+              {saveStatus}
             </div>
           ) : null}
 
@@ -405,16 +675,18 @@ export default function DagPreviewModal({
 
               <section className="flex flex-wrap justify-end gap-2">
                 <button
-                  onClick={() => showSaveUnavailable("copy")}
-                  className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500"
+                  onClick={openComposedWorkflow}
+                  disabled={!currentComposedWorkflow()}
+                  className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-500"
                 >
-                  Save as Copy
+                  Open on Canvas
                 </button>
                 <button
-                  onClick={() => showSaveUnavailable("same")}
-                  className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900"
+                  onClick={saveComposedWorkflow}
+                  disabled={!currentComposedWorkflow()}
+                  className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500"
                 >
-                  Save to Same Workflow
+                  Save as Private Workflow
                 </button>
                 <button
                   onClick={() => setAdvancedOpen((open) => !open)}

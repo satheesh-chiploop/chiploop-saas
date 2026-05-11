@@ -962,6 +962,8 @@ function WorkflowPage() {
   const [loop, setLoop] = useState<LoopKey>("digital");
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentNodeData>>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
+  const [autoConnectOnDrop, setAutoConnectOnDrop] = useState(true);
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
 
   // local catalog states
@@ -1834,6 +1836,8 @@ function WorkflowPage() {
       } catch (e) {
         console.warn("Suggestion failed", e);
       }
+      if (!autoConnectOnDrop) return;
+
       setEdges((eds) => {
         if (nodes.length === 0) return eds;
         const lastNode = getRightMostNode(nodes);
@@ -1848,7 +1852,7 @@ function WorkflowPage() {
         return eds.concat(newEdge);
       });
     },
-    [rf, nodes, setNodes, setEdges]
+    [autoConnectOnDrop, rf, nodes, setNodes, setEdges]
   );
 
   const getRightMostNode = (nds: Node[]) => {
@@ -1860,6 +1864,12 @@ function WorkflowPage() {
     (params: Connection | Edge) => setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: "#22d3ee" } }, eds)),
     [setEdges]
   );
+
+  const deleteSelectedEdge = useCallback(() => {
+    if (!selectedEdgeId) return;
+    setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdgeId));
+    setSelectedEdgeId(null);
+  }, [selectedEdgeId, setEdges]);
 
   /* ---------- Actions ---------- */
   const runWorkflow = async () => {
@@ -2825,6 +2835,26 @@ function WorkflowPage() {
             onDrop={onDropCanvas}
             onDragOver={onDragOverCanvas}
           >
+            <div className="absolute left-3 top-3 z-10 flex flex-wrap items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/90 p-2 text-xs text-slate-200 shadow-lg">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={autoConnectOnDrop}
+                  onChange={(event) => setAutoConnectOnDrop(event.target.checked)}
+                  className="h-4 w-4 accent-cyan-500"
+                />
+                Auto-connect dropped agents
+              </label>
+              <button
+                type="button"
+                onClick={deleteSelectedEdge}
+                disabled={!selectedEdgeId}
+                className="rounded border border-slate-700 px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-600"
+              >
+                Delete selected edge
+              </button>
+              <span className="text-slate-500">Drag right dot to left dot to connect branches.</span>
+            </div>
             <ReactFlow
               key={nodes.map(n => n.id).join("-")}
               nodes={nodes}
@@ -2832,6 +2862,8 @@ function WorkflowPage() {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
+              onEdgeClick={(_, edge) => setSelectedEdgeId(edge.id)}
+              onPaneClick={() => setSelectedEdgeId(null)}
               nodeTypes={{ agentNode: AgentNode }}
               fitView
               defaultEdgeOptions={{ animated: true, style: { stroke: '#22d3ee' } }}
@@ -3788,8 +3820,15 @@ function WorkflowPage() {
           loopType={loop}
           nodes={nodes}
           edges={edges}
-          savedWorkflows={customWorkflows}
+          savedWorkflows={[...prebuiltWorkflows, ...customWorkflows]}
           selectedWorkflowName={selectedWorkflowName}
+          onOpenComposedWorkflow={(workflow) => {
+            setNodes(workflow.nodes as Node<AgentNodeData>[]);
+            setEdges(workflow.edges);
+            if (workflow.loopType) setLoop(normalizeLoopType(workflow.loopType));
+            if (workflow.name) setSelectedWorkflowName(workflow.name);
+            setTimeout(() => fitView({ padding: 0.2 }), 50);
+          }}
           onClose={() => setShowDagPreview(false)}
         />
       )}
