@@ -50,8 +50,12 @@ type DagValidateResponse = {
 };
 
 type SavedWorkflowRecord = {
+  id?: string;
+  name?: string;
   definitions?: { nodes?: Node[]; edges?: Edge[] } | null;
   loop_type?: string | null;
+  is_prebuilt?: boolean | null;
+  status?: string | null;
 };
 
 type ComposedWorkflow = {
@@ -408,6 +412,7 @@ export default function DagPreviewModal({
 }: DagPreviewModalProps) {
   const supabase = createClientComponentClient();
   const [source, setSource] = useState<"current" | "saved">("current");
+  const [availableSavedWorkflows, setAvailableSavedWorkflows] = useState<SavedWorkflowOption[]>(savedWorkflows);
   const [selectedSavedWorkflowKeys, setSelectedSavedWorkflowKeys] = useState<string[]>(() => {
     const selected = savedWorkflows.find((workflow) => workflow.name === selectedWorkflowName);
     const first = selected || savedWorkflows[0];
@@ -425,11 +430,74 @@ export default function DagPreviewModal({
   const [composedWorkflow, setComposedWorkflow] = useState<ComposedWorkflow | null>(null);
 
   useEffect(() => {
-    if (selectedSavedWorkflowKeys.length || !savedWorkflows.length) return;
-    const selected = savedWorkflows.find((workflow) => workflow.name === selectedWorkflowName);
-    const first = selected || savedWorkflows[0];
+    setAvailableSavedWorkflows(savedWorkflows);
+  }, [savedWorkflows]);
+
+  useEffect(() => {
+    if (source !== "saved") return;
+    let cancelled = false;
+
+    async function loadWorkflows() {
+      setLoading("saved");
+      setError(null);
+      try {
+        const userId = await getStableUserId();
+        const [prebuiltResult, customResult] = await Promise.all([
+          supabase
+            .from("workflows")
+            .select("id,name,loop_type,definitions,is_prebuilt,status")
+            .eq("is_prebuilt", true)
+            .order("name", { ascending: true }),
+          supabase
+            .from("workflows")
+            .select("id,name,loop_type,definitions,is_prebuilt,status")
+            .eq("user_id", userId)
+            .eq("status", "saved")
+            .or("is_prebuilt.eq.false,is_prebuilt.is.null")
+            .order("created_at", { ascending: false }),
+        ]);
+
+        if (prebuiltResult.error) throw new Error(prebuiltResult.error.message);
+        if (customResult.error) throw new Error(customResult.error.message);
+
+        const rows = [...((prebuiltResult.data || []) as SavedWorkflowRecord[]), ...((customResult.data || []) as SavedWorkflowRecord[])];
+        const next = rows
+          .filter((row) => row.name && row.definitions?.nodes?.length)
+          .map((row) => ({
+            id: row.id,
+            name: String(row.name),
+            displayName: String(row.name),
+            loop_type: row.loop_type,
+            is_prebuilt: row.is_prebuilt,
+            definitions: row.definitions,
+          }));
+
+        if (cancelled) return;
+        setAvailableSavedWorkflows(next);
+        if (!selectedSavedWorkflowKeys.length && next.length) {
+          const selected = next.find((workflow) => workflow.name === selectedWorkflowName);
+          const first = selected || next[0];
+          setSelectedSavedWorkflowKeys(first ? [workflowKey(first)] : []);
+        }
+      } catch (err) {
+        if (!cancelled) setError(errorMessage(err));
+      } finally {
+        if (!cancelled) setLoading(null);
+      }
+    }
+
+    loadWorkflows();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSavedWorkflowKeys.length, selectedWorkflowName, source, supabase]);
+
+  useEffect(() => {
+    if (selectedSavedWorkflowKeys.length || !availableSavedWorkflows.length) return;
+    const selected = availableSavedWorkflows.find((workflow) => workflow.name === selectedWorkflowName);
+    const first = selected || availableSavedWorkflows[0];
     setSelectedSavedWorkflowKeys(first ? [workflowKey(first)] : []);
-  }, [savedWorkflows, selectedSavedWorkflowKeys.length, selectedWorkflowName]);
+  }, [availableSavedWorkflows, selectedSavedWorkflowKeys.length, selectedWorkflowName]);
 
   const hasCanvasWorkflow = nodes.length > 0;
   const canAnalyze = useMemo(() => {
@@ -508,7 +576,7 @@ export default function DagPreviewModal({
   }
 
   async function buildSavedWorkflowPayload() {
-    const selected = savedWorkflows.filter((workflow) => selectedSavedWorkflowKeys.includes(workflowKey(workflow)));
+    const selected = availableSavedWorkflows.filter((workflow) => selectedSavedWorkflowKeys.includes(workflowKey(workflow)));
     if (!selected.length) {
       throw new Error("Choose one or more saved workflows first.");
     }
@@ -699,8 +767,8 @@ export default function DagPreviewModal({
               ) : (
                 <div>
                   <div className="max-h-40 overflow-y-auto rounded-lg border border-slate-700 bg-slate-950 p-2">
-                    {savedWorkflows.length ? (
-                      savedWorkflows.map((workflow) => {
+                  {availableSavedWorkflows.length ? (
+                    availableSavedWorkflows.map((workflow) => {
                         const key = workflowKey(workflow);
                         const checked = selectedSavedWorkflowKeys.includes(key);
                         return (
@@ -721,7 +789,9 @@ export default function DagPreviewModal({
                         );
                       })
                     ) : (
-                      <div className="px-2 py-1.5 text-sm text-slate-500">No saved workflows</div>
+                      <div className="px-2 py-1.5 text-sm text-slate-500">
+                        {loading === "saved" ? "Loading workflows..." : "No Supabase saved workflows found"}
+                      </div>
                     )}
                   </div>
                   <label className="mt-2 flex items-center gap-2 text-xs text-slate-300">
