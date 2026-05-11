@@ -88,6 +88,117 @@ function graphPayloadFromNodes(nodes: Node[], edges: Edge[], loopType: string) {
   };
 }
 
+function inferAgentDomain(node: Node): string {
+  const label = String(node.data?.backendLabel || node.data?.uiLabel || node.id).toLowerCase();
+  if (label.includes("analog")) return "analog";
+  if (label.includes("embedded") || label.includes("firmware")) return "embedded";
+  if (label.includes("validation")) return "validation";
+  if (label.includes("system")) return "system";
+  if (label.includes("digital") || label.includes("rtl") || label.includes("synthesis") || label.includes("floorplan")) return "digital";
+  return "other";
+}
+
+function isSystemJoinCandidate(node: Node): boolean {
+  const label = String(node.data?.backendLabel || node.data?.uiLabel || node.id).toLowerCase();
+  return (
+    label.includes("system top assembly") ||
+    label.includes("system integration") ||
+    label.includes("system testbench") ||
+    label.includes("system simulation")
+  );
+}
+
+function sortedNodes(nodes: Node[]): Node[] {
+  return [...nodes].sort((a, b) => {
+    const ax = Number(a.position?.x || 0);
+    const bx = Number(b.position?.x || 0);
+    if (ax !== bx) return ax - bx;
+    return Number(a.position?.y || 0) - Number(b.position?.y || 0);
+  });
+}
+
+function suggestBranchWorkflowFromCurrent(nodes: Node[], loopType: string): ComposedWorkflow {
+  const clonedNodes = nodes.map((node) => ({
+    ...node,
+    type: node.type || "agentNode",
+    data: {
+      uiLabel: String(node.data?.uiLabel || node.data?.backendLabel || node.id),
+      backendLabel: String(node.data?.backendLabel || node.data?.uiLabel || node.id),
+      desc: node.data?.desc,
+    },
+  }));
+  const groups = new Map<string, Node[]>();
+  clonedNodes.forEach((node) => {
+    const domain = inferAgentDomain(node);
+    groups.set(domain, [...(groups.get(domain) || []), node]);
+  });
+
+  const systemNodes = sortedNodes(groups.get("system") || []);
+  const joinNode = systemNodes.find(isSystemJoinCandidate) || systemNodes[0];
+  const composedEdges: Edge[] = [];
+
+  for (const [domain, domainNodes] of groups.entries()) {
+    if (domain === "system" || !domainNodes.length) continue;
+    const ordered = sortedNodes(domainNodes);
+    ordered.slice(1).forEach((node, index) => {
+      const previous = ordered[index];
+      composedEdges.push({
+        id: `e-suggest-${previous.id}-${node.id}`,
+        source: previous.id,
+        target: node.id,
+        animated: true,
+        style: { stroke: "#22d3ee", strokeWidth: 2 },
+      });
+    });
+    const terminal = ordered[ordered.length - 1];
+    if (joinNode && terminal.id !== joinNode.id) {
+      composedEdges.push({
+        id: `e-suggest-${terminal.id}-${joinNode.id}`,
+        source: terminal.id,
+        target: joinNode.id,
+        animated: true,
+        style: { stroke: "#f59e0b", strokeWidth: 2 },
+      });
+    }
+  }
+
+  if (systemNodes.length) {
+    const systemStartIndex = joinNode ? systemNodes.findIndex((node) => node.id === joinNode.id) : 0;
+    const orderedSystem = systemNodes.slice(Math.max(0, systemStartIndex));
+    orderedSystem.slice(1).forEach((node, index) => {
+      const previous = orderedSystem[index];
+      composedEdges.push({
+        id: `e-suggest-${previous.id}-${node.id}`,
+        source: previous.id,
+        target: node.id,
+        animated: true,
+        style: { stroke: "#22d3ee", strokeWidth: 2 },
+      });
+    });
+  }
+
+  if (!composedEdges.length) {
+    const ordered = sortedNodes(clonedNodes);
+    ordered.slice(1).forEach((node, index) => {
+      const previous = ordered[index];
+      composedEdges.push({
+        id: `e-suggest-${previous.id}-${node.id}`,
+        source: previous.id,
+        target: node.id,
+        animated: true,
+        style: { stroke: "#22d3ee", strokeWidth: 2 },
+      });
+    });
+  }
+
+  return {
+    nodes: clonedNodes,
+    edges: composedEdges,
+    loopType,
+    sourceNames: ["Current workflow"],
+  };
+}
+
 function workflowKey(workflow: SavedWorkflowOption): string {
   return workflow.id || workflow.name;
 }
@@ -276,6 +387,7 @@ export default function DagPreviewModal({
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [suggestCompositionEdges, setSuggestCompositionEdges] = useState(true);
+  const [suggestCurrentBranches, setSuggestCurrentBranches] = useState(true);
   const [composedWorkflow, setComposedWorkflow] = useState<ComposedWorkflow | null>(null);
 
   useEffect(() => {
@@ -394,9 +506,16 @@ export default function DagPreviewModal({
     if (!canAnalyze) return;
     resetResults();
     try {
-      const payload = source === "current"
-        ? graphPayloadFromNodes(nodes, edges, loopType)
-        : await buildSavedWorkflowPayload();
+      let payload: unknown;
+      if (source === "current" && suggestCurrentBranches) {
+        const composed = suggestBranchWorkflowFromCurrent(nodes, loopType);
+        setComposedWorkflow(composed);
+        payload = graphPayloadFromComposedWorkflow(composed, true);
+      } else {
+        payload = source === "current"
+          ? graphPayloadFromNodes(nodes, edges, loopType)
+          : await buildSavedWorkflowPayload();
+      }
       await runPreview(payload);
     } catch (err) {
       setError(errorMessage(err));
@@ -419,7 +538,7 @@ export default function DagPreviewModal({
   }
 
   function currentComposedWorkflow(): ComposedWorkflow | null {
-    if (source === "saved") return composedWorkflow;
+    if (source === "saved" || (source === "current" && suggestCurrentBranches && composedWorkflow)) return composedWorkflow;
     if (!nodes.length) return null;
     return {
       nodes: nodes as Node[],
@@ -520,8 +639,22 @@ export default function DagPreviewModal({
                 {source === "current" ? "Canvas workflow" : "Saved workflows"}
               </label>
               {source === "current" ? (
-                <div className="rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-300">
-                  {hasCanvasWorkflow ? `${nodes.length} agents on canvas` : "No agents on canvas"}
+                <div>
+                  <div className="rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-300">
+                    {hasCanvasWorkflow ? `${nodes.length} agents on canvas` : "No agents on canvas"}
+                  </div>
+                  <label className="mt-2 flex items-center gap-2 text-xs text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={suggestCurrentBranches}
+                      onChange={(event) => {
+                        setSuggestCurrentBranches(event.target.checked);
+                        resetResults();
+                      }}
+                      className="h-4 w-4 accent-cyan-500"
+                    />
+                    Suggest branch structure from current workflow
+                  </label>
                 </div>
               ) : (
                 <div>
