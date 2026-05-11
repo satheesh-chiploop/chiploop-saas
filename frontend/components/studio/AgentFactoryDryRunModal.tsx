@@ -24,7 +24,9 @@ type FactoryPlan = {
   proposed_agent_spec?: Record<string, unknown>;
   proposed_skill_specs?: Record<string, unknown>[];
   proposed_tool_refs?: string[];
+  proposed_tool_specs?: Record<string, unknown>[];
   proposed_hook_refs?: string[];
+  proposed_hook_specs?: Record<string, unknown>[];
   files_to_generate?: Array<{ path?: string; description?: string; content_preview?: string }>;
   registry_patch?: { path?: string; content?: string } | null;
   validation_checklist?: string[];
@@ -57,17 +59,33 @@ function errorMessage(error: unknown): string {
   return "Request failed.";
 }
 
-function ChipList({ title, items }: { title: string; items?: string[] }) {
+function DependencyRows({
+  title,
+  refs,
+  generatedSpecs,
+}: {
+  title: string;
+  refs?: string[];
+  generatedSpecs?: Record<string, unknown>[];
+}) {
+  const generated = new Set((generatedSpecs || []).map((item) => String(item.name || "")));
+  const rows = refs || [];
   return (
     <div>
       <div className="mb-2 text-xs font-semibold uppercase text-slate-400">{title}</div>
-      {items?.length ? (
-        <div className="flex flex-wrap gap-1.5">
-          {items.map((item) => (
-            <span key={`${title}-${item}`} className="rounded-full border border-slate-700 bg-slate-950 px-2 py-1 text-[11px] text-slate-200">
-              {item}
-            </span>
-          ))}
+      {rows.length ? (
+        <div className="space-y-1">
+          {rows.map((item) => {
+            const isGenerated = generated.has(item);
+            return (
+              <div key={`${title}-${item}`} className="flex items-center justify-between gap-3 rounded border border-slate-800 bg-slate-950 px-2 py-1.5 text-xs text-slate-200">
+                <span>{item}</span>
+                <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${isGenerated ? "bg-amber-950 text-amber-200" : "bg-emerald-950 text-emerald-200"}`}>
+                  {isGenerated ? "Generated spec" : "Available"}
+                </span>
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="text-xs text-slate-500">None</div>
@@ -186,8 +204,14 @@ export default function AgentFactoryDryRunModal({
         description: String(spec.description || requestText.trim()),
         agent_spec: spec,
         skills: plan?.proposed_skill_specs || [],
-        tools: plan?.proposed_tool_refs || [],
-        hooks: plan?.proposed_hook_refs || [],
+        tools: (plan?.proposed_tool_specs || []).length ? plan?.proposed_tool_specs : plan?.proposed_tool_refs || [],
+        hooks: (plan?.proposed_hook_specs || []).length ? plan?.proposed_hook_specs : plan?.proposed_hook_refs || [],
+        dependency_status: {
+          generated_skills: plan?.proposed_skill_specs || [],
+          generated_tools: plan?.proposed_tool_specs || [],
+          generated_hooks: plan?.proposed_hook_specs || [],
+          save_mode: ((plan?.proposed_skill_specs || []).length || (plan?.proposed_tool_specs || []).length || (plan?.proposed_hook_specs || []).length) ? "draft_with_generated_dependencies" : "runnable_candidate",
+        },
         generated_files: plan?.files_to_generate || [],
         registry_patch: plan?.registry_patch || {},
         source: "studio_factory",
@@ -212,7 +236,7 @@ export default function AgentFactoryDryRunModal({
         ? await apiPatch<SavePrivateAgentResponse>(`/studio/user-agents/${match.id}`, savePayload)
         : await apiPost<SavePrivateAgentResponse>("/studio/user-agents", savePayload);
       setSavedMessage(
-        `${shouldUpdate ? "Updated" : "Saved"} ${response.agent?.agent_name || savePayload.name} as a private agent.`
+        `${shouldUpdate ? "Updated" : "Saved"} ${response.agent?.agent_name || savePayload.name} as a private draft agent.`
       );
       window.dispatchEvent(new Event("refreshAgents"));
     } catch (err) {
@@ -228,13 +252,13 @@ export default function AgentFactoryDryRunModal({
         <div className="flex items-start justify-between gap-4 border-b border-slate-800 p-5">
           <div>
             <h2 className="text-2xl font-extrabold text-cyan-300">Review Draft Agent</h2>
-            <p className="mt-1 text-sm text-slate-400">Generate a safe draft, review the summary, then save it as your private agent.</p>
+            <p className="mt-1 text-sm text-slate-400">Generate a safe draft, review the summary, then save it as a private draft agent.</p>
           </div>
           <button onClick={onClose} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:bg-slate-900">Close</button>
         </div>
 
         <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[360px_1fr]">
-          <section className="border-b border-slate-800 p-5 md:border-b-0 md:border-r">
+          <section className="min-h-0 overflow-y-auto border-b border-slate-800 p-5 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent md:border-b-0 md:border-r">
             <label className="block text-sm font-semibold text-slate-200">Agent name</label>
             <input value={name} onChange={(event) => setName(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-sm outline-none focus:border-cyan-600" placeholder="New agent name" />
 
@@ -277,7 +301,7 @@ export default function AgentFactoryDryRunModal({
             </button>
 
             <div className="mt-4 rounded-lg border border-amber-800/60 bg-amber-950/20 p-3 text-xs text-amber-100/80">
-              Draft only. Nothing is written to production folders or promoted globally.
+              Draft only. Nothing is written to production folders. After review, enable it for workflow runs.
             </div>
           </section>
 
@@ -306,10 +330,32 @@ export default function AgentFactoryDryRunModal({
                 </section>
 
                 <section className="grid gap-4 md:grid-cols-3">
-                  <ChipList title="Skills" items={(plan?.proposed_skill_specs || []).map((item) => String(item.name || item.id || "skill"))} />
-                  <ChipList title="Tools" items={plan?.proposed_tool_refs || []} />
-                  <ChipList title="Hooks" items={plan?.proposed_hook_refs || []} />
+                  <DependencyRows
+                    title="Skills"
+                    refs={(spec.required_skills as string[]) || requiredSkills}
+                    generatedSpecs={plan?.proposed_skill_specs || []}
+                  />
+                  <DependencyRows
+                    title="Tools / MCP"
+                    refs={plan?.proposed_tool_refs || []}
+                    generatedSpecs={plan?.proposed_tool_specs || []}
+                  />
+                  <DependencyRows
+                    title="Hooks"
+                    refs={plan?.proposed_hook_refs || []}
+                    generatedSpecs={plan?.proposed_hook_specs || []}
+                  />
                 </section>
+
+                {((plan?.proposed_skill_specs || []).length || (plan?.proposed_tool_specs || []).length || (plan?.proposed_hook_specs || []).length) ? (
+                  <section className="rounded-lg border border-amber-800/60 bg-amber-950/20 p-3 text-xs leading-5 text-amber-100/85">
+                    Missing dependencies were generated as private draft specs and will be saved with this agent. The agent remains draft-only until those specs are reviewed and promoted or implemented.
+                  </section>
+                ) : (
+                  <section className="rounded-lg border border-emerald-900/60 bg-emerald-950/20 p-3 text-xs leading-5 text-emerald-100/85">
+                    All referenced dependencies are available in the Studio registry. Review the draft before using it in a workflow.
+                  </section>
+                )}
 
                 <section className="grid gap-4 md:grid-cols-2">
                   <div className="rounded-lg border border-slate-800 bg-black/30 p-3">
@@ -324,7 +370,7 @@ export default function AgentFactoryDryRunModal({
 
                 <div className="flex flex-wrap gap-2">
                   <button onClick={savePrivateAgent} disabled={saving} className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500">
-                    {saving ? "Saving..." : "Save as Private Agent"}
+                    {saving ? "Saving..." : "Save Private Draft"}
                   </button>
                   <button onClick={() => setShowAdvanced((current) => !current)} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900">
                     {showAdvanced ? "Hide Advanced Details" : "Advanced Details"}

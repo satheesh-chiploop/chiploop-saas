@@ -203,7 +203,7 @@ export default function GeneratedAgentReviewModal({
                   disabled={saving}
                   className="mt-4 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
                 >
-                  {saving ? "Saving..." : "Save as Private Agent"}
+                  {saving ? "Saving..." : "Save Private Draft"}
                 </button>
               </section>
 

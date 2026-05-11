@@ -416,7 +416,7 @@ export default function MissingAgentsResolverModal({
                         disabled={loading === "save"}
                         className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
                       >
-                        {loading === "save" ? "Saving..." : "Save as Private Agent"}
+                        {loading === "save" ? "Saving..." : "Save Private Draft"}
                       </button>
                       <button
                         type="button"
