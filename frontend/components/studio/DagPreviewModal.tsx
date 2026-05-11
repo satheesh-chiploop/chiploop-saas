@@ -118,6 +118,13 @@ function sortedNodes(nodes: Node[]): Node[] {
 }
 
 function suggestBranchWorkflowFromCurrent(nodes: Node[], loopType: string): ComposedWorkflow {
+  const rowByDomain: Record<string, number> = {
+    digital: 110,
+    analog: 290,
+    embedded: 470,
+    validation: 650,
+    other: 830,
+  };
   const clonedNodes = nodes.map((node) => ({
     ...node,
     type: node.type || "agentNode",
@@ -134,6 +141,20 @@ function suggestBranchWorkflowFromCurrent(nodes: Node[], loopType: string): Comp
   });
 
   const systemNodes = sortedNodes(groups.get("system") || []);
+  let branchMaxX = 80;
+  for (const [domain, domainNodes] of groups.entries()) {
+    if (domain === "system" || !domainNodes.length) continue;
+    const ordered = sortedNodes(domainNodes);
+    const rowY = rowByDomain[domain] ?? rowByDomain.other;
+    ordered.forEach((node, index) => {
+      node.position = { x: 80 + index * 260, y: rowY };
+      branchMaxX = Math.max(branchMaxX, node.position.x);
+    });
+  }
+  systemNodes.forEach((node, index) => {
+    node.position = { x: branchMaxX + 300 + index * 260, y: 370 };
+  });
+
   const joinNode = systemNodes.find(isSystemJoinCandidate) || systemNodes[0];
   const composedEdges: Edge[] = [];
 
