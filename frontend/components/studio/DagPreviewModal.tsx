@@ -503,7 +503,13 @@ export default function DagPreviewModal({
     setLoading("saved");
     const loaded = await Promise.all(selected.map((workflow) => loadSavedWorkflowDefinition(workflow)));
     const payloadLoopType = loaded[0]?.loopType || loopType;
-    const composed = composeWorkflowFromDefinitions(loaded, payloadLoopType, suggestCompositionEdges);
+    const composed =
+      suggestCompositionEdges && loaded.length === 1
+        ? {
+            ...suggestBranchWorkflowFromCurrent(loaded[0].definitions.nodes || [], payloadLoopType),
+            sourceNames: [loaded[0].workflow.name],
+          }
+        : composeWorkflowFromDefinitions(loaded, payloadLoopType, suggestCompositionEdges);
     setComposedWorkflow(composed);
     return graphPayloadFromComposedWorkflow(composed, suggestCompositionEdges);
   }
@@ -715,7 +721,7 @@ export default function DagPreviewModal({
                       }}
                       className="h-4 w-4 accent-cyan-500"
                     />
-                    Suggest branch join edges when multiple workflows are selected
+                    Suggest branch structure and join edges
                   </label>
                 </div>
               )}
