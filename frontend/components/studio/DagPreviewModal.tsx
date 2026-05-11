@@ -63,6 +63,9 @@ type ComposedWorkflow = {
   edges: Edge[];
   loopType: string;
   sourceNames: string[];
+  originalStepCount: number;
+  originalSerialSteps: Array<{ agentName: string; sources: string[]; shared: boolean }>;
+  agentSources: Record<string, string[]>;
 };
 
 const REGISTERED_AGENT_ALIASES: Record<string, string> = {
@@ -134,7 +137,51 @@ function sortedNodes(nodes: Node[]): Node[] {
   });
 }
 
-function suggestBranchWorkflowFromCurrent(nodes: Node[], loopType: string): ComposedWorkflow {
+function workflowSerialNodes(nodes: Node[], edges?: Edge[]): Node[] {
+  if (!edges?.length) return nodes;
+  const nodeById = new Map(nodes.map((node) => [node.id, node]));
+  const indegree = new Map(nodes.map((node) => [node.id, 0]));
+  const outgoing = new Map<string, string[]>();
+  edges.forEach((edge) => {
+    if (!nodeById.has(edge.source) || !nodeById.has(edge.target)) return;
+    outgoing.set(edge.source, [...(outgoing.get(edge.source) || []), edge.target]);
+    indegree.set(edge.target, (indegree.get(edge.target) || 0) + 1);
+  });
+
+  const originalIndex = new Map(nodes.map((node, index) => [node.id, index]));
+  const queue = nodes
+    .filter((node) => (indegree.get(node.id) || 0) === 0)
+    .sort((a, b) => (originalIndex.get(a.id) || 0) - (originalIndex.get(b.id) || 0));
+  const ordered: Node[] = [];
+
+  while (queue.length) {
+    const node = queue.shift();
+    if (!node) break;
+    ordered.push(node);
+    (outgoing.get(node.id) || []).forEach((targetId) => {
+      indegree.set(targetId, (indegree.get(targetId) || 0) - 1);
+      if ((indegree.get(targetId) || 0) === 0) {
+        const targetNode = nodeById.get(targetId);
+        if (targetNode) {
+          queue.push(targetNode);
+          queue.sort((a, b) => (originalIndex.get(a.id) || 0) - (originalIndex.get(b.id) || 0));
+        }
+      }
+    });
+  }
+
+  return ordered.length === nodes.length ? ordered : nodes;
+}
+
+function agentLabelFromNode(node: Node): string {
+  return normalizeAgentName(String(node.data?.backendLabel || node.data?.uiLabel || node.id));
+}
+
+function uniqueStrings(values: string[]): string[] {
+  return Array.from(new Set(values.filter(Boolean)));
+}
+
+function suggestBranchWorkflowFromCurrent(nodes: Node[], loopType: string, sourceName = "Current workflow", originalEdges?: Edge[]): ComposedWorkflow {
   const rowByDomain: Record<string, number> = {
     digital: 110,
     analog: 290,
@@ -147,10 +194,11 @@ function suggestBranchWorkflowFromCurrent(nodes: Node[], loopType: string): Comp
     type: node.type || "agentNode",
     data: {
       uiLabel: String(node.data?.uiLabel || node.data?.backendLabel || node.id),
-      backendLabel: normalizeAgentName(String(node.data?.backendLabel || node.data?.uiLabel || node.id)),
+      backendLabel: agentLabelFromNode(node),
       desc: node.data?.desc,
     },
   }));
+  const agentSources = Object.fromEntries(clonedNodes.map((node) => [node.id, [sourceName]]));
   const groups = new Map<string, Node[]>();
   clonedNodes.forEach((node) => {
     const domain = inferAgentDomain(node);
@@ -233,7 +281,14 @@ function suggestBranchWorkflowFromCurrent(nodes: Node[], loopType: string): Comp
     nodes: clonedNodes,
     edges: composedEdges,
     loopType,
-    sourceNames: ["Current workflow"],
+    sourceNames: [sourceName],
+    originalStepCount: nodes.length,
+    originalSerialSteps: workflowSerialNodes(nodes, originalEdges).map((node) => ({
+      agentName: agentLabelFromNode(node),
+      sources: [sourceName],
+      shared: false,
+    })),
+    agentSources,
   };
 }
 
@@ -256,6 +311,9 @@ function composeWorkflowFromDefinitions(
   const nodeIdByAgentName = new Map<string, string>();
   const remappedNodeIds = new Map<string, string>();
   const edgeKeys = new Set<string>();
+  const agentSourceSets: Record<string, Set<string>> = {};
+  const originalSerialSteps: Array<{ agentName: string; sources: string[]; shared: boolean }> = [];
+  let originalStepCount = 0;
   const branchTerminalIds: string[] = [];
   let joinNodeId = "";
 
@@ -271,13 +329,15 @@ function composeWorkflowFromDefinitions(
     const prefix = workflowKey(workflow).replace(/[^a-zA-Z0-9_-]/g, "_") || `workflow_${workflowIndex + 1}`;
     const nodes = definitions.nodes || [];
     const edges = definitions.edges || [];
+    const orderedWorkflowNodes = workflowSerialNodes(nodes, edges);
     const outgoing = new Set(edges.map((edge) => edge.source));
     const prefixedNodeIds: string[] = [];
     let workflowJoinNodeId = "";
     let workflowHasSystemAgent = false;
+    originalStepCount += nodes.length;
 
     nodes.forEach((node) => {
-      const backendLabel = normalizeAgentName(String(node.data?.backendLabel || node.data?.uiLabel || node.id));
+      const backendLabel = agentLabelFromNode(node);
       const uiLabel = normalizeAgentName(String(node.data?.uiLabel || node.data?.backendLabel || backendLabel));
       const labelLower = backendLabel.toLowerCase();
       const agentKey = backendLabel.toLowerCase();
@@ -302,6 +362,8 @@ function composeWorkflowFromDefinitions(
       }
 
       remappedNodeIds.set(originalNodeKey, composedId);
+      if (!agentSourceSets[composedId]) agentSourceSets[composedId] = new Set<string>();
+      agentSourceSets[composedId].add(workflow.name);
       prefixedNodeIds.push(composedId);
       workflowHasSystemAgent = workflowHasSystemAgent || labelLower.includes("system");
       if (
@@ -315,6 +377,14 @@ function composeWorkflowFromDefinitions(
       ) {
         workflowJoinNodeId = composedId;
       }
+    });
+
+    orderedWorkflowNodes.forEach((node) => {
+      originalSerialSteps.push({
+        agentName: agentLabelFromNode(node),
+        sources: [workflow.name],
+        shared: false,
+      });
     });
 
     edges.forEach((edge) => {
@@ -343,6 +413,15 @@ function composeWorkflowFromDefinitions(
     }
   });
 
+  const agentSources = Object.fromEntries(
+    Object.entries(agentSourceSets).map(([nodeId, sources]) => [nodeId, Array.from(sources)]),
+  );
+  const sourceCountByAgentName = new Map<string, string[]>();
+  composedNodes.forEach((node) => {
+    const agentName = agentLabelFromNode(node);
+    sourceCountByAgentName.set(agentName, agentSources[node.id] || []);
+  });
+
   if (suggestCompositionEdges && workflows.length > 1 && joinNodeId) {
     Array.from(new Set(branchTerminalIds)).forEach((terminalId) => {
       if (terminalId !== joinNodeId) {
@@ -362,6 +441,16 @@ function composeWorkflowFromDefinitions(
     edges: composedEdges,
     loopType,
     sourceNames: workflows.map(({ workflow }) => workflow.name),
+    originalStepCount,
+    originalSerialSteps: originalSerialSteps.map((step) => {
+      const sources = sourceCountByAgentName.get(step.agentName) || step.sources;
+      return {
+        ...step,
+        sources,
+        shared: sources.length > 1,
+      };
+    }),
+    agentSources,
   };
 }
 
@@ -529,16 +618,52 @@ export default function DagPreviewModal({
     return selectedSavedWorkflowKeys.length > 0;
   }, [hasCanvasWorkflow, loading, selectedSavedWorkflowKeys.length, source]);
 
-  const dependencyGraph = preview?.preview?.dependency_graph || {};
-  const executionOrder = preview?.preview?.execution_order || [];
-  const parallelGroupAgents = preview?.preview?.parallel_group_agents || [];
+  const dependencyGraph = useMemo(() => preview?.preview?.dependency_graph || {}, [preview?.preview?.dependency_graph]);
+  const executionOrder = useMemo(() => preview?.preview?.execution_order || [], [preview?.preview?.execution_order]);
+  const parallelGroupAgents = useMemo(() => preview?.preview?.parallel_group_agents || [], [preview?.preview?.parallel_group_agents]);
   const resultErrors = preview?.errors || validation?.errors || [];
   const resultWarnings = preview?.warnings || validation?.warnings || [];
-  const serialSteps = executionOrder.map((nodeId) => dependencyGraph[nodeId]?.agent_name || nodeId);
-  const serialStageCount = serialSteps.length;
+  const activeComposedWorkflow = composedWorkflow || currentComposedWorkflow();
+  const agentSourcesByName = useMemo(() => {
+    const sourcesByName = new Map<string, string[]>();
+    if (!activeComposedWorkflow) return sourcesByName;
+    activeComposedWorkflow.nodes.forEach((node) => {
+      const agentName = agentLabelFromNode(node);
+      const sources = activeComposedWorkflow.agentSources[node.id] || activeComposedWorkflow.sourceNames;
+      sourcesByName.set(agentName, uniqueStrings([...(sourcesByName.get(agentName) || []), ...sources]));
+    });
+    return sourcesByName;
+  }, [activeComposedWorkflow]);
+  const displaySerialSteps = useMemo(() => {
+    const seen = new Set<string>();
+    const composedSteps = activeComposedWorkflow?.originalSerialSteps || [];
+    const sourceSteps = composedSteps.length
+      ? composedSteps
+      : executionOrder.map((nodeId) => ({
+          agentName: dependencyGraph[nodeId]?.agent_name || nodeId,
+          sources: [],
+          shared: false,
+        }));
+    return sourceSteps.filter((step) => {
+      if (seen.has(step.agentName)) return false;
+      seen.add(step.agentName);
+      return true;
+    }).map((step) => {
+      const sources = uniqueStrings([...(agentSourcesByName.get(step.agentName) || []), ...step.sources]);
+      return {
+        ...step,
+        sources,
+        shared: sources.length > 1 || step.shared,
+      };
+    });
+  }, [activeComposedWorkflow?.originalSerialSteps, agentSourcesByName, dependencyGraph, executionOrder]);
+  const serialStageCount = displaySerialSteps.length;
   const parallelStageCount = parallelGroupAgents.length;
   const parallelizableGroupCount = parallelGroupAgents.filter((group) => group.length > 1).length;
   const stageReduction = Math.max(0, serialStageCount - parallelStageCount);
+  const originalStepCount = activeComposedWorkflow?.originalStepCount || serialStageCount;
+  const composedStepCount = activeComposedWorkflow?.nodes.length || serialStageCount;
+  const sharedStepsRemoved = Math.max(0, originalStepCount - composedStepCount);
 
   function resetResults() {
     setPreview(null);
@@ -609,10 +734,12 @@ export default function DagPreviewModal({
     const payloadLoopType = loaded[0]?.loopType || loopType;
     const composed =
       suggestCompositionEdges && loaded.length === 1
-        ? {
-            ...suggestBranchWorkflowFromCurrent(loaded[0].definitions.nodes || [], payloadLoopType),
-            sourceNames: [loaded[0].workflow.name],
-          }
+        ? suggestBranchWorkflowFromCurrent(
+            loaded[0].definitions.nodes || [],
+            payloadLoopType,
+            loaded[0].workflow.name,
+            loaded[0].definitions.edges || [],
+          )
         : composeWorkflowFromDefinitions(loaded, payloadLoopType, suggestCompositionEdges);
     setComposedWorkflow(composed);
     return graphPayloadFromComposedWorkflow(composed, suggestCompositionEdges);
@@ -639,7 +766,7 @@ export default function DagPreviewModal({
     try {
       let payload: unknown;
       if (source === "current" && suggestCurrentBranches) {
-        const composed = suggestBranchWorkflowFromCurrent(nodes, loopType);
+        const composed = suggestBranchWorkflowFromCurrent(nodes, loopType, "Current workflow", edges);
         setComposedWorkflow(composed);
         payload = graphPayloadFromComposedWorkflow(composed, true);
       } else {
@@ -676,6 +803,13 @@ export default function DagPreviewModal({
       edges: edges as Edge[],
       loopType,
       sourceNames: selectedWorkflowName ? [selectedWorkflowName] : ["Current workflow"],
+      originalStepCount: nodes.length,
+      originalSerialSteps: workflowSerialNodes(nodes, edges).map((node) => ({
+        agentName: agentLabelFromNode(node),
+        sources: selectedWorkflowName ? [selectedWorkflowName] : ["Current workflow"],
+        shared: false,
+      })),
+      agentSources: Object.fromEntries(nodes.map((node) => [node.id, selectedWorkflowName ? [selectedWorkflowName] : ["Current workflow"]])),
     };
   }
 
@@ -728,6 +862,15 @@ export default function DagPreviewModal({
       setError(errorMessage(err));
       setSaveStatus(null);
     }
+  }
+
+  function sourceText(sources: string[]): string {
+    if (!sources.length) return "";
+    return sources.length > 1 ? `Used by: ${sources.join(", ")}` : `From: ${sources[0]}`;
+  }
+
+  function sourcesForAgent(agentName: string): string[] {
+    return agentSourcesByName.get(normalizeAgentName(agentName)) || [];
   }
 
   return (
@@ -891,15 +1034,48 @@ export default function DagPreviewModal({
                 </div>
               </section>
 
+              <section className="grid gap-3 rounded-lg border border-slate-800 bg-black/30 p-4 sm:grid-cols-2 lg:grid-cols-5">
+                <div>
+                  <div className="text-xs uppercase text-slate-500">Selected workflows</div>
+                  <div className="mt-1 text-lg font-bold text-slate-100">{activeComposedWorkflow?.sourceNames.length || 1}</div>
+                </div>
+                <div>
+                  <div className="text-xs uppercase text-slate-500">Original steps</div>
+                  <div className="mt-1 text-lg font-bold text-slate-100">{originalStepCount}</div>
+                </div>
+                <div>
+                  <div className="text-xs uppercase text-slate-500">Shared removed</div>
+                  <div className="mt-1 text-lg font-bold text-emerald-300">{sharedStepsRemoved}</div>
+                </div>
+                <div>
+                  <div className="text-xs uppercase text-slate-500">Composed steps</div>
+                  <div className="mt-1 text-lg font-bold text-cyan-300">{composedStepCount}</div>
+                </div>
+                <div>
+                  <div className="text-xs uppercase text-slate-500">Parallel groups</div>
+                  <div className="mt-1 text-lg font-bold text-cyan-300">{parallelizableGroupCount}</div>
+                </div>
+              </section>
+
               <section className="grid gap-4 lg:grid-cols-2">
                 <div className="rounded-lg border border-slate-800 bg-black/30 p-4">
                   <h3 className="mb-3 text-sm font-bold text-cyan-300">Current Serial Steps</h3>
-                  {serialSteps.length ? (
+                  {displaySerialSteps.length ? (
                     <ol className="space-y-2 text-sm text-slate-300">
-                      {serialSteps.map((step, index) => (
-                        <li key={`${step}-${index}`} className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
-                          <span className="mr-2 text-slate-500">Step {index + 1}</span>
-                          {step}
+                      {displaySerialSteps.map((step, index) => (
+                        <li key={`${step.agentName}-${index}`} className="rounded border border-slate-800 bg-slate-950 px-3 py-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-slate-500">Step {index + 1}</span>
+                            <span>{step.agentName}</span>
+                            {step.shared ? (
+                              <span className="rounded-full border border-emerald-900/70 bg-emerald-950/40 px-2 py-0.5 text-[11px] font-semibold uppercase text-emerald-200">
+                                Shared step
+                              </span>
+                            ) : null}
+                          </div>
+                          {sourceText(step.sources) ? (
+                            <div className="mt-1 text-xs text-slate-500">{sourceText(step.sources)}</div>
+                          ) : null}
                         </li>
                       ))}
                     </ol>
@@ -916,11 +1092,19 @@ export default function DagPreviewModal({
                         <div key={`group-${index}`} className="rounded border border-slate-800 bg-slate-950 p-3">
                           <div className="mb-2 text-xs font-semibold uppercase text-slate-500">Stage {index + 1}</div>
                           <div className="flex flex-wrap gap-2">
-                            {group.map((agent) => (
-                              <span key={`${index}-${agent}`} className="rounded-full border border-cyan-900/60 bg-cyan-950/30 px-2 py-1 text-xs text-cyan-100">
-                                {agent}
-                              </span>
-                            ))}
+                            {group.map((agent) => {
+                              const sources = sourcesForAgent(agent);
+                              return (
+                                <span key={`${index}-${agent}`} className="rounded-lg border border-cyan-900/60 bg-cyan-950/30 px-2 py-1 text-xs text-cyan-100">
+                                  <span>{agent}</span>
+                                  {sources.length ? (
+                                    <span className="ml-1 text-cyan-200/70">
+                                      - {sources.length > 1 ? `Shared: ${sources.join(", ")}` : sources[0]}
+                                    </span>
+                                  ) : null}
+                                </span>
+                              );
+                            })}
                           </div>
                         </div>
                       ))}
