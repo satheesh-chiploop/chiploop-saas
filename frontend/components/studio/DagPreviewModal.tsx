@@ -253,24 +253,55 @@ function composeWorkflowFromDefinitions(
 ): ComposedWorkflow {
   const composedNodes: Node[] = [];
   const composedEdges: Edge[] = [];
+  const nodeIdByAgentName = new Map<string, string>();
+  const remappedNodeIds = new Map<string, string>();
+  const edgeKeys = new Set<string>();
   const branchTerminalIds: string[] = [];
   let joinNodeId = "";
+
+  const addComposedEdge = (edge: Edge) => {
+    if (!edge.source || !edge.target || edge.source === edge.target) return;
+    const key = `${edge.source}->${edge.target}`;
+    if (edgeKeys.has(key)) return;
+    edgeKeys.add(key);
+    composedEdges.push(edge);
+  };
 
   workflows.forEach(({ workflow, definitions }, workflowIndex) => {
     const prefix = workflowKey(workflow).replace(/[^a-zA-Z0-9_-]/g, "_") || `workflow_${workflowIndex + 1}`;
     const nodes = definitions.nodes || [];
     const edges = definitions.edges || [];
     const outgoing = new Set(edges.map((edge) => edge.source));
-    const xOffset = workflowIndex * 80;
-    const yOffset = workflowIndex * 220;
     const prefixedNodeIds: string[] = [];
     let workflowJoinNodeId = "";
     let workflowHasSystemAgent = false;
 
     nodes.forEach((node) => {
       const backendLabel = normalizeAgentName(String(node.data?.backendLabel || node.data?.uiLabel || node.id));
+      const uiLabel = normalizeAgentName(String(node.data?.uiLabel || node.data?.backendLabel || backendLabel));
       const labelLower = backendLabel.toLowerCase();
-      const composedId = `${prefix}__${node.id}`;
+      const agentKey = backendLabel.toLowerCase();
+      const originalNodeKey = `${prefix}__${node.id}`;
+      let composedId = nodeIdByAgentName.get(agentKey);
+
+      if (!composedId) {
+        composedId = `${prefix}__${node.id}`;
+        nodeIdByAgentName.set(agentKey, composedId);
+        composedNodes.push({
+          id: composedId,
+          type: "agentNode",
+          position: {
+            x: Number(node.position?.x || 80) + workflowIndex * 280,
+            y: Number(node.position?.y || 120) + workflowIndex * 160,
+          },
+          data: {
+            uiLabel,
+            backendLabel,
+          },
+        });
+      }
+
+      remappedNodeIds.set(originalNodeKey, composedId);
       prefixedNodeIds.push(composedId);
       workflowHasSystemAgent = workflowHasSystemAgent || labelLower.includes("system");
       if (
@@ -284,25 +315,15 @@ function composeWorkflowFromDefinitions(
       ) {
         workflowJoinNodeId = composedId;
       }
-      composedNodes.push({
-        id: composedId,
-        type: "agentNode",
-        position: {
-          x: Number(node.position?.x || 80) + xOffset,
-          y: Number(node.position?.y || 120) + yOffset,
-        },
-        data: {
-          uiLabel: String(node.data?.uiLabel || node.data?.backendLabel || node.id),
-          backendLabel,
-        },
-      });
     });
 
     edges.forEach((edge) => {
-      composedEdges.push({
-        id: `e-${prefix}__${edge.source}-${prefix}__${edge.target}`,
-        source: `${prefix}__${edge.source}`,
-        target: `${prefix}__${edge.target}`,
+      const source = remappedNodeIds.get(`${prefix}__${edge.source}`) || `${prefix}__${edge.source}`;
+      const target = remappedNodeIds.get(`${prefix}__${edge.target}`) || `${prefix}__${edge.target}`;
+      addComposedEdge({
+        id: `e-${source}-${target}`,
+        source,
+        target,
         animated: true,
         style: { stroke: "#22d3ee", strokeWidth: 2 },
       });
@@ -315,15 +336,17 @@ function composeWorkflowFromDefinitions(
     if (!workflowHasSystemAgent) {
       nodes
         .filter((node) => !outgoing.has(node.id))
-        .forEach((node) => branchTerminalIds.push(`${prefix}__${node.id}`));
+        .forEach((node) => {
+          const remappedId = remappedNodeIds.get(`${prefix}__${node.id}`) || `${prefix}__${node.id}`;
+          branchTerminalIds.push(remappedId);
+        });
     }
   });
 
   if (suggestCompositionEdges && workflows.length > 1 && joinNodeId) {
-    branchTerminalIds.forEach((terminalId) => {
-      const duplicate = composedEdges.some((edge) => edge.source === terminalId && edge.target === joinNodeId);
-      if (!duplicate && terminalId !== joinNodeId) {
-        composedEdges.push({
+    Array.from(new Set(branchTerminalIds)).forEach((terminalId) => {
+      if (terminalId !== joinNodeId) {
+        addComposedEdge({
           id: `e-composer-${terminalId}-${joinNodeId}`,
           source: terminalId,
           target: joinNodeId,
