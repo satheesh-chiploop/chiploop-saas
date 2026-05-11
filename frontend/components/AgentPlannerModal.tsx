@@ -5,6 +5,7 @@ import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 import { Special_Elite } from "next/font/google";
 import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
 import MissingAgentsResolverModal from "@/components/studio/MissingAgentsResolverModal";
+import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 const supabase = createClientComponentClient();
 import WorkflowConsole from "@/app/workflow/WorkflowConsole";
@@ -85,6 +86,7 @@ export default function AgentPlannerModal({
 
   const [savedIntents, setSavedIntents] = useState<any[]>([]);
   const [selectedIntentId, setSelectedIntentId] = useState<string>("");
+  const [activePlannerTab, setActivePlannerTab] = useState<"describe" | "plan" | "agents" | "build">("describe");
 
 
   const [voiceSummary, setVoiceSummary] = useState<string | null>(null);
@@ -101,6 +103,7 @@ export default function AgentPlannerModal({
     setImprovedSpec(null);
     setSpec(null);
     setStage("initial");
+    setActivePlannerTab("describe");
   }, [initialDesignIntent]);
 
 
@@ -259,6 +262,7 @@ export default function AgentPlannerModal({
         setMissingFields([]);
         setReadyForPlanning(true);
         setResult(null);
+        setActivePlannerTab("agents");
         return;
       } else if (result.structured_spec_draft) {
         setSpec(result.structured_spec_draft);
@@ -268,6 +272,7 @@ export default function AgentPlannerModal({
         setMissingFields(missingList);
 
         setReadyForPlanning(false);
+        setActivePlannerTab("plan");
         return;
       }
 
@@ -310,6 +315,7 @@ export default function AgentPlannerModal({
   
       setSelectedAgents(plan.agents ?? []);
       setMissingAgents(plan.missing_agents ?? []);
+      setActivePlannerTab(plan.missing_agents?.length ? "agents" : "build");
 
       console.log("🧭 PREPLAN (from Select Agents):", JSON.stringify(plan, null, 2));
       console.log("🔗 Ordered agent list:", plan.agents);
@@ -352,12 +358,14 @@ export default function AgentPlannerModal({
         // 👇 Open naming dialog with missing agents
         setNamingTargets(newPlan.missing_agents || []);
         setShowMissingResolver(true);
+        setActivePlannerTab("agents");
         return;
       }
   
       // Case 2: User already ran Select Agents → just open naming dialog
       setNamingTargets(missingAgents);
       setShowMissingResolver(true);
+      setActivePlannerTab("agents");
 
       window.dispatchEvent(new Event("refreshAgents"));
 
@@ -425,6 +433,7 @@ export default function AgentPlannerModal({
       // ✅ Enable Select Agents
       //setReadyForPlanning(true);
       setReadyForPlanning(remaining.length === 0);
+      setActivePlannerTab(remaining.length === 0 ? "agents" : "plan");
   
     } catch (err) {
       console.error("❌ Finalize Spec failed:", err);
@@ -478,6 +487,7 @@ export default function AgentPlannerModal({
       
       // ✅ Switch UI to edit panel
       setStage("autofill");
+      setActivePlannerTab("plan");
 
   
     } catch (err) {
@@ -537,6 +547,7 @@ export default function AgentPlannerModal({
 // ✅ SEND WORKFLOW TO CANVAS
       setWorkflowGraph(builtWorkflow);
       setStage("workflow");
+      setActivePlannerTab("build");
       try {
         const workflowName = prompt(
           "💾 Enter a name to save this workflow:",
@@ -641,8 +652,9 @@ export default function AgentPlannerModal({
           <h2 className="text-xl font-bold text-white">System Planner</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition"
+            className="text-[0px] text-slate-400 transition hover:text-white"
           >
+            <span className="text-sm">X</span>
             ✖
           </button>
         </div>
@@ -652,8 +664,32 @@ export default function AgentPlannerModal({
           leverage memory, and design a new agent if required.
         </p>
 
+        <div className="mb-4 flex shrink-0 flex-wrap gap-2">
+          {[
+            ["describe", "Describe"],
+            ["plan", "Plan"],
+            ["agents", "Agents"],
+            ["build", "Build"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setActivePlannerTab(key as "describe" | "plan" | "agents" | "build")}
+              className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${
+                activePlannerTab === key
+                  ? "bg-cyan-600 text-white"
+                  : "border border-slate-700 text-slate-300 hover:bg-slate-900"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         <div className="min-h-0 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
 
+        {activePlannerTab === "describe" && (
+          <div className="space-y-4">
 
         {/* Optional: Start from existing Design Intent (only in initial stage) */}
         {stage === "initial" && (
@@ -710,7 +746,26 @@ export default function AgentPlannerModal({
           rows={4}
         />
 
-        <div className="flex gap-2 mt-4">
+        <VoiceSpecDraft
+          title="Voice Spec Draft"
+          subtitle="Record one or more short system design notes, generate a draft, then apply it to the planner spec."
+          loopType="system"
+          target="System Planner spec"
+          onApply={(draft) => {
+            setVoiceSummary(draft);
+            setGoal(draft);
+            setBackendSource("Voice spec draft");
+            setSpec(null);
+            setMissingFields([]);
+            setCoverage(0);
+            setStage("initial");
+            setReadyForPlanning(false);
+          }}
+        />
+          </div>
+        )}
+
+        <div className="hidden">
 
           <button
             onClick={handleAnalyzeSpec}
@@ -769,6 +824,8 @@ export default function AgentPlannerModal({
 
 
         {/* Show missing fields simply */}
+        {activePlannerTab === "plan" && (
+          <div className="space-y-4">
         {!finalizedSpec && missingFields.length > 0 && (
           <div className="mt-3 text-yellow-400 text-sm">
             Missing Details ({missingFields.length}):
@@ -831,7 +888,7 @@ export default function AgentPlannerModal({
         {/* NEW: Workflow Canvas stage */}
         
         
-        {missingAgents.length > 0 && (
+        {false && missingAgents.length > 0 && (
           <div className="mt-4 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
             <p className="text-cyan-300 text-sm font-semibold mb-2">Detected Agents:</p>
             <p className="text-green-400 text-xs mb-1">Required Agents:</p>
@@ -852,7 +909,7 @@ export default function AgentPlannerModal({
           </div>
         )}
 
-        {missingAgents.length === 0 && finalAgents.length > 0 && (
+        {false && missingAgents.length === 0 && finalAgents.length > 0 && (
           <div className="mt-6 border border-cyan-700 rounded-lg p-3 bg-slate-800/60">
             <p className="text-cyan-300 text-sm font-semibold mb-2">
               ✅ Final Agents for Workflow:
@@ -905,8 +962,45 @@ export default function AgentPlannerModal({
             Source: <span className="text-slate-300">{backendSource}</span>
           </p>
         )}
+          </div>
+        )}
 
         
+
+        {(activePlannerTab === "agents" || activePlannerTab === "build") && (
+          <div className="space-y-4">
+            {missingAgents.length > 0 ? (
+              <div className="rounded-lg border border-amber-700 bg-amber-950/30 p-4">
+                <p className="mb-2 text-sm font-semibold text-amber-200">Missing Agents</p>
+                <ul className="ml-4 list-disc space-y-1 text-sm text-amber-100">
+                  {missingAgents.map((agentName) => (
+                    <li key={agentName}>{agentName}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {finalAgents.length > 0 ? (
+              <div className="rounded-lg border border-cyan-800 bg-cyan-950/20 p-4">
+                <p className="mb-2 text-sm font-semibold text-cyan-200">Final Agents for Workflow</p>
+                <ul className="ml-4 list-disc space-y-1 text-sm text-slate-200">
+                  {finalAgents.map((agentName) => (
+                    <li key={agentName}>{agentName}</li>
+                  ))}
+                </ul>
+                {recentlyGenerated.length ? (
+                  <div className="mt-3 rounded border border-emerald-800 bg-emerald-950/20 p-3 text-xs text-emerald-100">
+                    Generated in this step: {recentlyGenerated.join(", ")}
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-slate-800 bg-black/30 p-4 text-sm text-slate-400">
+                Click Select Agents after the spec is ready.
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Display Agent JSON */}
         {agent && (
@@ -1049,8 +1143,42 @@ export default function AgentPlannerModal({
 
         </div>
 
+        <div className="mt-4 flex shrink-0 flex-wrap justify-between gap-3 border-t border-slate-800 pt-4">
+          <button
+            onClick={handleAnalyzeSpec}
+            disabled={isAnalyzing || !goal.trim()}
+            className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+          >
+            {isAnalyzing ? "Analyzing..." : "Analyze Spec"}
+          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={handleSelectAgents}
+              disabled={!goal.trim() || isSelectingAgents}
+              className="rounded-lg border border-cyan-700 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/40 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+            >
+              {isSelectingAgents ? "Selecting Agents..." : "Select Agents"}
+            </button>
+            <button
+              onClick={handleGenerateMissingAgents}
+              disabled={isGeneratingAgent || !goal.trim()}
+              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-500"
+            >
+              {isGeneratingAgent ? "Planning..." : "Resolve Missing Agents"}
+            </button>
+            <button
+              onClick={handleBuildWorkflow}
+              disabled={missingAgents.length > 0 || finalAgents.length === 0}
+              className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+            >
+              Build Workflow
+            </button>
+          </div>
+        </div>
+
         {summary && (
-          <div className="absolute bottom-4 right-4 w-80 bg-gray-900 text-white p-4 rounded-xl shadow-lg">
+          <div className="mt-3 max-h-36 shrink-0 overflow-auto rounded-xl border border-slate-800 bg-slate-900 p-3 text-white [&>h3]:hidden">
+              <div className="mb-2 text-sm font-bold">Spec Summary Preview</div>
               <h3 className="font-bold text-sm mb-2">🧾 Spec Summary Preview</h3>
               <pre className="text-xs whitespace-pre-wrap bg-gray-800 p-2 rounded-md max-h-48 overflow-auto">
                 {JSON.stringify(summary, null, 2)}
