@@ -464,16 +464,18 @@ export default function AppsHomePage() {
 
   const featured = apps.find(a => a.slug === "arch2rtl") || apps[0];
 
-  const primarySlugs = new Set<string>([
+  const primarySlugs = [
     "arch2rtl",
-    "system-sim",
-    "validation-run",
-    "analog-run",
-    "embedded-run",
     "dqa",
-  ]);
+    "analog-run",
+    "system-sim",
+    "embedded-run",
+    "validation-run",
+  ];
 
-  const primaryApps = apps.filter(a => primarySlugs.has(a.slug));
+  const primaryApps = primarySlugs
+    .map((slug) => apps.find((app) => app.slug === slug))
+    .filter((app): app is AppCard => Boolean(app));
 
   const flagship = primaryApps;
 
@@ -730,19 +732,6 @@ export default function AppsHomePage() {
             <div className="mt-2 text-xl font-bold">What do you want to do today?</div>
 
             <div className="mt-4 space-y-3">
-              <button
-                onClick={() => go("/apps/validation-run")}
-                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">Run validation on hardware</div>
-                  <span className="rounded-full bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200 border border-cyan-900/60">
-                    Recommended
-                  </span>
-                </div>
-                <div className="mt-1 text-sm text-slate-400">Bench to instruments to preflight to run to report</div>
-              </button>
-
               {/* Digital daily-use entry */}
               <button
                 onClick={() => go("/apps/arch2rtl")}
@@ -771,6 +760,21 @@ export default function AppsHomePage() {
                   <div className="mt-1 text-sm text-slate-400">Analog Run: netlist to model to validate to correlate</div>
               </button>
 
+              <button
+                onClick={() => go("/apps/system-software-validation")}
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold">Validate system software stack</div>
+                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
+                    New
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-slate-400">
+                  Software validation or full co-simulation (SW to FW to RTL)
+                </div>
+              </button>
+
               {/* Embedded daily-use entry */}
               <button
                 onClick={() => go("/apps/embedded-run")}
@@ -784,24 +788,20 @@ export default function AppsHomePage() {
                 </div>
                   <div className="mt-1 text-sm text-slate-400">Embedded Run: HAL to drivers to boot to diagnostics to report</div>
               </button>
+
+              <button
+                onClick={() => go("/apps/validation-run")}
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold">Run validation on hardware</div>
+                  <span className="rounded-full bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200 border border-cyan-900/60">
+                    Recommended
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-slate-400">Bench to instruments to preflight to run to report</div>
+              </button>
             </div>
-
-            <button
-              onClick={() => go("/apps/system-software-validation")}
-              className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
-            >
-              <div className="flex items-center justify-between">
-                <div className="font-semibold">Validate system software stack</div>
-                <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
-                  New
-                </span>
-              </div>
-              <div className="mt-1 text-sm text-slate-400">
-                Software validation or full co-simulation (SW to FW to RTL)
-              </div>
-            </button>
-
-
 
             <div className="mt-6 flex items-center gap-2">
               <button
