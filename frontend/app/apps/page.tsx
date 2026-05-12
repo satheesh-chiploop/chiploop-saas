@@ -1,5 +1,3 @@
-// ✅ AFTER: app_apps_page.tsx (minimal edits only)
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -54,16 +52,58 @@ type AppCard = {
   subtitle: string;
   loop_type: LoopType;
   status?: "Flagship" | "Coming";
-  nudge?: "Recommended" | "Most used" | "New";
+  nudge?: string;
   promise?: string;
 };
 
-const LOOP_META: Record<LoopType, { title: string; tagline: string; accent: string }> = {
-  digital: { title: "Digital Loop", tagline: "Design to RTL to Verify to Improve", accent: "accent-digital" },
-  validation: { title: "Validation Loop", tagline: "Plan to Run to Learn to Improve", accent: "accent-validation" },
-  analog: { title: "Analog Loop", tagline: "Analyze to Simulate to Correlate to Improve", accent: "accent-analog" },
-  embedded: { title: "Embedded(Firmware) Loop", tagline: "Code to Run to Observe to Fix", accent: "accent-embedded" },
-  system: { title: "System Loop", tagline: "Integrate to Analyze to Optimize", accent: "accent-system" },
+const LOOP_META: Record<LoopType, {
+  title: string;
+  tagline: string;
+  icon: string;
+  accent: string;
+  softBg: string;
+  border: string;
+}> = {
+  digital: {
+    title: "Digital Loop",
+    tagline: "Design to RTL to verify to improve",
+    icon: "D",
+    accent: "bg-sky-400",
+    softBg: "bg-sky-500/10 text-sky-200",
+    border: "border-sky-500/30",
+  },
+  validation: {
+    title: "Validation Loop",
+    tagline: "Plan to run to learn to improve",
+    icon: "V",
+    accent: "bg-amber-300",
+    softBg: "bg-amber-500/10 text-amber-100",
+    border: "border-amber-500/30",
+  },
+  analog: {
+    title: "Analog Loop",
+    tagline: "Analyze to simulate to correlate to improve",
+    icon: "A",
+    accent: "bg-fuchsia-400",
+    softBg: "bg-fuchsia-500/10 text-fuchsia-200",
+    border: "border-fuchsia-500/30",
+  },
+  embedded: {
+    title: "Embedded Firmware Loop",
+    tagline: "Code to run to observe to fix",
+    icon: "E",
+    accent: "bg-emerald-400",
+    softBg: "bg-emerald-500/10 text-emerald-200",
+    border: "border-emerald-500/30",
+  },
+  system: {
+    title: "System Loop",
+    tagline: "Integrate to analyze to optimize",
+    icon: "S",
+    accent: "bg-cyan-300",
+    softBg: "bg-cyan-500/10 text-cyan-100",
+    border: "border-cyan-500/30",
+  },
 };
 
 export default function AppsHomePage() {
@@ -102,7 +142,7 @@ export default function AppsHomePage() {
     return () => { mounted = false; };
   }, []);
 
-  // ✅ updated apps list (only change is digital apps)
+  // Apps are grouped by loop so the page can present both guided entry points and full catalog sections.
   const apps: AppCard[] = useMemo(() => ([
     {
       slug: "validation-run",
@@ -114,7 +154,7 @@ export default function AppsHomePage() {
       promise: "Get run results + gaps + exec report",
     },
 
-    // ✅ NEW DIGITAL FLAGSHIPS
+    // Digital apps
     {
       slug: "arch2rtl",
       title: "Arch2RTL",
@@ -217,7 +257,7 @@ export default function AppsHomePage() {
       promise: "Turn history into next test improvements",
     },
 
-    // ✅ NEW ANALOG APPS
+    // Analog apps
     {
       slug: "analog-run",
       title: "Analog Run",
@@ -291,7 +331,7 @@ export default function AppsHomePage() {
       promise: "PnR/STA handoff",
     },   
 
-    // ✅ EMBEDDED (production firmware chain)
+    // Embedded apps
     {
       slug: "embedded-run",
       title: "Embedded Run",
@@ -355,7 +395,7 @@ export default function AppsHomePage() {
       nudge: "New",
       promise: "Co-sim results + coverage report",
     },
-    // ✅ SYSTEM (Tiny Sensor Hub SoC)
+    // System apps
     {
       slug: "system-end2end",
       title: "System End2End",
@@ -422,36 +462,44 @@ export default function AppsHomePage() {
 
   ]), []);
 
-  const featured = apps.find(a => a.slug === "arch2tapeout") || apps[0];
+  const featured = apps.find(a => a.slug === "arch2rtl") || apps[0];
 
-  const FLAGSHIP_SLUGS = new Set<string>([
-    // Validation (1–2)
-    "validation-run",
-    "validation-plan",
-
-    // Digital (1–2)
+  const primarySlugs = new Set<string>([
     "arch2rtl",
-    "arch2synthesis",
-    "dqa",
-
-    // Analog (1–2)
+    "system-sim",
+    "validation-run",
     "analog-run",
-    "analog-model",
-
-    // Embedded (1–2)
     "embedded-run",
-    "embedded-driver",
-
-    // System 
-    "system-rtl",
-    "system-firmware",
-    "system-software",
-
+    "dqa",
   ]);
 
-  const flagship = apps.filter(a => a.status === "Flagship" && FLAGSHIP_SLUGS.has(a.slug));
+  const primaryApps = apps.filter(a => primarySlugs.has(a.slug));
 
-  const loops: LoopType[] = useMemo(() => (["digital", "analog", "embedded", "validation","system"]), []);
+  const flagship = primaryApps;
+
+  const loops: LoopType[] = useMemo(() => (["digital", "analog", "embedded", "validation", "system"]), []);
+
+  const outcomeInputs: Record<LoopType, string> = {
+    digital: "Architecture spec or RTL",
+    analog: "Analog spec or netlist",
+    embedded: "Registers, firmware intent, or logs",
+    validation: "Datasheet, bench, or run intent",
+    system: "SoC intent, subsystem specs, or handoff package",
+  };
+
+  const outcomeOutputs: Record<LoopType, string> = {
+    digital: "RTL, reports, constraints, and ZIP package",
+    analog: "Models, correlation reports, and integration views",
+    embedded: "HAL, drivers, diagnostics, and co-sim proof",
+    validation: "Plans, run results, gaps, and executive report",
+    system: "Integrated top, simulation evidence, firmware, and reports",
+  };
+
+  const visibleAppsForLoop = (loop: LoopType) => {
+    const rowApps = apps.filter((a) => a.loop_type === loop);
+    if (view === "all") return rowApps;
+    return rowApps.filter((a) => a.status === "Flagship").slice(0, 6);
+  };
 
   const go = (path: string) => router.push(path);
 
@@ -492,7 +540,7 @@ export default function AppsHomePage() {
   
 
   const routeForApp = (slug: string) => {
-    // ✅ Dedicated pages (apps with custom UX)
+    // Dedicated pages for apps with custom UX.
 
     const dedicated: Record<string, string> = {
       // Validation (dedicated pages)
@@ -511,7 +559,7 @@ export default function AppsHomePage() {
       "verify": "/apps/verify",
       "smoke": "/apps/smoke",
 
-      // ✅ ANALOG
+      // Analog
       "analog-run": "/apps/analog-run",
       "analog-spec": "/apps/analog-spec",
       "analog-netlist": "/apps/analog-netlist",
@@ -521,7 +569,7 @@ export default function AppsHomePage() {
       "analog-iterate": "/apps/analog-iterate",
       "analog-abstracts": "/apps/analog-abstracts",
 
-      // ✅ EMBEDDED (dedicated pages)
+      // Embedded
       "embedded-hal": "/apps/embedded-hal",
       "embedded-driver": "/apps/embedded-driver",
       "embedded-boot": "/apps/embedded-boot",
@@ -530,7 +578,7 @@ export default function AppsHomePage() {
       "embedded-validate": "/apps/embedded-validate",
       "embedded-run": "/apps/embedded-run",
 
-      // ✅ SYSTEM (dedicated pages)
+      // System
       "system-end2end": "/apps/system-end2end",
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
@@ -631,7 +679,7 @@ export default function AppsHomePage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-xs text-slate-400">
-                  Welcome{userEmail ? `, ${userEmail}` : ""} • <span className="text-cyan-300">Start here</span>
+                  Welcome{userEmail ? `, ${userEmail}` : ""} | <span className="text-cyan-300">Start here</span>
                 </div>
                 <h1 className="mt-2 text-3xl font-extrabold leading-tight">
                   Run outcomes, not workflows.
@@ -669,7 +717,7 @@ export default function AppsHomePage() {
                   </div>
 
                   <div className="mt-4 text-xs text-slate-500">
-                    Progressive outputs • Executive summary • ZIP artifacts
+                    Progressive outputs | Executive summary | ZIP artifacts
                   </div>
                 </div>
               </div>
@@ -695,7 +743,7 @@ export default function AppsHomePage() {
                 <div className="mt-1 text-sm text-slate-400">Bench to instruments to preflight to run to report</div>
               </button>
 
-              {/* ✅ change this to Arch2RTL */}
+              {/* Digital daily-use entry */}
               <button
                 onClick={() => go("/apps/arch2rtl")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
@@ -709,7 +757,7 @@ export default function AppsHomePage() {
                 <div className="mt-1 text-sm text-slate-400"> Digital - Arch2RTL: docs + SV + package</div>
               </button>
 
-              {/* ✅ NEW: Analog daily-use */}
+              {/* Analog daily-use entry */}
               <button
                 onClick={() => go("/apps/analog-run")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
@@ -723,7 +771,7 @@ export default function AppsHomePage() {
                   <div className="mt-1 text-sm text-slate-400">Analog Run: netlist to model to validate to correlate</div>
               </button>
 
-              {/* ✅ NEW: Embedded daily-use */}
+              {/* Embedded daily-use entry */}
               <button
                 onClick={() => go("/apps/embedded-run")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
@@ -819,8 +867,7 @@ export default function AppsHomePage() {
       <section className="mx-auto max-w-6xl px-6 pb-16 space-y-10">
         {(view === "recommended" ? loops.filter(l => l === "digital" || l === "analog" || l === "embedded" || l === "validation" || l === "system") : loops).map((loop) => {
           const meta = LOOP_META[loop];
-          const rowApps = apps.filter((a) => a.loop_type === loop);
-          const animatedApps = [...rowApps, ...rowApps, ...rowApps];
+          const rowApps = visibleAppsForLoop(loop);
 
           return (
             <div key={loop}>
@@ -838,19 +885,20 @@ export default function AppsHomePage() {
                 </button>
               </div>
 
-              <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/15">
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black to-transparent" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black to-transparent" />
-
-                <div className="marquee flex gap-4 py-5 px-4">
-                  {animatedApps.map((app, idx) => (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {rowApps.map((app) => (
                     <button
-                      key={`${app.slug}-${idx}`}
+                      key={app.slug}
                       onClick={() => go(routeForApp(app.slug))}
-                      className="min-w-[280px] max-w-[280px] rounded-2xl border border-slate-800 bg-slate-950/55 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
+                      className={`rounded-2xl border ${meta.border} bg-slate-950/55 p-4 text-left hover:bg-slate-950 transition`}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <div className="text-lg font-bold text-slate-100">{app.title}</div>
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${meta.border} ${meta.softBg} text-sm font-bold`}>
+                            {meta.icon}
+                          </div>
+                          <div className="truncate text-lg font-bold text-slate-100">{app.title}</div>
+                        </div>
                         {app.status ? (
                           <span className="rounded-full border border-slate-700 bg-slate-900/40 px-2 py-1 text-xs text-slate-200">
                             {app.status}
@@ -858,7 +906,16 @@ export default function AppsHomePage() {
                         ) : null}
                       </div>
 
-                      <div className="mt-2 text-sm text-slate-300">{app.subtitle}</div>
+                      <div className="mt-3 min-h-10 text-sm leading-5 text-slate-300">{app.subtitle}</div>
+
+                      <div className="mt-4 space-y-2 rounded-xl border border-slate-800 bg-black/20 p-3 text-xs text-slate-400">
+                        <div>
+                          Input: <span className="text-slate-200">{outcomeInputs[app.loop_type]}</span>
+                        </div>
+                        <div>
+                          Output: <span className="text-slate-200">{app.promise || outcomeOutputs[app.loop_type]}</span>
+                        </div>
+                      </div>
 
                       <div className="mt-3 flex items-center justify-between">
                         {app.nudge ? (
@@ -871,23 +928,11 @@ export default function AppsHomePage() {
                       </div>
                     </button>
                   ))}
-                </div>
               </div>
             </div>
           );
         })}
       </section>
-
-      <style jsx>{`
-        .marquee {
-          width: max-content;
-          animation: marquee 90s linear infinite;
-        }
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-33.333%); }
-        }
-      `}</style>
     </main>
   );
 }
