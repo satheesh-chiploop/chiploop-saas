@@ -123,9 +123,11 @@ function AdvancedBlock({ title, value, onCopy }: { title: string; value: unknown
 export default function AgentFactoryDryRunModal({
   initialRequest,
   onClose,
+  onSaved,
 }: {
   initialRequest: FactoryInitialRequest;
   onClose: () => void;
+  onSaved?: (agent: { id?: string; agent_name?: string; status?: string }) => void;
 }) {
   const [name, setName] = useState(initialRequest.name || "");
   const [requestText, setRequestText] = useState(initialRequest.natural_language_request || "");
@@ -239,6 +241,7 @@ export default function AgentFactoryDryRunModal({
         `${shouldUpdate ? "Updated" : "Saved"} ${response.agent?.agent_name || savePayload.name} as a private draft agent.`
       );
       window.dispatchEvent(new Event("refreshAgents"));
+      if (response.agent) onSaved?.(response.agent);
     } catch (err) {
       setError(errorMessage(err));
     } finally {

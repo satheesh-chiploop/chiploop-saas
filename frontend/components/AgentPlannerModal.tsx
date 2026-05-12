@@ -689,7 +689,8 @@ export default function AgentPlannerModal({
         <div className="min-h-0 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
 
         {activePlannerTab === "describe" && (
-          <div className="space-y-4">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="space-y-4">
 
         {/* Optional: Start from existing Design Intent (only in initial stage) */}
         {stage === "initial" && (
@@ -742,10 +743,11 @@ export default function AgentPlannerModal({
             else setGoal(e.target.value);
           }}
           placeholder="e.g., Design a 4-bit counter agent for RTL generation"
-          className="w-full bg-slate-700 text-white rounded-lg p-3 text-sm outline-none focus:ring-2 focus:ring-cyan-400"
-          rows={4}
+          className="h-[36vh] min-h-64 w-full resize-none rounded-lg border border-slate-700 bg-slate-900 p-4 text-sm leading-6 text-white outline-none focus:ring-2 focus:ring-cyan-400"
         />
+            </div>
 
+            <aside>
         <VoiceSpecDraft
           title="Voice Spec Draft"
           subtitle="Record one or more short system design notes, generate a draft, then apply it to the planner spec."
@@ -762,6 +764,7 @@ export default function AgentPlannerModal({
             setReadyForPlanning(false);
           }}
         />
+            </aside>
           </div>
         )}
 
@@ -1143,29 +1146,55 @@ export default function AgentPlannerModal({
 
         </div>
 
-        <div className="mt-4 flex shrink-0 flex-wrap justify-between gap-3 border-t border-slate-800 pt-4">
-          <button
-            onClick={handleAnalyzeSpec}
-            disabled={isAnalyzing || !goal.trim()}
-            className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
-          >
-            {isAnalyzing ? "Analyzing..." : "Analyze Spec"}
-          </button>
-          <div className="flex flex-wrap gap-2">
+        <div className="mt-4 flex shrink-0 flex-wrap justify-end gap-2 border-t border-slate-800 pt-4">
+          {activePlannerTab === "describe" ? (
             <button
-              onClick={handleSelectAgents}
-              disabled={!goal.trim() || isSelectingAgents}
-              className="rounded-lg border border-cyan-700 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/40 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              onClick={handleAnalyzeSpec}
+              disabled={isAnalyzing || !goal.trim()}
+              className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
             >
-              {isSelectingAgents ? "Selecting Agents..." : "Select Agents"}
+              {isAnalyzing ? "Analyzing..." : "Analyze Spec"}
             </button>
+          ) : null}
+          {activePlannerTab === "plan" && missingFields.length > 0 && !finalizedSpec ? (
             <button
-              onClick={handleGenerateMissingAgents}
-              disabled={isGeneratingAgent || !goal.trim()}
-              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-500"
+              onClick={handleAutoFillMissingFields}
+              disabled={isAnalyzing}
+              className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-bold text-black hover:bg-yellow-400 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
             >
-              {isGeneratingAgent ? "Planning..." : "Resolve Missing Agents"}
+              Auto-Fill Missing Details
             </button>
+          ) : null}
+          {activePlannerTab === "plan" && stage === "autofill" ? (
+            <button
+              onClick={handleFinalizeSpec}
+              disabled={isAnalyzing}
+              className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+            >
+              Finalize Spec
+            </button>
+          ) : null}
+          {activePlannerTab === "agents" ? (
+            <>
+              <button
+                onClick={handleSelectAgents}
+                disabled={!goal.trim() || isSelectingAgents}
+                className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+              >
+                {isSelectingAgents ? "Selecting Agents..." : "Select Agents"}
+              </button>
+              {missingAgents.length > 0 ? (
+                <button
+                  onClick={handleGenerateMissingAgents}
+                  disabled={isGeneratingAgent || !goal.trim()}
+                  className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-500"
+                >
+                  {isGeneratingAgent ? "Planning..." : "Resolve Missing Agents"}
+                </button>
+              ) : null}
+            </>
+          ) : null}
+          {activePlannerTab === "build" ? (
             <button
               onClick={handleBuildWorkflow}
               disabled={missingAgents.length > 0 || finalAgents.length === 0}
@@ -1173,7 +1202,7 @@ export default function AgentPlannerModal({
             >
               Build Workflow
             </button>
-          </div>
+          ) : null}
         </div>
 
         {summary && (

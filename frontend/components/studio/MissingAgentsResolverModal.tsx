@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ApiClientError, apiPost } from "@/lib/apiClient";
+import AgentFactoryDryRunModal from "./AgentFactoryDryRunModal";
 
 type ExistingAgentMatch = {
   name: string;
@@ -95,6 +96,28 @@ function MatchCard({
           Use
         </button>
       </div>
+      {showFactoryDryRun ? (
+        <AgentFactoryDryRunModal
+          initialRequest={{
+            name: plannedName,
+            natural_language_request: requestText,
+            loop_type: loopType,
+            domain: domain || loopType,
+            inputs: [],
+            outputs: plannerResult?.missing_capabilities?.length ? plannerResult.missing_capabilities : [currentMissing],
+            required_skills: plannerResult?.reusable_skills || [],
+            required_tools: plannerResult?.reusable_tools || [],
+            required_hooks: plannerResult?.reusable_hooks || [],
+            allow_extension: true,
+            force_create_private: true,
+          }}
+          onClose={() => setShowFactoryDryRun(false)}
+          onSaved={(agent) => {
+            setShowFactoryDryRun(false);
+            resolveWith(agent.agent_name || plannedName);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -127,13 +150,11 @@ export default function MissingAgentsResolverModal({
   const [loading, setLoading] = useState<"planner" | "factory" | "save" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showAdvancedFactoryDetails, setShowAdvancedFactoryDetails] = useState(false);
+  const [showFactoryDryRun, setShowFactoryDryRun] = useState(false);
 
   const currentMissing = missingAgents[index] || "";
   const complete = index >= missingAgents.length;
-  const canCreate = Boolean(
-    plannerResult &&
-      ["create_new", "extend_existing", "extend_or_create_variant"].includes(plannerResult.recommendation)
-  );
+  const canCreate = Boolean(plannerResult && currentMissing);
 
   const requestText = useMemo(() => {
     const specContext = spec ? `\n\nStructured spec context:\n${JSON.stringify(spec).slice(0, 1200)}` : "";
@@ -177,30 +198,7 @@ export default function MissingAgentsResolverModal({
   }
 
   async function runFactoryDryRun() {
-    setLoading("factory");
-    setError(null);
-    try {
-      const response = await apiPost<{ status: string; result: FactoryResult }>("/studio/agent-factory/dry-run", {
-        dry_run: true,
-        request: {
-          name: plannedName,
-          natural_language_request: requestText,
-          loop_type: loopType,
-          domain: domain || loopType,
-          inputs: [],
-          outputs: plannerResult?.missing_capabilities || [currentMissing],
-          required_skills: plannerResult?.reusable_skills || [],
-          required_tools: plannerResult?.reusable_tools || [],
-          required_hooks: plannerResult?.reusable_hooks || [],
-          allow_extension: plannerResult?.recommendation !== "create_new",
-        },
-      });
-      setFactoryResult(response.result);
-    } catch (err) {
-      setError(errorMessage(err));
-    } finally {
-      setLoading(null);
-    }
+    setShowFactoryDryRun(true);
   }
 
   function resolveWith(agentName: string) {
