@@ -477,7 +477,7 @@ export default function AppsHomePage() {
 
   const flagship = primaryApps;
 
-  const loops: LoopType[] = useMemo(() => (["digital", "analog", "embedded", "validation", "system"]), []);
+  const loops: LoopType[] = useMemo(() => (["digital", "analog", "system", "embedded", "validation"]), []);
 
   const outcomeInputs: Record<LoopType, string> = {
     digital: "Architecture spec or RTL",
@@ -885,7 +885,7 @@ export default function AppsHomePage() {
                 </button>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-3">
                   {rowApps.map((app) => (
                     <button
                       key={app.slug}
