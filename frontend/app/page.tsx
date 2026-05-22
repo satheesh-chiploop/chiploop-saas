@@ -15,7 +15,6 @@ const loops = [
   "Software",
   "Validation",
   "Analog",
-  "Physical Design",
   "System",
   "Still exploring",
 ];
@@ -165,7 +164,7 @@ function LandingPageContent() {
           Agentic AI for Connected Chip Design Loops
         </h1>
         <p className="mt-6 max-w-3xl text-base leading-7 text-slate-300 sm:mt-7 sm:text-lg sm:leading-8">
-          Build chip workflows across Digital, Embedded, Software, Validation, Analog, and Physical Design in one platform.
+          Build chip workflows across Digital, Embedded, Software, Validation, Analog, and System Loop in one platform.
           ChipLoop helps teams share specs, generated artifacts, and design context across loops instead of working in disconnected tools.
         </p>
         <div className="mt-8 flex w-full flex-col gap-4 sm:mt-10 sm:w-auto sm:flex-row">

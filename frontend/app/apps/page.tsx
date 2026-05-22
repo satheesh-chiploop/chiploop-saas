@@ -415,6 +415,15 @@ export default function AppsHomePage() {
       promise: "Simulation report + coverage + waves",
     },
     {
+      slug: "system-architecture",
+      title: "System Architecture Explorer",
+      subtitle: "No-code gem5 workload/cache sweeps with performance, power, area, and charts",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Visual PPA tradeoffs without writing gem5 configs",
+    },
+    {
       slug: "system-pd",
       title: "System PD",
       subtitle: "SoC RTL2GDS with OpenLane2 pipeline (DRC/LVS/Tapeout)",
@@ -468,6 +477,7 @@ export default function AppsHomePage() {
     "arch2rtl",
     "dqa",
     "analog-run",
+    "system-architecture",
     "system-sim",
     "embedded-run",
     "validation-run",
@@ -582,6 +592,7 @@ export default function AppsHomePage() {
 
       // System
       "system-end2end": "/apps/system-end2end",
+      "system-architecture": "/apps/system-architecture",
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",

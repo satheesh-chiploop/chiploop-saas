@@ -49,6 +49,7 @@ export default function AppSlugRouter() {
 
       // ✅ SYSTEM (dedicated pages)
       "system-end2end": "/apps/system-end2end",
+      "system-architecture": "/apps/system-architecture",
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
