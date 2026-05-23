@@ -12,7 +12,7 @@ const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const DEMO_GOAL =
-  "Explore cache-size tradeoffs for matrix multiplication with performance, power, and area estimates; show workload vs cache size charts.";
+  "Explore cache-size tradeoffs for matrix multiplication with gem5 performance results plus power and area analysis; show workload vs cache size charts.";
 
 type WorkflowRow = {
   id: string;
@@ -60,6 +60,8 @@ type SweepRow = {
   isa: string;
   cpu_model: string;
   cores: number;
+  prefetcher: string;
+  branch_predictor: string;
   l1d_size_kb: number;
   l2_size_kb: number;
   ipc: number;
@@ -69,6 +71,9 @@ type SweepRow = {
   estimated_area_mm2: number;
   perf_per_watt: number;
   perf_per_area: number;
+  execution_mode?: string;
+  sim_insts?: number;
+  sim_ticks?: number;
 };
 
 const DEFAULT_FORM: FormState = {
@@ -99,8 +104,8 @@ type SystemExplorerAppProps = {
   defaultForm?: Partial<FormState>;
 };
 
-const ISA_OPTIONS = ["x86", "riscv", "arm", "mips", "power", "sparc"];
-const CPU_OPTIONS = ["TimingSimpleCPU", "MinorCPU", "O3CPU", "AtomicSimpleCPU", "KvmCPU"];
+const ISA_OPTIONS = ["x86", "riscv"];
+const CPU_OPTIONS = ["TimingSimpleCPU", "MinorCPU", "O3CPU", "AtomicSimpleCPU"];
 const MODE_OPTIONS = ["syscall_emulation", "full_system"];
 const MEMORY_OPTIONS = ["DDR3_1600_8x8", "DDR4_2400_8x8", "LPDDR5_5500_1x16", "HBM_1000_4H_1x64"];
 const PREFETCH_OPTIONS = ["none", "stride", "tagged", "queued"];
@@ -111,61 +116,6 @@ const L2_OPTIONS = [256, 512, 1024, 2048];
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
   return logs.split("\n").map((l) => l.trimEnd()).filter((l) => l.trim().length > 0);
-}
-
-function estimate(form: FormState, l1: number, l2: number) {
-  const l1Gain = { 16: 0, 32: 0.16, 64: 0.22, 128: 0.25 }[l1] ?? Math.min(l1 / 256, 0.25);
-  const l2Gain = { 256: 0, 512: 0.1, 1024: 0.14, 2048: 0.18 }[l2] ?? Math.min(l2 / 4096, 0.18);
-  const cpuFactor = { TimingSimpleCPU: 1, MinorCPU: 1.18, O3CPU: 1.42, AtomicSimpleCPU: 0.92, KvmCPU: 1.55 }[form.cpu_model] ?? 1;
-  const isaFactor = { x86: 1, riscv: 0.96, arm: 0.98, mips: 0.9, power: 0.94, sparc: 0.88 }[form.isa] ?? 1;
-  const memoryFactor = form.memory_type.includes("DDR4") || form.memory_type.includes("LPDDR5") || form.memory_type.includes("HBM") ? 1.06 : 1;
-  const prefetchGain = form.prefetcher === "none" ? 0 : 0.05;
-  const coreScale = 1 + Math.min(form.cores - 1, 7) * 0.035;
-  const ipc = Number(((0.82 + l1Gain + l2Gain + prefetchGain) * cpuFactor * isaFactor * memoryFactor * coreScale).toFixed(3));
-  const l1d_mpki = Number(Math.max(18, 44 - l1 / 2.7 - (form.prefetcher === "none" ? 0 : 2.5)).toFixed(2));
-  const l2_mpki = Number(Math.max(6.5, 19 - l2 / 92 - (form.prefetcher === "none" ? 0 : 1.2)).toFixed(2));
-  const estimated_power_w = Number(((1.05 + l1 * 0.006 + l2 * 0.00055) * (0.85 + form.cores * 0.15) * cpuFactor).toFixed(3));
-  const estimated_area_mm2 = Number(((0.3 + l1 * 0.0032 + l2 * 0.00042) * (0.9 + form.cores * 0.1) * (form.cpu_model === "O3CPU" ? 1.12 : 1)).toFixed(3));
-  return {
-    ipc,
-    l1d_mpki,
-    l2_mpki,
-    estimated_power_w,
-    estimated_area_mm2,
-    perf_per_watt: Number((ipc / estimated_power_w).toFixed(3)),
-    perf_per_area: Number((ipc / estimated_area_mm2).toFixed(3)),
-  };
-}
-
-function buildRows(form: FormState): SweepRow[] {
-  const rows: SweepRow[] = [];
-  let idx = 1;
-  const isas = form.exploration_type === "isa_compare" ? (form.isas || [form.isa]) : [form.isa];
-  const cpuModels = form.exploration_type === "cpu_model" ? (form.cpu_models || [form.cpu_model]) : [form.cpu_model];
-  const memoryTypes = form.exploration_type === "memory_bottleneck" ? (form.memory_types || [form.memory_type]) : [form.memory_type];
-  for (const isa of isas) {
-    for (const cpuModel of cpuModels) {
-      for (const memoryType of memoryTypes) {
-        for (const l1 of form.l1d_size_kb) {
-          for (const l2 of form.l2_size_kb) {
-            const variantForm = { ...form, isa, cpu_model: cpuModel, memory_type: memoryType };
-            rows.push({
-              run_id: `archsim_${String(idx).padStart(2, "0")}`,
-              workload: form.workload,
-              isa,
-              cpu_model: cpuModel,
-              cores: form.cores,
-              l1d_size_kb: l1,
-              l2_size_kb: l2,
-              ...estimate(variantForm, l1, l2),
-            });
-            idx += 1;
-          }
-        }
-      }
-    }
-  }
-  return rows;
 }
 
 function MultiCheck({ label, options, value, onChange }: { label: string; options: number[]; value: number[]; onChange: (next: number[]) => void }) {
@@ -296,11 +246,12 @@ export default function SystemExplorerApp({
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
   const [trialPrompt, setTrialPrompt] = useState<TrialPrompt | null>(null);
   const [form, setForm] = useState<FormState>(initialForm);
-  const [submittedForm, setSubmittedForm] = useState<FormState | null>(null);
   const [resultRows, setResultRows] = useState<SweepRow[] | null>(null);
+  const [resultError, setResultError] = useState<string | null>(null);
   const logsRef = useRef<HTMLDivElement | null>(null);
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const completed = workflowRow?.status === "completed";
+  const failed = workflowRow?.status === "failed";
   const recommended = useMemo(() => resultRows ? [...resultRows].sort((a, b) => b.perf_per_watt - a.perf_per_watt)[0] : null, [resultRows]);
 
   useEffect(() => {
@@ -309,10 +260,25 @@ export default function SystemExplorerApp({
   }, [logLines.length]);
 
   useEffect(() => {
-    if (completed && submittedForm && !resultRows) {
-      setResultRows(buildRows(submittedForm));
-    }
-  }, [completed, submittedForm, resultRows]);
+    if (!completed || !workflowId || resultRows) return;
+    let active = true;
+    (async () => {
+      setResultError(null);
+      try {
+        const resp = await fetch(`${API_BASE}/apps/system/architecture/results/${workflowId}`);
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data?.detail || `Failed to load gem5 results (${resp.status})`);
+        const rows = Array.isArray(data?.runs) ? data.runs : [];
+        if (!rows.length) throw new Error("gem5 completed but no run rows were found in gem5_run_results.json");
+        if (active) setResultRows(rows);
+      } catch (e: any) {
+        if (active) setResultError(e?.message || String(e));
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [completed, workflowId, resultRows]);
 
   useEffect(() => {
     setForm(initialForm);
@@ -394,7 +360,7 @@ export default function SystemExplorerApp({
     setWorkflowId(null);
     setRunId(null);
     setResultRows(null);
-    setSubmittedForm(form);
+    setResultError(null);
     try {
       const resp = await fetch(`${API_BASE}/apps/system/architecture/run`, {
         method: "POST",
@@ -426,7 +392,6 @@ export default function SystemExplorerApp({
       }
     } catch (e: any) {
       setErr(e?.message || String(e));
-      setSubmittedForm(null);
     } finally {
       setRunning(false);
     }
@@ -485,7 +450,16 @@ export default function SystemExplorerApp({
                 <SelectField label="Memory" value={form.memory_type} options={MEMORY_OPTIONS} onChange={(memory_type) => setForm({ ...form, memory_type })} />
                 <div className="grid grid-cols-2 gap-3">
                   <SelectField label="Prefetcher" value={form.prefetcher} options={PREFETCH_OPTIONS} onChange={(prefetcher) => setForm({ ...form, prefetcher })} />
-                  <SelectField label="Branch predictor" value={form.branch_predictor} options={BRANCH_OPTIONS} onChange={(branch_predictor) => setForm({ ...form, branch_predictor })} />
+                  <SelectField
+                    label="Branch predictor"
+                    value={form.branch_predictor}
+                    options={BRANCH_OPTIONS}
+                    onChange={(branch_predictor) => setForm({
+                      ...form,
+                      branch_predictor,
+                      cpu_model: branch_predictor !== "default" && ["TimingSimpleCPU", "AtomicSimpleCPU"].includes(form.cpu_model) ? "O3CPU" : form.cpu_model,
+                    })}
+                  />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
                   <MultiCheck label="L1D sweep" options={L1_OPTIONS} value={form.l1d_size_kb} onChange={(l1d_size_kb) => setForm({ ...form, l1d_size_kb })} />
@@ -510,7 +484,7 @@ export default function SystemExplorerApp({
               <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-5">
                 <div className="text-sm font-semibold text-slate-100">Run recommendation</div>
                 <div className="mt-3 text-2xl font-bold text-emerald-300">{recommended.l1d_size_kb}KB L1D / {recommended.l2_size_kb}KB L2</div>
-                <div className="mt-2 text-sm text-slate-300">Best balance for performance per watt and performance per area in this run.</div>
+                <div className="mt-2 text-sm text-slate-300">Best balance for gem5 IPC, activity-based power, and configured area in this run.</div>
                 <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
                   <div className="rounded-lg bg-slate-950 p-3"><div className="text-slate-400">IPC</div><div className="text-lg font-semibold">{recommended.ipc}</div></div>
                   <div className="rounded-lg bg-slate-950 p-3"><div className="text-slate-400">Power</div><div className="text-lg font-semibold">{recommended.estimated_power_w}W</div></div>
@@ -541,10 +515,16 @@ export default function SystemExplorerApp({
                   The demo is prefilled like Arch2RTL. Click Run Demo, wait for the System workflow to finish, and the PPA charts will appear here. Change ISA, CPU, cores, memory, prefetcher, or cache sweep and run again to compare behavior.
                 </p>
               </div>
+            ) : failed ? (
+              <div className="rounded-lg border border-red-900/60 bg-red-950/30 p-8">
+                <div className="text-lg font-semibold text-red-100">gem5 run failed</div>
+                <p className="mt-2 text-sm text-red-200">Charts are only generated from real gem5 results. Check the run log for the missing tool, unsupported option, or workload setup error.</p>
+              </div>
             ) : !completed || !resultRows ? (
               <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-8">
                 <div className="text-lg font-semibold text-slate-100">Running System Architecture Explorer</div>
-                <p className="mt-2 text-sm text-slate-300">Charts will appear after the workflow status becomes completed.</p>
+                <p className="mt-2 text-sm text-slate-300">Charts will appear after gem5 finishes and ChipLoop parses stats.txt.</p>
+                {resultError ? <div className="mt-3 rounded-lg border border-red-900/60 bg-red-950/30 p-3 text-sm text-red-200">{resultError}</div> : null}
               </div>
             ) : (
               <>
@@ -563,6 +543,8 @@ export default function SystemExplorerApp({
                           <th>ISA</th>
                           <th>CPU</th>
                           <th>Cores</th>
+                          <th>Prefetch</th>
+                          <th>Branch</th>
                           <th>L1D</th>
                           <th>L2</th>
                           <th>IPC</th>
@@ -570,6 +552,7 @@ export default function SystemExplorerApp({
                           <th>L2 MPKI</th>
                           <th>Power</th>
                           <th>Area</th>
+                          <th>Mode</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -579,6 +562,8 @@ export default function SystemExplorerApp({
                             <td>{r.isa}</td>
                             <td>{r.cpu_model}</td>
                             <td>{r.cores}</td>
+                            <td>{r.prefetcher}</td>
+                            <td>{r.branch_predictor}</td>
                             <td>{r.l1d_size_kb}KB</td>
                             <td>{r.l2_size_kb}KB</td>
                             <td>{r.ipc}</td>
@@ -586,6 +571,7 @@ export default function SystemExplorerApp({
                             <td>{r.l2_mpki}</td>
                             <td>{r.estimated_power_w}W</td>
                             <td>{r.estimated_area_mm2}</td>
+                            <td>{r.execution_mode || "gem5"}</td>
                           </tr>
                         ))}
                       </tbody>
