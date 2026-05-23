@@ -50,6 +50,10 @@ export default function AppSlugRouter() {
       // ✅ SYSTEM (dedicated pages)
       "system-end2end": "/apps/system-end2end",
       "system-architecture": "/apps/system-architecture",
+      "system-cache-tuning": "/apps/system-cache-tuning",
+      "system-isa-compare": "/apps/system-isa-compare",
+      "system-memory-bottleneck": "/apps/system-memory-bottleneck",
+      "system-cpu-model": "/apps/system-cpu-model",
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",

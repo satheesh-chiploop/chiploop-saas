@@ -424,6 +424,42 @@ export default function AppsHomePage() {
       promise: "Visual PPA tradeoffs without writing gem5 configs",
     },
     {
+      slug: "system-cache-tuning",
+      title: "System Cache Tuning",
+      subtitle: "Tune L1/L2 cache, associativity, line size, and prefetching on X86/RISC-V",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Find the cache knee for a workload",
+    },
+    {
+      slug: "system-isa-compare",
+      title: "System ISA Compare",
+      subtitle: "Compare X86 and RISC-V behavior for the same workload and memory hierarchy",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Normalize performance, power, and cache behavior",
+    },
+    {
+      slug: "system-memory-bottleneck",
+      title: "System Memory Bottleneck",
+      subtitle: "Sweep memory presets, cores, and cache sizes to classify bottlenecks",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Find cache-bound vs memory-bound behavior",
+    },
+    {
+      slug: "system-cpu-model",
+      title: "System CPU Model",
+      subtitle: "Compare TimingSimpleCPU, MinorCPU, and O3CPU exploration tradeoffs",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Choose fast vs detailed CPU modeling",
+    },
+    {
       slug: "system-pd",
       title: "System PD",
       subtitle: "SoC RTL2GDS with OpenLane2 pipeline (DRC/LVS/Tapeout)",
@@ -471,7 +507,9 @@ export default function AppsHomePage() {
 
   ]), []);
 
-  const featured = apps.find(a => a.slug === "arch2rtl") || apps[0];
+  const featuredApps = ["arch2rtl", "system-architecture"]
+    .map((slug) => apps.find((app) => app.slug === slug))
+    .filter((app): app is AppCard => Boolean(app));
 
   const primarySlugs = [
     "arch2rtl",
@@ -593,6 +631,10 @@ export default function AppsHomePage() {
       // System
       "system-end2end": "/apps/system-end2end",
       "system-architecture": "/apps/system-architecture",
+      "system-cache-tuning": "/apps/system-cache-tuning",
+      "system-isa-compare": "/apps/system-isa-compare",
+      "system-memory-bottleneck": "/apps/system-memory-bottleneck",
+      "system-cpu-model": "/apps/system-cpu-model",
       "system-sim": "/apps/system-sim",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
@@ -707,12 +749,12 @@ export default function AppsHomePage() {
               </span>
             </div>
 
-            <div className="mt-5 rounded-2xl border border-slate-800 bg-black/30 p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              {featuredApps.map((featured) => (
+                <div key={featured.slug} className="rounded-2xl border border-slate-800 bg-black/30 p-5">
                   <div className="text-sm text-slate-400">Featured</div>
                   <div className="mt-1 text-2xl font-bold text-white">{featured.title}</div>
-                  <div className="mt-1 text-slate-300">{featured.subtitle}</div>
+                  <div className="mt-1 min-h-[48px] text-slate-300">{featured.subtitle}</div>
 
                   <div className="mt-5 flex flex-wrap gap-3">
                     <button
@@ -733,7 +775,7 @@ export default function AppsHomePage() {
                     Progressive outputs | Executive summary | ZIP artifacts
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
 
