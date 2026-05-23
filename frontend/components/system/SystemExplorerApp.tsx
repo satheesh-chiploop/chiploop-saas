@@ -155,6 +155,31 @@ function SelectField({ label, value, options, onChange }: { label: string; value
   );
 }
 
+async function loadGem5ResultRows(workflowId: string): Promise<SweepRow[]> {
+  const direct = await fetch(`${API_BASE}/apps/system/architecture/results/${workflowId}`);
+  if (direct.ok) {
+    const data = await direct.json();
+    return Array.isArray(data?.runs) ? data.runs : [];
+  }
+
+  const list = await fetch(`${API_BASE}/list_artifacts/${workflowId}`);
+  if (!list.ok) {
+    const message = direct.status === 404
+      ? "gem5 results are not available yet. Confirm the backend was restarted/deployed with the System Architecture results endpoint."
+      : `Failed to load gem5 results (${direct.status})`;
+    throw new Error(message);
+  }
+  const artifactIndex = await list.json();
+  const relPath = (artifactIndex?.files || []).find((path: string) => path.endsWith("gem5_run_results.json"));
+  if (!relPath) {
+    throw new Error("gem5_run_results.json was not found in this workflow's artifacts.");
+  }
+  const artifact = await fetch(`${API_BASE}/download_artifacts/${workflowId}/${encodeURIComponent(relPath).replace(/%2F/g, "/")}`);
+  if (!artifact.ok) throw new Error(`Failed to download gem5 results artifact (${artifact.status})`);
+  const data = await artifact.json();
+  return Array.isArray(data?.runs) ? data.runs : [];
+}
+
 function LineChart({ rows, yKey, label, unit = "" }: { rows: SweepRow[]; yKey: keyof SweepRow; label: string; unit?: string }) {
   const width = 560;
   const height = 230;
@@ -265,10 +290,7 @@ export default function SystemExplorerApp({
     (async () => {
       setResultError(null);
       try {
-        const resp = await fetch(`${API_BASE}/apps/system/architecture/results/${workflowId}`);
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data?.detail || `Failed to load gem5 results (${resp.status})`);
-        const rows = Array.isArray(data?.runs) ? data.runs : [];
+        const rows = await loadGem5ResultRows(workflowId);
         if (!rows.length) throw new Error("gem5 completed but no run rows were found in gem5_run_results.json");
         if (active) setResultRows(rows);
       } catch (e: any) {
