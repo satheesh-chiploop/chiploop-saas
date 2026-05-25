@@ -10,6 +10,7 @@ import GitHubImportPanel from "@/components/GitHubImportPanel";
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const ONBOARDING_DEMO_KEY = "chiploop_arch2rtl_onboarding_demo";
+const ARCH2RTL_HANDOFF_KEY = "chiploop_arch2rtl_handoff_prefill";
 
 const ARCH2RTL_ONBOARDING_SPEC = `Design a parameterized PWM controller.
 
@@ -87,6 +88,7 @@ export default function Arch2RTLAppPage() {
   const [runId, setRunId] = useState<string | null>(null);
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
   const [guidedOnboarding, setGuidedOnboarding] = useState(false);
+  const [systemHandoff, setSystemHandoff] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [trialPrompt, setTrialPrompt] = useState<TrialPrompt | null>(null);
   const [pendingTrialPrompt, setPendingTrialPrompt] = useState<TrialPrompt | null>(null);
@@ -249,6 +251,27 @@ export default function Arch2RTLAppPage() {
 
   useEffect(() => {
     if (loading || typeof window === "undefined") return;
+    const handoff = new URLSearchParams(window.location.search).get("handoff") === "system";
+    if (handoff) {
+      const rawHandoff = window.localStorage.getItem(ARCH2RTL_HANDOFF_KEY);
+      if (rawHandoff) {
+        try {
+          const parsed = JSON.parse(rawHandoff) as Partial<typeof ARCH2RTL_ONBOARDING_DEFAULTS>;
+          setSystemHandoff(true);
+          setProjectName(parsed.projectName || "system_architecture_to_rtl");
+          setTopModule(parsed.topModule || "system_architecture_wrapper");
+          setDesignLanguage(parsed.designLanguage || "systemverilog");
+          setSpecText(parsed.specText || "");
+          setGenRegmap(parsed.toggles?.genRegmap ?? true);
+          setGenUpfLite(parsed.toggles?.genUpfLite ?? true);
+          setGenPackaging(parsed.toggles?.genPackaging ?? true);
+          window.localStorage.removeItem(ARCH2RTL_HANDOFF_KEY);
+          return;
+        } catch {
+          window.localStorage.removeItem(ARCH2RTL_HANDOFF_KEY);
+        }
+      }
+    }
     const guided = new URLSearchParams(window.location.search).get("guided") === "1";
     if (!guided) return;
 
@@ -533,6 +556,16 @@ export default function Arch2RTLAppPage() {
                 </div>
               ))}
             </div>
+          </div>
+        ) : null}
+
+        {systemHandoff ? (
+          <div className="mt-6 rounded-2xl border border-emerald-900/60 bg-emerald-950/20 p-5">
+            <div className="text-sm font-semibold uppercase tracking-wide text-emerald-300">System Architecture handoff</div>
+            <h2 className="mt-1 text-2xl font-bold text-white">Review RTL intent from gem5 architecture evidence</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+              This spec was generated from a completed System Architecture run. Review the selected parameters and traceability notes, then run Arch2RTL when the scope matches the RTL you want.
+            </p>
           </div>
         ) : null}
 

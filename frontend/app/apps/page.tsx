@@ -424,6 +424,15 @@ export default function AppsHomePage() {
       promise: "Visual PPA tradeoffs without writing gem5 configs",
     },
     {
+      slug: "architecture-to-rtl",
+      title: "Architecture-to-RTL Delivery",
+      subtitle: "Turn completed gem5 architecture results into reviewed Arch2RTL intent and traceability",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Bridge system evidence into RTL handoff",
+    },
+    {
       slug: "system-cache-tuning",
       title: "System Cache Tuning",
       subtitle: "Tune L1/L2 cache, associativity, line size, and prefetching on X86/RISC-V",
@@ -516,6 +525,7 @@ export default function AppsHomePage() {
     "dqa",
     "analog-run",
     "system-architecture",
+    "architecture-to-rtl",
     "system-sim",
     "embedded-run",
     "validation-run",
@@ -631,6 +641,7 @@ export default function AppsHomePage() {
       // System
       "system-end2end": "/apps/system-end2end",
       "system-architecture": "/apps/system-architecture",
+      "architecture-to-rtl": "/apps/architecture-to-rtl",
       "system-cache-tuning": "/apps/system-cache-tuning",
       "system-isa-compare": "/apps/system-isa-compare",
       "system-memory-bottleneck": "/apps/system-memory-bottleneck",

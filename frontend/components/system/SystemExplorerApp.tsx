@@ -273,6 +273,8 @@ export default function SystemExplorerApp({
   const [form, setForm] = useState<FormState>(initialForm);
   const [resultRows, setResultRows] = useState<SweepRow[] | null>(null);
   const [resultError, setResultError] = useState<string | null>(null);
+  const [handoffBusy, setHandoffBusy] = useState(false);
+  const [handoffError, setHandoffError] = useState<string | null>(null);
   const logsRef = useRef<HTMLDivElement | null>(null);
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const completed = workflowRow?.status === "completed";
@@ -424,6 +426,13 @@ export default function SystemExplorerApp({
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
   }
 
+  async function openInArch2RTL() {
+    if (!workflowId || !recommended) return;
+    setHandoffError(null);
+    setHandoffBusy(true);
+    router.push(`/apps/architecture-to-rtl?workflow_id=${encodeURIComponent(workflowId)}&run_id=${encodeURIComponent(recommended.run_id)}`);
+  }
+
   if (loading) {
     return <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-200">Loading...</main>;
   }
@@ -513,6 +522,10 @@ export default function SystemExplorerApp({
                   <div className="rounded-lg bg-slate-950 p-3"><div className="text-slate-400">Area</div><div className="text-lg font-semibold">{recommended.estimated_area_mm2}</div></div>
                   <div className="rounded-lg bg-slate-950 p-3"><div className="text-slate-400">Perf/W</div><div className="text-lg font-semibold">{recommended.perf_per_watt}</div></div>
                 </div>
+                <button onClick={openInArch2RTL} disabled={handoffBusy || !workflowId} className="mt-4 w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-700">
+                  {handoffBusy ? "Opening..." : "Open in Arch2RTL"}
+                </button>
+                {handoffError ? <div className="mt-3 rounded-lg border border-red-900/60 bg-red-950/30 p-3 text-sm text-red-200">{handoffError}</div> : null}
               </div>
             ) : null}
 
