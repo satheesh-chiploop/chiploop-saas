@@ -190,13 +190,13 @@ export default function SettingsPlanPage() {
               <section className="rounded-lg border border-cyan-700/50 bg-cyan-950/20 p-5">
                 <div className="text-sm font-semibold text-cyan-100">Trial checkout required</div>
                 <div className="mt-2 text-sm text-cyan-100/85">
-                  Your account is created. Start the 7-day trial when you are ready to run workflows.
+                  Your account is created. Start the 3-day trial when you are ready to run workflows.
                 </div>
                 <button
                   onClick={() => router.push("/pricing?trial=1")}
                   className="mt-4 rounded-lg bg-cyan-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-600"
                 >
-                  Start 7-day trial
+                  Start 3-day trial
                 </button>
               </section>
             ) : null}
@@ -206,7 +206,7 @@ export default function SettingsPlanPage() {
                 <div className="text-sm font-semibold text-cyan-100">Trial status</div>
                 <div className="mt-2 text-sm text-cyan-100/85">
                   {trial.status === "active"
-                    ? `${trial.days_remaining ?? "-"} days remaining. Starter is $19.99/month after the 7-day trial. Cancel anytime before paid conversion.`
+                    ? `${trial.days_remaining ?? "-"} days remaining. Starter is $19.99/month after the 3-day trial. Cancel anytime before paid conversion.`
                     : `Trial ${trial.status}.`}
                 </div>
               </section>

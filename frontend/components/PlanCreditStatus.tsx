@@ -216,14 +216,14 @@ export function LowCreditBanner() {
       <div className="border-b border-cyan-800/50 bg-cyan-950/20 px-4 py-2 text-sm text-cyan-100">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
-            FYI: You can browse Apps and Studio. Start the 7-day trial when you are ready to run workflows.
+            FYI: You can browse Apps and Studio. Start the 3-day trial when you are ready to run workflows.
           </div>
           <button
             type="button"
             onClick={() => router.push("/pricing?trial=1")}
             className="w-fit rounded-lg border border-cyan-700/70 px-3 py-1 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-900/30"
           >
-            Start 7-day trial
+            Start 3-day trial
           </button>
         </div>
       </div>

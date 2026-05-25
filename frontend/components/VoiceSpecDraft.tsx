@@ -57,9 +57,9 @@ function trialCheckoutPrompt(data: unknown): TrialCheckoutPrompt | null {
     message:
       typeof detailObject.message === "string"
         ? detailObject.message
-        : "Start your 7-day trial to use voice design sessions.",
+        : "Start your 3-day trial to use voice design sessions.",
     checkoutUrl: typeof detailObject.checkout_url === "string" ? detailObject.checkout_url : "/pricing?trial=1",
-    checkoutLabel: typeof detailObject.checkout_label === "string" ? detailObject.checkout_label : "Start 7-day trial",
+    checkoutLabel: typeof detailObject.checkout_label === "string" ? detailObject.checkout_label : "Start 3-day trial",
   };
 }
 

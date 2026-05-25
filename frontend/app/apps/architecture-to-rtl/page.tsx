@@ -44,6 +44,12 @@ type WorkflowRow = {
   logs?: string | null;
 };
 
+type TrialCta = {
+  message: string;
+  checkoutUrl: string;
+  checkoutLabel: string;
+};
+
 async function loadGem5Rows(workflowId: string): Promise<SweepRow[]> {
   const direct = await fetch(`${API_BASE}/apps/system/architecture/results/${workflowId}`);
   if (direct.ok) {
@@ -83,6 +89,9 @@ export default function ArchitectureToRtlDeliveryPage() {
   const [arch2rtlWorkflowId, setArch2rtlWorkflowId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [runError, setRunError] = useState<string | null>(null);
+  const [runNotice, setRunNotice] = useState<string | null>(null);
+  const [trialCta, setTrialCta] = useState<TrialCta | null>(null);
 
   const recommended = useMemo(() => {
     if (!rows.length) return null;
@@ -146,6 +155,9 @@ export default function ArchitectureToRtlDeliveryPage() {
     if (!workflowId.trim()) return;
     setBusy(true);
     setErr(null);
+    setRunError(null);
+    setRunNotice(null);
+    setTrialCta(null);
     setPrefill(null);
     try {
       const nextRows = await loadGem5Rows(workflowId.trim());
@@ -164,6 +176,9 @@ export default function ArchitectureToRtlDeliveryPage() {
     if (!workflowId.trim()) return;
     setBusy(true);
     setErr(null);
+    setRunError(null);
+    setRunNotice(null);
+    setTrialCta(null);
     try {
       const resp = await fetch(`${API_BASE}/apps/system/architecture/rtl-handoff/${workflowId.trim()}`, {
         method: "POST",
@@ -192,7 +207,9 @@ export default function ArchitectureToRtlDeliveryPage() {
   async function runArch2RTLNow() {
     if (!prefill) return;
     setBusy(true);
-    setErr(null);
+    setRunError(null);
+    setRunNotice(null);
+    setTrialCta(null);
     try {
       const resp = await fetch(`${API_BASE}/apps/arch2rtl/run`, {
         method: "POST",
@@ -213,11 +230,22 @@ export default function ArchitectureToRtlDeliveryPage() {
       const data = text ? JSON.parse(text) : {};
       if (!resp.ok) {
         const detail = data?.detail ?? data;
+        const checkout = typeof detail === "object" && detail !== null ? detail : data;
+        if (resp.status === 402 && checkout?.requires_checkout) {
+          setTrialCta({
+            message: checkout.message || "Start your 3-day trial to run the architecture-derived RTL intent.",
+            checkoutUrl: checkout.checkout_url || "/pricing?trial=1",
+            checkoutLabel: checkout.checkout_label || "Start 3-day trial",
+          });
+          return;
+        }
         throw new Error(typeof detail === "string" ? detail : detail?.message || `Arch2RTL failed to start (${resp.status})`);
       }
       setArch2rtlWorkflowId(data.workflow_id);
+      setWorkflowRow({ id: data.workflow_id, status: "queued", logs: "" });
+      setRunNotice("Arch2RTL run started. Status and logs will update below.");
     } catch (e: unknown) {
-      setErr(errorMessage(e));
+      setRunError(errorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -293,9 +321,20 @@ export default function ArchitectureToRtlDeliveryPage() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <button onClick={openInArch2RTL} className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-100 hover:bg-slate-800">Open in Arch2RTL</button>
-                      <button onClick={runArch2RTLNow} disabled={busy} className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold hover:bg-cyan-500 disabled:bg-slate-700">Run Arch2RTL Now</button>
+                      <button onClick={runArch2RTLNow} disabled={busy} className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold hover:bg-cyan-500 disabled:bg-slate-700">{busy ? "Starting..." : "Run Arch2RTL Now"}</button>
                     </div>
                   </div>
+                  {runNotice ? <div className="mt-4 rounded-lg border border-emerald-800 bg-emerald-950/30 p-3 text-sm text-emerald-100">{runNotice}</div> : null}
+                  {runError ? <div className="mt-4 rounded-lg border border-red-900/60 bg-red-950/30 p-3 text-sm text-red-200">{runError}</div> : null}
+                  {trialCta ? (
+                    <div className="mt-4 rounded-lg border border-amber-800 bg-amber-950/30 p-4 text-sm text-amber-100">
+                      <div className="font-semibold">Trial required to run this RTL intent</div>
+                      <p className="mt-2 leading-6 text-slate-200">{trialCta.message}</p>
+                      <button onClick={() => router.push(trialCta.checkoutUrl)} className="mt-3 rounded-lg bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500">
+                        {trialCta.checkoutLabel}
+                      </button>
+                    </div>
+                  ) : null}
                   <div className="mt-4 grid gap-4 md:grid-cols-2">
                     <label className="block">
                       <span className="text-xs font-semibold text-slate-300">Project</span>

@@ -178,9 +178,9 @@ export default function Arch2RTLAppPage() {
           message:
             typeof detail.message === "string"
               ? detail.message
-              : "Start your 7-day trial to use voice design sessions.",
+              : "Start your 3-day trial to use voice design sessions.",
           checkoutUrl: typeof detail.checkout_url === "string" ? detail.checkout_url : "/pricing?trial=1",
-          checkoutLabel: typeof detail.checkout_label === "string" ? detail.checkout_label : "Start 7-day trial",
+          checkoutLabel: typeof detail.checkout_label === "string" ? detail.checkout_label : "Start 3-day trial",
           blocking: true,
         });
       }
@@ -213,9 +213,9 @@ export default function Arch2RTLAppPage() {
           message:
             typeof detail.message === "string"
               ? detail.message
-              : "Start your 7-day trial to use voice design sessions.",
+              : "Start your 3-day trial to use voice design sessions.",
           checkoutUrl: typeof detail.checkout_url === "string" ? detail.checkout_url : "/pricing?trial=1",
-          checkoutLabel: typeof detail.checkout_label === "string" ? detail.checkout_label : "Start 7-day trial",
+          checkoutLabel: typeof detail.checkout_label === "string" ? detail.checkout_label : "Start 3-day trial",
           blocking: true,
         });
       }
@@ -452,7 +452,7 @@ export default function Arch2RTLAppPage() {
       setRunId(out.run_id);
       if (out.trial_cta?.show) {
         setPendingTrialPrompt({
-          message: out.trial_cta.message || "Start your 7-day trial to run your own specs. No charge today.",
+          message: out.trial_cta.message || "Start your 3-day trial to run your own specs. No charge today.",
           runsRemaining: out.demo?.runs_remaining,
           blocking: false,
         });
@@ -474,9 +474,9 @@ export default function Arch2RTLAppPage() {
           message:
             typeof detail.message === "string"
               ? detail.message
-              : "Start your 7-day trial to keep using ChipLoop.",
+              : "Start your 3-day trial to keep using ChipLoop.",
           checkoutUrl: typeof detail.checkout_url === "string" ? detail.checkout_url : "/pricing?trial=1",
-          checkoutLabel: typeof detail.checkout_label === "string" ? detail.checkout_label : "Start 7-day trial",
+          checkoutLabel: typeof detail.checkout_label === "string" ? detail.checkout_label : "Start 3-day trial",
           blocking: true,
         });
         setErr(null);
@@ -638,7 +638,7 @@ export default function Arch2RTLAppPage() {
                     onClick={() => router.push(trialPrompt.checkoutUrl || "/pricing?trial=1")}
                     className="mt-3 rounded-lg bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500"
                   >
-                    {trialPrompt.checkoutLabel || "Start 7-day trial"}
+                    {trialPrompt.checkoutLabel || "Start 3-day trial"}
                   </button>
                 </div>
               ) : null}
@@ -721,7 +721,7 @@ export default function Arch2RTLAppPage() {
                             onClick={() => router.push(voiceTrialPrompt.checkoutUrl || "/pricing?trial=1")}
                             className="mt-3 rounded-lg bg-cyan-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-cyan-500"
                           >
-                            {voiceTrialPrompt.checkoutLabel || "Start 7-day trial"}
+                            {voiceTrialPrompt.checkoutLabel || "Start 3-day trial"}
                           </button>
                         ) : null}
                       </div>

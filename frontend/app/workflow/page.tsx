@@ -29,6 +29,7 @@ import DagPreviewModal from "@/components/studio/DagPreviewModal";
 import { LowCreditBanner } from "@/components/PlanCreditStatus";
 import TopNav from "@/components/TopNav";
 import GitHubImportPanel from "@/components/GitHubImportPanel";
+import { FiGrid } from "react-icons/fi";
 /* =========================
    Types & Constants
 ========================= */
@@ -116,11 +117,12 @@ const APP_PREBUILT_WORKFLOWS: CustomWorkflowRow[] = [
 ];
 
 function linearWorkflowDefinition(agentNames: string[]): WorkflowGraphDefinition {
+  const laidOutPositions = layoutNodePositions(agentNames.length);
   return {
     nodes: agentNames.map((name, index) => ({
       id: `n${index + 1}`,
       type: "agentNode",
-      position: { x: 80 + index * 240, y: 180 },
+      position: laidOutPositions[index],
       data: { uiLabel: name.replace(/^Digital /, ""), backendLabel: name },
     })),
     edges: agentNames.slice(1).map((_, index) => ({
@@ -129,6 +131,28 @@ function linearWorkflowDefinition(agentNames: string[]): WorkflowGraphDefinition
       target: `n${index + 2}`,
     })),
   };
+}
+
+const STUDIO_NODE_WIDTH = 264;
+const STUDIO_NODE_X_GAP = 64;
+const STUDIO_NODE_Y_GAP = 165;
+
+function layoutNodePositions(nodeCount: number): Array<{ x: number; y: number }> {
+  const columns = nodeCount <= 6 ? Math.max(nodeCount, 1) : Math.min(4, Math.ceil(Math.sqrt(nodeCount)));
+  return Array.from({ length: nodeCount }, (_, index) => {
+    const row = Math.floor(index / columns);
+    const slot = index % columns;
+    const column = row % 2 === 0 ? slot : columns - slot - 1;
+    return {
+      x: 80 + column * (STUDIO_NODE_WIDTH + STUDIO_NODE_X_GAP),
+      y: 160 + row * STUDIO_NODE_Y_GAP,
+    };
+  });
+}
+
+function autoArrangeNodes<T>(nodes: Node<T>[]): Node<T>[] {
+  const positions = layoutNodePositions(nodes.length);
+  return nodes.map((node, index) => ({ ...node, position: positions[index] }));
 }
 
 const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition> = {
@@ -2028,6 +2052,11 @@ type SystemPlannerIntent = {
     setSelectedEdgeId(null);
   }, [selectedEdgeId, setEdges]);
 
+  const arrangeCanvas = useCallback(() => {
+    setNodes((currentNodes) => autoArrangeNodes(currentNodes));
+    setTimeout(() => fitView({ padding: 0.2, duration: 400 }), 0);
+  }, [fitView, setNodes]);
+
   /* ---------- Actions ---------- */
   const runWorkflow = async () => {
     // 1) Require user to pick a workflow first
@@ -2378,6 +2407,7 @@ type SystemPlannerIntent = {
           desc: n.data?.desc || "",
         },
       }));
+      const arrangedNodes = data.is_prebuilt || fallbackDefinitions ? autoArrangeNodes(parsedNodes) : parsedNodes;
 
       const parsedEdges = (defs.edges || []).map((e: any, i: number) => ({
         id: e.id || `e${i}`,
@@ -2394,7 +2424,7 @@ type SystemPlannerIntent = {
       setLoop(resolvedLoop);
 
       console.log(`Parsed ${parsedNodes.length} nodes & ${parsedEdges.length} edges`);
-      setNodes(parsedNodes);
+      setNodes(arrangedNodes);
       setEdges(parsedEdges);
 
       setTimeout(() => {
@@ -3040,6 +3070,16 @@ type SystemPlannerIntent = {
                 className="rounded border border-slate-700 px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-600"
               >
                 Delete selected edge
+              </button>
+              <button
+                type="button"
+                onClick={arrangeCanvas}
+                disabled={!nodes.length}
+                className="flex items-center gap-1.5 rounded border border-slate-700 px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-600"
+                title="Arrange agents on the canvas"
+              >
+                <FiGrid aria-hidden="true" />
+                Arrange
               </button>
               <span className="text-slate-500">Drag right dot to left dot to connect branches.</span>
             </div>

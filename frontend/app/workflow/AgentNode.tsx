@@ -45,20 +45,20 @@ export default function AgentNode({
   return (
     <div
       onClick={handleSelectAgent}   
-      className="rounded-xl border border-cyan-400 bg-slate-800/90 text-white shadow-lg px-4 py-3 min-w-[220px] relative cursor-pointer hover:border-cyan-300 transition"
+      className="relative w-[264px] cursor-pointer rounded-lg border border-cyan-400 bg-slate-800/90 px-4 py-3 text-white shadow-lg transition hover:border-cyan-300"
     >
       {/* Agent name */}
-      <div className="font-bold text-cyan-300">
+      <div className="break-words pr-2 text-sm font-bold leading-5 text-cyan-300">
         {data?.uiLabel || "Agent"}
       </div>
 
       {/* Description */}
       {data?.desc && (
-        <div className="mt-1 text-xs text-slate-300">{data.desc}</div>
+        <div className="mt-2 line-clamp-3 break-words text-xs leading-5 text-slate-300">{data.desc}</div>
       )}
 
       {/* Backend label */}
-      <div className="mt-1 text-[10px] text-slate-500">
+      <div className="mt-2 break-words pr-16 text-[10px] leading-4 text-slate-400">
         {data?.backendLabel}
       </div>
 

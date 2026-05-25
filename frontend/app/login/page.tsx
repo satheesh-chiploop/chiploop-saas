@@ -80,7 +80,7 @@ export default function LoginPage() {
       toast.success(
         mode === "signup"
           ? trialIntent
-            ? "Account created. Complete Stripe trial checkout to start your 7-day trial."
+            ? "Account created. Complete Stripe trial checkout to start your 3-day trial."
             : "Account created! Check your email to confirm."
           : "Welcome back!"
       );
@@ -114,7 +114,7 @@ export default function LoginPage() {
       <Toaster position="top-center" reverseOrder={false} />
       <div className="bg-slate-900 border border-slate-700 p-8 rounded-2xl shadow-2xl w-96">
         <h1 className="text-3xl font-extrabold text-cyan-400 text-center mb-4">
-          {mode === "signup" && trialIntent ? "Start ChipLoop 7-Day Trial" : "ChipLoop Login"}
+          {mode === "signup" && trialIntent ? "Start ChipLoop 3-Day Trial" : "ChipLoop Login"}
         </h1>
 
         {/* Toggle between Sign In / Sign Up */}
@@ -143,7 +143,7 @@ export default function LoginPage() {
 
         {mode === "signup" && trialIntent ? (
           <div className="mb-5 rounded-lg border border-cyan-700/60 bg-cyan-950/30 p-3 text-sm text-cyan-100">
-            Free 7-day trial. Starter is $19.99/month after 7 days. Billing is handled securely by Stripe. Cancel anytime before trial ends.
+            Free 3-day trial. Starter is $19.99/month after 3 days. Billing is handled securely by Stripe. Cancel anytime before trial ends.
           </div>
         ) : null}
 

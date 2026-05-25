@@ -397,9 +397,9 @@ export default function SystemExplorerApp({
         const detail = data?.detail ?? data;
         if (detail?.requires_checkout) {
           setTrialPrompt({
-            message: detail.message || "Start your 7-day trial to run custom architecture exploration.",
+            message: detail.message || "Start your 3-day trial to run custom architecture exploration.",
             checkoutUrl: detail.checkout_url || "/pricing?trial=1",
-            checkoutLabel: detail.checkout_label || "Start 7-day trial",
+            checkoutLabel: detail.checkout_label || "Start 3-day trial",
           });
         }
         throw new Error(typeof detail === "string" ? detail : detail?.message || `${resp.status} ${resp.statusText}`);
