@@ -158,7 +158,7 @@ function LandingPageContent() {
 
       <section className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-12 pt-36 text-center sm:px-6 sm:pb-16 sm:pt-32">
         <div className="mb-5 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-semibold text-cyan-200 sm:text-sm">
-          Live demo every Saturday starting May 30, 2026
+          Live demo every Saturday starting June 13, 2026
         </div>
         <h1 className="max-w-5xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-7xl">
           Agentic AI for Connected Chip Design Loops
@@ -222,14 +222,14 @@ function LandingPageContent() {
               <p className="text-sm font-bold uppercase tracking-wide text-cyan-200">Weekly ChipLoop Webinar</p>
               <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">30-minute walkthrough and live demo every Saturday</h2>
               <p className="mt-4 leading-7 text-slate-300">
-                Every Saturday starting May 30, 2026, join at 9:00 AM PST or 9:00 PM PST. We will cover ChipLoop Apps, Studio, connected Loops,
+                Every Saturday for six weeks starting June 13, 2026, join at 9:00 AM PT or 9:00 PM PT. We will cover ChipLoop Apps, Studio, connected Loops,
                 the guided Arch2RTL demo, generated RTL, SDC, UPF, downloadable artifacts, and Q&A.
               </p>
             </div>
             <div className="rounded-xl border border-slate-700 bg-slate-950/70 p-5">
               <div className="text-sm text-slate-400">Sessions</div>
-              <div className="mt-2 font-semibold text-white">Saturday 9:00 AM PST</div>
-              <div className="mt-1 font-semibold text-white">Saturday 9:00 PM PST</div>
+              <div className="mt-2 font-semibold text-white">Saturday 9:00 AM PT</div>
+              <div className="mt-1 font-semibold text-white">Saturday 9:00 PM PT</div>
               <button
                 onClick={() => router.push("/webinar/register")}
                 className="mt-5 w-full rounded-lg bg-cyan-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-cyan-300"
