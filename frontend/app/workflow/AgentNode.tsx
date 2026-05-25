@@ -75,15 +75,21 @@ export default function AgentNode({
       </button>
 
       {/* Handles for ReactFlow */}
+      <span className="pointer-events-none absolute -left-3 top-1/2 z-10 -translate-x-full -translate-y-1/2 rounded bg-slate-950 px-1.5 py-0.5 text-[9px] font-bold text-emerald-300">
+        IN
+      </span>
       <Handle
         type="target"
         position={Position.Left}
-        className="!bg-cyan-400"
+        className="!-left-2.5 !h-5 !w-5 !border-2 !border-slate-950 !bg-emerald-400"
       />
+      <span className="pointer-events-none absolute -right-3 top-1/2 z-10 translate-x-full -translate-y-1/2 rounded bg-slate-950 px-1.5 py-0.5 text-[9px] font-bold text-cyan-300">
+        OUT
+      </span>
       <Handle
         type="source"
         position={Position.Right}
-        className="!bg-cyan-400"
+        className="!-right-2.5 !h-5 !w-5 !border-2 !border-slate-950 !bg-cyan-400"
       />
     </div>
   );

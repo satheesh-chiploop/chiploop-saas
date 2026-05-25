@@ -17,6 +17,7 @@ import ReactFlow, {
   Node,
   ReactFlowProvider,
   useReactFlow,
+  MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -134,20 +135,36 @@ function linearWorkflowDefinition(agentNames: string[]): WorkflowGraphDefinition
 }
 
 const STUDIO_NODE_WIDTH = 264;
-const STUDIO_NODE_X_GAP = 64;
-const STUDIO_NODE_Y_GAP = 165;
+const STUDIO_NODE_X_GAP = 108;
+const STUDIO_NODE_Y_GAP = 210;
+const STUDIO_EDGE_STYLE = { stroke: "#22d3ee", strokeWidth: 2.5 };
+const STUDIO_EDGE_MARKER = {
+  type: MarkerType.ArrowClosed,
+  color: "#22d3ee",
+  width: 20,
+  height: 20,
+};
 
 function layoutNodePositions(nodeCount: number): Array<{ x: number; y: number }> {
   const columns = nodeCount <= 6 ? Math.max(nodeCount, 1) : Math.min(4, Math.ceil(Math.sqrt(nodeCount)));
   return Array.from({ length: nodeCount }, (_, index) => {
     const row = Math.floor(index / columns);
-    const slot = index % columns;
-    const column = row % 2 === 0 ? slot : columns - slot - 1;
+    const column = index % columns;
     return {
       x: 80 + column * (STUDIO_NODE_WIDTH + STUDIO_NODE_X_GAP),
       y: 160 + row * STUDIO_NODE_Y_GAP,
     };
   });
+}
+
+function styleStudioEdge(edge: Edge): Edge {
+  return {
+    ...edge,
+    type: edge.type || "smoothstep",
+    animated: edge.animated ?? true,
+    markerEnd: edge.markerEnd || STUDIO_EDGE_MARKER,
+    style: { ...STUDIO_EDGE_STYLE, ...edge.style },
+  };
 }
 
 function autoArrangeNodes<T>(nodes: Node<T>[]): Node<T>[] {
@@ -1883,12 +1900,10 @@ type SystemPlannerIntent = {
         },
       }));
   
-      const newEdges = (graph.edges || []).map((e: any, idx: number) => ({
+      const newEdges = (graph.edges || []).map((e: any, idx: number) => styleStudioEdge({
         id: e.id || `e${idx}`,
         source: e.source,
         target: e.target,
-        animated: true,
-        style: { stroke: "#22d3ee", strokeWidth: 2 },
       }));
   
       setNodes(newNodes);
@@ -1941,7 +1956,7 @@ type SystemPlannerIntent = {
       const wf = e.detail;
       if (!wf) return;
       setNodes(wf.nodes || []);
-      setEdges(wf.edges || []);
+      setEdges((wf.edges || []).map((edge: Edge) => styleStudioEdge(edge)));
     }
   
     window.addEventListener("loadWorkflowGraph", handleLoadWorkflowGraph);
@@ -1960,16 +1975,17 @@ type SystemPlannerIntent = {
 
   /* ---------- Default Verify Loop ---------- */
   useEffect(() => {
+    const defaultPositions = layoutNodePositions(4);
     const n: Node<AgentNodeData>[] = [
-      { id: "spec", type: "agentNode", position: { x: 60, y: 180 }, data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
-      { id: "rtl", type: "agentNode", position: { x: 300, y: 180 }, data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
-      { id: "tb", type: "agentNode", position: { x: 540, y: 180 }, data: { uiLabel: "Verification Agent", backendLabel: "Digital Testbench Agent" } },
-      { id: "sim", type: "agentNode", position: { x: 780, y: 180 }, data: { uiLabel: "Sim Agent", backendLabel: "Digital Sim Agent" } },
+      { id: "spec", type: "agentNode", position: defaultPositions[0], data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
+      { id: "rtl", type: "agentNode", position: defaultPositions[1], data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
+      { id: "tb", type: "agentNode", position: defaultPositions[2], data: { uiLabel: "Verification Agent", backendLabel: "Digital Testbench Agent" } },
+      { id: "sim", type: "agentNode", position: defaultPositions[3], data: { uiLabel: "Sim Agent", backendLabel: "Digital Sim Agent" } },
     ];
     const e: Edge[] = [
-      { id: "e-spec-rtl", source: "spec", target: "rtl", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-      { id: "e-rtl-tb", source: "rtl", target: "tb", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
-      { id: "e-tb-sim", source: "tb", target: "sim", animated: true, style: { stroke: "#22d3ee", strokeWidth: 2 } },
+      styleStudioEdge({ id: "e-spec-rtl", source: "spec", target: "rtl" }),
+      styleStudioEdge({ id: "e-rtl-tb", source: "rtl", target: "tb" }),
+      styleStudioEdge({ id: "e-tb-sim", source: "tb", target: "sim" }),
     ];
     setNodes(n);
     setEdges(e);
@@ -2023,13 +2039,11 @@ type SystemPlannerIntent = {
         if (nodes.length === 0) return eds;
         const lastNode = getRightMostNode(nodes);
         if (!lastNode) return eds;
-        const newEdge: Edge = {
+        const newEdge: Edge = styleStudioEdge({
           id: `e-${lastNode.id}-${id}`,
           source: lastNode.id,
           target: id,
-          animated: true,
-          style: { stroke: "#22d3ee", strokeWidth: 2 },
-        };
+        });
         return eds.concat(newEdge);
       });
     },
@@ -2042,7 +2056,13 @@ type SystemPlannerIntent = {
   };
 
   const onConnect = useCallback(
-    (params: Connection | Edge) => setEdges((eds) => addEdge({ ...params, animated: true, style: { stroke: "#22d3ee" } }, eds)),
+    (params: Connection | Edge) => setEdges((eds) => addEdge({
+      ...params,
+      type: "smoothstep",
+      animated: true,
+      markerEnd: STUDIO_EDGE_MARKER,
+      style: STUDIO_EDGE_STYLE,
+    }, eds)),
     [setEdges]
   );
 
@@ -2409,12 +2429,10 @@ type SystemPlannerIntent = {
       }));
       const arrangedNodes = data.is_prebuilt || fallbackDefinitions ? autoArrangeNodes(parsedNodes) : parsedNodes;
 
-      const parsedEdges = (defs.edges || []).map((e: any, i: number) => ({
+      const parsedEdges = (defs.edges || []).map((e: any, i: number) => styleStudioEdge({
         id: e.id || `e${i}`,
         source: e.source || e.from,
         target: e.target || e.to,
-        animated: true,
-        style: { stroke: "#22d3ee", strokeWidth: 2 },
       }));
 
       setSelectedWorkflowName(data.name || wfName);
@@ -3094,7 +3112,13 @@ type SystemPlannerIntent = {
               onPaneClick={() => setSelectedEdgeId(null)}
               nodeTypes={{ agentNode: AgentNode }}
               fitView
-              defaultEdgeOptions={{ animated: true, style: { stroke: '#22d3ee' } }}
+              defaultEdgeOptions={{
+                type: "smoothstep",
+                animated: true,
+                markerEnd: STUDIO_EDGE_MARKER,
+                style: STUDIO_EDGE_STYLE,
+              }}
+              connectionLineStyle={STUDIO_EDGE_STYLE}
             >
              
               <Controls />
