@@ -102,6 +102,10 @@ const APP_PREBUILT_WORKFLOWS: CustomWorkflowRow[] = [
   { name: "Embedded_Validate", displayName: "Embedded Validate", loop_type: "embedded", is_prebuilt: true },
   { name: "System_End2End", displayName: "System End2End", loop_type: "system", is_prebuilt: true },
   { name: "System_Architecture_Explorer", displayName: "System Architecture Explorer", loop_type: "system", is_prebuilt: true },
+  { name: "System_Cache_Tuning", displayName: "System Cache Tuning", loop_type: "system", is_prebuilt: true },
+  { name: "System_ISA_Compare", displayName: "System ISA Compare", loop_type: "system", is_prebuilt: true },
+  { name: "System_Memory_Bottleneck", displayName: "System Memory Bottleneck", loop_type: "system", is_prebuilt: true },
+  { name: "System_CPU_Model", displayName: "System CPU Model", loop_type: "system", is_prebuilt: true },
   { name: "System_Architecture_to_RTL_Delivery", displayName: "Architecture to RTL Delivery", loop_type: "system", is_prebuilt: true },
   { name: "System_Sim", displayName: "System Sim", loop_type: "system", is_prebuilt: true },
   { name: "System_RTL", displayName: "System RTL", loop_type: "system", is_prebuilt: true },
@@ -179,6 +183,20 @@ function autoArrangeNodes<T>(nodes: Node<T>[], canvasWidth?: number): Node<T>[] 
   const positions = layoutNodePositions(nodes.length, canvasWidth);
   return nodes.map((node, index) => ({ ...node, position: positions[index] }));
 }
+
+const SYSTEM_ARCHITECTURE_EXPLORER_AGENTS = [
+  "System Architecture Intent Agent",
+  "System Workload Characterization Agent",
+  "System gem5 Config Agent",
+  "System Design Space Exploration Agent",
+  "System gem5 Execution Agent",
+  "System Performance Metrics Agent",
+  "System Power Estimation Agent",
+  "System Area Estimation Agent",
+  "System PPA Tradeoff Agent",
+  "System Visualization Agent",
+  "System Architecture Report Agent",
+];
 
 const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition> = {
   Digital_Arch2RTL: linearWorkflowDefinition([
@@ -282,19 +300,11 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "System Simulation Execution Agent",
     "System Simulation Coverage Summary Agent",
   ]),
-  System_Architecture_Explorer: linearWorkflowDefinition([
-    "System Architecture Intent Agent",
-    "System Workload Characterization Agent",
-    "System gem5 Config Agent",
-    "System Design Space Exploration Agent",
-    "System gem5 Execution Agent",
-    "System Performance Metrics Agent",
-    "System Power Estimation Agent",
-    "System Area Estimation Agent",
-    "System PPA Tradeoff Agent",
-    "System Visualization Agent",
-    "System Architecture Report Agent",
-  ]),
+  System_Architecture_Explorer: linearWorkflowDefinition(SYSTEM_ARCHITECTURE_EXPLORER_AGENTS),
+  System_Cache_Tuning: linearWorkflowDefinition(SYSTEM_ARCHITECTURE_EXPLORER_AGENTS),
+  System_ISA_Compare: linearWorkflowDefinition(SYSTEM_ARCHITECTURE_EXPLORER_AGENTS),
+  System_Memory_Bottleneck: linearWorkflowDefinition(SYSTEM_ARCHITECTURE_EXPLORER_AGENTS),
+  System_CPU_Model: linearWorkflowDefinition(SYSTEM_ARCHITECTURE_EXPLORER_AGENTS),
   System_Architecture_to_RTL_Delivery: linearWorkflowDefinition([
     "System Architecture Intent Agent",
     "System gem5 Execution Agent",
