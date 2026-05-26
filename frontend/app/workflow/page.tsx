@@ -1,6 +1,6 @@
 ﻿"use client";
 // 10-15
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { getStableUserId } from "@/utils/userId"
@@ -137,6 +137,7 @@ function linearWorkflowDefinition(agentNames: string[]): WorkflowGraphDefinition
 const STUDIO_NODE_WIDTH = 264;
 const STUDIO_NODE_X_GAP = 108;
 const STUDIO_NODE_Y_GAP = 210;
+const STUDIO_MAX_COLUMNS = 6;
 const STUDIO_EDGE_STYLE = { stroke: "#22d3ee", strokeWidth: 2.5 };
 const STUDIO_EDGE_MARKER = {
   type: MarkerType.ArrowClosed,
@@ -145,8 +146,15 @@ const STUDIO_EDGE_MARKER = {
   height: 20,
 };
 
-function layoutNodePositions(nodeCount: number): Array<{ x: number; y: number }> {
-  const columns = nodeCount <= 6 ? Math.max(nodeCount, 1) : Math.min(4, Math.ceil(Math.sqrt(nodeCount)));
+function layoutNodePositions(nodeCount: number, canvasWidth?: number): Array<{ x: number; y: number }> {
+  let responsiveColumns = 4;
+  if (canvasWidth) {
+    if (canvasWidth < 900) responsiveColumns = 2;
+    else if (canvasWidth < 1150) responsiveColumns = 3;
+    else if (canvasWidth >= 1900) responsiveColumns = STUDIO_MAX_COLUMNS;
+    else if (canvasWidth >= 1500) responsiveColumns = 5;
+  }
+  const columns = Math.max(1, Math.min(nodeCount, responsiveColumns));
   return Array.from({ length: nodeCount }, (_, index) => {
     const row = Math.floor(index / columns);
     const column = index % columns;
@@ -167,8 +175,8 @@ function styleStudioEdge(edge: Edge): Edge {
   };
 }
 
-function autoArrangeNodes<T>(nodes: Node<T>[]): Node<T>[] {
-  const positions = layoutNodePositions(nodes.length);
+function autoArrangeNodes<T>(nodes: Node<T>[], canvasWidth?: number): Node<T>[] {
+  const positions = layoutNodePositions(nodes.length, canvasWidth);
   return nodes.map((node, index) => ({ ...node, position: positions[index] }));
 }
 
@@ -1036,6 +1044,7 @@ function WorkflowPage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
   const rf = useReactFlow();
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   // Move anon id init into effect (avoids module init / bundler ordering issues)
   useEffect(() => {
@@ -1975,7 +1984,7 @@ type SystemPlannerIntent = {
 
   /* ---------- Default Verify Loop ---------- */
   useEffect(() => {
-    const defaultPositions = layoutNodePositions(4);
+    const defaultPositions = layoutNodePositions(4, canvasRef.current?.clientWidth);
     const n: Node<AgentNodeData>[] = [
       { id: "spec", type: "agentNode", position: defaultPositions[0], data: { uiLabel: "Spec Agent", backendLabel: "Digital Spec Agent" } },
       { id: "rtl", type: "agentNode", position: defaultPositions[1], data: { uiLabel: "RTL Agent", backendLabel: "Digital RTL Agent" } },
@@ -2073,7 +2082,7 @@ type SystemPlannerIntent = {
   }, [selectedEdgeId, setEdges]);
 
   const arrangeCanvas = useCallback(() => {
-    setNodes((currentNodes) => autoArrangeNodes(currentNodes));
+    setNodes((currentNodes) => autoArrangeNodes(currentNodes, canvasRef.current?.clientWidth));
     setTimeout(() => fitView({ padding: 0.2, duration: 400 }), 0);
   }, [fitView, setNodes]);
 
@@ -2427,7 +2436,9 @@ type SystemPlannerIntent = {
           desc: n.data?.desc || "",
         },
       }));
-      const arrangedNodes = data.is_prebuilt || fallbackDefinitions ? autoArrangeNodes(parsedNodes) : parsedNodes;
+      const arrangedNodes = data.is_prebuilt || fallbackDefinitions
+        ? autoArrangeNodes(parsedNodes, canvasRef.current?.clientWidth)
+        : parsedNodes;
 
       const parsedEdges = (defs.edges || []).map((e: any, i: number) => styleStudioEdge({
         id: e.id || `e${i}`,
@@ -3067,6 +3078,7 @@ type SystemPlannerIntent = {
         <section className="flex-1 flex flex-col p-4 overflow-hidden">
           {/* Canvas */}
           <div
+            ref={canvasRef}
             className="relative flex-1 border border-slate-800 rounded-xl overflow-hidden bg-black/60"
             onDrop={onDropCanvas}
             onDragOver={onDragOverCanvas}
