@@ -7,6 +7,15 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import {
+  DESIGN_CHAIN_CONTEXT_KEY,
+  GENERIC_VALIDATION_GOAL,
+  PWM_VALIDATION_GOAL,
+  SOFTWARE_HANDOFF_PREFILL_KEY,
+  VALIDATION_HANDOFF_PREFILL_KEY,
+  type DesignChainContext,
+} from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -54,6 +63,8 @@ export default function SystemSoftwareAppPage() {
   const [buildSystem, setBuildSystem] = useState("cmake");
   const [notes, setNotes] = useState("");
   const [useHandoffPath, setUseHandoffPath] = useState(true);
+  const [handoffFlow, setHandoffFlow] = useState(false);
+  const [pwmChainDemo, setPwmChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -99,6 +110,41 @@ export default function SystemSoftwareAppPage() {
       setLoading(false);
     })();
   }, [router]);
+
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1") return;
+    setHandoffFlow(true);
+    setPwmChainDemo(params.get("pwm_chain") === "1");
+    const raw = window.localStorage.getItem(SOFTWARE_HANDOFF_PREFILL_KEY);
+    if (!raw) return;
+    try {
+      const prefill = JSON.parse(raw) as {
+        projectName?: string;
+        systemFirmwareWorkflowId?: string;
+        systemRtlWorkflowId?: string;
+        softwareGoal?: string;
+        appNames?: string;
+        targetLanguage?: string;
+        sdkStyle?: string;
+        buildSystem?: string;
+        notes?: string;
+      };
+      setProjectName(prefill.projectName || "");
+      setUseHandoffPath(false);
+      setSystemFirmwareWorkflowId(prefill.systemFirmwareWorkflowId || "");
+      setSystemRtlWorkflowId(prefill.systemRtlWorkflowId || "");
+      setSoftwareGoal(prefill.softwareGoal || "");
+      setAppNamesText(prefill.appNames || "");
+      setTargetLanguage(prefill.targetLanguage || "rust");
+      setSdkStyle(prefill.sdkStyle || "rust_crate");
+      setBuildSystem(prefill.buildSystem || "cargo");
+      setNotes(prefill.notes || "");
+    } catch {
+      window.localStorage.removeItem(SOFTWARE_HANDOFF_PREFILL_KEY);
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (!workflowId) return;
@@ -185,6 +231,31 @@ export default function SystemSoftwareAppPage() {
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
   }
 
+  function openInFullStackValidation() {
+    if (!workflowId) return;
+    let context: DesignChainContext = {};
+    try {
+      context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+    } catch {
+      context = {};
+    }
+    context.softwareWorkflowId = workflowId;
+    context.softwareRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    window.localStorage.setItem(VALIDATION_HANDOFF_PREFILL_KEY, JSON.stringify({
+      projectName: pwmChainDemo ? "pwm_fan_controller_full_stack_validation" : "generated_hardware_full_stack_validation",
+      validationMode: "full_co_simulation",
+      systemSoftwareWorkflowId: workflowId,
+      systemFirmwareWorkflowId: context.embeddedWorkflowId,
+      systemRtlWorkflowId: context.embeddedWorkflowId,
+      goal: pwmChainDemo ? PWM_VALIDATION_GOAL : GENERIC_VALIDATION_GOAL,
+      notes: pwmChainDemo
+        ? "Validate imported Arch2RTL PWM hardware through Rust firmware and generated fan-control software."
+        : "Validate imported Arch2RTL hardware through the generated firmware and software handoffs.",
+    }));
+    router.push(`/apps/system-software-validation?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}`);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -217,6 +288,15 @@ export default function SystemSoftwareAppPage() {
           <p className="mt-2 text-slate-300">
             Handoff ingest → capability model → API contract → SDK scaffold.
           </p>
+          {pwmChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              PWM full-stack demo: create a fan-control API and application package from the Rust firmware handoff.
+            </div>
+          ) : handoffFlow ? (
+            <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Imported firmware handoff: create software APIs and applications from the actual generated hardware contract.
+            </div>
+          ) : null}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="space-y-3">
@@ -312,6 +392,21 @@ export default function SystemSoftwareAppPage() {
                     Download ZIP (full=1)
                   </button>
                     <AskThisRunPanel workflowId={workflowId} compact />
+                  {handoffFlow ? (
+                    <button
+                      type="button"
+                      onClick={openInFullStackValidation}
+                      disabled={workflowRow?.status !== "completed"}
+                      className="ml-3 mt-3 rounded-xl bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                    >
+                      Open in Full Validation
+                    </button>
+                  ) : null}
+                  {pwmChainDemo ? (
+                    <div className="mt-4">
+                      <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="software" />
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </div>

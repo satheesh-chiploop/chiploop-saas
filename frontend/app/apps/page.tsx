@@ -6,6 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 import { apiGet, apiPost } from "@/lib/apiClient";
 import { LowCreditBanner } from "@/components/PlanCreditStatus";
 import TopNav from "@/components/TopNav";
+import { DESIGN_CHAIN_CONTEXT_KEY, PWM_FULL_STACK_ARCH2RTL_SPEC } from "@/lib/pwmFullStackDemo";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -586,6 +587,20 @@ export default function AppsHomePage() {
     }
   }
 
+  function startPwmFullStackDemo() {
+    window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
+      projectName: "pwm_controller_onboarding",
+      topModule: "pwm_controller",
+      designLanguage: "systemverilog",
+      specText: PWM_FULL_STACK_ARCH2RTL_SPEC,
+      toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+    }));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({}));
+    go("/apps/arch2rtl?guided=1&pwm_chain=1");
+  }
+
+  const openApp = (slug: string) => go(routeForApp(slug));
+
   async function skipOnboarding() {
     setOnboardingBusy(true);
     try {
@@ -769,13 +784,13 @@ export default function AppsHomePage() {
 
                   <div className="mt-5 flex flex-wrap gap-3">
                     <button
-                      onClick={() => go(routeForApp(featured.slug))}
+                      onClick={() => openApp(featured.slug)}
                       className="rounded-xl bg-cyan-600 px-5 py-3 font-semibold hover:bg-cyan-500 transition"
                     >
                       Run now
                     </button>
                     <button
-                      onClick={() => go(routeForApp(featured.slug))}
+                      onClick={() => openApp(featured.slug)}
                       className="rounded-xl border border-slate-700 bg-slate-950/40 px-5 py-3 text-slate-200 hover:bg-slate-950 transition"
                     >
                       Preview outputs
@@ -893,6 +908,33 @@ export default function AppsHomePage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 pb-7">
+        <div className="flex flex-col gap-5 border-y border-slate-800 py-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="text-xs font-semibold uppercase text-emerald-300">Reference Journey</div>
+            <div className="mt-2 text-xl font-bold text-white">PWM Controller: RTL to Firmware to Software Validation</div>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              Run one prefilled design through the standard ChipLoop apps. The PWM input is provided for demonstration;
+              generated RTL, simulation, firmware co-simulation, and validation evidence come from the actual workflow runs.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+              {["Arch2RTL", "RTL Verification", "Embedded Firmware", "System Software", "Full Validation"].map((stage, index) => (
+                <div key={stage} className="flex items-center gap-2">
+                  <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
+                  {index < 4 ? <span className="text-slate-500">&gt;</span> : null}
+                </div>
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={startPwmFullStackDemo}
+            className="shrink-0 rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-500 transition"
+          >
+            Start PWM Reference Journey
+          </button>
+        </div>
+      </section>
+
       {/* Flagship row */}
       <section className="mx-auto max-w-6xl px-6 pb-4">
         <div className="mb-3 flex items-end justify-between">
@@ -906,7 +948,7 @@ export default function AppsHomePage() {
           {flagship.map((app) => (
             <button
               key={app.slug}
-              onClick={() => go(routeForApp(app.slug))}
+              onClick={() => openApp(app.slug)}
               className="rounded-2xl border border-slate-800 bg-slate-950/50 p-5 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
             >
               <div className="flex items-center justify-between gap-3">
@@ -953,7 +995,7 @@ export default function AppsHomePage() {
                   {rowApps.map((app) => (
                     <button
                       key={app.slug}
-                      onClick={() => go(routeForApp(app.slug))}
+                      onClick={() => openApp(app.slug)}
                       className={`rounded-2xl border ${meta.border} bg-slate-950/55 p-4 text-left hover:bg-slate-950 transition`}
                     >
                       <div className="flex items-center justify-between gap-2">

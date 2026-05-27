@@ -6,6 +6,14 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { apiPost } from "@/lib/apiClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import GitHubImportPanel from "@/components/GitHubImportPanel";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import {
+  DESIGN_CHAIN_CONTEXT_KEY,
+  GENERIC_VERIFY_INTENT,
+  PWM_VERIFY_INTENT,
+  VERIFY_HANDOFF_PREFILL_KEY,
+  type DesignChainContext,
+} from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -89,6 +97,7 @@ export default function Arch2RTLAppPage() {
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
   const [guidedOnboarding, setGuidedOnboarding] = useState(false);
   const [systemHandoff, setSystemHandoff] = useState(false);
+  const [pwmChainDemo, setPwmChainDemo] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [trialPrompt, setTrialPrompt] = useState<TrialPrompt | null>(null);
   const [pendingTrialPrompt, setPendingTrialPrompt] = useState<TrialPrompt | null>(null);
@@ -276,6 +285,7 @@ export default function Arch2RTLAppPage() {
     if (!guided) return;
 
     setGuidedOnboarding(true);
+    setPwmChainDemo(new URLSearchParams(window.location.search).get("pwm_chain") === "1");
     let demo = ARCH2RTL_ONBOARDING_DEFAULTS;
     const raw = window.localStorage.getItem(ONBOARDING_DEMO_KEY);
 
@@ -507,6 +517,32 @@ export default function Arch2RTLAppPage() {
     }
   }
 
+  function openInVerification() {
+    if (!workflowId) return;
+    const raw = window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY);
+    let context: DesignChainContext = {};
+    try {
+      context = raw ? JSON.parse(raw) as DesignChainContext : {};
+    } catch {
+      context = {};
+    }
+    context.arch2rtlWorkflowId = workflowId;
+    context.arch2rtlRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    window.localStorage.setItem(VERIFY_HANDOFF_PREFILL_KEY, JSON.stringify({
+      fromWorkflowId: workflowId,
+      fromRunId: runId,
+      testIntent: pwmChainDemo ? PWM_VERIFY_INTENT : GENERIC_VERIFY_INTENT,
+      randomVsDirected: "directed",
+      coverageTargets: pwmChainDemo
+        ? "PWM duty-cycle scenarios, reset behavior, dynamic updates"
+        : "Derived interface behavior, reset behavior, functional corner cases",
+      simulatorType: "verilator",
+      seedCount: 4,
+    }));
+    router.push(`/apps/verify?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}`);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -532,9 +568,11 @@ export default function Arch2RTLAppPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <div className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Guided first activity</div>
-                <h2 className="mt-1 text-2xl font-bold text-white">Run Arch2RTL and inspect the handoff package</h2>
+                <h2 className="mt-1 text-2xl font-bold text-white">{pwmChainDemo ? "Generate the PWM controller RTL" : "Run Arch2RTL and inspect the handoff package"}</h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
-                  The PWM controller spec is already filled in. Click Run Arch2RTL, wait for logs to finish, then download the ZIP and inspect the RTL, SDC, and UPF files.
+                  {pwmChainDemo
+                    ? "The PWM controller specification is filled in for the connected RTL, firmware, and software demonstration. Run it to produce the RTL and register-map handoff used by the next stage."
+                    : "The PWM controller spec is already filled in. Click Run Arch2RTL, wait for logs to finish, then download the ZIP and inspect the RTL, SDC, and UPF files."}
                 </p>
               </div>
               {onboardingCompleted ? (
@@ -651,7 +689,15 @@ export default function Arch2RTLAppPage() {
                     <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                       {guidedOnboarding ? "Download ZIP and finish" : "Download ZIP (full=1)"}
                     </button>
+                    <button
+                      onClick={openInVerification}
+                      disabled={workflowRow?.status !== "completed"}
+                      className="ml-3 mt-3 rounded-xl bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                    >
+                      Open in Verification
+                    </button>
                   </div>
+                  {pwmChainDemo ? <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="arch2rtl" /> : null}
                   <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}

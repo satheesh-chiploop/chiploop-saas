@@ -7,6 +7,15 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import {
+  DESIGN_CHAIN_CONTEXT_KEY,
+  EMBEDDED_HANDOFF_PREFILL_KEY,
+  GENERIC_EMBEDDED_SPEC,
+  PWM_EMBEDDED_SPEC,
+  VERIFY_HANDOFF_PREFILL_KEY,
+  type DesignChainContext,
+} from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -55,6 +64,8 @@ export default function VerifyAppPage() {
 
   const [enableFormal, setEnableFormal] = useState(false);
   const [enableGoldenModel, setEnableGoldenModel] = useState(false);
+  const [handoffFlow, setHandoffFlow] = useState(false);
+  const [pwmChainDemo, setPwmChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -100,6 +111,35 @@ export default function VerifyAppPage() {
       setLoading(false);
     })();
   }, [router]);
+
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1") return;
+    setHandoffFlow(true);
+    setPwmChainDemo(params.get("pwm_chain") === "1");
+    const raw = window.localStorage.getItem(VERIFY_HANDOFF_PREFILL_KEY);
+    if (!raw) return;
+    try {
+      const prefill = JSON.parse(raw) as {
+        fromWorkflowId?: string;
+        testIntent?: string;
+        randomVsDirected?: "random" | "directed";
+        coverageTargets?: string;
+        simulatorType?: string;
+        seedCount?: number;
+      };
+      setRtlSourceMode("from_arch2rtl");
+      setFromWorkflowId(prefill.fromWorkflowId || "");
+      setTestIntent(prefill.testIntent || "");
+      setRandomVsDirected(prefill.randomVsDirected || "directed");
+      setCoverageTargets(prefill.coverageTargets || "");
+      setSimulatorType(prefill.simulatorType || "verilator");
+      setSeedCount(prefill.seedCount || 4);
+    } catch {
+      window.localStorage.removeItem(VERIFY_HANDOFF_PREFILL_KEY);
+    }
+  }, [loading]);
 
   // Live workflow updates
   useEffect(() => {
@@ -198,6 +238,31 @@ export default function VerifyAppPage() {
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
   }
 
+  function openInEmbeddedFirmware() {
+    if (!workflowId) return;
+    let context: DesignChainContext = {};
+    try {
+      context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+    } catch {
+      context = {};
+    }
+    context.verifyWorkflowId = workflowId;
+    context.verifyRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    window.localStorage.setItem(EMBEDDED_HANDOFF_PREFILL_KEY, JSON.stringify({
+      specText: pwmChainDemo ? PWM_EMBEDDED_SPEC : GENERIC_EMBEDDED_SPEC,
+      goal: pwmChainDemo
+        ? "Generate Rust firmware and validate its PWM interface against the imported RTL."
+        : "Generate firmware and validation collateral from the actual imported RTL and register map.",
+      fromWorkflowId: context.arch2rtlWorkflowId,
+      fromRunId: context.arch2rtlRunId,
+      sourceVerificationWorkflowId: workflowId,
+      sourceVerificationRunId: runId,
+      topModule: pwmChainDemo ? "pwm_controller" : undefined,
+    }));
+    router.push(`/apps/embedded-run?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}`);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -230,6 +295,11 @@ export default function VerifyAppPage() {
           <p className="mt-2 text-slate-300">
             Verification Intelligence: TB + SVA + Coverage plan + Simulation summary (optional formal/golden model).
           </p>
+          {pwmChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              PWM full-stack demo: verify the generated controller RTL before creating Rust firmware that drives it.
+            </div>
+          ) : null}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="space-y-3">
@@ -372,7 +442,17 @@ export default function VerifyAppPage() {
                     >
                       Download ZIP (full=1)
                     </button>
+                    {handoffFlow && rtlSourceMode === "from_arch2rtl" ? (
+                      <button
+                        onClick={openInEmbeddedFirmware}
+                        disabled={workflowRow?.status !== "completed"}
+                        className="ml-3 mt-3 rounded-xl bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                      >
+                        Open in Firmware
+                      </button>
+                    ) : null}
                   </div>
+                  {pwmChainDemo ? <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" /> : null}
                   <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}

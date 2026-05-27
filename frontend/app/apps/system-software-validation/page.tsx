@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import { VALIDATION_HANDOFF_PREFILL_KEY } from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -52,6 +54,8 @@ export default function SystemSoftwareValidationAppPage() {
   const [systemRtlWorkflowId, setSystemRtlWorkflowId] = useState("");
   const [goal, setGoal] = useState("");
   const [notes, setNotes] = useState("");
+  const [handoffFlow, setHandoffFlow] = useState(false);
+  const [pwmChainDemo, setPwmChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -97,6 +101,36 @@ export default function SystemSoftwareValidationAppPage() {
       setLoading(false);
     })();
   }, [router]);
+
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1") return;
+    setHandoffFlow(true);
+    setPwmChainDemo(params.get("pwm_chain") === "1");
+    const raw = window.localStorage.getItem(VALIDATION_HANDOFF_PREFILL_KEY);
+    if (!raw) return;
+    try {
+      const prefill = JSON.parse(raw) as {
+        projectName?: string;
+        validationMode?: ValidationMode;
+        systemSoftwareWorkflowId?: string;
+        systemFirmwareWorkflowId?: string;
+        systemRtlWorkflowId?: string;
+        goal?: string;
+        notes?: string;
+      };
+      setProjectName(prefill.projectName || "");
+      setValidationMode(prefill.validationMode || "full_co_simulation");
+      setSystemSoftwareWorkflowId(prefill.systemSoftwareWorkflowId || "");
+      setSystemFirmwareWorkflowId(prefill.systemFirmwareWorkflowId || "");
+      setSystemRtlWorkflowId(prefill.systemRtlWorkflowId || "");
+      setGoal(prefill.goal || "");
+      setNotes(prefill.notes || "");
+    } catch {
+      window.localStorage.removeItem(VALIDATION_HANDOFF_PREFILL_KEY);
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (!workflowId) return;
@@ -231,6 +265,15 @@ export default function SystemSoftwareValidationAppPage() {
             Validate generated system software as either a software package-only
             flow or a full software → firmware → RTL co-simulation flow.
           </p>
+          {pwmChainDemo ? (
+            <div className="mt-4 rounded-xl border border-amber-800/60 bg-amber-950/20 p-4 text-sm text-slate-200">
+              PWM full-stack demo: validate the generated software, Rust firmware handoff, and imported PWM RTL together.
+            </div>
+          ) : handoffFlow ? (
+            <div className="mt-4 rounded-xl border border-amber-800/60 bg-amber-950/20 p-4 text-sm text-slate-200">
+              Imported full-stack handoff: validate the generated software, firmware, and original Arch2RTL hardware together.
+            </div>
+          ) : null}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="space-y-4">
@@ -383,6 +426,11 @@ export default function SystemSoftwareValidationAppPage() {
                   >
                     Download ZIP (full=1)
                   </button>
+                  {pwmChainDemo ? (
+                    <div className="mt-4">
+                      <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="validation" />
+                    </div>
+                  ) : null}
                     <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}

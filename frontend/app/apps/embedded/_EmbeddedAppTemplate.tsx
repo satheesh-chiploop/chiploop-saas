@@ -7,6 +7,15 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import {
+  DESIGN_CHAIN_CONTEXT_KEY,
+  EMBEDDED_HANDOFF_PREFILL_KEY,
+  GENERIC_SOFTWARE_GOAL,
+  PWM_SOFTWARE_GOAL,
+  SOFTWARE_HANDOFF_PREFILL_KEY,
+  type DesignChainContext,
+} from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -31,6 +40,13 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
   const [loading, setLoading] = useState(true);
   const [specText, setSpecText] = useState("");
   const [goal, setGoal] = useState("");
+  const [handoffFlow, setHandoffFlow] = useState(false);
+  const [pwmChainDemo, setPwmChainDemo] = useState(false);
+  const [fromWorkflowId, setFromWorkflowId] = useState("");
+  const [fromRunId, setFromRunId] = useState("");
+  const [sourceVerificationWorkflowId, setSourceVerificationWorkflowId] = useState("");
+  const [sourceVerificationRunId, setSourceVerificationRunId] = useState("");
+  const [topModule, setTopModule] = useState("");
 
   const [toolchain, setToolchain] = useState<Record<string, string>>({
     fw_language: "rust",
@@ -82,6 +98,36 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
       if (!uid) router.push("/");
     })();
   }, [router]);
+
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1") return;
+    setHandoffFlow(true);
+    setPwmChainDemo(params.get("pwm_chain") === "1");
+    const raw = window.localStorage.getItem(EMBEDDED_HANDOFF_PREFILL_KEY);
+    if (!raw) return;
+    try {
+      const prefill = JSON.parse(raw) as {
+        specText?: string;
+        goal?: string;
+        fromWorkflowId?: string;
+        fromRunId?: string;
+        sourceVerificationWorkflowId?: string;
+        sourceVerificationRunId?: string;
+        topModule?: string;
+      };
+      setSpecText(prefill.specText || "");
+      setGoal(prefill.goal || "");
+      setFromWorkflowId(prefill.fromWorkflowId || "");
+      setFromRunId(prefill.fromRunId || "");
+      setSourceVerificationWorkflowId(prefill.sourceVerificationWorkflowId || "");
+      setSourceVerificationRunId(prefill.sourceVerificationRunId || "");
+      setTopModule(prefill.topModule || "pwm_controller");
+    } catch {
+      window.localStorage.removeItem(EMBEDDED_HANDOFF_PREFILL_KEY);
+    }
+  }, [loading]);
 
   // Subscribe to workflow row (same as DQA)
   useEffect(() => {
@@ -137,6 +183,11 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
         goal: goal || undefined,
         toolchain,
         toggles,
+        from_workflow_id: fromWorkflowId || undefined,
+        from_run_id: fromRunId || undefined,
+        source_verification_workflow_id: sourceVerificationWorkflowId || undefined,
+        source_verification_run_id: sourceVerificationRunId || undefined,
+        top_module: topModule || undefined,
       });
 
       setWorkflowId(out.workflow_id);
@@ -151,6 +202,31 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
   function downloadZip() {
     if (!workflowId) return;
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
+  }
+
+  function openInSystemSoftware() {
+    if (!workflowId) return;
+    let context: DesignChainContext = {};
+    try {
+      context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+    } catch {
+      context = {};
+    }
+    context.embeddedWorkflowId = workflowId;
+    context.embeddedRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    window.localStorage.setItem(SOFTWARE_HANDOFF_PREFILL_KEY, JSON.stringify({
+      projectName: pwmChainDemo ? "pwm_fan_control_software" : "generated_hardware_software",
+      systemFirmwareWorkflowId: workflowId,
+      systemRtlWorkflowId: workflowId,
+      softwareGoal: pwmChainDemo ? PWM_SOFTWARE_GOAL : GENERIC_SOFTWARE_GOAL,
+      appNames: pwmChainDemo ? "fan_status_cli, fan_profile_service" : "",
+      targetLanguage: "rust",
+      sdkStyle: "rust_crate",
+      buildSystem: "cargo",
+      notes: "Source RTL and interface artifacts were imported from Arch2RTL; verification lineage is preserved in the firmware handoff.",
+    }));
+    router.push(`/apps/system-software?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -200,6 +276,15 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
         <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-6">
           <div className="text-2xl font-extrabold">{title}</div>
           <div className="mt-1 text-slate-300">{subtitle}</div>
+          {pwmChainDemo ? (
+            <div className="mt-4 rounded-xl border border-emerald-900/60 bg-emerald-950/20 p-4 text-sm text-slate-200">
+              PWM full-stack demo: this run imports the generated PWM RTL and register map, then creates Rust fan-control firmware collateral against that hardware interface.
+            </div>
+          ) : handoffFlow ? (
+            <div className="mt-4 rounded-xl border border-emerald-900/60 bg-emerald-950/20 p-4 text-sm text-slate-200">
+              Imported hardware handoff: this run uses generated RTL and register-map artifacts from the selected Arch2RTL workflow.
+            </div>
+          ) : null}
         </div>
 
         {/* One-shot intake */}
@@ -261,6 +346,16 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
               </div>
             ) : null}
             {workflowId ? <AskThisRunPanel workflowId={workflowId} compact /> : null}
+            {workflowId && handoffFlow && runPath === "/apps/embedded/run" ? (
+              <button
+                type="button"
+                onClick={openInSystemSoftware}
+                disabled={workflowRow?.status !== "completed"}
+                className="rounded-xl bg-cyan-700 px-4 py-2 text-sm font-semibold hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-400"
+              >
+                Open in System Software
+              </button>
+            ) : null}
           </div>
 
           {/* Toolchain + toggles */}
@@ -291,6 +386,10 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
             ))}
           </div>
         </div>
+
+        {pwmChainDemo && workflowId ? (
+          <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="embedded" />
+        ) : null}
 
         {/* Live logs */}
         <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-6">
