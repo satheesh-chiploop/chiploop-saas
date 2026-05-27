@@ -239,6 +239,7 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
   ]),
   Digital_Verify: linearWorkflowDefinition([
     "Digital Verification Handoff Ingest Agent",
+    "Digital Functional Coverage Agent",
     "Digital Testbench Generator Agent",
     "Digital Assertions (SVA) Agent",
     "Digital Simulation Control Agent",

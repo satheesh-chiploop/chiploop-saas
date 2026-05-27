@@ -369,7 +369,7 @@ export default function VerifyAppPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-300">Seed count</label>
+                  <label className="block text-sm text-slate-300">Seeds per testcase</label>
                   <input
                     type="number"
                     min={1}
@@ -387,6 +387,9 @@ export default function VerifyAppPage() {
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
                 placeholder="e.g., 90% line, 80% functional"
               />
+              <div className="text-xs text-slate-500">
+                Reported coverage is functional bin coverage generated from the RTL specification.
+              </div>
 
               <label className="block text-sm text-slate-300">Simulator (optional)</label>
               <input

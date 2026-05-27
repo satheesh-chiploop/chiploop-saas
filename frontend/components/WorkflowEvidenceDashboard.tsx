@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { ApiClientError, apiGet } from "@/lib/apiClient";
 
 type Stage = "arch2rtl" | "verification" | "embedded" | "software" | "validation";
 type JsonMap = Record<string, unknown>;
@@ -34,12 +33,16 @@ function number(value: unknown): number {
 }
 
 async function artifact(workflowId: string, filename: string): Promise<JsonMap | null> {
-  const response = await fetch(
-    `${API_BASE}/apps/dashboard/artifact/${workflowId}?filename=${encodeURIComponent(filename)}`
-  );
-  if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Unable to load ${filename}.`);
-  return record(await response.json());
+  try {
+    return record(
+      await apiGet<JsonMap>(
+        `/apps/dashboard/artifact/${workflowId}?filename=${encodeURIComponent(filename)}`
+      )
+    );
+  } catch (reason) {
+    if (reason instanceof ApiClientError && reason.status === 404) return null;
+    throw reason;
+  }
 }
 
 function Stat({ title, value }: { title: string; value: string | number }) {
@@ -135,7 +138,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Stat title="Runs" value={total} />
-            <Stat title="Coverage" value={coveragePct} />
+            <Stat title="Functional Coverage" value={coveragePct} />
           </div>
         </div>
       );
