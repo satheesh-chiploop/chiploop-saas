@@ -246,6 +246,8 @@ export default function VerifyAppPage() {
     } catch {
       context = {};
     }
+    const sourceArch2rtlWorkflowId = context.arch2rtlWorkflowId || fromWorkflowId || undefined;
+    if (sourceArch2rtlWorkflowId) context.arch2rtlWorkflowId = sourceArch2rtlWorkflowId;
     context.verifyWorkflowId = workflowId;
     context.verifyRunId = runId || undefined;
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
@@ -254,7 +256,7 @@ export default function VerifyAppPage() {
       goal: pwmChainDemo
         ? "Generate Rust firmware and validate its PWM interface against the imported RTL."
         : "Generate firmware and validation collateral from the actual imported RTL and register map.",
-      fromWorkflowId: context.arch2rtlWorkflowId,
+      fromWorkflowId: sourceArch2rtlWorkflowId,
       fromRunId: context.arch2rtlRunId,
       sourceVerificationWorkflowId: workflowId,
       sourceVerificationRunId: runId,
@@ -433,8 +435,13 @@ export default function VerifyAppPage() {
               {workflowId ? (
                 <div className="mt-4 space-y-4">
                   <div className="rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+                    {rtlSourceMode === "from_arch2rtl" ? (
+                      <div>
+                        source Arch2RTL workflow_id: <span className="text-slate-100">{fromWorkflowId || "not selected"}</span>
+                      </div>
+                    ) : null}
                     <div>
-                      workflow_id: <span className="text-slate-100">{workflowId}</span>
+                      Verify workflow_id: <span className="text-slate-100">{workflowId}</span>
                     </div>
                     <div>
                       run_id: <span className="text-slate-100">{runId}</span>

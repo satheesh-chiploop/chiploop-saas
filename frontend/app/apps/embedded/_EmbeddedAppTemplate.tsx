@@ -38,6 +38,8 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
+  const [sessionUserId, setSessionUserId] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [specText, setSpecText] = useState("");
   const [goal, setGoal] = useState("");
   const [handoffFlow, setHandoffFlow] = useState(false);
@@ -70,9 +72,10 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
 
   function authHeaders(): Record<string, string> {
-    // If you’re using cookie auth, you may not need anything here.
-    // Kept minimal like your DQA page pattern.
-    return {};
+    const headers: Record<string, string> = {};
+    if (sessionUserId) headers["x-user-id"] = sessionUserId;
+    if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+    return headers;
   }
 
   async function postJSON<T>(path: string, body: any): Promise<T> {
@@ -92,10 +95,14 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const { data } = await supabase.auth.getUser();
-      const uid = data?.user?.id ?? null;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        router.replace("/login?next=/apps/embedded-run");
+        return;
+      }
+      setSessionUserId(session.user.id);
+      setAccessToken(session.access_token);
       setLoading(false);
-      if (!uid) router.push("/");
     })();
   }, [router]);
 
@@ -171,8 +178,9 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
 
   const canRun = useMemo(() => {
     if (running) return false;
+    if (handoffFlow && (!fromWorkflowId.trim() || !sourceVerificationWorkflowId.trim())) return false;
     return specText.trim().length > 0;
-  }, [running, specText]);
+  }, [running, specText, handoffFlow, fromWorkflowId, sourceVerificationWorkflowId]);
 
   async function runNow() {
     setErr(null);
@@ -283,6 +291,34 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
           ) : handoffFlow ? (
             <div className="mt-4 rounded-xl border border-emerald-900/60 bg-emerald-950/20 p-4 text-sm text-slate-200">
               Imported hardware handoff: this run uses generated RTL and register-map artifacts from the selected Arch2RTL workflow.
+            </div>
+          ) : null}
+          {handoffFlow ? (
+            <div className="mt-4 grid gap-3 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm md:grid-cols-2">
+              <div>
+                <label className="block text-xs text-slate-400">Arch2RTL source workflow ID</label>
+                <input
+                  value={fromWorkflowId}
+                  onChange={(e) => setFromWorkflowId(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-slate-100"
+                  placeholder="Required Arch2RTL workflow ID"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400">Verify evidence workflow ID</label>
+                <input
+                  value={sourceVerificationWorkflowId}
+                  onChange={(e) => setSourceVerificationWorkflowId(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-slate-100"
+                  placeholder="Required Verify workflow ID"
+                />
+              </div>
+              <div className="text-xs text-slate-400">
+                Arch2RTL run ID: <span className="text-slate-200">{fromRunId || "not recorded"}</span>
+              </div>
+              <div className="text-xs text-slate-400">
+                Verify run ID: <span className="text-slate-200">{sourceVerificationRunId || "not recorded"}</span>
+              </div>
             </div>
           ) : null}
         </div>
