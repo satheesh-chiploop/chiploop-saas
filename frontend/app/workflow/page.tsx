@@ -238,8 +238,7 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital Executive Summary Agent",
   ]),
   Digital_Verify: linearWorkflowDefinition([
-    "Digital Spec Agent",
-    "Digital RTL Agent",
+    "Digital Verification Handoff Ingest Agent",
     "Digital Testbench Generator Agent",
     "Digital Assertions (SVA) Agent",
     "Digital Simulation Control Agent",
