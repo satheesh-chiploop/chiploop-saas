@@ -101,6 +101,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
         "system_cosim_trace_validation_report.json",
         "system_cosim_execution_report.json",
         "system_cosim_harness_manifest.json",
+        "system_software_validation_summary.json",
+        "build_validation_report.json",
+        "test_execution_report.json",
+        "mock_runtime_validation_report.json",
+        "package_audit_report.json",
+        "contract_consistency_report.json",
       ],
     };
     Promise.all(files[stage].map(async (filename) => [filename, await artifact(workflowId, filename)] as const))
@@ -235,16 +241,70 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
     const trace = evidence["system_cosim_trace_validation_report.json"] || {};
     const execution = evidence["system_cosim_execution_report.json"] || {};
     const harness = evidence["system_cosim_harness_manifest.json"] || {};
+    const softwareOnlySummary = evidence["system_software_validation_summary.json"] || {};
+    const buildReport = evidence["build_validation_report.json"] || {};
+    const testReport = evidence["test_execution_report.json"] || {};
+    const mockReport = evidence["mock_runtime_validation_report.json"] || {};
+    const packageReport = evidence["package_audit_report.json"] || {};
+    const contractReport = evidence["contract_consistency_report.json"] || {};
     const validationArtifactsLoaded = Boolean(
       evidence["system_software_validation_summary_l2.json"] ||
       evidence["system_cosim_trace_validation_report.json"] ||
       evidence["system_cosim_execution_report.json"] ||
-      evidence["system_cosim_harness_manifest.json"]
+      evidence["system_cosim_harness_manifest.json"] ||
+      evidence["system_software_validation_summary.json"] ||
+      evidence["build_validation_report.json"] ||
+      evidence["test_execution_report.json"] ||
+      evidence["mock_runtime_validation_report.json"] ||
+      evidence["package_audit_report.json"] ||
+      evidence["contract_consistency_report.json"]
     );
     if (!validationArtifactsLoaded) {
       return (
         <div className="mt-5 rounded-lg border border-amber-700/60 bg-amber-950/20 p-4 text-sm text-amber-100">
           Validation artifacts are still syncing or were not found for this workflow yet. Use Download ZIP to confirm the generated artifact names.
+        </div>
+      );
+    }
+
+    if (softwareOnlySummary.validation_scope === "software_only" || evidence["system_software_validation_summary.json"]) {
+      const checks = [
+        { label: "Build", status: firstString(softwareOnlySummary.build_status, buildReport.build_status, "unavailable") },
+        { label: "Tests", status: firstString(softwareOnlySummary.test_status, testReport.test_status, "unavailable") },
+        { label: "Contract", status: firstString(softwareOnlySummary.contract_status, contractReport.status, "unavailable") },
+        { label: "Mock Runtime", status: firstString(softwareOnlySummary.mock_runtime_status, mockReport.mock_runtime_status, "unavailable") },
+        { label: "Package", status: firstString(softwareOnlySummary.package_status, packageReport.package_status, "unavailable") },
+      ];
+      const passCount = checks.filter((item) => ["pass", "complete", "ready", "ok"].includes(item.status)).length;
+      const failCount = checks.filter((item) => ["fail", "failed", "not_ready", "blocked", "error"].includes(item.status)).length;
+      const totalChecks = checks.length;
+      const blockingIssues = array(softwareOnlySummary.blocking_issues).map(String);
+      return (
+        <div className="mt-5 space-y-5">
+          <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+            <div className="space-y-3">
+              <Bar label="Checks passed" value={passCount} total={totalChecks} color="bg-emerald-500" />
+              <Bar label="Checks failed" value={failCount} total={totalChecks} color="bg-rose-500" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Stat title="Verdict" value={String(softwareOnlySummary.overall_status || "unavailable")} />
+              <Stat title="Checks" value={totalChecks} />
+              <Stat title="Blocking Issues" value={blockingIssues.length} />
+            </div>
+          </div>
+          <div className="overflow-hidden rounded-lg border border-slate-800">
+            {checks.map((check) => (
+              <div key={check.label} className="flex items-center justify-between border-b border-slate-800 px-4 py-3 text-sm last:border-b-0">
+                <span className="text-slate-300">{check.label}</span>
+                <span className="font-semibold text-slate-100">{check.status}</span>
+              </div>
+            ))}
+          </div>
+          {blockingIssues.length ? (
+            <div className="rounded-lg border border-amber-700/60 bg-amber-950/20 p-4 text-sm text-amber-100">
+              Blocking issues: {blockingIssues.join(", ")}
+            </div>
+          ) : null}
         </div>
       );
     }
