@@ -49,6 +49,9 @@ export default function VerifyAppPage() {
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
+  const [closureWorkflowId, setClosureWorkflowId] = useState<string | null>(null);
+  const [closureRunId, setClosureRunId] = useState<string | null>(null);
+  const [closureRow, setClosureRow] = useState<WorkflowRow | null>(null);
 
   // Intake (minimal but useful)
   const [rtlSourceMode, setRtlSourceMode] = useState<"from_arch2rtl" | "paste" | "repo_path">("repo_path");
@@ -59,11 +62,15 @@ export default function VerifyAppPage() {
   const [testIntent, setTestIntent] = useState("");
   const [randomVsDirected, setRandomVsDirected] = useState<"random" | "directed">("random");
   const [coverageTargets, setCoverageTargets] = useState("");
-  const [simulatorType, setSimulatorType] = useState("");
+  const [simulatorType, setSimulatorType] = useState("verilator");
+  const [codeCoverageTool, setCodeCoverageTool] = useState("verilator_coverage");
+  const [formalTool, setFormalTool] = useState("none");
+  const [formalSolver, setFormalSolver] = useState("z3");
+  const [goldenModelTool, setGoldenModelTool] = useState("none");
   const [seedCount, setSeedCount] = useState<number>(10);
+  const [runClosureAnalysis, setRunClosureAnalysis] = useState(true);
+  const closureStartedRef = useRef(false);
 
-  const [enableFormal, setEnableFormal] = useState(false);
-  const [enableGoldenModel, setEnableGoldenModel] = useState(false);
   const [handoffFlow, setHandoffFlow] = useState(false);
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
 
@@ -135,6 +142,7 @@ export default function VerifyAppPage() {
       setRandomVsDirected(prefill.randomVsDirected || "directed");
       setCoverageTargets(prefill.coverageTargets || "");
       setSimulatorType(prefill.simulatorType || "verilator");
+      setCodeCoverageTool("verilator_coverage");
       setSeedCount(prefill.seedCount || 4);
     } catch {
       window.localStorage.removeItem(VERIFY_HANDOFF_PREFILL_KEY);
@@ -181,6 +189,52 @@ export default function VerifyAppPage() {
     };
   }, [workflowId]);
 
+  useEffect(() => {
+    if (!closureWorkflowId) return;
+
+    let isActive = true;
+
+    (async () => {
+      const { data, error } = await supabase
+        .from("workflows")
+        .select("id,status,phase,logs,updated_at")
+        .eq("id", closureWorkflowId)
+        .single();
+
+      if (isActive && !error && data) setClosureRow(data as any);
+    })();
+
+    const channel = supabase
+      .channel(`wf-${closureWorkflowId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "workflows", filter: `id=eq.${closureWorkflowId}` },
+        (payload) => {
+          const row = payload.new as any;
+          setClosureRow({
+            id: row.id,
+            status: row.status,
+            phase: row.phase,
+            logs: row.logs,
+            updated_at: row.updated_at,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isActive = false;
+      supabase.removeChannel(channel);
+    };
+  }, [closureWorkflowId]);
+
+  useEffect(() => {
+    if (!runClosureAnalysis || closureStartedRef.current) return;
+    if (!workflowId || workflowRow?.status !== "completed") return;
+    closureStartedRef.current = true;
+    void analyzeClosure();
+  }, [runClosureAnalysis, workflowId, workflowRow?.status]);
+
   const canRun = useMemo(() => {
     if (running) return false;
 
@@ -199,6 +253,10 @@ export default function VerifyAppPage() {
   async function runNow() {
     setErr(null);
     setRunning(true);
+    closureStartedRef.current = false;
+    setClosureWorkflowId(null);
+    setClosureRunId(null);
+    setClosureRow(null);
     try {
       const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>(
         "/apps/verify/run",
@@ -216,10 +274,18 @@ export default function VerifyAppPage() {
           coverage_targets: coverageTargets || undefined,
           simulator_type: simulatorType || undefined,
           seed_count: seedCount,
+          toolchain: {
+            simulator: simulatorType || "verilator",
+            code_coverage: codeCoverageTool,
+            formal: formalTool,
+            formal_solver: formalSolver,
+            golden_model: goldenModelTool,
+          },
+          run_closure_analysis: runClosureAnalysis,
 
           toggles: {
-            enable_formal: enableFormal,
-            enable_golden_model: enableGoldenModel,
+            enable_formal: formalTool !== "none",
+            enable_golden_model: goldenModelTool !== "none",
           },
         }
       );
@@ -233,9 +299,41 @@ export default function VerifyAppPage() {
     }
   }
 
+  async function analyzeClosure() {
+    if (!workflowId) return;
+    setErr(null);
+    try {
+      const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>(
+        "/apps/verify/closure/run",
+        {
+          source_verify_workflow_id: workflowId,
+          coverage_targets: coverageTargets || undefined,
+          seed_count: seedCount,
+          toolchain: {
+            simulator: simulatorType || "verilator",
+            code_coverage: codeCoverageTool,
+            formal: formalTool,
+            formal_solver: formalSolver,
+            golden_model: goldenModelTool,
+          },
+        }
+      );
+      setClosureWorkflowId(out.workflow_id);
+      setClosureRunId(out.run_id);
+    } catch (e: any) {
+      closureStartedRef.current = false;
+      setErr(e?.message || String(e));
+    }
+  }
+
   function downloadZip() {
     if (!workflowId) return;
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
+  }
+
+  function downloadClosureZip() {
+    if (!closureWorkflowId) return;
+    window.open(`${API_BASE}/workflow/${closureWorkflowId}/download_zip?full=1`, "_blank");
   }
 
   function openInEmbeddedFirmware() {
@@ -393,32 +491,93 @@ export default function VerifyAppPage() {
                 Reported coverage is functional bin coverage generated from the RTL specification.
               </div>
 
-              <label className="block text-sm text-slate-300">Simulator (optional)</label>
-              <input
-                value={simulatorType}
-                onChange={(e) => setSimulatorType(e.target.value)}
-                className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
-                placeholder="e.g., iverilog / verilator / vcs / xcelium"
-              />
-
-              <div className="mt-2 space-y-2">
-                <label className="flex items-center gap-2 text-sm text-slate-300">
-                  <input
-                    type="checkbox"
-                    checked={enableFormal}
-                    onChange={(e) => setEnableFormal(e.target.checked)}
-                  />
-                  Enable formal (optional)
-                </label>
-                <label className="flex items-center gap-2 text-sm text-slate-300">
-                  <input
-                    type="checkbox"
-                    checked={enableGoldenModel}
-                    onChange={(e) => setEnableGoldenModel(e.target.checked)}
-                  />
-                  Enable golden model comparison (optional)
-                </label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm text-slate-300">Simulator tool</label>
+                  <select
+                    value={simulatorType}
+                    onChange={(e) => setSimulatorType(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  >
+                    <option value="verilator">Verilator + Cocotb</option>
+                    <option value="icarus" disabled>Icarus Verilog (planned)</option>
+                    <option value="questa" disabled>Questa (planned)</option>
+                    <option value="vcs" disabled>VCS (planned)</option>
+                    <option value="xcelium" disabled>Xcelium (planned)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-300">Code coverage tool</label>
+                  <select
+                    value={codeCoverageTool}
+                    onChange={(e) => setCodeCoverageTool(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  >
+                    <option value="verilator_coverage">verilator_coverage</option>
+                    <option value="none">Disabled</option>
+                    <option value="urg" disabled>Synopsys URG (planned)</option>
+                    <option value="imc" disabled>Cadence IMC (planned)</option>
+                    <option value="vcover" disabled>Questa vcover (planned)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-300">Formal tool</label>
+                  <select
+                    value={formalTool}
+                    onChange={(e) => setFormalTool(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  >
+                    <option value="none">Disabled</option>
+                    <option value="symbiyosys">SymbiYosys (sby)</option>
+                    <option value="jasper" disabled>JasperGold (planned)</option>
+                    <option value="vc_formal" disabled>VC Formal (planned)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-slate-300">Formal solver</label>
+                  <select
+                    value={formalSolver}
+                    onChange={(e) => setFormalSolver(e.target.value)}
+                    disabled={formalTool === "none"}
+                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100 disabled:opacity-60"
+                  >
+                    <option value="z3">Z3</option>
+                    <option value="boolector">Boolector</option>
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm text-slate-300">Golden model comparison</label>
+                  <select
+                    value={goldenModelTool}
+                    onChange={(e) => setGoldenModelTool(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  >
+                    <option value="none">Disabled</option>
+                    <option value="chiploop_python_scoreboard">ChipLoop Python scoreboard</option>
+                    <option value="custom_python" disabled>Custom Python model (planned)</option>
+                    <option value="matlab" disabled>MATLAB reference model (planned)</option>
+                  </select>
+                </div>
               </div>
+
+              <div className="rounded-xl border border-slate-800 bg-black/20 p-3 text-xs text-slate-400">
+                Active tools: {simulatorType || "verilator"} simulation, {codeCoverageTool === "none" ? "no code coverage" : codeCoverageTool}, {formalTool === "none" ? "formal disabled" : `${formalTool} + ${formalSolver}`}, {goldenModelTool === "none" ? "golden model disabled" : goldenModelTool}.
+              </div>
+
+              <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={runClosureAnalysis}
+                  onChange={(e) => setRunClosureAnalysis(e.target.checked)}
+                  className="mt-1"
+                />
+                <span>
+                  Run closure analysis after Verify
+                  <span className="mt-1 block text-xs text-slate-500">
+                    Starts a linked child workflow when Verify completes to analyze coverage gaps, failing seeds, and recommended next actions.
+                  </span>
+                </span>
+              </label>
 
               <button
                 onClick={runNow}
@@ -452,6 +611,13 @@ export default function VerifyAppPage() {
                     >
                       Download ZIP (full=1)
                     </button>
+                    <button
+                      onClick={analyzeClosure}
+                      disabled={workflowRow?.status !== "completed" || Boolean(closureWorkflowId)}
+                      className="ml-3 mt-3 rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                    >
+                      Analyze Closure Gaps
+                    </button>
                     {handoffFlow && rtlSourceMode === "from_arch2rtl" ? (
                       <button
                         onClick={openInEmbeddedFirmware}
@@ -463,6 +629,32 @@ export default function VerifyAppPage() {
                     ) : null}
                   </div>
                   {pwmChainDemo ? <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" /> : null}
+                  {closureWorkflowId ? (
+                    <div className="rounded-xl border border-cyan-900/60 bg-cyan-950/15 p-4 text-sm text-slate-300">
+                      <div className="font-semibold text-cyan-200">Verification Closure Analysis</div>
+                      <div className="mt-2">
+                        closure workflow_id: <span className="text-slate-100">{closureWorkflowId}</span>
+                      </div>
+                      <div>
+                        closure run_id: <span className="text-slate-100">{closureRunId}</span>
+                      </div>
+                      <div>
+                        status: <span className="text-slate-100">{closureRow?.status || "queued"}</span>
+                      </div>
+                      <button
+                        onClick={downloadClosureZip}
+                        disabled={closureRow?.status !== "completed"}
+                        className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-700"
+                      >
+                        Download Closure Plan
+                      </button>
+                      <div className="mt-3 max-h-52 overflow-auto rounded-lg border border-slate-800 bg-black/30 p-3 font-mono text-xs text-slate-400">
+                        {parseLogLines(closureRow?.logs).map((line, index) => (
+                          <div key={`${line}-${index}`}>{line}</div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                   <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}

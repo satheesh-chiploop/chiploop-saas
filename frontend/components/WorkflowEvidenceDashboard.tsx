@@ -46,6 +46,10 @@ function firstString(...values: unknown[]): string {
   return "";
 }
 
+function pct(value: unknown): string {
+  return typeof value === "number" && Number.isFinite(value) ? `${value}%` : "Unavailable";
+}
+
 async function artifact(workflowId: string, filename: string): Promise<JsonMap | null> {
   try {
     return record(
@@ -151,19 +155,28 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
     if (stage === "verification") {
       const simulation = record(evidence["simulation_summary_coverage.json"]?.simulation);
       const coverage = record(evidence["simulation_summary_coverage.json"]?.coverage);
+      const codeCoverage = record(coverage.code);
+      const assertionCoverage = record(coverage.assertions);
+      const formal = record(evidence["simulation_summary_coverage.json"]?.formal);
+      const golden = record(evidence["simulation_summary_coverage.json"]?.golden_model);
+      const toolchain = record(evidence["simulation_summary_coverage.json"]?.toolchain);
       const passed = number(simulation.pass);
       const failed = number(simulation.fail);
       const total = number(simulation.total);
-      const coveragePct = typeof coverage.functional_coverage_pct === "number" ? `${coverage.functional_coverage_pct}%` : "Unavailable";
       return (
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_280px]">
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_320px]">
           <div className="space-y-3">
             <Bar label="Simulation passed" value={passed} total={total} color="bg-emerald-500" />
             <Bar label="Simulation failed" value={failed} total={total} color="bg-rose-500" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
             <Stat title="Runs" value={total} />
-            <Stat title="Functional Coverage" value={coveragePct} />
+            <Stat title="Functional Coverage" value={pct(coverage.functional_coverage_pct)} />
+            <Stat title="Code Line Coverage" value={pct(codeCoverage.line_coverage_pct)} />
+            <Stat title="SVA Assertion Coverage" value={pct(assertionCoverage.assertion_pass_pct)} />
+            <Stat title="Formal" value={String(formal.status || "not_enabled")} />
+            <Stat title="Golden Model" value={String(golden.status || "not_enabled")} />
+            <Stat title="Tools" value={String(toolchain.simulator || "verilator")} />
           </div>
         </div>
       );
@@ -314,7 +327,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
     const scenarios = traceScenarios.length ? traceScenarios : executionScenarios;
     const passed = firstNumber(summary.scenario_pass_count, trace.scenario_pass_count, execution.scenario_pass_count);
     const failed = firstNumber(summary.scenario_fail_count, trace.scenario_fail_count, execution.scenario_fail_count);
-    const blocked = firstNumber(summary.scenario_blocked_count, execution.scenario_blocked_count);
+    const blocked = traceScenarios.length
+      ? traceScenarios.filter((entry) => record(entry).trace_validation_status === "blocked").length
+      : firstNumber(summary.scenario_blocked_count, execution.scenario_blocked_count);
     const notApplicable = firstNumber(summary.scenario_not_applicable_count, trace.scenario_not_applicable_count);
     const total = firstNumber(summary.scenario_count, trace.scenario_count, execution.scenario_count, scenarios.length);
     const verdict = firstString(
