@@ -697,7 +697,7 @@ export default function Arch2RTLAppPage() {
                       Open in Verification
                     </button>
                   </div>
-                  {pwmChainDemo ? <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="arch2rtl" /> : null}
+                  <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="arch2rtl" />
                   <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}

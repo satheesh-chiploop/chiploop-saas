@@ -102,7 +102,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
     if (!workflowId || status !== "completed") return;
     let active = true;
     const files: Record<Stage, string[]> = {
-      arch2rtl: ["digital_regmap.json"],
+      arch2rtl: ["arch2rtl_dashboard.json", "digital_regmap.json"],
       verification: ["simulation_summary_coverage.json"],
       embedded: ["system_firmware_dashboard.json", "system_firmware_execution.json"],
       software: ["system_software_api_contract.json", "system_software_package.json"],
@@ -138,6 +138,40 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
     if (error) return <div className="mt-5 text-sm text-amber-300">{error}</div>;
 
     if (stage === "arch2rtl") {
+      const dashboard = record(evidence["arch2rtl_dashboard.json"]);
+      if (Object.keys(dashboard).length) {
+        const lint = record(dashboard.lint);
+        const storage = record(dashboard.storage);
+        const timing = record(dashboard.timing);
+        const iface = record(dashboard.interface);
+        const clockReset = record(dashboard.clock_reset);
+        const regmap = record(dashboard.register_map);
+        const lintStatus = firstString(lint.status, "unavailable");
+        return (
+          <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(560px,1.2fr)]">
+            <div className="space-y-3">
+              <Bar label="Inputs" value={number(iface.input_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-cyan-500" />
+              <Bar label="Outputs" value={number(iface.output_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-emerald-500" />
+              <Bar label="Flip-flops" value={number(storage.flipflop_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-violet-500" />
+              <Bar label="Latches" value={number(storage.latch_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-amber-500" />
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-3">
+              <Stat title="Lint" value={lintStatus} />
+              <Stat title="Flip-flops" value={number(storage.flipflop_count)} />
+              <Stat title="Latches" value={number(storage.latch_count)} />
+              <Stat title="Full-cycle Paths" value={number(timing.full_cycle_path_count)} />
+              <Stat title="Half-cycle Paths" value={number(timing.half_cycle_path_count)} />
+              <Stat title="Inputs" value={number(iface.input_count)} />
+              <Stat title="Outputs" value={number(iface.output_count)} />
+              <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
+              <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
+              <Stat title="Modules" value={number(dashboard.module_count)} />
+              <Stat title="RTL Files" value={number(dashboard.rtl_file_count)} />
+              <Stat title="Registers" value={number(regmap.register_count)} />
+            </div>
+          </div>
+        );
+      }
       const registers = array(record(evidence["digital_regmap.json"]?.regmap).registers);
       return registers.length ? (
         <div className="mt-5">
@@ -161,6 +195,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
     if (stage === "verification") {
       const simulation = record(evidence["simulation_summary_coverage.json"]?.simulation);
       const coverage = record(evidence["simulation_summary_coverage.json"]?.coverage);
+      const functional = record(coverage.functional);
       const codeCoverage = record(coverage.code);
       const assertionCoverage = record(coverage.assertions);
       const formal = record(evidence["simulation_summary_coverage.json"]?.formal);
@@ -179,16 +214,37 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
         String(toolchain.code_coverage || ""),
         String(toolchain.formal || ""),
       ].filter(Boolean).join(" / ");
+      const functionalGaps = array(functional.gaps);
       return (
-        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(420px,0.9fr)]">
-          <div className="space-y-3">
-            <Bar label="Simulation passed" value={passed} total={total} color="bg-emerald-500" />
-            <Bar label="Simulation failed" value={failed} total={total} color="bg-rose-500" />
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,0.85fr)_minmax(520px,1.15fr)]">
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Bar label="Simulation passed" value={passed} total={total} color="bg-emerald-500" />
+              <Bar label="Simulation failed" value={failed} total={total} color="bg-rose-500" />
+            </div>
+            {functionalGaps.length ? (
+              <div className="rounded-lg border border-amber-800/70 bg-amber-950/20 p-3">
+                <div className="text-xs font-semibold text-amber-200">Functional coverage not met</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {functionalGaps.slice(0, 6).map((item, index) => {
+                    const gap = record(item);
+                    return (
+                      <span key={index} className="rounded border border-amber-700/60 px-2 py-1 text-xs text-amber-100">
+                        {String(gap.coverage_point || gap.signal || "coverage_point")}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
           </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-3">
             <Stat title="Runs" value={total} />
             <Stat title="Functional Coverage" value={pct(coverage.functional_coverage_pct)} />
-            <Stat title="Code Line Coverage" value={pctWithStatus(codeCoverage.line_coverage_pct, codeStatus)} />
+            <Stat title="Code Line" value={pctWithStatus(codeCoverage.line_coverage_pct, codeStatus)} />
+            <Stat title="Code Branch" value={pctWithStatus(codeCoverage.branch_coverage_pct, codeStatus)} />
+            <Stat title="Code Condition" value={pctWithStatus(codeCoverage.condition_coverage_pct, codeCoverage.condition_source || codeStatus)} />
+            <Stat title="Code Toggle" value={pctWithStatus(codeCoverage.toggle_coverage_pct, codeCoverage.toggle_source || codeStatus)} />
             <Stat title="SVA Assertion Coverage" value={pct(assertionCoverage.assertion_pass_pct)} />
             <Stat title="Formal" value={formalValue} />
             <Stat title="Golden Model" value={String(golden.status || "not_enabled")} />

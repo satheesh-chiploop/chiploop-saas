@@ -60,7 +60,7 @@ export default function VerifyAppPage() {
   const [pastedRtl, setPastedRtl] = useState("");
 
   const [testIntent, setTestIntent] = useState("");
-  const [randomVsDirected, setRandomVsDirected] = useState<"random" | "directed">("random");
+  const [randomVsDirected, setRandomVsDirected] = useState<"random" | "directed" | "both">("both");
   const [coverageTargets, setCoverageTargets] = useState("");
   const [simulatorType, setSimulatorType] = useState("verilator");
   const [codeCoverageTool, setCodeCoverageTool] = useState("verilator_coverage");
@@ -131,7 +131,7 @@ export default function VerifyAppPage() {
       const prefill = JSON.parse(raw) as {
         fromWorkflowId?: string;
         testIntent?: string;
-        randomVsDirected?: "random" | "directed";
+        randomVsDirected?: "random" | "directed" | "both";
         coverageTargets?: string;
         simulatorType?: string;
         seedCount?: number;
@@ -139,7 +139,7 @@ export default function VerifyAppPage() {
       setRtlSourceMode("from_arch2rtl");
       setFromWorkflowId(prefill.fromWorkflowId || "");
       setTestIntent(prefill.testIntent || "");
-      setRandomVsDirected(prefill.randomVsDirected || "directed");
+      setRandomVsDirected(prefill.randomVsDirected || "both");
       setCoverageTargets(prefill.coverageTargets || "");
       setSimulatorType(prefill.simulatorType || "verilator");
       setCodeCoverageTool("verilator_coverage");
@@ -401,7 +401,26 @@ export default function VerifyAppPage() {
             </div>
           ) : null}
 
-          <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+          {pwmChainDemo || handoffFlow ? (
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+              {["RTL", "Verify", "Firmware", "Software", "Validation"].map((stage, index, stages) => (
+                <div key={stage} className="flex items-center gap-2">
+                  <span
+                    className={`rounded-full border px-3 py-1 font-semibold ${
+                      stage === "Verify"
+                        ? "border-cyan-400 bg-cyan-500 text-black"
+                        : "border-slate-700 bg-black/30 text-slate-300"
+                    }`}
+                  >
+                    {stage}
+                  </span>
+                  {index < stages.length - 1 ? <span className="text-slate-600">&gt;</span> : null}
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,0.85fr)]">
             <div className="space-y-3">
               <label className="block text-sm text-slate-300">RTL source</label>
               <select
@@ -457,14 +476,15 @@ export default function VerifyAppPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-slate-300">Random vs directed</label>
+                  <label className="block text-sm text-slate-300">Test mix</label>
                   <select
                     value={randomVsDirected}
                     onChange={(e) => setRandomVsDirected(e.target.value as any)}
                     className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
                   >
-                    <option value="random">Random</option>
-                    <option value="directed">Directed</option>
+                    <option value="both">Directed then random</option>
+                    <option value="directed">Directed only</option>
+                    <option value="random">Random only</option>
                   </select>
                 </div>
 
@@ -591,7 +611,7 @@ export default function VerifyAppPage() {
 
               {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
 
-              {workflowId ? (
+              {false && workflowId ? (
                 <div className="mt-4 space-y-4">
                   <div className="rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
                     {rtlSourceMode === "from_arch2rtl" ? (
@@ -659,7 +679,9 @@ export default function VerifyAppPage() {
               ) : null}
             </div>
 
-            <div>
+            <div className="space-y-4">
+              {rtlSourceMode === "paste" ? (
+                <div>
               <label className="block text-sm text-slate-300">Paste RTL (only if RTL source = paste)</label>
               <textarea
                 value={pastedRtl}
@@ -672,12 +694,109 @@ export default function VerifyAppPage() {
               <div className="mt-2 text-xs text-slate-500">
                 Minimal mode: saved as one file. We can enhance later to multi-file paste.
               </div>
+                </div>
+              ) : null}
+              {rtlSourceMode !== "paste" ? (
+                <div className="rounded-2xl border border-slate-800 bg-black/20 p-4 text-sm text-slate-300">
+                  <div className="font-semibold text-slate-100">RTL source</div>
+                  {rtlSourceMode === "from_arch2rtl" ? (
+                    <div className="mt-2">
+                      Imported from Arch2RTL workflow:{" "}
+                      <span className="break-all text-slate-100">{fromWorkflowId || "not selected"}</span>
+                    </div>
+                  ) : (
+                    <div className="mt-2">
+                      Repo / path: <span className="break-all text-slate-100">{repoPath || "not selected"}</span>
+                    </div>
+                  )}
+                </div>
+              ) : null}
+
+              {workflowId ? (
+                <>
+                  <div className="rounded-2xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+                    <div className="font-semibold text-slate-100">Run Status</div>
+                    {rtlSourceMode === "from_arch2rtl" ? (
+                      <div className="mt-2">
+                        source Arch2RTL workflow_id:{" "}
+                        <span className="break-all text-slate-100">{fromWorkflowId || "not selected"}</span>
+                      </div>
+                    ) : null}
+                    <div className="mt-1">
+                      Verify workflow_id: <span className="break-all text-slate-100">{workflowId}</span>
+                    </div>
+                    <div className="mt-1">
+                      run_id: <span className="break-all text-slate-100">{runId}</span>
+                    </div>
+                    <div className="mt-1">
+                      status: <span className="text-slate-100">{workflowRow?.status || "queued"}</span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        onClick={downloadZip}
+                        className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700"
+                      >
+                        Download ZIP (full=1)
+                      </button>
+                      <button
+                        onClick={analyzeClosure}
+                        disabled={workflowRow?.status !== "completed" || Boolean(closureWorkflowId)}
+                        className="rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                      >
+                        Analyze Closure Gaps
+                      </button>
+                      {handoffFlow && rtlSourceMode === "from_arch2rtl" ? (
+                        <button
+                          onClick={openInEmbeddedFirmware}
+                          disabled={workflowRow?.status !== "completed"}
+                          className="rounded-xl bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                        >
+                          Open in Firmware
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" />
+
+                  {closureWorkflowId ? (
+                    <div className="rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-4 text-sm text-slate-300">
+                      <div className="font-semibold text-cyan-200">Verification Closure Analysis</div>
+                      <div className="mt-2">
+                        closure workflow_id: <span className="break-all text-slate-100">{closureWorkflowId}</span>
+                      </div>
+                      <div>
+                        closure run_id: <span className="break-all text-slate-100">{closureRunId}</span>
+                      </div>
+                      <div>
+                        status: <span className="text-slate-100">{closureRow?.status || "queued"}</span>
+                      </div>
+                      <button
+                        onClick={downloadClosureZip}
+                        disabled={closureRow?.status !== "completed"}
+                        className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-700"
+                      >
+                        Download Closure Plan
+                      </button>
+                      <div className="mt-3 max-h-52 overflow-auto rounded-lg border border-slate-800 bg-black/30 p-3 font-mono text-xs text-slate-400">
+                        {parseLogLines(closureRow?.logs).map((line, index) => (
+                          <div key={`${line}-${index}`}>{line}</div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <div className="rounded-2xl border border-slate-800 bg-black/20 p-5 text-sm text-slate-400">
+                  Run evidence appears here after Verify completes.
+                </div>
+              )}
             </div>
           </div>
 
-          {pwmChainDemo && workflowId ? (
+          {workflowId ? (
             <div className="mt-6">
-              <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" />
+              <AskThisRunPanel workflowId={workflowId} compact />
             </div>
           ) : null}
 
