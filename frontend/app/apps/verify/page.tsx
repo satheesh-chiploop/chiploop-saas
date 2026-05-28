@@ -401,7 +401,7 @@ export default function VerifyAppPage() {
             </div>
           ) : null}
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
             <div className="space-y-3">
               <label className="block text-sm text-slate-300">RTL source</label>
               <select
@@ -628,7 +628,6 @@ export default function VerifyAppPage() {
                       </button>
                     ) : null}
                   </div>
-                  {pwmChainDemo ? <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" /> : null}
                   {closureWorkflowId ? (
                     <div className="rounded-xl border border-cyan-900/60 bg-cyan-950/15 p-4 text-sm text-slate-300">
                       <div className="font-semibold text-cyan-200">Verification Closure Analysis</div>
@@ -665,7 +664,7 @@ export default function VerifyAppPage() {
               <textarea
                 value={pastedRtl}
                 onChange={(e) => setPastedRtl(e.target.value)}
-                rows={18}
+                rows={rtlSourceMode === "paste" ? 18 : 8}
                 className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
                 placeholder="Paste your RTL here… (minimal mode stores it as rtl/top.sv)"
                 disabled={rtlSourceMode !== "paste"}
@@ -675,6 +674,12 @@ export default function VerifyAppPage() {
               </div>
             </div>
           </div>
+
+          {pwmChainDemo && workflowId ? (
+            <div className="mt-6">
+              <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" />
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
             <div className="text-sm font-semibold">Live logs</div>

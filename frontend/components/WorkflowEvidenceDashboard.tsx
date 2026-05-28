@@ -50,6 +50,12 @@ function pct(value: unknown): string {
   return typeof value === "number" && Number.isFinite(value) ? `${value}%` : "Unavailable";
 }
 
+function pctWithStatus(value: unknown, status: unknown): string {
+  if (typeof value === "number" && Number.isFinite(value)) return `${value}%`;
+  const text = typeof status === "string" && status.trim() ? status.trim() : "";
+  return text ? `Unavailable (${text})` : "Unavailable";
+}
+
 async function artifact(workflowId: string, filename: string): Promise<JsonMap | null> {
   try {
     return record(
@@ -163,20 +169,30 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
       const passed = number(simulation.pass);
       const failed = number(simulation.fail);
       const total = number(simulation.total);
+      const codeStatus = String(codeCoverage.status || "");
+      const formalStatus = String(formal.status || "not_enabled");
+      const formalValue = formalStatus === "fail" && typeof formal.returncode === "number"
+        ? `fail (rc ${formal.returncode})`
+        : formalStatus;
+      const toolsValue = [
+        String(toolchain.simulator || "verilator"),
+        String(toolchain.code_coverage || ""),
+        String(toolchain.formal || ""),
+      ].filter(Boolean).join(" / ");
       return (
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_320px]">
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(420px,0.9fr)]">
           <div className="space-y-3">
             <Bar label="Simulation passed" value={passed} total={total} color="bg-emerald-500" />
             <Bar label="Simulation failed" value={failed} total={total} color="bg-rose-500" />
           </div>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-2">
             <Stat title="Runs" value={total} />
             <Stat title="Functional Coverage" value={pct(coverage.functional_coverage_pct)} />
-            <Stat title="Code Line Coverage" value={pct(codeCoverage.line_coverage_pct)} />
+            <Stat title="Code Line Coverage" value={pctWithStatus(codeCoverage.line_coverage_pct, codeStatus)} />
             <Stat title="SVA Assertion Coverage" value={pct(assertionCoverage.assertion_pass_pct)} />
-            <Stat title="Formal" value={String(formal.status || "not_enabled")} />
+            <Stat title="Formal" value={formalValue} />
             <Stat title="Golden Model" value={String(golden.status || "not_enabled")} />
-            <Stat title="Tools" value={String(toolchain.simulator || "verilator")} />
+            <Stat title="Tools" value={toolsValue || "verilator"} />
           </div>
         </div>
       );
