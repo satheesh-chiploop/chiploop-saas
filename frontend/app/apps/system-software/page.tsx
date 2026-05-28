@@ -241,13 +241,15 @@ export default function SystemSoftwareAppPage() {
     }
     context.softwareWorkflowId = workflowId;
     context.softwareRunId = runId || undefined;
+    const sourceFirmwareWorkflowId = context.embeddedWorkflowId || systemFirmwareWorkflowId || "";
+    const sourceRtlWorkflowId = context.arch2rtlWorkflowId || systemRtlWorkflowId || "";
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     window.localStorage.setItem(VALIDATION_HANDOFF_PREFILL_KEY, JSON.stringify({
       projectName: pwmChainDemo ? "pwm_fan_controller_full_stack_validation" : "generated_hardware_full_stack_validation",
       validationMode: "full_co_simulation",
       systemSoftwareWorkflowId: workflowId,
-      systemFirmwareWorkflowId: context.embeddedWorkflowId,
-      systemRtlWorkflowId: context.embeddedWorkflowId,
+      systemFirmwareWorkflowId: sourceFirmwareWorkflowId,
+      systemRtlWorkflowId: sourceRtlWorkflowId,
       goal: pwmChainDemo ? PWM_VALIDATION_GOAL : GENERIC_VALIDATION_GOAL,
       notes: pwmChainDemo
         ? "Validate imported Arch2RTL PWM hardware through Rust firmware and generated fan-control software."

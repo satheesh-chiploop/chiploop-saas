@@ -222,11 +222,12 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
     }
     context.embeddedWorkflowId = workflowId;
     context.embeddedRunId = runId || undefined;
+    const sourceRtlWorkflowId = context.arch2rtlWorkflowId || fromWorkflowId || "";
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     window.localStorage.setItem(SOFTWARE_HANDOFF_PREFILL_KEY, JSON.stringify({
       projectName: pwmChainDemo ? "pwm_fan_control_software" : "generated_hardware_software",
       systemFirmwareWorkflowId: workflowId,
-      systemRtlWorkflowId: workflowId,
+      systemRtlWorkflowId: sourceRtlWorkflowId,
       softwareGoal: pwmChainDemo ? PWM_SOFTWARE_GOAL : GENERIC_SOFTWARE_GOAL,
       appNames: pwmChainDemo ? "fan_status_cli, fan_profile_service" : "",
       targetLanguage: "rust",
