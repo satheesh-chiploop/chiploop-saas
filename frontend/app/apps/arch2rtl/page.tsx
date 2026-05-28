@@ -680,27 +680,6 @@ export default function Arch2RTLAppPage() {
                   </button>
                 </div>
               ) : null}
-
-              {workflowId ? (
-                <div className="mt-4 space-y-4">
-                  <div className="rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
-                    <div>workflow_id: <span className="text-slate-100">{workflowId}</span></div>
-                    <div>run_id: <span className="text-slate-100">{runId}</span></div>
-                    <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
-                      {guidedOnboarding ? "Download ZIP and finish" : "Download ZIP (full=1)"}
-                    </button>
-                    <button
-                      onClick={openInVerification}
-                      disabled={workflowRow?.status !== "completed"}
-                      className="ml-3 mt-3 rounded-xl bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
-                    >
-                      Open in Verification
-                    </button>
-                  </div>
-                  <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="arch2rtl" />
-                  <AskThisRunPanel workflowId={workflowId} compact />
-                </div>
-              ) : null}
             </div>
 
             <div>
@@ -808,6 +787,43 @@ export default function Arch2RTLAppPage() {
               <div className="mt-2 text-xs text-slate-500">Tip: keep it structured (interfaces, clocks, resets, targets).</div>
             </div>
           </div>
+
+          {workflowId ? (
+            <div className="mt-6 grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
+              <div className="rounded-2xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+                <div className="font-semibold text-slate-100">Run Status</div>
+                <div className="mt-2">
+                  workflow_id: <span className="break-all text-slate-100">{workflowId}</span>
+                </div>
+                <div className="mt-1">
+                  run_id: <span className="break-all text-slate-100">{runId}</span>
+                </div>
+                <div className="mt-1">
+                  status: <span className="text-slate-100">{workflowRow?.status || "queued"}</span>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button onClick={downloadZip} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
+                    {guidedOnboarding ? "Download ZIP and finish" : "Download ZIP (full=1)"}
+                  </button>
+                  <button
+                    onClick={openInVerification}
+                    disabled={workflowRow?.status !== "completed"}
+                    className="rounded-xl bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                  >
+                    Open in Verification
+                  </button>
+                </div>
+              </div>
+
+              <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="arch2rtl" />
+            </div>
+          ) : null}
+
+          {workflowId ? (
+            <div className="mt-6">
+              <AskThisRunPanel workflowId={workflowId} compact />
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
             <div className="text-sm font-semibold">Live logs</div>

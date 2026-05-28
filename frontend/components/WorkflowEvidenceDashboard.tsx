@@ -53,6 +53,7 @@ function pct(value: unknown): string {
 function pctWithStatus(value: unknown, status: unknown): string {
   if (typeof value === "number" && Number.isFinite(value)) return `${value}%`;
   const text = typeof status === "string" && status.trim() ? status.trim() : "";
+  if (text === "not_reported_by_verilator_lcov") return "Unavailable";
   return text ? `Unavailable (${text})` : "Unavailable";
 }
 
@@ -71,9 +72,9 @@ async function artifact(workflowId: string, filename: string): Promise<JsonMap |
 
 function Stat({ title, value }: { title: string; value: string | number }) {
   return (
-    <div className="rounded-lg border border-slate-800 bg-black/30 p-3">
+    <div className="min-w-0 rounded-lg border border-slate-800 bg-black/30 p-3">
       <div className="text-xs text-slate-400">{title}</div>
-      <div className="mt-1 text-base font-semibold text-slate-100">{value}</div>
+      <div className="mt-1 min-h-6 break-words text-base font-semibold leading-snug text-slate-100">{value}</div>
     </div>
   );
 }
@@ -148,14 +149,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
         const regmap = record(dashboard.register_map);
         const lintStatus = firstString(lint.status, "unavailable");
         return (
-          <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,0.8fr)_minmax(560px,1.2fr)]">
+          <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
             <div className="space-y-3">
               <Bar label="Inputs" value={number(iface.input_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-cyan-500" />
               <Bar label="Outputs" value={number(iface.output_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-emerald-500" />
               <Bar label="Flip-flops" value={number(storage.flipflop_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-violet-500" />
               <Bar label="Latches" value={number(storage.latch_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-amber-500" />
             </div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-3">
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
               <Stat title="Lint" value={lintStatus} />
               <Stat title="Flip-flops" value={number(storage.flipflop_count)} />
               <Stat title="Latches" value={number(storage.latch_count)} />
@@ -216,7 +217,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
       ].filter(Boolean).join(" / ");
       const functionalGaps = array(functional.gaps);
       return (
-        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,0.85fr)_minmax(520px,1.15fr)]">
+        <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div className="space-y-4">
             <div className="space-y-3">
               <Bar label="Simulation passed" value={passed} total={total} color="bg-emerald-500" />
@@ -238,7 +239,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
               </div>
             ) : null}
           </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
             <Stat title="Runs" value={total} />
             <Stat title="Functional Coverage" value={pct(coverage.functional_coverage_pct)} />
             <Stat title="Code Line" value={pctWithStatus(codeCoverage.line_coverage_pct, codeStatus)} />
@@ -250,6 +251,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
             <Stat title="Golden Model" value={String(golden.status || "not_enabled")} />
             <Stat title="Tools" value={toolsValue || "verilator"} />
           </div>
+          {codeCoverage.toggle_source === "not_reported_by_verilator_lcov" ? (
+            <div className="text-xs text-slate-500 2xl:col-start-2">
+              Toggle coverage is not reported by Verilator LCOV for this run.
+            </div>
+          ) : null}
         </div>
       );
     }
