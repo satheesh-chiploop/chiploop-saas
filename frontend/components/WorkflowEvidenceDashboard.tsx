@@ -53,8 +53,13 @@ function pct(value: unknown): string {
 function pctWithStatus(value: unknown, status: unknown): string {
   if (typeof value === "number" && Number.isFinite(value)) return `${value}%`;
   const text = typeof status === "string" && status.trim() ? status.trim() : "";
-  if (text === "not_reported_by_verilator_lcov") return "Unavailable";
+  if (text === "not_reported_by_verilator_lcov" || text === "not_reported_by_verilator_annotate_points") return "Not reported";
   return text ? `Unavailable (${text})` : "Unavailable";
+}
+
+function statusLabel(value: unknown): string {
+  const text = typeof value === "string" && value.trim() ? value.trim() : "not_enabled";
+  return text.replaceAll("_", " ");
 }
 
 async function artifact(workflowId: string, filename: string): Promise<JsonMap | null> {
@@ -74,7 +79,7 @@ function Stat({ title, value }: { title: string; value: string | number }) {
   return (
     <div className="min-w-0 rounded-lg border border-slate-800 bg-black/30 p-3">
       <div className="text-xs text-slate-400">{title}</div>
-      <div className="mt-1 min-h-6 break-words text-base font-semibold leading-snug text-slate-100">{value}</div>
+      <div className="mt-1 min-h-6 overflow-hidden text-ellipsis text-base font-semibold leading-snug text-slate-100">{value}</div>
     </div>
   );
 }
@@ -196,7 +201,6 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
     if (stage === "verification") {
       const simulation = record(evidence["simulation_summary_coverage.json"]?.simulation);
       const coverage = record(evidence["simulation_summary_coverage.json"]?.coverage);
-      const functional = record(coverage.functional);
       const codeCoverage = record(coverage.code);
       const assertionCoverage = record(coverage.assertions);
       const formal = record(evidence["simulation_summary_coverage.json"]?.formal);
@@ -215,31 +219,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
         String(toolchain.code_coverage || ""),
         String(toolchain.formal || ""),
       ].filter(Boolean).join(" / ");
-      const functionalGaps = array(functional.gaps);
       return (
-        <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <Bar label="Simulation passed" value={passed} total={total} color="bg-emerald-500" />
-              <Bar label="Simulation failed" value={failed} total={total} color="bg-rose-500" />
-            </div>
-            {functionalGaps.length ? (
-              <div className="rounded-lg border border-amber-800/70 bg-amber-950/20 p-3">
-                <div className="text-xs font-semibold text-amber-200">Functional coverage not met</div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {functionalGaps.slice(0, 6).map((item, index) => {
-                    const gap = record(item);
-                    return (
-                      <span key={index} className="rounded border border-amber-700/60 px-2 py-1 text-xs text-amber-100">
-                        {String(gap.coverage_point || gap.signal || "coverage_point")}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : null}
+        <div className="mt-5 space-y-5">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Bar label="Simulation passed" value={passed} total={total} color="bg-emerald-500" />
+            <Bar label="Simulation failed" value={failed} total={total} color="bg-rose-500" />
           </div>
-          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-2 gap-3">
             <Stat title="Runs" value={total} />
             <Stat title="Functional Coverage" value={pct(coverage.functional_coverage_pct)} />
             <Stat title="Code Line" value={pctWithStatus(codeCoverage.line_coverage_pct, codeStatus)} />
@@ -247,13 +233,15 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
             <Stat title="Code Condition" value={pctWithStatus(codeCoverage.condition_coverage_pct, codeCoverage.condition_source || codeStatus)} />
             <Stat title="Code Toggle" value={pctWithStatus(codeCoverage.toggle_coverage_pct, codeCoverage.toggle_source || codeStatus)} />
             <Stat title="SVA Assertion Coverage" value={pct(assertionCoverage.assertion_pass_pct)} />
-            <Stat title="Formal" value={formalValue} />
-            <Stat title="Golden Model" value={String(golden.status || "not_enabled")} />
-            <Stat title="Tools" value={toolsValue || "verilator"} />
+            <Stat title="Formal" value={statusLabel(formalValue)} />
+            <Stat title="Golden Model" value={statusLabel(golden.status)} />
+            <div className="col-span-2">
+              <Stat title="Tools" value={toolsValue || "verilator"} />
+            </div>
           </div>
-          {codeCoverage.toggle_source === "not_reported_by_verilator_lcov" ? (
-            <div className="text-xs text-slate-500 2xl:col-start-2">
-              Toggle coverage is not reported by Verilator LCOV for this run.
+          {codeCoverage.toggle_source === "not_reported_by_verilator_lcov" || codeCoverage.toggle_source === "not_reported_by_verilator_annotate_points" ? (
+            <div className="text-xs text-slate-500">
+              Toggle coverage was not present in this run&apos;s Verilator coverage artifacts. New backend runs collect annotated toggle points when Verilator provides them.
             </div>
           ) : null}
         </div>
