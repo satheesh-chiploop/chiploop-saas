@@ -32,6 +32,20 @@ function number(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
 
+function firstNumber(...values: unknown[]): number {
+  for (const value of values) {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+  }
+  return 0;
+}
+
+function firstString(...values: unknown[]): string {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+}
+
 async function artifact(workflowId: string, filename: string): Promise<JsonMap | null> {
   try {
     return record(
@@ -82,7 +96,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
       verification: ["simulation_summary_coverage.json"],
       embedded: ["system_firmware_dashboard.json", "system_firmware_execution.json"],
       software: ["system_software_api_contract.json", "system_software_package.json"],
-      validation: ["system_software_validation_summary_l2.json", "system_cosim_trace_validation_report.json"],
+      validation: [
+        "system_software_validation_summary_l2.json",
+        "system_cosim_trace_validation_report.json",
+        "system_cosim_execution_report.json",
+        "system_cosim_harness_manifest.json",
+      ],
     };
     Promise.all(files[stage].map(async (filename) => [filename, await artifact(workflowId, filename)] as const))
       .then((entries) => {
@@ -189,7 +208,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
       const api = evidence["system_software_api_contract.json"] || {};
       const pkg = evidence["system_software_package.json"] || {};
       const groups = array(api.public_api_groups);
-      const methods = groups.reduce((sum, group) => sum + array(record(group).methods).length, 0);
+      const methods = groups.reduce<number>((sum, group) => sum + array(record(group).methods).length, 0);
       const artifacts = number(pkg.artifact_count);
       return (
         <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_300px]">
@@ -214,11 +233,37 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
 
     const summary = evidence["system_software_validation_summary_l2.json"] || {};
     const trace = evidence["system_cosim_trace_validation_report.json"] || {};
-    const passed = number(summary.scenario_pass_count);
-    const failed = number(summary.scenario_fail_count);
-    const blocked = number(summary.scenario_blocked_count);
-    const total = number(summary.scenario_count);
-    const scenarios = array(trace.scenario_validations);
+    const execution = evidence["system_cosim_execution_report.json"] || {};
+    const harness = evidence["system_cosim_harness_manifest.json"] || {};
+    const validationArtifactsLoaded = Boolean(
+      evidence["system_software_validation_summary_l2.json"] ||
+      evidence["system_cosim_trace_validation_report.json"] ||
+      evidence["system_cosim_execution_report.json"] ||
+      evidence["system_cosim_harness_manifest.json"]
+    );
+    if (!validationArtifactsLoaded) {
+      return (
+        <div className="mt-5 rounded-lg border border-amber-700/60 bg-amber-950/20 p-4 text-sm text-amber-100">
+          Validation artifacts are still syncing or were not found for this workflow yet. Use Download ZIP to confirm the generated artifact names.
+        </div>
+      );
+    }
+
+    const traceScenarios = array(trace.scenario_validations);
+    const executionScenarios = array(execution.scenario_results);
+    const scenarios = traceScenarios.length ? traceScenarios : executionScenarios;
+    const passed = firstNumber(summary.scenario_pass_count, trace.scenario_pass_count, execution.scenario_pass_count);
+    const failed = firstNumber(summary.scenario_fail_count, trace.scenario_fail_count, execution.scenario_fail_count);
+    const blocked = firstNumber(summary.scenario_blocked_count, execution.scenario_blocked_count);
+    const notApplicable = firstNumber(summary.scenario_not_applicable_count, trace.scenario_not_applicable_count);
+    const total = firstNumber(summary.scenario_count, trace.scenario_count, execution.scenario_count, scenarios.length);
+    const verdict = firstString(
+      summary.final_system_correctness_verdict,
+      trace.trace_validation_status,
+      execution.execution_status,
+      harness.harness_status,
+      "unavailable"
+    );
     return (
       <div className="mt-5 space-y-5">
         <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
@@ -226,20 +271,28 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
             <Bar label="Scenario passed" value={passed} total={total} color="bg-emerald-500" />
             <Bar label="Scenario failed" value={failed} total={total} color="bg-rose-500" />
             <Bar label="Scenario blocked" value={blocked} total={total} color="bg-amber-500" />
+            <Bar label="Not applicable" value={notApplicable} total={total} color="bg-slate-500" />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Stat title="Verdict" value={String(summary.final_system_correctness_verdict || "unavailable")} />
+            <Stat title="Verdict" value={verdict} />
             <Stat title="Scenarios" value={total} />
+            <Stat title="Not Applicable" value={notApplicable} />
           </div>
         </div>
         {scenarios.length ? (
           <div className="overflow-hidden rounded-lg border border-slate-800">
             {scenarios.slice(0, 6).map((entry, index) => {
               const scenario = record(entry);
+              const scenarioStatus = firstString(
+                scenario.trace_validation_status,
+                scenario.execution_status,
+                scenario.status,
+                "unavailable"
+              );
               return (
                 <div key={index} className="flex items-center justify-between border-b border-slate-800 px-4 py-3 text-sm last:border-b-0">
                   <span className="text-slate-300">{String(scenario.scenario_id || `scenario_${index + 1}`)}</span>
-                  <span className="font-semibold text-slate-100">{String(scenario.trace_validation_status || "unavailable")}</span>
+                  <span className="font-semibold text-slate-100">{scenarioStatus}</span>
                 </div>
               );
             })}
