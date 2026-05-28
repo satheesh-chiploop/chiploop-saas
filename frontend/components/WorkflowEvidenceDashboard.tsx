@@ -80,7 +80,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
     const files: Record<Stage, string[]> = {
       arch2rtl: ["digital_regmap.json"],
       verification: ["simulation_summary_coverage.json"],
-      embedded: ["system_firmware_dashboard.json"],
+      embedded: ["system_firmware_dashboard.json", "system_firmware_execution.json"],
       software: ["system_software_api_contract.json", "system_software_package.json"],
       validation: ["system_software_validation_summary_l2.json", "system_cosim_trace_validation_report.json"],
     };
@@ -146,18 +146,40 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
 
     if (stage === "embedded") {
       const dashboard = evidence["system_firmware_dashboard.json"] || {};
+      const execution = evidence["system_firmware_execution.json"] || {};
+      const readiness = record(execution.readiness);
+      const inputs = record(execution.inputs);
+      const missingInputs = array(dashboard.missing_inputs).length
+        ? array(dashboard.missing_inputs).map(String)
+        : array(readiness.missing).map(String);
+      const firmwareElfPlaceholder = dashboard.firmware_elf_placeholder === true || inputs.firmware_elf_placeholder === true;
       const passed = number(dashboard.passed_test_count);
       const failed = number(dashboard.failed_test_count);
       const executed = number(dashboard.executed_test_count);
       return (
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_320px]">
-          <div className="space-y-3">
-            <Bar label="Co-simulation passed" value={passed} total={executed} color="bg-emerald-500" />
-            <Bar label="Co-simulation failed" value={failed} total={executed} color="bg-rose-500" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Stat title="Status" value={String(dashboard.overall_status || "unavailable")} />
-            <Stat title="Executed" value={executed} />
+        <div className="mt-5 space-y-5">
+          {missingInputs.length ? (
+            <div className="rounded-lg border border-amber-700/60 bg-amber-950/20 p-4">
+              <div className="text-sm font-semibold text-amber-200">Blocked inputs</div>
+              <div className="mt-2 text-sm text-amber-100">{missingInputs.join(", ")}</div>
+              {firmwareElfPlaceholder ? (
+                <div className="mt-2 text-xs text-slate-300">
+                  Firmware generation produced a placeholder ELF. Check the ELF build debug artifact and ensure Cargo is installed in the backend runtime.
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+            <div className="space-y-3">
+              <Bar label="Co-simulation passed" value={passed} total={executed} color="bg-emerald-500" />
+              <Bar label="Co-simulation failed" value={failed} total={executed} color="bg-rose-500" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Stat title="Status" value={String(dashboard.overall_status || "unavailable")} />
+              <Stat title="Executed" value={executed} />
+              <Stat title="ELF" value={firmwareElfPlaceholder ? "placeholder" : String(dashboard.firmware_elf_detected ? "detected" : "missing")} />
+              <Stat title="Missing Inputs" value={missingInputs.length} />
+            </div>
           </div>
         </div>
       );
