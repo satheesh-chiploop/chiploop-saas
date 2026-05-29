@@ -151,7 +151,6 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
         const timing = record(dashboard.timing);
         const iface = record(dashboard.interface);
         const clockReset = record(dashboard.clock_reset);
-        const regmap = record(dashboard.register_map);
         const lintStatus = firstString(lint.status, "unavailable");
         return (
           <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
@@ -173,7 +172,6 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
               <Stat title="Modules" value={number(dashboard.module_count)} />
               <Stat title="RTL Files" value={number(dashboard.rtl_file_count)} />
-              <Stat title="Registers" value={number(regmap.register_count)} />
             </div>
           </div>
         );

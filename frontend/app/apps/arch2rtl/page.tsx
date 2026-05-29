@@ -120,6 +120,13 @@ export default function Arch2RTLAppPage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const arch2rtlReady = useMemo(() => {
+    if (workflowRow?.status === "completed") return true;
+    return logLines.some((line) =>
+      line.includes("Digital Arch2RTL Dashboard Agent done") ||
+      line.includes("Digital App complete: arch2rtl")
+    );
+  }, [logLines, workflowRow?.status]);
   const logsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -317,7 +324,7 @@ export default function Arch2RTLAppPage() {
 
     let isActive = true;
 
-    (async () => {
+    const fetchWorkflow = async () => {
       const { data, error } = await supabase
         .from("workflows")
         .select("id,status,phase,logs,updated_at")
@@ -325,7 +332,12 @@ export default function Arch2RTLAppPage() {
         .single();
 
       if (isActive && !error && data) setWorkflowRow(data as WorkflowRow);
-    })();
+    };
+
+    void fetchWorkflow();
+    const interval = window.setInterval(() => {
+      void fetchWorkflow();
+    }, 2500);
 
     const channel = supabase
       .channel(`wf-${workflowId}`)
@@ -347,6 +359,7 @@ export default function Arch2RTLAppPage() {
 
     return () => {
       isActive = false;
+      window.clearInterval(interval);
       supabase.removeChannel(channel);
     };
   }, [workflowId]);
@@ -799,7 +812,7 @@ export default function Arch2RTLAppPage() {
                   run_id: <span className="break-all text-slate-100">{runId}</span>
                 </div>
                 <div className="mt-1">
-                  status: <span className="text-slate-100">{workflowRow?.status || "queued"}</span>
+                  status: <span className="text-slate-100">{arch2rtlReady ? "completed" : workflowRow?.status || "queued"}</span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button onClick={downloadZip} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
@@ -807,7 +820,7 @@ export default function Arch2RTLAppPage() {
                   </button>
                   <button
                     onClick={openInVerification}
-                    disabled={workflowRow?.status !== "completed"}
+                    disabled={!arch2rtlReady}
                     className="rounded-xl bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
                   >
                     Open in Verification
@@ -815,7 +828,7 @@ export default function Arch2RTLAppPage() {
                 </div>
               </div>
 
-              <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="arch2rtl" />
+              <WorkflowEvidenceDashboard workflowId={workflowId} status={arch2rtlReady ? "completed" : workflowRow?.status} stage="arch2rtl" />
             </div>
           ) : null}
 
