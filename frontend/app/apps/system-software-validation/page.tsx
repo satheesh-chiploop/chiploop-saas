@@ -8,7 +8,13 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
-import { VALIDATION_HANDOFF_PREFILL_KEY } from "@/lib/pwmFullStackDemo";
+import {
+  DESIGN_CHAIN_CONTEXT_KEY,
+  PRODUCT_BUILDER_PREFILL_KEY,
+  PWM_PRODUCT_INTENT,
+  VALIDATION_HANDOFF_PREFILL_KEY,
+  type DesignChainContext,
+} from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -218,6 +224,16 @@ export default function SystemSoftwareValidationAppPage() {
 
       setWorkflowId(out.workflow_id);
       setRunId(out.run_id);
+      const raw = window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY);
+      let context: DesignChainContext = {};
+      try {
+        context = raw ? JSON.parse(raw) as DesignChainContext : {};
+      } catch {
+        context = {};
+      }
+      context.validationWorkflowId = out.workflow_id;
+      context.validationRunId = out.run_id;
+      window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     } catch (e: any) {
       setErr(e?.message || String(e));
     } finally {
@@ -228,6 +244,31 @@ export default function SystemSoftwareValidationAppPage() {
   function downloadZip() {
     if (!workflowId) return;
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
+  }
+
+  function openProductBuilder() {
+    if (!workflowId) return;
+    const raw = window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY);
+    let context: DesignChainContext = {};
+    try {
+      context = raw ? JSON.parse(raw) as DesignChainContext : {};
+    } catch {
+      context = {};
+    }
+    context.validationWorkflowId = workflowId;
+    context.validationRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    window.localStorage.setItem(PRODUCT_BUILDER_PREFILL_KEY, JSON.stringify({
+      arch2rtlWorkflowId: context.arch2rtlWorkflowId || systemRtlWorkflowId,
+      verifyWorkflowId: context.verifyWorkflowId,
+      systemFirmwareWorkflowId: context.embeddedWorkflowId || systemFirmwareWorkflowId,
+      systemSoftwareWorkflowId: context.softwareWorkflowId || systemSoftwareWorkflowId,
+      systemValidationWorkflowId: workflowId,
+      productIntent: pwmChainDemo ? PWM_PRODUCT_INTENT : "Build a simulator-backed product dashboard from the validated generated system collateral.",
+      appType: "web_dashboard",
+      targetRuntime: "simulated_device",
+    }));
+    router.push(`/apps/system-product-builder?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -425,6 +466,13 @@ export default function SystemSoftwareValidationAppPage() {
                     className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700"
                   >
                     Download ZIP (full=1)
+                  </button>
+                  <button
+                    onClick={openProductBuilder}
+                    disabled={workflowRow?.status !== "completed"}
+                    className="ml-3 mt-3 rounded-xl bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                  >
+                    Build Product App
                   </button>
                   {pwmChainDemo ? (
                     <div className="mt-4">

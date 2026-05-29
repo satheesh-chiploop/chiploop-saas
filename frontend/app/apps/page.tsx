@@ -514,10 +514,19 @@ export default function AppsHomePage() {
       nudge: "New",
       promise: "Build + test + contract + package validation or full co-sim proof",
     },
+    {
+      slug: "system-product-builder",
+      title: "Product App Builder",
+      subtitle: "Turn validated RTL, firmware, software, and validation collateral into a simulator-backed app",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Runnable dashboard + simulator adapter + product package",
+    },
 
   ]), []);
 
-  const featuredApps = ["arch2rtl", "system-architecture"]
+  const featuredApps = ["arch2rtl", "system-architecture", "system-product-builder"]
     .map((slug) => apps.find((app) => app.slug === slug))
     .filter((app): app is AppCard => Boolean(app));
 
@@ -912,16 +921,16 @@ export default function AppsHomePage() {
         <div className="flex flex-col gap-5 border-y border-slate-800 py-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl">
             <div className="text-xs font-semibold uppercase text-emerald-300">Reference Journey</div>
-            <div className="mt-2 text-xl font-bold text-white">PWM Controller: RTL to Firmware to Software Validation</div>
+            <div className="mt-2 text-xl font-bold text-white">PWM Controller: RTL to Firmware to Software to Product App</div>
             <p className="mt-2 text-sm leading-6 text-slate-300">
               Run one prefilled design through the standard ChipLoop apps. The PWM input is provided for demonstration;
               generated RTL, simulation, firmware co-simulation, and validation evidence come from the actual workflow runs.
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
-              {["Arch2RTL", "RTL Verification", "Embedded Firmware", "System Software", "Full Validation"].map((stage, index) => (
+              {["Arch2RTL", "RTL Verification", "Embedded Firmware", "System Software", "Full Validation", "Product App"].map((stage, index, stages) => (
                 <div key={stage} className="flex items-center gap-2">
                   <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
-                  {index < 4 ? <span className="text-slate-500">&gt;</span> : null}
+                  {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}
                 </div>
               ))}
             </div>

@@ -3,6 +3,7 @@ export const VERIFY_HANDOFF_PREFILL_KEY = "chiploop_verify_handoff_prefill";
 export const EMBEDDED_HANDOFF_PREFILL_KEY = "chiploop_embedded_handoff_prefill";
 export const SOFTWARE_HANDOFF_PREFILL_KEY = "chiploop_software_handoff_prefill";
 export const VALIDATION_HANDOFF_PREFILL_KEY = "chiploop_validation_handoff_prefill";
+export const PRODUCT_BUILDER_PREFILL_KEY = "chiploop_product_builder_prefill";
 
 export const PWM_FULL_STACK_ARCH2RTL_SPEC = `Design a parameterized PWM controller.
 
@@ -87,6 +88,10 @@ export const GENERIC_VALIDATION_GOAL = `Validate the generated software, firmwar
 
 Derive integrated scenarios from the actual handoff artifacts and prove the software-to-firmware-to-RTL contract with traceable co-simulation results.`;
 
+export const PWM_PRODUCT_INTENT = `Build a simulator-backed PWM fan-control product dashboard from the validated RTL, firmware, software, and validation collateral.
+
+The dashboard should let a user enable PWM, adjust duty cycle, view counter/PWM output state, run a thermal fan-control scenario, and preserve lineage back to the generated workflows.`;
+
 export type DesignChainContext = {
   arch2rtlWorkflowId?: string;
   arch2rtlRunId?: string;
@@ -96,4 +101,8 @@ export type DesignChainContext = {
   embeddedRunId?: string;
   softwareWorkflowId?: string;
   softwareRunId?: string;
+  validationWorkflowId?: string;
+  validationRunId?: string;
+  productWorkflowId?: string;
+  productRunId?: string;
 };
