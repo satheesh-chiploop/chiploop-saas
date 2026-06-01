@@ -170,8 +170,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         return (
           <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
             <div className="space-y-3">
-              <Bar label="Inputs" value={number(iface.input_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-cyan-500" />
-              <Bar label="Outputs" value={number(iface.output_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-emerald-500" />
+              <Bar label="Input bits" value={number(iface.input_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-cyan-500" />
+              <Bar label="Output bits" value={number(iface.output_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-emerald-500" />
               <Bar label="Flip-flops" value={number(storage.flipflop_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-violet-500" />
               <Bar label="Latches" value={number(storage.latch_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-amber-500" />
             </div>
@@ -181,8 +181,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <Stat title="Latches" value={number(storage.latch_count)} />
               <Stat title="Full-cycle Paths" value={number(timing.full_cycle_path_count)} />
               <Stat title="Half-cycle Paths" value={number(timing.half_cycle_path_count)} />
-              <Stat title="Inputs" value={number(iface.input_count)} />
-              <Stat title="Outputs" value={number(iface.output_count)} />
+              <Stat title="Input Bits" value={number(iface.input_count)} />
+              <Stat title="Output Bits" value={number(iface.output_count)} />
+              <Stat title="Input Ports" value={number(iface.input_port_count)} />
+              <Stat title="Output Ports" value={number(iface.output_port_count)} />
               <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
               <Stat title="Modules" value={number(dashboard.module_count)} />
