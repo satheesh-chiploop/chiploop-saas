@@ -10,7 +10,9 @@ import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
   GENERIC_VERIFY_INTENT,
+  IMAGE_VERIFY_INTENT,
   PWM_VERIFY_INTENT,
+  UART_VERIFY_INTENT,
   VERIFY_HANDOFF_PREFILL_KEY,
   type DesignChainContext,
 } from "@/lib/pwmFullStackDemo";
@@ -98,6 +100,8 @@ export default function Arch2RTLAppPage() {
   const [guidedOnboarding, setGuidedOnboarding] = useState(false);
   const [systemHandoff, setSystemHandoff] = useState(false);
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
+  const [uartChainDemo, setUartChainDemo] = useState(false);
+  const [imageChainDemo, setImageChainDemo] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [trialPrompt, setTrialPrompt] = useState<TrialPrompt | null>(null);
   const [pendingTrialPrompt, setPendingTrialPrompt] = useState<TrialPrompt | null>(null);
@@ -292,7 +296,10 @@ export default function Arch2RTLAppPage() {
     if (!guided) return;
 
     setGuidedOnboarding(true);
-    setPwmChainDemo(new URLSearchParams(window.location.search).get("pwm_chain") === "1");
+    const params = new URLSearchParams(window.location.search);
+    setPwmChainDemo(params.get("pwm_chain") === "1");
+    setUartChainDemo(params.get("uart_chain") === "1");
+    setImageChainDemo(params.get("image_chain") === "1");
     let demo = ARCH2RTL_ONBOARDING_DEFAULTS;
     const raw = window.localStorage.getItem(ONBOARDING_DEMO_KEY);
 
@@ -541,19 +548,24 @@ export default function Arch2RTLAppPage() {
     }
     context.arch2rtlWorkflowId = workflowId;
     context.arch2rtlRunId = runId || undefined;
+    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : context.demoKind;
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     window.localStorage.setItem(VERIFY_HANDOFF_PREFILL_KEY, JSON.stringify({
       fromWorkflowId: workflowId,
       fromRunId: runId,
-      testIntent: pwmChainDemo ? PWM_VERIFY_INTENT : GENERIC_VERIFY_INTENT,
+      testIntent: pwmChainDemo ? PWM_VERIFY_INTENT : uartChainDemo ? UART_VERIFY_INTENT : imageChainDemo ? IMAGE_VERIFY_INTENT : GENERIC_VERIFY_INTENT,
       randomVsDirected: "directed",
       coverageTargets: pwmChainDemo
         ? "PWM duty-cycle scenarios, reset behavior, dynamic updates"
+        : uartChainDemo
+        ? "UART packet movement, FIFO levels, interrupt status, framing and overflow error handling"
+        : imageChainDemo
+        ? "DMA progress, line-buffer windows, filter modes, histogram bins, frame_done interrupt behavior"
         : "Derived interface behavior, reset behavior, functional corner cases",
       simulatorType: "verilator",
       seedCount: 4,
     }));
-    router.push(`/apps/verify?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}`);
+    router.push(`/apps/verify?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -581,10 +593,16 @@ export default function Arch2RTLAppPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <div className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Guided first activity</div>
-                <h2 className="mt-1 text-2xl font-bold text-white">{pwmChainDemo ? "Generate the PWM controller RTL" : "Run Arch2RTL and inspect the handoff package"}</h2>
+                <h2 className="mt-1 text-2xl font-bold text-white">
+                  {pwmChainDemo ? "Generate the PWM controller RTL" : uartChainDemo ? "Generate the UART packet engine RTL" : imageChainDemo ? "Generate the image DMA pipeline RTL" : "Run Arch2RTL and inspect the handoff package"}
+                </h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                   {pwmChainDemo
                     ? "The PWM controller specification is filled in for the connected RTL, firmware, and software demonstration. Run it to produce the RTL and register-map handoff used by the next stage."
+                    : uartChainDemo
+                    ? "The UART packet engine specification is filled in for a larger connected RTL, firmware, software, validation, and product-app demonstration. Run it to produce FIFO, UART, register, and interrupt collateral for the next stage."
+                    : imageChainDemo
+                    ? "The image DMA pipeline specification is filled in for a large visual connected demo. Run it to produce DMA, line-buffer, filter, histogram, interrupt, and register collateral for the next stage."
                     : "The PWM controller spec is already filled in. Click Run Arch2RTL, wait for logs to finish, then download the ZIP and inspect the RTL, SDC, and UPF files."}
                 </p>
               </div>
@@ -596,7 +614,7 @@ export default function Arch2RTLAppPage() {
             </div>
             <div className="mt-4 grid gap-3 md:grid-cols-4">
               {[
-                "Review pre-filled PWM spec",
+                imageChainDemo ? "Review pre-filled image DMA spec" : uartChainDemo ? "Review pre-filled UART packet spec" : "Review pre-filled PWM spec",
                 "Run Arch2RTL",
                 "Open the downloaded RTL, SDC, and UPF files",
                 "Download ZIP to complete onboarding",
@@ -828,7 +846,7 @@ export default function Arch2RTLAppPage() {
                 </div>
               </div>
 
-              <WorkflowEvidenceDashboard workflowId={workflowId} status={arch2rtlReady ? "completed" : workflowRow?.status} stage="arch2rtl" />
+              <WorkflowEvidenceDashboard workflowId={workflowId} status={arch2rtlReady ? "completed" : workflowRow?.status} stage="arch2rtl" logs={workflowRow?.logs} />
             </div>
           ) : null}
 

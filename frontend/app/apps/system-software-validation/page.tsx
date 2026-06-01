@@ -10,8 +10,10 @@ import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
+  IMAGE_PRODUCT_INTENT,
   PRODUCT_BUILDER_PREFILL_KEY,
   PWM_PRODUCT_INTENT,
+  UART_PRODUCT_INTENT,
   VALIDATION_HANDOFF_PREFILL_KEY,
   type DesignChainContext,
 } from "@/lib/pwmFullStackDemo";
@@ -62,6 +64,8 @@ export default function SystemSoftwareValidationAppPage() {
   const [notes, setNotes] = useState("");
   const [handoffFlow, setHandoffFlow] = useState(false);
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
+  const [uartChainDemo, setUartChainDemo] = useState(false);
+  const [imageChainDemo, setImageChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -111,9 +115,11 @@ export default function SystemSoftwareValidationAppPage() {
   useEffect(() => {
     if (loading || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1") return;
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1") return;
     setHandoffFlow(true);
     setPwmChainDemo(params.get("pwm_chain") === "1");
+    setUartChainDemo(params.get("uart_chain") === "1");
+    setImageChainDemo(params.get("image_chain") === "1");
     const raw = window.localStorage.getItem(VALIDATION_HANDOFF_PREFILL_KEY);
     if (!raw) return;
     try {
@@ -233,6 +239,7 @@ export default function SystemSoftwareValidationAppPage() {
       }
       context.validationWorkflowId = out.workflow_id;
       context.validationRunId = out.run_id;
+      context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : context.demoKind;
       window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     } catch (e: any) {
       setErr(e?.message || String(e));
@@ -257,6 +264,7 @@ export default function SystemSoftwareValidationAppPage() {
     }
     context.validationWorkflowId = workflowId;
     context.validationRunId = runId || undefined;
+    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : context.demoKind;
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     window.localStorage.setItem(PRODUCT_BUILDER_PREFILL_KEY, JSON.stringify({
       arch2rtlWorkflowId: context.arch2rtlWorkflowId || systemRtlWorkflowId,
@@ -264,11 +272,11 @@ export default function SystemSoftwareValidationAppPage() {
       systemFirmwareWorkflowId: context.embeddedWorkflowId || systemFirmwareWorkflowId,
       systemSoftwareWorkflowId: context.softwareWorkflowId || systemSoftwareWorkflowId,
       systemValidationWorkflowId: workflowId,
-      productIntent: pwmChainDemo ? PWM_PRODUCT_INTENT : "Build a simulator-backed product dashboard from the validated generated system collateral.",
+      productIntent: pwmChainDemo ? PWM_PRODUCT_INTENT : uartChainDemo ? UART_PRODUCT_INTENT : imageChainDemo ? IMAGE_PRODUCT_INTENT : "Build a simulator-backed product dashboard from the validated generated system collateral.",
       appType: "web_dashboard",
       targetRuntime: "simulated_device",
     }));
-    router.push(`/apps/system-product-builder?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}`);
+    router.push(`/apps/system-product-builder?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -309,6 +317,14 @@ export default function SystemSoftwareValidationAppPage() {
           {pwmChainDemo ? (
             <div className="mt-4 rounded-xl border border-amber-800/60 bg-amber-950/20 p-4 text-sm text-slate-200">
               PWM full-stack demo: validate the generated software, Rust firmware handoff, and imported PWM RTL together.
+            </div>
+          ) : uartChainDemo ? (
+            <div className="mt-4 rounded-xl border border-amber-800/60 bg-amber-950/20 p-4 text-sm text-slate-200">
+              UART packet-engine demo: validate generated software, Rust firmware, and imported UART/FIFO RTL together.
+            </div>
+          ) : imageChainDemo ? (
+            <div className="mt-4 rounded-xl border border-amber-800/60 bg-amber-950/20 p-4 text-sm text-slate-200">
+              Image DMA demo: validate generated image software, Rust firmware, and imported DMA/filter/histogram RTL together.
             </div>
           ) : handoffFlow ? (
             <div className="mt-4 rounded-xl border border-amber-800/60 bg-amber-950/20 p-4 text-sm text-slate-200">
@@ -476,7 +492,7 @@ export default function SystemSoftwareValidationAppPage() {
                   </button>
                   {pwmChainDemo ? (
                     <div className="mt-4">
-                      <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="validation" />
+                      <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="validation" logs={workflowRow?.logs} />
                     </div>
                   ) : null}
                     <AskThisRunPanel workflowId={workflowId} compact />

@@ -10,6 +10,7 @@ type Props = {
   workflowId: string | null;
   status?: string | null;
   stage: Stage;
+  logs?: string | null;
 };
 
 const FLOW: Array<{ id: Stage; label: string }> = [
@@ -62,6 +63,19 @@ function statusLabel(value: unknown): string {
   return text.replaceAll("_", " ");
 }
 
+function countParticipatingAgents(logs: string | null | undefined): number | null {
+  if (!logs) return null;
+  const agents = new Set<string>();
+  for (const rawLine of logs.split("\n")) {
+    const line = rawLine.trim();
+    const running = line.match(/Running\s+(.+?\sAgent)\b/i);
+    const finished = line.match(/^(.+?\sAgent)\s+(?:done|failed)\b/i);
+    const name = running?.[1] || finished?.[1];
+    if (name) agents.add(name.trim());
+  }
+  return agents.size || null;
+}
+
 async function artifact(workflowId: string, filename: string): Promise<JsonMap | null> {
   try {
     return record(
@@ -99,10 +113,11 @@ function Bar({ label, value, total, color }: { label: string; value: number; tot
   );
 }
 
-export default function WorkflowEvidenceDashboard({ workflowId, status, stage }: Props) {
+export default function WorkflowEvidenceDashboard({ workflowId, status, stage, logs }: Props) {
   const [evidence, setEvidence] = useState<Record<string, JsonMap | null>>({});
   const [error, setError] = useState<string | null>(null);
   const stageIndex = FLOW.findIndex((item) => item.id === stage);
+  const agentCount = useMemo(() => countParticipatingAgents(logs), [logs]);
 
   useEffect(() => {
     if (!workflowId || status !== "completed") return;
@@ -172,6 +187,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
               <Stat title="Modules" value={number(dashboard.module_count)} />
               <Stat title="RTL Files" value={number(dashboard.rtl_file_count)} />
+              {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             </div>
           </div>
         );
@@ -225,6 +241,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
           </div>
           <div className="grid min-w-0 grid-cols-2 gap-3">
             <Stat title="Runs" value={total} />
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Functional Coverage" value={pct(coverage.functional_coverage_pct)} />
             <Stat title="Code Line" value={pctWithStatus(codeCoverage.line_coverage_pct, codeStatus)} />
             <Stat title="Code Branch" value={pctWithStatus(codeCoverage.branch_coverage_pct, codeStatus)} />
@@ -279,6 +296,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
             <div className="grid grid-cols-2 gap-3">
               <Stat title="Status" value={String(dashboard.overall_status || "unavailable")} />
               <Stat title="Executed" value={executed} />
+              {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
               <Stat title="ELF" value={firmwareElfPlaceholder ? "placeholder" : String(dashboard.firmware_elf_detected ? "detected" : "missing")} />
               <Stat title="Missing Inputs" value={missingInputs.length} />
             </div>
@@ -308,6 +326,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
           <div className="grid grid-cols-2 gap-3">
             <Stat title="API Methods" value={methods} />
             <Stat title="Artifacts" value={artifacts} />
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Package" value={String(pkg.package_status || "unavailable")} />
           </div>
         </div>
@@ -366,6 +385,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
             <div className="grid grid-cols-2 gap-3">
               <Stat title="Verdict" value={String(softwareOnlySummary.overall_status || "unavailable")} />
               <Stat title="Checks" value={totalChecks} />
+              {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
               <Stat title="Blocking Issues" value={blockingIssues.length} />
             </div>
           </div>
@@ -415,6 +435,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
           <div className="grid grid-cols-2 gap-3">
             <Stat title="Verdict" value={verdict} />
             <Stat title="Scenarios" value={total} />
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Not Applicable" value={notApplicable} />
           </div>
         </div>
@@ -439,7 +460,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage }:
         ) : null}
       </div>
     );
-  }, [evidence, error, stage, status, workflowId]);
+  }, [agentCount, evidence, error, stage, status, workflowId]);
 
   return (
     <section className="rounded-lg border border-slate-800 bg-slate-950/45 p-5">

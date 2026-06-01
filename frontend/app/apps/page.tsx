@@ -6,7 +6,12 @@ import { createClient } from "@supabase/supabase-js";
 import { apiGet, apiPost } from "@/lib/apiClient";
 import { LowCreditBanner } from "@/components/PlanCreditStatus";
 import TopNav from "@/components/TopNav";
-import { DESIGN_CHAIN_CONTEXT_KEY, PWM_FULL_STACK_ARCH2RTL_SPEC } from "@/lib/pwmFullStackDemo";
+import {
+  DESIGN_CHAIN_CONTEXT_KEY,
+  IMAGE_DMA_PIPELINE_ARCH2RTL_SPEC,
+  PWM_FULL_STACK_ARCH2RTL_SPEC,
+  UART_PACKET_ENGINE_ARCH2RTL_SPEC,
+} from "@/lib/pwmFullStackDemo";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -604,8 +609,32 @@ export default function AppsHomePage() {
       specText: PWM_FULL_STACK_ARCH2RTL_SPEC,
       toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
     }));
-    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({}));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "pwm" }));
     go("/apps/arch2rtl?guided=1&pwm_chain=1");
+  }
+
+  function startUartPacketDemo() {
+    window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
+      projectName: "uart_packet_engine_demo",
+      topModule: "uart_packet_engine",
+      designLanguage: "systemverilog",
+      specText: UART_PACKET_ENGINE_ARCH2RTL_SPEC,
+      toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+    }));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "uart_packet" }));
+    go("/apps/arch2rtl?guided=1&uart_chain=1");
+  }
+
+  function startImageDmaDemo() {
+    window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
+      projectName: "image_dma_pipeline_demo",
+      topModule: "image_dma_pipeline",
+      designLanguage: "systemverilog",
+      specText: IMAGE_DMA_PIPELINE_ARCH2RTL_SPEC,
+      toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+    }));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "image_dma" }));
+    go("/apps/arch2rtl?guided=1&image_chain=1");
   }
 
   const openApp = (slug: string) => go(routeForApp(slug));
@@ -676,6 +705,7 @@ export default function AppsHomePage() {
       "system-software": "/apps/system-software",
       "system-software-validation": "/apps/system-software-validation",
       "system-rtl": "/apps/system-rtl",
+      "system-product-builder": "/apps/system-product-builder",
     };
     
     return dedicated[slug] || `/apps/${slug}`;
@@ -918,29 +948,50 @@ export default function AppsHomePage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 pb-7">
-        <div className="flex flex-col gap-5 border-y border-slate-800 py-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-3xl">
-            <div className="text-xs font-semibold uppercase text-emerald-300">Reference Journey</div>
-            <div className="mt-2 text-xl font-bold text-white">PWM Controller: RTL to Firmware to Software to Product App</div>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              Run one prefilled design through the standard ChipLoop apps. The PWM input is provided for demonstration;
-              generated RTL, simulation, firmware co-simulation, and validation evidence come from the actual workflow runs.
-            </p>
-            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
-              {["Arch2RTL", "RTL Verification", "Embedded Firmware", "System Software", "Full Validation", "Product App"].map((stage, index, stages) => (
-                <div key={stage} className="flex items-center gap-2">
-                  <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
-                  {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}
+        <div className="border-y border-slate-800 py-6">
+          <div className="text-xs font-semibold uppercase text-emerald-300">Reference Journeys</div>
+          <div className="mt-2 text-xl font-bold text-white">End-to-end demos using the standard ChipLoop apps</div>
+          <div className="mt-5 grid gap-4 lg:grid-cols-3">
+            {[
+              {
+                title: "PWM Controller: RTL to Firmware to Software to Product App",
+                copy: "A compact peripheral demo for first-time walkthroughs. Generated RTL, simulation, firmware co-simulation, and validation evidence come from actual workflow runs.",
+                button: "Start PWM Reference Journey",
+                onClick: startPwmFullStackDemo,
+              },
+              {
+                title: "UART Packet Engine: FIFO, interrupts, firmware, software, and product app",
+                copy: "A larger peripheral demo intended to produce roughly 150-200 flip-flops through FIFOs, shifters, counters, state machines, and interrupt logic.",
+                button: "Start UART Reference Journey",
+                onClick: startUartPacketDemo,
+              },
+              {
+                title: "Image DMA Pipeline: 25k FF visual processing demo",
+                copy: "A large visual demo with DMA, register-based line buffers, 3x3 filtering, thresholding, histogram, interrupts, firmware, software, and product dashboard.",
+                button: "Start Image DMA Journey",
+                onClick: startImageDmaDemo,
+              },
+            ].map((journey) => (
+              <div key={journey.title} className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
+                <div className="text-lg font-bold text-white">{journey.title}</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{journey.copy}</p>
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                  {["Arch2RTL", "Verify", "Firmware", "Software", "Validation", "Product App"].map((stage, index, stages) => (
+                    <div key={stage} className="flex items-center gap-2">
+                      <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
+                      {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+                <button
+                  onClick={journey.onClick}
+                  className="mt-5 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500"
+                >
+                  {journey.button}
+                </button>
+              </div>
+            ))}
           </div>
-          <button
-            onClick={startPwmFullStackDemo}
-            className="shrink-0 rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-500 transition"
-          >
-            Start PWM Reference Journey
-          </button>
         </div>
       </section>
 

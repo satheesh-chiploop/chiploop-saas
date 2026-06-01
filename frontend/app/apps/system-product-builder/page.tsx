@@ -22,6 +22,19 @@ function parseLogLines(logs: string | null | undefined): string[] {
   return logs.split("\n").map((line) => line.trimEnd()).filter(Boolean);
 }
 
+function countParticipatingAgents(logs: string | null | undefined): number | null {
+  if (!logs) return null;
+  const agents = new Set<string>();
+  for (const rawLine of logs.split("\n")) {
+    const line = rawLine.trim();
+    const running = line.match(/Running\s+(.+?\sAgent)\b/i);
+    const finished = line.match(/^(.+?\sAgent)\s+(?:done|failed)\b/i);
+    const name = running?.[1] || finished?.[1];
+    if (name) agents.add(name.trim());
+  }
+  return agents.size || null;
+}
+
 export default function SystemProductBuilderPage() {
   const router = useRouter();
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -33,6 +46,8 @@ export default function SystemProductBuilderPage() {
   const [runId, setRunId] = useState<string | null>(null);
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
+  const [uartChainDemo, setUartChainDemo] = useState(false);
+  const [imageChainDemo, setImageChainDemo] = useState(false);
 
   const [arch2rtlWorkflowId, setArch2rtlWorkflowId] = useState("");
   const [verifyWorkflowId, setVerifyWorkflowId] = useState("");
@@ -44,6 +59,7 @@ export default function SystemProductBuilderPage() {
   const [targetRuntime, setTargetRuntime] = useState("simulated_device");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const agentCount = useMemo(() => countParticipatingAgents(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -86,6 +102,8 @@ export default function SystemProductBuilderPage() {
     if (loading || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     setPwmChainDemo(params.get("pwm_chain") === "1");
+    setUartChainDemo(params.get("uart_chain") === "1");
+    setImageChainDemo(params.get("image_chain") === "1");
     const rawPrefill = window.localStorage.getItem(PRODUCT_BUILDER_PREFILL_KEY);
     const rawContext = window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY);
     let context: DesignChainContext = {};
@@ -191,6 +209,14 @@ export default function SystemProductBuilderPage() {
             <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
               PWM full-stack demo: build a live fan-control dashboard driven by generated workflow lineage.
             </div>
+          ) : uartChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              UART packet-engine demo: build a simulator-backed dashboard for baud setup, packet movement, FIFO levels, IRQ status, and error scenarios.
+            </div>
+          ) : imageChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Image DMA demo: build a simulator-backed dashboard for filter controls, DMA progress, input/output preview, histogram, and interrupt status.
+            </div>
           ) : null}
 
           <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,0.85fr)]">
@@ -230,6 +256,7 @@ export default function SystemProductBuilderPage() {
                   <div>workflow_id: <span className="break-all text-slate-100">{workflowId}</span></div>
                   <div>run_id: <span className="break-all text-slate-100">{runId}</span></div>
                   <div>status: <span className="text-slate-100">{workflowRow?.status || "queued"}</span></div>
+                  {agentCount !== null ? <div>agents participated: <span className="text-slate-100">{agentCount}</span></div> : null}
                   <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">Download Product ZIP</button>
                 </div>
               ) : null}
