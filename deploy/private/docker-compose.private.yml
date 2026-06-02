@@ -1,0 +1,39 @@
+services:
+  frontend:
+    image: ghcr.io/chiploop/chiploop-frontend:${CHIPLOOP_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env.private
+    ports:
+      - "${CHIPLOOP_FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - backend
+
+  backend:
+    image: ghcr.io/chiploop/chiploop-backend:${CHIPLOOP_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env.private
+    ports:
+      - "${CHIPLOOP_BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./tool_profile.json:/etc/chiploop/tool_profile.json:ro
+      - ./model_profile.json:/etc/chiploop/model_profile.json:ro
+      - ./workflows:/var/lib/chiploop/workflows
+      - ./artifacts:/var/lib/chiploop/artifacts
+
+  runner:
+    image: ghcr.io/chiploop/chiploop-runner:${CHIPLOOP_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env.private
+    volumes:
+      - ./tool_profile.json:/etc/chiploop/tool_profile.json:ro
+      - ./model_profile.json:/etc/chiploop/model_profile.json:ro
+      - ./work:/var/lib/chiploop/work
+      - ./artifacts:/var/lib/chiploop/artifacts
+      # Customer-managed mounts.
+      # - /eda:/eda:ro
+      # - /pdk:/pdk:ro
+      # - /repos:/repos:ro
+
