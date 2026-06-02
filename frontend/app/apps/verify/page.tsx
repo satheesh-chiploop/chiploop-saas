@@ -15,6 +15,7 @@ import {
   GENERIC_EMBEDDED_SPEC,
   IMAGE_EMBEDDED_SPEC,
   PWM_EMBEDDED_SPEC,
+  SENSOR_EMBEDDED_SPEC,
   UART_EMBEDDED_SPEC,
   VERIFY_HANDOFF_PREFILL_KEY,
   type DesignChainContext,
@@ -80,6 +81,7 @@ export default function VerifyAppPage() {
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
   const [uartChainDemo, setUartChainDemo] = useState(false);
   const [imageChainDemo, setImageChainDemo] = useState(false);
+  const [sensorChainDemo, setSensorChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -129,11 +131,12 @@ export default function VerifyAppPage() {
   useEffect(() => {
     if (loading || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1") return;
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1" && params.get("sensor_chain") !== "1") return;
     setHandoffFlow(true);
     setPwmChainDemo(params.get("pwm_chain") === "1");
     setUartChainDemo(params.get("uart_chain") === "1");
     setImageChainDemo(params.get("image_chain") === "1");
+    setSensorChainDemo(params.get("sensor_chain") === "1");
     const raw = window.localStorage.getItem(VERIFY_HANDOFF_PREFILL_KEY);
     if (!raw) return;
     try {
@@ -364,24 +367,26 @@ export default function VerifyAppPage() {
     if (sourceArch2rtlWorkflowId) context.arch2rtlWorkflowId = sourceArch2rtlWorkflowId;
     context.verifyWorkflowId = workflowId;
     context.verifyRunId = runId || undefined;
-    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : context.demoKind;
+    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : context.demoKind;
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     window.localStorage.setItem(EMBEDDED_HANDOFF_PREFILL_KEY, JSON.stringify({
-      specText: pwmChainDemo ? PWM_EMBEDDED_SPEC : uartChainDemo ? UART_EMBEDDED_SPEC : imageChainDemo ? IMAGE_EMBEDDED_SPEC : GENERIC_EMBEDDED_SPEC,
+      specText: pwmChainDemo ? PWM_EMBEDDED_SPEC : uartChainDemo ? UART_EMBEDDED_SPEC : imageChainDemo ? IMAGE_EMBEDDED_SPEC : sensorChainDemo ? SENSOR_EMBEDDED_SPEC : GENERIC_EMBEDDED_SPEC,
       goal: pwmChainDemo
         ? "Generate Rust firmware and validate its PWM interface against the imported RTL."
         : uartChainDemo
         ? "Generate Rust firmware and validate UART packet, FIFO, and interrupt behavior against the imported RTL."
         : imageChainDemo
         ? "Generate Rust firmware and validate image DMA, filter, histogram, and interrupt behavior against the imported RTL."
+        : sensorChainDemo
+        ? "Generate Rust firmware and validate sensor sampling, FIFO, alerts, and low-power behavior against the imported RTL."
         : "Generate firmware and validation collateral from the actual imported RTL and register map.",
       fromWorkflowId: sourceArch2rtlWorkflowId,
       fromRunId: context.arch2rtlRunId,
       sourceVerificationWorkflowId: workflowId,
       sourceVerificationRunId: runId,
-      topModule: pwmChainDemo ? "pwm_controller" : uartChainDemo ? "uart_packet_engine" : imageChainDemo ? "image_dma_pipeline" : undefined,
+      topModule: pwmChainDemo ? "pwm_controller" : uartChainDemo ? "uart_packet_engine" : imageChainDemo ? "image_dma_pipeline" : sensorChainDemo ? "smart_sensor_hub_mcu" : undefined,
     }));
-    router.push(`/apps/embedded-run?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}`);
+    router.push(`/apps/embedded-run?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -428,11 +433,15 @@ export default function VerifyAppPage() {
             <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
               Image DMA demo: verify DMA progress, register-based line buffers, filter modes, histogram updates, and frame-done interrupt behavior.
             </div>
+          ) : sensorChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Smart sensor hub demo: verify periodic sampling, FIFO telemetry, threshold alerts, IRQ clear, and low-power behavior before firmware generation.
+            </div>
           ) : null}
 
-          {pwmChainDemo || uartChainDemo || imageChainDemo || handoffFlow ? (
+          {pwmChainDemo || uartChainDemo || imageChainDemo || sensorChainDemo || handoffFlow ? (
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-              {["RTL", "Verify", "Firmware", "Software", "Validation"].map((stage, index, stages) => (
+              {["RTL", "Verify", "Firmware", "Software", "Validation", "Product"].map((stage, index, stages) => (
                 <div key={stage} className="flex items-center gap-2">
                   <span
                     className={`rounded-full border px-3 py-1 font-semibold ${

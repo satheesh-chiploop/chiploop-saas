@@ -13,6 +13,7 @@ import {
   GENERIC_VALIDATION_GOAL,
   IMAGE_VALIDATION_GOAL,
   PWM_VALIDATION_GOAL,
+  SENSOR_VALIDATION_GOAL,
   UART_VALIDATION_GOAL,
   SOFTWARE_HANDOFF_PREFILL_KEY,
   VALIDATION_HANDOFF_PREFILL_KEY,
@@ -69,6 +70,7 @@ export default function SystemSoftwareAppPage() {
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
   const [uartChainDemo, setUartChainDemo] = useState(false);
   const [imageChainDemo, setImageChainDemo] = useState(false);
+  const [sensorChainDemo, setSensorChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -118,11 +120,12 @@ export default function SystemSoftwareAppPage() {
   useEffect(() => {
     if (loading || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1") return;
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1" && params.get("sensor_chain") !== "1") return;
     setHandoffFlow(true);
     setPwmChainDemo(params.get("pwm_chain") === "1");
     setUartChainDemo(params.get("uart_chain") === "1");
     setImageChainDemo(params.get("image_chain") === "1");
+    setSensorChainDemo(params.get("sensor_chain") === "1");
     const raw = window.localStorage.getItem(SOFTWARE_HANDOFF_PREFILL_KEY);
     if (!raw) return;
     try {
@@ -247,26 +250,28 @@ export default function SystemSoftwareAppPage() {
     }
     context.softwareWorkflowId = workflowId;
     context.softwareRunId = runId || undefined;
-    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : context.demoKind;
+    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : context.demoKind;
     const sourceFirmwareWorkflowId = context.embeddedWorkflowId || systemFirmwareWorkflowId || "";
     const sourceRtlWorkflowId = context.arch2rtlWorkflowId || systemRtlWorkflowId || "";
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     window.localStorage.setItem(VALIDATION_HANDOFF_PREFILL_KEY, JSON.stringify({
-      projectName: pwmChainDemo ? "pwm_fan_controller_full_stack_validation" : uartChainDemo ? "uart_packet_engine_full_stack_validation" : imageChainDemo ? "image_dma_pipeline_full_stack_validation" : "generated_hardware_full_stack_validation",
+      projectName: pwmChainDemo ? "pwm_fan_controller_full_stack_validation" : uartChainDemo ? "uart_packet_engine_full_stack_validation" : imageChainDemo ? "image_dma_pipeline_full_stack_validation" : sensorChainDemo ? "smart_sensor_hub_full_stack_validation" : "generated_hardware_full_stack_validation",
       validationMode: "full_co_simulation",
       systemSoftwareWorkflowId: workflowId,
       systemFirmwareWorkflowId: sourceFirmwareWorkflowId,
       systemRtlWorkflowId: sourceRtlWorkflowId,
-      goal: pwmChainDemo ? PWM_VALIDATION_GOAL : uartChainDemo ? UART_VALIDATION_GOAL : imageChainDemo ? IMAGE_VALIDATION_GOAL : GENERIC_VALIDATION_GOAL,
+      goal: pwmChainDemo ? PWM_VALIDATION_GOAL : uartChainDemo ? UART_VALIDATION_GOAL : imageChainDemo ? IMAGE_VALIDATION_GOAL : sensorChainDemo ? SENSOR_VALIDATION_GOAL : GENERIC_VALIDATION_GOAL,
       notes: pwmChainDemo
         ? "Validate imported Arch2RTL PWM hardware through Rust firmware and generated fan-control software."
         : uartChainDemo
         ? "Validate imported Arch2RTL UART packet-engine hardware through Rust firmware and generated packet-service software."
         : imageChainDemo
         ? "Validate imported Arch2RTL image DMA pipeline hardware through Rust firmware and generated image-processing software."
+        : sensorChainDemo
+        ? "Validate imported Arch2RTL smart sensor hub hardware through Rust firmware and generated IoT telemetry software."
         : "Validate imported Arch2RTL hardware through the generated firmware and software handoffs.",
     }));
-    router.push(`/apps/system-software-validation?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}`);
+    router.push(`/apps/system-software-validation?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -312,6 +317,10 @@ export default function SystemSoftwareAppPage() {
           ) : imageChainDemo ? (
             <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
               Image DMA demo: create an image-processing CLI and frame-processing service from the Rust firmware handoff.
+            </div>
+          ) : sensorChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Smart sensor hub demo: create an IoT telemetry CLI and alert service from the Rust firmware handoff.
             </div>
           ) : handoffFlow ? (
             <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">

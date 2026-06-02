@@ -10,6 +10,7 @@ import {
   DESIGN_CHAIN_CONTEXT_KEY,
   IMAGE_DMA_PIPELINE_ARCH2RTL_SPEC,
   PWM_FULL_STACK_ARCH2RTL_SPEC,
+  SENSOR_HUB_ARCH2RTL_SPEC,
   UART_PACKET_ENGINE_ARCH2RTL_SPEC,
 } from "@/lib/pwmFullStackDemo";
 
@@ -637,6 +638,18 @@ export default function AppsHomePage() {
     go("/apps/arch2rtl?guided=1&image_chain=1");
   }
 
+  function startSensorHubDemo() {
+    window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
+      projectName: "smart_sensor_hub_mcu_demo",
+      topModule: "smart_sensor_hub_mcu",
+      designLanguage: "systemverilog",
+      specText: SENSOR_HUB_ARCH2RTL_SPEC,
+      toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+    }));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "sensor_hub" }));
+    go("/apps/arch2rtl?guided=1&sensor_chain=1");
+  }
+
   const openApp = (slug: string) => go(routeForApp(slug));
 
   async function skipOnboarding() {
@@ -951,28 +964,39 @@ export default function AppsHomePage() {
         <div className="border-y border-slate-800 py-6">
           <div className="text-xs font-semibold uppercase text-emerald-300">Reference Journeys</div>
           <div className="mt-2 text-xl font-bold text-white">End-to-end demos using the standard ChipLoop apps</div>
-          <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
             {[
               {
+                segment: "Embedded Control / Motor & Power",
                 title: "PWM Controller: RTL to Firmware to Software to Product App",
                 copy: "A compact peripheral demo for first-time walkthroughs. Generated RTL, simulation, firmware co-simulation, and validation evidence come from actual workflow runs.",
                 button: "Start PWM Reference Journey",
                 onClick: startPwmFullStackDemo,
               },
               {
+                segment: "Connectivity / Communications IP",
                 title: "UART Packet Engine: FIFO, interrupts, firmware, software, and product app",
                 copy: "A larger peripheral demo intended to produce roughly 150-200 flip-flops through FIFOs, shifters, counters, state machines, and interrupt logic.",
                 button: "Start UART Reference Journey",
                 onClick: startUartPacketDemo,
               },
               {
+                segment: "Vision / Edge AI Preprocessing",
                 title: "Image DMA Pipeline: 25k FF visual processing demo",
                 copy: "A large visual demo with DMA, register-based line buffers, 3x3 filtering, thresholding, histogram, interrupts, firmware, software, and product dashboard.",
                 button: "Start Image DMA Journey",
                 onClick: startImageDmaDemo,
               },
+              {
+                segment: "IoT / Embedded Edge Devices",
+                title: "Smart Sensor Hub MCU: telemetry, alerts, low power, and product app",
+                copy: "An IoT edge-node demo with a microcontroller-style sensor hub, threshold alerts, FIFO telemetry buffering, low-power sampling, firmware, software, validation, and dashboard.",
+                button: "Start Sensor Hub Journey",
+                onClick: startSensorHubDemo,
+              },
             ].map((journey) => (
               <div key={journey.title} className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-300">{journey.segment}</div>
                 <div className="text-lg font-bold text-white">{journey.title}</div>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{journey.copy}</p>
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">

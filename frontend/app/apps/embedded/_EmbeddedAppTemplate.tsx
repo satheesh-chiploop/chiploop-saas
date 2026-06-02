@@ -14,6 +14,7 @@ import {
   GENERIC_SOFTWARE_GOAL,
   IMAGE_SOFTWARE_GOAL,
   PWM_SOFTWARE_GOAL,
+  SENSOR_SOFTWARE_GOAL,
   UART_SOFTWARE_GOAL,
   SOFTWARE_HANDOFF_PREFILL_KEY,
   type DesignChainContext,
@@ -48,6 +49,7 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
   const [uartChainDemo, setUartChainDemo] = useState(false);
   const [imageChainDemo, setImageChainDemo] = useState(false);
+  const [sensorChainDemo, setSensorChainDemo] = useState(false);
   const [fromWorkflowId, setFromWorkflowId] = useState("");
   const [fromRunId, setFromRunId] = useState("");
   const [sourceVerificationWorkflowId, setSourceVerificationWorkflowId] = useState("");
@@ -113,11 +115,12 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
   useEffect(() => {
     if (loading || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1") return;
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1" && params.get("sensor_chain") !== "1") return;
     setHandoffFlow(true);
     setPwmChainDemo(params.get("pwm_chain") === "1");
     setUartChainDemo(params.get("uart_chain") === "1");
     setImageChainDemo(params.get("image_chain") === "1");
+    setSensorChainDemo(params.get("sensor_chain") === "1");
     const raw = window.localStorage.getItem(EMBEDDED_HANDOFF_PREFILL_KEY);
     if (!raw) return;
     try {
@@ -228,21 +231,21 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
     }
     context.embeddedWorkflowId = workflowId;
     context.embeddedRunId = runId || undefined;
-    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : context.demoKind;
+    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : context.demoKind;
     const sourceRtlWorkflowId = context.arch2rtlWorkflowId || fromWorkflowId || "";
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     window.localStorage.setItem(SOFTWARE_HANDOFF_PREFILL_KEY, JSON.stringify({
-      projectName: pwmChainDemo ? "pwm_fan_control_software" : uartChainDemo ? "uart_packet_engine_software" : imageChainDemo ? "image_dma_pipeline_software" : "generated_hardware_software",
+      projectName: pwmChainDemo ? "pwm_fan_control_software" : uartChainDemo ? "uart_packet_engine_software" : imageChainDemo ? "image_dma_pipeline_software" : sensorChainDemo ? "smart_sensor_hub_software" : "generated_hardware_software",
       systemFirmwareWorkflowId: workflowId,
       systemRtlWorkflowId: sourceRtlWorkflowId,
-      softwareGoal: pwmChainDemo ? PWM_SOFTWARE_GOAL : uartChainDemo ? UART_SOFTWARE_GOAL : imageChainDemo ? IMAGE_SOFTWARE_GOAL : GENERIC_SOFTWARE_GOAL,
-      appNames: pwmChainDemo ? "fan_status_cli, fan_profile_service" : uartChainDemo ? "uart_packet_cli, telemetry_packet_service" : imageChainDemo ? "image_pipeline_cli, frame_processing_service" : "",
+      softwareGoal: pwmChainDemo ? PWM_SOFTWARE_GOAL : uartChainDemo ? UART_SOFTWARE_GOAL : imageChainDemo ? IMAGE_SOFTWARE_GOAL : sensorChainDemo ? SENSOR_SOFTWARE_GOAL : GENERIC_SOFTWARE_GOAL,
+      appNames: pwmChainDemo ? "fan_status_cli, fan_profile_service" : uartChainDemo ? "uart_packet_cli, telemetry_packet_service" : imageChainDemo ? "image_pipeline_cli, frame_processing_service" : sensorChainDemo ? "sensor_node_cli, telemetry_alert_service" : "",
       targetLanguage: "rust",
       sdkStyle: "rust_crate",
       buildSystem: "cargo",
       notes: "Source RTL and interface artifacts were imported from Arch2RTL; verification lineage is preserved in the firmware handoff.",
     }));
-    router.push(`/apps/system-software?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}`);
+    router.push(`/apps/system-software?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -303,6 +306,10 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
           ) : imageChainDemo ? (
             <div className="mt-4 rounded-xl border border-emerald-900/60 bg-emerald-950/20 p-4 text-sm text-slate-200">
               Image DMA demo: this run imports image pipeline registers, DMA controls, filter settings, histogram counters, and frame-status collateral.
+            </div>
+          ) : sensorChainDemo ? (
+            <div className="mt-4 rounded-xl border border-emerald-900/60 bg-emerald-950/20 p-4 text-sm text-slate-200">
+              Smart sensor hub demo: this run imports sensor telemetry, FIFO, threshold alert, interrupt, and low-power registers, then creates Rust IoT firmware collateral.
             </div>
           ) : handoffFlow ? (
             <div className="mt-4 rounded-xl border border-emerald-900/60 bg-emerald-950/20 p-4 text-sm text-slate-200">

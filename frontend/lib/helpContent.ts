@@ -141,6 +141,7 @@ export const helpTopics: HelpTopic[] = [
       "Verification closure analysis is separate from the compact dashboard. If functional coverage is below target, the downloadable closure plan lists the missing bins and recommended next actions. Code coverage reports line, branch, condition, and toggle values when the simulator artifacts contain those data; older LCOV-only runs may show toggle coverage as unavailable.",
       "The handoff actions are also available after non-demo Arch2RTL runs. In that path, ChipLoop passes the generated artifacts and workflow lineage forward, while downstream agents derive verification, firmware, software, and validation work from the selected design rather than applying PWM-specific goals.",
       "The System Architecture Explorer gem5 demo is a separate CPU/cache/workload exploration path and is not used as evidence for the PWM peripheral demo.",
+      "Segment: Embedded Control / Motor & Power Control.",
       "Step 1: Open Apps and choose PWM Controller Reference Journey, then run the prefilled Arch2RTL PWM controller.",
       "Step 2: After Arch2RTL completes, click Open in Verification and run the prefilled PWM verification.",
       "Step 3: After verification completes, click Open in Firmware and run Embedded.",
@@ -176,6 +177,7 @@ export const helpTopics: HelpTopic[] = [
       "The Embedded and System Software stages produce a Rust packet driver, packet CLI, and telemetry packet service. Full Validation checks that software commands become firmware register operations and the imported RTL shows ordered packet movement and interrupt behavior.",
       "Product App Builder generates a UART packet dashboard where users can set baud divider and packet length, send a packet, watch TX/RX FIFO levels, observe IRQ status, and inject a framing error in the simulator-backed app.",
       "The Demo Evidence Dashboard also shows how many agents participated in each completed stage, using the workflow logs for that stage.",
+      "Segment: Connectivity / Communications IP.",
     ],
     actions: ["Open Apps", "Start UART Reference Journey", "Run each stage", "Inspect agent count and generated evidence", "Build Product App"],
     exampleQuestions: [
@@ -202,6 +204,7 @@ export const helpTopics: HelpTopic[] = [
       "The Embedded and System Software stages produce a Rust image pipeline driver, image-processing CLI, and frame-processing service. Full Validation checks that software commands become firmware register operations and the imported RTL shows expected frame_done interrupts, DMA byte counts, output signatures, and histogram updates.",
       "Product App Builder generates a simulator-backed image dashboard with filter controls, threshold and brightness sliders, DMA progress, input/output previews, histogram view, IRQ/status fields, and workflow lineage.",
       "The Demo Evidence Dashboard also shows how many agents participated in each completed stage, using the workflow logs for that stage.",
+      "Segment: Vision / Edge AI Preprocessing.",
     ],
     actions: ["Open Apps", "Start Image DMA Journey", "Run each stage", "Inspect FF/dashboard evidence", "Build Product App"],
     exampleQuestions: [
@@ -215,6 +218,32 @@ export const helpTopics: HelpTopic[] = [
       { label: "Product App Builder", href: "/apps/system-product-builder" },
     ],
     keywords: ["image", "dma", "pipeline", "25k flip flops", "line buffer", "filter", "histogram", "reference journey", "arch2rtl", "verify", "firmware", "software", "validation", "product app"],
+  },
+  {
+    slug: "apps-smart-sensor-hub-reference-journey",
+    title: "Smart Sensor Hub MCU Reference Journey",
+    category: "Apps",
+    summary: "Run an IoT edge-node reference journey with sensor telemetry, thresholds, FIFO buffering, low-power control, firmware, software, validation, and product app.",
+    body: [
+      "Smart Sensor Hub MCU Reference Journey is the IoT/embedded-edge demo. It uses the same reusable ChipLoop apps and agents as the PWM, UART, and Image DMA journeys, but starts from a microcontroller-style sensor hub subsystem.",
+      "The Arch2RTL spec models a firmware-facing sensor hub with sample timer, temperature/humidity/air-quality channels, threshold comparators, FIFO buffering, alert interrupts, sample counters, and low-power control.",
+      "The Verify stage uses sensor-specific intent covering reset, register programming, sample capture, FIFO behavior, threshold alerts, ALERT_CLEAR, FIFO_CLEAR, overflow, and low-power state.",
+      "The Embedded and System Software stages produce Rust firmware, a sensor-node CLI, and a telemetry alert service. Full Validation checks that software commands become firmware register operations and the imported RTL shows expected sampling, FIFO, IRQ, and alert behavior.",
+      "Product App Builder generates an IoT product dashboard from the completed collateral with explanations for sample period, sensor channels, thresholds, telemetry, FIFO depth, alert state, sample count, and low-power mode.",
+      "Segment: IoT / Embedded Edge Devices.",
+    ],
+    actions: ["Open Apps", "Start Sensor Hub Journey", "Run each stage", "Inspect telemetry and alert evidence", "Build Product App"],
+    exampleQuestions: [
+      "How do I demo an IoT edge-node subsystem?",
+      "Does the sensor hub include a microcontroller?",
+      "What does the sensor product dashboard show?",
+    ],
+    links: [
+      { label: "Apps", href: "/apps" },
+      { label: "Arch2RTL", href: "/apps/arch2rtl?guided=1&sensor_chain=1" },
+      { label: "Product App Builder", href: "/apps/system-product-builder" },
+    ],
+    keywords: ["iot", "sensor hub", "microcontroller", "telemetry", "threshold", "fifo", "low power", "reference journey", "arch2rtl", "verify", "firmware", "software", "validation", "product app"],
   },
   {
     slug: "apps-product-builder",

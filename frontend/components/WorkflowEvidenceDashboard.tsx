@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ApiClientError, apiGet } from "@/lib/apiClient";
 
-type Stage = "arch2rtl" | "verification" | "embedded" | "software" | "validation";
+type Stage = "arch2rtl" | "verification" | "embedded" | "software" | "validation" | "product";
 type JsonMap = Record<string, unknown>;
 
 type Props = {
@@ -19,6 +19,7 @@ const FLOW: Array<{ id: Stage; label: string }> = [
   { id: "embedded", label: "Firmware" },
   { id: "software", label: "Software" },
   { id: "validation", label: "Validation" },
+  { id: "product", label: "Product" },
 ];
 
 function record(value: unknown): JsonMap {
@@ -138,6 +139,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "mock_runtime_validation_report.json",
         "package_audit_report.json",
         "contract_consistency_report.json",
+      ],
+      product: [
+        "system_product_dashboard_manifest.json",
+        "system_product_package.json",
+        "system_product_capability_model.json",
+        "system_product_collateral_contract.json",
       ],
     };
     Promise.all(files[stage].map(async (filename) => [filename, await artifact(workflowId, filename)] as const))

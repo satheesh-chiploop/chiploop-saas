@@ -35,6 +35,35 @@ function countParticipatingAgents(logs: string | null | undefined): number | nul
   return agents.size || null;
 }
 
+function WorkflowIdField({
+  label,
+  helper,
+  value,
+  onChange,
+  required = false,
+}: {
+  label: string;
+  helper: string;
+  value: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+}) {
+  return (
+    <label className="block rounded-xl border border-slate-800 bg-black/20 p-3">
+      <span className="block text-xs font-semibold uppercase tracking-wide text-cyan-200">
+        {label}{required ? " *" : ""}
+      </span>
+      <span className="mt-1 block text-xs text-slate-500">{helper}</span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-2 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
+        placeholder={`${label} workflow ID`}
+      />
+    </label>
+  );
+}
+
 export default function SystemProductBuilderPage() {
   const router = useRouter();
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -48,6 +77,7 @@ export default function SystemProductBuilderPage() {
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
   const [uartChainDemo, setUartChainDemo] = useState(false);
   const [imageChainDemo, setImageChainDemo] = useState(false);
+  const [sensorChainDemo, setSensorChainDemo] = useState(false);
 
   const [arch2rtlWorkflowId, setArch2rtlWorkflowId] = useState("");
   const [verifyWorkflowId, setVerifyWorkflowId] = useState("");
@@ -104,6 +134,7 @@ export default function SystemProductBuilderPage() {
     setPwmChainDemo(params.get("pwm_chain") === "1");
     setUartChainDemo(params.get("uart_chain") === "1");
     setImageChainDemo(params.get("image_chain") === "1");
+    setSensorChainDemo(params.get("sensor_chain") === "1");
     const rawPrefill = window.localStorage.getItem(PRODUCT_BUILDER_PREFILL_KEY);
     const rawContext = window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY);
     let context: DesignChainContext = {};
@@ -217,16 +248,49 @@ export default function SystemProductBuilderPage() {
             <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
               Image DMA demo: build a simulator-backed dashboard for filter controls, DMA progress, input/output preview, histogram, and interrupt status.
             </div>
+          ) : sensorChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Smart sensor hub demo: build a simulator-backed IoT dashboard for sample rate, sensor channels, live telemetry, FIFO depth, alerts, and low-power state.
+            </div>
           ) : null}
 
           <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,0.85fr)]">
             <div className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
-                <input value={arch2rtlWorkflowId} onChange={(e) => setArch2rtlWorkflowId(e.target.value)} className="rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" placeholder="Arch2RTL workflow ID" />
-                <input value={verifyWorkflowId} onChange={(e) => setVerifyWorkflowId(e.target.value)} className="rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" placeholder="Verify workflow ID" />
-                <input value={systemFirmwareWorkflowId} onChange={(e) => setSystemFirmwareWorkflowId(e.target.value)} className="rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" placeholder="Firmware workflow ID" />
-                <input value={systemSoftwareWorkflowId} onChange={(e) => setSystemSoftwareWorkflowId(e.target.value)} className="rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" placeholder="Software workflow ID *" />
-                <input value={systemValidationWorkflowId} onChange={(e) => setSystemValidationWorkflowId(e.target.value)} className="rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100 sm:col-span-2" placeholder="Validation workflow ID *" />
+                <WorkflowIdField
+                  label="RTL source"
+                  helper="Digital_Arch2RTL run that generated RTL, register map, constraints, and handoff collateral."
+                  value={arch2rtlWorkflowId}
+                  onChange={setArch2rtlWorkflowId}
+                />
+                <WorkflowIdField
+                  label="Verification evidence"
+                  helper="Digital_Verify run with simulation, coverage, assertions, formal, and debug evidence."
+                  value={verifyWorkflowId}
+                  onChange={setVerifyWorkflowId}
+                />
+                <WorkflowIdField
+                  label="Firmware handoff"
+                  helper="Embedded_Run or firmware workflow that generated drivers, register access, and co-sim collateral."
+                  value={systemFirmwareWorkflowId}
+                  onChange={setSystemFirmwareWorkflowId}
+                />
+                <WorkflowIdField
+                  label="Software package"
+                  helper="System_Software run that generated SDK, API contract, service, app, and package artifacts."
+                  value={systemSoftwareWorkflowId}
+                  onChange={setSystemSoftwareWorkflowId}
+                  required
+                />
+                <div className="sm:col-span-2">
+                  <WorkflowIdField
+                    label="Validation evidence"
+                    helper="System_Software_Validation run proving software to firmware to RTL behavior across scenarios."
+                    value={systemValidationWorkflowId}
+                    onChange={setSystemValidationWorkflowId}
+                    required
+                  />
+                </div>
               </div>
               <textarea value={productIntent} onChange={(e) => setProductIntent(e.target.value)} rows={6} className="w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100" placeholder="Describe the product interface to generate." />
               <div className="grid gap-3 sm:grid-cols-2">
