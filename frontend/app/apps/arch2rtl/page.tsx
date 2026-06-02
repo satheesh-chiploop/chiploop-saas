@@ -6,15 +6,13 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { apiPost } from "@/lib/apiClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import GitHubImportPanel from "@/components/GitHubImportPanel";
+import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
-  DESIGN_CHAIN_CONTEXT_KEY,
   GENERIC_VERIFY_INTENT,
   IMAGE_VERIFY_INTENT,
   PWM_VERIFY_INTENT,
   UART_VERIFY_INTENT,
-  VERIFY_HANDOFF_PREFILL_KEY,
-  type DesignChainContext,
 } from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
@@ -537,37 +535,6 @@ export default function Arch2RTLAppPage() {
     }
   }
 
-  function openInVerification() {
-    if (!workflowId) return;
-    const raw = window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY);
-    let context: DesignChainContext = {};
-    try {
-      context = raw ? JSON.parse(raw) as DesignChainContext : {};
-    } catch {
-      context = {};
-    }
-    context.arch2rtlWorkflowId = workflowId;
-    context.arch2rtlRunId = runId || undefined;
-    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : context.demoKind;
-    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
-    window.localStorage.setItem(VERIFY_HANDOFF_PREFILL_KEY, JSON.stringify({
-      fromWorkflowId: workflowId,
-      fromRunId: runId,
-      testIntent: pwmChainDemo ? PWM_VERIFY_INTENT : uartChainDemo ? UART_VERIFY_INTENT : imageChainDemo ? IMAGE_VERIFY_INTENT : GENERIC_VERIFY_INTENT,
-      randomVsDirected: "directed",
-      coverageTargets: pwmChainDemo
-        ? "PWM duty-cycle scenarios, reset behavior, dynamic updates"
-        : uartChainDemo
-        ? "UART packet movement, FIFO levels, interrupt status, framing and overflow error handling"
-        : imageChainDemo
-        ? "DMA progress, line-buffer windows, filter modes, histogram bins, frame_done interrupt behavior"
-        : "Derived interface behavior, reset behavior, functional corner cases",
-      simulatorType: "verilator",
-      seedCount: 4,
-    }));
-    router.push(`/apps/verify?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}`);
-  }
-
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -836,13 +803,26 @@ export default function Arch2RTLAppPage() {
                   <button onClick={downloadZip} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                     {guidedOnboarding ? "Download ZIP and finish" : "Download ZIP (full=1)"}
                   </button>
-                  <button
-                    onClick={openInVerification}
+                </div>
+                <div className="mt-4">
+                  <NextWorkflowLauncher
+                    currentStage="arch2rtl"
+                    currentWorkflowId={workflowId}
+                    currentRunId={runId}
+                    sourceArch2RTLWorkflowId={workflowId}
                     disabled={!arch2rtlReady}
-                    className="rounded-xl bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
-                  >
-                    Open in Verification
-                  </button>
+                    verifyTestIntent={pwmChainDemo ? PWM_VERIFY_INTENT : uartChainDemo ? UART_VERIFY_INTENT : imageChainDemo ? IMAGE_VERIFY_INTENT : GENERIC_VERIFY_INTENT}
+                    verifyCoverageTargets={
+                      pwmChainDemo
+                        ? "PWM duty-cycle scenarios, reset behavior, dynamic updates"
+                        : uartChainDemo
+                        ? "UART packet movement, FIFO levels, interrupt status, framing and overflow error handling"
+                        : imageChainDemo
+                        ? "DMA progress, line-buffer windows, filter modes, histogram bins, frame_done interrupt behavior"
+                        : "Derived interface behavior, reset behavior, functional corner cases"
+                    }
+                    verifyQuerySuffix={`${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}`}
+                  />
                 </div>
               </div>
 

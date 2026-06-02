@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -185,6 +186,8 @@ export default function Arch2SynthesisAppPage() {
         rtl_source_mode: rtlSourceMode === "none" ? undefined : rtlSourceMode,
         repo_path: rtlSourceMode === "repo_path" ? repoPath : undefined,
         from_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
+        source_arch2rtl_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
+        upstream_workflows: rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId } : undefined,
         pasted_rtl_files,
 
         // synthesis knobs
@@ -420,7 +423,17 @@ export default function Arch2SynthesisAppPage() {
                 <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                   Download ZIP (full=1)
                 </button>
-                    <AskThisRunPanel workflowId={workflowId} compact />
+                <div className="mt-3">
+                  <NextWorkflowLauncher
+                    currentStage="synthesis"
+                    currentWorkflowId={workflowId}
+                    currentRunId={runId}
+                    sourceArch2RTLWorkflowId={rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : null}
+                    upstreamWorkflows={rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId, arch2synthesis: workflowId } : undefined}
+                    disabled={workflowRow?.status !== "completed"}
+                  />
+                </div>
+                <AskThisRunPanel workflowId={workflowId} compact />
               </div>
             ) : null}
           </div>

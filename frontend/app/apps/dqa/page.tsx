@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -153,6 +154,8 @@ export default function DQAAppPage() {
         {
           rtl_source_mode: rtlSourceMode,
           from_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
+          source_arch2rtl_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
+          upstream_workflows: rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId } : undefined,
           repo_path: rtlSourceMode === "repo_path" ? repoPath : undefined,
           // Keep simple for now (backend supports richer array; this is minimal)
           pasted_rtl_files:
@@ -323,7 +326,17 @@ export default function DQAAppPage() {
                   >
                     Download ZIP (full=1)
                   </button>
-                    <AskThisRunPanel workflowId={workflowId} compact />
+                  <div className="mt-3">
+                    <NextWorkflowLauncher
+                      currentStage="dqa"
+                      currentWorkflowId={workflowId}
+                      currentRunId={runId}
+                      sourceArch2RTLWorkflowId={rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : null}
+                      upstreamWorkflows={rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId, dqa: workflowId } : undefined}
+                      disabled={workflowRow?.status !== "completed"}
+                    />
+                  </div>
+                  <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}
             </div>

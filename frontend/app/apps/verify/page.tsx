@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
@@ -58,6 +59,8 @@ export default function VerifyAppPage() {
   // Intake (minimal but useful)
   const [rtlSourceMode, setRtlSourceMode] = useState<"from_arch2rtl" | "paste" | "repo_path">("repo_path");
   const [fromWorkflowId, setFromWorkflowId] = useState("");
+  const [parentWorkflowId, setParentWorkflowId] = useState("");
+  const [upstreamWorkflows, setUpstreamWorkflows] = useState<Record<string, string>>({});
   const [repoPath, setRepoPath] = useState("");
   const [pastedRtl, setPastedRtl] = useState("");
 
@@ -141,6 +144,8 @@ export default function VerifyAppPage() {
         coverageTargets?: string;
         simulatorType?: string;
         seedCount?: number;
+        parentWorkflowId?: string;
+        upstreamWorkflows?: Record<string, string>;
       };
       setRtlSourceMode("from_arch2rtl");
       setFromWorkflowId(prefill.fromWorkflowId || "");
@@ -150,6 +155,8 @@ export default function VerifyAppPage() {
       setSimulatorType(prefill.simulatorType || "verilator");
       setCodeCoverageTool("verilator_coverage");
       setSeedCount(prefill.seedCount || 4);
+      setParentWorkflowId(prefill.parentWorkflowId || "");
+      setUpstreamWorkflows(prefill.upstreamWorkflows || {});
     } catch {
       window.localStorage.removeItem(VERIFY_HANDOFF_PREFILL_KEY);
     }
@@ -269,6 +276,9 @@ export default function VerifyAppPage() {
         {
           rtl_source_mode: rtlSourceMode,
           from_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
+          source_arch2rtl_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
+          parent_workflow_id: parentWorkflowId || undefined,
+          upstream_workflows: rtlSourceMode === "from_arch2rtl" ? { ...upstreamWorkflows, arch2rtl: fromWorkflowId } : undefined,
           repo_path: rtlSourceMode === "repo_path" ? repoPath : undefined,
           pasted_rtl_files:
             rtlSourceMode === "paste"
@@ -707,6 +717,18 @@ export default function VerifyAppPage() {
                         </button>
                       ) : null}
                     </div>
+                    {rtlSourceMode === "from_arch2rtl" ? (
+                      <div className="mt-3">
+                        <NextWorkflowLauncher
+                          currentStage="verify"
+                          currentWorkflowId={workflowId}
+                          currentRunId={runId}
+                          sourceArch2RTLWorkflowId={fromWorkflowId}
+                          upstreamWorkflows={{ ...upstreamWorkflows, arch2rtl: fromWorkflowId, verify: workflowId }}
+                          disabled={workflowRow?.status !== "completed"}
+                        />
+                      </div>
+                    ) : null}
                   </div>
 
                   <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" logs={workflowRow?.logs} />
