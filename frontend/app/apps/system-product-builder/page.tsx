@@ -78,6 +78,8 @@ export default function SystemProductBuilderPage() {
   const [uartChainDemo, setUartChainDemo] = useState(false);
   const [imageChainDemo, setImageChainDemo] = useState(false);
   const [sensorChainDemo, setSensorChainDemo] = useState(false);
+  const [secureChainDemo, setSecureChainDemo] = useState(false);
+  const [safetyChainDemo, setSafetyChainDemo] = useState(false);
 
   const [arch2rtlWorkflowId, setArch2rtlWorkflowId] = useState("");
   const [verifyWorkflowId, setVerifyWorkflowId] = useState("");
@@ -135,6 +137,8 @@ export default function SystemProductBuilderPage() {
     setUartChainDemo(params.get("uart_chain") === "1");
     setImageChainDemo(params.get("image_chain") === "1");
     setSensorChainDemo(params.get("sensor_chain") === "1");
+    setSecureChainDemo(params.get("secure_chain") === "1");
+    setSafetyChainDemo(params.get("safety_chain") === "1");
     const rawPrefill = window.localStorage.getItem(PRODUCT_BUILDER_PREFILL_KEY);
     const rawContext = window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY);
     let context: DesignChainContext = {};
@@ -251,6 +255,14 @@ export default function SystemProductBuilderPage() {
           ) : sensorChainDemo ? (
             <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
               Smart sensor hub demo: build a simulator-backed IoT dashboard for sample rate, sensor channels, live telemetry, FIFO depth, alerts, and low-power state.
+            </div>
+          ) : secureChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Secure boot demo: build a simulator-backed security dashboard for key slots, boot authentication, rollback, tamper, debug lock, IRQ, and audit state.
+            </div>
+          ) : safetyChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Safety fault demo: build a simulator-backed safety dashboard for watchdog, heartbeat, fault injection, escalation, reset request, and safety IRQ state.
             </div>
           ) : null}
 

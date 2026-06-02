@@ -12,6 +12,8 @@ import {
   GENERIC_VERIFY_INTENT,
   IMAGE_VERIFY_INTENT,
   PWM_VERIFY_INTENT,
+  SAFETY_VERIFY_INTENT,
+  SECURE_BOOT_VERIFY_INTENT,
   SENSOR_VERIFY_INTENT,
   UART_VERIFY_INTENT,
 } from "@/lib/pwmFullStackDemo";
@@ -102,6 +104,8 @@ export default function Arch2RTLAppPage() {
   const [uartChainDemo, setUartChainDemo] = useState(false);
   const [imageChainDemo, setImageChainDemo] = useState(false);
   const [sensorChainDemo, setSensorChainDemo] = useState(false);
+  const [secureChainDemo, setSecureChainDemo] = useState(false);
+  const [safetyChainDemo, setSafetyChainDemo] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [trialPrompt, setTrialPrompt] = useState<TrialPrompt | null>(null);
   const [pendingTrialPrompt, setPendingTrialPrompt] = useState<TrialPrompt | null>(null);
@@ -301,6 +305,8 @@ export default function Arch2RTLAppPage() {
     setUartChainDemo(params.get("uart_chain") === "1");
     setImageChainDemo(params.get("image_chain") === "1");
     setSensorChainDemo(params.get("sensor_chain") === "1");
+    setSecureChainDemo(params.get("secure_chain") === "1");
+    setSafetyChainDemo(params.get("safety_chain") === "1");
     let demo = ARCH2RTL_ONBOARDING_DEFAULTS;
     const raw = window.localStorage.getItem(ONBOARDING_DEMO_KEY);
 
@@ -564,7 +570,7 @@ export default function Arch2RTLAppPage() {
               <div>
                 <div className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Guided first activity</div>
                 <h2 className="mt-1 text-2xl font-bold text-white">
-                  {pwmChainDemo ? "Generate the PWM controller RTL" : uartChainDemo ? "Generate the UART packet engine RTL" : imageChainDemo ? "Generate the image DMA pipeline RTL" : sensorChainDemo ? "Generate the smart sensor hub MCU RTL" : "Run Arch2RTL and inspect the handoff package"}
+                  {pwmChainDemo ? "Generate the PWM controller RTL" : uartChainDemo ? "Generate the UART packet engine RTL" : imageChainDemo ? "Generate the image DMA pipeline RTL" : sensorChainDemo ? "Generate the smart sensor hub MCU RTL" : secureChainDemo ? "Generate the secure boot key manager RTL" : safetyChainDemo ? "Generate the safety fault manager RTL" : "Run Arch2RTL and inspect the handoff package"}
                 </h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                   {pwmChainDemo
@@ -575,6 +581,10 @@ export default function Arch2RTLAppPage() {
                     ? "The image DMA pipeline specification is filled in for a large visual connected demo. Run it to produce DMA, line-buffer, filter, histogram, interrupt, and register collateral for the next stage."
                     : sensorChainDemo
                     ? "The smart sensor hub MCU specification is filled in for an IoT connected demo. Run it to produce sensor telemetry, FIFO, alert, low-power, interrupt, and register collateral for the next stage."
+                    : secureChainDemo
+                    ? "The secure boot/key manager specification is filled in for a root-of-trust demo. Run it to produce boot authentication, key-slot, anti-rollback, debug-lock, tamper, and audit collateral for the next stage."
+                    : safetyChainDemo
+                    ? "The safety fault manager specification is filled in for an automotive safety demo. Run it to produce watchdog, fault-mask, escalation, reset-request, IRQ, and diagnostic collateral for the next stage."
                     : "The PWM controller spec is already filled in. Click Run Arch2RTL, wait for logs to finish, then download the ZIP and inspect the RTL, SDC, and UPF files."}
                 </p>
               </div>
@@ -586,7 +596,7 @@ export default function Arch2RTLAppPage() {
             </div>
             <div className="mt-4 grid gap-3 md:grid-cols-4">
               {[
-                sensorChainDemo ? "Review pre-filled sensor hub spec" : imageChainDemo ? "Review pre-filled image DMA spec" : uartChainDemo ? "Review pre-filled UART packet spec" : "Review pre-filled PWM spec",
+                safetyChainDemo ? "Review pre-filled safety fault spec" : secureChainDemo ? "Review pre-filled secure boot spec" : sensorChainDemo ? "Review pre-filled sensor hub spec" : imageChainDemo ? "Review pre-filled image DMA spec" : uartChainDemo ? "Review pre-filled UART packet spec" : "Review pre-filled PWM spec",
                 "Run Arch2RTL",
                 "Open the downloaded RTL, SDC, and UPF files",
                 "Download ZIP to complete onboarding",
@@ -816,7 +826,7 @@ export default function Arch2RTLAppPage() {
                     currentRunId={runId}
                     sourceArch2RTLWorkflowId={workflowId}
                     disabled={!arch2rtlReady}
-                    verifyTestIntent={pwmChainDemo ? PWM_VERIFY_INTENT : uartChainDemo ? UART_VERIFY_INTENT : imageChainDemo ? IMAGE_VERIFY_INTENT : sensorChainDemo ? SENSOR_VERIFY_INTENT : GENERIC_VERIFY_INTENT}
+                    verifyTestIntent={pwmChainDemo ? PWM_VERIFY_INTENT : uartChainDemo ? UART_VERIFY_INTENT : imageChainDemo ? IMAGE_VERIFY_INTENT : sensorChainDemo ? SENSOR_VERIFY_INTENT : secureChainDemo ? SECURE_BOOT_VERIFY_INTENT : safetyChainDemo ? SAFETY_VERIFY_INTENT : GENERIC_VERIFY_INTENT}
                     verifyCoverageTargets={
                       pwmChainDemo
                         ? "PWM duty-cycle scenarios, reset behavior, dynamic updates"
@@ -826,9 +836,13 @@ export default function Arch2RTLAppPage() {
                         ? "DMA progress, line-buffer windows, filter modes, histogram bins, frame_done interrupt behavior"
                         : sensorChainDemo
                         ? "Sensor sampling, FIFO levels, threshold alerts, interrupt clear, low-power behavior"
+                        : secureChainDemo
+                        ? "Boot authentication, key-slot coverage, rollback, tamper, debug lock, security IRQ behavior"
+                        : safetyChainDemo
+                        ? "Watchdog heartbeat, timeout, fault masks, escalation, reset request, safety IRQ behavior"
                         : "Derived interface behavior, reset behavior, functional corner cases"
                     }
-                    verifyQuerySuffix={`${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}`}
+                    verifyQuerySuffix={`${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}${secureChainDemo ? "&secure_chain=1" : ""}${safetyChainDemo ? "&safety_chain=1" : ""}`}
                   />
                 </div>
               </div>

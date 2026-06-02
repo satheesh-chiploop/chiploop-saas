@@ -15,6 +15,8 @@ import {
   GENERIC_EMBEDDED_SPEC,
   IMAGE_EMBEDDED_SPEC,
   PWM_EMBEDDED_SPEC,
+  SAFETY_EMBEDDED_SPEC,
+  SECURE_BOOT_EMBEDDED_SPEC,
   SENSOR_EMBEDDED_SPEC,
   UART_EMBEDDED_SPEC,
   VERIFY_HANDOFF_PREFILL_KEY,
@@ -82,6 +84,8 @@ export default function VerifyAppPage() {
   const [uartChainDemo, setUartChainDemo] = useState(false);
   const [imageChainDemo, setImageChainDemo] = useState(false);
   const [sensorChainDemo, setSensorChainDemo] = useState(false);
+  const [secureChainDemo, setSecureChainDemo] = useState(false);
+  const [safetyChainDemo, setSafetyChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -131,12 +135,14 @@ export default function VerifyAppPage() {
   useEffect(() => {
     if (loading || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1" && params.get("sensor_chain") !== "1") return;
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1" && params.get("sensor_chain") !== "1" && params.get("secure_chain") !== "1" && params.get("safety_chain") !== "1") return;
     setHandoffFlow(true);
     setPwmChainDemo(params.get("pwm_chain") === "1");
     setUartChainDemo(params.get("uart_chain") === "1");
     setImageChainDemo(params.get("image_chain") === "1");
     setSensorChainDemo(params.get("sensor_chain") === "1");
+    setSecureChainDemo(params.get("secure_chain") === "1");
+    setSafetyChainDemo(params.get("safety_chain") === "1");
     const raw = window.localStorage.getItem(VERIFY_HANDOFF_PREFILL_KEY);
     if (!raw) return;
     try {
@@ -367,10 +373,10 @@ export default function VerifyAppPage() {
     if (sourceArch2rtlWorkflowId) context.arch2rtlWorkflowId = sourceArch2rtlWorkflowId;
     context.verifyWorkflowId = workflowId;
     context.verifyRunId = runId || undefined;
-    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : context.demoKind;
+    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : secureChainDemo ? "secure_boot" : safetyChainDemo ? "safety_fault" : context.demoKind;
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     window.localStorage.setItem(EMBEDDED_HANDOFF_PREFILL_KEY, JSON.stringify({
-      specText: pwmChainDemo ? PWM_EMBEDDED_SPEC : uartChainDemo ? UART_EMBEDDED_SPEC : imageChainDemo ? IMAGE_EMBEDDED_SPEC : sensorChainDemo ? SENSOR_EMBEDDED_SPEC : GENERIC_EMBEDDED_SPEC,
+      specText: pwmChainDemo ? PWM_EMBEDDED_SPEC : uartChainDemo ? UART_EMBEDDED_SPEC : imageChainDemo ? IMAGE_EMBEDDED_SPEC : sensorChainDemo ? SENSOR_EMBEDDED_SPEC : secureChainDemo ? SECURE_BOOT_EMBEDDED_SPEC : safetyChainDemo ? SAFETY_EMBEDDED_SPEC : GENERIC_EMBEDDED_SPEC,
       goal: pwmChainDemo
         ? "Generate Rust firmware and validate its PWM interface against the imported RTL."
         : uartChainDemo
@@ -379,14 +385,18 @@ export default function VerifyAppPage() {
         ? "Generate Rust firmware and validate image DMA, filter, histogram, and interrupt behavior against the imported RTL."
         : sensorChainDemo
         ? "Generate Rust firmware and validate sensor sampling, FIFO, alerts, and low-power behavior against the imported RTL."
+        : secureChainDemo
+        ? "Generate Rust firmware and validate secure boot, rollback, tamper, debug-lock, and security IRQ behavior against the imported RTL."
+        : safetyChainDemo
+        ? "Generate Rust firmware and validate watchdog heartbeat, fault handling, reset escalation, and safety IRQ behavior against the imported RTL."
         : "Generate firmware and validation collateral from the actual imported RTL and register map.",
       fromWorkflowId: sourceArch2rtlWorkflowId,
       fromRunId: context.arch2rtlRunId,
       sourceVerificationWorkflowId: workflowId,
       sourceVerificationRunId: runId,
-      topModule: pwmChainDemo ? "pwm_controller" : uartChainDemo ? "uart_packet_engine" : imageChainDemo ? "image_dma_pipeline" : sensorChainDemo ? "smart_sensor_hub_mcu" : undefined,
+      topModule: pwmChainDemo ? "pwm_controller" : uartChainDemo ? "uart_packet_engine" : imageChainDemo ? "image_dma_pipeline" : sensorChainDemo ? "smart_sensor_hub_mcu" : secureChainDemo ? "secure_boot_key_manager" : safetyChainDemo ? "safety_fault_watchdog" : undefined,
     }));
-    router.push(`/apps/embedded-run?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}`);
+    router.push(`/apps/embedded-run?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}${secureChainDemo ? "&secure_chain=1" : ""}${safetyChainDemo ? "&safety_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -437,9 +447,17 @@ export default function VerifyAppPage() {
             <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
               Smart sensor hub demo: verify periodic sampling, FIFO telemetry, threshold alerts, IRQ clear, and low-power behavior before firmware generation.
             </div>
+          ) : secureChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Secure boot demo: verify image authentication, rollback failure, tamper handling, debug lock, audit count, and security IRQ behavior.
+            </div>
+          ) : safetyChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Safety fault demo: verify watchdog heartbeat, timeout, fault masks, escalation, reset request, and safety IRQ behavior.
+            </div>
           ) : null}
 
-          {pwmChainDemo || uartChainDemo || imageChainDemo || sensorChainDemo || handoffFlow ? (
+          {pwmChainDemo || uartChainDemo || imageChainDemo || sensorChainDemo || secureChainDemo || safetyChainDemo || handoffFlow ? (
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
               {["RTL", "Verify", "Firmware", "Software", "Validation", "Product"].map((stage, index, stages) => (
                 <div key={stage} className="flex items-center gap-2">

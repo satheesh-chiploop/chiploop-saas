@@ -10,6 +10,8 @@ import {
   DESIGN_CHAIN_CONTEXT_KEY,
   IMAGE_DMA_PIPELINE_ARCH2RTL_SPEC,
   PWM_FULL_STACK_ARCH2RTL_SPEC,
+  SAFETY_FAULT_MANAGER_ARCH2RTL_SPEC,
+  SECURE_BOOT_ARCH2RTL_SPEC,
   SENSOR_HUB_ARCH2RTL_SPEC,
   UART_PACKET_ENGINE_ARCH2RTL_SPEC,
 } from "@/lib/pwmFullStackDemo";
@@ -650,6 +652,30 @@ export default function AppsHomePage() {
     go("/apps/arch2rtl?guided=1&sensor_chain=1");
   }
 
+  function startSecureBootDemo() {
+    window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
+      projectName: "secure_boot_key_manager_demo",
+      topModule: "secure_boot_key_manager",
+      designLanguage: "systemverilog",
+      specText: SECURE_BOOT_ARCH2RTL_SPEC,
+      toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+    }));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "secure_boot" }));
+    go("/apps/arch2rtl?guided=1&secure_chain=1");
+  }
+
+  function startSafetyFaultDemo() {
+    window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
+      projectName: "safety_fault_watchdog_demo",
+      topModule: "safety_fault_watchdog",
+      designLanguage: "systemverilog",
+      specText: SAFETY_FAULT_MANAGER_ARCH2RTL_SPEC,
+      toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+    }));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "safety_fault" }));
+    go("/apps/arch2rtl?guided=1&safety_chain=1");
+  }
+
   const openApp = (slug: string) => go(routeForApp(slug));
 
   async function skipOnboarding() {
@@ -993,6 +1019,20 @@ export default function AppsHomePage() {
                 copy: "An IoT edge-node demo with a microcontroller-style sensor hub, threshold alerts, FIFO telemetry buffering, low-power sampling, firmware, software, validation, and dashboard.",
                 button: "Start Sensor Hub Journey",
                 onClick: startSensorHubDemo,
+              },
+              {
+                segment: "Security / Root-of-Trust IP",
+                title: "Secure Boot + Key Manager: authentication, rollback, debug lock",
+                copy: "A security reference journey with secure boot policy, key-slot selection, anti-rollback checks, tamper handling, firmware provisioning, validation, and dashboard.",
+                button: "Start Secure Boot Journey",
+                onClick: startSecureBootDemo,
+              },
+              {
+                segment: "Automotive / Safety Control",
+                title: "Safety Fault Manager + Watchdog: faults, heartbeat, reset escalation",
+                copy: "A safety reference journey with watchdog timeout, heartbeat service, fault masks, escalation policy, reset request, firmware diagnostics, validation, and dashboard.",
+                button: "Start Safety Journey",
+                onClick: startSafetyFaultDemo,
               },
             ].map((journey) => (
               <div key={journey.title} className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
