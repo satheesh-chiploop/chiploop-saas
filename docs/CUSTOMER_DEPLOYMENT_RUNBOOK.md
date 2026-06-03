@@ -5,7 +5,7 @@
 | Mode | Frontend | Backend | Data | Tools | Models |
 |---|---|---|---|---|---|
 | Hosted SaaS | ChipLoop | ChipLoop | ChipLoop | ChipLoop | ChipLoop |
-| Hybrid Runner | ChipLoop | Customer | ChipLoop | Customer | ChipLoop or customer |
+| Hybrid Private Backend | ChipLoop | Customer | ChipLoop | Customer | Customer |
 | Hybrid Private Data | ChipLoop | Customer | Customer | Customer | Customer |
 | Private | Customer | Customer | Customer | Customer | Customer |
 | Customer Cloud | Customer or ChipLoop | Customer cloud | Customer cloud | Customer | Customer |
@@ -13,7 +13,7 @@
 Set the active mode with:
 
 ```bash
-CHIPLOOP_DEPLOYMENT_MODE=hybrid_runner
+CHIPLOOP_DEPLOYMENT_MODE=hybrid_private_backend
 ```
 
 ## Customer Inputs
@@ -36,7 +36,7 @@ Before installation, collect:
 Start from:
 
 ```text
-backend/config/tool_profiles/customer_private_runner.example.json
+backend/config/tool_profiles/hybrid_private_backend_opensource.example.json
 ```
 
 Production customer profiles should set:
@@ -116,7 +116,7 @@ Supported policies:
 - `full_sync`: upload all artifacts to configured shared storage.
 - `summary_only`: sync text reports and summaries; keep other artifacts private.
 - `manifest_only`: sync only manifest/summary/report-style text artifacts.
-- `private_storage`: keep artifacts on the private runner.
+- `private_storage`: keep artifacts on the private backend.
 - `full_private`: keep artifacts private.
 - `customer_cloud_storage`: keep artifacts in customer cloud storage.
 
@@ -125,7 +125,7 @@ Supported policies:
 ChipLoop application licensing and EDA tool licensing are separate:
 
 - Hosted SaaS uses the existing ChipLoop subscription and billing system.
-- Hybrid runner deployments use a ChipLoop hybrid-runner license.
+- Hybrid Private Backend deployments use a ChipLoop hybrid-private-backend license.
 - Private and customer-cloud deployments use a ChipLoop enterprise license key supplied to the customer.
 - Synopsys, Cadence, Siemens, PDK, and other third-party licenses remain customer-managed and are passed through environment variables or the customer secret manager.
 
@@ -140,18 +140,24 @@ CHIPLOOP_LICENSE_KEY=
 
 Use one package:
 
-- `deploy/hybrid-runner`
+- `deploy/hybrid-private-backend`
 - `deploy/private`
 - `deploy/customer-cloud`
 
 Mount tools, PDKs, repositories, and profile files read-only where possible.
 
+For a ChipLoop-hosted frontend and Supabase customer, follow the detailed release and onboarding procedure in:
+
+```text
+docs/HYBRID_PRIVATE_BACKEND_CUSTOMER_RELEASE_GUIDE.md
+```
+
 ## Diagnostics
 
-From the backend or runner container:
+From the backend container:
 
 ```bash
-python -m chiploop_sdk.runner_healthcheck
+curl http://127.0.0.1:8000/ready
 python -m chiploop_sdk.support_bundle
 ```
 
@@ -165,7 +171,7 @@ Review:
 
 - Active deployment mode.
 - Model profile/provider.
-- Tool profile/runner/artifact policy.
+- Tool profile, backend execution environment, and artifact policy.
 - Tool paths and availability.
 - Tool adapter registry.
 - Tool diagnostics output.

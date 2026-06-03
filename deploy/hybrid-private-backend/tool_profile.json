@@ -1,0 +1,36 @@
+{
+  "profile_id": "customer_hybrid_private_backend",
+  "runner": "customer_private_backend",
+  "artifact_policy": "full_sync",
+  "strict_tool_profile": true,
+  "runtime": {
+    "python": { "executable": "/usr/local/bin/python" },
+    "python3": { "executable": "/usr/local/bin/python3" },
+    "pip": { "executable": "/usr/local/bin/pip" },
+    "pytest": { "executable": "/usr/local/bin/pytest" },
+    "cocotb_config": { "executable": "/usr/local/bin/cocotb-config" }
+  },
+  "tools": {
+    "verilator": { "executable": "/eda/bin/verilator" },
+    "verilator_coverage": { "executable": "/eda/bin/verilator_coverage" },
+    "iverilog": { "executable": "/eda/bin/iverilog" },
+    "vvp": { "executable": "/eda/bin/vvp" },
+    "yosys": { "executable": "/eda/bin/yosys" },
+    "sby": { "executable": "/eda/bin/sby" },
+    "z3": { "executable": "/eda/bin/z3" },
+    "boolector": { "executable": "/eda/bin/boolector" },
+    "cargo": { "executable": "/eda/bin/cargo" },
+    "rustc": { "executable": "/eda/bin/rustc" },
+    "gcc": { "executable": "/eda/bin/gcc" },
+    "make": { "executable": "/eda/bin/make" },
+    "git": { "executable": "/usr/bin/git" },
+    "bash": { "executable": "/bin/bash" },
+    "gem5_x86": { "executable": "/eda/gem5/build/X86/gem5.opt" },
+    "gem5_riscv": { "executable": "/eda/gem5/build/RISCV/gem5.opt" }
+  },
+  "env": {
+    "PATH": {
+      "prepend": ["/eda/bin", "/usr/local/bin"]
+    }
+  }
+}

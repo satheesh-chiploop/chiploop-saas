@@ -1,0 +1,33 @@
+services:
+  backend:
+    image: ghcr.io/chiploop/chiploop-backend:${CHIPLOOP_IMAGE_TAG:?Set CHIPLOOP_IMAGE_TAG to the release supplied by ChipLoop}
+    restart: unless-stopped
+    env_file:
+      - .env.backend
+    ports:
+      - "${CHIPLOOP_BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./tool_profile.json:/etc/chiploop/tool_profile.json:ro
+      - ./model_profile.json:/etc/chiploop/model_profile.json:ro
+      - chiploop_workflows:/app/backend/backend/workflows
+      - chiploop_artifacts:/var/lib/chiploop/artifacts
+      - chiploop_tmp:/var/lib/chiploop/tmp
+      # Add customer-managed tools, PDKs, repositories, and license configuration.
+      # - /eda:/eda:ro
+      # - /pdk:/pdk:ro
+      # - /repos:/repos:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=10)"]
+      interval: 30s
+      timeout: 15s
+      start_period: 60s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  chiploop_workflows:
+  chiploop_artifacts:
+  chiploop_tmp:

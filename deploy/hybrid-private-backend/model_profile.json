@@ -1,5 +1,5 @@
 {
-  "model_profile_id": "customer_byok_openai_example",
+  "model_profile_id": "customer_hybrid_private_backend",
   "provider": "openai",
   "ai_billing_mode": "byok",
   "model_key_owner": "customer",
@@ -13,9 +13,10 @@
       "max_completion_tokens": 32000,
       "timeout_sec": 360,
       "stream": true
+    },
+    "inspection": {
+      "model": "gpt-5.5",
+      "stream": true
     }
-  },
-  "env": {
-    "OPENAI_API_KEY": "set-in-secret-manager"
   }
 }

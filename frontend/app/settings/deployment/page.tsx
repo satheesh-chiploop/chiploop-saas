@@ -41,6 +41,8 @@ type DeploymentResponse = {
   model_profile: {
     model_profile_id: string;
     provider: string;
+    ai_billing_mode?: string;
+    model_key_owner?: string;
     capabilities: string[];
     agents: string[];
   };
@@ -137,7 +139,7 @@ export default function DeploymentSettingsPage() {
 
   useEffect(() => {
     apiGet<DeploymentResponse>("/settings/deployment")
-      .then(setData)
+      .then((response) => setData(response))
       .catch((err) => setError(errorMessage(err)));
   }, []);
 
@@ -248,6 +250,14 @@ export default function DeploymentSettingsPage() {
                   <div className="text-xs text-slate-500">Provider</div>
                   <div className="mt-1 font-mono text-sm text-slate-100">{data.model_profile.provider}</div>
                 </div>
+                <div className="rounded-lg border border-slate-800 bg-black/30 p-3">
+                  <div className="text-xs text-slate-500">AI Billing</div>
+                  <div className="mt-1 font-mono text-sm text-slate-100">{data.model_profile.ai_billing_mode || "byok"}</div>
+                </div>
+                <div className="rounded-lg border border-slate-800 bg-black/30 p-3">
+                  <div className="text-xs text-slate-500">Model Keys</div>
+                  <div className="mt-1 font-mono text-sm text-slate-100">{data.model_profile.model_key_owner || "customer"}</div>
+                </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {data.model_profile.capabilities.map((cap) => (
@@ -265,7 +275,7 @@ export default function DeploymentSettingsPage() {
                   <div className="mt-1 font-mono text-sm text-slate-100">{data.tool_profile.profile_id}</div>
                 </div>
                 <div className="rounded-lg border border-slate-800 bg-black/30 p-3">
-                  <div className="text-xs text-slate-500">Runner</div>
+                  <div className="text-xs text-slate-500">Execution</div>
                   <div className="mt-1 font-mono text-sm text-slate-100">{data.tool_profile.runner}</div>
                 </div>
                 <div className="rounded-lg border border-slate-800 bg-black/30 p-3">
@@ -315,7 +325,7 @@ export default function DeploymentSettingsPage() {
             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
                 <h2 className="text-lg font-bold">Tool Diagnostics</h2>
-                <p className="mt-1 text-sm text-slate-400">Run version probes using the active tool profile and runner environment.</p>
+                <p className="mt-1 text-sm text-slate-400">Run version probes using the active tool profile and backend execution environment.</p>
               </div>
               <button
                 onClick={runDiagnostics}
