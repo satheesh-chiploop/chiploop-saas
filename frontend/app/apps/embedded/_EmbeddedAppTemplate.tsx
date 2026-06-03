@@ -39,6 +39,11 @@ type Props = {
   runPath: string; // e.g. "/apps/embedded/hal/run"
 };
 
+function parseLogLines(logs: string | null | undefined): string[] {
+  if (!logs) return [];
+  return logs.split("\n").map((line) => line.trimEnd()).filter((line) => line.trim().length > 0);
+}
+
 export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props) {
   const router = useRouter();
 
@@ -80,6 +85,15 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
+  const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const embeddedReady = useMemo(() => {
+    const status = String(workflowRow?.status || "").trim().toLowerCase();
+    if (["completed", "complete", "success", "succeeded"].includes(status)) return true;
+    return logLines.some((line) =>
+      line.includes("System Software Handoff Package Agent done") ||
+      line.includes("Embedded App complete")
+    );
+  }, [logLines, workflowRow?.status]);
 
   function authHeaders(): Record<string, string> {
     const headers: Record<string, string> = {};
@@ -423,7 +437,7 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
               <button
                 type="button"
                 onClick={openInSystemSoftware}
-                disabled={workflowRow?.status !== "completed"}
+                disabled={!embeddedReady}
                 className="rounded-xl bg-cyan-700 px-4 py-2 text-sm font-semibold hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-400"
               >
                 Open in System Software
@@ -461,7 +475,7 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
         </div>
 
         {pwmChainDemo && workflowId ? (
-          <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="embedded" logs={workflowRow?.logs} />
+          <WorkflowEvidenceDashboard workflowId={workflowId} status={embeddedReady ? "completed" : workflowRow?.status} stage="embedded" logs={workflowRow?.logs} />
         ) : null}
 
         {/* Live logs */}
