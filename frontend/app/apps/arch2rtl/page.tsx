@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@/lib/platformClient";
 import { apiPost } from "@/lib/apiClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import GitHubImportPanel from "@/components/GitHubImportPanel";
@@ -19,7 +19,7 @@ import {
 } from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 const ONBOARDING_DEMO_KEY = "chiploop_arch2rtl_onboarding_demo";
 const ARCH2RTL_HANDOFF_KEY = "chiploop_arch2rtl_handoff_prefill";
 

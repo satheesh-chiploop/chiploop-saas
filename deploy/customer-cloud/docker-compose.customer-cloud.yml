@@ -1,0 +1,31 @@
+services:
+  frontend:
+    image: ghcr.io/chiploop/chiploop-frontend:${CHIPLOOP_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env.customer-cloud
+    ports:
+      - "${CHIPLOOP_FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - backend
+
+  backend:
+    image: ghcr.io/chiploop/chiploop-backend:${CHIPLOOP_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env.customer-cloud
+    ports:
+      - "${CHIPLOOP_BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./tool_profile.json:/etc/chiploop/tool_profile.json:ro
+      - ./model_profile.json:/etc/chiploop/model_profile.json:ro
+      - ./artifacts:/var/lib/chiploop/artifacts
+      # Customer-managed mounts:
+      # - /eda:/eda:ro
+      # - /pdk:/pdk:ro
+      # - /repos:/repos:ro
+    healthcheck:
+      test: ["CMD", "python", "-m", "chiploop_sdk.runner_healthcheck"]
+      interval: 30s
+      timeout: 15s
+      retries: 3

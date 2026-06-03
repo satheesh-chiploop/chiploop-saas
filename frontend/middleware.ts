@@ -9,11 +9,15 @@ export async function middleware(req: NextRequest) {
   res.headers.set("Pragma", "no-cache");
   res.headers.set("Expires", "0");
 
-  const supabase = createMiddlewareClient({ req, res });
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const backendPlatform = (process.env.NEXT_PUBLIC_CHIPLOOP_PLATFORM_PROVIDER || "supabase").toLowerCase() === "backend";
+  let session: unknown = null;
+  if (backendPlatform) {
+    session = req.cookies.get("chiploop_access_token")?.value || null;
+  } else {
+    const supabase = createMiddlewareClient({ req, res });
+    const result = await supabase.auth.getSession();
+    session = result.data.session;
+  }
 
   const pathname = req.nextUrl.pathname;
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Editor from "@monaco-editor/react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@/lib/platformClient";
 import { getStableUserId } from "@/utils/userId";
 
 const supabase = createClientComponentClient();

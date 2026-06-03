@@ -13,7 +13,7 @@ import { apiPost } from "@/lib/apiClient";
 //  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 // );
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@/lib/platformClient";
 const supabase = createClientComponentClient();
 
 interface WorkflowRow {

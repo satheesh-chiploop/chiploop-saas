@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 // 10-15
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@/lib/platformClient";
 import { getStableUserId } from "@/utils/userId"
 
 import ReactFlow, {

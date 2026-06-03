@@ -9,6 +9,7 @@ const tabs = [
   { label: "API Keys", href: "/settings/api-keys" },
   { label: "Usage", href: "/settings/usage" },
   { label: "Integrations", href: "/settings/integrations" },
+  { label: "Deployment", href: "/settings/deployment" },
 ];
 
 export default function SettingsNav({ children }: { children: React.ReactNode }) {
@@ -23,7 +24,7 @@ export default function SettingsNav({ children }: { children: React.ReactNode })
           <div>
             <h1 className="text-3xl font-extrabold">Settings</h1>
             <p className="mt-2 text-sm text-slate-400">
-              Plan, developer access, and usage for SDK and CLI workflows.
+              Plan, developer access, usage, integrations, and deployment runtime status.
             </p>
           </div>
 

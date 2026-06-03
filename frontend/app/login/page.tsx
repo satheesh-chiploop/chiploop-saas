@@ -1,13 +1,14 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient, usesBackendPlatform } from "@/lib/platformClient";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
+  const backendPlatform = usesBackendPlatform();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +16,7 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [trialIntent, setTrialIntent] = useState(false);
 
-  // âœ… NEW: prevent flash by waiting until auth is checked
+  // ✅ NEW: prevent flash by waiting until auth is checked
   const [authChecked, setAuthChecked] = useState(false);
 
   const getNext = () => {
@@ -46,7 +47,7 @@ export default function LoginPage() {
   }, [supabase, router]);
   
   
-  // âœ… NEW: show a lightweight loading screen until session is known
+  // ✅ NEW: show a lightweight loading screen until session is known
   if (!authChecked) {
     return (
       <main className="min-h-screen flex flex-col justify-center items-center bg-[#0b0b0c] text-white">
@@ -55,7 +56,7 @@ export default function LoginPage() {
     );
   }
 
-  // ðŸ”¹ Email/Password sign-in or sign-up
+  // 🔹 Email/Password sign-in or sign-up
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -66,7 +67,7 @@ export default function LoginPage() {
         result = await supabase.auth.signUp({
           email,
           password,
-          // âœ… small improvement: keep consistent apps-first landing after confirm
+          // ✅ small improvement: keep consistent apps-first landing after confirm
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(getNext())}`,
           },
@@ -85,7 +86,7 @@ export default function LoginPage() {
           : "Welcome back!"
       );
 
-      if (mode === "signin") router.replace(getNext()); // âœ… replace
+      if (mode === "signin") router.replace(getNext()); // ✅ replace
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Something went wrong.";
       toast.error(message);
@@ -96,17 +97,21 @@ export default function LoginPage() {
 
   
 
-  // ðŸ”¹ Magic Link
+  // 🔹 Magic Link
   const handleMagicLink = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      // âœ… small improvement: apps-first return
+      // ✅ small improvement: apps-first return
       options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(getNext())}` },
     });
     setLoading(false);
     if (error) toast.error(error.message);
     else toast.success("Magic link sent. Check your inbox.");
+  };
+
+  const handleOidcLogin = () => {
+    window.location.href = `/auth/oidc?next=${encodeURIComponent(getNext())}`;
   };
 
   return (
@@ -117,7 +122,18 @@ export default function LoginPage() {
           {mode === "signup" && trialIntent ? "Start ChipLoop 3-Day Trial" : "ChipLoop Login"}
         </h1>
 
+        {backendPlatform ? (
+          <button
+            onClick={handleOidcLogin}
+            className="w-full rounded-md bg-cyan-500 px-4 py-3 font-semibold text-black transition hover:bg-cyan-400"
+          >
+            Sign in with company identity
+          </button>
+        ) : null}
+
         {/* Toggle between Sign In / Sign Up */}
+        {!backendPlatform ? (
+        <>
         <div className="flex justify-center mb-6 space-x-4">
           <button
             onClick={() => setMode("signin")}
@@ -184,8 +200,11 @@ export default function LoginPage() {
               : "Sign In"}
           </button>
         </form>
+        </>
+        ) : null}
 
         {/* Magic link login */}
+        {!backendPlatform ? (
         <div className="mt-4 text-center text-sm text-gray-400">
           <button
             onClick={handleMagicLink}
@@ -194,12 +213,13 @@ export default function LoginPage() {
             Or send me a Magic Link
           </button>
         </div>
+        ) : null}
 
         
       </div>
 
       <p className="text-gray-500 text-xs mt-6">
-        Secure login powered by Supabase Auth. Trial billing is handled by Stripe.
+        {backendPlatform ? "Secure login powered by your company identity provider." : "Secure login powered by Supabase Auth. Trial billing is handled by Stripe."}
       </p>
     </main>
   );

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@/lib/platformClient";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
   GENERIC_VERIFY_INTENT,
@@ -10,7 +10,7 @@ import {
   type DesignChainContext,
 } from "@/lib/pwmFullStackDemo";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 type ChainStage = "arch2rtl" | "dqa" | "smoke" | "synthesis" | "tapeout" | "verify";
 type NextAction = "verify" | "dqa" | "smoke" | "synthesis" | "tapeout";

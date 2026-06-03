@@ -6,8 +6,7 @@ This package is for customers who host ChipLoop entirely inside their environmen
 
 - Frontend hosting.
 - Backend/runtime.
-- Database and storage.
-- Authentication provider.
+- Customer-managed platform services: Supabase by default, or PostgreSQL plus local/S3 storage and OIDC.
 - Model provider keys.
 - EDA tools, PDKs, licenses, and internal repositories.
 
@@ -20,14 +19,36 @@ cp ../../backend/config/model_profiles/customer_azure_openai.example.json model_
 docker compose -f docker-compose.private.yml up -d
 ```
 
-## Adapter Requirements
+## Platform Requirements
 
-Private deployments should configure:
+The recommended first deployment uses customer-managed or self-hosted Supabase:
 
-- `CHIPLOOP_STORAGE_PROVIDER`
-- `CHIPLOOP_AUTH_PROVIDER`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `CHIPLOOP_MODEL_PROFILE_PATH`
 - `CHIPLOOP_TOOL_PROFILE_PATH`
 
-Supabase can still be used by private deployments, but it should be treated as one adapter option rather than a hard requirement.
+Alternative providers are supported through:
 
+- `CHIPLOOP_DATABASE_PROVIDER=postgresql`
+- `CHIPLOOP_STORAGE_PROVIDER=local_fs`, `s3`, or `minio`
+- `CHIPLOOP_AUTH_PROVIDER=oidc`
+- `CHIPLOOP_FRONTEND_PLATFORM_PROVIDER=backend_platform_api`
+- `NEXT_PUBLIC_CHIPLOOP_PLATFORM_PROVIDER=backend`
+
+PostgreSQL must be initialized with the ChipLoop schema before backend startup. Supabase-specific RPC features still require Supabase/PostgREST unless separately migrated.
+
+For a non-Supabase UI deployment, configure the OIDC issuer, client ID, authorization endpoint, and token endpoint. The frontend uses the authenticated backend platform API for workflow data and polls it for live updates. Route browser `/api/*` traffic to the backend so secure OIDC cookies remain same-origin.
+
+`NEXT_PUBLIC_CHIPLOOP_PLATFORM_PROVIDER` is a frontend build-time variable. Build or select the backend-platform frontend image for PostgreSQL/OIDC deployments.
+
+## Validation
+
+```bash
+docker compose -f docker-compose.private.yml exec backend python -m chiploop_sdk.runner_healthcheck
+docker compose -f docker-compose.private.yml exec backend python -m chiploop_sdk.support_bundle
+```
+
+Set `"strict_tool_profile": true` in the mounted tool profile before production use.

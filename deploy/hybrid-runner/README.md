@@ -23,17 +23,14 @@ docker compose -f docker-compose.runner.yml up -d
 Inside the runner container, verify:
 
 ```bash
-which verilator
-which yosys
-which sby
-which dc_shell || true
-which genus || true
-python -c "print('chiploop runner python ok')"
+python -m chiploop_sdk.runner_healthcheck
+python -m chiploop_sdk.support_bundle
 ```
 
 ## Security
 
 - Do not put license files in the image.
 - Mount customer EDA tools read-only.
-- Use `summary_only` or `metadata_only` artifact policy when full artifacts cannot leave the customer network.
-
+- Set `"strict_tool_profile": true` in `tool_profile.json`.
+- Use `summary_only`, `manifest_only`, or `private_storage` artifact policy when full artifacts cannot leave the customer network.
+- Keep model keys and EDA license variables in the customer secret manager, not in the image.

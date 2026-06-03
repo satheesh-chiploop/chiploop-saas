@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+import { createClientComponentClient } from "@/lib/platformClient";
 import { apiGet, apiPost } from "@/lib/apiClient";
 import { LowCreditBanner } from "@/components/PlanCreditStatus";
 import TopNav from "@/components/TopNav";
@@ -16,10 +16,7 @@ import {
   UART_PACKET_ENGINE_ARCH2RTL_SPEC,
 } from "@/lib/pwmFullStackDemo";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabase = createClientComponentClient();
 
 type LoopType = "digital" | "validation" | "analog" | "embedded" | "system";
 

@@ -4,12 +4,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import TopNav from "@/components/TopNav";
 
 const supabase = createClientComponentClient();
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 const DEMO_GOAL =
   "Explore cache-size tradeoffs for matrix multiplication with gem5 performance results plus power and area analysis; show workload vs cache size charts.";

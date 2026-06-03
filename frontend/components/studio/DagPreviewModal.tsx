@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@/lib/platformClient";
 import type { Edge, Node } from "reactflow";
 import { ApiClientError, apiPost } from "@/lib/apiClient";
 import { getStableUserId } from "@/utils/userId";

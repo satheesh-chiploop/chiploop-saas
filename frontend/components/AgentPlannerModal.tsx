@@ -6,7 +6,7 @@ import { Special_Elite } from "next/font/google";
 import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
 import MissingAgentsResolverModal from "@/components/studio/MissingAgentsResolverModal";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@/lib/platformClient";
 const supabase = createClientComponentClient();
 import WorkflowConsole from "@/app/workflow/WorkflowConsole";
 import { getStableUserId } from "@/utils/userId";
