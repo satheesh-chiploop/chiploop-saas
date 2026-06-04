@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ApiClientError, apiGet } from "@/lib/apiClient";
 
-type Stage = "arch2rtl" | "verification" | "embedded" | "software" | "validation" | "product";
+type Stage = "arch2rtl" | "dqa" | "smoke" | "synthesis" | "tapeout" | "verification" | "embedded" | "software" | "validation" | "product";
 type JsonMap = Record<string, unknown>;
 
 type Props = {
@@ -15,6 +15,10 @@ type Props = {
 
 const FLOW: Array<{ id: Stage; label: string }> = [
   { id: "arch2rtl", label: "RTL" },
+  { id: "dqa", label: "DQA" },
+  { id: "smoke", label: "Smoke" },
+  { id: "synthesis", label: "Synth" },
+  { id: "tapeout", label: "Tapeout" },
   { id: "verification", label: "Verify" },
   { id: "embedded", label: "Firmware" },
   { id: "software", label: "Software" },
@@ -125,6 +129,35 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     let active = true;
     const files: Record<Stage, string[]> = {
       arch2rtl: ["arch2rtl_dashboard.json", "digital_regmap.json"],
+      dqa: [
+        "rtl_handoff_ingest_manifest.json",
+        "rtl_lint_report.json",
+        "cdc_findings.json",
+        "reset_integrity_findings.json",
+        "synthesis_readiness_findings.json",
+        "executive_summary.json",
+      ],
+      smoke: [
+        "rtl_handoff_ingest_manifest.json",
+        "simulation_manifest.json",
+        "simulation_summary_coverage.json",
+        "executive_summary.json",
+      ],
+      synthesis: [
+        "rtl_handoff_ingest_manifest.json",
+        "synthesis_metrics.json",
+        "synthesis_readiness_findings.json",
+        "executive_summary.json",
+      ],
+      tapeout: [
+        "rtl_handoff_ingest_manifest.json",
+        "synthesis_metrics.json",
+        "floorplan_metrics.json",
+        "placement_metrics.json",
+        "route_metrics.json",
+        "tapeout_package.json",
+        "executive_summary.json",
+      ],
       verification: ["simulation_summary_coverage.json"],
       embedded: ["system_firmware_dashboard.json", "system_firmware_execution.json"],
       software: ["system_software_api_contract.json", "system_software_package.json"],
@@ -147,7 +180,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "system_product_collateral_contract.json",
       ],
     };
-    Promise.all(files[stage].map(async (filename) => [filename, await artifact(workflowId, filename)] as const))
+    Promise.all((files[stage] || []).map(async (filename) => [filename, await artifact(workflowId, filename)] as const))
       .then((entries) => {
         if (active) setEvidence(Object.fromEntries(entries));
       })
@@ -219,6 +252,41 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           </div>
         </div>
       ) : <div className="mt-5 text-sm text-amber-300">Register-map artifact is not available for this completed run.</div>;
+    }
+
+    if (stage === "dqa" || stage === "smoke" || stage === "synthesis" || stage === "tapeout") {
+      const handoff = record(evidence["rtl_handoff_ingest_manifest.json"]);
+      const lint = record(evidence["rtl_lint_report.json"]);
+      const cdc = record(evidence["cdc_findings.json"]);
+      const reset = record(evidence["reset_integrity_findings.json"]);
+      const readiness = record(evidence["synthesis_readiness_findings.json"]);
+      const sim = record(record(evidence["simulation_summary_coverage.json"]).simulation);
+      const synth = record(evidence["synthesis_metrics.json"]);
+      const summary = record(evidence["executive_summary.json"]);
+      const rtlFiles = number(handoff.rtl_file_count);
+      const passed = firstNumber(sim.pass, sim.passed);
+      const failed = firstNumber(sim.fail, sim.failed);
+      return (
+        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <div className="space-y-3">
+            <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
+            <Bar label="Simulation passed" value={passed} total={Math.max(passed + failed, 1)} color="bg-emerald-500" />
+            <Bar label="Simulation failed" value={failed} total={Math.max(passed + failed, 1)} color="bg-rose-500" />
+          </div>
+          <div className="grid min-w-0 grid-cols-2 gap-3">
+            <Stat title="Source" value={firstString(handoff.source_mode, "imported")} />
+            <Stat title="RTL Files" value={rtlFiles} />
+            <Stat title="Top Module" value={firstString(handoff.top_module, "not inferred")} />
+            <Stat title="Lint" value={firstString(lint.status, lint.verdict, "available")} />
+            <Stat title="CDC" value={firstString(cdc.status, cdc.verdict, "available")} />
+            <Stat title="Reset" value={firstString(reset.status, reset.verdict, "available")} />
+            <Stat title="Synth Ready" value={firstString(readiness.status, readiness.verdict, "available")} />
+            <Stat title="Cells" value={firstNumber(synth.cell_count, synth.cells, 0)} />
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+            <Stat title="Summary" value={firstString(summary.status, summary.verdict, status || "running")} />
+          </div>
+        </div>
+      );
     }
 
     if (stage === "verification") {
