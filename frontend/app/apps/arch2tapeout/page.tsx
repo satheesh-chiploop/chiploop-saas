@@ -482,33 +482,6 @@ export default function Arch2TapeoutAppPage() {
 
             {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
 
-            {workflowId ? (
-              <div className="mt-4 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
-                <div>
-                  workflow_id: <span className="text-slate-100">{workflowId}</span>
-                </div>
-                <div>
-                  run_id: <span className="text-slate-100">{runId}</span>
-                </div>
-                <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
-                  Download ZIP (full=1)
-                </button>
-                <div className="mt-3">
-                  <NextWorkflowLauncher
-                    currentStage="tapeout"
-                    currentWorkflowId={workflowId}
-                    currentRunId={runId}
-                    sourceArch2RTLWorkflowId={rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : null}
-                    upstreamWorkflows={rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId, arch2tapeout: workflowId } : undefined}
-                    disabled={workflowRow?.status !== "completed"}
-                  />
-                </div>
-                <div className="mt-4">
-                  <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
-                </div>
-                <AskThisRunPanel workflowId={workflowId} compact />
-              </div>
-            ) : null}
           </div>
 
           {/* RIGHT: spec + logs */}
@@ -553,6 +526,34 @@ export default function Arch2TapeoutAppPage() {
             </div>
           </div>
         </div>
+
+        {workflowId ? (
+          <div className="mt-6 space-y-4">
+            <div className="rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+              <div>
+                workflow_id: <span className="break-all text-slate-100">{workflowId}</span>
+              </div>
+              <div>
+                run_id: <span className="break-all text-slate-100">{runId}</span>
+              </div>
+              <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
+                Download ZIP (full=1)
+              </button>
+              <div className="mt-3">
+                <NextWorkflowLauncher
+                  currentStage="tapeout"
+                  currentWorkflowId={workflowId}
+                  currentRunId={runId}
+                  sourceArch2RTLWorkflowId={rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : null}
+                  upstreamWorkflows={rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId, arch2tapeout: workflowId } : undefined}
+                  disabled={workflowRow?.status !== "completed"}
+                />
+              </div>
+            </div>
+            <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
+            <AskThisRunPanel workflowId={workflowId} compact />
+          </div>
+        ) : null}
       </div>
     </main>
   );

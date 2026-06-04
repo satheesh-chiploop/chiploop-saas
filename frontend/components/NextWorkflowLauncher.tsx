@@ -70,11 +70,13 @@ export default function NextWorkflowLauncher({
 
   if (!currentWorkflowId || !sourceArch2RTLWorkflowId) return null;
 
-  const mergedUpstream: Record<string, string> = {
-    ...(upstreamWorkflows || {}),
-    arch2rtl: sourceArch2RTLWorkflowId,
-    [stageKey(currentStage)]: currentWorkflowId,
-  };
+  const mergedUpstream: Record<string, string> = Object.fromEntries(
+    Object.entries({
+      ...(upstreamWorkflows || {}),
+      arch2rtl: sourceArch2RTLWorkflowId,
+      [stageKey(currentStage)]: currentWorkflowId,
+    }).filter((entry): entry is [string, string] => typeof entry[1] === "string" && Boolean(entry[1]))
+  );
 
   async function runNext() {
     if (!currentWorkflowId || !sourceArch2RTLWorkflowId) return;

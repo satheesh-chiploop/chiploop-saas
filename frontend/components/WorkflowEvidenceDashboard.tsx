@@ -13,18 +13,32 @@ type Props = {
   logs?: string | null;
 };
 
-const FLOW: Array<{ id: Stage; label: string }> = [
-  { id: "arch2rtl", label: "RTL" },
-  { id: "dqa", label: "DQA" },
-  { id: "smoke", label: "Smoke" },
-  { id: "synthesis", label: "Synth" },
-  { id: "tapeout", label: "Tapeout" },
+type FlowItem = { id: Stage; label: string };
+
+const RTL_STAGE: FlowItem = { id: "arch2rtl", label: "RTL" };
+
+const MAIN_FLOW: FlowItem[] = [
+  RTL_STAGE,
   { id: "verification", label: "Verify" },
   { id: "embedded", label: "Firmware" },
   { id: "software", label: "Software" },
   { id: "validation", label: "Validation" },
   { id: "product", label: "Product" },
 ];
+
+const OPTIONAL_DIGITAL_FLOW: Record<Extract<Stage, "dqa" | "smoke" | "synthesis" | "tapeout">, FlowItem> = {
+  dqa: { id: "dqa", label: "DQA" },
+  smoke: { id: "smoke", label: "Smoke" },
+  synthesis: { id: "synthesis", label: "Synth" },
+  tapeout: { id: "tapeout", label: "Tapeout" },
+};
+
+function displayedFlow(stage: Stage): FlowItem[] {
+  if (stage === "dqa" || stage === "smoke" || stage === "synthesis" || stage === "tapeout") {
+    return [RTL_STAGE, OPTIONAL_DIGITAL_FLOW[stage], ...MAIN_FLOW.slice(1)];
+  }
+  return MAIN_FLOW;
+}
 
 function record(value: unknown): JsonMap {
   return value && typeof value === "object" && !Array.isArray(value) ? value as JsonMap : {};
@@ -68,6 +82,47 @@ function statusLabel(value: unknown): string {
   return text.replaceAll("_", " ");
 }
 
+function findingCount(report: JsonMap): number {
+  return array(report.findings).length
+    + array(report.heuristic_issues).length
+    + array(report.synthesizable_subset_findings).length
+    + array(record(report.yosys).errors).length;
+}
+
+function lintVerdict(report: JsonMap): string {
+  if (!Object.keys(report).length) return "unavailable";
+  const verilator = record(report.verilator_lint);
+  if (verilator.available === false) return "unavailable";
+  const rc = verilator.returncode;
+  const issues = array(report.heuristic_issues);
+  if (typeof rc === "number" && rc !== 0) return `fail (rc ${rc})`;
+  if (issues.some((issue) => String(record(issue).severity || "").toLowerCase() === "warning")) return "warning";
+  return "pass";
+}
+
+function findingsVerdict(report: JsonMap): string {
+  if (!Object.keys(report).length) return "unavailable";
+  const findings = array(report.findings);
+  if (!findings.length) return "pass";
+  const hasError = findings.some((item) => {
+    const severity = String(record(item).severity || "").toLowerCase();
+    return severity === "error" || severity === "critical" || severity === "fail";
+  });
+  return hasError ? "fail" : "warning";
+}
+
+function synthesisReadinessVerdict(report: JsonMap): string {
+  if (!Object.keys(report).length) return "unavailable";
+  const score = number(report.score);
+  const yosys = record(report.yosys);
+  if (yosys.available === false) return "unavailable";
+  const errors = array(yosys.errors).length;
+  if (errors > 0) return "fail";
+  if (score >= 80) return "pass";
+  if (score >= 60) return "warning";
+  return "fail";
+}
+
 function countParticipatingAgents(logs: string | null | undefined): number | null {
   if (!logs) return null;
   const agents = new Set<string>();
@@ -98,7 +153,7 @@ function Stat({ title, value }: { title: string; value: string | number }) {
   return (
     <div className="min-w-0 rounded-lg border border-slate-800 bg-black/30 p-3">
       <div className="text-xs text-slate-400">{title}</div>
-      <div className="mt-1 min-h-6 overflow-hidden text-ellipsis text-base font-semibold leading-snug text-slate-100">{value}</div>
+      <div className="mt-1 min-h-6 break-words text-base font-semibold leading-snug text-slate-100">{value}</div>
     </div>
   );
 }
@@ -121,7 +176,8 @@ function Bar({ label, value, total, color }: { label: string; value: number; tot
 export default function WorkflowEvidenceDashboard({ workflowId, status, stage, logs }: Props) {
   const [evidence, setEvidence] = useState<Record<string, JsonMap | null>>({});
   const [error, setError] = useState<string | null>(null);
-  const stageIndex = FLOW.findIndex((item) => item.id === stage);
+  const flow = useMemo(() => displayedFlow(stage), [stage]);
+  const stageIndex = flow.findIndex((item) => item.id === stage);
   const agentCount = useMemo(() => countParticipatingAgents(logs), [logs]);
 
   useEffect(() => {
@@ -267,20 +323,21 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const passed = firstNumber(sim.pass, sim.passed);
       const failed = firstNumber(sim.fail, sim.failed);
       return (
-        <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-          <div className="space-y-3">
+        <div className="mt-5 space-y-5">
+          <div className="grid gap-3 sm:grid-cols-3">
             <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
             <Bar label="Simulation passed" value={passed} total={Math.max(passed + failed, 1)} color="bg-emerald-500" />
             <Bar label="Simulation failed" value={failed} total={Math.max(passed + failed, 1)} color="bg-rose-500" />
           </div>
-          <div className="grid min-w-0 grid-cols-2 gap-3">
-            <Stat title="Source" value={firstString(handoff.source_mode, "imported")} />
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat title="Source" value={firstString(handoff.source_mode, "imported").replaceAll("_", " ")} />
             <Stat title="RTL Files" value={rtlFiles} />
             <Stat title="Top Module" value={firstString(handoff.top_module, "not inferred")} />
-            <Stat title="Lint" value={firstString(lint.status, lint.verdict, "available")} />
-            <Stat title="CDC" value={firstString(cdc.status, cdc.verdict, "available")} />
-            <Stat title="Reset" value={firstString(reset.status, reset.verdict, "available")} />
-            <Stat title="Synth Ready" value={firstString(readiness.status, readiness.verdict, "available")} />
+            <Stat title="Lint" value={lintVerdict(lint)} />
+            <Stat title="CDC" value={findingsVerdict(cdc)} />
+            <Stat title="Reset" value={findingsVerdict(reset)} />
+            <Stat title="Synth Ready" value={synthesisReadinessVerdict(readiness)} />
+            <Stat title="Findings" value={findingCount(lint) + findingCount(cdc) + findingCount(reset) + findingCount(readiness)} />
             <Stat title="Cells" value={firstNumber(synth.cell_count, synth.cells, 0)} />
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Summary" value={firstString(summary.status, summary.verdict, status || "running")} />
@@ -546,13 +603,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           <div className="text-sm font-semibold text-white">Demo Evidence Dashboard</div>
           <div className="mt-1 text-xs text-slate-400">Rendered from generated workflow artifacts.</div>
         </div>
-        <div className="flex items-center gap-2">
-          {FLOW.map((item, index) => (
+        <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
+          {flow.map((item, index) => (
             <div key={item.id} className="flex items-center gap-2">
               <div className={`rounded px-2 py-1 text-xs ${index <= stageIndex ? "bg-cyan-500/20 text-cyan-200" : "bg-slate-800 text-slate-500"}`}>
                 {item.label}
               </div>
-              {index < FLOW.length - 1 ? <span className="text-slate-600">&gt;</span> : null}
+              {index < flow.length - 1 ? <span className="text-slate-600">&gt;</span> : null}
             </div>
           ))}
         </div>
