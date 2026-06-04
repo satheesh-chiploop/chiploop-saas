@@ -459,6 +459,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         postcts.worst_slack,
         postplace.worst_slack,
         preplace.worst_slack,
+        synth.chiploop__sta_preplace_wns,
         synth.worst_slack,
         synth.timing__setup__ws
       );
@@ -468,6 +469,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         postcts.tns,
         postplace.tns,
         preplace.tns,
+        synth.chiploop__sta_preplace_tns,
         synth.tns,
         synth.timing__setup__tns
       );
@@ -478,7 +480,20 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const unmapped = metricValue(synth.chiploop__unmapped_cell_count, synth.design__instance_unmapped__count);
       const checkErrors = metricValue(synth.chiploop__synthesis_check_error_count, synth.synthesis__check_error__count);
       const netlistStatus = synth.chiploop__netlist_present === true || firstString(record(synthSummary.outputs).netlist) ? "generated" : "not produced";
-      const timingViolations = timingViolationValue(wns, tns, firstPresent(synth.timing_violations, synth.setup_violations));
+      const timingViolations = timingViolationValue(
+        wns,
+        tns,
+        firstPresent(
+          synth.chiploop__sta_preplace_setup_violation_count,
+          synth.timing_violations,
+          synth.setup_violations,
+          synth.timing__setup__vio__count,
+          synth.timing__setup_vio__count,
+          synth.timing__setup__violation__count,
+          synth.timing__setup__violating_paths,
+          synth.sta__setup__violation_count
+        )
+      );
       const rtlFiles = number(handoff.rtl_file_count);
       const drc = metricValue(summary.drc_violations, record(evidence["route_metrics.json"]).drc_violations);
       const lvs = metricValue(summary.lvs_status);
