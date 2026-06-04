@@ -103,6 +103,7 @@ export default function Arch2RTLAppPage() {
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
   const [uartChainDemo, setUartChainDemo] = useState(false);
   const [imageChainDemo, setImageChainDemo] = useState(false);
+  const [mbistChainDemo, setMbistChainDemo] = useState(false);
   const [sensorChainDemo, setSensorChainDemo] = useState(false);
   const [secureChainDemo, setSecureChainDemo] = useState(false);
   const [safetyChainDemo, setSafetyChainDemo] = useState(false);
@@ -304,6 +305,7 @@ export default function Arch2RTLAppPage() {
     setPwmChainDemo(params.get("pwm_chain") === "1");
     setUartChainDemo(params.get("uart_chain") === "1");
     setImageChainDemo(params.get("image_chain") === "1");
+    setMbistChainDemo(params.get("mbist_chain") === "1");
     setSensorChainDemo(params.get("sensor_chain") === "1");
     setSecureChainDemo(params.get("secure_chain") === "1");
     setSafetyChainDemo(params.get("safety_chain") === "1");
@@ -570,7 +572,7 @@ export default function Arch2RTLAppPage() {
               <div>
                 <div className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Guided first activity</div>
                 <h2 className="mt-1 text-2xl font-bold text-white">
-                  {pwmChainDemo ? "Generate the PWM controller RTL" : uartChainDemo ? "Generate the UART packet engine RTL" : imageChainDemo ? "Generate the image DMA pipeline RTL" : sensorChainDemo ? "Generate the smart sensor hub MCU RTL" : secureChainDemo ? "Generate the secure boot key manager RTL" : safetyChainDemo ? "Generate the safety fault manager RTL" : "Run Arch2RTL and inspect the handoff package"}
+                  {pwmChainDemo ? "Generate the PWM controller RTL" : uartChainDemo ? "Generate the UART packet engine RTL" : imageChainDemo ? "Generate the image DMA pipeline RTL" : mbistChainDemo ? "Generate the SRAM MBIST demo RTL" : sensorChainDemo ? "Generate the smart sensor hub MCU RTL" : secureChainDemo ? "Generate the secure boot key manager RTL" : safetyChainDemo ? "Generate the safety fault manager RTL" : "Run Arch2RTL and inspect the handoff package"}
                 </h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                   {pwmChainDemo
@@ -579,6 +581,8 @@ export default function Arch2RTLAppPage() {
                     ? "The UART packet engine specification is filled in for a larger connected RTL, firmware, software, validation, and product-app demonstration. Run it to produce FIFO, UART, register, and interrupt collateral for the next stage."
                     : imageChainDemo
                     ? "The image DMA pipeline specification is filled in for a large visual connected demo. Run it to produce DMA, line-buffer, filter, histogram, interrupt, and register collateral for the next stage."
+                    : mbistChainDemo
+                    ? "The SRAM MBIST demo specification is filled in for a focused memory and DFT journey. Run it to produce a small SRAM controller, then open Synthesis to inspect scan, ATPG readiness, and MBIST applicability evidence."
                     : sensorChainDemo
                     ? "The smart sensor hub MCU specification is filled in for an IoT connected demo. Run it to produce sensor telemetry, FIFO, alert, low-power, interrupt, and register collateral for the next stage."
                     : secureChainDemo
@@ -596,7 +600,7 @@ export default function Arch2RTLAppPage() {
             </div>
             <div className="mt-4 grid gap-3 md:grid-cols-4">
               {[
-                safetyChainDemo ? "Review pre-filled safety fault spec" : secureChainDemo ? "Review pre-filled secure boot spec" : sensorChainDemo ? "Review pre-filled sensor hub spec" : imageChainDemo ? "Review pre-filled image DMA spec" : uartChainDemo ? "Review pre-filled UART packet spec" : "Review pre-filled PWM spec",
+                safetyChainDemo ? "Review pre-filled safety fault spec" : secureChainDemo ? "Review pre-filled secure boot spec" : sensorChainDemo ? "Review pre-filled sensor hub spec" : mbistChainDemo ? "Review pre-filled SRAM MBIST spec" : imageChainDemo ? "Review pre-filled image DMA spec" : uartChainDemo ? "Review pre-filled UART packet spec" : "Review pre-filled PWM spec",
                 "Run Arch2RTL",
                 "Open the downloaded RTL, SDC, and UPF files",
                 "Download ZIP to complete onboarding",
@@ -826,7 +830,15 @@ export default function Arch2RTLAppPage() {
                     currentRunId={runId}
                     sourceArch2RTLWorkflowId={workflowId}
                     disabled={!arch2rtlReady}
-                    verifyTestIntent={pwmChainDemo ? PWM_VERIFY_INTENT : uartChainDemo ? UART_VERIFY_INTENT : imageChainDemo ? IMAGE_VERIFY_INTENT : sensorChainDemo ? SENSOR_VERIFY_INTENT : secureChainDemo ? SECURE_BOOT_VERIFY_INTENT : safetyChainDemo ? SAFETY_VERIFY_INTENT : GENERIC_VERIFY_INTENT}
+                    verifyTestIntent={pwmChainDemo ? PWM_VERIFY_INTENT : uartChainDemo ? UART_VERIFY_INTENT : imageChainDemo ? IMAGE_VERIFY_INTENT : mbistChainDemo ? `Verify the SRAM MBIST demo controller generated by Arch2RTL.
+
+Directed scenarios:
+- Reset the controller and confirm ready, BIST status, IRQ, and memory read data clear.
+- Write and read several SRAM addresses through the memory-mapped interface.
+- Start the BIST path and confirm bist_done, bist_fail, and IRQ status behavior.
+- Exercise IRQ_CLEAR and BIST_CONTROL.CLEAR_RESULT.
+
+Collect register readback, memory access, BIST status, assertion, and coverage evidence.` : sensorChainDemo ? SENSOR_VERIFY_INTENT : secureChainDemo ? SECURE_BOOT_VERIFY_INTENT : safetyChainDemo ? SAFETY_VERIFY_INTENT : GENERIC_VERIFY_INTENT}
                     verifyCoverageTargets={
                       pwmChainDemo
                         ? "PWM duty-cycle scenarios, reset behavior, dynamic updates"
@@ -834,6 +846,8 @@ export default function Arch2RTLAppPage() {
                         ? "UART packet movement, FIFO levels, interrupt status, framing and overflow error handling"
                         : imageChainDemo
                         ? "DMA progress, line-buffer windows, filter modes, histogram bins, frame_done interrupt behavior"
+                        : mbistChainDemo
+                        ? "SRAM register access, BIST start/done/fail behavior, IRQ clear, memory wrapper interface"
                         : sensorChainDemo
                         ? "Sensor sampling, FIFO levels, threshold alerts, interrupt clear, low-power behavior"
                         : secureChainDemo
@@ -842,7 +856,7 @@ export default function Arch2RTLAppPage() {
                         ? "Watchdog heartbeat, timeout, fault masks, escalation, reset request, safety IRQ behavior"
                         : "Derived interface behavior, reset behavior, functional corner cases"
                     }
-                    verifyQuerySuffix={`${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}${secureChainDemo ? "&secure_chain=1" : ""}${safetyChainDemo ? "&safety_chain=1" : ""}`}
+                    verifyQuerySuffix={`${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${mbistChainDemo ? "&mbist_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}${secureChainDemo ? "&secure_chain=1" : ""}${safetyChainDemo ? "&safety_chain=1" : ""}`}
                   />
                 </div>
               </div>

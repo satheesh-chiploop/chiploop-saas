@@ -222,6 +222,10 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital Foundry Profile Agent",
     "Digital Implementation Setup Agent",
     "Digital Synthesis Agent",
+    "Digital Logic Equivalence Check Agent",
+    "Digital DFT Scan Stitching Agent",
+    "Digital Scan ATPG Coverage Agent",
+    "Digital MBIST Collateral Agent",
   ]),
   Digital_Arch2Sim: linearWorkflowDefinition([
     "Digital RTL Handoff Ingest Agent",
@@ -254,6 +258,10 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital Foundry Profile Agent",
     "Digital Implementation Setup Agent",
     "Digital Synthesis Agent",
+    "Digital Logic Equivalence Check Agent",
+    "Digital DFT Scan Stitching Agent",
+    "Digital Scan ATPG Coverage Agent",
+    "Digital MBIST Collateral Agent",
     "Digital STA PrePlace Agent",
     "Digital Floorplan Agent",
     "Digital Placement Agent",
@@ -543,6 +551,26 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       uiLabel: "Digital Synthesis Agent",
       backendLabel: "Digital Synthesis Agent",
       desc: "Runs OpenLane2 synthesis (Yosys) using the workflow OpenLane config + selected SDC. Produces synth netlist + key reports/logs."
+    },
+    {
+      uiLabel: "Digital Logic Equivalence Check Agent",
+      backendLabel: "Digital Logic Equivalence Check Agent",
+      desc: "Runs post-synthesis RTL-vs-gate equivalence using Yosys where available, and reports pass/fail/inconclusive with logs."
+    },
+    {
+      uiLabel: "Digital DFT Scan Stitching Agent",
+      backendLabel: "Digital DFT Scan Stitching Agent",
+      desc: "Generates scan stitching collateral and runs OpenROAD DFT when available; reports scan chains, scan flops, and tool readiness."
+    },
+    {
+      uiLabel: "Digital Scan ATPG Coverage Agent",
+      backendLabel: "Digital Scan ATPG Coverage Agent",
+      desc: "Stages scan/gate netlists for open-source ATPG and reports pattern/coverage evidence when a configured adapter command is available."
+    },
+    {
+      uiLabel: "Digital MBIST Collateral Agent",
+      backendLabel: "Digital MBIST Collateral Agent",
+      desc: "Detects memory-like RTL/netlist structures and generates limited MBIST collateral; memoryless demos get clearly labeled scratchpad reference collateral."
     },
     {
       uiLabel: "Digital STA PrePlace Agent",

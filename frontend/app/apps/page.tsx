@@ -9,6 +9,7 @@ import TopNav from "@/components/TopNav";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
   IMAGE_DMA_PIPELINE_ARCH2RTL_SPEC,
+  MBIST_SRAM_ARCH2RTL_SPEC,
   PWM_FULL_STACK_ARCH2RTL_SPEC,
   SAFETY_FAULT_MANAGER_ARCH2RTL_SPEC,
   SECURE_BOOT_ARCH2RTL_SPEC,
@@ -637,6 +638,18 @@ export default function AppsHomePage() {
     go("/apps/arch2rtl?guided=1&image_chain=1");
   }
 
+  function startMbistSramDemo() {
+    window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
+      projectName: "sram_mbist_demo",
+      topModule: "sram_mbist_demo_controller",
+      designLanguage: "systemverilog",
+      specText: MBIST_SRAM_ARCH2RTL_SPEC,
+      toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+    }));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "mbist_sram" }));
+    go("/apps/arch2rtl?guided=1&mbist_chain=1");
+  }
+
   function startSensorHubDemo() {
     window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
       projectName: "smart_sensor_hub_mcu_demo",
@@ -1009,6 +1022,13 @@ export default function AppsHomePage() {
                 copy: "A large visual demo with DMA, register-based line buffers, 3x3 filtering, thresholding, histogram, interrupts, firmware, software, and product dashboard.",
                 button: "Start Image DMA Journey",
                 onClick: startImageDmaDemo,
+              },
+              {
+                segment: "Memory / DFT",
+                title: "SRAM MBIST Demo: OpenRAM-style memory, scan, ATPG, and MBIST evidence",
+                copy: "A focused memory-test journey using a small SRAM scratchpad controller. Run Arch2RTL, then Arch2Synthesis to see scan DFT, ATPG readiness, and MBIST applicability evidence.",
+                button: "Start MBIST SRAM Journey",
+                onClick: startMbistSramDemo,
               },
               {
                 segment: "IoT / Embedded Edge Devices",

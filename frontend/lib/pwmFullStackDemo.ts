@@ -307,6 +307,58 @@ export const IMAGE_PRODUCT_INTENT = `Build a simulator-backed image processing p
 
 The dashboard should let a user select a filter mode, adjust threshold and brightness, start a frame, visualize DMA progress, show input/output frame previews, display a histogram, show irq/status/error fields, and preserve lineage back to the generated workflows.`;
 
+export const MBIST_SRAM_ARCH2RTL_SPEC = `Design a small SRAM scratchpad controller for demonstrating OpenRAM-style memory integration and MBIST collateral.
+
+This is a focused memory-test reference journey. Keep the design simple and fast to run, but make the memory intent explicit so downstream synthesis/DFT agents can detect memory-like structures and generate MBIST collateral.
+
+Top module:
+- sram_mbist_demo_controller
+
+Inputs:
+- clk
+- reset_n
+- wr_en
+- wr_addr[7:0]
+- wr_data[31:0]
+- rd_en
+- rd_addr[7:0]
+- bist_start
+
+Outputs:
+- rd_data[31:0]
+- ready
+- bist_done
+- bist_fail
+- irq
+
+Memory intent:
+- Use an OpenRAM-compatible single-port SRAM abstraction named demo_sram_32x64 when OpenRAM SRAM collateral is available.
+- If OpenRAM macro collateral is not available during RTL generation, instantiate a synthesizable single-port memory wrapper with the same interface and name it demo_sram_32x64_model.
+- Memory is 64 words by 32 bits.
+- The memory wrapper interface should include clk, csb, web, addr[5:0], din[31:0], and dout[31:0].
+
+Register map:
+- 0x00 CONTROL: bit 0 ENABLE, bit 1 SOFT_RESET, bit 2 IRQ_ENABLE
+- 0x04 STATUS: ready, bist_done, bist_fail, busy
+- 0x08 MEM_ADDR: memory address[5:0]
+- 0x0C MEM_WDATA: memory write data[31:0]
+- 0x10 MEM_RDATA: memory read data[31:0], read-only
+- 0x14 MEM_CONTROL: bit 0 MEM_WRITE, bit 1 MEM_READ
+- 0x18 BIST_CONTROL: bit 0 START, bit 1 CLEAR_RESULT
+- 0x1C BIST_STATUS: done, fail, running, last_fail_addr[5:0]
+- 0x20 IRQ_STATUS: bist_done, bist_fail
+- 0x24 IRQ_CLEAR: write one to clear IRQ_STATUS
+
+Functional requirements:
+- Reset clears control/status registers, ready state, BIST status, IRQ, and software-visible read data.
+- Firmware can write and read SRAM locations through MEM_ADDR, MEM_WDATA, MEM_CONTROL, and MEM_RDATA.
+- The controller should expose a simple BIST request path through bist_start or BIST_CONTROL.START.
+- BIST status registers should be present even if the downstream MBIST agent later replaces or wraps the memory path.
+- irq asserts when IRQ_ENABLE is set and BIST done/fail status is latched.
+- Keep the RTL synthesizable and avoid vendor-only primitives in the fallback memory wrapper.
+
+Generate synthesizable SystemVerilog, register map, assertions, simulation testbench, UPF-lite collateral, timing constraints, and packaging manifest.`;
+
 export const SENSOR_HUB_ARCH2RTL_SPEC = `Design a smart sensor hub microcontroller subsystem with a memory-mapped register interface.
 
 This IoT edge-node demo should model a small microcontroller-style subsystem around sensor telemetry, local threshold policy, FIFO buffering, interrupt generation, and low-power sampling control. The CPU core may be represented as a firmware-facing control sequencer and register fabric for this reference journey; focus the generated RTL on the sensor hub peripherals and software-visible behavior.
@@ -584,7 +636,7 @@ export const SAFETY_PRODUCT_INTENT = `Build a simulator-backed safety fault mana
 The dashboard should let a user configure watchdog timeout, feed heartbeat, inject faults, view latched faults, safety IRQ, reset request, escalation level, reset count, and run safety fault/recovery scenarios.`;
 
 export type DesignChainContext = {
-  demoKind?: "pwm" | "uart_packet" | "image_dma" | "sensor_hub" | "secure_boot" | "safety_fault";
+  demoKind?: "pwm" | "uart_packet" | "image_dma" | "mbist_sram" | "sensor_hub" | "secure_boot" | "safety_fault";
   arch2rtlWorkflowId?: string;
   arch2rtlRunId?: string;
   verifyWorkflowId?: string;

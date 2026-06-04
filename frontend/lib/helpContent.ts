@@ -220,6 +220,31 @@ export const helpTopics: HelpTopic[] = [
     keywords: ["image", "dma", "pipeline", "25k flip flops", "line buffer", "filter", "histogram", "reference journey", "arch2rtl", "verify", "firmware", "software", "validation", "product app"],
   },
   {
+    slug: "apps-sram-mbist-reference-journey",
+    title: "SRAM MBIST Reference Journey",
+    category: "Apps",
+    summary: "Run a focused memory/DFT demo with an OpenRAM-style SRAM controller, scan DFT, ATPG readiness, and MBIST applicability evidence.",
+    body: [
+      "SRAM MBIST Reference Journey is a compact Memory / DFT demo. It starts from a small memory-mapped SRAM scratchpad controller instead of a large image pipeline.",
+      "The Arch2RTL spec asks for an OpenRAM-compatible SRAM abstraction with a synthesizable fallback wrapper, so downstream synthesis and DFT agents can detect memory intent.",
+      "After Arch2RTL, open Synthesis to inspect synthesis metrics, logic-equivalence evidence, scan DFT evidence, open-source ATPG tool readiness, and MBIST applicability.",
+      "Scan DFT is backed by OpenROAD/OpenLane2 where supported. ATPG and MBIST report real coverage or insertion only when the corresponding open-source/customer tool adapter is configured.",
+      "Segment: Memory / DFT.",
+    ],
+    actions: ["Open Apps", "Start MBIST SRAM Journey", "Run Arch2RTL", "Open Synthesis", "Inspect Scan, ATPG, and MBIST dashboard evidence"],
+    exampleQuestions: [
+      "How do I demo MBIST without the image pipeline?",
+      "Does PWM have MBIST?",
+      "Which DFT tools are configured for this run?",
+    ],
+    links: [
+      { label: "Apps", href: "/apps" },
+      { label: "Arch2RTL", href: "/apps/arch2rtl?guided=1&mbist_chain=1" },
+      { label: "Arch2Synthesis", href: "/apps/arch2synthesis" },
+    ],
+    keywords: ["sram", "mbist", "openram", "autombist", "scan", "atpg", "dft", "reference journey", "arch2rtl", "synthesis"],
+  },
+  {
     slug: "apps-smart-sensor-hub-reference-journey",
     title: "Smart Sensor Hub MCU Reference Journey",
     category: "Apps",

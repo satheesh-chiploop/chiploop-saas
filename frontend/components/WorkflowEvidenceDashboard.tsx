@@ -35,7 +35,7 @@ const OPTIONAL_DIGITAL_FLOW: Record<Extract<Stage, "dqa" | "smoke" | "synthesis"
 
 function displayedFlow(stage: Stage): FlowItem[] {
   if (stage === "dqa" || stage === "smoke" || stage === "synthesis" || stage === "tapeout") {
-    return [RTL_STAGE, OPTIONAL_DIGITAL_FLOW[stage], ...MAIN_FLOW.slice(1)];
+    return [RTL_STAGE, OPTIONAL_DIGITAL_FLOW[stage]];
   }
   return MAIN_FLOW;
 }
@@ -64,6 +64,27 @@ function firstString(...values: unknown[]): string {
     if (typeof value === "string" && value.trim()) return value.trim();
   }
   return "";
+}
+
+function firstPresent(...values: unknown[]): unknown {
+  for (const value of values) {
+    if (value !== undefined && value !== null && value !== "") return value;
+  }
+  return undefined;
+}
+
+function metricValue(...values: unknown[]): string | number {
+  const value = firstPresent(...values);
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim()) return value.trim();
+  return "not produced";
+}
+
+function signedMetric(...values: unknown[]): string | number {
+  const value = firstPresent(...values);
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim()) return value.trim();
+  return "not run";
 }
 
 function pct(value: unknown): string {
@@ -121,6 +142,34 @@ function synthesisReadinessVerdict(report: JsonMap): string {
   if (score >= 80) return "pass";
   if (score >= 60) return "warning";
   return "fail";
+}
+
+function synthesisStatus(summary: JsonMap): string {
+  const status = firstString(summary.status, summary.verdict);
+  const rc = summary.return_code;
+  if (status === "ok" || status === "pass" || status === "passed") return "pass";
+  if (status === "failed" || status === "fail") return typeof rc === "number" ? `fail (rc ${rc})` : "fail";
+  return status || "not produced";
+}
+
+function sdcStatus(setup: JsonMap, synthSummary: JsonMap): string {
+  const setupStatus = firstString(setup.status);
+  const outputs = record(setup.outputs);
+  const inputs = record(synthSummary.inputs);
+  const sdc = firstString(outputs.sdc, inputs.sdc, record(synthSummary.outputs).sdc);
+  const synthStatus = firstString(synthSummary.status);
+  if (setupStatus === "ok" && sdc) return "pass";
+  if (synthStatus === "failed" && firstString(synthSummary.error).toLowerCase().includes("sdc")) return "fail";
+  return sdc ? "available" : "not produced";
+}
+
+function timingViolationValue(wns: unknown, tns: unknown, explicit: unknown): string | number {
+  const direct = firstPresent(explicit);
+  if (typeof direct === "number" && Number.isFinite(direct)) return direct;
+  const w = typeof wns === "number" && Number.isFinite(wns) ? wns : Number.NaN;
+  const t = typeof tns === "number" && Number.isFinite(tns) ? tns : Number.NaN;
+  if (Number.isFinite(w) || Number.isFinite(t)) return w < 0 || t < 0 ? "violated" : "0";
+  return "not run";
 }
 
 function countParticipatingAgents(logs: string | null | undefined): number | null {
@@ -201,13 +250,27 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       ],
       synthesis: [
         "rtl_handoff_ingest_manifest.json",
+        "implementation_setup_summary.json",
+        "synth_summary.json",
+        "metrics.json",
         "synthesis_metrics.json",
+        "lec_summary.json",
+        "scan_summary.json",
+        "atpg_summary.json",
+        "mbist_summary.json",
         "synthesis_readiness_findings.json",
         "executive_summary.json",
       ],
       tapeout: [
         "rtl_handoff_ingest_manifest.json",
+        "implementation_setup_summary.json",
+        "synth_summary.json",
+        "metrics.json",
         "synthesis_metrics.json",
+        "lec_summary.json",
+        "scan_summary.json",
+        "atpg_summary.json",
+        "mbist_summary.json",
         "floorplan_metrics.json",
         "placement_metrics.json",
         "route_metrics.json",
@@ -310,14 +373,38 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       ) : <div className="mt-5 text-sm text-amber-300">Register-map artifact is not available for this completed run.</div>;
     }
 
-    if (stage === "dqa" || stage === "smoke" || stage === "synthesis" || stage === "tapeout") {
+    if (stage === "dqa") {
       const handoff = record(evidence["rtl_handoff_ingest_manifest.json"]);
       const lint = record(evidence["rtl_lint_report.json"]);
       const cdc = record(evidence["cdc_findings.json"]);
       const reset = record(evidence["reset_integrity_findings.json"]);
       const readiness = record(evidence["synthesis_readiness_findings.json"]);
+      const summary = record(evidence["executive_summary.json"]);
+      const rtlFiles = number(handoff.rtl_file_count);
+      return (
+        <div className="mt-5 space-y-5">
+          <div className="grid gap-3 sm:grid-cols-1">
+            <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
+          </div>
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat title="Source" value={firstString(handoff.source_mode, "imported").replaceAll("_", " ")} />
+            <Stat title="RTL Files" value={rtlFiles} />
+            <Stat title="Top Module" value={firstString(handoff.top_module, "not inferred")} />
+            <Stat title="Lint" value={lintVerdict(lint)} />
+            <Stat title="CDC" value={findingsVerdict(cdc)} />
+            <Stat title="Reset" value={findingsVerdict(reset)} />
+            <Stat title="Synth Ready" value={synthesisReadinessVerdict(readiness)} />
+            <Stat title="Findings" value={findingCount(lint) + findingCount(cdc) + findingCount(reset) + findingCount(readiness)} />
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+            <Stat title="Summary" value={firstString(summary.status, summary.verdict, status || "running")} />
+          </div>
+        </div>
+      );
+    }
+
+    if (stage === "smoke") {
+      const handoff = record(evidence["rtl_handoff_ingest_manifest.json"]);
       const sim = record(record(evidence["simulation_summary_coverage.json"]).simulation);
-      const synth = record(evidence["synthesis_metrics.json"]);
       const summary = record(evidence["executive_summary.json"]);
       const rtlFiles = number(handoff.rtl_file_count);
       const passed = firstNumber(sim.pass, sim.passed);
@@ -333,14 +420,97 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Source" value={firstString(handoff.source_mode, "imported").replaceAll("_", " ")} />
             <Stat title="RTL Files" value={rtlFiles} />
             <Stat title="Top Module" value={firstString(handoff.top_module, "not inferred")} />
-            <Stat title="Lint" value={lintVerdict(lint)} />
-            <Stat title="CDC" value={findingsVerdict(cdc)} />
-            <Stat title="Reset" value={findingsVerdict(reset)} />
-            <Stat title="Synth Ready" value={synthesisReadinessVerdict(readiness)} />
-            <Stat title="Findings" value={findingCount(lint) + findingCount(cdc) + findingCount(reset) + findingCount(readiness)} />
-            <Stat title="Cells" value={firstNumber(synth.cell_count, synth.cells, 0)} />
+            <Stat title="Runs" value={firstNumber(sim.total, passed + failed)} />
+            <Stat title="Simulation" value={failed > 0 ? "fail" : passed > 0 ? "pass" : "not run"} />
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Summary" value={firstString(summary.status, summary.verdict, status || "running")} />
+          </div>
+        </div>
+      );
+    }
+
+    if (stage === "synthesis" || stage === "tapeout") {
+      const handoff = record(evidence["rtl_handoff_ingest_manifest.json"]);
+      const setup = record(evidence["implementation_setup_summary.json"]);
+      const synthSummary = record(evidence["synth_summary.json"]);
+      const synth = record(evidence["metrics.json"] || evidence["synthesis_metrics.json"]);
+      const lec = record(evidence["lec_summary.json"]);
+      const dft = record(evidence["scan_summary.json"]);
+      const atpg = record(evidence["atpg_summary.json"]);
+      const mbist = record(evidence["mbist_summary.json"]);
+      const summary = record(evidence["executive_summary.json"]);
+      const staStages = record(summary.sta_stages);
+      const postroute = record(staStages.sta_postroute);
+      const postcts = record(staStages.sta_postcts);
+      const postplace = record(staStages.sta_postplace);
+      const preplace = record(staStages.sta_preplace);
+      const wns = firstPresent(
+        summary.worst_slack,
+        postroute.worst_slack,
+        postcts.worst_slack,
+        postplace.worst_slack,
+        preplace.worst_slack,
+        synth.worst_slack,
+        synth.timing__setup__ws
+      );
+      const tns = firstPresent(
+        summary.tns,
+        postroute.tns,
+        postcts.tns,
+        postplace.tns,
+        preplace.tns,
+        synth.tns,
+        synth.timing__setup__tns
+      );
+      const area = metricValue(summary.area, synth.area, synth.design__instance__area, synth.design__core__area);
+      const cells = metricValue(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count);
+      const flipflops = metricValue(synth.chiploop__flipflop_count, synth.flipflops, synth.ff_count, synth.registers, synth.design__instance__ff_count, synth["design__instance__count:flop"]);
+      const latches = metricValue(synth.chiploop__latch_count, synth.latches, synth.latch_count, synth.design__instance__latch_count);
+      const unmapped = metricValue(synth.chiploop__unmapped_cell_count, synth.design__instance_unmapped__count);
+      const checkErrors = metricValue(synth.chiploop__synthesis_check_error_count, synth.synthesis__check_error__count);
+      const netlistStatus = synth.chiploop__netlist_present === true || firstString(record(synthSummary.outputs).netlist) ? "generated" : "not produced";
+      const timingViolations = timingViolationValue(wns, tns, firstPresent(synth.timing_violations, synth.setup_violations));
+      const rtlFiles = number(handoff.rtl_file_count);
+      const drc = metricValue(summary.drc_violations, record(evidence["route_metrics.json"]).drc_violations);
+      const lvs = metricValue(summary.lvs_status);
+      return (
+        <div className="mt-5 space-y-5">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
+            <Bar label="Cells" value={typeof cells === "number" ? cells : firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count)} total={Math.max(firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count), 1)} color="bg-violet-500" />
+          </div>
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat title="Source" value={firstString(handoff.source_mode, "imported").replaceAll("_", " ")} />
+            <Stat title="Top Module" value={firstString(record(synthSummary.inputs).top_module, handoff.top_module, summary.design_name, "not inferred")} />
+            <Stat title="RTL Files" value={rtlFiles} />
+            <Stat title="SDC Checks" value={sdcStatus(setup, synthSummary)} />
+            <Stat title="Synthesis" value={synthesisStatus(synthSummary)} />
+            <Stat title="Area" value={area} />
+            <Stat title="Cells" value={cells} />
+            <Stat title="Flip-flops" value={flipflops} />
+            <Stat title="Latches" value={latches} />
+            <Stat title="WNS" value={signedMetric(wns)} />
+            <Stat title="TNS" value={signedMetric(tns)} />
+            <Stat title="Timing Violations" value={timingViolations} />
+            <Stat title="Unmapped Cells" value={unmapped} />
+            <Stat title="Synthesis Errors" value={checkErrors} />
+            <Stat title="Netlist" value={netlistStatus} />
+            <Stat title="LEC" value={statusLabel(lec.status)} />
+            <Stat title="LEC Unproven" value={metricValue(lec.unproven_points)} />
+            <Stat title="DFT" value={statusLabel(dft.status)} />
+            <Stat title="Scan Chains" value={metricValue(dft.scan_chains)} />
+            <Stat title="Scan Flops" value={metricValue(dft.scan_flops)} />
+            <Stat title="ATPG" value={statusLabel(atpg.status)} />
+            <Stat title="Patterns" value={metricValue(atpg.pattern_count)} />
+            <Stat title="Stuck-at Coverage" value={metricValue(atpg.stuck_at_coverage_pct)} />
+            <Stat title="MBIST" value={statusLabel(mbist.status)} />
+            <Stat title="Memories" value={metricValue(mbist.memory_count)} />
+            <Stat title="Memory Bits" value={metricValue(mbist.estimated_memory_bits)} />
+            <Stat title="autombist" value={mbist.autombist_available === true ? "available" : mbist.autombist_available === false ? "not configured" : "not produced"} />
+            {stage === "tapeout" ? <Stat title="DRC Violations" value={drc} /> : null}
+            {stage === "tapeout" ? <Stat title="LVS" value={lvs} /> : null}
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+            <Stat title="Summary" value={firstString(summary.status, summary.verdict, synthSummary.status, status || "running")} />
           </div>
         </div>
       );
