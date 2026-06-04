@@ -42,6 +42,19 @@ function parseLogLines(logs: string | null | undefined): string[] {
     .filter((l) => l.trim().length > 0);
 }
 
+function validationRunReady(row: WorkflowRow | null): boolean {
+  if (!row) return false;
+  const logs = row.logs || "";
+  return (
+    row.status === "completed" ||
+    logs.includes("System Software Validation Summary Agent done") ||
+    logs.includes("System Software Validation Summary (L2) done") ||
+    logs.includes("System App complete: System_Software_Validation") ||
+    logs.includes("validation_summary.json") ||
+    logs.includes("cosim_validation_summary.json")
+  );
+}
+
 export default function SystemSoftwareValidationAppPage() {
   const router = useRouter();
 
@@ -74,6 +87,7 @@ export default function SystemSoftwareValidationAppPage() {
   const [safetyChainDemo, setSafetyChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const readyForProductBuilder = useMemo(() => validationRunReady(workflowRow), [workflowRow]);
   const logsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -506,7 +520,7 @@ export default function SystemSoftwareValidationAppPage() {
                   </button>
                   <button
                     onClick={openProductBuilder}
-                    disabled={workflowRow?.status !== "completed"}
+                    disabled={!readyForProductBuilder}
                     className="ml-3 mt-3 rounded-xl bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
                   >
                     Build Product App

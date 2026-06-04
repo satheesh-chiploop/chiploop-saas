@@ -41,6 +41,17 @@ function parseLogLines(logs: string | null | undefined): string[] {
     .filter((l) => l.trim().length > 0);
 }
 
+function softwareRunReady(row: WorkflowRow | null): boolean {
+  if (!row) return false;
+  const logs = row.logs || "";
+  return (
+    row.status === "completed" ||
+    logs.includes("System Software Packaging Agent done") ||
+    logs.includes("System App complete: System_Software") ||
+    logs.includes("system_software_package.json")
+  );
+}
+
 export default function SystemSoftwareAppPage() {
   const router = useRouter();
 
@@ -77,6 +88,7 @@ export default function SystemSoftwareAppPage() {
   const [safetyChainDemo, setSafetyChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const readyForValidation = useMemo(() => softwareRunReady(workflowRow), [workflowRow]);
   const logsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -444,7 +456,7 @@ export default function SystemSoftwareAppPage() {
                     <button
                       type="button"
                       onClick={openInFullStackValidation}
-                      disabled={workflowRow?.status !== "completed"}
+                      disabled={!readyForValidation}
                       className="ml-3 mt-3 rounded-xl bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-500 disabled:cursor-not-allowed disabled:bg-slate-700"
                     >
                       Open in Full Validation
