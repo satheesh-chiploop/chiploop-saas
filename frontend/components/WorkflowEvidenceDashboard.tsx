@@ -233,7 +233,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     if (!workflowId || status !== "completed") return;
     let active = true;
     const files: Record<Stage, string[]> = {
-      arch2rtl: ["arch2rtl_dashboard.json", "digital_regmap.json"],
+      arch2rtl: ["arch2rtl_dashboard.json", "digital_regmap.json", "upf_static_check.json"],
       dqa: [
         "rtl_handoff_ingest_manifest.json",
         "rtl_lint_report.json",
@@ -255,6 +255,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "metrics.json",
         "synthesis_metrics.json",
         "lec_summary.json",
+        "upf_static_check.json",
         "scan_summary.json",
         "atpg_summary.json",
         "mbist_summary.json",
@@ -268,6 +269,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "metrics.json",
         "synthesis_metrics.json",
         "lec_summary.json",
+        "upf_static_check.json",
         "scan_summary.json",
         "atpg_summary.json",
         "mbist_summary.json",
@@ -325,6 +327,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const timing = record(dashboard.timing);
         const iface = record(dashboard.interface);
         const clockReset = record(dashboard.clock_reset);
+        const upf = record(evidence["upf_static_check.json"]);
         const lintStatus = firstString(lint.status, "unavailable");
         return (
           <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
@@ -346,6 +349,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <Stat title="Output Ports" value={number(iface.output_port_count)} />
               <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
+              <Stat title="UPF Static" value={statusLabel(upf.status)} />
+              <Stat title="Power Domains" value={metricValue(upf.domain_count)} />
               <Stat title="Modules" value={number(dashboard.module_count)} />
               <Stat title="RTL Files" value={number(dashboard.rtl_file_count)} />
               {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
@@ -435,6 +440,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthSummary = record(evidence["synth_summary.json"]);
       const synth = record(evidence["metrics.json"] || evidence["synthesis_metrics.json"]);
       const lec = record(evidence["lec_summary.json"]);
+      const upf = record(evidence["upf_static_check.json"]);
       const dft = record(evidence["scan_summary.json"]);
       const atpg = record(evidence["atpg_summary.json"]);
       const mbist = record(evidence["mbist_summary.json"]);
@@ -497,6 +503,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Netlist" value={netlistStatus} />
             <Stat title="LEC" value={statusLabel(lec.status)} />
             <Stat title="LEC Unproven" value={metricValue(lec.unproven_points)} />
+            <Stat title="UPF Static" value={statusLabel(upf.status)} />
+            <Stat title="Power Domains" value={metricValue(upf.domain_count)} />
+            <Stat title="Isolation Rules" value={metricValue(upf.isolation_rule_count)} />
+            <Stat title="Retention Rules" value={metricValue(upf.retention_rule_count)} />
+            <Stat title="OpenROAD UPF" value={statusLabel(record(upf.openroad_read_upf).status)} />
+            <Stat title="PA Sim" value={statusLabel(record(upf.power_aware_sim).status)} />
             <Stat title="DFT" value={statusLabel(dft.status)} />
             <Stat title="Scan Chains" value={metricValue(dft.scan_chains)} />
             <Stat title="Scan Flops" value={metricValue(dft.scan_flops)} />
