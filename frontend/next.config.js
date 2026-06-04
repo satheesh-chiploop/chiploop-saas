@@ -1,15 +1,22 @@
 /** @type {import('next').NextConfig} */
+const publicApiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+const apiBaseUrl = (
+  process.env.CHIPLOOP_API_BASE_URL ||
+  process.env.CHIPLOOP_BACKEND_URL ||
+  (publicApiUrl.startsWith("http://") || publicApiUrl.startsWith("https://") ? publicApiUrl : "") ||
+  "https://api.getchiploop.com"
+).replace(/\/+$/, "");
+
 const nextConfig = {
   async rewrites() {
-    const publicApiUrl = process.env.NEXT_PUBLIC_API_URL || "";
-    const backendUrl =
-      process.env.CHIPLOOP_BACKEND_URL ||
-      (publicApiUrl.startsWith("http://") || publicApiUrl.startsWith("https://") ? publicApiUrl : "") ||
-      "http://localhost:8000";
     return [
       {
         source: "/api/:path*",
-        destination: `${backendUrl.replace(/\/$/, "")}/:path*`,
+        destination: `${apiBaseUrl}/:path*`,
+      },
+      {
+        source: "/api",
+        destination: apiBaseUrl,
       },
     ];
   },
