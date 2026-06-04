@@ -194,6 +194,7 @@ async function artifact(workflowId: string, filename: string): Promise<JsonMap |
     );
   } catch (reason) {
     if (reason instanceof ApiClientError && reason.status === 404) return null;
+    if (reason instanceof ApiClientError && reason.status >= 500) return null;
     throw reason;
   }
 }
@@ -328,6 +329,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const iface = record(dashboard.interface);
         const clockReset = record(dashboard.clock_reset);
         const upf = record(evidence["upf_static_check.json"]);
+        const hasUpf = Object.keys(upf).length > 0;
         const lintStatus = firstString(lint.status, "unavailable");
         return (
           <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
@@ -349,8 +351,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <Stat title="Output Ports" value={number(iface.output_port_count)} />
               <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
-              <Stat title="UPF Static" value={statusLabel(upf.status)} />
-              <Stat title="Power Domains" value={metricValue(upf.domain_count)} />
+              {hasUpf ? <Stat title="UPF Static" value={statusLabel(upf.status)} /> : null}
+              {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
               <Stat title="Modules" value={number(dashboard.module_count)} />
               <Stat title="RTL Files" value={number(dashboard.rtl_file_count)} />
               {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
@@ -441,6 +443,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synth = record(evidence["metrics.json"] || evidence["synthesis_metrics.json"]);
       const lec = record(evidence["lec_summary.json"]);
       const upf = record(evidence["upf_static_check.json"]);
+      const hasUpf = Object.keys(upf).length > 0;
       const dft = record(evidence["scan_summary.json"]);
       const atpg = record(evidence["atpg_summary.json"]);
       const mbist = record(evidence["mbist_summary.json"]);
@@ -503,12 +506,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Netlist" value={netlistStatus} />
             <Stat title="LEC" value={statusLabel(lec.status)} />
             <Stat title="LEC Unproven" value={metricValue(lec.unproven_points)} />
-            <Stat title="UPF Static" value={statusLabel(upf.status)} />
-            <Stat title="Power Domains" value={metricValue(upf.domain_count)} />
-            <Stat title="Isolation Rules" value={metricValue(upf.isolation_rule_count)} />
-            <Stat title="Retention Rules" value={metricValue(upf.retention_rule_count)} />
-            <Stat title="OpenROAD UPF" value={statusLabel(record(upf.openroad_read_upf).status)} />
-            <Stat title="PA Sim" value={statusLabel(record(upf.power_aware_sim).status)} />
+            {hasUpf ? <Stat title="UPF Static" value={statusLabel(upf.status)} /> : null}
+            {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
+            {hasUpf ? <Stat title="Isolation Rules" value={metricValue(upf.isolation_rule_count)} /> : null}
+            {hasUpf ? <Stat title="Retention Rules" value={metricValue(upf.retention_rule_count)} /> : null}
+            {hasUpf ? <Stat title="OpenROAD UPF" value={statusLabel(record(upf.openroad_read_upf).status)} /> : null}
+            {hasUpf ? <Stat title="PA Sim" value={statusLabel(record(upf.power_aware_sim).status)} /> : null}
             <Stat title="DFT" value={statusLabel(dft.status)} />
             <Stat title="Scan Chains" value={metricValue(dft.scan_chains)} />
             <Stat title="Scan Flops" value={metricValue(dft.scan_flops)} />
