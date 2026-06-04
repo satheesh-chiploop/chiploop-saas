@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -46,6 +47,8 @@ export default function SmokeAppPage() {
   const [fromWorkflowId, setFromWorkflowId] = useState("");
   const [repoPath, setRepoPath] = useState("");
   const [pastedRtl, setPastedRtl] = useState("");
+  const [parentWorkflowId, setParentWorkflowId] = useState("");
+  const [upstreamWorkflows, setUpstreamWorkflows] = useState<Record<string, string> | null>(null);
 
   const [simulatorType, setSimulatorType] = useState("verilator");
   const [timeBudget, setTimeBudget] = useState<"fast" | "medium">("fast");
@@ -95,6 +98,27 @@ export default function SmokeAppPage() {
       setLoading(false);
     })();
   }, [router]);
+
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("handoff") !== "1") return;
+    const sourceId = params.get("from_workflow_id") || params.get("source_arch2rtl_workflow_id") || "";
+    if (sourceId) {
+      setRtlSourceMode("from_arch2rtl");
+      setFromWorkflowId(sourceId);
+    }
+    setParentWorkflowId(params.get("parent_workflow_id") || "");
+    const rawUpstream = params.get("upstream_workflows");
+    if (rawUpstream) {
+      try {
+        const parsed = JSON.parse(rawUpstream) as Record<string, string>;
+        setUpstreamWorkflows(parsed && typeof parsed === "object" ? parsed : null);
+      } catch {
+        setUpstreamWorkflows(null);
+      }
+    }
+  }, [loading]);
 
   // ✅ Live workflow updates
   useEffect(() => {
@@ -154,7 +178,8 @@ export default function SmokeAppPage() {
           rtl_source_mode: rtlSourceMode,
           from_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
           source_arch2rtl_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
-          upstream_workflows: rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId } : undefined,
+          parent_workflow_id: parentWorkflowId || undefined,
+          upstream_workflows: rtlSourceMode === "from_arch2rtl" ? { ...(upstreamWorkflows || {}), arch2rtl: fromWorkflowId } : undefined,
           repo_path: rtlSourceMode === "repo_path" ? repoPath : undefined,
           pasted_rtl_files:
             rtlSourceMode === "paste"
@@ -318,6 +343,9 @@ export default function SmokeAppPage() {
                       upstreamWorkflows={rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId, smoke: workflowId } : undefined}
                       disabled={workflowRow?.status !== "completed"}
                     />
+                  </div>
+                  <div className="mt-4">
+                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="smoke" logs={workflowRow?.logs} />
                   </div>
                   <AskThisRunPanel workflowId={workflowId} compact />
                 </div>

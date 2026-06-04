@@ -8,6 +8,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -57,6 +58,8 @@ export default function Arch2SynthesisAppPage() {
   const [repoPath, setRepoPath] = useState("");
   const [fromWorkflowId, setFromWorkflowId] = useState("");
   const [pastedRtlFilesJson, setPastedRtlFilesJson] = useState("");
+  const [parentWorkflowId, setParentWorkflowId] = useState("");
+  const [upstreamWorkflows, setUpstreamWorkflows] = useState<Record<string, string> | null>(null);
 
   // --- Synthesis knobs ---
   const [foundry, setFoundry] = useState("sky130");
@@ -109,6 +112,29 @@ export default function Arch2SynthesisAppPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("handoff") !== "1") return;
+    const sourceId = params.get("from_workflow_id") || params.get("source_arch2rtl_workflow_id") || "";
+    if (sourceId) {
+      setRtlSourceMode("from_arch2rtl");
+      setFromWorkflowId(sourceId);
+      setStartStage("synth");
+      setTopModule((current) => current || "imported_from_arch2rtl");
+    }
+    setParentWorkflowId(params.get("parent_workflow_id") || "");
+    const rawUpstream = params.get("upstream_workflows");
+    if (rawUpstream) {
+      try {
+        const parsed = JSON.parse(rawUpstream) as Record<string, string>;
+        setUpstreamWorkflows(parsed && typeof parsed === "object" ? parsed : null);
+      } catch {
+        setUpstreamWorkflows(null);
+      }
+    }
+  }, [loading]);
+
   // Poll workflow row when workflowId is present
   useEffect(() => {
     if (!workflowId) return;
@@ -154,10 +180,10 @@ export default function Arch2SynthesisAppPage() {
 
   const canRun = useMemo(() => {
     if (running) return false;
-    if (!topModule.trim()) return false;
 
     const hasSpec = !!specText.trim();
     const hasRtlSource = rtlSourceMode !== "none";
+    if (!topModule.trim() && !hasRtlSource) return false;
 
     // Require at least one: spec OR RTL source
     if (!hasSpec && !hasRtlSource) return false;
@@ -187,7 +213,8 @@ export default function Arch2SynthesisAppPage() {
         repo_path: rtlSourceMode === "repo_path" ? repoPath : undefined,
         from_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
         source_arch2rtl_workflow_id: rtlSourceMode === "from_arch2rtl" ? fromWorkflowId : undefined,
-        upstream_workflows: rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId } : undefined,
+        parent_workflow_id: parentWorkflowId || undefined,
+        upstream_workflows: rtlSourceMode === "from_arch2rtl" ? { ...(upstreamWorkflows || {}), arch2rtl: fromWorkflowId } : undefined,
         pasted_rtl_files,
 
         // synthesis knobs
@@ -432,6 +459,9 @@ export default function Arch2SynthesisAppPage() {
                     upstreamWorkflows={rtlSourceMode === "from_arch2rtl" ? { arch2rtl: fromWorkflowId, arch2synthesis: workflowId } : undefined}
                     disabled={workflowRow?.status !== "completed"}
                   />
+                </div>
+                <div className="mt-4">
+                  <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="synthesis" logs={workflowRow?.logs} />
                 </div>
                 <AskThisRunPanel workflowId={workflowId} compact />
               </div>
