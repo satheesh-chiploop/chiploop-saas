@@ -152,6 +152,7 @@ export default function Arch2SynthesisAppPage() {
       setFromWorkflowId(sourceId);
       setStartStage("synth");
       setTopModule((current) => current || "imported_from_arch2rtl");
+      setGenUpfLite(true);
     }
     setParentWorkflowId(params.get("parent_workflow_id") || "");
     const rawUpstream = params.get("upstream_workflows");
@@ -386,7 +387,7 @@ export default function Arch2SynthesisAppPage() {
               </label>
               <label className="flex items-center gap-2 text-sm text-slate-300">
                 <input type="checkbox" checked={genUpfLite} onChange={(e) => setGenUpfLite(e.target.checked)} />
-                Generate UPF-lite
+                Inherit/generate UPF-lite and run static checks
               </label>
               <label className="flex items-center gap-2 text-sm text-slate-300">
                 <input type="checkbox" checked={genPackaging} onChange={(e) => setGenPackaging(e.target.checked)} />
@@ -394,7 +395,7 @@ export default function Arch2SynthesisAppPage() {
               </label>
               <label className="flex items-center gap-2 text-sm text-slate-300">
                 <input type="checkbox" checked={enableScanDft} onChange={(e) => setEnableScanDft(e.target.checked)} />
-                Insert scan DFT and run ATPG readiness
+                Insert scan DFT, then run ATPG readiness
               </label>
             </div>
 

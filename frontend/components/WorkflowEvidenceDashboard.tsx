@@ -108,6 +108,31 @@ function metricOrNotApplicable(status: unknown, ...values: unknown[]): string | 
   return metricValue(...values);
 }
 
+function scanMetric(status: unknown, value: unknown): string | number {
+  const text = typeof status === "string" ? status.trim() : "";
+  if (text === "not_applicable" || text === "scan_not_inserted" || text === "no_scan_flops" || text === "tool_unavailable") {
+    return "not applicable";
+  }
+  return metricValue(value);
+}
+
+function lecDashboardStatus(lec: JsonMap): string {
+  const status = firstString(lec.status);
+  if (status === "missing_cell_library") return "setup issue: missing liberty";
+  if (status === "missing_stdcell_models") return "setup issue: missing stdcell models";
+  if (status === "incomplete_stdcell_models") return "setup issue: incomplete stdcell models";
+  if (status === "inconclusive_unresolved_cells") return "inconclusive: unresolved cells";
+  if (status === "inconclusive_missing_sat_models") return "inconclusive: missing SAT models";
+  return statusLabel(status);
+}
+
+function dynamicUpfStatus(upf: JsonMap): string {
+  const pa = record(upf.power_aware_sim);
+  const status = firstString(pa.status);
+  if (status === "not_supported_by_open_source_flow") return "not supported by open-source flow";
+  return statusLabel(status || "not run");
+}
+
 function findingCount(report: JsonMap): number {
   return array(report.findings).length
     + array(report.heuristic_issues).length
@@ -524,17 +549,17 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Unmapped Cells" value={unmapped} />
             <Stat title="Synthesis Errors" value={checkErrors} />
             <Stat title="Netlist" value={netlistStatus} />
-            <Stat title="LEC" value={statusLabel(lec.status)} />
+            <Stat title="LEC" value={lecDashboardStatus(lec)} />
             <Stat title="LEC Unproven" value={metricValue(lec.unproven_points)} />
             {hasUpf ? <Stat title="UPF Static" value={statusLabel(upf.status)} /> : null}
             {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
             {hasUpf ? <Stat title="Isolation Rules" value={metricValue(upf.isolation_rule_count)} /> : null}
             {hasUpf ? <Stat title="Retention Rules" value={metricValue(upf.retention_rule_count)} /> : null}
             {hasUpf ? <Stat title="OpenROAD UPF" value={statusLabel(record(upf.openroad_read_upf).status)} /> : null}
-            {hasUpf ? <Stat title="PA Sim" value={statusLabel(record(upf.power_aware_sim).status)} /> : null}
+            {hasUpf ? <Stat title="Dynamic UPF Sim" value={dynamicUpfStatus(upf)} /> : null}
             <Stat title="DFT" value={statusLabel(dft.status)} />
-            <Stat title="Scan Chains" value={metricOrNotApplicable(dft.status, dft.actual_scan_chains, dft.scan_chains)} />
-            <Stat title="Scan Flops" value={metricOrNotApplicable(dft.status, dft.scan_flops)} />
+            <Stat title="Scan Chains" value={scanMetric(dft.status, firstPresent(dft.actual_scan_chains, dft.scan_chains))} />
+            <Stat title="Scan Candidates" value={metricValue(dft.scan_flops)} />
             <Stat title="ATPG" value={statusLabel(atpg.status)} />
             <Stat title="Patterns" value={metricOrNotApplicable(atpg.status, atpg.pattern_count)} />
             <Stat title="Stuck-at Coverage" value={metricOrNotApplicable(atpg.status, atpg.stuck_at_coverage_pct)} />
