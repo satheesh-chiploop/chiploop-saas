@@ -103,6 +103,21 @@ function statusLabel(value: unknown): string {
   return text.replaceAll("_", " ");
 }
 
+function dftDashboardStatus(dft: JsonMap): string {
+  const status = firstString(dft.status);
+  if (status === "scan_cell_mapping_required") return "scan-cell mapping required";
+  if (status === "scan_not_inserted") return "scan not inserted";
+  return statusLabel(status);
+}
+
+function atpgDashboardStatus(atpg: JsonMap): string {
+  const status = firstString(atpg.status);
+  const reason = firstString(atpg.reason);
+  if (reason === "scan_cell_mapping_required") return "blocked: scan-cell mapping required";
+  if (status === "tool_detected_needs_adapter_command") return "adapter command required";
+  return statusLabel(status);
+}
+
 function metricOrNotApplicable(status: unknown, ...values: unknown[]): string | number {
   if (typeof status === "string" && status.trim() === "not_applicable") return "not applicable";
   return metricValue(...values);
@@ -110,7 +125,7 @@ function metricOrNotApplicable(status: unknown, ...values: unknown[]): string | 
 
 function scanMetric(status: unknown, value: unknown): string | number {
   const text = typeof status === "string" ? status.trim() : "";
-  if (text === "not_applicable" || text === "scan_not_inserted" || text === "no_scan_flops" || text === "tool_unavailable") {
+  if (text === "not_applicable" || text === "scan_not_inserted" || text === "scan_cell_mapping_required" || text === "no_scan_flops" || text === "tool_unavailable") {
     return "not applicable";
   }
   return metricValue(value);
@@ -557,10 +572,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {hasUpf ? <Stat title="Retention Rules" value={metricValue(upf.retention_rule_count)} /> : null}
             {hasUpf ? <Stat title="OpenROAD UPF" value={statusLabel(record(upf.openroad_read_upf).status)} /> : null}
             {hasUpf ? <Stat title="Dynamic UPF Sim" value={dynamicUpfStatus(upf)} /> : null}
-            <Stat title="DFT" value={statusLabel(dft.status)} />
+            <Stat title="DFT" value={dftDashboardStatus(dft)} />
             <Stat title="Scan Chains" value={scanMetric(dft.status, firstPresent(dft.actual_scan_chains, dft.scan_chains))} />
             <Stat title="Scan Candidates" value={metricValue(dft.scan_flops)} />
-            <Stat title="ATPG" value={statusLabel(atpg.status)} />
+            <Stat title="ATPG" value={atpgDashboardStatus(atpg)} />
             <Stat title="Patterns" value={metricOrNotApplicable(atpg.status, atpg.pattern_count)} />
             <Stat title="Stuck-at Coverage" value={metricOrNotApplicable(atpg.status, atpg.stuck_at_coverage_pct)} />
             <Stat title="MBIST" value={statusLabel(mbist.status)} />
