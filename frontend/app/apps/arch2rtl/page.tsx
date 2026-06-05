@@ -7,6 +7,7 @@ import { apiPost } from "@/lib/apiClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import GitHubImportPanel from "@/components/GitHubImportPanel";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
+import TextFileUpload from "@/components/TextFileUpload";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
   GENERIC_VERIFY_INTENT,
@@ -83,6 +84,11 @@ type VoiceNote = {
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
   return logs.split("\n").map(l => l.trimEnd()).filter(l => l.trim().length > 0);
+}
+
+function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
+  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
+  return uploaded;
 }
 
 export default function Arch2RTLAppPage() {
@@ -784,6 +790,12 @@ export default function Arch2RTLAppPage() {
                   </div>
                 ) : null}
               </div>
+
+              <TextFileUpload
+                label="Upload spec"
+                helper="Load a text, markdown, JSON, YAML, SystemVerilog, Verilog, or SDC spec file."
+                onText={(text, _fileName, mode) => setSpecText((current) => mergeUploadedText(current, text, mode))}
+              />
 
               <label className="block text-sm text-slate-300">Spec text *</label>
               <textarea

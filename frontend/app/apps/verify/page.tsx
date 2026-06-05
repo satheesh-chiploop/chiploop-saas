@@ -8,6 +8,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
+import TextFileUpload from "@/components/TextFileUpload";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
@@ -34,12 +35,24 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
+type ClockRow = {
+  name: string;
+  port: string;
+  frequency_mhz: string;
+  source?: string;
+};
+
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
   return logs
     .split("\n")
     .map((l) => l.trimEnd())
     .filter((l) => l.trim().length > 0);
+}
+
+function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
+  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
+  return uploaded;
 }
 
 export default function VerifyAppPage() {
@@ -68,8 +81,11 @@ export default function VerifyAppPage() {
   const [pastedRtl, setPastedRtl] = useState("");
 
   const [testIntent, setTestIntent] = useState("");
+  const [verificationPlan, setVerificationPlan] = useState("");
+  const [monitorCheckerPlan, setMonitorCheckerPlan] = useState("");
   const [randomVsDirected, setRandomVsDirected] = useState<"random" | "directed" | "both">("both");
   const [coverageTargets, setCoverageTargets] = useState("");
+  const [coveragePlan, setCoveragePlan] = useState("");
   const [simulatorType, setSimulatorType] = useState("verilator");
   const [codeCoverageTool, setCodeCoverageTool] = useState("verilator_coverage");
   const [formalTool, setFormalTool] = useState("none");
@@ -78,6 +94,9 @@ export default function VerifyAppPage() {
   const [seedCount, setSeedCount] = useState<number>(10);
   const [runClosureAnalysis, setRunClosureAnalysis] = useState(true);
   const closureStartedRef = useRef(false);
+  const [clockRows, setClockRows] = useState<ClockRow[]>([]);
+  const [resetRows, setResetRows] = useState<any[]>([]);
+  const [clockProbeStatus, setClockProbeStatus] = useState("");
 
   const [handoffFlow, setHandoffFlow] = useState(false);
   const [pwmChainDemo, setPwmChainDemo] = useState(false);
@@ -111,6 +130,17 @@ export default function VerifyAppPage() {
     if (!resp.ok) {
       const txt = await resp.text().catch(() => "");
       throw new Error(`${resp.status} ${resp.statusText}${txt ? ` — ${txt}` : ""}`);
+    }
+    return resp.json();
+  }
+
+  async function getJSON<T>(path: string): Promise<T> {
+    const resp = await fetch(`${API_BASE}${path}`, {
+      headers: { ...authHeaders() },
+    });
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => "");
+      throw new Error(`${resp.status} ${resp.statusText}${txt ? ` - ${txt}` : ""}`);
     }
     return resp.json();
   }
@@ -170,6 +200,50 @@ export default function VerifyAppPage() {
       window.localStorage.removeItem(VERIFY_HANDOFF_PREFILL_KEY);
     }
   }, [loading]);
+
+  useEffect(() => {
+    if (loading || rtlSourceMode !== "from_arch2rtl" || !fromWorkflowId.trim()) return;
+    let cancelled = false;
+    setClockProbeStatus("Detecting clocks from Arch2RTL handoff...");
+    (async () => {
+      try {
+        const data = await getJSON<{ clock_intent?: any }>(`/apps/digital/clock-candidates/${fromWorkflowId.trim()}`);
+        if (cancelled) return;
+        const clocks = Array.isArray(data.clock_intent?.clocks) ? data.clock_intent.clocks : [];
+        const resets = Array.isArray(data.clock_intent?.resets) ? data.clock_intent.resets : [];
+        setClockRows(clocks.map((c: any) => ({
+          name: String(c.name || c.port || "clk"),
+          port: String(c.port || c.name || "clk"),
+          frequency_mhz: c.frequency_mhz ? String(Number(c.frequency_mhz).toFixed(3).replace(/\.?0+$/, "")) : "",
+          source: c.source || "inferred",
+        })));
+        setResetRows(resets);
+        setClockProbeStatus(clocks.length ? "Clock/reset context will be included with verification handoff." : "No clock ports detected from the source workflow.");
+      } catch (e: any) {
+        if (!cancelled) setClockProbeStatus(e?.message || "Clock detection failed.");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, rtlSourceMode, fromWorkflowId]);
+
+  function clockConstraintsPayload() {
+    if (!clockRows.length) return undefined;
+    return {
+      source: "ui_clock_table",
+      clocks: clockRows.map((row) => {
+        const mhz = Number(row.frequency_mhz);
+        return {
+          name: row.name || row.port,
+          port: row.port || row.name,
+          frequency_mhz: Number.isFinite(mhz) && mhz > 0 ? mhz : undefined,
+          source: row.source || "ui_clock_table",
+        };
+      }),
+      resets: resetRows,
+    };
+  }
 
   // Live workflow updates
   useEffect(() => {
@@ -295,10 +369,14 @@ export default function VerifyAppPage() {
               : undefined,
 
           test_intent: testIntent,
+          verification_plan: verificationPlan || undefined,
+          monitor_checker_plan: monitorCheckerPlan || undefined,
           random_vs_directed: randomVsDirected,
           coverage_targets: coverageTargets || undefined,
+          coverage_plan: coveragePlan || undefined,
           simulator_type: simulatorType || undefined,
           seed_count: seedCount,
+          clock_constraints: clockConstraintsPayload(),
           toolchain: {
             simulator: simulatorType || "verilator",
             code_coverage: codeCoverageTool,
@@ -507,11 +585,35 @@ export default function VerifyAppPage() {
                   <input
                     value={fromWorkflowId}
                     onChange={(e) => setFromWorkflowId(e.target.value)}
-                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
-                    placeholder="workflow_id from Arch2RTL"
-                  />
-                </>
-              ) : null}
+                  className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  placeholder="workflow_id from Arch2RTL"
+                />
+                <div className="rounded-xl border border-slate-800 bg-black/30 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-sm font-semibold text-slate-200">Detected clock/reset context</div>
+                    <div className="text-xs text-slate-500">{clockProbeStatus}</div>
+                  </div>
+                  {clockRows.length ? (
+                    <div className="mt-2 grid gap-2 md:grid-cols-2">
+                      {clockRows.map((clock, idx) => (
+                        <div key={`${clock.port}-${idx}`} className="rounded-lg border border-slate-800 p-2 text-xs">
+                          <div className="text-slate-300">{clock.name}</div>
+                          <div className="text-slate-500">
+                            port {clock.port}
+                            {clock.frequency_mhz ? `, ${clock.frequency_mhz} MHz` : ""}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  {resetRows.length ? (
+                    <div className="mt-2 text-xs text-slate-500">
+                      Resets: {resetRows.map((r: any) => r.port || r.name).filter(Boolean).join(", ")}
+                    </div>
+                  ) : null}
+                </div>
+              </>
+            ) : null}
 
               <VoiceSpecDraft
                 title="Verification Voice Spec"
@@ -519,6 +621,12 @@ export default function VerifyAppPage() {
                 target="Verification test intent"
                 compact
                 onApply={setTestIntent}
+              />
+
+              <TextFileUpload
+                label="Upload verification spec or test intent"
+                helper="Load a test intent, verification note, markdown plan, or structured JSON/YAML."
+                onText={(text, _fileName, mode) => setTestIntent((current) => mergeUploadedText(current, text, mode))}
               />
 
               <label className="block text-sm text-slate-300">Test intent *</label>
@@ -566,6 +674,51 @@ export default function VerifyAppPage() {
               <div className="text-xs text-slate-500">
                 Reported coverage is functional bin coverage generated from the RTL specification.
               </div>
+
+              <TextFileUpload
+                label="Upload coverage point plan"
+                helper="Optional: import coverage groups, coverpoints, bins, exclusions, and closure goals."
+                onText={(text, _fileName, mode) => setCoveragePlan((current) => mergeUploadedText(current, text, mode))}
+              />
+
+              <label className="block text-sm text-slate-300">Coverage point plan (optional)</label>
+              <textarea
+                value={coveragePlan}
+                onChange={(e) => setCoveragePlan(e.target.value)}
+                rows={5}
+                className="w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                placeholder="Functional coverage points, covergroups, crosses, bins, coverage exclusions, and target percentages..."
+              />
+
+              <TextFileUpload
+                label="Upload verification plan"
+                helper="Optional: import a reviewer-authored verification plan and keep it with the run evidence."
+                onText={(text, _fileName, mode) => setVerificationPlan((current) => mergeUploadedText(current, text, mode))}
+              />
+
+              <label className="block text-sm text-slate-300">Verification plan (optional)</label>
+              <textarea
+                value={verificationPlan}
+                onChange={(e) => setVerificationPlan(e.target.value)}
+                rows={5}
+                className="w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                placeholder="Verification objectives, scenarios, assumptions, scoreboarding, assertions, and exclusions..."
+              />
+
+              <TextFileUpload
+                label="Upload monitor/checker plan"
+                helper="Optional: import monitor points, scoreboard/checker rules, protocol checks, and sampled observations."
+                onText={(text, _fileName, mode) => setMonitorCheckerPlan((current) => mergeUploadedText(current, text, mode))}
+              />
+
+              <label className="block text-sm text-slate-300">Monitor/checker plan (optional)</label>
+              <textarea
+                value={monitorCheckerPlan}
+                onChange={(e) => setMonitorCheckerPlan(e.target.value)}
+                rows={5}
+                className="w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                placeholder="What should monitors observe? What should scoreboards/checkers compare? Include protocol rules, output response checks, sampled events, and exclusions..."
+              />
 
               <div className="grid grid-cols-2 gap-3">
                 <div>

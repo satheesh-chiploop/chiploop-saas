@@ -103,6 +103,11 @@ function statusLabel(value: unknown): string {
   return text.replaceAll("_", " ");
 }
 
+function metricOrNotApplicable(status: unknown, ...values: unknown[]): string | number {
+  if (typeof status === "string" && status.trim() === "not_applicable") return "not applicable";
+  return metricValue(...values);
+}
+
 function findingCount(report: JsonMap): number {
   return array(report.findings).length
     + array(report.heuristic_issues).length
@@ -501,7 +506,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         <div className="mt-5 space-y-5">
           <div className="grid gap-3 sm:grid-cols-2">
             <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
-            <Bar label="Cells" value={typeof cells === "number" ? cells : firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count)} total={Math.max(firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count), 1)} color="bg-violet-500" />
+            <Bar label="Leaf cells" value={typeof cells === "number" ? cells : firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count)} total={Math.max(firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count), 1)} color="bg-violet-500" />
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Stat title="Source" value={firstString(handoff.source_mode, "imported").replaceAll("_", " ")} />
@@ -510,7 +515,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="SDC Checks" value={sdcStatus(setup, synthSummary)} />
             <Stat title="Synthesis" value={synthesisStatus(synthSummary)} />
             <Stat title="Area" value={area} />
-            <Stat title="Cells" value={cells} />
+            <Stat title="Leaf Cells" value={cells} />
             <Stat title="Flip-flops" value={flipflops} />
             <Stat title="Latches" value={latches} />
             <Stat title="WNS" value={signedMetric(wns)} />
@@ -528,11 +533,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {hasUpf ? <Stat title="OpenROAD UPF" value={statusLabel(record(upf.openroad_read_upf).status)} /> : null}
             {hasUpf ? <Stat title="PA Sim" value={statusLabel(record(upf.power_aware_sim).status)} /> : null}
             <Stat title="DFT" value={statusLabel(dft.status)} />
-            <Stat title="Scan Chains" value={metricValue(dft.scan_chains)} />
-            <Stat title="Scan Flops" value={metricValue(dft.scan_flops)} />
+            <Stat title="Scan Chains" value={metricOrNotApplicable(dft.status, dft.actual_scan_chains, dft.scan_chains)} />
+            <Stat title="Scan Flops" value={metricOrNotApplicable(dft.status, dft.scan_flops)} />
             <Stat title="ATPG" value={statusLabel(atpg.status)} />
-            <Stat title="Patterns" value={metricValue(atpg.pattern_count)} />
-            <Stat title="Stuck-at Coverage" value={metricValue(atpg.stuck_at_coverage_pct)} />
+            <Stat title="Patterns" value={metricOrNotApplicable(atpg.status, atpg.pattern_count)} />
+            <Stat title="Stuck-at Coverage" value={metricOrNotApplicable(atpg.status, atpg.stuck_at_coverage_pct)} />
             <Stat title="MBIST" value={statusLabel(mbist.status)} />
             <Stat title="Memories" value={metricValue(mbist.memory_count)} />
             <Stat title="Memory Bits" value={metricValue(mbist.estimated_memory_bits)} />

@@ -8,6 +8,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
+import TextFileUpload from "@/components/TextFileUpload";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 
 const supabase = createClientComponentClient();
@@ -21,12 +22,26 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
+type ClockRow = {
+  name: string;
+  port: string;
+  frequency_mhz: string;
+  period_ns?: number | null;
+  source?: string;
+  needs_user_frequency?: boolean;
+};
+
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
   return logs
     .split("\n")
     .map((l) => l.trimEnd())
     .filter((l) => l.trim().length > 0);
+}
+
+function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
+  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
+  return uploaded;
 }
 
 export default function Arch2SynthesisAppPage() {
@@ -52,6 +67,7 @@ export default function Arch2SynthesisAppPage() {
   const [genRegmap, setGenRegmap] = useState(true);
   const [genUpfLite, setGenUpfLite] = useState(false);
   const [genPackaging, setGenPackaging] = useState(true);
+  const [enableScanDft, setEnableScanDft] = useState(false);
 
   // --- RTL source options (to skip Arch2RTL) ---
   const [rtlSourceMode, setRtlSourceMode] = useState<"none" | "repo_path" | "paste" | "from_arch2rtl">("none");
@@ -67,6 +83,9 @@ export default function Arch2SynthesisAppPage() {
   const [toolchain, setToolchain] = useState("openlane2");
   const [targetFreqMhz, setTargetFreqMhz] = useState<string>(""); // keep as string for input stability
   const [constraintsSdc, setConstraintsSdc] = useState("");
+  const [clockRows, setClockRows] = useState<ClockRow[]>([]);
+  const [resetRows, setResetRows] = useState<any[]>([]);
+  const [clockProbeStatus, setClockProbeStatus] = useState("");
 
   // --- Stage control ---
   const [startStage, setStartStage] = useState<"arch2rtl" | "synth">("arch2rtl");
@@ -87,6 +106,17 @@ export default function Arch2SynthesisAppPage() {
     if (!resp.ok) {
       const txt = await resp.text().catch(() => "");
       throw new Error(`${resp.status} ${resp.statusText}${txt ? ` — ${txt}` : ""}`);
+    }
+    return resp.json();
+  }
+
+  async function getJSON<T>(path: string): Promise<T> {
+    const resp = await fetch(`${API_BASE}${path}`, {
+      headers: { ...authHeaders() },
+    });
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => "");
+      throw new Error(`${resp.status} ${resp.statusText}${txt ? ` - ${txt}` : ""}`);
     }
     return resp.json();
   }
@@ -134,6 +164,56 @@ export default function Arch2SynthesisAppPage() {
       }
     }
   }, [loading]);
+
+  useEffect(() => {
+    if (loading || rtlSourceMode !== "from_arch2rtl" || !fromWorkflowId.trim()) return;
+    let cancelled = false;
+    setClockProbeStatus("Detecting clocks from Arch2RTL handoff...");
+    (async () => {
+      try {
+        const data = await getJSON<{ clock_intent?: any }>(`/apps/digital/clock-candidates/${fromWorkflowId.trim()}`);
+        if (cancelled) return;
+        const clocks = Array.isArray(data.clock_intent?.clocks) ? data.clock_intent.clocks : [];
+        const resets = Array.isArray(data.clock_intent?.resets) ? data.clock_intent.resets : [];
+        setClockRows(clocks.map((c: any) => ({
+          name: String(c.name || c.port || "clk"),
+          port: String(c.port || c.name || "clk"),
+          frequency_mhz: c.frequency_mhz ? String(Number(c.frequency_mhz).toFixed(3).replace(/\.?0+$/, "")) : "",
+          period_ns: c.period_ns ?? null,
+          source: c.source || "inferred",
+          needs_user_frequency: Boolean(c.needs_user_frequency),
+        })));
+        setResetRows(resets);
+        setClockProbeStatus(clocks.length ? "Review detected clocks before synthesis." : "No clock ports detected; enter target frequency or SDC manually.");
+      } catch (e: any) {
+        if (!cancelled) setClockProbeStatus(e?.message || "Clock detection failed.");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, rtlSourceMode, fromWorkflowId]);
+
+  function updateClockFrequency(index: number, value: string) {
+    setClockRows((rows) => rows.map((row, idx) => (idx === index ? { ...row, frequency_mhz: value } : row)));
+  }
+
+  function clockConstraintsPayload() {
+    if (!clockRows.length) return undefined;
+    return {
+      source: "ui_clock_table",
+      clocks: clockRows.map((row) => {
+        const mhz = Number(row.frequency_mhz);
+        return {
+          name: row.name || row.port,
+          port: row.port || row.name,
+          frequency_mhz: Number.isFinite(mhz) && mhz > 0 ? mhz : undefined,
+          source: row.source || "ui_clock_table",
+        };
+      }),
+      resets: resetRows,
+    };
+  }
 
   // Poll workflow row when workflowId is present
   useEffect(() => {
@@ -223,6 +303,7 @@ export default function Arch2SynthesisAppPage() {
         toolchain: toolchain || undefined,
         target_frequency_mhz: targetFreqMhz.trim() ? Number(targetFreqMhz) : undefined,
         constraints_sdc: constraintsSdc.trim() ? constraintsSdc : undefined,
+        clock_constraints: clockConstraintsPayload(),
 
         // stage control
         start_stage: startStage,
@@ -232,6 +313,7 @@ export default function Arch2SynthesisAppPage() {
           gen_regmap: genRegmap,
           gen_upf_lite: genUpfLite,
           gen_packaging: genPackaging,
+          enable_scan_dft: enableScanDft,
           skip_arch2rtl: rtlSourceMode !== "none" || startStage !== "arch2rtl",
         },
       });
@@ -309,6 +391,10 @@ export default function Arch2SynthesisAppPage() {
               <label className="flex items-center gap-2 text-sm text-slate-300">
                 <input type="checkbox" checked={genPackaging} onChange={(e) => setGenPackaging(e.target.checked)} />
                 Generate packaging/handoff
+              </label>
+              <label className="flex items-center gap-2 text-sm text-slate-300">
+                <input type="checkbox" checked={enableScanDft} onChange={(e) => setEnableScanDft(e.target.checked)} />
+                Insert scan DFT and run ATPG readiness
               </label>
             </div>
 
@@ -404,6 +490,53 @@ export default function Arch2SynthesisAppPage() {
                 placeholder="e.g., 250"
               />
 
+              {rtlSourceMode === "from_arch2rtl" ? (
+                <div className="rounded-xl border border-slate-800 bg-black/30 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-sm font-semibold text-slate-200">Detected clock table</div>
+                    <div className="text-xs text-slate-500">{clockProbeStatus}</div>
+                  </div>
+                  {clockRows.length ? (
+                    <div className="mt-3 overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead className="text-slate-400">
+                          <tr>
+                            <th className="py-1 pr-2">Clock</th>
+                            <th className="py-1 pr-2">Port</th>
+                            <th className="py-1 pr-2">MHz</th>
+                            <th className="py-1">Source</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {clockRows.map((clock, idx) => (
+                            <tr key={`${clock.port}-${idx}`} className="border-t border-slate-800">
+                              <td className="py-2 pr-2 text-slate-200">{clock.name}</td>
+                              <td className="py-2 pr-2 text-slate-300">{clock.port}</td>
+                              <td className="py-2 pr-2">
+                                <input
+                                  value={clock.frequency_mhz}
+                                  onChange={(e) => updateClockFrequency(idx, e.target.value)}
+                                  className="w-24 rounded-lg border border-slate-800 bg-black/40 px-2 py-1 text-slate-100"
+                                  placeholder="MHz"
+                                />
+                              </td>
+                              <td className="py-2 text-slate-500">{clock.source || "inferred"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="mt-2 text-xs text-slate-500">Clock rows will appear after a valid Arch2RTL workflow ID is loaded.</div>
+                  )}
+                  {resetRows.length ? (
+                    <div className="mt-2 text-xs text-slate-500">
+                      Resets: {resetRows.map((r: any) => r.port || r.name).filter(Boolean).join(", ")}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
               <label className="block text-sm text-slate-300">SDC constraints (optional)</label>
               <textarea
                 value={constraintsSdc}
@@ -445,6 +578,14 @@ export default function Arch2SynthesisAppPage() {
           <div className="space-y-4">
             <div className="rounded-2xl border border-slate-800 bg-black/30 p-5">
               <VoiceSpecDraft title="Voice Spec Draft" loopType="digital" target="Digital spec" onApply={setSpecText} />
+
+              <div className="mt-4">
+                <TextFileUpload
+                  label="Upload spec"
+                  helper="Load a text, markdown, JSON, YAML, SystemVerilog, Verilog, or SDC spec file."
+                  onText={(text, _fileName, mode) => setSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
+              </div>
 
               <label className="block text-sm text-slate-300">Spec text (optional if RTL provided)</label>
               <textarea
