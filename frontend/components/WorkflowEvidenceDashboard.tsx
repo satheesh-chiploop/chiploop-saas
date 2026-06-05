@@ -432,7 +432,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const reset = record(evidence["reset_integrity_findings.json"]);
       const readiness = record(evidence["synthesis_readiness_findings.json"]);
       const summary = record(evidence["executive_summary.json"]);
-      const rtlFiles = number(handoff.rtl_file_count);
+      const rtlFiles = firstNumber(
+        handoff.rtl_file_count,
+        array(handoff.rtl_files).length,
+        array(record(synthSummary.inputs).rtl_files).length,
+        array(lec.rtl_files).length
+      );
       return (
         <div className="mt-5 space-y-5">
           <div className="grid gap-3 sm:grid-cols-1">
