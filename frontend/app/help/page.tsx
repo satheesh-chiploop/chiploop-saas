@@ -172,6 +172,33 @@ export default function HelpPage() {
             {selectedTopic.body.map((paragraph) => renderHelpBodyLine(paragraph))}
           </div>
 
+          {selectedTopic.comparisonRows?.length ? (
+            <div className="mt-6 overflow-hidden rounded-lg border border-slate-800">
+              <div className="overflow-x-auto">
+                <table className="min-w-[900px] divide-y divide-slate-800 text-left text-sm">
+                  <thead className="bg-slate-950/80 text-xs font-semibold uppercase text-slate-400">
+                    <tr>
+                      <th scope="col" className="w-[16%] px-4 py-3">Area</th>
+                      <th scope="col" className="w-[28%] px-4 py-3">Traditional Flow</th>
+                      <th scope="col" className="w-[28%] px-4 py-3">ChipLoop Flow</th>
+                      <th scope="col" className="w-[28%] px-4 py-3">Differentiation</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800 bg-slate-950/40 text-slate-300">
+                    {selectedTopic.comparisonRows.map((row) => (
+                      <tr key={row.area} className="align-top">
+                        <th scope="row" className="px-4 py-4 font-semibold text-cyan-100">{row.area}</th>
+                        <td className="px-4 py-4">{row.traditional}</td>
+                        <td className="px-4 py-4">{row.chiploop}</td>
+                        <td className="px-4 py-4 font-medium text-white">{row.differentiation}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : null}
+
           <div className="mt-7 grid gap-4 md:grid-cols-2">
             <section className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
               <h3 className="text-sm font-semibold text-white">What to do</h3>

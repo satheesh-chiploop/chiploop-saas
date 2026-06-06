@@ -116,14 +116,17 @@ function atpgDashboardStatus(atpg: JsonMap): string {
   if (reason === "scan_cell_mapping_required") return "blocked: scan-cell mapping required";
   if (status === "tool_detected_needs_adapter_command") return "adapter command required";
   if (status === "adapter_completed_no_metrics") return "adapter ran: no metrics";
+  if (status === "adapter_completed_no_patterns") return "adapter ran: no patterns";
   if (status === "patterns_generated") return "patterns generated";
   if (status === "adapter_command_missing") return "adapter command missing";
   if (status === "adapter_failed") return "adapter failed";
   return statusLabel(status);
 }
 
-function metricOrNotApplicable(status: unknown, ...values: unknown[]): string | number {
-  if (typeof status === "string" && status.trim() === "not_applicable") return "not applicable";
+function atpgMetric(status: unknown, ...values: unknown[]): string | number {
+  const text = typeof status === "string" ? status.trim() : "";
+  if (text === "not_applicable") return "not applicable";
+  if (text !== "patterns_generated") return "not produced";
   return metricValue(...values);
 }
 
@@ -335,6 +338,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "lvs_summary.json",
         "tapeout_package.json",
         "tapeout_summary.json",
+        "tapeout_lec_summary.json",
         "executive_summary.json",
       ],
       verification: ["simulation_summary_coverage.json"],
@@ -515,6 +519,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const drcSummary = record(evidence["drc_summary.json"]);
       const lvsSummary = record(evidence["lvs_summary.json"]);
       const tapeoutSummary = record(evidence["tapeout_summary.json"]);
+      const tapeoutLec = record(evidence["tapeout_lec_summary.json"]);
       const summary = record(evidence["executive_summary.json"]);
       const staStages = record(summary.sta_stages);
       const postroute = record(staStages.sta_postroute);
@@ -597,8 +602,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Unmapped Cells" value={unmapped} />
             <Stat title="Synthesis Errors" value={checkErrors} />
             <Stat title="Netlist" value={netlistStatus} />
-            <Stat title="LEC" value={lecDashboardStatus(lec)} />
-            <Stat title="LEC Unproven" value={metricValue(lec.unproven_points)} />
+            <Stat title={stage === "tapeout" ? "Synthesis LEC" : "LEC"} value={lecDashboardStatus(lec)} />
+            <Stat title={stage === "tapeout" ? "Synthesis LEC Unproven" : "LEC Unproven"} value={metricValue(lec.unproven_points)} />
+            {stage === "tapeout" ? <Stat title="Tapeout LEC" value={lecDashboardStatus(tapeoutLec)} /> : null}
+            {stage === "tapeout" ? <Stat title="Tapeout LEC Unproven" value={metricValue(tapeoutLec.unproven_points)} /> : null}
             {hasUpf ? <Stat title="UPF Static" value={statusLabel(upf.status)} /> : null}
             {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
             {hasUpf ? <Stat title="Isolation Rules" value={metricValue(upf.isolation_rule_count)} /> : null}
@@ -609,8 +616,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Scan Chains" value={scanMetric(dft.status, firstPresent(dft.actual_scan_chains, dft.scan_chains))} />
             <Stat title="Scan Candidates" value={metricValue(dft.scan_flops)} />
             <Stat title="ATPG" value={atpgDashboardStatus(atpg)} />
-            <Stat title="Patterns" value={metricOrNotApplicable(atpg.status, atpg.pattern_count)} />
-            <Stat title="Stuck-at Coverage" value={metricOrNotApplicable(atpg.status, atpg.stuck_at_coverage_pct)} />
+            <Stat title="Patterns" value={atpgMetric(atpg.status, atpg.pattern_count)} />
+            <Stat title="Stuck-at Coverage" value={atpgMetric(atpg.status, atpg.stuck_at_coverage_pct)} />
             <Stat title="MBIST" value={statusLabel(mbist.status)} />
             <Stat title="Memories" value={metricValue(mbist.memory_count)} />
             <Stat title="Memory Bits" value={metricValue(mbist.estimated_memory_bits)} />

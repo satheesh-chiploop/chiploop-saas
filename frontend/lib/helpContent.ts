@@ -4,6 +4,7 @@ export type HelpTopic = {
   category: "Basics" | "Apps" | "Inspection" | "Studio" | "Integrations" | "Developer" | "Examples";
   summary: string;
   body: string[];
+  comparisonRows?: Array<{ area: string; traditional: string; chiploop: string; differentiation: string }>;
   actions: string[];
   exampleQuestions: string[];
   links: Array<{ label: string; href: string }>;
@@ -66,30 +67,159 @@ export const helpTopics: HelpTopic[] = [
     keywords: ["arch2rtl", "apps", "demo", "rtl", "download", "artifacts"],
   },
   {
+    slug: "chiploop-vs-traditional-flow",
+    title: "ChipLoop vs Traditional Flow",
+    category: "Basics",
+    summary: "ChipLoop is a unified silicon-to-product platform that carries context, artifacts, evidence, and lineage from architecture and RTL through verification, implementation, software, validation, and product apps.",
+    body: [
+      "Traditional semiconductor flows hand off files, reports, scripts, and review notes between disconnected stages. ChipLoop keeps the workflow data visible in one platform so teams can see what was generated, what passed, what failed, what evidence exists, and what should happen next.",
+      "The core difference is platform continuity: ChipLoop lets teams traverse from architecture intent to RTL, verification closure, DFT/tapeout evidence, firmware, software, full-system validation, and product app prototypes without losing context between stages.",
+      "ChipLoop does not replace signoff tools. It acts as the execution, evidence, and lineage layer around them, surfacing real tool output and generated artifacts in a form that downstream agents and users can inspect.",
+    ],
+    comparisonRows: [
+      {
+        area: "End-to-end platform visibility",
+        traditional: "Architecture, RTL, verification, physical design, firmware, software, and product demos live in separate tools, repos, dashboards, and meetings.",
+        chiploop: "Workflows, artifacts, dashboards, reports, lineage, and Ask This Run stay available in one platform from RTL through product app.",
+        differentiation: "Teams can traverse the full silicon-to-product path without losing context between stages.",
+      },
+      {
+        area: "Starting point",
+        traditional: "Requirements are written in documents and manually translated into architecture, RTL, and verification tasks.",
+        chiploop: "Structured intent and guided Apps turn requirements into executable workflows and reviewable artifacts.",
+        differentiation: "Intent becomes workflow data instead of static handoff text.",
+      },
+      {
+        area: "Architecture to RTL",
+        traditional: "Architecture exploration and RTL implementation are often disconnected.",
+        chiploop: "System Architecture and Architecture-to-RTL Delivery carry selected metrics, assumptions, and traceability into Arch2RTL.",
+        differentiation: "Architecture evidence feeds RTL planning instead of staying in a separate report.",
+      },
+      {
+        area: "Verification closure",
+        traditional: "Engineers manually inspect coverage, update plans, add tests, tune seeds, and rerun.",
+        chiploop: "Closure Loop updates verification and coverage plans, adds testcase intents and seed plans, reruns executable generated tests, and charts coverage improvement.",
+        differentiation: "Closure becomes an iterative, traceable loop with visible progress.",
+      },
+      {
+        area: "Implementation evidence",
+        traditional: "LEC, DFT, ATPG, STA, DRC, and LVS evidence is scattered across tool logs and scripts.",
+        chiploop: "Arch2Synthesis and Arch2Tapeout dashboards surface real stage status and generated reports.",
+        differentiation: "Tool readiness, missing collateral, and failures are visible earlier.",
+      },
+      {
+        area: "Product app continuity",
+        traditional: "Product-facing demos are usually built later from manually interpreted firmware, software, and validation state.",
+        chiploop: "Product App Builder uses RTL, verification, firmware, software, and validation lineage to create simulator-backed product prototypes.",
+        differentiation: "The same platform connects silicon evidence to product-facing behavior.",
+      },
+      {
+        area: "Reporting policy",
+        traditional: "Incomplete reports may need manual interpretation and can be easy to misread.",
+        chiploop: "Unavailable coverage, LEC, ATPG, DRC, LVS, or validation evidence is reported as unavailable or failed.",
+        differentiation: "No fake pass, fake coverage, or hidden fallback is presented as evidence.",
+      },
+    ],
+    actions: ["Open Apps to run a guided flow", "Use Ask This Run after completion", "Follow handoff actions from RTL to Verify, Firmware, Validation, and Product App", "Use dashboards to inspect real evidence and missing outputs"],
+    exampleQuestions: [
+      "How is ChipLoop different from a traditional flow?",
+      "How does ChipLoop keep RTL to product app data visible?",
+      "What does platform continuity mean?",
+      "Does ChipLoop replace signoff tools?",
+    ],
+    links: [
+      { label: "Apps", href: "/apps" },
+      { label: "Studio", href: "/workflow" },
+      { label: "Verify", href: "/apps/verify" },
+      { label: "Product App Builder", href: "/apps/system-product-builder" },
+    ],
+    keywords: ["traditional flow", "differentiation", "single platform", "unified platform", "platform continuity", "rtl to product app", "visibility", "lineage", "evidence", "handoff", "silicon to product", "product app"],
+  },
+  {
     slug: "apps-verify",
     title: "Verify App",
     category: "Apps",
-    summary: "Run RTL verification with simulation, functional coverage, code coverage, SVA evidence, optional formal, and closure analysis.",
+    summary: "Run RTL verification with simulation, functional coverage, code coverage, SVA evidence, optional formal, closure analysis, and closure-loop reruns.",
     body: [
       "Verify imports generated Arch2RTL output or accepts pasted RTL, then runs the selected verification flow and produces simulation, coverage, and review artifacts.",
       "The app supports directed tests, random tests, or both in one run. When both is selected, ChipLoop runs the directed intent first and then follows with randomized seed runs for broader exploration.",
       "The simulator/tool selectors show the current tool path, including Verilator, cocotb, verilator_coverage, SymbiYosys, and solver options when available. Optional formal and golden-model comparison can be enabled from the app controls.",
       "The Demo Evidence Dashboard shows a compact summary: simulation pass/fail counts, run count, functional coverage, code line/branch/condition/toggle coverage when reported, SVA assertion coverage, formal status, golden-model status, and tools used.",
       "Coverage closure is handled by a separate closure-analysis run. If functional coverage is below target or a testcase fails, use Analyze Closure Gap to generate a downloadable plan with missing bins, likely causes, and suggested next actions.",
+      "Run Closure Loop takes the next step: it ingests the closure gap, updates the verification plan and coverage plan, creates traceable testcase intents and a seed plan, reruns executable generated tests when available, and emits a coverage trend chart.",
+      "The closure chart tracks functional coverage plus code line, branch, condition, and toggle coverage when reported, along with coverage points added, testcase intents added, and seed updates. The current backend executes one concrete closure iteration per loop run, so repeat Run Closure Loop to continue improving coverage.",
+      "Closure-loop reporting is evidence-only. ChipLoop does not invent coverage improvement, executable tests, or pass results when simulator artifacts are missing.",
       "Toggle coverage depends on simulator output. New Verilator runs attempt annotated coverage-point extraction; older LCOV-only artifacts may show toggle coverage as unavailable.",
     ],
-    actions: ["Open Verify", "Choose directed, random, or both", "Run Verify", "Analyze Closure Gap", "Download closure plan"],
+    actions: ["Open Verify", "Choose directed, random, or both", "Run Verify", "Analyze Closure Gap", "Run Closure Loop", "Inspect the coverage trend chart", "Download closure artifacts"],
     exampleQuestions: [
       "What coverage does Verify report?",
       "Why is toggle coverage unavailable?",
       "How do I know which functional coverage bins are missing?",
       "Can I run both directed and random tests?",
+      "How do I use the closure loop to improve coverage?",
+      "Where is the coverage improvement chart?",
     ],
     links: [
       { label: "Verify", href: "/apps/verify" },
       { label: "Arch2RTL", href: "/apps/arch2rtl" },
     ],
-    keywords: ["verify", "verification", "coverage", "functional coverage", "code coverage", "toggle", "branch", "condition", "sva", "formal", "symbiyosys", "verilator", "closure"],
+    keywords: ["verify", "verification", "coverage", "functional coverage", "code coverage", "toggle", "branch", "condition", "sva", "formal", "symbiyosys", "verilator", "closure", "closure loop", "coverage trend", "coverage chart", "testcase", "seed"],
+  },
+  {
+    slug: "verification-closure-loop",
+    title: "Verification Closure Loop",
+    category: "Apps",
+    summary: "Update verification and coverage plans, add traceable testcase intents and seed plans, rerun verification, and chart coverage improvement.",
+    body: [
+      "Verification Closure Loop is the follow-on flow after a Verify run and closure-gap analysis. It is meant for iterative closure after Arch2RTL and baseline verification are complete.",
+      "The loop ingests verification_source_handoff.json, simulation results, coverage metrics, and closure gaps. It then emits updated planning and rerun artifacts instead of treating the first closure report as the final answer.",
+      "Generated artifacts include verification_plan_v2.md, coverage_point_plan_v2.md, testcase_seed_update.json, rerun_manifest.json, closure_judgement.json, and closure_chart.json.",
+      "The chart shows baseline versus iteration coverage for functional coverage and code line, branch, condition, and toggle coverage when those values exist. It also tracks coverage points added, testcase intents added, and seed updates per iteration.",
+      "Testcase intents are traceable closure recommendations. They become executable only when the generated testbench contains matching runnable cocotb tests; otherwise the rerun manifest records the gap instead of pretending a test ran.",
+      "The current backend executes one concrete closure iteration per loop run. Set the user iteration target for planning, then repeat Run Closure Loop until coverage goals are met or the judgement says more design/testbench work is required.",
+      "No fake closure is reported. Missing simulator output, missing executable tests, or unavailable coverage fields remain visible in the artifacts and dashboard.",
+    ],
+    actions: ["Open Verify", "Run baseline verification", "Analyze Closure Gap", "Run Closure Loop", "Review the coverage chart", "Inspect rerun_manifest.json and closure_judgement.json"],
+    exampleQuestions: [
+      "What does Run Closure Loop do?",
+      "Why are testcase intents different from executable tests?",
+      "Where is the coverage trend chart?",
+      "How do I know whether another closure iteration is useful?",
+    ],
+    links: [
+      { label: "Verify", href: "/apps/verify" },
+      { label: "Arch2RTL", href: "/apps/arch2rtl" },
+    ],
+    keywords: ["verification closure loop", "closure loop", "coverage trend", "coverage chart", "functional coverage", "line coverage", "branch coverage", "condition coverage", "toggle coverage", "verification plan", "coverage plan", "testcase seed", "rerun", "iterations"],
+  },
+  {
+    slug: "digital-implementation-signoff",
+    title: "Digital Implementation, DFT, ATPG, LEC, and Tapeout",
+    category: "Apps",
+    summary: "Inspect synthesis and tapeout evidence with real LEC, scan DFT, ATPG, STA, DRC, LVS, and macro collateral status.",
+    body: [
+      "Arch2Synthesis and Arch2Tapeout dashboards are evidence dashboards. They report what the generated artifacts and configured tools produced; they do not insert fake pass, fake coverage, or fallback LEC/ATPG results.",
+      "LEC requires real parseable RTL, synthesized netlist, and standard-cell functional models. If a stdcell model cannot be parsed, the dashboard reports the parse issue rather than falling back to an invented equivalence result.",
+      "When DFT is enabled, synthesis performs scan-cell replacement for supported flip-flops and records scan candidates and scan chains. Scan replacement passing means the netlist was transformed; ATPG still needs a working ATPG adapter and generated collateral.",
+      "ATPG uses CHIPLOOP_ATPG_COMMAND, such as an Atalanta wrapper. The agents generate the needed bench collateral from the workflow artifacts and expect the adapter to return real pattern and coverage metrics. If bench generation, adapter execution, or metrics parsing fails, the dashboard reports that failure.",
+      "For tapeout, the dashboard surfaces floorplan, placement, CTS, route, fill, STA, DRC, LVS, and tapeout package stage summaries when reports exist. Missing reports stay visible as not produced or failed instead of being hidden.",
+      "Analog or macro blocks require explicit collateral: LEF for physical abstract, LIB for timing, GDS for layout, SPICE/CDL for LVS, and placement or integration metadata that matches a real netlist instance. ChipLoop does not create hardcoded macro placement for a block that is not instantiated.",
+      "OpenROAD/OpenLane availability depends on backend installation. If a tool is unavailable, configure the tool path in the backend environment and rerun the flow so the next artifacts are produced from the real tool.",
+    ],
+    actions: ["Open Arch2Synthesis or Arch2Tapeout", "Inspect LEC, DFT, ATPG, STA, DRC, and LVS cards", "Configure CHIPLOOP_ATPG_COMMAND for ATPG", "Provide explicit macro or analog collateral before mixed-signal tapeout", "Download the ZIP and inspect stage reports"],
+    exampleQuestions: [
+      "Why does LEC show a stdcell parse error?",
+      "What does scan replace pass mean?",
+      "How do I enable ATPG patterns and coverage?",
+      "What collateral is needed for an analog macro?",
+      "Why are DRC or LVS not produced?",
+    ],
+    links: [
+      { label: "Arch2Synthesis", href: "/apps/arch2synthesis" },
+      { label: "Arch2Tapeout", href: "/apps/arch2tapeout" },
+    ],
+    keywords: ["synthesis", "tapeout", "implementation", "dft", "scan", "scan replacement", "atpg", "atalanta", "podem", "lec", "logic equivalence", "stdcell", "sta", "timing", "drc", "lvs", "macro", "analog", "lef", "lib", "gds", "spice", "openroad", "openlane", "no fallback"],
   },
   {
     slug: "apps-system-architecture",
