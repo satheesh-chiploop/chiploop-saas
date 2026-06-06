@@ -117,6 +117,7 @@ function atpgDashboardStatus(atpg: JsonMap): string {
   if (status === "tool_detected_needs_adapter_command") return "adapter command required";
   if (status === "adapter_completed_no_metrics") return "adapter ran: no metrics";
   if (status === "patterns_generated") return "patterns generated";
+  if (status === "adapter_command_missing") return "adapter command missing";
   if (status === "adapter_failed") return "adapter failed";
   return statusLabel(status);
 }
