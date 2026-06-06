@@ -115,6 +115,9 @@ function atpgDashboardStatus(atpg: JsonMap): string {
   const reason = firstString(atpg.reason);
   if (reason === "scan_cell_mapping_required") return "blocked: scan-cell mapping required";
   if (status === "tool_detected_needs_adapter_command") return "adapter command required";
+  if (status === "adapter_completed_no_metrics") return "adapter ran: no metrics";
+  if (status === "patterns_generated") return "patterns generated";
+  if (status === "adapter_failed") return "adapter failed";
   return statusLabel(status);
 }
 
