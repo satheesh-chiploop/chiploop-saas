@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import TopNav from "@/components/TopNav";
-import { ApiClientError, apiPost } from "@/lib/apiClient";
+import { ApiClientError, apiGet, apiPost } from "@/lib/apiClient";
 import { findHelpTopic, helpCategories, helpTopics, type HelpTopic } from "@/lib/helpContent";
 
 type HelpAskResponse = {
@@ -11,6 +11,26 @@ type HelpAskResponse = {
   answer: string;
   suggested_actions: string[];
   sources: Array<{ slug: string; title: string; category: string; href: string }>;
+};
+
+type HelpCatalogRow = {
+  type: "agent" | "workflow";
+  name: string;
+  loop_type: string;
+  domain: string;
+  description: string;
+  steps: number | null;
+};
+
+type HelpCatalogResponse = {
+  status: string;
+  counts: {
+    agents: number;
+    workflows: number;
+    agents_by_loop: Record<string, number>;
+    workflows_by_loop: Record<string, number>;
+  };
+  rows: HelpCatalogRow[];
 };
 
 function topicMatches(topic: HelpTopic, query: string): boolean {
@@ -61,12 +81,29 @@ export default function HelpPage() {
   const [answer, setAnswer] = useState<HelpAskResponse | null>(null);
   const [askError, setAskError] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
+  const [catalog, setCatalog] = useState<HelpCatalogResponse | null>(null);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const topic = findHelpTopic(params.get("topic"));
     setSelectedSlug(topic.slug);
   }, []);
+
+  useEffect(() => {
+    if (selectedSlug !== "agent-workflow-catalog" || catalog || catalogError) return;
+    let cancelled = false;
+    apiGet<HelpCatalogResponse>("/help/catalog")
+      .then((response) => {
+        if (!cancelled) setCatalog(response);
+      })
+      .catch((error) => {
+        if (!cancelled) setCatalogError(error instanceof Error ? error.message : "Catalog request failed.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [catalog, catalogError, selectedSlug]);
 
   const selectedTopic = findHelpTopic(selectedSlug);
   const visibleTopics = useMemo(() => {
@@ -196,6 +233,61 @@ export default function HelpPage() {
                   </tbody>
                 </table>
               </div>
+            </div>
+          ) : null}
+
+          {selectedTopic.slug === "agent-workflow-catalog" ? (
+            <div className="mt-6 space-y-4">
+              {catalog ? (
+                <>
+                  <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
+                      <p className="text-xs font-semibold uppercase text-slate-500">Agents</p>
+                      <p className="mt-2 text-2xl font-bold text-white">{catalog.counts.agents}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
+                      <p className="text-xs font-semibold uppercase text-slate-500">Workflows</p>
+                      <p className="mt-2 text-2xl font-bold text-white">{catalog.counts.workflows}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 lg:col-span-2">
+                      <p className="text-xs font-semibold uppercase text-slate-500">Agent loops</p>
+                      <p className="mt-2 text-sm text-slate-300">
+                        {Object.entries(catalog.counts.agents_by_loop).map(([loop, count]) => `${loop}: ${count}`).join(" | ")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden rounded-lg border border-slate-800">
+                    <div className="overflow-x-auto">
+                      <table className="min-w-[980px] divide-y divide-slate-800 text-left text-sm">
+                        <thead className="bg-slate-950/80 text-xs font-semibold uppercase text-slate-400">
+                          <tr>
+                            <th scope="col" className="w-[10%] px-4 py-3">Type</th>
+                            <th scope="col" className="w-[10%] px-4 py-3">Loop</th>
+                            <th scope="col" className="w-[24%] px-4 py-3">Name</th>
+                            <th scope="col" className="w-[12%] px-4 py-3">Domain / Steps</th>
+                            <th scope="col" className="w-[44%] px-4 py-3">Description</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800 bg-slate-950/40 text-slate-300">
+                          {catalog.rows.map((row) => (
+                            <tr key={`${row.type}:${row.name}`} className="align-top">
+                              <td className="px-4 py-4 font-semibold text-cyan-100">{row.type}</td>
+                              <td className="px-4 py-4">{row.loop_type || "unknown"}</td>
+                              <th scope="row" className="px-4 py-4 font-semibold text-white">{row.name}</th>
+                              <td className="px-4 py-4">{row.type === "workflow" ? `${row.steps ?? 0} agents` : row.domain}</td>
+                              <td className="px-4 py-4">{row.description || "No description provided."}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
+                  {catalogError || "Loading registry catalog..."}
+                </div>
+              )}
             </div>
           ) : null}
 

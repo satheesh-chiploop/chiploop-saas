@@ -573,6 +573,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         record(evidence["route_metrics.json"]).drc_violations,
         drcSummary.drc_violations,
         drcSummary.violations,
+        drcSummary.drc_status,
         firstString(drcSummary.status) ? statusLabel(drcSummary.status) : undefined
       );
       const lvs = metricValue(
@@ -580,6 +581,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         lvsSummary.lvs_status,
         firstString(lvsSummary.status) ? statusLabel(lvsSummary.status) : undefined
       );
+      const xor = metricValue(record(tapeoutSummary.signoff_inputs).xor_differences, tapeoutSummary.xor_differences, drcSummary.xor_differences, lvsSummary.xor_differences);
+      const overall = stage === "tapeout" ? firstString(tapeoutSummary.status, summary.status, summary.verdict, status || "running") : firstString(summary.status, summary.verdict, synthSummary.status, status || "running");
       return (
         <div className="mt-5 space-y-5">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -629,9 +632,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {stage === "tapeout" ? <Stat title="Fill" value={statusLabel(fill.status)} /> : null}
             {stage === "tapeout" ? <Stat title="DRC Violations" value={drc} /> : null}
             {stage === "tapeout" ? <Stat title="LVS" value={lvs} /> : null}
+            {stage === "tapeout" ? <Stat title="XOR Differences" value={xor} /> : null}
             {stage === "tapeout" ? <Stat title="Tapeout" value={statusLabel(tapeoutSummary.status)} /> : null}
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
-            <Stat title="Summary" value={firstString(summary.status, summary.verdict, synthSummary.status, status || "running")} />
+            <Stat title="Summary" value={statusLabel(overall)} />
           </div>
         </div>
       );
