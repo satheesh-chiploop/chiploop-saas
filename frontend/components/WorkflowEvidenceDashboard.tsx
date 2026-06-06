@@ -324,9 +324,17 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "atpg_summary.json",
         "mbist_summary.json",
         "floorplan_metrics.json",
+        "floorplan_summary.json",
         "placement_metrics.json",
+        "place_summary.json",
+        "cts_summary.json",
         "route_metrics.json",
+        "route_summary.json",
+        "fill_summary.json",
+        "drc_summary.json",
+        "lvs_summary.json",
         "tapeout_package.json",
+        "tapeout_summary.json",
         "executive_summary.json",
       ],
       verification: ["simulation_summary_coverage.json"],
@@ -438,9 +446,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const summary = record(evidence["executive_summary.json"]);
       const rtlFiles = firstNumber(
         handoff.rtl_file_count,
-        array(handoff.rtl_files).length,
-        array(record(synthSummary.inputs).rtl_files).length,
-        array(lec.rtl_files).length
+        array(handoff.rtl_files).length
       );
       return (
         <div className="mt-5 space-y-5">
@@ -501,6 +507,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const dft = record(evidence["scan_summary.json"]);
       const atpg = record(evidence["atpg_summary.json"]);
       const mbist = record(evidence["mbist_summary.json"]);
+      const floorplan = record(evidence["floorplan_summary.json"]);
+      const place = record(evidence["place_summary.json"]);
+      const cts = record(evidence["cts_summary.json"]);
+      const route = record(evidence["route_summary.json"]);
+      const fill = record(evidence["fill_summary.json"]);
+      const drcSummary = record(evidence["drc_summary.json"]);
+      const lvsSummary = record(evidence["lvs_summary.json"]);
+      const tapeoutSummary = record(evidence["tapeout_summary.json"]);
       const summary = record(evidence["executive_summary.json"]);
       const staStages = record(summary.sta_stages);
       const postroute = record(staStages.sta_postroute);
@@ -549,8 +563,18 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         )
       );
       const rtlFiles = number(handoff.rtl_file_count);
-      const drc = metricValue(summary.drc_violations, record(evidence["route_metrics.json"]).drc_violations);
-      const lvs = metricValue(summary.lvs_status);
+      const drc = metricValue(
+        summary.drc_violations,
+        record(evidence["route_metrics.json"]).drc_violations,
+        drcSummary.drc_violations,
+        drcSummary.violations,
+        firstString(drcSummary.status) ? statusLabel(drcSummary.status) : undefined
+      );
+      const lvs = metricValue(
+        summary.lvs_status,
+        lvsSummary.lvs_status,
+        firstString(lvsSummary.status) ? statusLabel(lvsSummary.status) : undefined
+      );
       return (
         <div className="mt-5 space-y-5">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -591,8 +615,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Memories" value={metricValue(mbist.memory_count)} />
             <Stat title="Memory Bits" value={metricValue(mbist.estimated_memory_bits)} />
             <Stat title="autombist" value={mbist.autombist_available === true ? "available" : mbist.autombist_available === false ? "not configured" : "not produced"} />
+            {stage === "tapeout" ? <Stat title="Floorplan" value={statusLabel(floorplan.status)} /> : null}
+            {stage === "tapeout" ? <Stat title="Place" value={statusLabel(place.status)} /> : null}
+            {stage === "tapeout" ? <Stat title="CTS" value={statusLabel(cts.status)} /> : null}
+            {stage === "tapeout" ? <Stat title="Route" value={statusLabel(route.status)} /> : null}
+            {stage === "tapeout" ? <Stat title="Fill" value={statusLabel(fill.status)} /> : null}
             {stage === "tapeout" ? <Stat title="DRC Violations" value={drc} /> : null}
             {stage === "tapeout" ? <Stat title="LVS" value={lvs} /> : null}
+            {stage === "tapeout" ? <Stat title="Tapeout" value={statusLabel(tapeoutSummary.status)} /> : null}
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Summary" value={firstString(summary.status, summary.verdict, synthSummary.status, status || "running")} />
           </div>

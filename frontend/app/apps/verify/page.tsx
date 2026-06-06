@@ -71,6 +71,10 @@ export default function VerifyAppPage() {
   const [closureWorkflowId, setClosureWorkflowId] = useState<string | null>(null);
   const [closureRunId, setClosureRunId] = useState<string | null>(null);
   const [closureRow, setClosureRow] = useState<WorkflowRow | null>(null);
+  const [closureLoopWorkflowId, setClosureLoopWorkflowId] = useState<string | null>(null);
+  const [closureLoopRunId, setClosureLoopRunId] = useState<string | null>(null);
+  const [closureLoopRow, setClosureLoopRow] = useState<WorkflowRow | null>(null);
+  const [closureChart, setClosureChart] = useState<any | null>(null);
 
   // Intake (minimal but useful)
   const [rtlSourceMode, setRtlSourceMode] = useState<"from_arch2rtl" | "paste" | "repo_path">("repo_path");
@@ -93,6 +97,9 @@ export default function VerifyAppPage() {
   const [goldenModelTool, setGoldenModelTool] = useState("none");
   const [seedCount, setSeedCount] = useState<number>(10);
   const [runClosureAnalysis, setRunClosureAnalysis] = useState(true);
+  const [closureMaxIterations, setClosureMaxIterations] = useState<number>(1);
+  const [closureSeedBudget, setClosureSeedBudget] = useState<number>(10);
+  const [closureRerunMode, setClosureRerunMode] = useState<"coverage_targeted" | "failed_only" | "full_regression">("coverage_targeted");
   const closureStartedRef = useRef(false);
   const [clockRows, setClockRows] = useState<ClockRow[]>([]);
   const [resetRows, setResetRows] = useState<any[]>([]);
@@ -325,6 +332,61 @@ export default function VerifyAppPage() {
   }, [closureWorkflowId]);
 
   useEffect(() => {
+    if (!closureLoopWorkflowId) return;
+
+    let isActive = true;
+
+    (async () => {
+      const { data, error } = await supabase
+        .from("workflows")
+        .select("id,status,phase,logs,updated_at")
+        .eq("id", closureLoopWorkflowId)
+        .single();
+
+      if (isActive && !error && data) setClosureLoopRow(data as any);
+    })();
+
+    const channel = supabase
+      .channel(`wf-${closureLoopWorkflowId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "workflows", filter: `id=eq.${closureLoopWorkflowId}` },
+        (payload) => {
+          const row = payload.new as any;
+          setClosureLoopRow({
+            id: row.id,
+            status: row.status,
+            phase: row.phase,
+            logs: row.logs,
+            updated_at: row.updated_at,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isActive = false;
+      supabase.removeChannel(channel);
+    };
+  }, [closureLoopWorkflowId]);
+
+  useEffect(() => {
+    if (!closureLoopWorkflowId || closureLoopRow?.status !== "completed") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getJSON<any>(`/apps/dashboard/artifact/${closureLoopWorkflowId}?filename=closure_chart.json`);
+        if (!cancelled) setClosureChart(data);
+      } catch {
+        if (!cancelled) setClosureChart(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [closureLoopWorkflowId, closureLoopRow?.status]);
+
+  useEffect(() => {
     if (!runClosureAnalysis || closureStartedRef.current) return;
     if (!workflowId || workflowRow?.status !== "completed") return;
     closureStartedRef.current = true;
@@ -353,6 +415,10 @@ export default function VerifyAppPage() {
     setClosureWorkflowId(null);
     setClosureRunId(null);
     setClosureRow(null);
+    setClosureLoopWorkflowId(null);
+    setClosureLoopRunId(null);
+    setClosureLoopRow(null);
+    setClosureChart(null);
     try {
       const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>(
         "/apps/verify/run",
@@ -429,6 +495,36 @@ export default function VerifyAppPage() {
     }
   }
 
+  async function runClosureLoop() {
+    if (!workflowId) return;
+    setErr(null);
+    setClosureChart(null);
+    try {
+      const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>(
+        "/apps/verify/closure-loop/run",
+        {
+          source_verify_workflow_id: workflowId,
+          coverage_targets: coverageTargets || undefined,
+          seed_count: seedCount,
+          seed_budget: closureSeedBudget,
+          max_iterations: closureMaxIterations,
+          rerun_mode: closureRerunMode,
+          toolchain: {
+            simulator: simulatorType || "verilator",
+            code_coverage: codeCoverageTool,
+            formal: formalTool,
+            formal_solver: formalSolver,
+            golden_model: goldenModelTool,
+          },
+        }
+      );
+      setClosureLoopWorkflowId(out.workflow_id);
+      setClosureLoopRunId(out.run_id);
+    } catch (e: any) {
+      setErr(e?.message || String(e));
+    }
+  }
+
   function downloadZip() {
     if (!workflowId) return;
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
@@ -437,6 +533,11 @@ export default function VerifyAppPage() {
   function downloadClosureZip() {
     if (!closureWorkflowId) return;
     window.open(`${API_BASE}/workflow/${closureWorkflowId}/download_zip?full=1`, "_blank");
+  }
+
+  function downloadClosureLoopZip() {
+    if (!closureLoopWorkflowId) return;
+    window.open(`${API_BASE}/workflow/${closureLoopWorkflowId}/download_zip?full=1`, "_blank");
   }
 
   function openInEmbeddedFirmware() {
@@ -808,6 +909,49 @@ export default function VerifyAppPage() {
                 </span>
               </label>
 
+              <div className="rounded-xl border border-slate-800 bg-black/20 p-3">
+                <div className="text-sm font-semibold text-slate-100">Closure loop controls</div>
+                <div className="mt-1 text-xs text-slate-500">
+                  Current backend executes one concrete closure iteration per loop run; repeat the loop to continue closure.
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs text-slate-400">Iterations</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={10}
+                      value={closureMaxIterations}
+                      onChange={(e) => setClosureMaxIterations(parseInt(e.target.value || "1", 10))}
+                      className="mt-1 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400">Seed budget</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={closureSeedBudget}
+                      onChange={(e) => setClosureSeedBudget(parseInt(e.target.value || "10", 10))}
+                      className="mt-1 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400">Rerun mode</label>
+                    <select
+                      value={closureRerunMode}
+                      onChange={(e) => setClosureRerunMode(e.target.value as any)}
+                      className="mt-1 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
+                    >
+                      <option value="coverage_targeted">Coverage targeted</option>
+                      <option value="failed_only">Failed only</option>
+                      <option value="full_regression">Full regression</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
               <button
                 onClick={runNow}
                 disabled={!canRun}
@@ -887,6 +1031,13 @@ export default function VerifyAppPage() {
                       >
                         Analyze Closure Gaps
                       </button>
+                      <button
+                        onClick={runClosureLoop}
+                        disabled={workflowRow?.status !== "completed" || Boolean(closureLoopWorkflowId)}
+                        className="rounded-xl bg-violet-700 px-4 py-2 font-semibold text-white hover:bg-violet-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                      >
+                        Run Closure Loop
+                      </button>
                       {handoffFlow && rtlSourceMode === "from_arch2rtl" ? (
                         <button
                           onClick={openInEmbeddedFirmware}
@@ -934,6 +1085,73 @@ export default function VerifyAppPage() {
                       </button>
                       <div className="mt-3 max-h-52 overflow-auto rounded-lg border border-slate-800 bg-black/30 p-3 font-mono text-xs text-slate-400">
                         {parseLogLines(closureRow?.logs).map((line, index) => (
+                          <div key={`${line}-${index}`}>{line}</div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {closureLoopWorkflowId ? (
+                    <div className="rounded-2xl border border-violet-900/60 bg-violet-950/15 p-4 text-sm text-slate-300">
+                      <div className="font-semibold text-violet-200">Verification Closure Loop</div>
+                      <div className="mt-2">
+                        closure loop workflow_id: <span className="break-all text-slate-100">{closureLoopWorkflowId}</span>
+                      </div>
+                      <div>
+                        closure loop run_id: <span className="break-all text-slate-100">{closureLoopRunId}</span>
+                      </div>
+                      <div>
+                        status: <span className="text-slate-100">{closureLoopRow?.status || "queued"}</span>
+                      </div>
+                      <button
+                        onClick={downloadClosureLoopZip}
+                        disabled={closureLoopRow?.status !== "completed"}
+                        className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-700"
+                      >
+                        Download Closure Loop
+                      </button>
+                      {closureChart?.series?.length ? (
+                        <div className="mt-4 space-y-3">
+                          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Coverage trend</div>
+                          {[
+                            ["functional_coverage_pct", "Functional"],
+                            ["code_line_coverage_pct", "Code line"],
+                            ["code_branch_coverage_pct", "Branch"],
+                            ["code_condition_coverage_pct", "Condition"],
+                            ["code_toggle_coverage_pct", "Toggle"],
+                          ].map(([key, label]) => {
+                            const values = closureChart.series.map((row: any) => Number(row[key]));
+                            const latest = [...values].reverse().find((value: number) => Number.isFinite(value));
+                            return (
+                              <div key={key} className="grid grid-cols-[110px_1fr_54px] items-center gap-3 text-xs">
+                                <div className="text-slate-300">{label}</div>
+                                <div className="flex h-3 overflow-hidden rounded bg-slate-800">
+                                  {closureChart.series.map((row: any, idx: number) => {
+                                    const value = Number(row[key]);
+                                    const width = Number.isFinite(value) ? Math.max(2, Math.min(100, value)) : 0;
+                                    return <div key={`${key}-${idx}`} className={idx === 0 ? "bg-slate-500" : "bg-violet-400"} style={{ width: `${width}%` }} title={`${row.label}: ${Number.isFinite(value) ? value : "n/a"}`} />;
+                                  })}
+                                </div>
+                                <div className="text-right text-slate-100">{Number.isFinite(latest) ? `${latest}%` : "n/a"}</div>
+                              </div>
+                            );
+                          })}
+                          <div className="grid grid-cols-3 gap-3 pt-2">
+                            {["coverage_points_added", "testcase_intents_added", "seeds_added"].map((key) => {
+                              const latest = closureChart.series[closureChart.series.length - 1] || {};
+                              return (
+                                <div key={key} className="rounded-lg border border-slate-800 bg-black/20 p-3">
+                                  <div className="text-xs text-slate-400">{key.replaceAll("_", " ")}</div>
+                                  <div className="mt-1 text-lg font-semibold text-slate-100">{latest[key] ?? 0}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <div className="text-xs text-slate-500">Stop reason: {closureChart.stop_reason || "not reported"}</div>
+                        </div>
+                      ) : null}
+                      <div className="mt-3 max-h-52 overflow-auto rounded-lg border border-slate-800 bg-black/30 p-3 font-mono text-xs text-slate-400">
+                        {parseLogLines(closureLoopRow?.logs).map((line, index) => (
                           <div key={`${line}-${index}`}>{line}</div>
                         ))}
                       </div>
