@@ -148,13 +148,6 @@ function lecDashboardStatus(lec: JsonMap): string {
   return statusLabel(status);
 }
 
-function dynamicUpfStatus(upf: JsonMap): string {
-  const pa = record(upf.power_aware_sim);
-  const status = firstString(pa.status);
-  if (status === "not_supported_by_open_source_flow") return "not supported by open-source flow";
-  return statusLabel(status || "not run");
-}
-
 function findingCount(report: JsonMap): number {
   return array(report.findings).length
     + array(report.heuristic_issues).length
@@ -477,7 +470,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const handoff = record(evidence["rtl_handoff_ingest_manifest.json"]);
       const sim = record(record(evidence["simulation_summary_coverage.json"]).simulation);
       const summary = record(evidence["executive_summary.json"]);
-      const rtlFiles = number(handoff.rtl_file_count);
+      const rtlFiles = firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length);
       const passed = firstNumber(sim.pass, sim.passed);
       const failed = firstNumber(sim.fail, sim.failed);
       return (
@@ -567,7 +560,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           synth.sta__setup__violation_count
         )
       );
-      const rtlFiles = number(handoff.rtl_file_count);
+      const rtlFiles = firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length);
       const drc = metricValue(
         summary.drc_violations,
         record(evidence["route_metrics.json"]).drc_violations,
@@ -595,12 +588,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="RTL Files" value={rtlFiles} />
             <Stat title="SDC Checks" value={sdcStatus(setup, synthSummary)} />
             <Stat title="Synthesis" value={synthesisStatus(synthSummary)} />
-            <Stat title="Area" value={area} />
+            <Stat title="Area (um^2)" value={area} />
             <Stat title="Leaf Cells" value={cells} />
             <Stat title="Flip-flops" value={flipflops} />
             <Stat title="Latches" value={latches} />
-            <Stat title="WNS" value={signedMetric(wns)} />
-            <Stat title="TNS" value={signedMetric(tns)} />
+            <Stat title="WNS (ns)" value={signedMetric(wns)} />
+            <Stat title="TNS (ns)" value={signedMetric(tns)} />
             <Stat title="Timing Violations" value={timingViolations} />
             <Stat title="Unmapped Cells" value={unmapped} />
             <Stat title="Synthesis Errors" value={checkErrors} />
@@ -613,8 +606,6 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
             {hasUpf ? <Stat title="Isolation Rules" value={metricValue(upf.isolation_rule_count)} /> : null}
             {hasUpf ? <Stat title="Retention Rules" value={metricValue(upf.retention_rule_count)} /> : null}
-            {hasUpf ? <Stat title="OpenROAD UPF" value={statusLabel(record(upf.openroad_read_upf).status)} /> : null}
-            {hasUpf ? <Stat title="Dynamic UPF Sim" value={dynamicUpfStatus(upf)} /> : null}
             <Stat title="DFT" value={dftDashboardStatus(dft)} />
             <Stat title="Scan Chains" value={scanMetric(dft.status, firstPresent(dft.actual_scan_chains, dft.scan_chains))} />
             <Stat title="Scan Candidates" value={metricValue(dft.scan_flops)} />
