@@ -281,7 +281,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     const files: Record<Stage, string[]> = {
       arch2rtl: ["arch2rtl_dashboard.json", "digital_regmap.json", "upf_static_check.json"],
       dqa: [
-        "rtl_handoff_ingest_manifest.json",
+        "digital/handoff/rtl_handoff_ingest_manifest.json",
         "rtl_lint_report.json",
         "cdc_findings.json",
         "reset_integrity_findings.json",
@@ -289,13 +289,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "executive_summary.json",
       ],
       smoke: [
-        "rtl_handoff_ingest_manifest.json",
+        "digital/handoff/rtl_handoff_ingest_manifest.json",
         "simulation_manifest.json",
         "simulation_summary_coverage.json",
         "executive_summary.json",
       ],
       synthesis: [
-        "rtl_handoff_ingest_manifest.json",
+        "digital/handoff/rtl_handoff_ingest_manifest.json",
         "implementation_setup_summary.json",
         "synth_summary.json",
         "metrics.json",
@@ -309,7 +309,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "executive_summary.json",
       ],
       tapeout: [
-        "rtl_handoff_ingest_manifest.json",
+        "digital/handoff/rtl_handoff_ingest_manifest.json",
         "implementation_setup_summary.json",
         "synth_summary.json",
         "metrics.json",
@@ -356,7 +356,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "system_product_collateral_contract.json",
       ],
     };
-    Promise.all((files[stage] || []).map(async (filename) => [filename, await artifact(workflowId, filename)] as const))
+    Promise.all((files[stage] || []).map(async (filename) => [filename.split("/").pop() || filename, await artifact(workflowId, filename)] as const))
       .then((entries) => {
         if (active) setEvidence(Object.fromEntries(entries));
       })
