@@ -97,10 +97,18 @@ export default function VerifyAppPage() {
   const [goldenModelTool, setGoldenModelTool] = useState("none");
   const [seedCount, setSeedCount] = useState<number>(10);
   const [runClosureAnalysis, setRunClosureAnalysis] = useState(true);
+  const [runClosureLoopAfterVerify, setRunClosureLoopAfterVerify] = useState(false);
+  const [debugFailuresAfterVerify, setDebugFailuresAfterVerify] = useState(false);
+  const [failureDebugLogOnlyFirst, setFailureDebugLogOnlyFirst] = useState(true);
+  const [failureDebugGenerateVcd, setFailureDebugGenerateVcd] = useState(true);
+  const [failureDebugAutoApplyTb, setFailureDebugAutoApplyTb] = useState(false);
+  const [failureDebugAutoApplyRtl, setFailureDebugAutoApplyRtl] = useState(false);
+  const [failureDebugRerunFailing, setFailureDebugRerunFailing] = useState(true);
   const [closureMaxIterations, setClosureMaxIterations] = useState<number>(1);
   const [closureSeedBudget, setClosureSeedBudget] = useState<number>(10);
   const [closureRerunMode, setClosureRerunMode] = useState<"coverage_targeted" | "failed_only" | "full_regression">("coverage_targeted");
   const closureStartedRef = useRef(false);
+  const closureLoopStartedRef = useRef(false);
   const [clockRows, setClockRows] = useState<ClockRow[]>([]);
   const [resetRows, setResetRows] = useState<any[]>([]);
   const [clockProbeStatus, setClockProbeStatus] = useState("");
@@ -387,11 +395,18 @@ export default function VerifyAppPage() {
   }, [closureLoopWorkflowId, closureLoopRow?.status]);
 
   useEffect(() => {
-    if (!runClosureAnalysis || closureStartedRef.current) return;
+    if (runClosureLoopAfterVerify || (!runClosureAnalysis && !debugFailuresAfterVerify) || closureStartedRef.current) return;
     if (!workflowId || workflowRow?.status !== "completed") return;
     closureStartedRef.current = true;
     void analyzeClosure();
-  }, [runClosureAnalysis, workflowId, workflowRow?.status]);
+  }, [runClosureAnalysis, runClosureLoopAfterVerify, debugFailuresAfterVerify, workflowId, workflowRow?.status]);
+
+  useEffect(() => {
+    if (!runClosureLoopAfterVerify || closureLoopStartedRef.current) return;
+    if (!workflowId || workflowRow?.status !== "completed") return;
+    closureLoopStartedRef.current = true;
+    void runClosureLoop();
+  }, [runClosureLoopAfterVerify, workflowId, workflowRow?.status]);
 
   const canRun = useMemo(() => {
     if (running) return false;
@@ -412,6 +427,7 @@ export default function VerifyAppPage() {
     setErr(null);
     setRunning(true);
     closureStartedRef.current = false;
+    closureLoopStartedRef.current = false;
     setClosureWorkflowId(null);
     setClosureRunId(null);
     setClosureRow(null);
@@ -450,7 +466,16 @@ export default function VerifyAppPage() {
             formal_solver: formalSolver,
             golden_model: goldenModelTool,
           },
-          run_closure_analysis: runClosureAnalysis,
+          run_closure_analysis: runClosureLoopAfterVerify || runClosureAnalysis || debugFailuresAfterVerify,
+          enable_failure_debug: debugFailuresAfterVerify,
+          failure_debug_options: {
+            enabled: debugFailuresAfterVerify,
+            log_only_first: failureDebugLogOnlyFirst,
+            generate_vcd_if_inconclusive: failureDebugGenerateVcd,
+            auto_apply_testbench_fixes: failureDebugAutoApplyTb,
+            auto_apply_rtl_fixes: failureDebugAutoApplyRtl,
+            rerun_failing_tests: failureDebugRerunFailing,
+          },
 
           toggles: {
             enable_formal: formalTool !== "none",
@@ -485,6 +510,15 @@ export default function VerifyAppPage() {
             formal_solver: formalSolver,
             golden_model: goldenModelTool,
           },
+          enable_failure_debug: debugFailuresAfterVerify,
+          failure_debug_options: {
+            enabled: debugFailuresAfterVerify,
+            log_only_first: failureDebugLogOnlyFirst,
+            generate_vcd_if_inconclusive: failureDebugGenerateVcd,
+            auto_apply_testbench_fixes: failureDebugAutoApplyTb,
+            auto_apply_rtl_fixes: failureDebugAutoApplyRtl,
+            rerun_failing_tests: failureDebugRerunFailing,
+          },
         }
       );
       setClosureWorkflowId(out.workflow_id);
@@ -509,6 +543,16 @@ export default function VerifyAppPage() {
           seed_budget: closureSeedBudget,
           max_iterations: closureMaxIterations,
           rerun_mode: closureRerunMode,
+          random_vs_directed: randomVsDirected,
+          enable_failure_debug: debugFailuresAfterVerify,
+          failure_debug_options: {
+            enabled: debugFailuresAfterVerify,
+            log_only_first: failureDebugLogOnlyFirst,
+            generate_vcd_if_inconclusive: failureDebugGenerateVcd,
+            auto_apply_testbench_fixes: failureDebugAutoApplyTb,
+            auto_apply_rtl_fixes: failureDebugAutoApplyRtl,
+            rerun_failing_tests: failureDebugRerunFailing,
+          },
           toolchain: {
             simulator: simulatorType || "verilator",
             code_coverage: codeCoverageTool,
@@ -897,60 +941,124 @@ export default function VerifyAppPage() {
               <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
                 <input
                   type="checkbox"
-                  checked={runClosureAnalysis}
+                  checked={runClosureLoopAfterVerify || runClosureAnalysis}
                   onChange={(e) => setRunClosureAnalysis(e.target.checked)}
+                  disabled={runClosureLoopAfterVerify}
                   className="mt-1"
                 />
                 <span>
                   Run closure analysis after Verify
                   <span className="mt-1 block text-xs text-slate-500">
-                    Starts a linked child workflow when Verify completes to analyze coverage gaps, failing seeds, and recommended next actions.
+                    Starts a linked child workflow when Verify completes to analyze coverage gaps, failing seeds, and recommended next actions. Required when closure loop is enabled.
                   </span>
                 </span>
               </label>
 
-              <div className="rounded-xl border border-slate-800 bg-black/20 p-3">
-                <div className="text-sm font-semibold text-slate-100">Closure loop controls</div>
-                <div className="mt-1 text-xs text-slate-500">
-                  Current backend executes one concrete closure iteration per loop run; repeat the loop to continue closure.
+              <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={runClosureLoopAfterVerify}
+                  onChange={(e) => setRunClosureLoopAfterVerify(e.target.checked)}
+                  className="mt-1"
+                />
+                <span>
+                  Run closure loop after Verify
+                  <span className="mt-1 block text-xs text-slate-500">
+                    Automatically analyzes gaps, updates plans, adds testcase/seed intents, reruns verification, and emits a merged coverage trend.
+                  </span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={debugFailuresAfterVerify}
+                  onChange={(e) => setDebugFailuresAfterVerify(e.target.checked)}
+                  className="mt-1"
+                />
+                <span>
+                  Debug failing tests after Verify
+                  <span className="mt-1 block text-xs text-slate-500">
+                    Runs log-first failure debug for failing testcase/seed pairs before closure-loop coverage chasing.
+                  </span>
+                </span>
+              </label>
+
+              {debugFailuresAfterVerify ? (
+                <div className="rounded-xl border border-slate-800 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-slate-100">Failure debug settings</div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    RTL and testbench fixes are proposal-only unless auto-apply is explicitly enabled.
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-300">
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" checked={failureDebugLogOnlyFirst} onChange={(e) => setFailureDebugLogOnlyFirst(e.target.checked)} />
+                      Log-only debug first
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" checked={failureDebugGenerateVcd} onChange={(e) => setFailureDebugGenerateVcd(e.target.checked)} />
+                      Generate VCD if inconclusive
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" checked={failureDebugRerunFailing} onChange={(e) => setFailureDebugRerunFailing(e.target.checked)} />
+                      Rerun failing tests
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input type="checkbox" checked={failureDebugAutoApplyTb} onChange={(e) => setFailureDebugAutoApplyTb(e.target.checked)} />
+                      Auto-apply testbench fixes
+                    </label>
+                    <label className="col-span-2 flex items-center gap-2 text-amber-200">
+                      <input type="checkbox" checked={failureDebugAutoApplyRtl} onChange={(e) => setFailureDebugAutoApplyRtl(e.target.checked)} />
+                      Auto-apply RTL fixes
+                    </label>
+                  </div>
                 </div>
-                <div className="mt-3 grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs text-slate-400">Iterations</label>
-                    <input
-                      type="number"
-                      min={1}
-                      max={10}
-                      value={closureMaxIterations}
-                      onChange={(e) => setClosureMaxIterations(parseInt(e.target.value || "1", 10))}
-                      className="mt-1 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
-                    />
+              ) : null}
+
+              {runClosureLoopAfterVerify ? (
+                <div className="rounded-xl border border-slate-800 bg-black/20 p-3">
+                  <div className="text-sm font-semibold text-slate-100">Closure loop settings</div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    Iterations run sequentially after Verify. The loop stops early if closure is achieved or no measurable improvement is found.
                   </div>
-                  <div>
-                    <label className="block text-xs text-slate-400">Seed budget</label>
-                    <input
-                      type="number"
-                      min={1}
-                      max={100}
-                      value={closureSeedBudget}
-                      onChange={(e) => setClosureSeedBudget(parseInt(e.target.value || "10", 10))}
-                      className="mt-1 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400">Rerun mode</label>
-                    <select
-                      value={closureRerunMode}
-                      onChange={(e) => setClosureRerunMode(e.target.value as any)}
-                      className="mt-1 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
-                    >
-                      <option value="coverage_targeted">Coverage targeted</option>
-                      <option value="failed_only">Failed only</option>
-                      <option value="full_regression">Full regression</option>
-                    </select>
+                  <div className="mt-3 grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs text-slate-400">Iterations</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={10}
+                        value={closureMaxIterations}
+                        onChange={(e) => setClosureMaxIterations(parseInt(e.target.value || "1", 10))}
+                        className="mt-1 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-400">Seed budget</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={closureSeedBudget}
+                        onChange={(e) => setClosureSeedBudget(parseInt(e.target.value || "10", 10))}
+                        className="mt-1 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-400">Rerun mode</label>
+                      <select
+                        value={closureRerunMode}
+                        onChange={(e) => setClosureRerunMode(e.target.value as any)}
+                        className="mt-1 w-full rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-slate-100"
+                      >
+                        <option value="coverage_targeted">Coverage targeted</option>
+                        <option value="failed_only">Failed only</option>
+                        <option value="full_regression">Full regression</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : null}
 
               <button
                 onClick={runNow}
@@ -1113,6 +1221,11 @@ export default function VerifyAppPage() {
                       {closureChart?.series?.length ? (
                         <div className="mt-4 space-y-3">
                           <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Coverage trend</div>
+                          <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+                            <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-slate-500" /> baseline</span>
+                            <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-violet-400" /> merged iteration</span>
+                            <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-slate-800" /> unfilled</span>
+                          </div>
                           {[
                             ["functional_coverage_pct", "Functional"],
                             ["code_line_coverage_pct", "Code line"],
@@ -1129,7 +1242,8 @@ export default function VerifyAppPage() {
                                   {closureChart.series.map((row: any, idx: number) => {
                                     const value = Number(row[key]);
                                     const width = Number.isFinite(value) ? Math.max(2, Math.min(100, value)) : 0;
-                                    return <div key={`${key}-${idx}`} className={idx === 0 ? "bg-slate-500" : "bg-violet-400"} style={{ width: `${width}%` }} title={`${row.label}: ${Number.isFinite(value) ? value : "n/a"}`} />;
+                                    const color = idx === 0 ? "bg-slate-500" : "bg-violet-400";
+                                    return <div key={`${key}-${idx}`} className={color} style={{ width: `${width}%` }} title={`${row.label}: ${Number.isFinite(value) ? value : "n/a"}`} />;
                                   })}
                                 </div>
                                 <div className="text-right text-slate-100">{Number.isFinite(latest) ? `${latest}%` : "n/a"}</div>
