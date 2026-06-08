@@ -427,6 +427,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               {hasSpec2Rtl ? <Stat title="Spec2RTL Matched" value={metricValue(spec2rtlSummary.matched)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Partial" value={metricValue(spec2rtlSummary.partial)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Missing" value={metricValue(spec2rtlSummary.missing)} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Inconclusive" value={metricValue(spec2rtlSummary.inconclusive)} /> : null}
               {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             </div>
           </div>
@@ -441,6 +442,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const digitalScope = record(scopes.digital);
         const analogScope = record(scopes.analog);
         const socScope = record(scopes.soc);
+        const lintSummary = record(systemDashboard.lint_summary);
         const iface = record(socScope.interface);
         const storage = record(systemScope.storage);
         const timing = record(systemScope.timing);
@@ -451,6 +453,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const bitTotal = Math.max(number(iface.input_count) + number(iface.output_count), 1);
         const portTotal = Math.max(number(iface.input_port_count) + number(iface.output_port_count), 1);
         const storageTotal = Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1);
+        const rtlFileTotal = Math.max(number(systemScope.rtl_file_count), 1);
+        const participatedTotal = Math.max(agentCount ?? 0, 1);
         const physCompile = firstString(compile.phys);
         return (
           <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
@@ -461,18 +465,22 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <Bar label="SoC output ports" value={number(iface.output_port_count)} total={portTotal} color="bg-teal-500" />
               <Bar label="System flip-flops" value={number(storage.flipflop_count)} total={storageTotal} color="bg-violet-500" />
               <Bar label="System latches" value={number(storage.latch_count)} total={storageTotal} color="bg-amber-500" />
+              <Bar label="RTL files" value={number(systemScope.rtl_file_count)} total={rtlFileTotal} color="bg-indigo-500" />
+              <Bar label="Digital RTL files" value={number(digitalScope.rtl_file_count)} total={rtlFileTotal} color="bg-blue-500" />
+              <Bar label="Analog RTL files" value={number(analogScope.rtl_file_count)} total={rtlFileTotal} color="bg-rose-500" />
+              <Bar label="SoC RTL files" value={number(socScope.rtl_file_count)} total={rtlFileTotal} color="bg-fuchsia-500" />
+              {agentCount !== null ? <Bar label="Agents participated" value={agentCount} total={participatedTotal} color="bg-slate-400" /> : null}
             </div>
             <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
-              <Stat title="Lint" value={firstString(record(systemScope.lint).status, "not run")} />
+              <Stat title="Digital Lint" value={firstString(lintSummary.digital, record(digitalScope.lint).status, "not run")} />
+              <Stat title="Analog Compile" value={firstString(lintSummary.analog, record(analogScope.lint).status, "not run")} />
+              <Stat title="SoC Compile" value={firstString(lintSummary.soc, compile.sim, "not produced")} />
+              <Stat title="System Lint" value={firstString(lintSummary.system, record(systemScope.lint).status, "not run")} />
               <Stat title="Full-cycle Paths" value={number(timing.full_cycle_path_count)} />
               <Stat title="Half-cycle Paths" value={number(timing.half_cycle_path_count)} />
               <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
               <Stat title="Modules" value={number(systemScope.module_count)} />
-              <Stat title="RTL Files" value={number(systemScope.rtl_file_count)} />
-              <Stat title="Digital RTL Files" value={number(digitalScope.rtl_file_count)} />
-              <Stat title="Analog RTL Files" value={number(analogScope.rtl_file_count)} />
-              <Stat title="SoC RTL Files" value={number(socScope.rtl_file_count)} />
               <Stat title="System Sim Compile" value={firstString(compile.sim, "not produced")} />
               {physCompile && physCompile !== "skipped" ? <Stat title="Physical RTL Compile" value={physCompile} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL" value={statusLabel(spec2rtl.status)} /> : null}
@@ -480,7 +488,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               {hasSpec2Rtl ? <Stat title="Spec2RTL Matched" value={metricValue(spec2rtlSummary.matched)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Partial" value={metricValue(spec2rtlSummary.partial)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Missing" value={metricValue(spec2rtlSummary.missing)} /> : null}
-              {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Inconclusive" value={metricValue(spec2rtlSummary.inconclusive)} /> : null}
             </div>
           </div>
         );

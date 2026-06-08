@@ -118,22 +118,36 @@ Outputs:
 - alert_status
 
 Register map:
-- 0x00 CONTROL: bit 0 ENABLE, bit 1 SAMPLE_START, bit 2 IRQ_ENABLE, bit 3 ALERT_CLEAR
-- 0x04 STATUS: sample_done, alert_pending, adc_valid_seen, busy
-- 0x08 THRESHOLD: threshold_code[11:0], read/write
-- 0x0C LATEST_TEMP: latest filtered temp_code[11:0], read-only
-- 0x10 SAMPLE_COUNT: completed sample count[15:0], read-only
-- 0x14 IRQ_STATUS: alert, sample_done
-- 0x18 IRQ_CLEAR: write one to clear IRQ_STATUS bits
+- 0x00 CONTROL[15:0], read/write:
+  - bit 0 ENABLE is stored.
+  - bit 1 SAMPLE_START is a write pulse; writing 1 requests one conversion and it reads back as 0.
+  - bit 2 IRQ_ENABLE is stored.
+  - bit 3 ALERT_CLEAR is a write pulse; writing 1 clears alert_status and STATUS.alert_pending, then reads back as 0.
+- 0x04 STATUS[15:0], read-only:
+  - bit 0 sample_done is sticky after any completed adc_valid sample until IRQ_CLEAR bit 1 is written.
+  - bit 1 alert_pending mirrors latched alert_status until ALERT_CLEAR or IRQ_CLEAR bit 0 is written.
+  - bit 2 adc_valid_seen is sticky after the first adc_valid sample until reset.
+  - bit 3 busy is high while a requested sample is pending.
+- 0x08 THRESHOLD[15:0], read/write: threshold_code is bits [11:0]; upper bits read 0.
+- 0x0C LATEST_TEMP[15:0], read-only: latest filtered temp_code is bits [11:0]; upper bits read 0.
+- 0x10 SAMPLE_COUNT[15:0], read-only: completed sample count.
+- 0x14 IRQ_STATUS[15:0], read-only sticky interrupt status:
+  - bit 0 alert
+  - bit 1 sample_done
+- 0x18 IRQ_CLEAR[15:0], write-only/write-one-to-clear:
+  - writing bit 0 clears IRQ_STATUS.alert and alert_status.
+  - writing bit 1 clears IRQ_STATUS.sample_done and STATUS.sample_done.
 
 Behavior:
 - Reset clears control, status, latest temperature, sample count, IRQ, and alert state.
 - Firmware enables sampling through CONTROL.ENABLE and can request an immediate sample through SAMPLE_START.
-- sample_req asserts when sampling is enabled or SAMPLE_START is written.
+- sample_req is a one-cycle pulse when SAMPLE_START is written, and may also pulse periodically when CONTROL.ENABLE is set.
 - On adc_valid, capture adc_code, apply a simple two-sample moving average filter, update temp_code, and increment SAMPLE_COUNT.
-- Compare filtered temp_code against THRESHOLD. Latch alert_status and IRQ_STATUS.alert when temp_code is above threshold.
+- Compare filtered temp_code against THRESHOLD[11:0]. Latch alert_status, STATUS.alert_pending, and IRQ_STATUS.alert when temp_code is above threshold.
+- Latch STATUS.sample_done and IRQ_STATUS.sample_done on each completed adc_valid sample.
 - alert_irq asserts when CONTROL.IRQ_ENABLE is set and any IRQ_STATUS bit is latched.
-- ALERT_CLEAR or IRQ_CLEAR clears alert/IRQ status without clearing latest temperature.
+- ALERT_CLEAR and IRQ_CLEAR only clear their specified alert/IRQ/status bits; they must not clear LATEST_TEMP, THRESHOLD, or SAMPLE_COUNT.
+- Use explicit internal signal names for the sticky state where practical: irq_status_alert, irq_status_sample_done, status_sample_done, status_alert_pending, latest_temp, sample_count, and threshold_code.
 
 Generate synthesizable Verilog/SystemVerilog RTL, assertions, register-map collateral, and a system handoff package.`;
 
@@ -170,8 +184,18 @@ Integration requirements:
 - Instantiate temp_sensor_adc_model and temp_monitor_digital.
 - Connect temp_monitor_digital.sample_req to temp_sensor_adc_model.sample_req.
 - Connect temp_sensor_adc_model.adc_code and adc_valid to temp_monitor_digital.adc_code and adc_valid.
-- Expose the digital memory-mapped register interface at the SoC top for firmware/software access.
-- Expose alert_irq, temp_code, threshold_code, and alert_status for simulation visibility.
+- Expose the digital memory-mapped register interface at the SoC top with the same widths as temp_monitor_digital:
+  - clk
+  - reset_n
+  - wr_en
+  - wr_addr[7:0]
+  - wr_data[15:0]
+  - rd_en
+  - rd_addr[7:0]
+  - rd_data[15:0]
+- Expose alert_irq, temp_code[11:0], threshold_code[11:0], and alert_status for simulation visibility.
+- Expose sensor_temp_celsius[15:0] at the SoC top and connect it to temp_sensor_adc_model.sensor_temp_celsius.
+- Keep avdd and avss as SoC top ports for the analog behavioral model.
 - Keep the analog behavioral model in the simulation filelist and provide a physical/abstract placeholder for downstream handoff.
 - Generate system RTL filelists, SoC top assembly, SVA, and a System RTL handoff package.
 
