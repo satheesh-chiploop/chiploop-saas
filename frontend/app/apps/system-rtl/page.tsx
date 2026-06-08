@@ -5,10 +5,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
-import TextFileUpload from "@/components/TextFileUpload";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import SpecTextBox from "@/components/SpecTextBox";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
   SYSTEM_MIXED_SIGNAL_PREFILL_KEY,
@@ -336,59 +335,39 @@ export default function SystemRTLAppPage() {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
-                <TextFileUpload
-                  compact
-                  label="Upload digital spec"
-                  helper="Digital RTL/IP behavior, registers, interfaces, interrupts, reset, and clocking."
-                  onText={(text, _fileName, mode) => setDigitalSpecText((current) => mergeUploadedText(current, text, mode))}
-                />
-
-                <label className="block text-sm text-slate-300">Digital specification *</label>
-                <textarea
-                  value={digitalSpecText}
-                  onChange={(e) => setDigitalSpecText(e.target.value)}
-                  rows={6}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                />
-              </div>
-
-              <div>
-                <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
-                <TextFileUpload
-                  compact
-                  label="Upload analog macro spec"
-                  helper="Analog is treated as a macro: include abstract behavior, pins, power, timing, LEF/LIB/GDS/SPICE availability, and integration assumptions."
-                  onText={(text, _fileName, mode) => setAnalogSpecText((current) => mergeUploadedText(current, text, mode))}
-                />
-
-                <label className="block text-sm text-slate-300">Analog specification *</label>
-                <textarea
-                  value={analogSpecText}
-                  onChange={(e) => setAnalogSpecText(e.target.value)}
-                  rows={6}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                />
-              </div>
-
-              <div>
-                <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
-                <TextFileUpload
-                  compact
-                  label="Upload SoC integration spec"
-                  helper="Top-level integration, address map, macro hookup, reset/clock/power domains, and verification expectations."
-                  onText={(text, _fileName, mode) => setSocIntegrationSpecText((current) => mergeUploadedText(current, text, mode))}
-                />
-
-                <label className="block text-sm text-slate-300">SoC integration specification *</label>
-                <textarea
-                  value={socIntegrationSpecText}
-                  onChange={(e) => setSocIntegrationSpecText(e.target.value)}
-                  rows={6}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                />
-              </div>
+              <SpecTextBox
+                label="Digital specification"
+                required
+                value={digitalSpecText}
+                onChange={setDigitalSpecText}
+                voiceTitle="Digital Voice Spec"
+                voiceLoopType="digital"
+                voiceTarget="System digital spec"
+                uploadLabel="Upload digital spec"
+                uploadHelper="Digital RTL/IP behavior, registers, interfaces, interrupts, reset, and clocking."
+              />
+              <SpecTextBox
+                label="Analog specification"
+                required
+                value={analogSpecText}
+                onChange={setAnalogSpecText}
+                voiceTitle="Analog Voice Spec"
+                voiceLoopType="analog"
+                voiceTarget="System analog spec"
+                uploadLabel="Upload analog macro spec"
+                uploadHelper="Analog is treated as a macro: include abstract behavior, pins, power, timing, LEF/LIB/GDS/SPICE availability, and integration assumptions."
+              />
+              <SpecTextBox
+                label="SoC integration specification"
+                required
+                value={socIntegrationSpecText}
+                onChange={setSocIntegrationSpecText}
+                voiceTitle="SoC Voice Spec"
+                voiceLoopType="system"
+                voiceTarget="SoC integration spec"
+                uploadLabel="Upload SoC integration spec"
+                uploadHelper="Top-level integration, address map, macro hookup, reset/clock/power domains, and verification expectations."
+              />
             </div>
           </div>
 
@@ -413,9 +392,4 @@ export default function SystemRTLAppPage() {
       </div>
     </main>
   );
-}
-
-function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
-  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
-  return uploaded;
 }

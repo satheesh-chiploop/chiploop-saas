@@ -5,10 +5,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
-import TextFileUpload from "@/components/TextFileUpload";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import SpecTextBox from "@/components/SpecTextBox";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
   SOFTWARE_HANDOFF_PREFILL_KEY,
@@ -38,11 +37,6 @@ function systemFirmwareReady(row: WorkflowRow | null): boolean {
   if (!row) return false;
   const logs = row.logs || "";
   return row.status === "completed" || logs.includes("System App complete: System_Firmware") || logs.includes("system_software_handoff");
-}
-
-function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
-  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
-  return uploaded;
 }
 
 export default function SystemFirmwareAppPage() {
@@ -330,62 +324,39 @@ export default function SystemFirmwareAppPage() {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
-                <TextFileUpload
-                  compact
-                  label="Upload digital/firmware spec"
-                  helper="Digital register/control behavior and firmware intent."
-                  onText={(text, _fileName, mode) => setDigitalSpecText((current) => mergeUploadedText(current, text, mode))}
-                />
-
-                <label className="block text-sm text-slate-300">Digital specification *</label>
-                <textarea
-                  value={digitalSpecText}
-                  onChange={(e) => setDigitalSpecText(e.target.value)}
-                  rows={6}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                  placeholder="Paste Digital spec here…"
-                />
-              </div>
-
-              <div>
-                <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
-                <TextFileUpload
-                  compact
-                  label="Upload analog macro spec"
-                  helper="Analog macro pins, behavior, status/observation points, and firmware-visible assumptions."
-                  onText={(text, _fileName, mode) => setAnalogSpecText((current) => mergeUploadedText(current, text, mode))}
-                />
-
-                <label className="block text-sm text-slate-300">Analog specification *</label>
-                <textarea
-                  value={analogSpecText}
-                  onChange={(e) => setAnalogSpecText(e.target.value)}
-                  rows={6}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                  placeholder="Paste Analog spec here…"
-                />
-              </div>
-
-              <div>
-                <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
-                <TextFileUpload
-                  compact
-                  label="Upload SoC integration spec"
-                  helper="Address map, macro hookup, firmware-visible registers, interrupts, and integration constraints."
-                  onText={(text, _fileName, mode) => setSocIntegrationSpecText((current) => mergeUploadedText(current, text, mode))}
-                />
-
-                <label className="block text-sm text-slate-300">SoC integration specification *</label>
-                <textarea
-                  value={socIntegrationSpecText}
-                  onChange={(e) => setSocIntegrationSpecText(e.target.value)}
-                  rows={6}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                  placeholder="Paste SoC integration spec here…"
-                />
-              </div>
+              <SpecTextBox
+                label="Digital specification"
+                required
+                value={digitalSpecText}
+                onChange={setDigitalSpecText}
+                voiceTitle="Digital Voice Spec"
+                voiceLoopType="digital"
+                voiceTarget="System digital spec"
+                uploadLabel="Upload digital/firmware spec"
+                uploadHelper="Digital register/control behavior and firmware intent."
+              />
+              <SpecTextBox
+                label="Analog specification"
+                required
+                value={analogSpecText}
+                onChange={setAnalogSpecText}
+                voiceTitle="Analog Voice Spec"
+                voiceLoopType="analog"
+                voiceTarget="System analog spec"
+                uploadLabel="Upload analog macro spec"
+                uploadHelper="Analog macro pins, behavior, status/observation points, and firmware-visible assumptions."
+              />
+              <SpecTextBox
+                label="SoC integration specification"
+                required
+                value={socIntegrationSpecText}
+                onChange={setSocIntegrationSpecText}
+                voiceTitle="SoC Voice Spec"
+                voiceLoopType="system"
+                voiceTarget="SoC integration spec"
+                uploadLabel="Upload SoC integration spec"
+                uploadHelper="Address map, macro hookup, firmware-visible registers, interrupts, and integration constraints."
+              />
             </div>
           </div>
 

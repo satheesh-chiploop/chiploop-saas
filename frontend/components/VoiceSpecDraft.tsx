@@ -16,6 +16,7 @@ type VoiceSpecDraftProps = {
   loopType?: string;
   target?: string;
   compact?: boolean;
+  inline?: boolean;
   onApply: (draft: string) => void;
 };
 
@@ -70,6 +71,7 @@ export default function VoiceSpecDraft({
   loopType = "digital",
   target = "ChipLoop App",
   compact = false,
+  inline = false,
   onApply,
 }: VoiceSpecDraftProps) {
   const router = useRouter();
@@ -189,7 +191,7 @@ export default function VoiceSpecDraft({
   }
 
   return (
-    <div className={`rounded-2xl border border-cyan-900/50 bg-cyan-950/15 ${compact ? "p-2" : "p-4"}`}>
+    <div className={inline ? "relative inline-flex flex-col items-end" : `rounded-2xl border border-cyan-900/50 bg-cyan-950/15 ${compact ? "p-2" : "p-4"}`}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className={compact ? "sr-only" : ""}>
           <div className="text-sm font-semibold text-cyan-200">{title}</div>
@@ -199,7 +201,7 @@ export default function VoiceSpecDraft({
           type="button"
           onClick={() => setOpen((current) => !current)}
           title={open ? "Hide voice input" : "Use voice input"}
-          className={compact ? "inline-flex items-center rounded-lg border border-cyan-800 px-3 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-900/30" : "rounded-lg border border-cyan-800 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-900/30"}
+          className={inline ? "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-800 bg-cyan-950/30 text-cyan-100 transition hover:bg-cyan-900/40" : compact ? "inline-flex items-center rounded-lg border border-cyan-800 px-3 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-900/30" : "rounded-lg border border-cyan-800 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-900/30"}
         >
           {compact ? (
             <>
@@ -211,7 +213,7 @@ export default function VoiceSpecDraft({
       </div>
 
       {open ? (
-        <div className="mt-4 space-y-3">
+        <div className={inline ? "absolute bottom-11 right-0 z-20 w-[min(420px,80vw)] space-y-3 rounded-xl border border-cyan-900/70 bg-slate-950 p-3 shadow-2xl" : "mt-4 space-y-3"}>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"

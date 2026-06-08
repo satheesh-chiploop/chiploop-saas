@@ -284,6 +284,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital_regmap.json",
         "upf_static_check.json",
         "digital/spec2rtl/spec2rtl_conformance.json",
+        "system_rtl_dashboard.json",
         "system_rtl_package.json",
         "system_rtl_package_debug.json",
         "system_full_compile_summary.json",
@@ -432,6 +433,50 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         );
       }
       const registers = array(record(evidence["digital_regmap.json"]?.regmap).registers);
+      const systemDashboard = record(evidence["system_rtl_dashboard.json"]);
+      if (Object.keys(systemDashboard).length) {
+        const scopes = record(systemDashboard.scopes);
+        const compile = record(systemDashboard.compile);
+        const systemScope = record(scopes.system);
+        const digitalScope = record(scopes.digital);
+        const analogScope = record(scopes.analog);
+        const socScope = record(scopes.soc);
+        const iface = record(systemScope.interface);
+        const storage = record(systemScope.storage);
+        const timing = record(systemScope.timing);
+        const clockReset = record(systemScope.clock_reset);
+        return (
+          <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+            <div className="space-y-3">
+              <Bar label="Input bits" value={number(iface.input_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-cyan-500" />
+              <Bar label="Output bits" value={number(iface.output_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-emerald-500" />
+              <Bar label="Flip-flops" value={number(storage.flipflop_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-violet-500" />
+              <Bar label="Latches" value={number(storage.latch_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-amber-500" />
+            </div>
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
+              <Stat title="Lint" value={firstString(record(systemScope.lint).status, "not run")} />
+              <Stat title="Flip-flops" value={number(storage.flipflop_count)} />
+              <Stat title="Latches" value={number(storage.latch_count)} />
+              <Stat title="Full-cycle Paths" value={number(timing.full_cycle_path_count)} />
+              <Stat title="Half-cycle Paths" value={number(timing.half_cycle_path_count)} />
+              <Stat title="Input Bits" value={number(iface.input_count)} />
+              <Stat title="Output Bits" value={number(iface.output_count)} />
+              <Stat title="Input Ports" value={number(iface.input_port_count)} />
+              <Stat title="Output Ports" value={number(iface.output_port_count)} />
+              <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
+              <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
+              <Stat title="Modules" value={number(systemScope.module_count)} />
+              <Stat title="RTL Files" value={number(systemScope.rtl_file_count)} />
+              <Stat title="Digital RTL Files" value={number(digitalScope.rtl_file_count)} />
+              <Stat title="Analog RTL Files" value={number(analogScope.rtl_file_count)} />
+              <Stat title="SoC RTL Files" value={number(socScope.rtl_file_count)} />
+              <Stat title="System Sim Compile" value={firstString(compile.sim, "not produced")} />
+              <Stat title="Physical Compile" value={firstString(compile.phys, "not produced")} />
+              {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+            </div>
+          </div>
+        );
+      }
       const systemPkg = record(evidence["system_rtl_package.json"]);
       const systemDebug = record(evidence["system_rtl_package_debug.json"]);
       const compile = record(evidence["system_full_compile_summary.json"]);
