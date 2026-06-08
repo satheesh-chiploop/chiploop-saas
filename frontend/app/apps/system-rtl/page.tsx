@@ -326,10 +326,6 @@ export default function SystemRTLAppPage() {
                   >
                     Open System Sim
                   </button>
-                  <div className="mt-4">
-                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="arch2rtl" logs={workflowRow?.logs} />
-                  </div>
-                  <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}
             </div>
@@ -370,6 +366,13 @@ export default function SystemRTLAppPage() {
               />
             </div>
           </div>
+
+          {workflowId ? (
+            <div className="mt-6">
+              <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="arch2rtl" logs={workflowRow?.logs} />
+              <AskThisRunPanel workflowId={workflowId} compact />
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
             <div className="text-sm font-semibold">Live logs</div>

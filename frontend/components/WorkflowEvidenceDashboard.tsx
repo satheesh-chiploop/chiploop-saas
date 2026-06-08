@@ -441,28 +441,31 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const digitalScope = record(scopes.digital);
         const analogScope = record(scopes.analog);
         const socScope = record(scopes.soc);
-        const iface = record(systemScope.interface);
+        const iface = record(socScope.interface);
         const storage = record(systemScope.storage);
         const timing = record(systemScope.timing);
-        const clockReset = record(systemScope.clock_reset);
+        const clockReset = record(socScope.clock_reset);
+        const spec2rtl = record(evidence["spec2rtl_conformance.json"]);
+        const spec2rtlSummary = record(spec2rtl.summary);
+        const hasSpec2Rtl = Object.keys(spec2rtl).length > 0;
+        const bitTotal = Math.max(number(iface.input_count) + number(iface.output_count), 1);
+        const portTotal = Math.max(number(iface.input_port_count) + number(iface.output_port_count), 1);
+        const storageTotal = Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1);
+        const physCompile = firstString(compile.phys);
         return (
           <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
             <div className="space-y-3">
-              <Bar label="Input bits" value={number(iface.input_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-cyan-500" />
-              <Bar label="Output bits" value={number(iface.output_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-emerald-500" />
-              <Bar label="Flip-flops" value={number(storage.flipflop_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-violet-500" />
-              <Bar label="Latches" value={number(storage.latch_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-amber-500" />
+              <Bar label="SoC input bits" value={number(iface.input_count)} total={bitTotal} color="bg-cyan-500" />
+              <Bar label="SoC output bits" value={number(iface.output_count)} total={bitTotal} color="bg-emerald-500" />
+              <Bar label="SoC input ports" value={number(iface.input_port_count)} total={portTotal} color="bg-sky-500" />
+              <Bar label="SoC output ports" value={number(iface.output_port_count)} total={portTotal} color="bg-teal-500" />
+              <Bar label="System flip-flops" value={number(storage.flipflop_count)} total={storageTotal} color="bg-violet-500" />
+              <Bar label="System latches" value={number(storage.latch_count)} total={storageTotal} color="bg-amber-500" />
             </div>
             <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
               <Stat title="Lint" value={firstString(record(systemScope.lint).status, "not run")} />
-              <Stat title="Flip-flops" value={number(storage.flipflop_count)} />
-              <Stat title="Latches" value={number(storage.latch_count)} />
               <Stat title="Full-cycle Paths" value={number(timing.full_cycle_path_count)} />
               <Stat title="Half-cycle Paths" value={number(timing.half_cycle_path_count)} />
-              <Stat title="Input Bits" value={number(iface.input_count)} />
-              <Stat title="Output Bits" value={number(iface.output_count)} />
-              <Stat title="Input Ports" value={number(iface.input_port_count)} />
-              <Stat title="Output Ports" value={number(iface.output_port_count)} />
               <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
               <Stat title="Modules" value={number(systemScope.module_count)} />
@@ -471,7 +474,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <Stat title="Analog RTL Files" value={number(analogScope.rtl_file_count)} />
               <Stat title="SoC RTL Files" value={number(socScope.rtl_file_count)} />
               <Stat title="System Sim Compile" value={firstString(compile.sim, "not produced")} />
-              <Stat title="Physical Compile" value={firstString(compile.phys, "not produced")} />
+              {physCompile && physCompile !== "skipped" ? <Stat title="Physical RTL Compile" value={physCompile} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL" value={statusLabel(spec2rtl.status)} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Checked" value={metricValue(spec2rtlSummary.checked)} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Matched" value={metricValue(spec2rtlSummary.matched)} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Partial" value={metricValue(spec2rtlSummary.partial)} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Missing" value={metricValue(spec2rtlSummary.missing)} /> : null}
               {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             </div>
           </div>
