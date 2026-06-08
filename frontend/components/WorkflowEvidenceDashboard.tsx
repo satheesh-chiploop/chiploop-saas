@@ -473,15 +473,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             </div>
             <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
               <Stat title="Digital Lint" value={firstString(lintSummary.digital, record(digitalScope.lint).status, "not run")} />
-              <Stat title="Analog Compile" value={firstString(lintSummary.analog, record(analogScope.lint).status, "not run")} />
-              <Stat title="SoC Compile" value={firstString(lintSummary.soc, compile.sim, "not produced")} />
+              <Stat title="Analog Lint" value={firstString(lintSummary.analog, record(analogScope.lint).status, "not run")} />
+              <Stat title="SoC Lint" value={firstString(lintSummary.soc, compile.sim, "not produced")} />
               <Stat title="System Lint" value={firstString(lintSummary.system, record(systemScope.lint).status, "not run")} />
               <Stat title="Full-cycle Paths" value={number(timing.full_cycle_path_count)} />
               <Stat title="Half-cycle Paths" value={number(timing.half_cycle_path_count)} />
               <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
               <Stat title="Modules" value={number(systemScope.module_count)} />
-              <Stat title="System Sim Compile" value={firstString(compile.sim, "not produced")} />
               {physCompile && physCompile !== "skipped" ? <Stat title="Physical RTL Compile" value={physCompile} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL" value={statusLabel(spec2rtl.status)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Checked" value={metricValue(spec2rtlSummary.checked)} /> : null}
@@ -521,8 +520,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <Stat title="Latches" value="not produced pre-synthesis" />
               <Stat title="Full-cycle Paths" value="not produced pre-synthesis" />
               <Stat title="Half-cycle Paths" value="not produced pre-synthesis" />
-              <Stat title="System Sim Compile" value={firstString(compileInfo.sim, record(compile.sim).status, "not produced")} />
-              <Stat title="Physical Compile" value={firstString(compileInfo.phys, record(compile.phys).status, "not produced")} />
+              <Stat title="SoC Lint" value={firstString(compileInfo.sim, record(compile.sim).status, "not produced")} />
+              <Stat title="Physical Lint" value={firstString(compileInfo.phys, record(compile.phys).status, "not produced")} />
               <Stat title="Instances" value={instances.length} />
               <Stat title="Connections" value={connections.length} />
               <Stat title="Analog Macro" value={artifacts.integration_intent ? "integrated by intent" : "not reported"} />
