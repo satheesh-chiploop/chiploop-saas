@@ -279,7 +279,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     if (!workflowId || status !== "completed") return;
     let active = true;
     const files: Record<Stage, string[]> = {
-      arch2rtl: ["arch2rtl_dashboard.json", "digital_regmap.json", "upf_static_check.json"],
+      arch2rtl: ["arch2rtl_dashboard.json", "digital_regmap.json", "upf_static_check.json", "digital/spec2rtl/spec2rtl_conformance.json"],
       dqa: [
         "digital/handoff/rtl_handoff_ingest_manifest.json",
         "rtl_lint_report.json",
@@ -383,6 +383,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const iface = record(dashboard.interface);
         const clockReset = record(dashboard.clock_reset);
         const upf = record(evidence["upf_static_check.json"]);
+        const spec2rtl = record(evidence["spec2rtl_conformance.json"]);
+        const spec2rtlSummary = record(spec2rtl.summary);
+        const hasSpec2Rtl = Object.keys(spec2rtl).length > 0;
         const hasUpf = Object.keys(upf).length > 0;
         const lintStatus = firstString(lint.status, "unavailable");
         return (
@@ -409,6 +412,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
               <Stat title="Modules" value={number(dashboard.module_count)} />
               <Stat title="RTL Files" value={number(dashboard.rtl_file_count)} />
+              {hasSpec2Rtl ? <Stat title="Spec2RTL" value={statusLabel(spec2rtl.status)} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Checked" value={metricValue(spec2rtlSummary.checked)} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Matched" value={metricValue(spec2rtlSummary.matched)} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Partial" value={metricValue(spec2rtlSummary.partial)} /> : null}
+              {hasSpec2Rtl ? <Stat title="Spec2RTL Missing" value={metricValue(spec2rtlSummary.missing)} /> : null}
               {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             </div>
           </div>
