@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import TextFileUpload from "@/components/TextFileUpload";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
   SOFTWARE_HANDOFF_PREFILL_KEY,
@@ -38,6 +40,11 @@ function systemFirmwareReady(row: WorkflowRow | null): boolean {
   return row.status === "completed" || logs.includes("System App complete: System_Firmware") || logs.includes("system_software_handoff");
 }
 
+function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
+  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
+  return uploaded;
+}
+
 export default function SystemFirmwareAppPage() {
   const router = useRouter();
 
@@ -58,6 +65,7 @@ export default function SystemFirmwareAppPage() {
   const [digitalSpecText, setDigitalSpecText] = useState("");
   const [analogSpecText, setAnalogSpecText] = useState("");
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
+  const [systemRtlWorkflowId, setSystemRtlWorkflowId] = useState("");
   const [tempMonitorChain, setTempMonitorChain] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
@@ -110,6 +118,12 @@ export default function SystemFirmwareAppPage() {
     const params = new URLSearchParams(window.location.search);
     const isTempMonitor = params.get("tempmon_chain") === "1";
     setTempMonitorChain(isTempMonitor);
+    try {
+      const context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+      if (context.systemRtlWorkflowId) setSystemRtlWorkflowId(context.systemRtlWorkflowId);
+    } catch {
+      // ignore malformed handoff context
+    }
     if (!isTempMonitor) return;
     const raw = window.localStorage.getItem(SYSTEM_MIXED_SIGNAL_PREFILL_KEY);
     if (!raw) return;
@@ -171,11 +185,13 @@ export default function SystemFirmwareAppPage() {
 
   const canRun = useMemo(() => {
     if (running) return false;
-    if (!digitalSpecText.trim()) return false;
-    if (!analogSpecText.trim()) return false;
-    if (!socIntegrationSpecText.trim()) return false;
+    if (!systemRtlWorkflowId.trim()) {
+      if (!digitalSpecText.trim()) return false;
+      if (!analogSpecText.trim()) return false;
+      if (!socIntegrationSpecText.trim()) return false;
+    }
     return true;
-  }, [running, digitalSpecText, analogSpecText, socIntegrationSpecText]);
+  }, [running, systemRtlWorkflowId, digitalSpecText, analogSpecText, socIntegrationSpecText]);
 
   async function runNow() {
     setErr(null);
@@ -188,6 +204,7 @@ export default function SystemFirmwareAppPage() {
           digital_spec_text: digitalSpecText,
           analog_spec_text: analogSpecText,
           soc_integration_spec_text: socIntegrationSpecText,
+          system_rtl_workflow_id: systemRtlWorkflowId || undefined,
         }
       );
       setWorkflowId(out.workflow_id);
@@ -213,6 +230,7 @@ export default function SystemFirmwareAppPage() {
       context = {};
     }
     context.demoKind = tempMonitorChain ? "temp_monitor_system" : context.demoKind;
+    if (systemRtlWorkflowId.trim()) context.systemRtlWorkflowId = systemRtlWorkflowId.trim();
     context.systemFirmwareWorkflowId = workflowId;
     context.systemFirmwareRunId = runId || undefined;
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
@@ -268,6 +286,13 @@ export default function SystemFirmwareAppPage() {
                 onChange={(e) => setProjectName(e.target.value)}
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
               />
+              <label className="block text-sm text-slate-300">Start from System RTL workflow ID</label>
+              <input
+                value={systemRtlWorkflowId}
+                onChange={(e) => setSystemRtlWorkflowId(e.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                placeholder="Optional: use existing System RTL handoff and skip System RTL generation"
+              />
 
               <button
                 onClick={runNow}
@@ -296,7 +321,10 @@ export default function SystemFirmwareAppPage() {
                   >
                     Open System Software
                   </button>
-                    <AskThisRunPanel workflowId={workflowId} compact />
+                  <div className="mt-4">
+                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="embedded" logs={workflowRow?.logs} />
+                  </div>
+                  <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}
             </div>
@@ -304,6 +332,11 @@ export default function SystemFirmwareAppPage() {
             <div className="space-y-4">
               <div>
                 <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
+                <TextFileUpload
+                  label="Upload digital/firmware spec"
+                  helper="Digital register/control behavior and firmware intent."
+                  onText={(text, _fileName, mode) => setDigitalSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
 
                 <label className="block text-sm text-slate-300">Digital specification *</label>
                 <textarea
@@ -317,6 +350,11 @@ export default function SystemFirmwareAppPage() {
 
               <div>
                 <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
+                <TextFileUpload
+                  label="Upload analog macro spec"
+                  helper="Analog macro pins, behavior, status/observation points, and firmware-visible assumptions."
+                  onText={(text, _fileName, mode) => setAnalogSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
 
                 <label className="block text-sm text-slate-300">Analog specification *</label>
                 <textarea
@@ -330,6 +368,11 @@ export default function SystemFirmwareAppPage() {
 
               <div>
                 <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
+                <TextFileUpload
+                  label="Upload SoC integration spec"
+                  helper="Address map, macro hookup, firmware-visible registers, interrupts, and integration constraints."
+                  onText={(text, _fileName, mode) => setSocIntegrationSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
 
                 <label className="block text-sm text-slate-300">SoC integration specification *</label>
                 <textarea

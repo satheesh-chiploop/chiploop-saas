@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import TextFileUpload from "@/components/TextFileUpload";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
   SYSTEM_MIXED_SIGNAL_PREFILL_KEY,
@@ -325,7 +327,10 @@ export default function SystemRTLAppPage() {
                   >
                     Open System Sim
                   </button>
-                    <AskThisRunPanel workflowId={workflowId} compact />
+                  <div className="mt-4">
+                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="arch2rtl" logs={workflowRow?.logs} />
+                  </div>
+                  <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}
             </div>
@@ -333,6 +338,11 @@ export default function SystemRTLAppPage() {
             <div className="space-y-4">
               <div>
                 <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
+                <TextFileUpload
+                  label="Upload digital spec"
+                  helper="Digital RTL/IP behavior, registers, interfaces, interrupts, reset, and clocking."
+                  onText={(text, _fileName, mode) => setDigitalSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
 
                 <label className="block text-sm text-slate-300">Digital specification *</label>
                 <textarea
@@ -345,6 +355,11 @@ export default function SystemRTLAppPage() {
 
               <div>
                 <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
+                <TextFileUpload
+                  label="Upload analog macro spec"
+                  helper="Analog is treated as a macro: include abstract behavior, pins, power, timing, LEF/LIB/GDS/SPICE availability, and integration assumptions."
+                  onText={(text, _fileName, mode) => setAnalogSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
 
                 <label className="block text-sm text-slate-300">Analog specification *</label>
                 <textarea
@@ -357,6 +372,11 @@ export default function SystemRTLAppPage() {
 
               <div>
                 <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
+                <TextFileUpload
+                  label="Upload SoC integration spec"
+                  helper="Top-level integration, address map, macro hookup, reset/clock/power domains, and verification expectations."
+                  onText={(text, _fileName, mode) => setSocIntegrationSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
 
                 <label className="block text-sm text-slate-300">SoC integration specification *</label>
                 <textarea
@@ -390,4 +410,9 @@ export default function SystemRTLAppPage() {
       </div>
     </main>
   );
+}
+
+function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
+  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
+  return uploaded;
 }

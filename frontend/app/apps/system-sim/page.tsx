@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import TextFileUpload from "@/components/TextFileUpload";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
   SYSTEM_MIXED_SIGNAL_PREFILL_KEY,
@@ -29,6 +31,11 @@ function parseLogLines(logs: string | null | undefined): string[] {
   return logs.split("\n").map((l) => l.trimEnd()).filter((l) => l.trim().length > 0);
 }
 
+function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
+  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
+  return uploaded;
+}
+
 export default function SystemSimAppPage() {
   const router = useRouter();
 
@@ -42,11 +49,33 @@ export default function SystemSimAppPage() {
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
+  const [closureWorkflowId, setClosureWorkflowId] = useState<string | null>(null);
+  const [closureRunId, setClosureRunId] = useState<string | null>(null);
+  const [closureRow, setClosureRow] = useState<WorkflowRow | null>(null);
+  const [closureLoopWorkflowId, setClosureLoopWorkflowId] = useState<string | null>(null);
+  const [closureLoopRunId, setClosureLoopRunId] = useState<string | null>(null);
+  const [closureLoopRow, setClosureLoopRow] = useState<WorkflowRow | null>(null);
 
   const [projectName, setProjectName] = useState("");
   const [digitalSpecText, setDigitalSpecText] = useState("");
   const [analogSpecText, setAnalogSpecText] = useState("");
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
+  const [systemRtlWorkflowId, setSystemRtlWorkflowId] = useState("");
+  const [testIntent, setTestIntent] = useState("");
+  const [verificationPlan, setVerificationPlan] = useState("");
+  const [monitorCheckerPlan, setMonitorCheckerPlan] = useState("");
+  const [coverageTargets, setCoverageTargets] = useState("");
+  const [coveragePlan, setCoveragePlan] = useState("");
+  const [randomVsDirected, setRandomVsDirected] = useState<"random" | "directed" | "both">("both");
+  const [simulatorType, setSimulatorType] = useState("verilator");
+  const [codeCoverageTool, setCodeCoverageTool] = useState("verilator_coverage");
+  const [runClosureAnalysis, setRunClosureAnalysis] = useState(false);
+  const [runClosureLoopAfterVerify, setRunClosureLoopAfterVerify] = useState(false);
+  const [closureMaxIterations, setClosureMaxIterations] = useState(1);
+  const [closureSeedBudget, setClosureSeedBudget] = useState(10);
+  const [closureRerunMode, setClosureRerunMode] = useState<"coverage_targeted" | "failed_only" | "full_regression">("coverage_targeted");
+  const closureStartedRef = useRef(false);
+  const closureLoopStartedRef = useRef(false);
   const [systemSimTestcases, setSystemSimTestcases] = useState("");
   const [systemSimSeeds, setSystemSimSeeds] = useState("");
   const [systemSimNumIters, setSystemSimNumIters] = useState(25);
@@ -101,6 +130,12 @@ export default function SystemSimAppPage() {
     const params = new URLSearchParams(window.location.search);
     const isTempMonitor = params.get("tempmon_chain") === "1";
     setTempMonitorChain(isTempMonitor);
+    try {
+      const context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+      if (context.systemRtlWorkflowId) setSystemRtlWorkflowId(context.systemRtlWorkflowId);
+    } catch {
+      // ignore malformed handoff context
+    }
     if (!isTempMonitor) return;
     const raw = window.localStorage.getItem(SYSTEM_MIXED_SIGNAL_PREFILL_KEY);
     if (!raw) return;
@@ -119,6 +154,7 @@ export default function SystemSimAppPage() {
       setAnalogSpecText(prefill.analogSpecText || "");
       setSocIntegrationSpecText(prefill.socIntegrationSpecText || "");
       setSystemSimTestcases(prefill.systemSimTestcases || "reset_defaults, threshold_below, threshold_above, alert_clear");
+      setTestIntent(prefill.systemSimTestcases || "Verify reset defaults, below-threshold behavior, above-threshold alert behavior, alert clear, and analog temperature macro observation points.");
       setSystemSimSeeds(prefill.systemSimSeeds || "1, 2, 7");
       setSystemSimNumIters(Number(prefill.systemSimNumIters || 40));
     } catch {
@@ -165,17 +201,86 @@ export default function SystemSimAppPage() {
     };
   }, [workflowId]);
 
+  useEffect(() => {
+    if (!closureWorkflowId) return;
+    let isActive = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from("workflows")
+        .select("id,status,phase,logs,updated_at")
+        .eq("id", closureWorkflowId)
+        .single();
+      if (isActive && !error && data) setClosureRow(data as WorkflowRow);
+    })();
+    const channel = supabase.channel(`wf-${closureWorkflowId}`).on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "workflows", filter: `id=eq.${closureWorkflowId}` },
+      (payload) => setClosureRow(payload.new as WorkflowRow),
+    ).subscribe();
+    return () => {
+      isActive = false;
+      supabase.removeChannel(channel);
+    };
+  }, [closureWorkflowId]);
+
+  useEffect(() => {
+    if (!closureLoopWorkflowId) return;
+    let isActive = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from("workflows")
+        .select("id,status,phase,logs,updated_at")
+        .eq("id", closureLoopWorkflowId)
+        .single();
+      if (isActive && !error && data) setClosureLoopRow(data as WorkflowRow);
+    })();
+    const channel = supabase.channel(`wf-${closureLoopWorkflowId}`).on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "workflows", filter: `id=eq.${closureLoopWorkflowId}` },
+      (payload) => setClosureLoopRow(payload.new as WorkflowRow),
+    ).subscribe();
+    return () => {
+      isActive = false;
+      supabase.removeChannel(channel);
+    };
+  }, [closureLoopWorkflowId]);
+
+  useEffect(() => {
+    if (runClosureLoopAfterVerify || !runClosureAnalysis || closureStartedRef.current) return;
+    if (!workflowId || workflowRow?.status !== "completed") return;
+    closureStartedRef.current = true;
+    void analyzeClosure();
+  }, [runClosureAnalysis, runClosureLoopAfterVerify, workflowId, workflowRow?.status]);
+
+  useEffect(() => {
+    if (!runClosureLoopAfterVerify || closureLoopStartedRef.current) return;
+    if (!workflowId || workflowRow?.status !== "completed") return;
+    closureLoopStartedRef.current = true;
+    void runClosureLoop();
+  }, [runClosureLoopAfterVerify, workflowId, workflowRow?.status]);
+
   const canRun = useMemo(() => {
     if (running) return false;
-    if (!digitalSpecText.trim()) return false;
-    if (!analogSpecText.trim()) return false;
-    if (!socIntegrationSpecText.trim()) return false;
+    if (!systemRtlWorkflowId.trim()) {
+      if (!digitalSpecText.trim()) return false;
+      if (!analogSpecText.trim()) return false;
+      if (!socIntegrationSpecText.trim()) return false;
+    }
+    if (!testIntent.trim()) return false;
     return true;
-  }, [running, digitalSpecText, analogSpecText, socIntegrationSpecText]);
+  }, [running, systemRtlWorkflowId, digitalSpecText, analogSpecText, socIntegrationSpecText, testIntent]);
 
   async function runNow() {
     setErr(null);
     setRunning(true);
+    closureStartedRef.current = false;
+    closureLoopStartedRef.current = false;
+    setClosureWorkflowId(null);
+    setClosureRunId(null);
+    setClosureRow(null);
+    setClosureLoopWorkflowId(null);
+    setClosureLoopRunId(null);
+    setClosureLoopRow(null);
     try {
       const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>(
         "/apps/system/sim/run",
@@ -184,9 +289,23 @@ export default function SystemSimAppPage() {
           digital_spec_text: digitalSpecText,
           analog_spec_text: analogSpecText,
           soc_integration_spec_text: socIntegrationSpecText,
+          system_rtl_workflow_id: systemRtlWorkflowId || undefined,
+          test_intent: testIntent,
+          verification_plan: verificationPlan || undefined,
+          monitor_checker_plan: monitorCheckerPlan || undefined,
+          coverage_targets: coverageTargets || undefined,
+          coverage_plan: coveragePlan || undefined,
+          random_vs_directed: randomVsDirected,
+          simulator_type: simulatorType,
+          seed_count: systemSimSeeds.split(",").filter((x) => x.trim()).length || undefined,
           system_sim_testcases: systemSimTestcases.split(",").map((x) => x.trim()).filter(Boolean),
           system_sim_seeds: systemSimSeeds.split(",").map((x) => Number(x.trim())).filter((x) => Number.isFinite(x)),
           system_sim_num_iters: systemSimNumIters,
+          toolchain: {
+            simulator: simulatorType,
+            code_coverage: codeCoverageTool,
+          },
+          run_closure_analysis: runClosureLoopAfterVerify || runClosureAnalysis,
         }
       );
       setWorkflowId(out.workflow_id);
@@ -203,6 +322,56 @@ export default function SystemSimAppPage() {
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
   }
 
+  async function analyzeClosure() {
+    if (!workflowId) return;
+    setErr(null);
+    try {
+      const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>("/apps/verify/closure/run", {
+        source_verify_workflow_id: workflowId,
+        coverage_targets: coverageTargets || undefined,
+        seed_count: systemSimSeeds.split(",").filter((x) => x.trim()).length || 5,
+        toolchain: { simulator: simulatorType, code_coverage: codeCoverageTool },
+      });
+      setClosureWorkflowId(out.workflow_id);
+      setClosureRunId(out.run_id);
+    } catch (e: any) {
+      closureStartedRef.current = false;
+      setErr(e?.message || String(e));
+    }
+  }
+
+  async function runClosureLoop() {
+    if (!workflowId) return;
+    setErr(null);
+    try {
+      const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>("/apps/verify/closure-loop/run", {
+        source_verify_workflow_id: workflowId,
+        coverage_targets: coverageTargets || undefined,
+        seed_count: systemSimSeeds.split(",").filter((x) => x.trim()).length || 5,
+        seed_budget: closureSeedBudget,
+        max_iterations: closureMaxIterations,
+        rerun_mode: closureRerunMode,
+        random_vs_directed: randomVsDirected,
+        toolchain: { simulator: simulatorType, code_coverage: codeCoverageTool },
+      });
+      setClosureLoopWorkflowId(out.workflow_id);
+      setClosureLoopRunId(out.run_id);
+    } catch (e: any) {
+      closureLoopStartedRef.current = false;
+      setErr(e?.message || String(e));
+    }
+  }
+
+  function downloadClosureZip() {
+    if (!closureWorkflowId) return;
+    window.open(`${API_BASE}/workflow/${closureWorkflowId}/download_zip?full=1`, "_blank");
+  }
+
+  function downloadClosureLoopZip() {
+    if (!closureLoopWorkflowId) return;
+    window.open(`${API_BASE}/workflow/${closureLoopWorkflowId}/download_zip?full=1`, "_blank");
+  }
+
   function openSystemFirmware() {
     if (!workflowId) return;
     let context: DesignChainContext = {};
@@ -212,6 +381,7 @@ export default function SystemSimAppPage() {
       context = {};
     }
     context.demoKind = tempMonitorChain ? "temp_monitor_system" : context.demoKind;
+    if (systemRtlWorkflowId.trim()) context.systemRtlWorkflowId = systemRtlWorkflowId.trim();
     context.systemSimWorkflowId = workflowId;
     context.systemSimRunId = runId || undefined;
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
@@ -256,8 +426,28 @@ export default function SystemSimAppPage() {
                 onChange={(e) => setProjectName(e.target.value)}
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
               />
+              <label className="block text-sm text-slate-300">Start from System RTL workflow ID</label>
+              <input
+                value={systemRtlWorkflowId}
+                onChange={(e) => setSystemRtlWorkflowId(e.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                placeholder="Optional: skip System RTL generation and verify this source workflow"
+              />
               <div className="rounded-2xl border border-slate-800 bg-black/20 p-4">
                 <div className="text-sm font-semibold text-slate-200">System Sim run settings</div>
+                <label className="mt-3 block text-sm text-slate-300">Test intent *</label>
+                <textarea
+                  value={testIntent}
+                  onChange={(e) => setTestIntent(e.target.value)}
+                  rows={4}
+                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  placeholder="Scenarios, expected behavior, corner cases, analog macro observations, and pass/fail intent..."
+                />
+                <TextFileUpload
+                  label="Upload verification spec or test intent"
+                  helper="Load a test intent, verification note, markdown plan, or structured JSON/YAML."
+                  onText={(text, _fileName, mode) => setTestIntent((current) => mergeUploadedText(current, text, mode))}
+                />
                 <label className="mt-3 block text-sm text-slate-300">Testcases</label>
                 <input
                   value={systemSimTestcases}
@@ -280,6 +470,92 @@ export default function SystemSimAppPage() {
                   onChange={(e) => setSystemSimNumIters(Number(e.target.value || 1))}
                   className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
                 />
+                <label className="mt-3 block text-sm text-slate-300">Coverage targets</label>
+                <input
+                  value={coverageTargets}
+                  onChange={(e) => setCoverageTargets(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  placeholder="Example: functional 85%, line 80%, branch 70%"
+                />
+                <TextFileUpload
+                  label="Upload coverage point plan"
+                  helper="Coverpoints, bins, exclusions, analog macro observation points, and closure goals."
+                  onText={(text, _fileName, mode) => setCoveragePlan((current) => mergeUploadedText(current, text, mode))}
+                />
+                <textarea
+                  value={coveragePlan}
+                  onChange={(e) => setCoveragePlan(e.target.value)}
+                  rows={4}
+                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  placeholder="Functional/code coverage points, bins, crosses, exclusions..."
+                />
+                <TextFileUpload
+                  label="Upload verification plan"
+                  helper="Reviewer-authored verification plan kept with run evidence."
+                  onText={(text, _fileName, mode) => setVerificationPlan((current) => mergeUploadedText(current, text, mode))}
+                />
+                <textarea
+                  value={verificationPlan}
+                  onChange={(e) => setVerificationPlan(e.target.value)}
+                  rows={3}
+                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  placeholder="Verification objectives, scenarios, assumptions, scoreboarding, assertions, and exclusions..."
+                />
+                <TextFileUpload
+                  label="Upload monitor/checker plan"
+                  helper="Monitor points, scoreboard/checker rules, protocol checks, analog macro sampled observations."
+                  onText={(text, _fileName, mode) => setMonitorCheckerPlan((current) => mergeUploadedText(current, text, mode))}
+                />
+                <textarea
+                  value={monitorCheckerPlan}
+                  onChange={(e) => setMonitorCheckerPlan(e.target.value)}
+                  rows={3}
+                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  placeholder="What should monitors observe and what should scoreboards/checkers compare?"
+                />
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <label className="block text-sm text-slate-300">
+                    Test style
+                    <select value={randomVsDirected} onChange={(e) => setRandomVsDirected(e.target.value as "random" | "directed" | "both")} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                      <option value="both">Directed + random</option>
+                      <option value="directed">Directed only</option>
+                      <option value="random">Random only</option>
+                    </select>
+                  </label>
+                  <label className="block text-sm text-slate-300">
+                    Simulator
+                    <select value={simulatorType} onChange={(e) => setSimulatorType(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                      <option value="verilator">verilator</option>
+                      <option value="icarus">icarus</option>
+                    </select>
+                  </label>
+                  <label className="block text-sm text-slate-300">
+                    Code coverage
+                    <select value={codeCoverageTool} onChange={(e) => setCodeCoverageTool(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                      <option value="verilator_coverage">verilator_coverage</option>
+                      <option value="none">none</option>
+                    </select>
+                  </label>
+                </div>
+                <label className="mt-3 flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={runClosureLoopAfterVerify || runClosureAnalysis} onChange={(e) => setRunClosureAnalysis(e.target.checked)} disabled={runClosureLoopAfterVerify} className="mt-1" />
+                  <span>Run closure analysis after System Sim</span>
+                </label>
+                <label className="mt-3 flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={runClosureLoopAfterVerify} onChange={(e) => setRunClosureLoopAfterVerify(e.target.checked)} className="mt-1" />
+                  <span>Run closure loop after System Sim</span>
+                </label>
+                {runClosureLoopAfterVerify ? (
+                  <div className="mt-3 grid grid-cols-3 gap-3">
+                    <input type="number" min={1} max={10} value={closureMaxIterations} onChange={(e) => setClosureMaxIterations(Number(e.target.value || 1))} className="rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" title="Iterations" />
+                    <input type="number" min={1} max={100} value={closureSeedBudget} onChange={(e) => setClosureSeedBudget(Number(e.target.value || 10))} className="rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" title="Seed budget" />
+                    <select value={closureRerunMode} onChange={(e) => setClosureRerunMode(e.target.value as any)} className="rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                      <option value="coverage_targeted">Coverage targeted</option>
+                      <option value="failed_only">Failed only</option>
+                      <option value="full_regression">Full regression</option>
+                    </select>
+                  </div>
+                ) : null}
               </div>
 
               <button
@@ -309,7 +585,48 @@ export default function SystemSimAppPage() {
                   >
                     Open System Firmware
                   </button>
-                    <AskThisRunPanel workflowId={workflowId} compact />
+                  <button
+                    type="button"
+                    onClick={analyzeClosure}
+                    disabled={workflowRow?.status !== "completed" || Boolean(closureWorkflowId)}
+                    className="ml-3 mt-3 rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                  >
+                    Analyze Closure
+                  </button>
+                  <button
+                    type="button"
+                    onClick={runClosureLoop}
+                    disabled={workflowRow?.status !== "completed" || Boolean(closureLoopWorkflowId)}
+                    className="ml-3 mt-3 rounded-xl bg-violet-700 px-4 py-2 font-semibold text-white hover:bg-violet-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                  >
+                    Run Closure Loop
+                  </button>
+                  <div className="mt-4">
+                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" logs={workflowRow?.logs} />
+                  </div>
+                  {closureWorkflowId ? (
+                    <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/15 p-3">
+                      <div className="font-semibold text-cyan-200">System Sim Closure Analysis</div>
+                      <div>workflow_id: <span className="break-all text-slate-100">{closureWorkflowId}</span></div>
+                      <div>run_id: <span className="break-all text-slate-100">{closureRunId}</span></div>
+                      <div>status: <span className="text-slate-100">{closureRow?.status || "queued"}</span></div>
+                      <button onClick={downloadClosureZip} disabled={closureRow?.status !== "completed"} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-700">
+                        Download Closure Plan
+                      </button>
+                    </div>
+                  ) : null}
+                  {closureLoopWorkflowId ? (
+                    <div className="mt-4 rounded-xl border border-violet-900/60 bg-violet-950/15 p-3">
+                      <div className="font-semibold text-violet-200">System Sim Closure Loop</div>
+                      <div>workflow_id: <span className="break-all text-slate-100">{closureLoopWorkflowId}</span></div>
+                      <div>run_id: <span className="break-all text-slate-100">{closureLoopRunId}</span></div>
+                      <div>status: <span className="text-slate-100">{closureLoopRow?.status || "queued"}</span></div>
+                      <button onClick={downloadClosureLoopZip} disabled={closureLoopRow?.status !== "completed"} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-700">
+                        Download Closure Loop
+                      </button>
+                    </div>
+                  ) : null}
+                  <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}
             </div>
@@ -317,6 +634,11 @@ export default function SystemSimAppPage() {
             <div className="space-y-4">
               <div>
                 <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
+                <TextFileUpload
+                  label="Upload digital spec"
+                  helper="Digital behavior, interfaces, registers, and verification-relevant requirements."
+                  onText={(text, _fileName, mode) => setDigitalSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
 
                 <label className="block text-sm text-slate-300">Digital specification *</label>
                 <textarea value={digitalSpecText} onChange={(e) => setDigitalSpecText(e.target.value)} rows={6}
@@ -324,6 +646,11 @@ export default function SystemSimAppPage() {
               </div>
               <div>
                 <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
+                <TextFileUpload
+                  label="Upload analog macro spec"
+                  helper="Analog macro model/pins/observability; System Sim treats analog as a macro abstraction."
+                  onText={(text, _fileName, mode) => setAnalogSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
 
                 <label className="block text-sm text-slate-300">Analog specification *</label>
                 <textarea value={analogSpecText} onChange={(e) => setAnalogSpecText(e.target.value)} rows={6}
@@ -331,6 +658,11 @@ export default function SystemSimAppPage() {
               </div>
               <div>
                 <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
+                <TextFileUpload
+                  label="Upload SoC integration spec"
+                  helper="Top-level integration, macro hookups, clock/reset/power assumptions, and system scenarios."
+                  onText={(text, _fileName, mode) => setSocIntegrationSpecText((current) => mergeUploadedText(current, text, mode))}
+                />
 
                 <label className="block text-sm text-slate-300">SoC integration specification *</label>
                 <textarea value={socIntegrationSpecText} onChange={(e) => setSocIntegrationSpecText(e.target.value)} rows={6}
