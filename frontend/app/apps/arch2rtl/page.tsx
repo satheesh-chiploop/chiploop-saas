@@ -126,6 +126,7 @@ export default function Arch2RTLAppPage() {
   const [genRegmap, setGenRegmap] = useState(true);
   const [genUpfLite, setGenUpfLite] = useState(false);
   const [genPackaging, setGenPackaging] = useState(true);
+  const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [voiceRecording, setVoiceRecording] = useState(false);
   const [voiceBusy, setVoiceBusy] = useState(false);
@@ -490,6 +491,7 @@ export default function Arch2RTLAppPage() {
             gen_regmap: genRegmap,
             gen_upf_lite: genUpfLite,
             gen_packaging: genPackaging,
+            run_spec2rtl_check: runSpec2RtlCheck,
           },
         }
       );
@@ -664,6 +666,15 @@ export default function Arch2RTLAppPage() {
                 <label className="flex items-center gap-2 text-sm text-slate-300">
                   <input type="checkbox" checked={genPackaging} onChange={e => setGenPackaging(e.target.checked)} />
                   Generate packaging/handoff
+                </label>
+                <label className="flex items-start gap-2 text-sm text-slate-300">
+                  <input className="mt-1" type="checkbox" checked={runSpec2RtlCheck} onChange={e => setRunSpec2RtlCheck(e.target.checked)} />
+                  <span>
+                    Run Spec-to-RTL conformance check
+                    <span className="block text-xs text-slate-500">
+                      Optional: checks generated RTL against spec, interfaces, reset behavior, register intent, and requirement trace.
+                    </span>
+                  </span>
                 </label>
               </div>
 

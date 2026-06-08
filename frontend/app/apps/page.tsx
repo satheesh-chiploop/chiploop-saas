@@ -172,6 +172,15 @@ export default function AppsHomePage() {
       promise: "Generate RTL + docs + handoff artifacts",
     },
     {
+      slug: "spec2rtl",
+      title: "Spec2RTL Check",
+      subtitle: "Check generated or third-party RTL against a claimed spec",
+      loop_type: "digital",
+      status: "New",
+      nudge: "Conformance",
+      promise: "Report matched, partial, missing, and inconclusive requirements",
+    },
+    {
       slug: "arch2synthesis",
       title: "Arch2Synthesis",
       subtitle: "Arch2RTL + Synthesis (or RTL to Synthesis) with reports",

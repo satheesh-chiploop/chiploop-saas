@@ -68,6 +68,7 @@ export default function Arch2TapeoutAppPage() {
   const [genUpfLite, setGenUpfLite] = useState(false);
   const [genPackaging, setGenPackaging] = useState(true);
   const [enableScanDft, setEnableScanDft] = useState(false);
+  const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
 
   // --- RTL source options (to skip Arch2RTL) ---
   const [rtlSourceMode, setRtlSourceMode] = useState<"none" | "repo_path" | "paste" | "from_arch2rtl">("none");
@@ -328,6 +329,7 @@ export default function Arch2TapeoutAppPage() {
           gen_upf_lite: genUpfLite,
           gen_packaging: genPackaging,
           enable_scan_dft: enableScanDft,
+          run_spec2rtl_check: runSpec2RtlCheck,
           skip_arch2rtl: rtlSourceMode !== "none" || startStage !== "arch2rtl",
           // (optional future: if your workflow supports it)
           // skip_synth: startStage === "floorplan",
@@ -411,6 +413,15 @@ export default function Arch2TapeoutAppPage() {
               <label className="flex items-center gap-2 text-sm text-slate-300">
                 <input type="checkbox" checked={enableScanDft} onChange={(e) => setEnableScanDft(e.target.checked)} />
                 Insert scan DFT, then run ATPG readiness
+              </label>
+              <label className="flex items-start gap-2 text-sm text-slate-300">
+                <input className="mt-1" type="checkbox" checked={runSpec2RtlCheck} onChange={(e) => setRunSpec2RtlCheck(e.target.checked)} />
+                <span>
+                  Run Spec-to-RTL conformance check
+                  <span className="block text-xs text-slate-500">
+                    Optional: checks RTL against spec before synthesis and tapeout stages consume it.
+                  </span>
+                </span>
               </label>
             </div>
 

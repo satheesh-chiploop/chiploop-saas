@@ -1233,18 +1233,25 @@ export default function VerifyAppPage() {
                             ["code_condition_coverage_pct", "Condition"],
                             ["code_toggle_coverage_pct", "Toggle"],
                           ].map(([key, label]) => {
-                            const values = closureChart.series.map((row: any) => Number(row[key]));
-                            const latest = [...values].reverse().find((value: number) => Number.isFinite(value));
+                            const values = closureChart.series
+                              .map((row: any) => Number(row[key]))
+                              .filter((value: number) => Number.isFinite(value));
+                            const baseline = values.length ? Math.max(0, Math.min(100, values[0])) : undefined;
+                            const latest = values.length ? Math.max(0, Math.min(100, values[values.length - 1])) : undefined;
+                            const gain = baseline !== undefined && latest !== undefined ? Math.max(0, latest - baseline) : 0;
                             return (
                               <div key={key} className="grid grid-cols-[110px_1fr_54px] items-center gap-3 text-xs">
                                 <div className="text-slate-300">{label}</div>
-                                <div className="flex h-3 overflow-hidden rounded bg-slate-800">
-                                  {closureChart.series.map((row: any, idx: number) => {
-                                    const value = Number(row[key]);
-                                    const width = Number.isFinite(value) ? Math.max(2, Math.min(100, value)) : 0;
-                                    const color = idx === 0 ? "bg-slate-500" : "bg-violet-400";
-                                    return <div key={`${key}-${idx}`} className={color} style={{ width: `${width}%` }} title={`${row.label}: ${Number.isFinite(value) ? value : "n/a"}`} />;
-                                  })}
+                                <div
+                                  className="relative h-3 overflow-hidden rounded bg-slate-800"
+                                  title={`baseline: ${baseline ?? "n/a"}%, latest merged: ${latest ?? "n/a"}%, remaining: ${latest !== undefined ? Math.max(0, 100 - latest).toFixed(2) : "n/a"}%`}
+                                >
+                                  {baseline !== undefined ? (
+                                    <div className="absolute inset-y-0 left-0 bg-slate-500" style={{ width: `${baseline}%` }} />
+                                  ) : null}
+                                  {latest !== undefined && gain > 0 ? (
+                                    <div className="absolute inset-y-0 bg-violet-400" style={{ left: `${baseline ?? 0}%`, width: `${gain}%` }} />
+                                  ) : null}
                                 </div>
                                 <div className="text-right text-slate-100">{Number.isFinite(latest) ? `${latest}%` : "n/a"}</div>
                               </div>

@@ -22,6 +22,7 @@ export default function AppSlugRouter() {
 
       // Digital (dedicated pages)
       "arch2rtl": "/apps/arch2rtl",
+      "spec2rtl": "/apps/spec2rtl",
       "arch2synthesis": "/apps/arch2synthesis",
       "arch2tapeout": "/apps/arch2tapeout",
       "integrate": "/apps/integrate",
