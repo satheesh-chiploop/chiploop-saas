@@ -711,6 +711,7 @@ export default function AppsHomePage() {
   function startTempMonitorSystemDemo() {
     window.localStorage.setItem(SYSTEM_MIXED_SIGNAL_PREFILL_KEY, JSON.stringify({
       projectName: "temp_monitor_mixed_signal_soc",
+      topModule: "temp_monitor_soc",
       digitalSpecText: TEMP_MONITOR_SYSTEM_DIGITAL_SPEC,
       analogSpecText: TEMP_MONITOR_SYSTEM_ANALOG_SPEC,
       socIntegrationSpecText: TEMP_MONITOR_SYSTEM_SOC_SPEC,

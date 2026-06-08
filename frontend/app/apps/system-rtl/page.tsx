@@ -54,6 +54,7 @@ export default function SystemRTLAppPage() {
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
 
   const [projectName, setProjectName] = useState("");
+  const [topModule, setTopModule] = useState("");
   const [digitalSpecText, setDigitalSpecText] = useState("");
   const [analogSpecText, setAnalogSpecText] = useState("");
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
@@ -119,12 +120,14 @@ export default function SystemRTLAppPage() {
     try {
       const prefill = JSON.parse(raw) as {
         projectName?: string;
+        topModule?: string;
         digitalSpecText?: string;
         analogSpecText?: string;
         socIntegrationSpecText?: string;
         runSpec2RtlCheck?: boolean;
       };
       setProjectName(prefill.projectName || "");
+      setTopModule(prefill.topModule || "");
       setDigitalSpecText(prefill.digitalSpecText || "");
       setAnalogSpecText(prefill.analogSpecText || "");
       setSocIntegrationSpecText(prefill.socIntegrationSpecText || "");
@@ -196,6 +199,7 @@ export default function SystemRTLAppPage() {
         "/apps/system/rtl/run",
         {
           project_name: projectName || undefined,
+          top_module: topModule.trim() || undefined,
           digital_spec_text: digitalSpecText,
           analog_spec_text: analogSpecText,
           soc_integration_spec_text: socIntegrationSpecText,
@@ -277,6 +281,13 @@ export default function SystemRTLAppPage() {
               <input
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+              />
+              <label className="block text-sm text-slate-300">SoC top module (optional)</label>
+              <input
+                value={topModule}
+                onChange={(e) => setTopModule(e.target.value)}
+                placeholder="e.g. temp_monitor_soc"
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
               />
 
