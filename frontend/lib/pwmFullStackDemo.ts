@@ -4,6 +4,7 @@ export const EMBEDDED_HANDOFF_PREFILL_KEY = "chiploop_embedded_handoff_prefill";
 export const SOFTWARE_HANDOFF_PREFILL_KEY = "chiploop_software_handoff_prefill";
 export const VALIDATION_HANDOFF_PREFILL_KEY = "chiploop_validation_handoff_prefill";
 export const PRODUCT_BUILDER_PREFILL_KEY = "chiploop_product_builder_prefill";
+export const SYSTEM_MIXED_SIGNAL_PREFILL_KEY = "chiploop_system_mixed_signal_prefill";
 
 export const PWM_FULL_STACK_ARCH2RTL_SPEC = `Design a parameterized PWM controller.
 
@@ -91,6 +92,123 @@ Derive integrated scenarios from the actual handoff artifacts and prove the soft
 export const PWM_PRODUCT_INTENT = `Build a simulator-backed PWM fan-control product dashboard from the validated RTL, firmware, software, and validation collateral.
 
 The dashboard should let a user enable PWM, adjust duty cycle, view counter/PWM output state, run a thermal fan-control scenario, and preserve lineage back to the generated workflows.`;
+
+export const TEMP_MONITOR_SYSTEM_DIGITAL_SPEC = `Design the digital RTL for a mixed-signal temperature monitor SoC.
+
+Top module:
+- temp_monitor_digital
+
+Inputs:
+- clk
+- reset_n
+- wr_en
+- wr_addr[7:0]
+- wr_data[15:0]
+- rd_en
+- rd_addr[7:0]
+- adc_code[11:0]
+- adc_valid
+
+Outputs:
+- rd_data[15:0]
+- sample_req
+- alert_irq
+- temp_code[11:0]
+- threshold_code[11:0]
+- alert_status
+
+Register map:
+- 0x00 CONTROL: bit 0 ENABLE, bit 1 SAMPLE_START, bit 2 IRQ_ENABLE, bit 3 ALERT_CLEAR
+- 0x04 STATUS: sample_done, alert_pending, adc_valid_seen, busy
+- 0x08 THRESHOLD: threshold_code[11:0], read/write
+- 0x0C LATEST_TEMP: latest filtered temp_code[11:0], read-only
+- 0x10 SAMPLE_COUNT: completed sample count[15:0], read-only
+- 0x14 IRQ_STATUS: alert, sample_done
+- 0x18 IRQ_CLEAR: write one to clear IRQ_STATUS bits
+
+Behavior:
+- Reset clears control, status, latest temperature, sample count, IRQ, and alert state.
+- Firmware enables sampling through CONTROL.ENABLE and can request an immediate sample through SAMPLE_START.
+- sample_req asserts when sampling is enabled or SAMPLE_START is written.
+- On adc_valid, capture adc_code, apply a simple two-sample moving average filter, update temp_code, and increment SAMPLE_COUNT.
+- Compare filtered temp_code against THRESHOLD. Latch alert_status and IRQ_STATUS.alert when temp_code is above threshold.
+- alert_irq asserts when CONTROL.IRQ_ENABLE is set and any IRQ_STATUS bit is latched.
+- ALERT_CLEAR or IRQ_CLEAR clears alert/IRQ status without clearing latest temperature.
+
+Generate synthesizable Verilog/SystemVerilog RTL, assertions, register-map collateral, and a system handoff package.`;
+
+export const TEMP_MONITOR_SYSTEM_ANALOG_SPEC = `Create a simple behavioral analog temperature sensor and ADC front-end model for system integration.
+
+Analog block:
+- temp_sensor_adc_model
+
+Inputs:
+- sample_req
+- sensor_temp_celsius[15:0] as a behavioral stimulus/control value
+- avdd
+- avss
+
+Outputs:
+- adc_code[11:0]
+- adc_valid
+
+Behavior:
+- Model an idealized temperature sensor plus 12-bit ADC.
+- Convert temperature in Celsius into adc_code using a simple linear transfer function.
+- Clamp output code to 0..4095.
+- When sample_req is asserted, produce adc_valid and a stable adc_code after a small behavioral latency.
+- Include parameters for gain error, offset error, and nominal sample latency so later analog correlation can refine the model.
+
+Generate analog spec JSON, behavioral model collateral, testbench intent, coverage intent, and abstract-view notes suitable for SoC integration.`;
+
+export const TEMP_MONITOR_SYSTEM_SOC_SPEC = `Integrate the temperature sensor ADC behavioral model with the digital temperature monitor controller.
+
+SoC top:
+- temp_monitor_soc
+
+Integration requirements:
+- Instantiate temp_sensor_adc_model and temp_monitor_digital.
+- Connect temp_monitor_digital.sample_req to temp_sensor_adc_model.sample_req.
+- Connect temp_sensor_adc_model.adc_code and adc_valid to temp_monitor_digital.adc_code and adc_valid.
+- Expose the digital memory-mapped register interface at the SoC top for firmware/software access.
+- Expose alert_irq, temp_code, threshold_code, and alert_status for simulation visibility.
+- Keep the analog behavioral model in the simulation filelist and provide a physical/abstract placeholder for downstream handoff.
+- Generate system RTL filelists, SoC top assembly, SVA, and a System RTL handoff package.
+
+Verification intent:
+- Reset defaults.
+- Read/write THRESHOLD.
+- Trigger sample conversion.
+- Sweep below-threshold and above-threshold temperature codes.
+- Confirm alert_irq latching and clear behavior.`;
+
+export const TEMP_MONITOR_SYSTEM_FIRMWARE_SPEC = `Generate firmware for the mixed-signal temperature monitor SoC.
+
+Hardware interface:
+- System RTL workflow provides temp_monitor_soc, temp_monitor_digital, the analog ADC model, and the register map.
+- Firmware configures threshold, requests samples, polls latest temperature, handles alert IRQ, and clears alert state.
+
+APIs:
+- tempmon_init()
+- tempmon_set_threshold_code()
+- tempmon_request_sample()
+- tempmon_read_temperature_code()
+- tempmon_get_status()
+- tempmon_clear_alert()
+
+Generate register accessors, driver scaffold, build collateral, co-simulation collateral, validation report, and software-facing handoff package.`;
+
+export const TEMP_MONITOR_SYSTEM_SOFTWARE_GOAL = `Create a temperature-monitor service and SDK over the generated firmware handoff.
+
+Provide commands to configure threshold, request a temperature sample, read latest temperature, subscribe/poll alert status, clear alerts, and report health/state for a product dashboard.`;
+
+export const TEMP_MONITOR_SYSTEM_VALIDATION_GOAL = `Validate the mixed-signal temperature-monitor chain end to end.
+
+Run below-threshold, above-threshold, threshold-update, alert-clear, and repeated-sampling scenarios. Confirm software commands become firmware register operations and the System RTL/analog model produces expected temperature code, sample_done, alert_status, and alert_irq behavior.`;
+
+export const TEMP_MONITOR_SYSTEM_PRODUCT_INTENT = `Build a simulator-backed temperature monitor product dashboard from the validated System RTL, firmware, software, and validation collateral.
+
+The dashboard should show a live temperature gauge, threshold slider, sample button, alert indicator, latest ADC/temp code, sample count, and workflow lineage across System RTL, System Sim, Firmware, Software, Validation, and Product App.`;
 
 export const UART_PACKET_ENGINE_ARCH2RTL_SPEC = `Design a UART buffered packet engine with a memory-mapped register interface.
 
@@ -636,9 +754,15 @@ export const SAFETY_PRODUCT_INTENT = `Build a simulator-backed safety fault mana
 The dashboard should let a user configure watchdog timeout, feed heartbeat, inject faults, view latched faults, safety IRQ, reset request, escalation level, reset count, and run safety fault/recovery scenarios.`;
 
 export type DesignChainContext = {
-  demoKind?: "pwm" | "uart_packet" | "image_dma" | "mbist_sram" | "sensor_hub" | "secure_boot" | "safety_fault";
+  demoKind?: "pwm" | "uart_packet" | "image_dma" | "mbist_sram" | "sensor_hub" | "secure_boot" | "safety_fault" | "temp_monitor_system";
   arch2rtlWorkflowId?: string;
   arch2rtlRunId?: string;
+  systemRtlWorkflowId?: string;
+  systemRtlRunId?: string;
+  systemSimWorkflowId?: string;
+  systemSimRunId?: string;
+  systemFirmwareWorkflowId?: string;
+  systemFirmwareRunId?: string;
   verifyWorkflowId?: string;
   verifyRunId?: string;
   embeddedWorkflowId?: string;

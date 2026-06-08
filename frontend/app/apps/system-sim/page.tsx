@@ -7,11 +7,22 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import {
+  DESIGN_CHAIN_CONTEXT_KEY,
+  SYSTEM_MIXED_SIGNAL_PREFILL_KEY,
+  type DesignChainContext,
+} from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 type WorkflowRow = { id: string; status?: string | null; phase?: string | null; logs?: string | null; updated_at?: string | null; };
+
+function systemSimReady(row: WorkflowRow | null): boolean {
+  if (!row) return false;
+  const logs = row.logs || "";
+  return row.status === "completed" || logs.includes("System App complete: System_Sim") || logs.includes("system_sim_coverage");
+}
 
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
@@ -36,8 +47,13 @@ export default function SystemSimAppPage() {
   const [digitalSpecText, setDigitalSpecText] = useState("");
   const [analogSpecText, setAnalogSpecText] = useState("");
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
+  const [systemSimTestcases, setSystemSimTestcases] = useState("");
+  const [systemSimSeeds, setSystemSimSeeds] = useState("");
+  const [systemSimNumIters, setSystemSimNumIters] = useState(25);
+  const [tempMonitorChain, setTempMonitorChain] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const readyForFirmware = useMemo(() => systemSimReady(workflowRow), [workflowRow]);
   const logsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -79,6 +95,36 @@ export default function SystemSimAppPage() {
       setLoading(false);
     })();
   }, [router]);
+
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const isTempMonitor = params.get("tempmon_chain") === "1";
+    setTempMonitorChain(isTempMonitor);
+    if (!isTempMonitor) return;
+    const raw = window.localStorage.getItem(SYSTEM_MIXED_SIGNAL_PREFILL_KEY);
+    if (!raw) return;
+    try {
+      const prefill = JSON.parse(raw) as {
+        projectName?: string;
+        digitalSpecText?: string;
+        analogSpecText?: string;
+        socIntegrationSpecText?: string;
+        systemSimTestcases?: string;
+        systemSimSeeds?: string;
+        systemSimNumIters?: number;
+      };
+      setProjectName(prefill.projectName ? `${prefill.projectName}_sim` : "");
+      setDigitalSpecText(prefill.digitalSpecText || "");
+      setAnalogSpecText(prefill.analogSpecText || "");
+      setSocIntegrationSpecText(prefill.socIntegrationSpecText || "");
+      setSystemSimTestcases(prefill.systemSimTestcases || "reset_defaults, threshold_below, threshold_above, alert_clear");
+      setSystemSimSeeds(prefill.systemSimSeeds || "1, 2, 7");
+      setSystemSimNumIters(Number(prefill.systemSimNumIters || 40));
+    } catch {
+      window.localStorage.removeItem(SYSTEM_MIXED_SIGNAL_PREFILL_KEY);
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (!workflowId) return;
@@ -138,6 +184,9 @@ export default function SystemSimAppPage() {
           digital_spec_text: digitalSpecText,
           analog_spec_text: analogSpecText,
           soc_integration_spec_text: socIntegrationSpecText,
+          system_sim_testcases: systemSimTestcases.split(",").map((x) => x.trim()).filter(Boolean),
+          system_sim_seeds: systemSimSeeds.split(",").map((x) => Number(x.trim())).filter((x) => Number.isFinite(x)),
+          system_sim_num_iters: systemSimNumIters,
         }
       );
       setWorkflowId(out.workflow_id);
@@ -152,6 +201,21 @@ export default function SystemSimAppPage() {
   function downloadZip() {
     if (!workflowId) return;
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
+  }
+
+  function openSystemFirmware() {
+    if (!workflowId) return;
+    let context: DesignChainContext = {};
+    try {
+      context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+    } catch {
+      context = {};
+    }
+    context.demoKind = tempMonitorChain ? "temp_monitor_system" : context.demoKind;
+    context.systemSimWorkflowId = workflowId;
+    context.systemSimRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    router.push(`/apps/system-firmware${tempMonitorChain ? "?tempmon_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -177,6 +241,11 @@ export default function SystemSimAppPage() {
         <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
           <div className="text-sm text-slate-400">System Loop</div>
           <h1 className="mt-2 text-3xl font-extrabold text-amber-300">System Sim</h1>
+          {tempMonitorChain ? (
+            <div className="mt-4 rounded-xl border border-emerald-800/60 bg-emerald-950/20 p-4 text-sm text-slate-200">
+              Temperature Monitor System journey: run System Sim with configurable testcases, seeds, iteration budget, and coverage evidence before firmware handoff.
+            </div>
+          ) : null}
           <p className="mt-2 text-slate-300">SoC integration + simulation + coverage + waveforms → ZIP.</p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -187,6 +256,31 @@ export default function SystemSimAppPage() {
                 onChange={(e) => setProjectName(e.target.value)}
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
               />
+              <div className="rounded-2xl border border-slate-800 bg-black/20 p-4">
+                <div className="text-sm font-semibold text-slate-200">System Sim run settings</div>
+                <label className="mt-3 block text-sm text-slate-300">Testcases</label>
+                <input
+                  value={systemSimTestcases}
+                  onChange={(e) => setSystemSimTestcases(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  placeholder="reset_defaults, threshold_below, threshold_above"
+                />
+                <label className="mt-3 block text-sm text-slate-300">Seeds</label>
+                <input
+                  value={systemSimSeeds}
+                  onChange={(e) => setSystemSimSeeds(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  placeholder="1, 2, 7"
+                />
+                <label className="mt-3 block text-sm text-slate-300">Iteration budget</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={systemSimNumIters}
+                  onChange={(e) => setSystemSimNumIters(Number(e.target.value || 1))}
+                  className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                />
+              </div>
 
               <button
                 onClick={runNow}
@@ -206,6 +300,14 @@ export default function SystemSimAppPage() {
                   <div>run_id: <span className="text-slate-100">{runId}</span></div>
                   <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                     Download ZIP (full=1)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openSystemFirmware}
+                    disabled={!readyForFirmware}
+                    className="ml-3 mt-3 rounded-xl bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                  >
+                    Open System Firmware
                   </button>
                     <AskThisRunPanel workflowId={workflowId} compact />
                 </div>

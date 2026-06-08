@@ -7,6 +7,11 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import {
+  DESIGN_CHAIN_CONTEXT_KEY,
+  SYSTEM_MIXED_SIGNAL_PREFILL_KEY,
+  type DesignChainContext,
+} from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -18,6 +23,12 @@ type WorkflowRow = {
   logs?: string | null;
   updated_at?: string | null;
 };
+
+function systemRtlReady(row: WorkflowRow | null): boolean {
+  if (!row) return false;
+  const logs = row.logs || "";
+  return row.status === "completed" || logs.includes("System App complete: System_RTL") || logs.includes("system_rtl_package.json");
+}
 
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
@@ -45,8 +56,11 @@ export default function SystemRTLAppPage() {
   const [digitalSpecText, setDigitalSpecText] = useState("");
   const [analogSpecText, setAnalogSpecText] = useState("");
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
+  const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
+  const [tempMonitorChain, setTempMonitorChain] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const readyForSystemSim = useMemo(() => systemRtlReady(workflowRow), [workflowRow]);
   const logsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -92,6 +106,32 @@ export default function SystemRTLAppPage() {
       setLoading(false);
     })();
   }, [router]);
+
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const isTempMonitor = params.get("tempmon_chain") === "1";
+    setTempMonitorChain(isTempMonitor);
+    if (!isTempMonitor) return;
+    const raw = window.localStorage.getItem(SYSTEM_MIXED_SIGNAL_PREFILL_KEY);
+    if (!raw) return;
+    try {
+      const prefill = JSON.parse(raw) as {
+        projectName?: string;
+        digitalSpecText?: string;
+        analogSpecText?: string;
+        socIntegrationSpecText?: string;
+        runSpec2RtlCheck?: boolean;
+      };
+      setProjectName(prefill.projectName || "");
+      setDigitalSpecText(prefill.digitalSpecText || "");
+      setAnalogSpecText(prefill.analogSpecText || "");
+      setSocIntegrationSpecText(prefill.socIntegrationSpecText || "");
+      setRunSpec2RtlCheck(Boolean(prefill.runSpec2RtlCheck));
+    } catch {
+      window.localStorage.removeItem(SYSTEM_MIXED_SIGNAL_PREFILL_KEY);
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (!workflowId) return;
@@ -158,6 +198,9 @@ export default function SystemRTLAppPage() {
           digital_spec_text: digitalSpecText,
           analog_spec_text: analogSpecText,
           soc_integration_spec_text: socIntegrationSpecText,
+          toggles: {
+            run_spec2rtl_check: runSpec2RtlCheck,
+          },
         }
       );
       setWorkflowId(out.workflow_id);
@@ -172,6 +215,21 @@ export default function SystemRTLAppPage() {
   function downloadZip() {
     if (!workflowId) return;
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
+  }
+
+  function openSystemSim() {
+    if (!workflowId) return;
+    let context: DesignChainContext = {};
+    try {
+      context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+    } catch {
+      context = {};
+    }
+    context.demoKind = tempMonitorChain ? "temp_monitor_system" : context.demoKind;
+    context.systemRtlWorkflowId = workflowId;
+    context.systemRtlRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    router.push(`/apps/system-sim${tempMonitorChain ? "?tempmon_chain=1" : ""}`);
   }
 
   if (loading) {
@@ -203,6 +261,11 @@ export default function SystemRTLAppPage() {
         <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
           <div className="text-sm text-slate-400">System Loop</div>
           <h1 className="mt-2 text-3xl font-extrabold text-amber-300">System RTL</h1>
+          {tempMonitorChain ? (
+            <div className="mt-4 rounded-xl border border-emerald-800/60 bg-emerald-950/20 p-4 text-sm text-slate-200">
+              Temperature Monitor System journey: generate digital RTL, analog behavioral collateral, SoC top assembly, SVA, System RTL package, and optional Spec2RTL evidence from the same three-spec source.
+            </div>
+          ) : null}
           <p className="mt-2 text-slate-300">
             SoC integration + top assembly + RTL handoff artifacts → ZIP.
           </p>
@@ -225,6 +288,18 @@ export default function SystemRTLAppPage() {
               >
                 {running ? "Starting…" : "Run System RTL"}
               </button>
+              <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={runSpec2RtlCheck}
+                  onChange={(e) => setRunSpec2RtlCheck(e.target.checked)}
+                  className="mt-1"
+                />
+                <span>
+                  Run Spec2RTL conformance on generated digital/System RTL evidence
+                  <span className="block text-xs text-slate-500">Unchecked by default; enabled for the reference journey.</span>
+                </span>
+              </label>
 
               {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
 
@@ -241,6 +316,14 @@ export default function SystemRTLAppPage() {
                     className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700"
                   >
                     Download ZIP (full=1)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openSystemSim}
+                    disabled={!readyForSystemSim}
+                    className="ml-3 mt-3 rounded-xl bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                  >
+                    Open System Sim
                   </button>
                     <AskThisRunPanel workflowId={workflowId} compact />
                 </div>

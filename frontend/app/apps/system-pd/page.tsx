@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -44,6 +45,17 @@ export default function SystemPDAppPage() {
   const [digitalSpecText, setDigitalSpecText] = useState("");
   const [analogSpecText, setAnalogSpecText] = useState("");
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
+  const [foundry, setFoundry] = useState("sky130");
+  const [pdk, setPdk] = useState("sky130A");
+  const [toolchain, setToolchain] = useState("openlane2");
+  const [targetFreqMhz, setTargetFreqMhz] = useState("");
+  const [constraintsSdc, setConstraintsSdc] = useState("");
+  const [effort, setEffort] = useState<"fast" | "balanced" | "signoff">("balanced");
+  const [runFill, setRunFill] = useState(true);
+  const [runDrc, setRunDrc] = useState(true);
+  const [runLvs, setRunLvs] = useState(true);
+  const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
+  const [enableScanDft, setEnableScanDft] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -141,6 +153,7 @@ export default function SystemPDAppPage() {
     setErr(null);
     setRunning(true);
     try {
+      const freq = Number(targetFreqMhz);
       const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>(
         "/apps/system/pd/run",
         {
@@ -148,6 +161,19 @@ export default function SystemPDAppPage() {
           digital_spec_text: digitalSpecText,
           analog_spec_text: analogSpecText,
           soc_integration_spec_text: socIntegrationSpecText,
+          foundry,
+          pdk,
+          toolchain,
+          target_frequency_mhz: Number.isFinite(freq) && freq > 0 ? freq : undefined,
+          constraints_sdc: constraintsSdc || undefined,
+          effort,
+          run_fill: runFill,
+          run_drc: runDrc,
+          run_lvs: runLvs,
+          toggles: {
+            run_spec2rtl_check: runSpec2RtlCheck,
+            enable_scan_dft: enableScanDft,
+          },
         }
       );
       setWorkflowId(out.workflow_id);
@@ -187,7 +213,7 @@ export default function SystemPDAppPage() {
         <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
           <div className="text-sm text-slate-400">System Loop</div>
           <h1 className="mt-2 text-3xl font-extrabold text-amber-300">System PD</h1>
-          <p className="mt-2 text-slate-300">SoC RTL2GDS pipeline (OpenLane2) → DRC/LVS/Tapeout → ZIP.</p>
+          <p className="mt-2 text-slate-300">System RTL2GDS with synthesis, synthesis LEC, scan DFT, ATPG, STA, DRC/LVS/XOR, tapeout, and tapeout LEC evidence.</p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="space-y-3">
@@ -197,6 +223,62 @@ export default function SystemPDAppPage() {
                 onChange={(e) => setProjectName(e.target.value)}
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
               />
+              <div className="grid gap-3 sm:grid-cols-3">
+                <label className="block text-sm text-slate-300">
+                  Foundry
+                  <input value={foundry} onChange={(e) => setFoundry(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" />
+                </label>
+                <label className="block text-sm text-slate-300">
+                  PDK
+                  <input value={pdk} onChange={(e) => setPdk(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" />
+                </label>
+                <label className="block text-sm text-slate-300">
+                  Toolchain
+                  <input value={toolchain} onChange={(e) => setToolchain(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" />
+                </label>
+              </div>
+
+              <label className="block text-sm text-slate-300">
+                Target frequency MHz
+                <input value={targetFreqMhz} onChange={(e) => setTargetFreqMhz(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" placeholder="Optional" />
+              </label>
+
+              <label className="block text-sm text-slate-300">
+                SDC constraints
+                <textarea value={constraintsSdc} onChange={(e) => setConstraintsSdc(e.target.value)} rows={4} className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100" placeholder="Optional create_clock / constraints" />
+              </label>
+
+              <label className="block text-sm text-slate-300">
+                Implementation effort
+                <select value={effort} onChange={(e) => setEffort(e.target.value as "fast" | "balanced" | "signoff")} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                  <option value="fast">Fast</option>
+                  <option value="balanced">Balanced</option>
+                  <option value="signoff">Signoff</option>
+                </select>
+              </label>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={runSpec2RtlCheck} onChange={(e) => setRunSpec2RtlCheck(e.target.checked)} className="mt-1" />
+                  <span>Run Spec2RTL conformance before implementation</span>
+                </label>
+                <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={enableScanDft} onChange={(e) => setEnableScanDft(e.target.checked)} className="mt-1" />
+                  <span>Enable scan DFT and ATPG coverage evidence</span>
+                </label>
+                <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={runFill} onChange={(e) => setRunFill(e.target.checked)} className="mt-1" />
+                  <span>Run fill</span>
+                </label>
+                <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={runDrc} onChange={(e) => setRunDrc(e.target.checked)} className="mt-1" />
+                  <span>Run DRC</span>
+                </label>
+                <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={runLvs} onChange={(e) => setRunLvs(e.target.checked)} className="mt-1" />
+                  <span>Run LVS</span>
+                </label>
+              </div>
 
               <button
                 onClick={runNow}
@@ -217,7 +299,10 @@ export default function SystemPDAppPage() {
                   <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                     Download ZIP (full=1)
                   </button>
-                    <AskThisRunPanel workflowId={workflowId} compact />
+                  <div className="mt-4">
+                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
+                  </div>
+                  <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}
             </div>
@@ -287,3 +372,4 @@ export default function SystemPDAppPage() {
     </main>
   );
 }
+

@@ -14,6 +14,10 @@ import {
   SAFETY_FAULT_MANAGER_ARCH2RTL_SPEC,
   SECURE_BOOT_ARCH2RTL_SPEC,
   SENSOR_HUB_ARCH2RTL_SPEC,
+  SYSTEM_MIXED_SIGNAL_PREFILL_KEY,
+  TEMP_MONITOR_SYSTEM_ANALOG_SPEC,
+  TEMP_MONITOR_SYSTEM_DIGITAL_SPEC,
+  TEMP_MONITOR_SYSTEM_SOC_SPEC,
   UART_PACKET_ENGINE_ARCH2RTL_SPEC,
 } from "@/lib/pwmFullStackDemo";
 
@@ -58,7 +62,7 @@ type AppCard = {
   title: string;
   subtitle: string;
   loop_type: LoopType;
-  status?: "Flagship" | "Coming";
+  status?: "Flagship" | "New" | "Coming";
   nudge?: string;
   promise?: string;
 };
@@ -485,13 +489,22 @@ export default function AppsHomePage() {
       promise: "Choose fast vs detailed CPU modeling",
     },
     {
-      slug: "system-pd",
-      title: "System PD",
-      subtitle: "SoC RTL2GDS with OpenLane2 pipeline (DRC/LVS/Tapeout)",
+      slug: "system-synthesis",
+      title: "System Synthesis",
+      subtitle: "System RTL through synthesis, LEC, scan DFT, ATPG, and MBIST evidence",
       loop_type: "system",
       status: "Flagship",
       nudge: "New",
-      promise: "GDS + DRC/LVS + exec summary",
+      promise: "System netlist + LEC/DFT/ATPG evidence",
+    },
+    {
+      slug: "system-pd",
+      title: "System PD",
+      subtitle: "System RTL2GDS with synthesis, STA, DRC/LVS/XOR, tapeout, and tapeout LEC",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "GDS + signoff-gated DRC/LVS/XOR/LEC evidence",
     },
     {
       slug: "system-rtl",
@@ -695,6 +708,21 @@ export default function AppsHomePage() {
     go("/apps/arch2rtl?guided=1&safety_chain=1");
   }
 
+  function startTempMonitorSystemDemo() {
+    window.localStorage.setItem(SYSTEM_MIXED_SIGNAL_PREFILL_KEY, JSON.stringify({
+      projectName: "temp_monitor_mixed_signal_soc",
+      digitalSpecText: TEMP_MONITOR_SYSTEM_DIGITAL_SPEC,
+      analogSpecText: TEMP_MONITOR_SYSTEM_ANALOG_SPEC,
+      socIntegrationSpecText: TEMP_MONITOR_SYSTEM_SOC_SPEC,
+      runSpec2RtlCheck: true,
+      systemSimTestcases: "reset_defaults, threshold_below, threshold_above, alert_clear",
+      systemSimSeeds: "1, 2, 7",
+      systemSimNumIters: 40,
+    }));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "temp_monitor_system" }));
+    go("/apps/system-rtl?tempmon_chain=1");
+  }
+
   const openApp = (slug: string) => go(routeForApp(slug));
 
   async function skipOnboarding() {
@@ -758,6 +786,7 @@ export default function AppsHomePage() {
       "system-memory-bottleneck": "/apps/system-memory-bottleneck",
       "system-cpu-model": "/apps/system-cpu-model",
       "system-sim": "/apps/system-sim",
+      "system-synthesis": "/apps/system-synthesis",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
       "system-software": "/apps/system-software",
@@ -1012,6 +1041,14 @@ export default function AppsHomePage() {
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             {[
               {
+                segment: "Mixed-Signal / Product SoC",
+                title: "Temperature Monitor SoC: analog sensor, System RTL, Sim, Firmware, Software, Validation, Product App",
+                copy: "A System-first journey using digital_spec, analog_spec, and soc_spec. It builds a temperature sensor ADC behavioral model, digital threshold/alert RTL, integrated SoC top, system simulation, firmware/software, validation, and dashboard.",
+                button: "Start System Temp Monitor Journey",
+                onClick: startTempMonitorSystemDemo,
+                stages: ["System RTL", "System Sim", "Firmware", "Software", "Validation", "Product App"],
+              },
+              {
                 segment: "Embedded Control / Motor & Power",
                 title: "PWM Controller: RTL to Firmware to Software to Product App",
                 copy: "A compact peripheral demo for first-time walkthroughs. Generated RTL, simulation, firmware co-simulation, and validation evidence come from actual workflow runs.",
@@ -1066,7 +1103,7 @@ export default function AppsHomePage() {
                 <div className="text-lg font-bold text-white">{journey.title}</div>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{journey.copy}</p>
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                  {["Arch2RTL", "Verify", "Firmware", "Software", "Validation", "Product App"].map((stage, index, stages) => (
+                  {(("stages" in journey && journey.stages) ? journey.stages : ["Arch2RTL", "Verify", "Firmware", "Software", "Validation", "Product App"]).map((stage, index, stages) => (
                     <div key={stage} className="flex items-center gap-2">
                       <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
                       {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}

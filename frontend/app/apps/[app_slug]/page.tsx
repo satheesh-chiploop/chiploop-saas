@@ -57,6 +57,7 @@ export default function AppSlugRouter() {
       "system-memory-bottleneck": "/apps/system-memory-bottleneck",
       "system-cpu-model": "/apps/system-cpu-model",
       "system-sim": "/apps/system-sim",
+      "system-synthesis": "/apps/system-synthesis",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
       "system-software": "/apps/system-software",

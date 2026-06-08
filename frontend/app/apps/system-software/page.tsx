@@ -17,6 +17,7 @@ import {
   SECURE_BOOT_VALIDATION_GOAL,
   SENSOR_VALIDATION_GOAL,
   UART_VALIDATION_GOAL,
+  TEMP_MONITOR_SYSTEM_VALIDATION_GOAL,
   SOFTWARE_HANDOFF_PREFILL_KEY,
   VALIDATION_HANDOFF_PREFILL_KEY,
   type DesignChainContext,
@@ -86,6 +87,7 @@ export default function SystemSoftwareAppPage() {
   const [sensorChainDemo, setSensorChainDemo] = useState(false);
   const [secureChainDemo, setSecureChainDemo] = useState(false);
   const [safetyChainDemo, setSafetyChainDemo] = useState(false);
+  const [tempMonitorChainDemo, setTempMonitorChainDemo] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const readyForValidation = useMemo(() => softwareRunReady(workflowRow), [workflowRow]);
@@ -136,7 +138,7 @@ export default function SystemSoftwareAppPage() {
   useEffect(() => {
     if (loading || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1" && params.get("sensor_chain") !== "1" && params.get("secure_chain") !== "1" && params.get("safety_chain") !== "1") return;
+    if (params.get("handoff") !== "1" && params.get("pwm_chain") !== "1" && params.get("uart_chain") !== "1" && params.get("image_chain") !== "1" && params.get("sensor_chain") !== "1" && params.get("secure_chain") !== "1" && params.get("safety_chain") !== "1" && params.get("tempmon_chain") !== "1") return;
     setHandoffFlow(true);
     setPwmChainDemo(params.get("pwm_chain") === "1");
     setUartChainDemo(params.get("uart_chain") === "1");
@@ -144,6 +146,7 @@ export default function SystemSoftwareAppPage() {
     setSensorChainDemo(params.get("sensor_chain") === "1");
     setSecureChainDemo(params.get("secure_chain") === "1");
     setSafetyChainDemo(params.get("safety_chain") === "1");
+    setTempMonitorChainDemo(params.get("tempmon_chain") === "1");
     const raw = window.localStorage.getItem(SOFTWARE_HANDOFF_PREFILL_KEY);
     if (!raw) return;
     try {
@@ -268,18 +271,20 @@ export default function SystemSoftwareAppPage() {
     }
     context.softwareWorkflowId = workflowId;
     context.softwareRunId = runId || undefined;
-    context.demoKind = pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : secureChainDemo ? "secure_boot" : safetyChainDemo ? "safety_fault" : context.demoKind;
-    const sourceFirmwareWorkflowId = context.embeddedWorkflowId || systemFirmwareWorkflowId || "";
-    const sourceRtlWorkflowId = context.arch2rtlWorkflowId || systemRtlWorkflowId || "";
+    context.demoKind = tempMonitorChainDemo ? "temp_monitor_system" : pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : secureChainDemo ? "secure_boot" : safetyChainDemo ? "safety_fault" : context.demoKind;
+    const sourceFirmwareWorkflowId = context.systemFirmwareWorkflowId || context.embeddedWorkflowId || systemFirmwareWorkflowId || "";
+    const sourceRtlWorkflowId = context.systemRtlWorkflowId || context.arch2rtlWorkflowId || systemRtlWorkflowId || "";
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     window.localStorage.setItem(VALIDATION_HANDOFF_PREFILL_KEY, JSON.stringify({
-      projectName: pwmChainDemo ? "pwm_fan_controller_full_stack_validation" : uartChainDemo ? "uart_packet_engine_full_stack_validation" : imageChainDemo ? "image_dma_pipeline_full_stack_validation" : sensorChainDemo ? "smart_sensor_hub_full_stack_validation" : secureChainDemo ? "secure_boot_full_stack_validation" : safetyChainDemo ? "safety_fault_watchdog_full_stack_validation" : "generated_hardware_full_stack_validation",
+      projectName: tempMonitorChainDemo ? "temp_monitor_system_full_stack_validation" : pwmChainDemo ? "pwm_fan_controller_full_stack_validation" : uartChainDemo ? "uart_packet_engine_full_stack_validation" : imageChainDemo ? "image_dma_pipeline_full_stack_validation" : sensorChainDemo ? "smart_sensor_hub_full_stack_validation" : secureChainDemo ? "secure_boot_full_stack_validation" : safetyChainDemo ? "safety_fault_watchdog_full_stack_validation" : "generated_hardware_full_stack_validation",
       validationMode: "full_co_simulation",
       systemSoftwareWorkflowId: workflowId,
       systemFirmwareWorkflowId: sourceFirmwareWorkflowId,
       systemRtlWorkflowId: sourceRtlWorkflowId,
-      goal: pwmChainDemo ? PWM_VALIDATION_GOAL : uartChainDemo ? UART_VALIDATION_GOAL : imageChainDemo ? IMAGE_VALIDATION_GOAL : sensorChainDemo ? SENSOR_VALIDATION_GOAL : secureChainDemo ? SECURE_BOOT_VALIDATION_GOAL : safetyChainDemo ? SAFETY_VALIDATION_GOAL : GENERIC_VALIDATION_GOAL,
-      notes: pwmChainDemo
+      goal: tempMonitorChainDemo ? TEMP_MONITOR_SYSTEM_VALIDATION_GOAL : pwmChainDemo ? PWM_VALIDATION_GOAL : uartChainDemo ? UART_VALIDATION_GOAL : imageChainDemo ? IMAGE_VALIDATION_GOAL : sensorChainDemo ? SENSOR_VALIDATION_GOAL : secureChainDemo ? SECURE_BOOT_VALIDATION_GOAL : safetyChainDemo ? SAFETY_VALIDATION_GOAL : GENERIC_VALIDATION_GOAL,
+      notes: tempMonitorChainDemo
+        ? "Validate System RTL temperature monitor, analog behavioral model, firmware, and software together."
+        : pwmChainDemo
         ? "Validate imported Arch2RTL PWM hardware through Rust firmware and generated fan-control software."
         : uartChainDemo
         ? "Validate imported Arch2RTL UART packet-engine hardware through Rust firmware and generated packet-service software."
@@ -293,7 +298,7 @@ export default function SystemSoftwareAppPage() {
         ? "Validate imported Arch2RTL safety fault manager hardware through Rust firmware and generated safety monitor software."
         : "Validate imported Arch2RTL hardware through the generated firmware and software handoffs.",
     }));
-    router.push(`/apps/system-software-validation?handoff=1${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}${secureChainDemo ? "&secure_chain=1" : ""}${safetyChainDemo ? "&safety_chain=1" : ""}`);
+    router.push(`/apps/system-software-validation?handoff=1${tempMonitorChainDemo ? "&tempmon_chain=1" : ""}${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}${secureChainDemo ? "&secure_chain=1" : ""}${safetyChainDemo ? "&safety_chain=1" : ""}`);
   }
 
   if (loading) {

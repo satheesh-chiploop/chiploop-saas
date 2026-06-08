@@ -8,6 +8,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import {
   PRODUCT_BUILDER_PREFILL_KEY,
+  TEMP_MONITOR_SYSTEM_PRODUCT_INTENT,
   type DesignChainContext,
   DESIGN_CHAIN_CONTEXT_KEY,
 } from "@/lib/pwmFullStackDemo";
@@ -80,6 +81,7 @@ export default function SystemProductBuilderPage() {
   const [sensorChainDemo, setSensorChainDemo] = useState(false);
   const [secureChainDemo, setSecureChainDemo] = useState(false);
   const [safetyChainDemo, setSafetyChainDemo] = useState(false);
+  const [tempMonitorChainDemo, setTempMonitorChainDemo] = useState(false);
 
   const [arch2rtlWorkflowId, setArch2rtlWorkflowId] = useState("");
   const [verifyWorkflowId, setVerifyWorkflowId] = useState("");
@@ -139,6 +141,7 @@ export default function SystemProductBuilderPage() {
     setSensorChainDemo(params.get("sensor_chain") === "1");
     setSecureChainDemo(params.get("secure_chain") === "1");
     setSafetyChainDemo(params.get("safety_chain") === "1");
+    setTempMonitorChainDemo(params.get("tempmon_chain") === "1");
     const rawPrefill = window.localStorage.getItem(PRODUCT_BUILDER_PREFILL_KEY);
     const rawContext = window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY);
     let context: DesignChainContext = {};
@@ -149,12 +152,13 @@ export default function SystemProductBuilderPage() {
     }
     try {
       const prefill = rawPrefill ? JSON.parse(rawPrefill) as any : {};
-      setArch2rtlWorkflowId(prefill.arch2rtlWorkflowId || context.arch2rtlWorkflowId || "");
-      setVerifyWorkflowId(prefill.verifyWorkflowId || context.verifyWorkflowId || "");
-      setSystemFirmwareWorkflowId(prefill.systemFirmwareWorkflowId || context.embeddedWorkflowId || "");
+      const isTempMonitor = params.get("tempmon_chain") === "1";
+      setArch2rtlWorkflowId(prefill.arch2rtlWorkflowId || context.systemRtlWorkflowId || context.arch2rtlWorkflowId || "");
+      setVerifyWorkflowId(prefill.verifyWorkflowId || context.systemSimWorkflowId || context.verifyWorkflowId || "");
+      setSystemFirmwareWorkflowId(prefill.systemFirmwareWorkflowId || context.systemFirmwareWorkflowId || context.embeddedWorkflowId || "");
       setSystemSoftwareWorkflowId(prefill.systemSoftwareWorkflowId || context.softwareWorkflowId || "");
       setSystemValidationWorkflowId(prefill.systemValidationWorkflowId || context.validationWorkflowId || "");
-      setProductIntent(prefill.productIntent || "Build a simulator-backed product dashboard from the validated system collateral.");
+      setProductIntent(prefill.productIntent || (isTempMonitor ? TEMP_MONITOR_SYSTEM_PRODUCT_INTENT : "Build a simulator-backed product dashboard from the validated system collateral."));
       setAppType(prefill.appType || "web_dashboard");
       setTargetRuntime(prefill.targetRuntime || "simulated_device");
     } catch {
@@ -209,6 +213,7 @@ export default function SystemProductBuilderPage() {
       try { context = raw ? JSON.parse(raw) as DesignChainContext : {}; } catch { context = {}; }
       context.productWorkflowId = out.workflow_id;
       context.productRunId = out.run_id;
+      context.demoKind = tempMonitorChainDemo ? "temp_monitor_system" : pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : secureChainDemo ? "secure_boot" : safetyChainDemo ? "safety_fault" : context.demoKind;
       window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     } catch (e: any) {
       setErr(e?.message || String(e));
@@ -240,7 +245,11 @@ export default function SystemProductBuilderPage() {
           <p className="mt-2 text-slate-300">
             Generate a simulator-backed product interface from validated RTL, firmware, software, and validation collateral.
           </p>
-          {pwmChainDemo ? (
+          {tempMonitorChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              Temperature monitor SoC journey: build a simulator-backed product dashboard from System RTL, System Sim, firmware, software, and validation lineage.
+            </div>
+          ) : pwmChainDemo ? (
             <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
               PWM full-stack demo: build a live fan-control dashboard driven by generated workflow lineage.
             </div>
@@ -271,13 +280,13 @@ export default function SystemProductBuilderPage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <WorkflowIdField
                   label="RTL source"
-                  helper="Digital_Arch2RTL run that generated RTL, register map, constraints, and handoff collateral."
+                  helper="System RTL or Digital_Arch2RTL run that generated RTL, register map, constraints, and handoff collateral."
                   value={arch2rtlWorkflowId}
                   onChange={setArch2rtlWorkflowId}
                 />
                 <WorkflowIdField
                   label="Verification evidence"
-                  helper="Digital_Verify run with simulation, coverage, assertions, formal, and debug evidence."
+                  helper="System Sim or Digital_Verify run with simulation, coverage, assertions, formal, and debug evidence."
                   value={verifyWorkflowId}
                   onChange={setVerifyWorkflowId}
                 />
