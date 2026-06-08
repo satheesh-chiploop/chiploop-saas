@@ -279,7 +279,16 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     if (!workflowId || status !== "completed") return;
     let active = true;
     const files: Record<Stage, string[]> = {
-      arch2rtl: ["arch2rtl_dashboard.json", "digital_regmap.json", "upf_static_check.json", "digital/spec2rtl/spec2rtl_conformance.json"],
+      arch2rtl: [
+        "arch2rtl_dashboard.json",
+        "digital_regmap.json",
+        "upf_static_check.json",
+        "digital/spec2rtl/spec2rtl_conformance.json",
+        "system_rtl_package.json",
+        "system_rtl_package_debug.json",
+        "system_full_compile_summary.json",
+        "system_integration_intent.json",
+      ],
       dqa: [
         "digital/handoff/rtl_handoff_ingest_manifest.json",
         "rtl_lint_report.json",
@@ -423,6 +432,45 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         );
       }
       const registers = array(record(evidence["digital_regmap.json"]?.regmap).registers);
+      const systemPkg = record(evidence["system_rtl_package.json"]);
+      const systemDebug = record(evidence["system_rtl_package_debug.json"]);
+      const compile = record(evidence["system_full_compile_summary.json"]);
+      const intent = record(evidence["system_integration_intent.json"]);
+      if (Object.keys(systemPkg).length || Object.keys(systemDebug).length || Object.keys(intent).length) {
+        const filelists = record(systemPkg.filelists);
+        const compileInfo = record(systemPkg.compile);
+        const top = record(systemPkg.top);
+        const simFiles = array(filelists.sim);
+        const physFiles = array(filelists.phys);
+        const instances = array(intent.instances);
+        const connections = array(intent.connections);
+        const artifacts = record(systemPkg.artifacts);
+        return (
+          <div className="mt-5 space-y-5">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Bar label="RTL files imported" value={simFiles.length || physFiles.length} total={Math.max(simFiles.length || physFiles.length, 1)} color="bg-cyan-500" />
+              <Bar label="Integration instances" value={instances.length} total={Math.max(instances.length, 1)} color="bg-violet-500" />
+            </div>
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <Stat title="Top Module" value={firstString(top.sim, top.phys, "soc_top_sim")} />
+              <Stat title="RTL Files" value={simFiles.length || physFiles.length} />
+              <Stat title="Input Bits" value="not produced pre-synthesis" />
+              <Stat title="Output Bits" value="not produced pre-synthesis" />
+              <Stat title="Flip-flops" value="not produced pre-synthesis" />
+              <Stat title="Latches" value="not produced pre-synthesis" />
+              <Stat title="Full-cycle Paths" value="not produced pre-synthesis" />
+              <Stat title="Half-cycle Paths" value="not produced pre-synthesis" />
+              <Stat title="System Sim Compile" value={firstString(compileInfo.sim, record(compile.sim).status, "not produced")} />
+              <Stat title="Physical Compile" value={firstString(compileInfo.phys, record(compile.phys).status, "not produced")} />
+              <Stat title="Instances" value={instances.length} />
+              <Stat title="Connections" value={connections.length} />
+              <Stat title="Analog Macro" value={artifacts.integration_intent ? "integrated by intent" : "not reported"} />
+              <Stat title="Ready for Cosim" value={systemPkg.ready_for_cosim === true ? "yes" : "no"} />
+              {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+            </div>
+          </div>
+        );
+      }
       return registers.length ? (
         <div className="mt-5">
           <div className="text-sm font-semibold text-slate-100">Generated Firmware Register Interface</div>
@@ -430,10 +478,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {registers.slice(0, 8).map((item, index) => {
               const register = record(item);
               return (
-                <div key={`${String(register.name || "register")}-${index}`} className="rounded-lg border border-cyan-900/60 bg-cyan-950/15 p-3">
-                  <div className="text-xs text-cyan-300">{String(register.offset || "-")}</div>
-                  <div className="mt-1 font-semibold text-slate-100">{String(register.name || "REGISTER")}</div>
-                  <div className="mt-1 text-xs text-slate-400">{String(register.access || "")}</div>
+                <div key={`${String(register.name || "register")}-${index}`} className="min-w-0 rounded-lg border border-cyan-900/60 bg-cyan-950/15 p-3">
+                  <div className="break-all text-xs text-cyan-300">{String(register.offset || "-")}</div>
+                  <div className="mt-1 break-words font-semibold text-slate-100">{String(register.name || "REGISTER")}</div>
+                  <div className="mt-1 break-words text-xs text-slate-400">{String(register.access || "")}</div>
                 </div>
               );
             })}

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FiMic } from "react-icons/fi";
 import { createClientComponentClient } from "@/lib/platformClient";
 
 type VoiceNote = {
@@ -188,18 +189,24 @@ export default function VoiceSpecDraft({
   }
 
   return (
-    <div className={`rounded-2xl border border-cyan-900/50 bg-cyan-950/15 ${compact ? "p-3" : "p-4"}`}>
+    <div className={`rounded-2xl border border-cyan-900/50 bg-cyan-950/15 ${compact ? "p-2" : "p-4"}`}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+        <div className={compact ? "sr-only" : ""}>
           <div className="text-sm font-semibold text-cyan-200">{title}</div>
           <div className="mt-1 text-xs leading-5 text-slate-400">{subtitle}</div>
         </div>
         <button
           type="button"
           onClick={() => setOpen((current) => !current)}
-          className="rounded-lg border border-cyan-800 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-900/30"
+          title={open ? "Hide voice input" : "Use voice input"}
+          className={compact ? "inline-flex items-center rounded-lg border border-cyan-800 px-3 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-900/30" : "rounded-lg border border-cyan-800 px-3 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-900/30"}
         >
-          {open ? "Hide Voice" : "Use Voice"}
+          {compact ? (
+            <>
+              <FiMic aria-hidden="true" />
+              <span className="sr-only">{open ? "Hide voice input" : "Use voice input"}</span>
+            </>
+          ) : open ? "Hide Voice" : "Use Voice"}
         </button>
       </div>
 

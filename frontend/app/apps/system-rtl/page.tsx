@@ -339,6 +339,7 @@ export default function SystemRTLAppPage() {
               <div>
                 <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
                 <TextFileUpload
+                  compact
                   label="Upload digital spec"
                   helper="Digital RTL/IP behavior, registers, interfaces, interrupts, reset, and clocking."
                   onText={(text, _fileName, mode) => setDigitalSpecText((current) => mergeUploadedText(current, text, mode))}
@@ -356,6 +357,7 @@ export default function SystemRTLAppPage() {
               <div>
                 <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
                 <TextFileUpload
+                  compact
                   label="Upload analog macro spec"
                   helper="Analog is treated as a macro: include abstract behavior, pins, power, timing, LEF/LIB/GDS/SPICE availability, and integration assumptions."
                   onText={(text, _fileName, mode) => setAnalogSpecText((current) => mergeUploadedText(current, text, mode))}
@@ -373,6 +375,7 @@ export default function SystemRTLAppPage() {
               <div>
                 <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
                 <TextFileUpload
+                  compact
                   label="Upload SoC integration spec"
                   helper="Top-level integration, address map, macro hookup, reset/clock/power domains, and verification expectations."
                   onText={(text, _fileName, mode) => setSocIntegrationSpecText((current) => mergeUploadedText(current, text, mode))}

@@ -333,6 +333,7 @@ export default function SystemFirmwareAppPage() {
               <div>
                 <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
                 <TextFileUpload
+                  compact
                   label="Upload digital/firmware spec"
                   helper="Digital register/control behavior and firmware intent."
                   onText={(text, _fileName, mode) => setDigitalSpecText((current) => mergeUploadedText(current, text, mode))}
@@ -351,6 +352,7 @@ export default function SystemFirmwareAppPage() {
               <div>
                 <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
                 <TextFileUpload
+                  compact
                   label="Upload analog macro spec"
                   helper="Analog macro pins, behavior, status/observation points, and firmware-visible assumptions."
                   onText={(text, _fileName, mode) => setAnalogSpecText((current) => mergeUploadedText(current, text, mode))}
@@ -369,6 +371,7 @@ export default function SystemFirmwareAppPage() {
               <div>
                 <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
                 <TextFileUpload
+                  compact
                   label="Upload SoC integration spec"
                   helper="Address map, macro hookup, firmware-visible registers, interrupts, and integration constraints."
                   onText={(text, _fileName, mode) => setSocIntegrationSpecText((current) => mergeUploadedText(current, text, mode))}

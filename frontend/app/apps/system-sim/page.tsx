@@ -71,6 +71,12 @@ export default function SystemSimAppPage() {
   const [codeCoverageTool, setCodeCoverageTool] = useState("verilator_coverage");
   const [runClosureAnalysis, setRunClosureAnalysis] = useState(false);
   const [runClosureLoopAfterVerify, setRunClosureLoopAfterVerify] = useState(false);
+  const [debugFailuresAfterVerify, setDebugFailuresAfterVerify] = useState(false);
+  const [failureDebugLogOnlyFirst, setFailureDebugLogOnlyFirst] = useState(true);
+  const [failureDebugGenerateVcd, setFailureDebugGenerateVcd] = useState(true);
+  const [failureDebugAutoApplyTb, setFailureDebugAutoApplyTb] = useState(false);
+  const [failureDebugAutoApplyRtl, setFailureDebugAutoApplyRtl] = useState(false);
+  const [failureDebugRerunFailing, setFailureDebugRerunFailing] = useState(true);
   const [closureMaxIterations, setClosureMaxIterations] = useState(1);
   const [closureSeedBudget, setClosureSeedBudget] = useState(10);
   const [closureRerunMode, setClosureRerunMode] = useState<"coverage_targeted" | "failed_only" | "full_regression">("coverage_targeted");
@@ -246,11 +252,11 @@ export default function SystemSimAppPage() {
   }, [closureLoopWorkflowId]);
 
   useEffect(() => {
-    if (runClosureLoopAfterVerify || !runClosureAnalysis || closureStartedRef.current) return;
+    if (runClosureLoopAfterVerify || (!runClosureAnalysis && !debugFailuresAfterVerify) || closureStartedRef.current) return;
     if (!workflowId || workflowRow?.status !== "completed") return;
     closureStartedRef.current = true;
     void analyzeClosure();
-  }, [runClosureAnalysis, runClosureLoopAfterVerify, workflowId, workflowRow?.status]);
+  }, [runClosureAnalysis, runClosureLoopAfterVerify, debugFailuresAfterVerify, workflowId, workflowRow?.status]);
 
   useEffect(() => {
     if (!runClosureLoopAfterVerify || closureLoopStartedRef.current) return;
@@ -305,7 +311,16 @@ export default function SystemSimAppPage() {
             simulator: simulatorType,
             code_coverage: codeCoverageTool,
           },
-          run_closure_analysis: runClosureLoopAfterVerify || runClosureAnalysis,
+          run_closure_analysis: runClosureLoopAfterVerify || runClosureAnalysis || debugFailuresAfterVerify,
+          enable_failure_debug: debugFailuresAfterVerify,
+          failure_debug_options: {
+            enabled: debugFailuresAfterVerify,
+            log_only_first: failureDebugLogOnlyFirst,
+            generate_vcd_if_inconclusive: failureDebugGenerateVcd,
+            auto_apply_testbench_fixes: failureDebugAutoApplyTb,
+            auto_apply_rtl_fixes: failureDebugAutoApplyRtl,
+            rerun_failing_tests: failureDebugRerunFailing,
+          },
         }
       );
       setWorkflowId(out.workflow_id);
@@ -331,6 +346,15 @@ export default function SystemSimAppPage() {
         coverage_targets: coverageTargets || undefined,
         seed_count: systemSimSeeds.split(",").filter((x) => x.trim()).length || 5,
         toolchain: { simulator: simulatorType, code_coverage: codeCoverageTool },
+        enable_failure_debug: debugFailuresAfterVerify,
+        failure_debug_options: {
+          enabled: debugFailuresAfterVerify,
+          log_only_first: failureDebugLogOnlyFirst,
+          generate_vcd_if_inconclusive: failureDebugGenerateVcd,
+          auto_apply_testbench_fixes: failureDebugAutoApplyTb,
+          auto_apply_rtl_fixes: failureDebugAutoApplyRtl,
+          rerun_failing_tests: failureDebugRerunFailing,
+        },
       });
       setClosureWorkflowId(out.workflow_id);
       setClosureRunId(out.run_id);
@@ -353,6 +377,15 @@ export default function SystemSimAppPage() {
         rerun_mode: closureRerunMode,
         random_vs_directed: randomVsDirected,
         toolchain: { simulator: simulatorType, code_coverage: codeCoverageTool },
+        enable_failure_debug: debugFailuresAfterVerify,
+        failure_debug_options: {
+          enabled: debugFailuresAfterVerify,
+          log_only_first: failureDebugLogOnlyFirst,
+          generate_vcd_if_inconclusive: failureDebugGenerateVcd,
+          auto_apply_testbench_fixes: failureDebugAutoApplyTb,
+          auto_apply_rtl_fixes: failureDebugAutoApplyRtl,
+          rerun_failing_tests: failureDebugRerunFailing,
+        },
       });
       setClosureLoopWorkflowId(out.workflow_id);
       setClosureLoopRunId(out.run_id);
@@ -444,6 +477,7 @@ export default function SystemSimAppPage() {
                   placeholder="Scenarios, expected behavior, corner cases, analog macro observations, and pass/fail intent..."
                 />
                 <TextFileUpload
+                  compact
                   label="Upload verification spec or test intent"
                   helper="Load a test intent, verification note, markdown plan, or structured JSON/YAML."
                   onText={(text, _fileName, mode) => setTestIntent((current) => mergeUploadedText(current, text, mode))}
@@ -478,6 +512,7 @@ export default function SystemSimAppPage() {
                   placeholder="Example: functional 85%, line 80%, branch 70%"
                 />
                 <TextFileUpload
+                  compact
                   label="Upload coverage point plan"
                   helper="Coverpoints, bins, exclusions, analog macro observation points, and closure goals."
                   onText={(text, _fileName, mode) => setCoveragePlan((current) => mergeUploadedText(current, text, mode))}
@@ -490,6 +525,7 @@ export default function SystemSimAppPage() {
                   placeholder="Functional/code coverage points, bins, crosses, exclusions..."
                 />
                 <TextFileUpload
+                  compact
                   label="Upload verification plan"
                   helper="Reviewer-authored verification plan kept with run evidence."
                   onText={(text, _fileName, mode) => setVerificationPlan((current) => mergeUploadedText(current, text, mode))}
@@ -502,6 +538,7 @@ export default function SystemSimAppPage() {
                   placeholder="Verification objectives, scenarios, assumptions, scoreboarding, assertions, and exclusions..."
                 />
                 <TextFileUpload
+                  compact
                   label="Upload monitor/checker plan"
                   helper="Monitor points, scoreboard/checker rules, protocol checks, analog macro sampled observations."
                   onText={(text, _fileName, mode) => setMonitorCheckerPlan((current) => mergeUploadedText(current, text, mode))}
@@ -545,6 +582,40 @@ export default function SystemSimAppPage() {
                   <input type="checkbox" checked={runClosureLoopAfterVerify} onChange={(e) => setRunClosureLoopAfterVerify(e.target.checked)} className="mt-1" />
                   <span>Run closure loop after System Sim</span>
                 </label>
+                <label className="mt-3 flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={debugFailuresAfterVerify} onChange={(e) => setDebugFailuresAfterVerify(e.target.checked)} className="mt-1" />
+                  <span>Debug failing tests after System Sim</span>
+                </label>
+                {debugFailuresAfterVerify ? (
+                  <div className="mt-3 rounded-xl border border-slate-800 bg-black/20 p-3">
+                    <div className="text-sm font-semibold text-slate-100">Failure debug settings</div>
+                    <div className="mt-1 text-xs text-slate-500">
+                      RTL and testbench fixes are proposal-only unless auto-apply is explicitly enabled.
+                    </div>
+                    <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-300">
+                      <label className="flex items-center gap-2">
+                        <input type="checkbox" checked={failureDebugLogOnlyFirst} onChange={(e) => setFailureDebugLogOnlyFirst(e.target.checked)} />
+                        Log-only debug first
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input type="checkbox" checked={failureDebugGenerateVcd} onChange={(e) => setFailureDebugGenerateVcd(e.target.checked)} />
+                        Generate VCD if inconclusive
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input type="checkbox" checked={failureDebugRerunFailing} onChange={(e) => setFailureDebugRerunFailing(e.target.checked)} />
+                        Rerun failing tests
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input type="checkbox" checked={failureDebugAutoApplyTb} onChange={(e) => setFailureDebugAutoApplyTb(e.target.checked)} />
+                        Auto-apply testbench fixes
+                      </label>
+                      <label className="col-span-2 flex items-center gap-2 text-amber-200">
+                        <input type="checkbox" checked={failureDebugAutoApplyRtl} onChange={(e) => setFailureDebugAutoApplyRtl(e.target.checked)} />
+                        Auto-apply RTL fixes
+                      </label>
+                    </div>
+                  </div>
+                ) : null}
                 {runClosureLoopAfterVerify ? (
                   <div className="mt-3 grid grid-cols-3 gap-3">
                     <input type="number" min={1} max={10} value={closureMaxIterations} onChange={(e) => setClosureMaxIterations(Number(e.target.value || 1))} className="rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" title="Iterations" />
@@ -635,6 +706,7 @@ export default function SystemSimAppPage() {
               <div>
                 <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
                 <TextFileUpload
+                  compact
                   label="Upload digital spec"
                   helper="Digital behavior, interfaces, registers, and verification-relevant requirements."
                   onText={(text, _fileName, mode) => setDigitalSpecText((current) => mergeUploadedText(current, text, mode))}
@@ -647,6 +719,7 @@ export default function SystemSimAppPage() {
               <div>
                 <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
                 <TextFileUpload
+                  compact
                   label="Upload analog macro spec"
                   helper="Analog macro model/pins/observability; System Sim treats analog as a macro abstraction."
                   onText={(text, _fileName, mode) => setAnalogSpecText((current) => mergeUploadedText(current, text, mode))}
@@ -659,6 +732,7 @@ export default function SystemSimAppPage() {
               <div>
                 <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
                 <TextFileUpload
+                  compact
                   label="Upload SoC integration spec"
                   helper="Top-level integration, macro hookups, clock/reset/power assumptions, and system scenarios."
                   onText={(text, _fileName, mode) => setSocIntegrationSpecText((current) => mergeUploadedText(current, text, mode))}
