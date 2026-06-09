@@ -344,7 +344,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "tapeout_lec_summary.json",
         "executive_summary.json",
       ],
-      verification: ["simulation_summary_coverage.json"],
+      verification: ["simulation_summary_coverage.json", "system_sim_dashboard.json"],
       embedded: ["system_firmware_dashboard.json", "system_firmware_execution.json"],
       software: ["system_software_api_contract.json", "system_software_package.json"],
       validation: [
@@ -749,13 +749,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     }
 
     if (stage === "verification") {
-      const simulation = record(evidence["simulation_summary_coverage.json"]?.simulation);
-      const coverage = record(evidence["simulation_summary_coverage.json"]?.coverage);
+      const verifyDashboard = evidence["simulation_summary_coverage.json"] || evidence["system_sim_dashboard.json"] || {};
+      const simulation = record(verifyDashboard?.simulation);
+      const coverage = record(verifyDashboard?.coverage);
       const codeCoverage = record(coverage.code);
       const assertionCoverage = record(coverage.assertions);
-      const formal = record(evidence["simulation_summary_coverage.json"]?.formal);
-      const golden = record(evidence["simulation_summary_coverage.json"]?.golden_model);
-      const toolchain = record(evidence["simulation_summary_coverage.json"]?.toolchain);
+      const formal = record(verifyDashboard?.formal);
+      const golden = record(verifyDashboard?.golden_model);
+      const toolchain = record(verifyDashboard?.toolchain);
       const passed = number(simulation.pass);
       const failed = number(simulation.fail);
       const total = number(simulation.total);

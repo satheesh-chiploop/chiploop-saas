@@ -738,8 +738,8 @@ export default function SystemSimAppPage() {
 
               {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
 
-              {workflowId ? (
-                <div className="mt-4 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+              {false && workflowId ? (
+                <div className="hidden">
                   <div>workflow_id: <span className="text-slate-100">{workflowId}</span></div>
                   <div>run_id: <span className="text-slate-100">{runId}</span></div>
                   <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
@@ -886,6 +886,115 @@ export default function SystemSimAppPage() {
               )}
             </div>
           </div>
+
+          {workflowId ? (
+            <div className="mt-6 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+              <div>workflow_id: <span className="break-all text-slate-100">{workflowId}</span></div>
+              <div>run_id: <span className="break-all text-slate-100">{runId}</span></div>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <button onClick={downloadZip} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
+                  Download ZIP (full=1)
+                </button>
+                <button
+                  type="button"
+                  onClick={openSystemFirmware}
+                  disabled={!readyForFirmware}
+                  className="rounded-xl bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                >
+                  Open System Firmware
+                </button>
+                <button
+                  type="button"
+                  onClick={analyzeClosure}
+                  disabled={workflowRow?.status !== "completed" || Boolean(closureWorkflowId)}
+                  className="rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                >
+                  Analyze Closure
+                </button>
+                <button
+                  type="button"
+                  onClick={runClosureLoop}
+                  disabled={workflowRow?.status !== "completed" || Boolean(closureLoopWorkflowId)}
+                  className="rounded-xl bg-violet-700 px-4 py-2 font-semibold text-white hover:bg-violet-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                >
+                  Run Closure Loop
+                </button>
+              </div>
+              <div className="mt-4">
+                <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" logs={workflowRow?.logs} />
+              </div>
+              {closureWorkflowId ? (
+                <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/15 p-3">
+                  <div className="font-semibold text-cyan-200">System Sim Closure Analysis</div>
+                  <div>workflow_id: <span className="break-all text-slate-100">{closureWorkflowId}</span></div>
+                  <div>run_id: <span className="break-all text-slate-100">{closureRunId}</span></div>
+                  <div>status: <span className="text-slate-100">{closureRow?.status || "queued"}</span></div>
+                  <button onClick={downloadClosureZip} disabled={closureRow?.status !== "completed"} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-700">
+                    Download Closure Plan
+                  </button>
+                </div>
+              ) : null}
+              {closureLoopWorkflowId ? (
+                <div className="mt-4 rounded-xl border border-violet-900/60 bg-violet-950/15 p-3">
+                  <div className="font-semibold text-violet-200">System Sim Closure Loop</div>
+                  <div>workflow_id: <span className="break-all text-slate-100">{closureLoopWorkflowId}</span></div>
+                  <div>run_id: <span className="break-all text-slate-100">{closureLoopRunId}</span></div>
+                  <div>status: <span className="text-slate-100">{closureLoopRow?.status || "queued"}</span></div>
+                  <button onClick={downloadClosureLoopZip} disabled={closureLoopRow?.status !== "completed"} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-700">
+                    Download Closure Loop
+                  </button>
+                  {closureChart?.series?.length ? (
+                    <div className="mt-4">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-violet-200">Coverage trend</div>
+                      <div className="mt-2 space-y-2">
+                        {[
+                          ["functional", "Functional"],
+                          ["line", "Code line"],
+                          ["branch", "Branch"],
+                          ["condition", "Condition"],
+                          ["toggle", "Toggle"],
+                        ].map(([key, label]) => {
+                          const values = closureChart.series
+                            .map((point: any) => point?.merged_coverage?.[key] ?? point?.coverage?.[key])
+                            .map((value: any) => Number(value))
+                            .filter((value: number) => Number.isFinite(value));
+                          const latest = values.length ? values[values.length - 1] : null;
+                          return (
+                            <div key={key} className="grid grid-cols-[110px_minmax(0,1fr)_52px] items-center gap-2 text-xs">
+                              <div className="text-slate-300">{label}</div>
+                              <div className="h-3 overflow-hidden rounded-full bg-slate-800">
+                                <div className="h-full bg-violet-400" style={{ width: `${latest === null ? 0 : Math.max(0, Math.min(100, latest))}%` }} />
+                              </div>
+                              <div className="text-right text-slate-100">{latest === null ? "-" : `${latest}%`}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-3 grid grid-cols-3 gap-3 text-xs">
+                        {[
+                          ["coverage_points_added", "coverage points added"],
+                          ["testcase_intents_added", "testcase intents added"],
+                          ["seeds_added", "seeds added"],
+                        ].map(([key, label]) => {
+                          const latest = closureChart.series[closureChart.series.length - 1] || {};
+                          return (
+                            <div key={key} className="rounded-lg border border-slate-800 bg-black/20 p-2">
+                              <div className="text-slate-400">{label}</div>
+                              <div className="mt-1 text-lg font-semibold text-slate-100">{latest[key] ?? 0}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-2 text-xs text-slate-500">Stop reason: {closureChart.stop_reason || "not reported"}</div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+              <div className="mt-4">
+                <AskThisRunPanel workflowId={workflowId} compact />
+              </div>
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
             <div className="text-sm font-semibold">Live logs</div>
