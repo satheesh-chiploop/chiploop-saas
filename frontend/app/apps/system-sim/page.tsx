@@ -383,11 +383,11 @@ export default function SystemSimAppPage() {
     if (!workflowId) return;
     setErr(null);
     try {
-      const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>("/apps/verify/closure/run", {
+      const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>("/apps/system/sim/closure/run", {
         source_verify_workflow_id: workflowId,
         coverage_targets: coverageTargets || undefined,
         seed_count: systemSimSeeds.split(",").filter((x) => x.trim()).length || 5,
-        toolchain: { simulator: simulatorType, code_coverage: codeCoverageTool },
+        toolchain: { simulator: simulatorType, code_coverage: codeCoverageTool, formal: formalTool, formal_solver: formalSolver, golden_model: goldenModelTool },
         enable_failure_debug: debugFailuresAfterVerify,
         failure_debug_options: {
           enabled: debugFailuresAfterVerify,
@@ -411,7 +411,7 @@ export default function SystemSimAppPage() {
     setErr(null);
     setClosureChart(null);
     try {
-      const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>("/apps/verify/closure-loop/run", {
+      const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>("/apps/system/sim/closure-loop/run", {
         source_verify_workflow_id: workflowId,
         coverage_targets: coverageTargets || undefined,
         seed_count: systemSimSeeds.split(",").filter((x) => x.trim()).length || 5,
@@ -419,7 +419,7 @@ export default function SystemSimAppPage() {
         max_iterations: closureMaxIterations,
         rerun_mode: closureRerunMode,
         random_vs_directed: randomVsDirected,
-        toolchain: { simulator: simulatorType, code_coverage: codeCoverageTool },
+        toolchain: { simulator: simulatorType, code_coverage: codeCoverageTool, formal: formalTool, formal_solver: formalSolver, golden_model: goldenModelTool },
         enable_failure_debug: debugFailuresAfterVerify,
         failure_debug_options: {
           enabled: debugFailuresAfterVerify,
