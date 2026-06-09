@@ -797,23 +797,23 @@ export default function SystemSimAppPage() {
                           <div className="text-xs font-semibold uppercase tracking-wide text-violet-200">Coverage trend</div>
                           <div className="mt-2 space-y-2">
                             {[
-                              ["functional", "Functional"],
-                              ["line", "Code line"],
-                              ["branch", "Branch"],
-                              ["condition", "Condition"],
-                              ["toggle", "Toggle"],
+                              ["functional_coverage_pct", "Functional"],
+                              ["code_line_coverage_pct", "Code line"],
+                              ["code_branch_coverage_pct", "Branch"],
+                              ["code_condition_coverage_pct", "Condition"],
+                              ["code_toggle_coverage_pct", "Toggle"],
                             ].map(([key, label]) => {
                               const values = closureChart.series
-                                .map((point: any) => Number(point?.merged_coverage?.[key] ?? point?.coverage?.[key] ?? 0))
+                                .map((point: any) => Number(point?.[key]))
                                 .filter((value: number) => Number.isFinite(value));
-                              const latest = values.length ? values[values.length - 1] : 0;
+                              const latest = values.length ? values[values.length - 1] : null;
                               return (
                                 <div key={key} className="grid grid-cols-[110px_minmax(0,1fr)_52px] items-center gap-2 text-xs">
                                   <div className="text-slate-300">{label}</div>
                                   <div className="h-3 overflow-hidden rounded-full bg-slate-800">
-                                    <div className="h-full bg-violet-400" style={{ width: `${Math.max(0, Math.min(100, latest))}%` }} />
+                                    <div className="h-full bg-violet-400" style={{ width: `${latest === null ? 0 : Math.max(0, Math.min(100, latest))}%` }} />
                                   </div>
-                                  <div className="text-right text-slate-100">{latest ? `${latest}%` : "-"}</div>
+                                  <div className="text-right text-slate-100">{latest === null ? "-" : `${latest}%`}</div>
                                 </div>
                               );
                             })}
@@ -836,6 +836,11 @@ export default function SystemSimAppPage() {
                           <div className="mt-2 text-xs text-slate-500">Stop reason: {closureChart.stop_reason || "not reported"}</div>
                         </div>
                       ) : null}
+                      <div className="mt-3 max-h-52 overflow-auto rounded-lg border border-slate-800 bg-black/30 p-3 font-mono text-xs text-slate-400">
+                        {parseLogLines(closureLoopRow?.logs).map((line, index) => (
+                          <div key={`${line}-${index}`}>{line}</div>
+                        ))}
+                      </div>
                     </div>
                   ) : null}
                   <AskThisRunPanel workflowId={workflowId} compact />
@@ -948,15 +953,14 @@ export default function SystemSimAppPage() {
                       <div className="text-xs font-semibold uppercase tracking-wide text-violet-200">Coverage trend</div>
                       <div className="mt-2 space-y-2">
                         {[
-                          ["functional", "Functional"],
-                          ["line", "Code line"],
-                          ["branch", "Branch"],
-                          ["condition", "Condition"],
-                          ["toggle", "Toggle"],
+                          ["functional_coverage_pct", "Functional"],
+                          ["code_line_coverage_pct", "Code line"],
+                          ["code_branch_coverage_pct", "Branch"],
+                          ["code_condition_coverage_pct", "Condition"],
+                          ["code_toggle_coverage_pct", "Toggle"],
                         ].map(([key, label]) => {
                           const values = closureChart.series
-                            .map((point: any) => point?.merged_coverage?.[key] ?? point?.coverage?.[key])
-                            .map((value: any) => Number(value))
+                            .map((point: any) => Number(point?.[key]))
                             .filter((value: number) => Number.isFinite(value));
                           const latest = values.length ? values[values.length - 1] : null;
                           return (
@@ -988,6 +992,11 @@ export default function SystemSimAppPage() {
                       <div className="mt-2 text-xs text-slate-500">Stop reason: {closureChart.stop_reason || "not reported"}</div>
                     </div>
                   ) : null}
+                  <div className="mt-3 max-h-52 overflow-auto rounded-lg border border-slate-800 bg-black/30 p-3 font-mono text-xs text-slate-400">
+                    {parseLogLines(closureLoopRow?.logs).map((line, index) => (
+                      <div key={`${line}-${index}`}>{line}</div>
+                    ))}
+                  </div>
                 </div>
               ) : null}
               <div className="mt-4">
