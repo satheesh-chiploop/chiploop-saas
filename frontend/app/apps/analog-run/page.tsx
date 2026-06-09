@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 
 const supabase = createClientComponentClient();
@@ -294,16 +294,8 @@ export default function AnalogRunPage() {
             </div>
 
             <div>
-              <VoiceSpecDraft title="Voice Spec Draft" loopType="analog" target="Analog App spec" onApply={setDatasheetText} />
+              <SpecTextBox label="Datasheet / spec text" required value={datasheetText} onChange={setDatasheetText} rows={18} voiceTitle="Voice Spec Draft" voiceLoopType="analog" voiceTarget="Analog App spec" uploadLabel="Upload analog spec" uploadHelper="Load a datasheet, spec, markdown, JSON, YAML, Verilog-A, or text notes." placeholder="Paste datasheet or spec text here..." />
 
-              <label className="block text-sm text-slate-300">Datasheet / spec text *</label>
-              <textarea
-                value={datasheetText}
-                onChange={(e) => setDatasheetText(e.target.value)}
-                rows={18}
-                className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                placeholder="Paste datasheet or spec text here…"
-              />
               <div className="mt-2 text-xs text-slate-500">
                 Tip: include pins, modes, key targets (gain/BW/offset/PSRR), and corner ranges (VDD/temp/process).
               </div>

@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 
@@ -234,21 +234,9 @@ export default function SystemSynthesisAppPage() {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <VoiceSpecDraft title="Digital Voice Spec" loopType="digital" target="System digital spec" compact onApply={setDigitalSpecText} />
-                <label className="block text-sm text-slate-300">Digital specification *</label>
-                <textarea value={digitalSpecText} onChange={(e) => setDigitalSpecText(e.target.value)} rows={6} className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100" placeholder="Paste digital spec here..." />
-              </div>
-              <div>
-                <VoiceSpecDraft title="Analog Voice Spec" loopType="analog" target="System analog spec" compact onApply={setAnalogSpecText} />
-                <label className="block text-sm text-slate-300">Analog specification *</label>
-                <textarea value={analogSpecText} onChange={(e) => setAnalogSpecText(e.target.value)} rows={6} className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100" placeholder="Paste analog spec here..." />
-              </div>
-              <div>
-                <VoiceSpecDraft title="SoC Voice Spec" loopType="system" target="SoC integration spec" compact onApply={setSocIntegrationSpecText} />
-                <label className="block text-sm text-slate-300">SoC integration specification *</label>
-                <textarea value={socIntegrationSpecText} onChange={(e) => setSocIntegrationSpecText(e.target.value)} rows={6} className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100" placeholder="Paste SoC integration spec here..." />
-              </div>
+              <SpecTextBox label="Digital specification" required value={digitalSpecText} onChange={setDigitalSpecText} rows={6} voiceTitle="Digital Voice Spec" voiceLoopType="digital" voiceTarget="System digital spec" uploadLabel="Upload digital spec" uploadHelper="Digital behavior, interfaces, registers, and verification-relevant requirements." placeholder="Paste digital spec here..." />
+              <SpecTextBox label="Analog specification" required value={analogSpecText} onChange={setAnalogSpecText} rows={6} voiceTitle="Analog Voice Spec" voiceLoopType="analog" voiceTarget="System analog spec" uploadLabel="Upload analog spec" uploadHelper="Analog macro model, pins, observability, and assumptions." placeholder="Paste analog spec here..." />
+              <SpecTextBox label="SoC integration specification" required value={socIntegrationSpecText} onChange={setSocIntegrationSpecText} rows={6} voiceTitle="SoC Voice Spec" voiceLoopType="system" voiceTarget="SoC integration spec" uploadLabel="Upload SoC integration spec" uploadHelper="Top-level integration, macro hookups, clock/reset/power assumptions, and system scenarios." placeholder="Paste SoC integration spec here..." />
             </div>
           </div>
 

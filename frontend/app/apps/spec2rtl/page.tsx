@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
-import TextFileUpload from "@/components/TextFileUpload";
+import SpecTextBox from "@/components/SpecTextBox";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import { createClientComponentClient } from "@/lib/platformClient";
 
@@ -23,11 +23,6 @@ type WorkflowRow = {
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
   return logs.split("\n").map((line) => line.trimEnd()).filter((line) => line.trim().length > 0);
-}
-
-function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
-  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
-  return uploaded;
 }
 
 export default function Spec2RTLCheckPage() {
@@ -232,17 +227,17 @@ export default function Spec2RTLCheckPage() {
             </div>
 
             <div>
-              <TextFileUpload
-                label="Upload claimed spec"
-                helper="Load the spec, requirements, markdown, JSON, or register/interface notes."
-                onText={(text, _fileName, mode) => setSpecText((current) => mergeUploadedText(current, text, mode))}
-              />
-              <label className="mt-4 block text-sm text-slate-300">Claimed spec *</label>
-              <textarea
+              <SpecTextBox
+                label="Claimed spec"
+                required
                 value={specText}
-                onChange={(e) => setSpecText(e.target.value)}
+                onChange={setSpecText}
                 rows={18}
-                className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                voiceTitle="Claimed Spec Voice Draft"
+                voiceLoopType="digital"
+                voiceTarget="Claimed RTL spec"
+                uploadLabel="Upload claimed spec"
+                uploadHelper="Load the spec, requirements, markdown, JSON, or register/interface notes."
                 placeholder="Paste the claimed RTL spec, interface requirements, register behavior, reset behavior, and expected functions..."
               />
             </div>

@@ -5,10 +5,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
-import TextFileUpload from "@/components/TextFileUpload";
+import SpecTextBox from "@/components/SpecTextBox";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
@@ -48,11 +47,6 @@ function parseLogLines(logs: string | null | undefined): string[] {
     .split("\n")
     .map((l) => l.trimEnd())
     .filter((l) => l.trim().length > 0);
-}
-
-function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
-  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
-  return uploaded;
 }
 
 export default function VerifyAppPage() {
@@ -760,29 +754,19 @@ export default function VerifyAppPage() {
               </>
             ) : null}
 
-              <VoiceSpecDraft
-                title="Verification Voice Spec"
-                loopType="validation"
-                target="Verification test intent"
-                compact
-                onApply={setTestIntent}
-              />
-
-              <TextFileUpload
-                label="Upload verification spec or test intent"
-                helper="Load a test intent, verification note, markdown plan, or structured JSON/YAML."
-                onText={(text, _fileName, mode) => setTestIntent((current) => mergeUploadedText(current, text, mode))}
-              />
-
-              <label className="block text-sm text-slate-300">Test intent *</label>
-              <textarea
+              <SpecTextBox
+                label="Test intent"
+                required
                 value={testIntent}
-                onChange={(e) => setTestIntent(e.target.value)}
+                onChange={setTestIntent}
                 rows={6}
-                className="w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                placeholder="What should the testbench verify? Any scenarios, reset behavior, corner cases…"
+                voiceTitle="Verification Voice Spec"
+                voiceLoopType="validation"
+                voiceTarget="Verification test intent"
+                uploadLabel="Upload verification spec or test intent"
+                uploadHelper="Load a test intent, verification note, markdown plan, or structured JSON/YAML."
+                placeholder="What should the testbench verify? Any scenarios, reset behavior, corner cases..."
               />
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm text-slate-300">Test mix</label>
@@ -820,48 +804,42 @@ export default function VerifyAppPage() {
                 Reported coverage is functional bin coverage generated from the RTL specification.
               </div>
 
-              <TextFileUpload
-                label="Upload coverage point plan"
-                helper="Optional: import coverage groups, coverpoints, bins, exclusions, and closure goals."
-                onText={(text, _fileName, mode) => setCoveragePlan((current) => mergeUploadedText(current, text, mode))}
-              />
-
-              <label className="block text-sm text-slate-300">Coverage point plan (optional)</label>
-              <textarea
+              <SpecTextBox
+                label="Coverage point plan (optional)"
                 value={coveragePlan}
-                onChange={(e) => setCoveragePlan(e.target.value)}
+                onChange={setCoveragePlan}
                 rows={5}
-                className="w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                voiceTitle="Coverage Plan Voice Spec"
+                voiceLoopType="validation"
+                voiceTarget="Verification coverage point plan"
+                uploadLabel="Upload coverage point plan"
+                uploadHelper="Optional: import coverage groups, coverpoints, bins, exclusions, and closure goals."
                 placeholder="Functional coverage points, covergroups, crosses, bins, coverage exclusions, and target percentages..."
               />
 
-              <TextFileUpload
-                label="Upload verification plan"
-                helper="Optional: import a reviewer-authored verification plan and keep it with the run evidence."
-                onText={(text, _fileName, mode) => setVerificationPlan((current) => mergeUploadedText(current, text, mode))}
-              />
-
-              <label className="block text-sm text-slate-300">Verification plan (optional)</label>
-              <textarea
+              <SpecTextBox
+                label="Verification plan (optional)"
                 value={verificationPlan}
-                onChange={(e) => setVerificationPlan(e.target.value)}
+                onChange={setVerificationPlan}
                 rows={5}
-                className="w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                voiceTitle="Verification Plan Voice Spec"
+                voiceLoopType="validation"
+                voiceTarget="Verification plan"
+                uploadLabel="Upload verification plan"
+                uploadHelper="Optional: import a reviewer-authored verification plan and keep it with the run evidence."
                 placeholder="Verification objectives, scenarios, assumptions, scoreboarding, assertions, and exclusions..."
               />
 
-              <TextFileUpload
-                label="Upload monitor/checker plan"
-                helper="Optional: import monitor points, scoreboard/checker rules, protocol checks, and sampled observations."
-                onText={(text, _fileName, mode) => setMonitorCheckerPlan((current) => mergeUploadedText(current, text, mode))}
-              />
-
-              <label className="block text-sm text-slate-300">Monitor/checker plan (optional)</label>
-              <textarea
+              <SpecTextBox
+                label="Monitor/checker plan (optional)"
                 value={monitorCheckerPlan}
-                onChange={(e) => setMonitorCheckerPlan(e.target.value)}
+                onChange={setMonitorCheckerPlan}
                 rows={5}
-                className="w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                voiceTitle="Monitor/Checker Voice Spec"
+                voiceLoopType="validation"
+                voiceTarget="Monitor/checker plan"
+                uploadLabel="Upload monitor/checker plan"
+                uploadHelper="Optional: import monitor points, scoreboard/checker rules, protocol checks, and sampled observations."
                 placeholder="What should monitors observe? What should scoreboards/checkers compare? Include protocol rules, output response checks, sampled events, and exclusions..."
               />
 

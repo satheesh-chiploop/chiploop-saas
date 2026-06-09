@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 
 const supabase = createClientComponentClient();
@@ -273,15 +273,18 @@ export default function ValidationPlanAppPage() {
 
             {/* Right: Spec text */}
             <div>
-              <VoiceSpecDraft title="Voice Spec Draft" loopType="validation" target="Validation App spec" onApply={setDatasheetText} />
-
-              <label className="block text-sm text-slate-300">Datasheet / Spec text *</label>
-              <textarea
+              <SpecTextBox
+                label="Datasheet / Spec text"
+                required
                 value={datasheetText}
-                onChange={(e) => setDatasheetText(e.target.value)}
+                onChange={setDatasheetText}
                 rows={18}
-                className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                placeholder="Paste datasheet/spec text here…"
+                voiceTitle="Voice Spec Draft"
+                voiceLoopType="validation"
+                voiceTarget="Validation App spec"
+                uploadLabel="Upload validation spec"
+                uploadHelper="Load a datasheet, requirements, markdown, JSON, YAML, logs, or text notes."
+                placeholder="Paste datasheet/spec text here..."
               />
               <div className="mt-2 text-xs text-slate-500">
                 Tip: start with the key sections (timing, power, interrupts, state machine, fault table).

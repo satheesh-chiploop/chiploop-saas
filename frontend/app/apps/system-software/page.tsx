@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
@@ -478,14 +478,16 @@ export default function SystemSoftwareAppPage() {
 
             <div className="space-y-4">
               <div>
-                <VoiceSpecDraft title="Software Voice Spec" loopType="software" target="System Software spec" compact onApply={setSoftwareGoal} />
-
-                <label className="block text-sm text-slate-300">Software goal</label>
-                <textarea
+                <SpecTextBox
+                  label="Software goal"
                   value={softwareGoal}
-                  onChange={(e) => setSoftwareGoal(e.target.value)}
+                  onChange={setSoftwareGoal}
                   rows={4}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  voiceTitle="Software Voice Spec"
+                  voiceLoopType="software"
+                  voiceTarget="System Software spec"
+                  uploadLabel="Upload software goal"
+                  uploadHelper="Load software requirements, API notes, markdown, JSON, YAML, C, Rust, or text notes."
                   placeholder="Describe the software package you want to build..."
                 />
               </div>

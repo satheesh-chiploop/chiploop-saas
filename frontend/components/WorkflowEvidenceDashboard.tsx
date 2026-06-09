@@ -1002,7 +1002,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     <section className="rounded-lg border border-slate-800 bg-slate-950/45 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-sm font-semibold text-white">Demo Evidence Dashboard</div>
+          <div className="text-sm font-semibold text-white">Dashboard - Run Summary</div>
           <div className="mt-1 text-xs text-slate-400">Rendered from generated workflow artifacts.</div>
         </div>
         <div className="flex max-w-full flex-wrap items-center justify-end gap-2">

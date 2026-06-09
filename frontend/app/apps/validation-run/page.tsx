@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 //import { createClient } from "@supabase/supabase-js";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 
 const supabase = createClientComponentClient();
@@ -807,22 +807,19 @@ export default function ValidationRunAppPage() {
 
             {planMode === "type_name" ? (
               <div className="mt-3">
-                <VoiceSpecDraft
-                  title="Voice Spec Draft"
-                  loopType="validation"
-                  target="Validation App spec"
-                  onApply={setDatasheetText}
-                />
-
-                <div className="text-xs text-slate-300 mb-1">
-                  Datasheet / spec text (required to generate a new test plan)
-                </div>
-                <textarea
+                <SpecTextBox
+                  label="Datasheet / spec text"
+                  required
                   value={datasheetText}
-                  onChange={(e) => setDatasheetText(e.target.value)}
+                  onChange={setDatasheetText}
                   rows={6}
+                  voiceTitle="Voice Spec Draft"
+                  voiceLoopType="validation"
+                  voiceTarget="Validation App spec"
+                  uploadLabel="Upload validation spec"
+                  uploadHelper="Load datasheet sections, requirements, markdown, JSON, YAML, logs, or text notes."
                   placeholder="Paste relevant datasheet sections or a spec summary here (interfaces, commands, electrical limits, expected behavior, pass/fail criteria)."
-                  className="w-full rounded border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+                  textareaClassName="w-full resize-y bg-transparent p-1 text-sm text-white outline-none placeholder:text-slate-500"
                 />
                 <div className="mt-1 text-[11px] text-slate-500">
                   Tip: even 10–30 lines is enough for a first plan. You can refine later.

@@ -17,6 +17,9 @@ type Props = {
   voiceTarget: string;
   uploadLabel: string;
   uploadHelper?: string;
+  placeholder?: string;
+  textareaClassName?: string;
+  onApplyText?: (value: string) => void;
 };
 
 function mergeText(current: string, incoming: string, mode: InsertMode) {
@@ -35,8 +38,16 @@ export default function SpecTextBox({
   voiceTarget,
   uploadLabel,
   uploadHelper,
+  placeholder,
+  textareaClassName,
+  onApplyText,
 }: Props) {
   const [mode, setMode] = useState<InsertMode>("replace");
+  function applyExternalText(text: string, insertMode: InsertMode) {
+    const next = mergeText(value, text, insertMode);
+    onChange(next);
+    onApplyText?.(next);
+  }
 
   return (
     <div>
@@ -49,7 +60,8 @@ export default function SpecTextBox({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           rows={rows}
-          className="w-full resize-y bg-transparent p-1 text-slate-100 outline-none"
+          className={textareaClassName || "w-full resize-y bg-transparent p-1 text-slate-100 outline-none"}
+          placeholder={placeholder}
         />
         <div className="mt-2 flex items-center justify-end gap-2">
           <select
@@ -67,7 +79,7 @@ export default function SpecTextBox({
             target={voiceTarget}
             compact
             inline
-            onApply={(draft) => onChange(mergeText(value, draft, mode))}
+            onApply={(draft) => applyExternalText(draft, mode)}
           />
           <TextFileUpload
             compact
@@ -77,7 +89,7 @@ export default function SpecTextBox({
             onModeChange={setMode}
             label={uploadLabel}
             helper={uploadHelper}
-            onText={(text, _fileName, insertMode) => onChange(mergeText(value, text, insertMode))}
+            onText={(text, _fileName, insertMode) => applyExternalText(text, insertMode)}
           />
         </div>
       </div>

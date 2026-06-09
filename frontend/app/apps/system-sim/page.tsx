@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
-import TextFileUpload from "@/components/TextFileUpload";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import SpecTextBox from "@/components/SpecTextBox";
 import {
@@ -19,6 +18,7 @@ const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 type WorkflowRow = { id: string; status?: string | null; phase?: string | null; logs?: string | null; updated_at?: string | null; };
+type SystemRtlSourceMode = "from_system_rtl" | "paste" | "repo_path";
 
 function systemSimReady(row: WorkflowRow | null): boolean {
   if (!row) return false;
@@ -29,11 +29,6 @@ function systemSimReady(row: WorkflowRow | null): boolean {
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
   return logs.split("\n").map((l) => l.trimEnd()).filter((l) => l.trim().length > 0);
-}
-
-function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
-  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
-  return uploaded;
 }
 
 export default function SystemSimAppPage() {
@@ -55,8 +50,11 @@ export default function SystemSimAppPage() {
   const [closureLoopWorkflowId, setClosureLoopWorkflowId] = useState<string | null>(null);
   const [closureLoopRunId, setClosureLoopRunId] = useState<string | null>(null);
   const [closureLoopRow, setClosureLoopRow] = useState<WorkflowRow | null>(null);
+  const [closureChart, setClosureChart] = useState<any | null>(null);
 
   const [projectName, setProjectName] = useState("");
+  const [rtlSourceMode, setRtlSourceMode] = useState<SystemRtlSourceMode>("from_system_rtl");
+  const [repoPath, setRepoPath] = useState("");
   const [digitalSpecText, setDigitalSpecText] = useState("");
   const [analogSpecText, setAnalogSpecText] = useState("");
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
@@ -69,6 +67,9 @@ export default function SystemSimAppPage() {
   const [randomVsDirected, setRandomVsDirected] = useState<"random" | "directed" | "both">("both");
   const [simulatorType, setSimulatorType] = useState("verilator");
   const [codeCoverageTool, setCodeCoverageTool] = useState("verilator_coverage");
+  const [formalTool, setFormalTool] = useState("none");
+  const [formalSolver, setFormalSolver] = useState("z3");
+  const [goldenModelTool, setGoldenModelTool] = useState("none");
   const [runClosureAnalysis, setRunClosureAnalysis] = useState(false);
   const [runClosureLoopAfterVerify, setRunClosureLoopAfterVerify] = useState(false);
   const [debugFailuresAfterVerify, setDebugFailuresAfterVerify] = useState(false);
@@ -116,6 +117,15 @@ export default function SystemSimAppPage() {
     return resp.json();
   }
 
+  async function getJSON<T>(path: string): Promise<T> {
+    const resp = await fetch(`${API_BASE}${path}`, { headers: authHeaders() });
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => "");
+      throw new Error(`${resp.status} ${resp.statusText}${txt ? ` - ${txt}` : ""}`);
+    }
+    return resp.json();
+  }
+
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -138,7 +148,10 @@ export default function SystemSimAppPage() {
     setTempMonitorChain(isTempMonitor);
     try {
       const context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
-      if (context.systemRtlWorkflowId) setSystemRtlWorkflowId(context.systemRtlWorkflowId);
+      if (context.systemRtlWorkflowId) {
+        setSystemRtlWorkflowId(context.systemRtlWorkflowId);
+        setRtlSourceMode("from_system_rtl");
+      }
     } catch {
       // ignore malformed handoff context
     }
@@ -252,6 +265,18 @@ export default function SystemSimAppPage() {
   }, [closureLoopWorkflowId]);
 
   useEffect(() => {
+    if (!closureLoopWorkflowId || closureLoopRow?.status !== "completed") return;
+    (async () => {
+      try {
+        const data = await getJSON<any>(`/apps/dashboard/artifact/${closureLoopWorkflowId}?filename=closure_chart.json`);
+        setClosureChart(data);
+      } catch {
+        setClosureChart(null);
+      }
+    })();
+  }, [closureLoopWorkflowId, closureLoopRow?.status]);
+
+  useEffect(() => {
     if (runClosureLoopAfterVerify || (!runClosureAnalysis && !debugFailuresAfterVerify) || closureStartedRef.current) return;
     if (!workflowId || workflowRow?.status !== "completed") return;
     closureStartedRef.current = true;
@@ -267,14 +292,12 @@ export default function SystemSimAppPage() {
 
   const canRun = useMemo(() => {
     if (running) return false;
-    if (!systemRtlWorkflowId.trim()) {
-      if (!digitalSpecText.trim()) return false;
-      if (!analogSpecText.trim()) return false;
-      if (!socIntegrationSpecText.trim()) return false;
-    }
+    if (rtlSourceMode === "from_system_rtl" && !systemRtlWorkflowId.trim()) return false;
+    if (rtlSourceMode === "repo_path" && !repoPath.trim()) return false;
+    if (rtlSourceMode === "paste" && ![digitalSpecText, analogSpecText, socIntegrationSpecText].some((text) => text.trim())) return false;
     if (!testIntent.trim()) return false;
     return true;
-  }, [running, systemRtlWorkflowId, digitalSpecText, analogSpecText, socIntegrationSpecText, testIntent]);
+  }, [running, rtlSourceMode, systemRtlWorkflowId, repoPath, digitalSpecText, analogSpecText, socIntegrationSpecText, testIntent]);
 
   async function runNow() {
     setErr(null);
@@ -287,15 +310,27 @@ export default function SystemSimAppPage() {
     setClosureLoopWorkflowId(null);
     setClosureLoopRunId(null);
     setClosureLoopRow(null);
+    setClosureChart(null);
     try {
       const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>(
         "/apps/system/sim/run",
         {
           project_name: projectName || undefined,
-          digital_spec_text: digitalSpecText,
-          analog_spec_text: analogSpecText,
-          soc_integration_spec_text: socIntegrationSpecText,
-          system_rtl_workflow_id: systemRtlWorkflowId || undefined,
+          rtl_source_mode: rtlSourceMode,
+          digital_spec_text: rtlSourceMode === "paste" ? "" : digitalSpecText,
+          analog_spec_text: rtlSourceMode === "paste" ? "" : analogSpecText,
+          soc_integration_spec_text: rtlSourceMode === "paste" ? "" : socIntegrationSpecText,
+          system_rtl_workflow_id: rtlSourceMode === "from_system_rtl" ? systemRtlWorkflowId : undefined,
+          from_workflow_id: rtlSourceMode === "from_system_rtl" ? systemRtlWorkflowId : undefined,
+          repo_path: rtlSourceMode === "repo_path" ? repoPath : undefined,
+          pasted_rtl_files:
+            rtlSourceMode === "paste"
+              ? [
+                  { path: "rtl/system_digital.sv", content: digitalSpecText },
+                  { path: "rtl/system_analog_model.sv", content: analogSpecText },
+                  { path: "rtl/system_soc.sv", content: socIntegrationSpecText },
+                ].filter((item) => item.content.trim())
+              : undefined,
           test_intent: testIntent,
           verification_plan: verificationPlan || undefined,
           monitor_checker_plan: monitorCheckerPlan || undefined,
@@ -310,6 +345,9 @@ export default function SystemSimAppPage() {
           toolchain: {
             simulator: simulatorType,
             code_coverage: codeCoverageTool,
+            formal: formalTool,
+            formal_solver: formalSolver,
+            golden_model: goldenModelTool,
           },
           run_closure_analysis: runClosureLoopAfterVerify || runClosureAnalysis || debugFailuresAfterVerify,
           enable_failure_debug: debugFailuresAfterVerify,
@@ -320,6 +358,10 @@ export default function SystemSimAppPage() {
             auto_apply_testbench_fixes: failureDebugAutoApplyTb,
             auto_apply_rtl_fixes: failureDebugAutoApplyRtl,
             rerun_failing_tests: failureDebugRerunFailing,
+          },
+          toggles: {
+            enable_formal: formalTool !== "none",
+            enable_golden_model: goldenModelTool !== "none",
           },
         }
       );
@@ -367,6 +409,7 @@ export default function SystemSimAppPage() {
   async function runClosureLoop() {
     if (!workflowId) return;
     setErr(null);
+    setClosureChart(null);
     try {
       const out = await postJSON<{ ok: boolean; workflow_id: string; run_id: string }>("/apps/verify/closure-loop/run", {
         source_verify_workflow_id: workflowId,
@@ -459,28 +502,52 @@ export default function SystemSimAppPage() {
                 onChange={(e) => setProjectName(e.target.value)}
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
               />
-              <label className="block text-sm text-slate-300">Start from System RTL workflow ID</label>
-              <input
-                value={systemRtlWorkflowId}
-                onChange={(e) => setSystemRtlWorkflowId(e.target.value)}
+              <label className="block text-sm text-slate-300">RTL source</label>
+              <select
+                value={rtlSourceMode}
+                onChange={(e) => setRtlSourceMode(e.target.value as SystemRtlSourceMode)}
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
-                placeholder="Optional: skip System RTL generation and verify this source workflow"
-              />
+              >
+                <option value="from_system_rtl">Use System RTL output</option>
+                <option value="repo_path">Repo / path</option>
+                <option value="paste">Paste RTL</option>
+              </select>
+              {rtlSourceMode === "from_system_rtl" ? (
+                <>
+                  <label className="block text-sm text-slate-300">System RTL workflow_id *</label>
+                  <input
+                    value={systemRtlWorkflowId}
+                    onChange={(e) => setSystemRtlWorkflowId(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                    placeholder="workflow_id from System RTL"
+                  />
+                </>
+              ) : null}
+              {rtlSourceMode === "repo_path" ? (
+                <>
+                  <label className="block text-sm text-slate-300">Repo/path *</label>
+                  <input
+                    value={repoPath}
+                    onChange={(e) => setRepoPath(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                    placeholder="/path/to/repo or checked-out RTL directory"
+                  />
+                </>
+              ) : null}
               <div className="rounded-2xl border border-slate-800 bg-black/20 p-4">
                 <div className="text-sm font-semibold text-slate-200">System Sim run settings</div>
-                <label className="mt-3 block text-sm text-slate-300">Test intent *</label>
-                <textarea
+                <SpecTextBox
+                  label="Test intent"
+                  required
                   value={testIntent}
-                  onChange={(e) => setTestIntent(e.target.value)}
+                  onChange={setTestIntent}
                   rows={4}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  voiceTitle="System Sim Voice Spec"
+                  voiceLoopType="validation"
+                  voiceTarget="System simulation test intent"
+                  uploadLabel="Upload verification spec or test intent"
+                  uploadHelper="Load a test intent, verification note, markdown plan, or structured JSON/YAML."
                   placeholder="Scenarios, expected behavior, corner cases, analog macro observations, and pass/fail intent..."
-                />
-                <TextFileUpload
-                  compact
-                  label="Upload verification spec or test intent"
-                  helper="Load a test intent, verification note, markdown plan, or structured JSON/YAML."
-                  onText={(text, _fileName, mode) => setTestIntent((current) => mergeUploadedText(current, text, mode))}
                 />
                 <label className="mt-3 block text-sm text-slate-300">Testcases</label>
                 <input
@@ -511,50 +578,47 @@ export default function SystemSimAppPage() {
                   className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
                   placeholder="Example: functional 85%, line 80%, branch 70%"
                 />
-                <TextFileUpload
-                  compact
-                  label="Upload coverage point plan"
-                  helper="Coverpoints, bins, exclusions, analog macro observation points, and closure goals."
-                  onText={(text, _fileName, mode) => setCoveragePlan((current) => mergeUploadedText(current, text, mode))}
-                />
-                <textarea
+                <SpecTextBox
+                  label="Coverage point plan"
                   value={coveragePlan}
-                  onChange={(e) => setCoveragePlan(e.target.value)}
+                  onChange={setCoveragePlan}
                   rows={4}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  voiceTitle="Coverage Plan Voice Spec"
+                  voiceLoopType="validation"
+                  voiceTarget="System simulation coverage point plan"
+                  uploadLabel="Upload coverage point plan"
+                  uploadHelper="Coverpoints, bins, exclusions, analog macro observation points, and closure goals."
                   placeholder="Functional/code coverage points, bins, crosses, exclusions..."
                 />
-                <TextFileUpload
-                  compact
-                  label="Upload verification plan"
-                  helper="Reviewer-authored verification plan kept with run evidence."
-                  onText={(text, _fileName, mode) => setVerificationPlan((current) => mergeUploadedText(current, text, mode))}
-                />
-                <textarea
+                <SpecTextBox
+                  label="Verification plan"
                   value={verificationPlan}
-                  onChange={(e) => setVerificationPlan(e.target.value)}
+                  onChange={setVerificationPlan}
                   rows={3}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  voiceTitle="Verification Plan Voice Spec"
+                  voiceLoopType="validation"
+                  voiceTarget="System simulation verification plan"
+                  uploadLabel="Upload verification plan"
+                  uploadHelper="Reviewer-authored verification plan kept with run evidence."
                   placeholder="Verification objectives, scenarios, assumptions, scoreboarding, assertions, and exclusions..."
                 />
-                <TextFileUpload
-                  compact
-                  label="Upload monitor/checker plan"
-                  helper="Monitor points, scoreboard/checker rules, protocol checks, analog macro sampled observations."
-                  onText={(text, _fileName, mode) => setMonitorCheckerPlan((current) => mergeUploadedText(current, text, mode))}
-                />
-                <textarea
+                <SpecTextBox
+                  label="Monitor/checker plan"
                   value={monitorCheckerPlan}
-                  onChange={(e) => setMonitorCheckerPlan(e.target.value)}
+                  onChange={setMonitorCheckerPlan}
                   rows={3}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  voiceTitle="Monitor/Checker Voice Spec"
+                  voiceLoopType="validation"
+                  voiceTarget="System simulation monitor/checker plan"
+                  uploadLabel="Upload monitor/checker plan"
+                  uploadHelper="Monitor points, scoreboard/checker rules, protocol checks, analog macro sampled observations."
                   placeholder="What should monitors observe and what should scoreboards/checkers compare?"
                 />
-                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <label className="block text-sm text-slate-300">
-                    Test style
+                    Test mix
                     <select value={randomVsDirected} onChange={(e) => setRandomVsDirected(e.target.value as "random" | "directed" | "both")} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
-                      <option value="both">Directed + random</option>
+                      <option value="both">Directed then random</option>
                       <option value="directed">Directed only</option>
                       <option value="random">Random only</option>
                     </select>
@@ -570,21 +634,54 @@ export default function SystemSimAppPage() {
                     Code coverage
                     <select value={codeCoverageTool} onChange={(e) => setCodeCoverageTool(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
                       <option value="verilator_coverage">verilator_coverage</option>
-                      <option value="none">none</option>
+                      <option value="none">Disabled</option>
                     </select>
                   </label>
+                  <label className="block text-sm text-slate-300">
+                    Formal tool
+                    <select value={formalTool} onChange={(e) => setFormalTool(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                      <option value="none">Disabled</option>
+                      <option value="symbiyosys">SymbiYosys (sby)</option>
+                    </select>
+                  </label>
+                  <label className="block text-sm text-slate-300">
+                    Formal solver
+                    <select value={formalSolver} onChange={(e) => setFormalSolver(e.target.value)} disabled={formalTool === "none"} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100 disabled:opacity-60">
+                      <option value="z3">Z3</option>
+                      <option value="boolector">Boolector</option>
+                    </select>
+                  </label>
+                  <label className="block text-sm text-slate-300 sm:col-span-2">
+                    Golden model comparison
+                    <select value={goldenModelTool} onChange={(e) => setGoldenModelTool(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                      <option value="none">Disabled</option>
+                      <option value="chiploop_python_scoreboard">ChipLoop Python scoreboard</option>
+                    </select>
+                  </label>
+                </div>
+                <div className="mt-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-xs text-slate-400">
+                  Active tools: {simulatorType || "verilator"} simulation, {codeCoverageTool === "none" ? "no code coverage" : codeCoverageTool}, {formalTool === "none" ? "formal disabled" : `${formalTool} + ${formalSolver}`}, {goldenModelTool === "none" ? "golden model disabled" : goldenModelTool}.
                 </div>
                 <label className="mt-3 flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
                   <input type="checkbox" checked={runClosureLoopAfterVerify || runClosureAnalysis} onChange={(e) => setRunClosureAnalysis(e.target.checked)} disabled={runClosureLoopAfterVerify} className="mt-1" />
                   <span>Run closure analysis after System Sim</span>
+                  <span className="mt-1 block text-xs text-slate-500">
+                    Starts a linked child workflow when System Sim completes to analyze coverage gaps, failing seeds, and recommended next actions. Required when closure loop is enabled.
+                  </span>
                 </label>
                 <label className="mt-3 flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
                   <input type="checkbox" checked={runClosureLoopAfterVerify} onChange={(e) => setRunClosureLoopAfterVerify(e.target.checked)} className="mt-1" />
                   <span>Run closure loop after System Sim</span>
+                  <span className="mt-1 block text-xs text-slate-500">
+                    Automatically analyzes gaps, updates plans, adds testcase/seed intents, reruns simulation, and emits a merged coverage trend.
+                  </span>
                 </label>
                 <label className="mt-3 flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
                   <input type="checkbox" checked={debugFailuresAfterVerify} onChange={(e) => setDebugFailuresAfterVerify(e.target.checked)} className="mt-1" />
                   <span>Debug failing tests after System Sim</span>
+                  <span className="mt-1 block text-xs text-slate-500">
+                    Runs log-first failure debug for failing testcase/seed pairs before closure-loop coverage chasing.
+                  </span>
                 </label>
                 {debugFailuresAfterVerify ? (
                   <div className="mt-3 rounded-xl border border-slate-800 bg-black/20 p-3">
@@ -687,7 +784,7 @@ export default function SystemSimAppPage() {
                     </div>
                   ) : null}
                   {closureLoopWorkflowId ? (
-                    <div className="mt-4 rounded-xl border border-violet-900/60 bg-violet-950/15 p-3">
+                  <div className="mt-4 rounded-xl border border-violet-900/60 bg-violet-950/15 p-3">
                       <div className="font-semibold text-violet-200">System Sim Closure Loop</div>
                       <div>workflow_id: <span className="break-all text-slate-100">{closureLoopWorkflowId}</span></div>
                       <div>run_id: <span className="break-all text-slate-100">{closureLoopRunId}</span></div>
@@ -695,6 +792,50 @@ export default function SystemSimAppPage() {
                       <button onClick={downloadClosureLoopZip} disabled={closureLoopRow?.status !== "completed"} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-700">
                         Download Closure Loop
                       </button>
+                      {closureChart?.series?.length ? (
+                        <div className="mt-4">
+                          <div className="text-xs font-semibold uppercase tracking-wide text-violet-200">Coverage trend</div>
+                          <div className="mt-2 space-y-2">
+                            {[
+                              ["functional", "Functional"],
+                              ["line", "Code line"],
+                              ["branch", "Branch"],
+                              ["condition", "Condition"],
+                              ["toggle", "Toggle"],
+                            ].map(([key, label]) => {
+                              const values = closureChart.series
+                                .map((point: any) => Number(point?.merged_coverage?.[key] ?? point?.coverage?.[key] ?? 0))
+                                .filter((value: number) => Number.isFinite(value));
+                              const latest = values.length ? values[values.length - 1] : 0;
+                              return (
+                                <div key={key} className="grid grid-cols-[110px_minmax(0,1fr)_52px] items-center gap-2 text-xs">
+                                  <div className="text-slate-300">{label}</div>
+                                  <div className="h-3 overflow-hidden rounded-full bg-slate-800">
+                                    <div className="h-full bg-violet-400" style={{ width: `${Math.max(0, Math.min(100, latest))}%` }} />
+                                  </div>
+                                  <div className="text-right text-slate-100">{latest ? `${latest}%` : "-"}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <div className="mt-3 grid grid-cols-3 gap-3 text-xs">
+                            {[
+                              ["coverage_points_added", "coverage points added"],
+                              ["testcase_intents_added", "testcase intents added"],
+                              ["seeds_added", "seeds added"],
+                            ].map(([key, label]) => {
+                              const latest = closureChart.series[closureChart.series.length - 1] || {};
+                              return (
+                                <div key={key} className="rounded-lg border border-slate-800 bg-black/20 p-2">
+                                  <div className="text-slate-400">{label}</div>
+                                  <div className="mt-1 text-lg font-semibold text-slate-100">{latest[key] ?? 0}</div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <div className="mt-2 text-xs text-slate-500">Stop reason: {closureChart.stop_reason || "not reported"}</div>
+                        </div>
+                      ) : null}
                     </div>
                   ) : null}
                   <AskThisRunPanel workflowId={workflowId} compact />
@@ -703,39 +844,46 @@ export default function SystemSimAppPage() {
             </div>
 
             <div className="space-y-4">
-              <SpecTextBox
-                label="Digital specification"
-                required
-                value={digitalSpecText}
-                onChange={setDigitalSpecText}
-                voiceTitle="Digital Voice Spec"
-                voiceLoopType="digital"
-                voiceTarget="System digital spec"
-                uploadLabel="Upload digital spec"
-                uploadHelper="Digital behavior, interfaces, registers, and verification-relevant requirements."
-              />
-              <SpecTextBox
-                label="Analog specification"
-                required
-                value={analogSpecText}
-                onChange={setAnalogSpecText}
-                voiceTitle="Analog Voice Spec"
-                voiceLoopType="analog"
-                voiceTarget="System analog spec"
-                uploadLabel="Upload analog macro spec"
-                uploadHelper="Analog macro model/pins/observability; System Sim treats analog as a macro abstraction."
-              />
-              <SpecTextBox
-                label="SoC integration specification"
-                required
-                value={socIntegrationSpecText}
-                onChange={setSocIntegrationSpecText}
-                voiceTitle="SoC Voice Spec"
-                voiceLoopType="system"
-                voiceTarget="SoC integration spec"
-                uploadLabel="Upload SoC integration spec"
-                uploadHelper="Top-level integration, macro hookups, clock/reset/power assumptions, and system scenarios."
-              />
+              {rtlSourceMode === "paste" ? (
+                <>
+                  <SpecTextBox
+                    label="Digital RTL"
+                    value={digitalSpecText}
+                    onChange={setDigitalSpecText}
+                    voiceTitle="Digital RTL Voice Input"
+                    voiceLoopType="digital"
+                    voiceTarget="System digital RTL"
+                    uploadLabel="Upload digital RTL"
+                    uploadHelper="Digital Verilog/SystemVerilog module files used by System Sim."
+                  />
+                  <SpecTextBox
+                    label="Analog RTL / behavioral model"
+                    value={analogSpecText}
+                    onChange={setAnalogSpecText}
+                    voiceTitle="Analog Model Voice Input"
+                    voiceLoopType="analog"
+                    voiceTarget="System analog RTL or behavioral model"
+                    uploadLabel="Upload analog model"
+                    uploadHelper="Analog macro wrapper or behavioral Verilog/SystemVerilog model used by System Sim."
+                  />
+                  <SpecTextBox
+                    label="SoC RTL"
+                    value={socIntegrationSpecText}
+                    onChange={setSocIntegrationSpecText}
+                    voiceTitle="SoC RTL Voice Input"
+                    voiceLoopType="system"
+                    voiceTarget="SoC RTL"
+                    uploadLabel="Upload SoC RTL"
+                    uploadHelper="Top-level SoC wrapper RTL and integration modules."
+                  />
+                </>
+              ) : (
+                <div className="rounded-2xl border border-slate-800 bg-black/20 p-4 text-sm text-slate-300">
+                  {rtlSourceMode === "from_system_rtl"
+                    ? "Using the selected System RTL workflow as the RTL source. Paste boxes are hidden because the run will hydrate RTL, filelists, SoC top, and integration intent from that workflow."
+                    : "Using RTL from the repo/path. Paste boxes are hidden because the run will scan the selected path for Verilog/SystemVerilog sources."}
+                </div>
+              )}
             </div>
           </div>
 

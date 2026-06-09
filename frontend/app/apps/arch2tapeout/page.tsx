@@ -5,10 +5,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
-import TextFileUpload from "@/components/TextFileUpload";
+import SpecTextBox from "@/components/SpecTextBox";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 
 const supabase = createClientComponentClient();
@@ -37,11 +36,6 @@ function parseLogLines(logs: string | null | undefined): string[] {
     .split("\n")
     .map((l) => l.trimEnd())
     .filter((l) => l.trim().length > 0);
-}
-
-function mergeUploadedText(current: string, uploaded: string, mode: "append" | "replace") {
-  if (mode === "append") return [current.trim(), uploaded.trim()].filter(Boolean).join("\n\n");
-  return uploaded;
 }
 
 export default function Arch2TapeoutAppPage() {
@@ -632,24 +626,19 @@ export default function Arch2TapeoutAppPage() {
           {/* RIGHT: spec + logs */}
           <div className="space-y-4">
             <div className="rounded-2xl border border-slate-800 bg-black/30 p-5">
-              <VoiceSpecDraft title="Voice Spec Draft" loopType="digital" target="Digital spec" onApply={setSpecText} />
-
-              <div className="mt-4">
-                <TextFileUpload
-                  label="Upload spec"
-                  helper="Load a text, markdown, JSON, YAML, SystemVerilog, Verilog, or SDC spec file."
-                  onText={(text, _fileName, mode) => setSpecText((current) => mergeUploadedText(current, text, mode))}
-                />
-              </div>
-
-              <label className="block text-sm text-slate-300">Spec text (optional if RTL provided)</label>
-              <textarea
+              <SpecTextBox
+                label="Spec text (optional if RTL provided)"
                 value={specText}
-                onChange={(e) => setSpecText(e.target.value)}
+                onChange={setSpecText}
                 rows={14}
-                className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                placeholder="Paste your spec here…"
+                voiceTitle="Voice Spec Draft"
+                voiceLoopType="digital"
+                voiceTarget="Digital spec"
+                uploadLabel="Upload spec"
+                uploadHelper="Load a text, markdown, JSON, YAML, SystemVerilog, Verilog, or SDC spec file."
+                placeholder="Paste your spec here..."
               />
+
               <div className="mt-2 text-xs text-slate-500">Tip: keep it structured (interfaces, clocks, resets, targets).</div>
             </div>
 

@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 
 const supabase = createClientComponentClient();
@@ -237,15 +237,18 @@ export default function AnalogValidateModelPage() {
             </div>
 
             <div>
-              <VoiceSpecDraft title="Voice Spec Draft" loopType="analog" target="Analog App spec" onApply={setDatasheetText} />
-
-              <label className="block text-sm text-slate-300">Spec text *</label>
-              <textarea
+              <SpecTextBox
+                label="Spec text"
+                required
                 value={datasheetText}
-                onChange={(e) => setDatasheetText(e.target.value)}
+                onChange={setDatasheetText}
                 rows={18}
-                className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                placeholder="Paste datasheet/spec text here…"
+                voiceTitle="Voice Spec Draft"
+                voiceLoopType="analog"
+                voiceTarget="Analog App spec"
+                uploadLabel="Upload analog spec"
+                uploadHelper="Load a datasheet, spec, markdown, JSON, YAML, Verilog-A, or text notes."
+                placeholder="Paste datasheet/spec text here..."
               />
               <div className="mt-2 text-xs text-slate-500">
                 Include mode transitions, timing expectations, and min/max bounds you want asserted.

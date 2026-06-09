@@ -27,6 +27,7 @@ type WorkflowRow = {
   logs?: string | null;
   updated_at?: string | null;
 };
+type SystemRtlSourceMode = "from_system_rtl" | "paste" | "repo_path";
 
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
@@ -59,6 +60,8 @@ export default function SystemFirmwareAppPage() {
   const [digitalSpecText, setDigitalSpecText] = useState("");
   const [analogSpecText, setAnalogSpecText] = useState("");
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
+  const [rtlSourceMode, setRtlSourceMode] = useState<SystemRtlSourceMode>("from_system_rtl");
+  const [repoPath, setRepoPath] = useState("");
   const [systemRtlWorkflowId, setSystemRtlWorkflowId] = useState("");
   const [tempMonitorChain, setTempMonitorChain] = useState(false);
 
@@ -114,7 +117,10 @@ export default function SystemFirmwareAppPage() {
     setTempMonitorChain(isTempMonitor);
     try {
       const context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
-      if (context.systemRtlWorkflowId) setSystemRtlWorkflowId(context.systemRtlWorkflowId);
+      if (context.systemRtlWorkflowId) {
+        setSystemRtlWorkflowId(context.systemRtlWorkflowId);
+        setRtlSourceMode("from_system_rtl");
+      }
     } catch {
       // ignore malformed handoff context
     }
@@ -179,13 +185,11 @@ export default function SystemFirmwareAppPage() {
 
   const canRun = useMemo(() => {
     if (running) return false;
-    if (!systemRtlWorkflowId.trim()) {
-      if (!digitalSpecText.trim()) return false;
-      if (!analogSpecText.trim()) return false;
-      if (!socIntegrationSpecText.trim()) return false;
-    }
+    if (rtlSourceMode === "from_system_rtl" && !systemRtlWorkflowId.trim()) return false;
+    if (rtlSourceMode === "repo_path" && !repoPath.trim()) return false;
+    if (rtlSourceMode === "paste" && ![digitalSpecText, analogSpecText, socIntegrationSpecText].some((text) => text.trim())) return false;
     return true;
-  }, [running, systemRtlWorkflowId, digitalSpecText, analogSpecText, socIntegrationSpecText]);
+  }, [running, rtlSourceMode, systemRtlWorkflowId, repoPath, digitalSpecText, analogSpecText, socIntegrationSpecText]);
 
   async function runNow() {
     setErr(null);
@@ -195,10 +199,21 @@ export default function SystemFirmwareAppPage() {
         "/apps/system/firmware/run",
         {
           project_name: projectName || undefined,
-          digital_spec_text: digitalSpecText,
-          analog_spec_text: analogSpecText,
-          soc_integration_spec_text: socIntegrationSpecText,
-          system_rtl_workflow_id: systemRtlWorkflowId || undefined,
+          rtl_source_mode: rtlSourceMode,
+          digital_spec_text: rtlSourceMode === "paste" ? "" : digitalSpecText,
+          analog_spec_text: rtlSourceMode === "paste" ? "" : analogSpecText,
+          soc_integration_spec_text: rtlSourceMode === "paste" ? "" : socIntegrationSpecText,
+          system_rtl_workflow_id: rtlSourceMode === "from_system_rtl" ? systemRtlWorkflowId : undefined,
+          from_workflow_id: rtlSourceMode === "from_system_rtl" ? systemRtlWorkflowId : undefined,
+          repo_path: rtlSourceMode === "repo_path" ? repoPath : undefined,
+          pasted_rtl_files:
+            rtlSourceMode === "paste"
+              ? [
+                  { path: "rtl/system_digital.sv", content: digitalSpecText },
+                  { path: "rtl/system_analog_model.sv", content: analogSpecText },
+                  { path: "rtl/system_soc.sv", content: socIntegrationSpecText },
+                ].filter((item) => item.content.trim())
+              : undefined,
         }
       );
       setWorkflowId(out.workflow_id);
@@ -280,13 +295,38 @@ export default function SystemFirmwareAppPage() {
                 onChange={(e) => setProjectName(e.target.value)}
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
               />
-              <label className="block text-sm text-slate-300">Start from System RTL workflow ID</label>
-              <input
-                value={systemRtlWorkflowId}
-                onChange={(e) => setSystemRtlWorkflowId(e.target.value)}
+              <label className="block text-sm text-slate-300">RTL source</label>
+              <select
+                value={rtlSourceMode}
+                onChange={(e) => setRtlSourceMode(e.target.value as SystemRtlSourceMode)}
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
-                placeholder="Optional: use existing System RTL handoff and skip System RTL generation"
-              />
+              >
+                <option value="from_system_rtl">Use System RTL output</option>
+                <option value="repo_path">Repo / path</option>
+                <option value="paste">Paste RTL</option>
+              </select>
+              {rtlSourceMode === "from_system_rtl" ? (
+                <>
+                  <label className="block text-sm text-slate-300">System RTL workflow_id *</label>
+                  <input
+                    value={systemRtlWorkflowId}
+                    onChange={(e) => setSystemRtlWorkflowId(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                    placeholder="workflow_id from System RTL"
+                  />
+                </>
+              ) : null}
+              {rtlSourceMode === "repo_path" ? (
+                <>
+                  <label className="block text-sm text-slate-300">Repo/path *</label>
+                  <input
+                    value={repoPath}
+                    onChange={(e) => setRepoPath(e.target.value)}
+                    className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                    placeholder="/path/to/repo or checked-out RTL directory"
+                  />
+                </>
+              ) : null}
 
               <button
                 onClick={runNow}
@@ -324,39 +364,46 @@ export default function SystemFirmwareAppPage() {
             </div>
 
             <div className="space-y-4">
-              <SpecTextBox
-                label="Digital specification"
-                required
-                value={digitalSpecText}
-                onChange={setDigitalSpecText}
-                voiceTitle="Digital Voice Spec"
-                voiceLoopType="digital"
-                voiceTarget="System digital spec"
-                uploadLabel="Upload digital/firmware spec"
-                uploadHelper="Digital register/control behavior and firmware intent."
-              />
-              <SpecTextBox
-                label="Analog specification"
-                required
-                value={analogSpecText}
-                onChange={setAnalogSpecText}
-                voiceTitle="Analog Voice Spec"
-                voiceLoopType="analog"
-                voiceTarget="System analog spec"
-                uploadLabel="Upload analog macro spec"
-                uploadHelper="Analog macro pins, behavior, status/observation points, and firmware-visible assumptions."
-              />
-              <SpecTextBox
-                label="SoC integration specification"
-                required
-                value={socIntegrationSpecText}
-                onChange={setSocIntegrationSpecText}
-                voiceTitle="SoC Voice Spec"
-                voiceLoopType="system"
-                voiceTarget="SoC integration spec"
-                uploadLabel="Upload SoC integration spec"
-                uploadHelper="Address map, macro hookup, firmware-visible registers, interrupts, and integration constraints."
-              />
+              {rtlSourceMode === "paste" ? (
+                <>
+                  <SpecTextBox
+                    label="Digital RTL"
+                    value={digitalSpecText}
+                    onChange={setDigitalSpecText}
+                    voiceTitle="Digital RTL Voice Input"
+                    voiceLoopType="digital"
+                    voiceTarget="System digital RTL"
+                    uploadLabel="Upload digital RTL"
+                    uploadHelper="Digital Verilog/SystemVerilog register/control logic used for firmware handoff."
+                  />
+                  <SpecTextBox
+                    label="Analog RTL / behavioral model"
+                    value={analogSpecText}
+                    onChange={setAnalogSpecText}
+                    voiceTitle="Analog Model Voice Input"
+                    voiceLoopType="analog"
+                    voiceTarget="System analog RTL or behavioral model"
+                    uploadLabel="Upload analog model"
+                    uploadHelper="Analog macro pins, behavior, status/observation points, and firmware-visible assumptions."
+                  />
+                  <SpecTextBox
+                    label="SoC RTL"
+                    value={socIntegrationSpecText}
+                    onChange={setSocIntegrationSpecText}
+                    voiceTitle="SoC RTL Voice Input"
+                    voiceLoopType="system"
+                    voiceTarget="SoC RTL"
+                    uploadLabel="Upload SoC RTL"
+                    uploadHelper="Address map, macro hookup, firmware-visible registers, interrupts, and integration constraints."
+                  />
+                </>
+              ) : (
+                <div className="rounded-2xl border border-slate-800 bg-black/20 p-4 text-sm text-slate-300">
+                  {rtlSourceMode === "from_system_rtl"
+                    ? "Using the selected System RTL workflow as the firmware RTL/register source."
+                    : "Using RTL from the repo/path as the firmware RTL/register source."}
+                </div>
+              )}
             </div>
           </div>
 

@@ -5,7 +5,7 @@ import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
 import { Special_Elite } from "next/font/google";
 import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
 import MissingAgentsResolverModal from "@/components/studio/MissingAgentsResolverModal";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import { createClientComponentClient } from "@/lib/platformClient";
 const supabase = createClientComponentClient();
 import WorkflowConsole from "@/app/workflow/WorkflowConsole";
@@ -735,36 +735,35 @@ export default function AgentPlannerModal({
           </div>
         )}
 
-        <textarea
+        <SpecTextBox
+          label="Planner spec"
           value={finalizedSpec ?? goal}
-          onChange={(e) => {
-            if (finalizedSpec !== null) setFinalizedSpec(e.target.value);
-            else if (improvedSpec !== null) setImprovedSpec(e.target.value);
-            else setGoal(e.target.value);
+          onChange={(value) => {
+            if (finalizedSpec !== null) setFinalizedSpec(value);
+            else if (improvedSpec !== null) setImprovedSpec(value);
+            else setGoal(value);
           }}
-          placeholder="e.g., Design a 4-bit counter agent for RTL generation"
-          className="h-[36vh] min-h-64 w-full resize-none rounded-lg border border-slate-700 bg-slate-900 p-4 text-sm leading-6 text-white outline-none focus:ring-2 focus:ring-cyan-400"
-        />
-            </div>
-
-            <aside>
-        <VoiceSpecDraft
-          title="Voice Spec Draft"
-          subtitle="Record one or more short system design notes, generate a draft, then apply it to the planner spec."
-          loopType="system"
-          target="System Planner spec"
-          onApply={(draft) => {
-            setVoiceSummary(draft);
-            setGoal(draft);
-            setBackendSource("Voice spec draft");
+          onApplyText={(value) => {
+            setVoiceSummary(value);
+            setGoal(value);
+            setBackendSource("Spec draft");
             setSpec(null);
             setMissingFields([]);
             setCoverage(0);
             setStage("initial");
             setReadyForPlanning(false);
           }}
+          rows={12}
+          voiceTitle="Voice Spec Draft"
+          voiceLoopType="system"
+          voiceTarget="System Planner spec"
+          uploadLabel="Upload planner spec"
+          uploadHelper="Load a system spec, architecture notes, markdown, JSON, YAML, RTL, or text notes."
+          placeholder="e.g., Design a 4-bit counter agent for RTL generation"
+          textareaClassName="h-[36vh] min-h-64 w-full resize-none bg-transparent p-1 text-sm leading-6 text-white outline-none"
         />
-            </aside>
+            </div>
+
           </div>
         )}
 

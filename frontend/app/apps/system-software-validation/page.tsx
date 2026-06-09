@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
@@ -464,20 +464,16 @@ export default function SystemSoftwareValidationAppPage() {
               ) : null}
 
               <div>
-                <VoiceSpecDraft
-                  title="Validation Goal Voice Spec"
-                  loopType="validation"
-                  target="System Software Validation goal"
-                  compact
-                  onApply={setGoal}
-                />
-
-                <label className="block text-sm text-slate-300">Goal (optional)</label>
-                <textarea
+                <SpecTextBox
+                  label="Goal (optional)"
                   value={goal}
-                  onChange={(e) => setGoal(e.target.value)}
+                  onChange={setGoal}
                   rows={3}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                  voiceTitle="Validation Goal Voice Spec"
+                  voiceLoopType="validation"
+                  voiceTarget="System Software Validation goal"
+                  uploadLabel="Upload validation goal"
+                  uploadHelper="Load validation requirements, scenarios, markdown, JSON, YAML, logs, or text notes."
                   placeholder="What do you want to prove with this validation run?"
                 />
               </div>

@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
@@ -378,14 +378,16 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-6 space-y-4">
             <div className="text-lg font-bold">One-shot input</div>
-            <VoiceSpecDraft title="Voice Spec Draft" loopType="embedded" target="Embedded App spec" onApply={setSpecText} />
-
-
-            <label className="block text-sm text-slate-300">Spec / context</label>
-            <textarea
+            <SpecTextBox
+              label="Spec / context"
               value={specText}
-              onChange={(e) => setSpecText(e.target.value)}
-              className="h-48 w-full rounded-xl border border-slate-800 bg-black/40 p-3 text-sm outline-none focus:border-cyan-600"
+              onChange={setSpecText}
+              rows={8}
+              voiceTitle="Voice Spec Draft"
+              voiceLoopType="embedded"
+              voiceTarget="Embedded App spec"
+              uploadLabel="Upload embedded spec"
+              uploadHelper="Load spec excerpts, register maps, requirements, markdown, JSON, YAML, C, Rust, or text notes."
               placeholder="Paste spec excerpt, register map notes, requirements, constraints..."
             />
 

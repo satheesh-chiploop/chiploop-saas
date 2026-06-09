@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import VoiceSpecDraft from "@/components/VoiceSpecDraft";
+import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 
 const supabase = createClientComponentClient();
@@ -303,20 +303,17 @@ export default function IntegrateAppPage() {
             </div>
 
             <div>
-              <VoiceSpecDraft
-                title="Integration Voice Spec"
-                loopType="digital"
-                target="Integration App spec"
-                compact
-                onApply={setIntegrationDescription}
-              />
-
-              <label className="block text-sm text-slate-300">Integration description *</label>
-              <textarea
+              <SpecTextBox
+                label="Integration description"
+                required
                 value={integrationDescription}
-                onChange={(e) => setIntegrationDescription(e.target.value)}
+                onChange={setIntegrationDescription}
                 rows={12}
-                className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                voiceTitle="Integration Voice Spec"
+                voiceLoopType="digital"
+                voiceTarget="Integration App spec"
+                uploadLabel="Upload integration spec"
+                uploadHelper="Load integration notes, markdown, JSON, YAML, SystemVerilog, Verilog, or text notes."
                 placeholder="Describe how to connect the IPs..."
               />
 
