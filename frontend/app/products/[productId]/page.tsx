@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import TopNav from "@/components/TopNav";
+import SpecTextBox from "@/components/SpecTextBox";
 import { apiGet, apiPatch, apiPost } from "@/lib/apiClient";
 
 type Stage = {
@@ -39,6 +40,7 @@ type ProductRun = {
   current_stage?: string | null;
   error?: string | null;
   stage_results?: Record<string, unknown>;
+  logs?: string | null;
   created_at?: string;
   updated_at?: string;
   completed_at?: string | null;
@@ -96,16 +98,40 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
   Digital_Arch2RTL: {
     note: "Spec text can be left blank only when the product description is detailed enough to use as the RTL spec.",
     fields: [
+      { key: "project_name", label: "Project name", type: "text", defaultValue: "" },
       { key: "top_module", label: "Top module", type: "text", defaultValue: "" },
+      { key: "design_language", label: "Design language", type: "text", defaultValue: "systemverilog" },
       { key: "spec_text", label: "Spec text", type: "text", defaultValue: "", helper: "Used before product description fallback." },
+      { key: "enable_regmap", label: "Generate register map", type: "boolean", defaultValue: true },
+      { key: "enable_upf_lite", label: "Generate UPF-lite", type: "boolean", defaultValue: false },
       { key: "enable_packaging", label: "Generate handoff package", type: "boolean", defaultValue: true },
+      { key: "enable_scan_dft", label: "Enable scan/DFT intent", type: "boolean", defaultValue: false },
+      { key: "run_spec2rtl_check", label: "Run Spec2RTL compliance check", type: "boolean", defaultValue: false },
+      { key: "throughput_latency_targets", label: "Throughput/latency targets", type: "text", defaultValue: "" },
+      { key: "power_priority", label: "Power priority", type: "text", defaultValue: "" },
     ],
   },
   Digital_Verify: {
     fields: [
-      { key: "seed_count", label: "Seed count", type: "number", defaultValue: 4 },
+      { key: "test_intent", label: "Test intent", type: "text", defaultValue: "Run smoke, reset, register access, and representative functional tests." },
+      { key: "verification_plan", label: "Verification plan", type: "text", defaultValue: "" },
+      { key: "monitor_checker_plan", label: "Monitor/checker plan", type: "text", defaultValue: "" },
+      { key: "random_vs_directed", label: "Random vs directed", type: "text", defaultValue: "both" },
       { key: "coverage_targets", label: "Coverage target", type: "text", defaultValue: "90% functional, 70% line" },
-      { key: "enable_formal", label: "Formal", type: "boolean", defaultValue: false },
+      { key: "coverage_plan", label: "Coverage plan", type: "text", defaultValue: "" },
+      { key: "simulator_type", label: "Simulator", type: "text", defaultValue: "verilator" },
+      { key: "code_coverage_tool", label: "Code coverage tool", type: "text", defaultValue: "verilator_coverage" },
+      { key: "formal_tool", label: "Formal tool", type: "text", defaultValue: "none" },
+      { key: "formal_solver", label: "Formal solver", type: "text", defaultValue: "z3" },
+      { key: "golden_model_tool", label: "Golden model tool", type: "text", defaultValue: "none" },
+      { key: "seed_count", label: "Seed count", type: "number", defaultValue: 10 },
+      { key: "run_closure_analysis", label: "Run closure analysis", type: "boolean", defaultValue: true },
+      { key: "enable_failure_debug", label: "Run failure debug", type: "boolean", defaultValue: false },
+      { key: "failure_debug_log_only_first", label: "Failure debug log-only first", type: "boolean", defaultValue: true },
+      { key: "failure_debug_generate_vcd", label: "Generate VCD for failures", type: "boolean", defaultValue: true },
+      { key: "failure_debug_auto_apply_tb", label: "Auto-apply TB fixes", type: "boolean", defaultValue: false },
+      { key: "failure_debug_auto_apply_rtl", label: "Auto-apply RTL fixes", type: "boolean", defaultValue: false },
+      { key: "failure_debug_rerun_failing", label: "Rerun failing tests", type: "boolean", defaultValue: true },
     ],
   },
   Digital_Arch2Synthesis: {
@@ -170,8 +196,17 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
   verify_closure_loop: {
     fields: [
       { key: "max_iterations", label: "Max iterations", type: "number", defaultValue: 1 },
-      { key: "seed_count", label: "Seed count", type: "number", defaultValue: 5 },
+      { key: "seed_count", label: "Seed count", type: "number", defaultValue: 10 },
+      { key: "seed_budget", label: "Seed budget", type: "number", defaultValue: 10 },
       { key: "coverage_targets", label: "Coverage target", type: "text", defaultValue: "90% functional, 70% line" },
+      { key: "rerun_mode", label: "Rerun mode", type: "text", defaultValue: "coverage_targeted" },
+      { key: "random_vs_directed", label: "Random vs directed", type: "text", defaultValue: "both" },
+      { key: "enable_failure_debug", label: "Run failure debug", type: "boolean", defaultValue: false },
+      { key: "failure_debug_log_only_first", label: "Failure debug log-only first", type: "boolean", defaultValue: true },
+      { key: "failure_debug_generate_vcd", label: "Generate VCD for failures", type: "boolean", defaultValue: true },
+      { key: "failure_debug_auto_apply_tb", label: "Auto-apply TB fixes", type: "boolean", defaultValue: false },
+      { key: "failure_debug_auto_apply_rtl", label: "Auto-apply RTL fixes", type: "boolean", defaultValue: false },
+      { key: "failure_debug_rerun_failing", label: "Rerun failing tests", type: "boolean", defaultValue: true },
     ],
   },
   System_Software: {
@@ -235,6 +270,32 @@ function appLink(app: string, workflowId?: string | null, runId?: string | null)
   const params = new URLSearchParams({ workflow_id: workflowId });
   if (runId) params.set("run_id", runId);
   return `${base}?${params.toString()}`;
+}
+
+function parseLogLines(logs?: string | null) {
+  if (!logs) return [];
+  return logs.split("\n").map((line) => line.trimEnd()).filter((line) => line.trim().length > 0);
+}
+
+function isRichTextField(field: StageField) {
+  return [
+    "spec_text",
+    "digital_spec",
+    "analog_spec",
+    "soc_spec",
+    "test_intent",
+    "verification_plan",
+    "monitor_checker_plan",
+    "coverage_plan",
+    "constraints_sdc",
+    "throughput_latency_targets",
+  ].includes(field.key);
+}
+
+function voiceLoopTypeForApp(app: string) {
+  if (app.startsWith("System_")) return "system";
+  if (app.startsWith("Embedded_")) return "embedded";
+  return "digital";
 }
 
 function StepRail({ active }: { active: "define" | "configure" | "run" }) {
@@ -353,6 +414,7 @@ export default function ProductDetailPage() {
     failed: stageRuns.filter((stageRun) => stageRun.status === "failed").length,
     running: stageRuns.filter((stageRun) => ["queued", "running"].includes(stageRun.status)).length,
   }), [stageRuns]);
+  const productRunLogLines = useMemo(() => parseLogLines(productRun?.logs), [productRun?.logs]);
 
   useEffect(() => {
     if (!productRun || !product || !["queued", "running"].includes(productRun.status)) return;
@@ -654,6 +716,27 @@ export default function ProductDetailPage() {
                           </label>
                         );
                       }
+                      if (field.type === "text" && isRichTextField(field)) {
+                        return (
+                          <SpecTextBox
+                            key={field.key}
+                            label={field.label}
+                            value={String(value)}
+                            onChange={(nextValue) => updateStageSetting(selectedStage.id, field.key, nextValue)}
+                            rows={field.key.includes("spec") || field.key.includes("plan") || field.key.includes("intent") ? 7 : 4}
+                            required={Boolean(field.required)}
+                            voiceTitle={`${selectedStage.label}: ${field.label}`}
+                            voiceLoopType={voiceLoopTypeForApp(selectedStage.app)}
+                            voiceTarget={`${selectedStage.label} ${field.label}`}
+                            uploadLabel={`Upload ${field.label}`}
+                            uploadHelper="Use Replace or Append to control how uploaded text is applied."
+                            placeholder={field.helper || field.label}
+                            textareaClassName={`w-full resize-y bg-transparent p-1 text-sm text-slate-100 outline-none ${
+                              field.required && isBlank(value) ? "ring-1 ring-rose-500/70" : ""
+                            }`}
+                          />
+                        );
+                      }
                       return (
                         <label key={field.key} className="grid gap-2">
                           <span className="text-sm font-medium text-slate-200">
@@ -772,7 +855,7 @@ export default function ProductDetailPage() {
                               onClick={() => router.push(appLink(stageRun.app, stageRun.workflow_id, stageRun.run_id))}
                               className="rounded-md border border-cyan-700/70 px-2 py-1 text-xs text-cyan-100 hover:bg-cyan-950/40"
                             >
-                              Open App
+                              Open Dashboard
                             </button>
                             <a
                               href={`/api/workflow/${stageRun.workflow_id}/download_zip?full=1`}
@@ -800,6 +883,24 @@ export default function ProductDetailPage() {
                   ))}
                 </div>
               ) : null}
+              <div className="mt-4 rounded-lg border border-slate-800 bg-slate-950 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-sm font-semibold text-white">Run Log</div>
+                    <div className="mt-1 text-xs text-slate-500">Product-level orchestration log for queued, running, completed, and failed stages. Scroll to review long agent lists.</div>
+                  </div>
+                  <span className="rounded-md bg-slate-900 px-2 py-1 text-xs text-slate-400">{productRunLogLines.length} lines</span>
+                </div>
+                <div className="mt-3 max-h-96 overflow-y-auto overflow-x-auto rounded-md bg-black/50 p-3 font-mono text-xs leading-5 text-slate-200">
+                  {productRunLogLines.length ? productRunLogLines.map((line, index) => (
+                    <div key={`${index}-${line}`} className={line.includes("Failed") || line.includes("failed") ? "text-rose-300" : line.includes("Completed") ? "text-emerald-300" : "text-slate-300"}>
+                      {line}
+                    </div>
+                  )) : (
+                    <div className="text-slate-500">No product run log lines yet. The log appears after the run is queued.</div>
+                  )}
+                </div>
+              </div>
             </div>
           ) : null}
           {runHistory.length ? (
