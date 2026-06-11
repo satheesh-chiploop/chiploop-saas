@@ -489,6 +489,15 @@ export default function AppsHomePage() {
       promise: "Choose fast vs detailed CPU modeling",
     },
     {
+      slug: "system-dqa",
+      title: "System DQA",
+      subtitle: "System RTL quality gate with lint, CDC, reset integrity, and synthesis readiness",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "New",
+      promise: "Quality checks on integrated System RTL",
+    },
+    {
       slug: "system-synthesis",
       title: "System Synthesis",
       subtitle: "System RTL through synthesis, LEC, scan DFT, ATPG, and MBIST evidence",

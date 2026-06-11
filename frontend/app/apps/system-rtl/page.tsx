@@ -237,6 +237,21 @@ export default function SystemRTLAppPage() {
     router.push(`/apps/system-sim${tempMonitorChain ? "?tempmon_chain=1" : ""}`);
   }
 
+  function openSystemNext(path: string) {
+    if (!workflowId) return;
+    let context: DesignChainContext = {};
+    try {
+      context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+    } catch {
+      context = {};
+    }
+    context.demoKind = tempMonitorChain ? "temp_monitor_system" : context.demoKind;
+    context.systemRtlWorkflowId = workflowId;
+    context.systemRtlRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    router.push(`${path}${tempMonitorChain ? "?tempmon_chain=1" : ""}`);
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -337,6 +352,40 @@ export default function SystemRTLAppPage() {
                   >
                     Open System Sim
                   </button>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={() => openSystemNext("/apps/system-dqa")}
+                      disabled={!readyForSystemSim}
+                      className="rounded-xl bg-cyan-700 px-4 py-2 font-semibold text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                    >
+                      Open System DQA
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openSystemNext("/apps/system-synthesis")}
+                      disabled={!readyForSystemSim}
+                      className="rounded-xl bg-indigo-700 px-4 py-2 font-semibold text-white hover:bg-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                    >
+                      Open System Synthesis
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openSystemNext("/apps/system-pd")}
+                      disabled={!readyForSystemSim}
+                      className="rounded-xl bg-violet-700 px-4 py-2 font-semibold text-white hover:bg-violet-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                    >
+                      Open System PD
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openSystemNext("/apps/system-firmware")}
+                      disabled={!readyForSystemSim}
+                      className="rounded-xl bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                    >
+                      Open System Firmware
+                    </button>
+                  </div>
                 </div>
               ) : null}
             </div>

@@ -8,6 +8,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import SpecTextBox from "@/components/SpecTextBox";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import { DESIGN_CHAIN_CONTEXT_KEY, type DesignChainContext } from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -38,6 +39,7 @@ export default function SystemPDAppPage() {
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
+  const [systemRtlWorkflowId, setSystemRtlWorkflowId] = useState("");
 
   // Intake
   const [projectName, setProjectName] = useState("");
@@ -101,6 +103,16 @@ export default function SystemPDAppPage() {
     })();
   }, [router]);
 
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    try {
+      const context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+      if (context.systemRtlWorkflowId) setSystemRtlWorkflowId(context.systemRtlWorkflowId);
+    } catch {
+      // ignore malformed handoff context
+    }
+  }, [loading]);
+
   // Live workflow updates
   useEffect(() => {
     if (!workflowId) return;
@@ -143,11 +155,12 @@ export default function SystemPDAppPage() {
 
   const canRun = useMemo(() => {
     if (running) return false;
+    if (systemRtlWorkflowId.trim()) return true;
     if (!digitalSpecText.trim()) return false;
     if (!analogSpecText.trim()) return false;
     if (!socIntegrationSpecText.trim()) return false;
     return true;
-  }, [running, digitalSpecText, analogSpecText, socIntegrationSpecText]);
+  }, [running, systemRtlWorkflowId, digitalSpecText, analogSpecText, socIntegrationSpecText]);
 
   async function runNow() {
     setErr(null);
@@ -158,6 +171,9 @@ export default function SystemPDAppPage() {
         "/apps/system/pd/run",
         {
           project_name: projectName || undefined,
+          rtl_source_mode: systemRtlWorkflowId.trim() ? "from_system_rtl" : undefined,
+          system_rtl_workflow_id: systemRtlWorkflowId.trim() || undefined,
+          from_workflow_id: systemRtlWorkflowId.trim() || undefined,
           digital_spec_text: digitalSpecText,
           analog_spec_text: analogSpecText,
           soc_integration_spec_text: socIntegrationSpecText,
@@ -223,6 +239,15 @@ export default function SystemPDAppPage() {
                 onChange={(e) => setProjectName(e.target.value)}
                 className="w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
               />
+              <label className="block text-sm text-slate-300">
+                System RTL workflow id
+                <input
+                  value={systemRtlWorkflowId}
+                  onChange={(e) => setSystemRtlWorkflowId(e.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  placeholder="Optional: continue from System RTL"
+                />
+              </label>
               <div className="grid gap-3 sm:grid-cols-3">
                 <label className="block text-sm text-slate-300">
                   Foundry
