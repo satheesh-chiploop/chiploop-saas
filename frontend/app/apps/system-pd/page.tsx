@@ -58,6 +58,9 @@ export default function SystemPDAppPage() {
   const [runLvs, setRunLvs] = useState(true);
   const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
   const [enableScanDft, setEnableScanDft] = useState(false);
+  const [analogPhysicalMode, setAnalogPhysicalMode] = useState<"blackbox" | "generate_sky130_gds" | "provided_gds">("blackbox");
+  const [analogPdk, setAnalogPdk] = useState("sky130A");
+  const [analogSpiceText, setAnalogSpiceText] = useState("");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -186,6 +189,9 @@ export default function SystemPDAppPage() {
           run_fill: runFill,
           run_drc: runDrc,
           run_lvs: runLvs,
+          analog_physical_mode: analogPhysicalMode,
+          analog_pdk: analogPdk,
+          analog_spice_text: analogSpiceText || undefined,
           toggles: {
             run_spec2rtl_check: runSpec2RtlCheck,
             enable_scan_dft: enableScanDft,
@@ -281,6 +287,45 @@ export default function SystemPDAppPage() {
                   <option value="signoff">Signoff</option>
                 </select>
               </label>
+
+              <div className="rounded-xl border border-slate-800 bg-black/20 p-4">
+                <label className="block text-sm text-slate-300">
+                  Analog physical mode
+                  <select
+                    value={analogPhysicalMode}
+                    onChange={(e) => setAnalogPhysicalMode(e.target.value as "blackbox" | "generate_sky130_gds" | "provided_gds")}
+                    className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                  >
+                    <option value="blackbox">Black-box analog macros</option>
+                    <option value="generate_sky130_gds">Generate analog GDS - Sky130</option>
+                    <option value="provided_gds">Use provided analog GDS</option>
+                  </select>
+                </label>
+                {analogPhysicalMode === "generate_sky130_gds" ? (
+                  <div className="mt-3 space-y-3">
+                    <label className="block text-sm text-slate-300">
+                      Analog PDK
+                      <select
+                        value={analogPdk}
+                        onChange={(e) => setAnalogPdk(e.target.value)}
+                        className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                      >
+                        <option value="sky130A">Sky130A</option>
+                      </select>
+                    </label>
+                    <label className="block text-sm text-slate-300">
+                      Sky130 transistor-level SPICE
+                      <textarea
+                        value={analogSpiceText}
+                        onChange={(e) => setAnalogSpiceText(e.target.value)}
+                        rows={7}
+                        className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                        placeholder=".subckt analog_macro vin vout vdd vss&#10;M1 ... sky130_fd_pr__nfet_01v8 W=... L=...&#10;.ends analog_macro"
+                      />
+                    </label>
+                  </div>
+                ) : null}
+              </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
