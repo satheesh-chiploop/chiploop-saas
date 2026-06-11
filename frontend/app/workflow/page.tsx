@@ -288,7 +288,7 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital CDC Analysis Agent",
     "Digital Reset Integrity Agent",
     "Digital Synthesis Readiness Agent",
-    "Digital Executive Summary Agent",
+    "Digital DQA Summary Agent",
   ]),
   Digital_Verify: linearWorkflowDefinition([
     "Digital Verification Handoff Ingest Agent",
@@ -445,7 +445,7 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital CDC Analysis Agent",
     "Digital Reset Integrity Agent",
     "Digital Synthesis Readiness Agent",
-    "Digital Executive Summary Agent",
+    "Digital DQA Summary Agent",
   ]),
   System_PD: linearWorkflowDefinition([
     "Digital Spec Agent",
@@ -598,6 +598,7 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
     { uiLabel: "Digital Bug Localization Agent", backendLabel: "Digital Bug Localization Agent", desc: "Heuristic failure root-cause hints by scanning logs for assertion/mismatch signatures; points to likely first divergence." },
     { uiLabel: "Digital Formal Verification Agent", backendLabel: "Digital Formal Verification Agent", desc: "Generates SymbiYosys orchestration configs and a minimal formal wrapper; optionally runs sby if available." },
     { uiLabel: "Digital Synthesis Readiness Agent", backendLabel: "Digital Synthesis Readiness Agent", desc: "Checks synthesizable subset red flags and runs open-source synthesis sanity (Yosys) to assess readiness; reports timing/area intent gaps from spec." },
+    { uiLabel: "Digital DQA Summary Agent", backendLabel: "Digital DQA Summary Agent", desc: "Summarizes lint, CDC, reset integrity, and synthesis readiness for DQA without tapeout/PD metrics." },
     { uiLabel: "Digital Power Intent (UPF-lite) Agent", backendLabel: "Digital Power Intent (UPF-lite) Agent", desc: "Generates a UPF-lite power intent file (domains + optional isolation/retention) derived from spec/architecture (no hardcoding)." },
     { uiLabel: "Digital UPF Static Check Agent", backendLabel: "Digital UPF Static Check Agent", desc: "Runs open-source-friendly structural UPF checks and optional OpenROAD/private low-power tool probes." },
     { uiLabel: "Digital IP Packaging & Handoff Agent", backendLabel: "Digital IP Packaging & Handoff Agent", desc: "Creates SoC-ready IP package folder layout + manifest + checklist; bundles key RTL/docs/constraints/power/verification collateral." },
