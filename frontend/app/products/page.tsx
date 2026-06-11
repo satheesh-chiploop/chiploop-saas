@@ -69,6 +69,30 @@ function stageBadge(stage: { required?: boolean; recommended?: boolean; optional
   return "Stage";
 }
 
+function StepRail({ active }: { active: "define" | "configure" | "run" }) {
+  const steps = [
+    { id: "define", label: "Define", text: "Create product" },
+    { id: "configure", label: "Configure", text: "Review stages" },
+    { id: "run", label: "Run", text: "Track results" },
+  ] as const;
+  return (
+    <div className="grid gap-2 rounded-lg border border-slate-800 bg-slate-900/45 p-3 sm:grid-cols-3">
+      {steps.map((step, index) => (
+        <div
+          key={step.id}
+          className={`rounded-md border px-3 py-2 ${
+            active === step.id ? "border-cyan-400 bg-cyan-500/10" : "border-slate-800 bg-slate-950/60"
+          }`}
+        >
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Step {index + 1}</div>
+          <div className={active === step.id ? "text-sm font-semibold text-cyan-100" : "text-sm font-semibold text-white"}>{step.label}</div>
+          <div className="mt-1 text-xs text-slate-400">{step.text}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ProductsPage() {
   const router = useRouter();
   const [authChecked, setAuthChecked] = useState(false);
@@ -153,7 +177,8 @@ export default function ProductsPage() {
         reference_slug: selectedReference || undefined,
       });
       setProducts((current) => [out.product, ...current.filter((item) => item.id !== out.product.id)]);
-      setMessage("Product created. You can review stages before running.");
+      setMessage("Product created. Opening stage review.");
+      router.push(`/products/${out.product.id}`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Failed to create product");
     } finally {
@@ -169,11 +194,15 @@ export default function ProductsPage() {
 
         <section className="mb-6">
           <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Products</div>
-          <h1 className="mt-2 text-3xl font-bold tracking-normal text-white">Build a product through coordinated development stages</h1>
+          <h1 className="mt-2 text-3xl font-bold tracking-normal text-white">Define, configure, and run product development</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-            Create a product, review the recommended stages, and keep the workflow runs, artifacts, and dashboards tied to one product record.
+            Start with the product intent, review the development stages, then run the workflows with product-level lineage and results.
           </p>
         </section>
+
+        <div className="mb-6">
+          <StepRail active="define" />
+        </div>
 
         {message ? (
           <div className="mb-5 rounded-lg border border-cyan-500/30 bg-cyan-950/30 px-4 py-3 text-sm text-cyan-100">
@@ -185,10 +214,10 @@ export default function ProductsPage() {
           <section className="rounded-lg border border-slate-800 bg-slate-900/45 p-5">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-white">Create Product</h2>
-                <p className="mt-1 text-sm text-slate-400">Choose type, starting point, and optional reference journey.</p>
+                <h2 className="text-xl font-semibold text-white">Step 1: Define Product</h2>
+                <p className="mt-1 text-sm text-slate-400">Choose product type, starting point, and an optional reference product.</p>
               </div>
-              <span className="rounded-md bg-cyan-500/10 px-2 py-1 text-xs font-semibold text-cyan-200">Draft first</span>
+              <span className="rounded-md bg-cyan-500/10 px-2 py-1 text-xs font-semibold text-cyan-200">Define</span>
             </div>
 
             <div className="mt-5 grid gap-4">
@@ -237,17 +266,20 @@ export default function ProductsPage() {
               </label>
 
               <label className="grid gap-2">
-                <span className="text-sm font-medium text-slate-200">Reference journey</span>
+                <span className="text-sm font-medium text-slate-200">Start from reference product</span>
                 <select
                   value={selectedReference}
                   onChange={(event) => setSelectedReference(event.target.value)}
                   className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
                 >
-                  <option value="">None</option>
+                  <option value="">None, create custom product</option>
                   {references.map((reference) => (
                     <option key={reference.slug} value={reference.slug}>{reference.name}</option>
                   ))}
                 </select>
+                <span className="text-xs leading-5 text-slate-500">
+                  Reference products prefill stage plans. Existing Apps reference journeys remain available while migration continues.
+                </span>
               </label>
 
               <label className="grid gap-2">
@@ -266,14 +298,14 @@ export default function ProductsPage() {
                 disabled={busy}
                 className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {busy ? "Creating..." : "Create Product"}
+                {busy ? "Creating..." : "Create Product and Configure"}
               </button>
             </div>
           </section>
 
           <section className="rounded-lg border border-slate-800 bg-slate-900/45 p-5">
-            <h2 className="text-xl font-semibold text-white">Existing Products</h2>
-            <p className="mt-1 text-sm text-slate-400">Private to the signed-in user.</p>
+              <h2 className="text-xl font-semibold text-white">Existing Products</h2>
+              <p className="mt-1 text-sm text-slate-400">Private to the signed-in user. Continue configuring or running product stages.</p>
             <div className="mt-5 grid gap-3">
               {!authChecked ? (
                 <div className="text-sm text-slate-400">Checking session...</div>
@@ -290,7 +322,12 @@ export default function ProductsPage() {
                   <div key={product.id} className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <div className="font-semibold text-white">{product.name}</div>
+                        <button
+                          onClick={() => router.push(`/products/${product.id}`)}
+                          className="font-semibold text-white hover:text-cyan-200"
+                        >
+                          {product.name}
+                        </button>
                         <div className="mt-1 text-xs text-slate-400">{typeLabel(product.product_type)} · {product.starting_point.replace(/_/g, " ")}</div>
                       </div>
                       <span className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300">{product.status}</span>
@@ -306,6 +343,12 @@ export default function ProductsPage() {
                         ) : null}
                       </div>
                     ) : null}
+                    <button
+                      onClick={() => router.push(`/products/${product.id}`)}
+                      className="mt-3 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800"
+                    >
+                      Configure
+                    </button>
                   </div>
                 ))
               )}
@@ -316,8 +359,8 @@ export default function ProductsPage() {
         <section className="mt-6 rounded-lg border border-slate-800 bg-slate-900/45 p-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-white">Reference Journeys</h2>
-              <p className="mt-1 text-sm text-slate-400">Visible to all. Current Apps reference journeys remain available while these are migrated.</p>
+              <h2 className="text-xl font-semibold text-white">Reference Products</h2>
+              <p className="mt-1 text-sm text-slate-400">Visible to all. These prefill product stages; current Apps reference journeys remain available.</p>
             </div>
             <button
               onClick={() => router.push("/apps")}
