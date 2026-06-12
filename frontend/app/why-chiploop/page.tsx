@@ -4,17 +4,15 @@ import { useRouter } from "next/navigation";
 import TopNav from "@/components/TopNav";
 
 const rows = [
-  ["Separate tools for each loop", "One platform for many chip design loops"],
-  ["Manual handoff between stages", "Connected workflow handoff across stages"],
-  ["Context scattered across files, logs, and chats", "Engineering context preserved across runs"],
-  ["Hard to reproduce setup", "Reusable Apps, Products, and Studio workflows"],
-  ["Debug requires chasing artifacts manually", "Logs, dashboards, artifacts, and ZIPs in one place"],
-  ["Customization requires flow engineering", "Configurable agents, tools, stages, and run settings"],
-  ["Product progress tracked manually", "Product-level orchestration and run history"],
+  ["One platform", "Separate tools per loop", "Products, Apps, and Studio in one place"],
+  ["Connected context", "Context scattered across files and chats", "Specs, settings, logs, artifacts, and handoffs stay connected"],
+  ["Reusable execution", "Hard to reproduce setup", "Reusable workflows, agents, and run settings"],
+  ["Run visibility", "Debug requires manual artifact chasing", "Run logs, dashboards, artifacts, and ZIPs stay attached"],
+  ["Workflow control", "Custom scripts for every variation", "Configurable stages, tools, agents, and goals"],
+  ["Product tracking", "Progress tracked manually", "Product-level stages, history, and results"],
 ];
 
 const actions = [
-  ["Explore Loops", "/loops"],
   ["Explore Products", "/products"],
   ["Explore Apps", "/apps"],
   ["Explore Studio", "/workflow"],
@@ -40,14 +38,22 @@ export default function WhyChipLoopPage() {
         </div>
 
         <div className="mt-8 overflow-hidden rounded-xl border border-slate-800 bg-slate-900/80">
-          <div className="grid grid-cols-1 bg-slate-950 text-sm font-bold text-cyan-200 sm:grid-cols-2">
-            <div className="border-b border-slate-800 p-4 sm:border-b-0 sm:border-r">Traditional Execution</div>
-            <div className="p-4">ChipLoop Execution</div>
+          <div className="grid grid-cols-1 bg-slate-950 text-sm font-bold text-cyan-200 md:grid-cols-[0.8fr_1fr_1fr]">
+            <div className="border-b border-slate-800 p-4 md:border-b-0 md:border-r">Feature</div>
+            <div className="border-b border-slate-800 p-4 md:border-b-0 md:border-r">Traditional</div>
+            <div className="p-4">ChipLoop</div>
           </div>
-          {rows.map(([traditional, chiploop]) => (
-            <div key={traditional} className="grid grid-cols-1 border-t border-slate-800 text-sm leading-6 sm:grid-cols-2">
-              <div className="border-b border-slate-800 p-4 text-slate-400 sm:border-b-0 sm:border-r">{traditional}</div>
-              <div className="p-4 text-slate-100">{chiploop}</div>
+          {rows.map(([feature, traditional, chiploop]) => (
+            <div key={feature} className="grid grid-cols-1 border-t border-slate-800 text-sm leading-6 md:grid-cols-[0.8fr_1fr_1fr]">
+              <div className="border-b border-slate-800 p-4 font-semibold text-slate-100 md:border-b-0 md:border-r">{feature}</div>
+              <div className="flex gap-3 border-b border-slate-800 p-4 text-slate-400 md:border-b-0 md:border-r">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border border-rose-400/50 text-xs font-bold text-rose-300">X</span>
+                <span>{traditional}</span>
+              </div>
+              <div className="flex gap-3 p-4 text-slate-100">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border border-emerald-400/60 text-xs font-bold text-emerald-300">✓</span>
+                <span>{chiploop}</span>
+              </div>
             </div>
           ))}
         </div>

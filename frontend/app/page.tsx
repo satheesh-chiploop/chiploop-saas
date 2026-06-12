@@ -115,8 +115,7 @@ function LandingPageContent() {
       <section className="mx-auto max-w-6xl px-4 py-10 text-center sm:px-6 sm:py-14">
         <h2 className="text-3xl font-extrabold sm:text-4xl">One Platform. Many Chip Design Loops. Connected Engineering Context.</h2>
         <p className="mx-auto mt-4 max-w-4xl text-base leading-7 text-slate-300">
-          ChipLoop keeps design intent, workflow settings, logs, artifacts, dashboards, and handoff context connected as work moves across
-          digital, analog, embedded, system, validation, physical design, and product workflows.
+          ChipLoop keeps specs, settings, logs, artifacts, dashboards, and handoffs connected across every chip design loop.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
           <button onClick={startGuidedDemo} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
@@ -149,15 +148,26 @@ function LandingPageContent() {
         <div className="text-center">
           <h2 className="text-3xl font-extrabold">Define. Configure. Run.</h2>
         </div>
-        <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="mt-8 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
           {[
-            ["Define", "Start from specs, starter products, existing workflows, or design intent."],
-            ["Configure", "Choose stages, agents, tools, coverage goals, handoff sources, and run settings."],
-            ["Run", "Track execution logs, dashboards, artifacts, failures, coverage, and ZIP downloads."],
-          ].map(([title, body]) => (
-            <div key={title} className="rounded-xl bg-slate-900 p-6 ring-1 ring-slate-800">
-              <h3 className="text-lg font-bold text-white">{title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-300">{body}</p>
+            ["01", "Define", "Specs, products, or workflows"],
+            ["02", "Configure", "Stages, tools, agents, goals"],
+            ["03", "Run", "Logs, dashboards, artifacts"],
+          ].map(([step, title, body], index) => (
+            <div key={title} className="contents">
+              <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-6 text-center">
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">
+                  {step}
+                </div>
+                <h3 className="mt-4 text-xl font-extrabold text-white">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
+              </div>
+              {index < 2 ? (
+                <div className="flex items-center justify-center text-3xl font-extrabold text-cyan-300 md:px-2">
+                  <span className="hidden md:inline">→</span>
+                  <span className="md:hidden">↓</span>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
@@ -230,20 +240,20 @@ function LandingPageContent() {
       <section className="mx-auto max-w-5xl px-4 py-12 text-center sm:px-6 sm:py-16">
         <h2 className="text-2xl font-extrabold sm:text-3xl">Start Building Connected Chip Workflows</h2>
         <p className="mt-4 text-slate-300">
-          Begin with the guided Arch2RTL demo, explore chip design loops, or launch prebuilt Apps and Product journeys.
+          Begin with the guided Arch2RTL demo, then continue through Products, Apps, or Studio.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
           <button onClick={startGuidedDemo} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
             Start Arch2RTL Demo
           </button>
-          <button onClick={() => router.push("/loops")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
-            Explore Loops
-          </button>
-          <button onClick={() => router.push("/why-chiploop")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
-            Why ChipLoop
+          <button onClick={() => goTo("/products")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
+            Explore Products
           </button>
           <button onClick={() => goTo("/apps")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
             Explore Apps
+          </button>
+          <button onClick={() => goTo("/workflow")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
+            Explore Studio
           </button>
         </div>
       </section>
