@@ -155,6 +155,52 @@ function findingCount(report: JsonMap): number {
     + array(record(report.yosys).errors).length;
 }
 
+function uniqueStrings(values: unknown[]): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const value of values) {
+    const text = typeof value === "string" ? value.trim() : "";
+    if (!text || seen.has(text)) continue;
+    seen.add(text);
+    out.push(text);
+  }
+  return out;
+}
+
+function boolToolNames(tools: JsonMap): string[] {
+  return Object.entries(tools)
+    .filter(([, value]) => value === true)
+    .map(([key]) => key);
+}
+
+function dqaToolSummary(lint: JsonMap, readiness: JsonMap, executionSummary: JsonMap, profileSummary: JsonMap) {
+  const lintTooling = record(lint.tooling);
+  const lintProfile = record(lintTooling.tool_profile);
+  const summaryProfile = record(executionSummary.tool_profile);
+  const explicitProfile = Object.keys(profileSummary).length ? profileSummary : {};
+  const executions = [
+    ...array(lintTooling.executions),
+    ...array(executionSummary.executions),
+  ].map(record);
+  const yosys = record(readiness.yosys);
+  const used = uniqueStrings([
+    ...executions.map((item) => item.tool),
+    yosys.available === true ? "yosys" : "",
+  ]);
+  const detected = boolToolNames(record(readiness.tools_detected));
+  const profileTools = [
+    ...array(lintProfile.tools),
+    ...array(summaryProfile.tools),
+    ...array(explicitProfile.tools),
+  ];
+  const available = uniqueStrings([...used, ...detected, ...profileTools]);
+  return {
+    used,
+    available,
+    defaultTool: used.join(" / ") || "not reported",
+  };
+}
+
 function lintVerdict(report: JsonMap): string {
   if (!Object.keys(report).length) return "unavailable";
   const verilator = record(report.verilator_lint);
@@ -253,6 +299,48 @@ function Stat({ title, value }: { title: string; value: string | number }) {
   );
 }
 
+function ToolStrip({ used, available, defaultTool }: { used: string[]; available: string[]; defaultTool: string }) {
+  const visibleTools = available.length ? available : used;
+  return (
+    <div className="rounded-lg border border-slate-800 bg-black/30 p-3">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
+        <div className="min-w-0 lg:w-64">
+          <div className="text-xs text-slate-400">Tools Used</div>
+          <div className="mt-1 break-words text-base font-semibold leading-snug text-slate-100">{defaultTool}</div>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-xs text-slate-400">Available Tools</div>
+          <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+            {visibleTools.map((tool) => (
+              <span key={tool} className="shrink-0 rounded border border-slate-700 bg-slate-950 px-2.5 py-1 text-xs font-semibold text-cyan-100">
+                {tool}
+              </span>
+            ))}
+            {!visibleTools.length ? <span className="text-sm text-slate-500">not reported</span> : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CheckCard({ title, status, tool, detail }: { title: string; status: string; tool: string; detail?: string | number }) {
+  return (
+    <div className="min-w-0 rounded-lg border border-slate-800 bg-black/30 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-xs text-slate-400">{title}</div>
+          <div className="mt-1 break-words text-base font-semibold leading-snug text-slate-100">{status}</div>
+        </div>
+        <span className="shrink-0 rounded border border-cyan-700/70 bg-cyan-950/40 px-2 py-1 text-[11px] font-semibold text-cyan-100">
+          {tool}
+        </span>
+      </div>
+      {detail !== undefined ? <div className="mt-2 text-xs text-slate-500">{detail}</div> : null}
+    </div>
+  );
+}
+
 function Bar({ label, value, total, color }: { label: string; value: number; total: number; color: string }) {
   const width = total > 0 ? Math.max((value / total) * 100, value > 0 ? 5 : 0) : 0;
   return (
@@ -296,6 +384,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "cdc_findings.json",
         "reset_integrity_findings.json",
         "synthesis_readiness_findings.json",
+        "dqa_summary.json",
+        "tool_execution_summary.json",
+        "tool_profile_used.json",
         "executive_summary.json",
       ],
       smoke: [
@@ -556,24 +647,39 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const cdc = record(evidence["cdc_findings.json"]);
       const reset = record(evidence["reset_integrity_findings.json"]);
       const readiness = record(evidence["synthesis_readiness_findings.json"]);
-      const summary = record(evidence["executive_summary.json"]);
+      const summary = record(evidence["dqa_summary.json"] || evidence["executive_summary.json"]);
+      const toolSummary = dqaToolSummary(
+        lint,
+        readiness,
+        record(evidence["tool_execution_summary.json"]),
+        record(evidence["tool_profile_used.json"])
+      );
+      const lintExecution = record(array(record(lint.tooling).executions)[0]);
+      const lintTool = firstString(lintExecution.tool, "verilator");
+      const synthTool = record(readiness.yosys).available === true ? "yosys" : "not available";
+      const readinessScore = firstPresent(readiness.score);
+      const yosysErrors = array(record(readiness.yosys).errors).length;
       const rtlFiles = firstNumber(
+        summary.rtl_file_count,
         handoff.rtl_file_count,
         array(handoff.rtl_files).length
       );
       return (
         <div className="mt-5 space-y-5">
+          <ToolStrip used={toolSummary.used} available={toolSummary.available} defaultTool={toolSummary.defaultTool} />
           <div className="grid gap-3 sm:grid-cols-1">
             <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
+          </div>
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <CheckCard title="RTL Lint" status={lintVerdict(lint)} tool={lintTool} detail={`${findingCount(lint)} findings`} />
+            <CheckCard title="CDC" status={findingsVerdict(cdc)} tool="heuristic scan" detail={`${findingCount(cdc)} findings`} />
+            <CheckCard title="Reset" status={findingsVerdict(reset)} tool="heuristic scan" detail={`${findingCount(reset)} findings`} />
+            <CheckCard title="Synth Ready" status={synthesisReadinessVerdict(readiness)} tool={synthTool} detail={readinessScore !== undefined ? `score ${String(readinessScore)}${yosysErrors ? `, ${yosysErrors} yosys error(s)` : ""}` : undefined} />
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Stat title="Source" value={firstString(handoff.source_mode, "imported").replaceAll("_", " ")} />
             <Stat title="RTL Files" value={rtlFiles} />
             <Stat title="Top Module" value={firstString(handoff.top_module, "not inferred")} />
-            <Stat title="Lint" value={lintVerdict(lint)} />
-            <Stat title="CDC" value={findingsVerdict(cdc)} />
-            <Stat title="Reset" value={findingsVerdict(reset)} />
-            <Stat title="Synth Ready" value={synthesisReadinessVerdict(readiness)} />
             <Stat title="Findings" value={findingCount(lint) + findingCount(cdc) + findingCount(reset) + findingCount(readiness)} />
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Summary" value={firstString(summary.status, summary.verdict, status || "running")} />
@@ -731,6 +837,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="MBIST" value={statusLabel(mbist.status)} />
             <Stat title="Memories" value={metricValue(mbist.memory_count)} />
             <Stat title="Memory Bits" value={metricValue(mbist.estimated_memory_bits)} />
+            <Stat title="RTL Storage Arrays" value={metricValue(mbist.non_mbist_storage_count)} />
             <Stat title="autombist" value={mbist.autombist_available === true ? "available" : mbist.autombist_available === false ? "not configured" : "not produced"} />
             {stage === "tapeout" ? <Stat title="Floorplan" value={statusLabel(floorplan.status)} /> : null}
             {stage === "tapeout" ? <Stat title="Place" value={statusLabel(place.status)} /> : null}
