@@ -90,7 +90,7 @@ export default function TopNav({
     { key: "marketplace", label: "Marketplace", href: "/marketplace", show: showMarketplace },
     { key: "pricing", label: "Pricing", href: "/pricing", show: true },
     { key: "events", label: "Events", href: "/events", show: true },
-    { key: "help", label: "Help", href: "/help", show: true },
+    { key: "help", label: "Playbook", href: "/help", show: true },
     { key: "settings", label: "Settings", href: "/settings/plan", show: showSettings },
     { key: "admin", label: "Admin", href: "/admin/marketplace", show: showAdmin },
     { key: "webinar", label: "Webinar", href: "/webinar/register", show: showWebinar },
