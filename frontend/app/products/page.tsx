@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import TopNav from "@/components/TopNav";
 import { LowCreditBanner } from "@/components/PlanCreditStatus";
-import { apiGet, apiPost } from "@/lib/apiClient";
+import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/apiClient";
 import { createClientComponentClient } from "@/lib/platformClient";
 
 type ProductType = "digital" | "analog" | "mixed_signal" | "embedded" | "validation";
@@ -105,6 +105,10 @@ export default function ProductsPage() {
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState<Partial<Product>>({});
+  const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
+  const [deleteConfirmName, setDeleteConfirmName] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
   const selectedReferenceData = useMemo(
@@ -130,7 +134,7 @@ export default function ProductsPage() {
         const refs = await apiGet<{ status: string; reference_journeys: ReferenceJourney[] }>("/products/reference-journeys");
         if (mounted) setReferences(refs.reference_journeys || []);
       } catch (error) {
-        if (mounted) setMessage(error instanceof Error ? error.message : "Failed to load reference journeys");
+        if (mounted) setMessage(error instanceof Error ? error.message : "Failed to load starter products");
       }
     })();
     return () => { mounted = false; };
@@ -181,6 +185,71 @@ export default function ProductsPage() {
       router.push(`/products/${out.product.id}`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Failed to create product");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function beginEditProduct(product: Product) {
+    setEditingProductId(product.id);
+    setEditDraft({
+      name: product.name,
+      product_type: product.product_type,
+      starting_point: product.starting_point,
+      description: product.description,
+      status: product.status,
+    });
+    setDeletingProductId(null);
+    setDeleteConfirmName("");
+    setMessage(null);
+  }
+
+  async function saveProductEdit(productId: string) {
+    const name = String(editDraft.name || "").trim();
+    if (!name) {
+      setMessage("Product name is required.");
+      return;
+    }
+    setBusy(true);
+    setMessage(null);
+    try {
+      const out = await apiPatch<{ status: string; product: Product }>(`/products/${productId}`, {
+        name,
+        product_type: editDraft.product_type,
+        starting_point: editDraft.starting_point,
+        description: String(editDraft.description || "").trim(),
+        status: editDraft.status,
+      });
+      setProducts((current) => current.map((item) => (item.id === productId ? out.product : item)));
+      setEditingProductId(null);
+      setEditDraft({});
+      setMessage("Product updated.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Failed to update product");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function deleteProduct(product: Product) {
+    if (deleteConfirmName !== product.name) {
+      setMessage(`Type "${product.name}" to confirm delete.`);
+      return;
+    }
+    setBusy(true);
+    setMessage(null);
+    try {
+      await apiDelete<{ status: string; deleted_product_id: string }>(`/products/${product.id}`);
+      setProducts((current) => current.filter((item) => item.id !== product.id));
+      setDeletingProductId(null);
+      setDeleteConfirmName("");
+      if (editingProductId === product.id) {
+        setEditingProductId(null);
+        setEditDraft({});
+      }
+      setMessage("Product deleted.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Failed to delete product");
     } finally {
       setBusy(false);
     }
@@ -278,7 +347,7 @@ export default function ProductsPage() {
                   ))}
                 </select>
                 <span className="text-xs leading-5 text-slate-500">
-                  Reference products prefill stage plans. Existing Apps reference journeys remain available while migration continues.
+                  Starter products prefill stage plans. Existing standalone Apps remain available while migration continues.
                 </span>
               </label>
 
@@ -315,24 +384,76 @@ export default function ProductsPage() {
                 </div>
               ) : products.length === 0 ? (
                 <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
-                  No products yet. Create one from a product type or reference journey.
+                  No products yet. Create one from a product type or starter product.
                 </div>
               ) : (
                 products.map((product) => (
                   <div key={product.id} className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <button
-                          onClick={() => router.push(`/products/${product.id}`)}
-                          className="font-semibold text-white hover:text-cyan-200"
-                        >
-                          {product.name}
-                        </button>
-                        <div className="mt-1 text-xs text-slate-400">{typeLabel(product.product_type)} · {product.starting_point.replace(/_/g, " ")}</div>
+                    {editingProductId === product.id ? (
+                      <div className="grid gap-3">
+                        <label className="grid gap-2">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Name</span>
+                          <input
+                            value={String(editDraft.name || "")}
+                            onChange={(event) => setEditDraft((current) => ({ ...current, name: event.target.value }))}
+                            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                          />
+                        </label>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <label className="grid gap-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Product type</span>
+                            <select
+                              value={String(editDraft.product_type || product.product_type)}
+                              onChange={(event) => setEditDraft((current) => ({ ...current, product_type: event.target.value }))}
+                              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                            >
+                              {PRODUCT_TYPES.map((type) => (
+                                <option key={type.id} value={type.id}>{type.label}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="grid gap-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Status</span>
+                            <select
+                              value={String(editDraft.status || product.status)}
+                              onChange={(event) => setEditDraft((current) => ({ ...current, status: event.target.value }))}
+                              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                            >
+                              {["draft", "ready", "running", "completed", "failed", "archived"].map((status) => (
+                                <option key={status} value={status}>{status}</option>
+                              ))}
+                            </select>
+                          </label>
+                        </div>
+                        <label className="grid gap-2">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Description</span>
+                          <textarea
+                            value={String(editDraft.description || "")}
+                            onChange={(event) => setEditDraft((current) => ({ ...current, description: event.target.value }))}
+                            rows={3}
+                            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                          />
+                        </label>
                       </div>
-                      <span className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300">{product.status}</span>
-                    </div>
-                    {product.description ? <p className="mt-3 text-sm leading-6 text-slate-300">{product.description}</p> : null}
+                    ) : (
+                      <>
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <button
+                              onClick={() => router.push(`/products/${product.id}`)}
+                              className="font-semibold text-white hover:text-cyan-200"
+                            >
+                              {product.name}
+                            </button>
+                            <div className="mt-1 text-xs text-slate-400">
+                              {typeLabel(product.product_type)} / {product.starting_point.replace(/_/g, " ")}
+                            </div>
+                          </div>
+                          <span className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300">{product.status}</span>
+                        </div>
+                        {product.description ? <p className="mt-3 text-sm leading-6 text-slate-300">{product.description}</p> : null}
+                      </>
+                    )}
                     {product.stage_config?.stages?.length ? (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {product.stage_config.stages.slice(0, 6).map((stage) => (
@@ -343,12 +464,81 @@ export default function ProductsPage() {
                         ) : null}
                       </div>
                     ) : null}
-                    <button
-                      onClick={() => router.push(`/products/${product.id}`)}
-                      className="mt-3 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800"
-                    >
-                      Configure
-                    </button>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        onClick={() => router.push(`/products/${product.id}`)}
+                        className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800"
+                      >
+                        Configure
+                      </button>
+                      {editingProductId === product.id ? (
+                        <>
+                          <button
+                            onClick={() => saveProductEdit(product.id)}
+                            disabled={busy}
+                            className="rounded-lg bg-cyan-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingProductId(null);
+                              setEditDraft({});
+                            }}
+                            className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800"
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => beginEditProduct(product)}
+                          className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800"
+                        >
+                          Edit
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setDeletingProductId(deletingProductId === product.id ? null : product.id);
+                          setDeleteConfirmName("");
+                        }}
+                        className="rounded-lg border border-red-500/50 px-3 py-2 text-sm font-semibold text-red-200 hover:bg-red-950/40"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                    {deletingProductId === product.id ? (
+                      <div className="mt-3 rounded-lg border border-red-500/30 bg-red-950/20 p-3">
+                        <p className="text-sm leading-6 text-red-100">
+                          Delete removes this product and its product run records. Type the product name to confirm.
+                        </p>
+                        <input
+                          value={deleteConfirmName}
+                          onChange={(event) => setDeleteConfirmName(event.target.value)}
+                          placeholder={product.name}
+                          className="mt-3 w-full rounded-lg border border-red-500/40 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-red-300"
+                        />
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <button
+                            onClick={() => deleteProduct(product)}
+                            disabled={busy || deleteConfirmName !== product.name}
+                            className="rounded-lg bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Confirm Delete
+                          </button>
+                          <button
+                            onClick={() => {
+                              setDeletingProductId(null);
+                              setDeleteConfirmName("");
+                            }}
+                            className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 ))
               )}
@@ -359,8 +549,8 @@ export default function ProductsPage() {
         <section className="mt-6 rounded-lg border border-slate-800 bg-slate-900/45 p-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-white">Reference Products</h2>
-              <p className="mt-1 text-sm text-slate-400">Visible to all. These prefill product stages; current Apps reference journeys remain available.</p>
+              <h2 className="text-xl font-semibold text-white">Starter Products</h2>
+              <p className="mt-1 text-sm text-slate-400">Visible to all. These prefill product stages; current standalone Apps remain available.</p>
             </div>
             <button
               onClick={() => router.push("/apps")}

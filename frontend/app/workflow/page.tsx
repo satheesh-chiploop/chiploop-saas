@@ -46,6 +46,20 @@ type WorkflowGraphDefinition = {
   edges: Array<{ id: string; source: string; target: string }>;
 };
 
+type WorkflowConfigField = {
+  key: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "boolean" | "select";
+  default?: string | number | boolean;
+  required?: boolean;
+  options?: string[];
+};
+
+type WorkflowConfigSchema = {
+  version?: number;
+  fields?: WorkflowConfigField[];
+};
+
 type CatalogItem = {
   id?: string;
   uiLabel: string;
@@ -74,6 +88,8 @@ type CustomWorkflowRow = {
     edges?: WorkflowGraphDefinition["edges"];
     app_intent?: unknown;
     template_workflow?: unknown;
+    workflow_config_schema?: WorkflowConfigSchema;
+    default_run_config?: Record<string, string | number | boolean>;
   } | null;
 };
 
@@ -566,6 +582,48 @@ function normalizeLoopType(value?: string | null, fallbackName?: string): LoopKe
 function workflowDisplayName(workflow: CustomWorkflowRow): string {
   const staticMatch = APP_PREBUILT_WORKFLOWS.find((item) => item.name === workflow.name);
   return workflow.displayName || staticMatch?.displayName || workflow.name.replace(/^App:\s*/, "");
+}
+
+function normalizeWorkflowConfigSchema(schema?: WorkflowConfigSchema | null): WorkflowConfigSchema {
+  const fields = Array.isArray(schema?.fields)
+    ? schema.fields
+        .map((field) => ({
+          ...field,
+          key: String(field.key || "").trim(),
+          label: String(field.label || field.key || "").trim(),
+          type: field.type || "text",
+          options: Array.isArray(field.options) ? field.options.map((option) => String(option).trim()).filter(Boolean) : [],
+        }))
+        .filter((field) => field.key && field.label)
+    : [];
+  return { version: schema?.version || 1, fields };
+}
+
+function buildConfigDefaults(
+  schema?: WorkflowConfigSchema | null,
+  savedDefaults?: Record<string, string | number | boolean> | null,
+): Record<string, string | number | boolean> {
+  const out: Record<string, string | number | boolean> = {};
+  for (const field of normalizeWorkflowConfigSchema(schema).fields || []) {
+    const saved = savedDefaults?.[field.key];
+    if (saved !== undefined) {
+      out[field.key] = saved;
+    } else if (field.default !== undefined) {
+      out[field.key] = field.default;
+    } else {
+      out[field.key] = field.type === "boolean" ? false : "";
+    }
+  }
+  return out;
+}
+
+function coerceConfigValue(field: WorkflowConfigField, raw: string | number | boolean): string | number | boolean {
+  if (field.type === "boolean") return Boolean(raw);
+  if (field.type === "number") {
+    const value = typeof raw === "number" ? raw : Number(raw);
+    return Number.isFinite(value) ? value : 0;
+  }
+  return String(raw ?? "");
 }
 
 type PrivateAgentResponseItem = {
@@ -1293,6 +1351,8 @@ function WorkflowPage() {
       edges?: unknown[];
       app_intent?: unknown;
       template_workflow?: unknown;
+      workflow_config_schema?: WorkflowConfigSchema;
+      default_run_config?: Record<string, string | number | boolean>;
     } | null;
   is_prebuilt?: boolean | null;
 };
@@ -1339,6 +1399,11 @@ type SystemPlannerIntent = {
   const [pendingSpecFile, setPendingSpecFile] = useState<File | undefined>(undefined);
   const [pendingWorkflowPayload, setPendingWorkflowPayload] = useState<any>(null);
   const [pendingValidationRun, setPendingValidationRun] = useState(false);
+  const [selectedWorkflowDefinitions, setSelectedWorkflowDefinitions] = useState<WorkflowRecord["definitions"] | null>(null);
+  const [selectedWorkflowConfigSchema, setSelectedWorkflowConfigSchema] = useState<WorkflowConfigSchema>({ version: 1, fields: [] });
+  const [selectedWorkflowDefaultConfig, setSelectedWorkflowDefaultConfig] = useState<Record<string, string | number | boolean>>({});
+  const [pendingRunConfig, setPendingRunConfig] = useState<Record<string, string | number | boolean>>({});
+  const [showWorkflowConfigModal, setShowWorkflowConfigModal] = useState(false);
 
   const [showScopeModal, setShowScopeModal] = useState(false);
   const [previewTestPlan, setPreviewTestPlan] = useState<any>(null);
@@ -2323,6 +2388,7 @@ type SystemPlannerIntent = {
     if (!runName) return;
 
     setPendingRunName(runName);
+    setPendingRunConfig(buildConfigDefaults(selectedWorkflowConfigSchema, selectedWorkflowDefaultConfig));
 
     const wfNameLower = selectedWorkflowName.toLowerCase();
 
@@ -2411,6 +2477,12 @@ type SystemPlannerIntent = {
   const clearWorkflow = () => {
     setNodes([]);
     setEdges([]);
+    setSelectedWorkflowName(null);
+    setSelectedWorkflowId(null);
+    setSelectedWorkflowDefinitions(null);
+    setSelectedWorkflowConfigSchema({ version: 1, fields: [] });
+    setSelectedWorkflowDefaultConfig({});
+    setPendingRunConfig({});
   };
 
   /* ---------- Derived ---------- */
@@ -2458,6 +2530,42 @@ type SystemPlannerIntent = {
     loadWorkflowFromDB(wf);
   };
 
+  const saveWorkflowConfigSchema = async (
+    schema: WorkflowConfigSchema,
+    defaults: Record<string, string | number | boolean>,
+  ) => {
+    if (!selectedWorkflowId || !selectedWorkflowName) {
+      alert("Select a saved workflow before configuring settings.");
+      return;
+    }
+    const normalizedSchema = normalizeWorkflowConfigSchema(schema);
+    const nextDefinitions = {
+      ...(selectedWorkflowDefinitions || {}),
+      nodes,
+      edges,
+      workflow_config_schema: normalizedSchema,
+      default_run_config: buildConfigDefaults(normalizedSchema, defaults),
+    };
+    const { error } = await supabase
+      .from("workflows")
+      .update({
+        definitions: nextDefinitions,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", selectedWorkflowId);
+    if (error) {
+      console.error("Workflow config save failed:", error);
+      alert(`Could not save workflow settings: ${error.message}`);
+      return;
+    }
+    setSelectedWorkflowDefinitions(nextDefinitions);
+    setSelectedWorkflowConfigSchema(normalizedSchema);
+    setSelectedWorkflowDefaultConfig(buildConfigDefaults(normalizedSchema, defaults));
+    setPendingRunConfig(buildConfigDefaults(normalizedSchema, defaults));
+    setShowWorkflowConfigModal(false);
+    await loadCustomWorkflowsFromDB();
+  };
+
   const loadCustomWorkflow = (wfName: string) => {
     const stored = localStorage.getItem(`workflow_${wfName}`);
     if (!stored) return;
@@ -2484,6 +2592,8 @@ type SystemPlannerIntent = {
             edges: (w.definitions.edges || []) as WorkflowGraphDefinition["edges"],
             app_intent: w.definitions.app_intent,
             template_workflow: w.definitions.template_workflow,
+            workflow_config_schema: w.definitions.workflow_config_schema,
+            default_run_config: w.definitions.default_run_config,
           }
         : null,
   });
@@ -2640,6 +2750,15 @@ type SystemPlannerIntent = {
       const defs =
         ((data.definitions.nodes || []).length > 0 ? data.definitions : fallbackDefinitions) ||
         data.definitions;
+      const defsWithConfig = defs as WorkflowRecord["definitions"];
+      const workflowConfigSchema =
+        (defsWithConfig?.workflow_config_schema && Array.isArray(defsWithConfig.workflow_config_schema.fields))
+          ? defsWithConfig.workflow_config_schema
+          : { version: 1, fields: [] };
+      const defaultRunConfig =
+        defsWithConfig?.default_run_config && typeof defsWithConfig.default_run_config === "object" && !Array.isArray(defsWithConfig.default_run_config)
+          ? defsWithConfig.default_run_config as Record<string, string | number | boolean>
+          : {};
 
       const parsedNodes = (defs.nodes || []).map((n: any, i: number) => ({
         id: n.id || `n${i}`,
@@ -2663,6 +2782,10 @@ type SystemPlannerIntent = {
 
       setSelectedWorkflowName(data.name || wfName);
       setSelectedWorkflowId(data.id || null);
+      setSelectedWorkflowDefinitions(defs as WorkflowRecord["definitions"]);
+      setSelectedWorkflowConfigSchema(workflowConfigSchema);
+      setSelectedWorkflowDefaultConfig(defaultRunConfig);
+      setPendingRunConfig(buildConfigDefaults(workflowConfigSchema, defaultRunConfig));
       const resolvedLoop = normalizeLoopType(data.loop_type, data.name || wfName);
       setSelectedWorkflowLoopType(resolvedLoop);
       setLoop(resolvedLoop);
@@ -2680,7 +2803,17 @@ type SystemPlannerIntent = {
     }
   };
 
-  const runWorkflowWithFormData = async (workflowPayload: any, text: string, file?: File, instrumentIds?: string[],scopePayload?: any,benchId?: string,testPlanName?:string,previewTestPlanOverride?: any) => {
+  const runWorkflowWithFormData = async (
+    workflowPayload: any,
+    text: string,
+    file?: File,
+    instrumentIds?: string[],
+    scopePayload?: any,
+    benchId?: string,
+    testPlanName?: string,
+    previewTestPlanOverride?: any,
+    runConfigOverride?: Record<string, string | number | boolean>,
+  ) => {
     const formData = new FormData();
 
     // Unwrap if caller passed { workflow: {...}, workflow_id: ... }
@@ -2690,6 +2823,10 @@ type SystemPlannerIntent = {
 
     
     formData.append("spec_text", text || "");
+    const resolvedRunConfig = runConfigOverride || pendingRunConfig;
+    if (resolvedRunConfig && Object.keys(resolvedRunConfig).length > 0) {
+      formData.append("run_config_json", JSON.stringify(resolvedRunConfig));
+    }
     if (file) formData.append("file", file);
 
     const userId = await getStableUserId(supabase); // or however you already do it in this file
@@ -2884,6 +3021,9 @@ type SystemPlannerIntent = {
       const formData = new FormData();
       formData.append("workflow", JSON.stringify(workflow));
       formData.append("spec_text", text || "");
+      if (pendingRunConfig && Object.keys(pendingRunConfig).length > 0) {
+        formData.append("run_config_json", JSON.stringify(pendingRunConfig));
+      }
       if (file) formData.append("file", file);
   
       const res = await fetch(`${API_BASE}/run_workflow`, {
@@ -3360,12 +3500,30 @@ type SystemPlannerIntent = {
               onClick={() => {
                 setNodes([]);
                 setEdges([]);
+                setSelectedWorkflowName(null);
+                setSelectedWorkflowId(null);
+                setSelectedWorkflowDefinitions(null);
+                setSelectedWorkflowConfigSchema({ version: 1, fields: [] });
+                setSelectedWorkflowDefaultConfig({});
+                setPendingRunConfig({});
               }}
             >
               New Workflow
             </button>
             <button onClick={runWorkflow} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400">
               Run Workflow
+            </button>
+            <button
+              onClick={() => {
+                if (!selectedWorkflowId) {
+                  alert("Select or save a workflow before configuring settings.");
+                  return;
+                }
+                setShowWorkflowConfigModal(true);
+              }}
+              className="rounded-lg bg-slate-700 px-4 py-2 font-bold text-white hover:bg-slate-600"
+            >
+              Configure Workflow
             </button>
             <button
               onClick={async () => {
@@ -3390,6 +3548,8 @@ type SystemPlannerIntent = {
                       loop_type: loop.toLowerCase(),
                       nodes,
                       edges,
+                      workflow_config_schema: selectedWorkflowConfigSchema,
+                      default_run_config: selectedWorkflowDefaultConfig,
                     },
                   }),
                 });
@@ -4193,6 +4353,9 @@ type SystemPlannerIntent = {
       {showSpecModal && (
         <SpecInputModal
           loop={loop}
+          configSchema={selectedWorkflowConfigSchema}
+          runConfig={pendingRunConfig}
+          onRunConfigChange={setPendingRunConfig}
           showTestPlanName={selectedWorkflowName === "Validation_Generate_Lab_Handoff"}
           testPlanName={testPlanName}
           setTestPlanName={setTestPlanName}
@@ -4203,6 +4366,15 @@ type SystemPlannerIntent = {
             console.log("Spec submitted:", { text, file, testPlanName });
          
           }}
+        />
+      )}
+
+      {showWorkflowConfigModal && (
+        <WorkflowConfigModal
+          schema={selectedWorkflowConfigSchema}
+          defaults={selectedWorkflowDefaultConfig}
+          onClose={() => setShowWorkflowConfigModal(false)}
+          onSave={saveWorkflowConfigSchema}
         />
       )}
 
@@ -4444,13 +4616,208 @@ type SystemPlannerIntent = {
 /* =========================
    Modals (unchanged)
 ========================= */
-function SpecInputModal({ loop, onClose, onSubmit,showTestPlanName,testPlanName,setTestPlanName }: { loop: string; onClose: () => void; onSubmit: (text: string, file?: File) => void;showTestPlanName?: boolean;testPlanName?: string;setTestPlanName?: (v: string) => void; }) {
-  const [text, setText] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+function WorkflowConfigModal({
+  schema,
+  defaults,
+  onClose,
+  onSave,
+}: {
+  schema: WorkflowConfigSchema;
+  defaults: Record<string, string | number | boolean>;
+  onClose: () => void;
+  onSave: (schema: WorkflowConfigSchema, defaults: Record<string, string | number | boolean>) => void;
+}) {
+  const initialFields = normalizeWorkflowConfigSchema(schema).fields || [];
+  const [fields, setFields] = useState<WorkflowConfigField[]>(
+    initialFields.length
+      ? initialFields
+      : [{ key: "timeout_sec", label: "Timeout Seconds", type: "number", default: 300, required: false, options: [] }],
+  );
+  const [defaultValues, setDefaultValues] = useState<Record<string, string | number | boolean>>(
+    buildConfigDefaults({ version: 1, fields }, defaults),
+  );
+
+  const updateField = (index: number, patch: Partial<WorkflowConfigField>) => {
+    setFields((current) => {
+      const next = current.map((field, idx) => (idx === index ? { ...field, ...patch } : field));
+      setDefaultValues((values) => buildConfigDefaults({ version: 1, fields: next }, values));
+      return next;
+    });
+  };
+
+  const addField = () => {
+    setFields((current) => [
+      ...current,
+      { key: `setting_${current.length + 1}`, label: `Setting ${current.length + 1}`, type: "text", default: "", required: false, options: [] },
+    ]);
+  };
+
+  const removeField = (index: number) => {
+    setFields((current) => {
+      const next = current.filter((_, idx) => idx !== index);
+      setDefaultValues((values) => buildConfigDefaults({ version: 1, fields: next }, values));
+      return next;
+    });
+  };
+
+  const save = () => {
+    const normalized = normalizeWorkflowConfigSchema({ version: 1, fields });
+    const seen = new Set<string>();
+    for (const field of normalized.fields || []) {
+      if (seen.has(field.key)) {
+        alert(`Duplicate setting key: ${field.key}`);
+        return;
+      }
+      seen.add(field.key);
+    }
+    onSave(normalized, buildConfigDefaults(normalized, defaultValues));
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="w-full max-w-2xl rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl">
+      <div className="max-h-[92vh] w-[920px] max-w-[96vw] overflow-y-auto rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-cyan-400">Configure Workflow Settings</h2>
+            <p className="mt-1 text-sm text-slate-400">These fields appear before every Studio run and are passed to agents as run_config.</p>
+          </div>
+          <button onClick={onClose} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">Close</button>
+        </div>
+
+        <div className="mt-5 grid gap-3">
+          {fields.map((field, index) => {
+            const currentDefault = defaultValues[field.key] ?? field.default ?? (field.type === "boolean" ? false : "");
+            return (
+              <div key={`${field.key}-${index}`} className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+                <div className="grid gap-3 md:grid-cols-[1fr_1fr_150px]">
+                  <label className="grid gap-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Key</span>
+                    <input
+                      value={field.key}
+                      onChange={(event) => updateField(index, { key: event.target.value.replace(/\s+/g, "_") })}
+                      className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                    />
+                  </label>
+                  <label className="grid gap-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Label</span>
+                    <input
+                      value={field.label}
+                      onChange={(event) => updateField(index, { label: event.target.value })}
+                      className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                    />
+                  </label>
+                  <label className="grid gap-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Type</span>
+                    <select
+                      value={field.type}
+                      onChange={(event) => updateField(index, { type: event.target.value as WorkflowConfigField["type"] })}
+                      className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                    >
+                      <option value="text">text</option>
+                      <option value="textarea">textarea</option>
+                      <option value="number">number</option>
+                      <option value="boolean">boolean</option>
+                      <option value="select">select</option>
+                    </select>
+                  </label>
+                </div>
+                <div className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+                  <label className="grid gap-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Default</span>
+                    {field.type === "boolean" ? (
+                      <input
+                        type="checkbox"
+                        checked={Boolean(currentDefault)}
+                        onChange={(event) => setDefaultValues((current) => ({ ...current, [field.key]: event.target.checked }))}
+                        className="mt-2 h-4 w-4 accent-cyan-500"
+                      />
+                    ) : (
+                      <input
+                        type={field.type === "number" ? "number" : "text"}
+                        value={String(currentDefault)}
+                        onChange={(event) => setDefaultValues((current) => ({ ...current, [field.key]: coerceConfigValue(field, event.target.value) }))}
+                        className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                      />
+                    )}
+                  </label>
+                  <label className="grid gap-1">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Select Options</span>
+                    <input
+                      value={(field.options || []).join(", ")}
+                      onChange={(event) => updateField(index, { options: event.target.value.split(",").map((item) => item.trim()).filter(Boolean) })}
+                      placeholder="verilator, icarus"
+                      disabled={field.type !== "select"}
+                      className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-40"
+                    />
+                  </label>
+                  <div className="flex items-end gap-3">
+                    <label className="flex items-center gap-2 rounded-lg border border-slate-800 px-3 py-2 text-sm text-slate-200">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(field.required)}
+                        onChange={(event) => updateField(index, { required: event.target.checked })}
+                        className="h-4 w-4 accent-cyan-500"
+                      />
+                      Required
+                    </label>
+                    <button
+                      onClick={() => removeField(index)}
+                      className="rounded-lg border border-red-500/50 px-3 py-2 text-sm font-semibold text-red-200 hover:bg-red-950/40"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-5 flex justify-between gap-3">
+          <button onClick={addField} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800">
+            Add Setting
+          </button>
+          <div className="flex gap-3">
+            <button onClick={onClose} className="rounded-lg bg-slate-700 px-4 py-2 font-semibold hover:bg-slate-600">Cancel</button>
+            <button onClick={save} className="rounded-lg bg-cyan-500 px-5 py-2 font-bold text-black hover:bg-cyan-400">
+              Save Settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SpecInputModal({
+  loop,
+  onClose,
+  onSubmit,
+  configSchema,
+  runConfig,
+  onRunConfigChange,
+  showTestPlanName,
+  testPlanName,
+  setTestPlanName,
+}: {
+  loop: string;
+  onClose: () => void;
+  onSubmit: (text: string, file?: File) => void;
+  configSchema?: WorkflowConfigSchema;
+  runConfig?: Record<string, string | number | boolean>;
+  onRunConfigChange?: (next: Record<string, string | number | boolean>) => void;
+  showTestPlanName?: boolean;
+  testPlanName?: string;
+  setTestPlanName?: (v: string) => void;
+}) {
+  const [text, setText] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const normalizedSchema = normalizeWorkflowConfigSchema(configSchema);
+  const fields = normalizedSchema.fields || [];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+      <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
       <h2 className="mb-4 text-2xl font-bold text-cyan-400">Enter Spec for {loop.charAt(0).toUpperCase() + loop.slice(1)} Loop</h2>
         {showTestPlanName && (
           <div className="mb-4">
@@ -4501,6 +4868,68 @@ function SpecInputModal({ loop, onClose, onSubmit,showTestPlanName,testPlanName,
           </label>
           {file && <p className="mt-2 text-sm text-green-400">{file.name} selected</p>}
         </div>
+        {fields.length > 0 ? (
+          <div className="mb-4 rounded-lg border border-slate-700 bg-slate-950/50 p-4">
+            <h3 className="text-sm font-semibold text-cyan-300">Workflow Settings</h3>
+            <div className="mt-3 grid gap-3">
+              {fields.map((field) => {
+                const current = runConfig?.[field.key] ?? field.default ?? (field.type === "boolean" ? false : "");
+                const update = (value: string | number | boolean) => {
+                  const next = {
+                    ...(runConfig || {}),
+                    [field.key]: coerceConfigValue(field, value),
+                  };
+                  onRunConfigChange?.(next);
+                };
+                if (field.type === "boolean") {
+                  return (
+                    <label key={field.key} className="flex items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2">
+                      <span className="text-sm text-slate-200">{field.label}</span>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(current)}
+                        onChange={(event) => update(event.target.checked)}
+                        className="h-4 w-4 accent-cyan-500"
+                      />
+                    </label>
+                  );
+                }
+                return (
+                  <label key={field.key} className="grid gap-2">
+                    <span className="text-sm font-medium text-slate-200">
+                      {field.label}{field.required ? " *" : ""}
+                    </span>
+                    {field.type === "select" ? (
+                      <select
+                        value={String(current)}
+                        onChange={(event) => update(event.target.value)}
+                        className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                      >
+                        {(field.options || []).map((option) => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                    ) : field.type === "textarea" ? (
+                      <textarea
+                        value={String(current)}
+                        onChange={(event) => update(event.target.value)}
+                        rows={3}
+                        className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                      />
+                    ) : (
+                      <input
+                        type={field.type === "number" ? "number" : "text"}
+                        value={String(current)}
+                        onChange={(event) => update(event.target.value)}
+                        className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                      />
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
         <div className="flex justify-end space-x-3">
           <button onClick={onClose} className="rounded-lg bg-slate-700 px-4 py-2 hover:bg-slate-600">Cancel</button>
           <button

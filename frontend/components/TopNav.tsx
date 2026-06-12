@@ -6,7 +6,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import type { User } from "@supabase/supabase-js";
 import { PlanCreditBadge } from "@/components/PlanCreditStatus";
 
-type NavKey = "home" | "apps" | "products" | "studio" | "marketplace" | "pricing" | "help" | "settings" | "admin" | "webinar" | "workshop";
+type NavKey = "home" | "apps" | "products" | "studio" | "marketplace" | "pricing" | "events" | "help" | "settings" | "admin" | "webinar" | "workshop";
 
 type TopNavProps = {
   current?: NavKey;
@@ -89,6 +89,7 @@ export default function TopNav({
     { key: "studio", label: "Studio", href: "/workflow", show: true },
     { key: "marketplace", label: "Marketplace", href: "/marketplace", show: showMarketplace },
     { key: "pricing", label: "Pricing", href: "/pricing", show: true },
+    { key: "events", label: "Events", href: "/events", show: true },
     { key: "help", label: "Help", href: "/help", show: true },
     { key: "settings", label: "Settings", href: "/settings/plan", show: showSettings },
     { key: "admin", label: "Admin", href: "/admin/marketplace", show: showAdmin },

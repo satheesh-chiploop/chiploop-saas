@@ -25,6 +25,8 @@ const supabase = createClientComponentClient();
 
 type LoopType = "digital" | "validation" | "analog" | "embedded" | "system";
 
+const LOOP_TYPES: LoopType[] = ["digital", "analog", "system", "embedded", "validation"];
+
 type OnboardingResponse = {
   status: string;
   onboarding: {
@@ -125,6 +127,7 @@ export default function AppsHomePage() {
   const [onboardingBusy, setOnboardingBusy] = useState(false);
 
   const [view, setView] = useState<"recommended" | "all">("recommended");
+  const [selectedLoop, setSelectedLoop] = useState<LoopType | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -151,6 +154,14 @@ export default function AppsHomePage() {
       }
     })();
     return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    const loop = new URLSearchParams(window.location.search).get("loop");
+    if (LOOP_TYPES.includes(loop as LoopType)) {
+      setSelectedLoop(loop as LoopType);
+      setView("all");
+    }
   }, []);
 
   // Apps are grouped by loop so the page can present both guided entry points and full catalog sections.
@@ -584,7 +595,7 @@ export default function AppsHomePage() {
 
   const flagship = primaryApps;
 
-  const loops: LoopType[] = useMemo(() => (["digital", "analog", "system", "embedded", "validation"]), []);
+  const loops: LoopType[] = useMemo(() => LOOP_TYPES, []);
 
   const outcomeInputs: Record<LoopType, string> = {
     digital: "Architecture spec or RTL",
@@ -1168,7 +1179,7 @@ export default function AppsHomePage() {
 
       {/* Loop rows */}
       <section className="mx-auto max-w-6xl px-6 pb-16 space-y-10">
-        {(view === "recommended" ? loops.filter(l => l === "digital" || l === "analog" || l === "embedded" || l === "validation" || l === "system") : loops).map((loop) => {
+        {(selectedLoop ? loops.filter((loop) => loop === selectedLoop) : loops).map((loop) => {
           const meta = LOOP_META[loop];
           const rowApps = visibleAppsForLoop(loop);
 
