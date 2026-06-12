@@ -129,12 +129,12 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {paths.map(([title, body, href, cta]) => (
-            <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/70 p-6">
-              <h3 className="text-xl font-bold text-cyan-300">{title}</h3>
-              <p className="mt-3 min-h-24 text-sm leading-6 text-slate-300">{body}</p>
+            <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-center">
+              <h3 className="text-2xl font-extrabold text-cyan-300">{title}</h3>
+              <p className="mt-3 text-base font-semibold leading-6 text-slate-200">{body}</p>
               <button onClick={() => goTo(href)} className="mt-5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
                 {cta}
               </button>
