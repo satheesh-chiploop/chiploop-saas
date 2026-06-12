@@ -96,8 +96,7 @@ function LandingPageContent() {
           Agentic AI Platform for Chip Design and Implementation
         </h1>
         <p className="mt-6 max-w-4xl text-base leading-7 text-slate-300 sm:mt-7 sm:text-lg sm:leading-8">
-          Define, configure, and run AI-powered workflows from specs to RTL, verification, firmware, system software,
-          co-simulation, validation, physical design, and product handoff.
+          Orchestrate chip workflows from specs to implementation, firmware, software, validation, and product handoff.
         </p>
         <div className="mt-8 flex w-full flex-col gap-4 sm:mt-10 sm:w-auto sm:flex-row">
           <button onClick={() => goTo("/products")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
@@ -146,7 +145,7 @@ function LandingPageContent() {
 
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold">Define. Configure. Run.</h2>
+          <h2 className="text-3xl font-extrabold">Design Intent to Execution</h2>
         </div>
         <div className="mt-8 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
           {[

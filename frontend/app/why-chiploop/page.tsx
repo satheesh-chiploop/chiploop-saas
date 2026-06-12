@@ -5,9 +5,18 @@ import TopNav from "@/components/TopNav";
 
 const rows = [
   ["One platform", "Separate tools per loop", "Products, Apps, and Studio in one place"],
+  ["Ask to run", "Users manually assemble run steps", "Ask for a loop or product run and review the generated setup"],
+  ["Run across loops", "Teams stitch loop execution manually", "Run within one loop or across multiple loops"],
+  ["Architecture to RTL", "Architecture intent converts through manual setup", "Move from architecture intent to RTL execution"],
+  ["Repair loops", "Fixes stay local to one tool", "Repair and iterate within a loop or across connected loops"],
+  ["Scalability", "Execution slows as projects grow", "Reusable templates scale across products and teams"],
   ["Connected context", "Context scattered across files and chats", "Specs, settings, logs, artifacts, and handoffs stay connected"],
+  ["Tool integration", "New tools require custom glue code", "Add tools and pick the right tool per workflow"],
+  ["Process technology", "Flows tied to one PDK or environment", "Process-technology agnostic orchestration"],
+  ["Developer access", "Browser and automation live separately", "Use the same context from UI, SDK, CLI, IDE, and CI"],
   ["Reusable execution", "Hard to reproduce setup", "Reusable workflows, agents, and run settings"],
   ["Run visibility", "Debug requires manual artifact chasing", "Run logs, dashboards, artifacts, and ZIPs stay attached"],
+  ["Handoff quality", "Artifacts handed over without context", "Dashboards, reports, and ZIPs travel with the run"],
   ["Workflow control", "Custom scripts for every variation", "Configurable stages, tools, agents, and goals"],
   ["Product tracking", "Progress tracked manually", "Product-level stages, history, and results"],
 ];
@@ -59,12 +68,31 @@ export default function WhyChipLoopPage() {
         </div>
 
         <section className="mt-10 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-6 sm:p-8">
-          <h2 className="text-2xl font-extrabold">Define. Configure. Run. Review. Improve.</h2>
-          <p className="mt-3 max-w-4xl leading-7 text-slate-300">
-            Start from a product, a prebuilt app, or a custom Studio workflow. Configure the settings each loop needs,
-            run the agents, then review dashboards and downloadable handoff packages from the same product context.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <h2 className="text-2xl font-extrabold">Design Intent to Execution</h2>
+          <div className="mt-6 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
+            {[
+              ["01", "Define", "Product, app, or workflow"],
+              ["02", "Configure", "Stages, tools, and goals"],
+              ["03", "Run", "Logs, dashboards, and ZIPs"],
+            ].map(([step, title, body], index) => (
+              <div key={title} className="contents">
+                <div className="rounded-xl border border-cyan-400/20 bg-slate-950/50 p-5 text-center">
+                  <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">
+                    {step}
+                  </div>
+                  <h3 className="mt-4 text-lg font-extrabold text-white">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
+                </div>
+                {index < 2 ? (
+                  <div className="flex items-center justify-center text-3xl font-extrabold text-cyan-300 md:px-2">
+                    <span className="hidden md:inline">{"\u2192"}</span>
+                    <span className="md:hidden">{"\u2193"}</span>
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             {actions.map(([label, href], index) => (
               <button
                 key={label}
