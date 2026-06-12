@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import SpecTextBox from "@/components/SpecTextBox";
+import TextFileUpload from "@/components/TextFileUpload";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import { DESIGN_CHAIN_CONTEXT_KEY, type DesignChainContext } from "@/lib/pwmFullStackDemo";
@@ -60,7 +61,9 @@ export default function SystemPDAppPage() {
   const [enableScanDft, setEnableScanDft] = useState(false);
   const [analogPhysicalMode, setAnalogPhysicalMode] = useState<"blackbox" | "generate_sky130_gds" | "provided_gds">("blackbox");
   const [analogPdk, setAnalogPdk] = useState("sky130A");
+  const [hasProvidedSpice, setHasProvidedSpice] = useState(false);
   const [analogSpiceText, setAnalogSpiceText] = useState("");
+  const [spiceUploadMode, setSpiceUploadMode] = useState<"append" | "replace">("replace");
   const [nextFlow, setNextFlow] = useState<"system-firmware">("system-firmware");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
@@ -192,7 +195,7 @@ export default function SystemPDAppPage() {
           run_lvs: runLvs,
           analog_physical_mode: analogPhysicalMode,
           analog_pdk: analogPdk,
-          analog_spice_text: analogSpiceText || undefined,
+          analog_spice_text: hasProvidedSpice ? analogSpiceText || undefined : undefined,
           toggles: {
             run_spec2rtl_check: runSpec2RtlCheck,
             enable_scan_dft: enableScanDft,
@@ -330,16 +333,51 @@ export default function SystemPDAppPage() {
                         <option value="sky130A">Sky130A</option>
                       </select>
                     </label>
-                    <label className="block text-sm text-slate-300">
-                      Sky130 transistor-level SPICE
-                      <textarea
-                        value={analogSpiceText}
-                        onChange={(e) => setAnalogSpiceText(e.target.value)}
-                        rows={7}
-                        className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
-                        placeholder=".subckt analog_macro vin vout vdd vss&#10;M1 ... sky130_fd_pr__nfet_01v8 W=... L=...&#10;.ends analog_macro"
+                    <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-sm text-slate-300">
+                      <input
+                        type="checkbox"
+                        checked={hasProvidedSpice}
+                        onChange={(e) => setHasProvidedSpice(e.target.checked)}
+                        className="mt-1"
                       />
+                      <span>I have a Sky130 transistor-level SPICE netlist</span>
                     </label>
+                    {hasProvidedSpice ? (
+                      <div className="rounded-xl border border-slate-800 bg-black/20 p-3">
+                        <label className="block text-sm text-slate-300">
+                          Sky130 transistor-level SPICE
+                          <textarea
+                            value={analogSpiceText}
+                            onChange={(e) => setAnalogSpiceText(e.target.value)}
+                            rows={7}
+                            className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/30 p-4 text-slate-100"
+                            placeholder=".subckt analog_macro vin vout vdd vss&#10;M1 ... sky130_fd_pr__nfet_01v8 W=... L=...&#10;.ends analog_macro"
+                          />
+                        </label>
+                        <div className="mt-3 flex items-center justify-end gap-2">
+                          <select
+                            value={spiceUploadMode}
+                            onChange={(e) => setSpiceUploadMode(e.target.value as "append" | "replace")}
+                            className="h-9 rounded-lg border border-slate-800 bg-black/40 px-2 text-xs text-slate-200"
+                          >
+                            <option value="replace">Replace</option>
+                            <option value="append">Append</option>
+                          </select>
+                          <TextFileUpload
+                            compact
+                            inline
+                            showMode={false}
+                            mode={spiceUploadMode}
+                            onModeChange={setSpiceUploadMode}
+                            accept=".spice,.spi,.cir,.ckt,.txt"
+                            label="Upload SPICE netlist"
+                            onText={(text, _fileName, mode) => {
+                              setAnalogSpiceText((current) => mode === "append" ? [current.trim(), text.trim()].filter(Boolean).join("\n\n") : text);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
               </div>
