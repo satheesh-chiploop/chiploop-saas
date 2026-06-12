@@ -35,9 +35,9 @@ const automationSnippets = {
 };
 
 const paths = [
-  ["Products", "Create end-to-end product journeys with staged workflows, configuration, run history, dashboards, and downloads.", "/products", "Explore Products"],
-  ["Apps", "Run focused prebuilt workflows for RTL, verification, firmware, system simulation, physical design, validation, and product app generation.", "/apps", "Explore Apps"],
-  ["Studio", "Build custom agents and workflows, configure execution settings, and run your own chip design flows.", "/workflow", "Open Studio"],
+  ["Products", "Build complete chip journeys.", "/products", "Explore Products"],
+  ["Apps", "Run ready-made chip workflows.", "/apps", "Explore Apps"],
+  ["Studio", "Create custom agents and workflows.", "/workflow", "Open Studio"],
 ];
 
 function LandingPageContent() {
@@ -177,10 +177,9 @@ function LandingPageContent() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
               <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Developer Automation</p>
-              <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">Use ChipLoop from CLI, SDK, IDE, or GitHub</h2>
+              <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">Automate from CLI, SDK, IDE, or GitHub</h2>
               <p className="mt-4 leading-7 text-slate-300">
-                Start in Products, Apps, or Studio. When your workflow needs scripts, local editor workflows, repo automation,
-                or private runners, ChipLoop developer automation keeps the same execution context connected.
+                Use the same ChipLoop context in scripts, editors, CI, and private runners.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 {[
@@ -201,11 +200,8 @@ function LandingPageContent() {
                     {label}
                   </button>
                 ))}
-                <button onClick={() => router.push("/pricing")} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-300 transition hover:border-cyan-300 hover:text-cyan-200">
-                  View Pricing
-                </button>
               </div>
-              <p className="mt-4 text-sm text-cyan-100/80">Developer automation is available on Pro, Pro Max, and Enterprise plans.</p>
+              <p className="mt-4 text-sm text-cyan-100/80">Available for scripted, local, and CI-driven workflows.</p>
             </div>
             <div className="overflow-hidden rounded-xl border border-slate-700 bg-slate-950 shadow-2xl">
               <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
