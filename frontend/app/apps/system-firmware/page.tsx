@@ -64,6 +64,7 @@ export default function SystemFirmwareAppPage() {
   const [repoPath, setRepoPath] = useState("");
   const [systemRtlWorkflowId, setSystemRtlWorkflowId] = useState("");
   const [tempMonitorChain, setTempMonitorChain] = useState(false);
+  const [nextFlow, setNextFlow] = useState<"system-software">("system-software");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const readyForSoftware = useMemo(() => systemFirmwareReady(workflowRow), [workflowRow]);
@@ -257,6 +258,10 @@ export default function SystemFirmwareAppPage() {
     router.push(`/apps/system-software?handoff=1${tempMonitorChain ? "&tempmon_chain=1" : ""}`);
   }
 
+  function openNextFlow() {
+    if (nextFlow === "system-software") openSystemSoftware();
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -415,14 +420,25 @@ export default function SystemFirmwareAppPage() {
                 <button onClick={downloadZip} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                   Download ZIP (full=1)
                 </button>
-                <button
-                  type="button"
-                  onClick={openSystemSoftware}
-                  disabled={!readyForSoftware}
-                  className="rounded-xl bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-700"
-                >
-                  Open System Software
-                </button>
+              </div>
+              <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+                <label className="text-xs font-semibold uppercase tracking-wide text-cyan-200">Run next workflow</label>
+                <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
+                  <select value={nextFlow} onChange={(e) => setNextFlow(e.target.value as typeof nextFlow)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-cyan-400">
+                    <option value="system-software">System Software</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={openNextFlow}
+                    disabled={!readyForSoftware}
+                    className="rounded-lg bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
+                  >
+                    Open
+                  </button>
+                </div>
+                <div className="mt-2 text-xs text-slate-400">
+                  Firmware handoff: <span className="break-all text-slate-200">{workflowId}</span>
+                </div>
               </div>
               <div className="mt-4">
                 <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="embedded" logs={workflowRow?.logs} />

@@ -43,6 +43,11 @@ export default function SystemDQAAppPage() {
   const [analogSpecText, setAnalogSpecText] = useState("");
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
   const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
+  const [runLint, setRunLint] = useState(true);
+  const [runCdc, setRunCdc] = useState(true);
+  const [runReset, setRunReset] = useState(true);
+  const [runSynthesisReadiness, setRunSynthesisReadiness] = useState(true);
+  const [nextFlow, setNextFlow] = useState<"system-synthesis" | "system-pd" | "system-firmware">("system-synthesis");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -124,9 +129,10 @@ export default function SystemDQAAppPage() {
 
   const canRun = useMemo(() => {
     if (running) return false;
+    if (!runLint && !runCdc && !runReset && !runSynthesisReadiness) return false;
     if (systemRtlWorkflowId.trim()) return true;
     return Boolean(digitalSpecText.trim() && analogSpecText.trim() && socIntegrationSpecText.trim());
-  }, [running, systemRtlWorkflowId, digitalSpecText, analogSpecText, socIntegrationSpecText]);
+  }, [running, runLint, runCdc, runReset, runSynthesisReadiness, systemRtlWorkflowId, digitalSpecText, analogSpecText, socIntegrationSpecText]);
 
   async function runNow() {
     setErr(null);
@@ -142,6 +148,10 @@ export default function SystemDQAAppPage() {
         soc_integration_spec_text: socIntegrationSpecText,
         toggles: {
           run_spec2rtl_check: runSpec2RtlCheck,
+          run_lint: runLint,
+          run_cdc: runCdc,
+          run_reset: runReset,
+          run_synthesis_readiness: runSynthesisReadiness,
         },
       });
       setWorkflowId(out.workflow_id);
@@ -156,6 +166,22 @@ export default function SystemDQAAppPage() {
   function downloadZip() {
     if (!workflowId) return;
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
+  }
+
+  function openNextFlow() {
+    if (!workflowId || typeof window === "undefined") return;
+    const sourceSystemRtlWorkflowId = systemRtlWorkflowId.trim() || workflowId;
+    let context: DesignChainContext = {};
+    try {
+      context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+    } catch {
+      context = {};
+    }
+    context.systemRtlWorkflowId = sourceSystemRtlWorkflowId;
+    context.systemDqaWorkflowId = workflowId;
+    context.systemDqaRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    router.push(`/apps/${nextFlow}?handoff=1&from_workflow_id=${encodeURIComponent(sourceSystemRtlWorkflowId)}&parent_workflow_id=${encodeURIComponent(workflowId)}`);
   }
 
   if (loading) {
@@ -190,23 +216,32 @@ export default function SystemDQAAppPage() {
                 <span>Run Spec2RTL conformance before quality checks</span>
               </label>
 
+              <div className="overflow-hidden rounded-xl border border-slate-800 bg-black/20">
+                <div className="border-b border-slate-800 px-4 py-3 text-sm font-semibold text-slate-100">Tools and checks before run</div>
+                <div className="grid grid-cols-[auto_1fr_1fr] border-b border-slate-800 px-4 py-2 text-xs font-semibold uppercase text-slate-400">
+                  <div>Use</div>
+                  <div>Check</div>
+                  <div>Primary tool</div>
+                </div>
+                {[
+                  { label: "RTL lint", tool: "Verilator", checked: runLint, set: setRunLint },
+                  { label: "CDC analysis", tool: "Heuristic scan", checked: runCdc, set: setRunCdc },
+                  { label: "Reset integrity", tool: "Heuristic scan", checked: runReset, set: setRunReset },
+                  { label: "Synthesis readiness", tool: "Yosys", checked: runSynthesisReadiness, set: setRunSynthesisReadiness },
+                ].map((item) => (
+                  <label key={item.label} className="grid grid-cols-[auto_1fr_1fr] items-center gap-3 border-b border-slate-800 px-4 py-3 text-sm last:border-b-0">
+                    <input type="checkbox" checked={item.checked} onChange={(e) => item.set(e.target.checked)} />
+                    <span className="text-slate-200">{item.label}</span>
+                    <span className="text-cyan-100">{item.tool}</span>
+                  </label>
+                ))}
+              </div>
+
               <button onClick={runNow} disabled={!canRun} className={`mt-2 w-full rounded-xl px-5 py-3 font-semibold transition ${canRun ? "bg-amber-600 hover:bg-amber-500" : "cursor-not-allowed bg-slate-700"}`}>
                 {running ? "Starting..." : "Run System DQA"}
               </button>
 
               {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
-
-              {workflowId ? (
-                <div className="mt-4 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
-                  <div>workflow_id: <span className="break-all text-slate-100">{workflowId}</span></div>
-                  <div>run_id: <span className="break-all text-slate-100">{runId}</span></div>
-                  <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">Download ZIP (full=1)</button>
-                  <div className="mt-4">
-                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="dqa" logs={workflowRow?.logs} />
-                  </div>
-                  <AskThisRunPanel workflowId={workflowId} compact />
-                </div>
-              ) : null}
             </div>
 
             <div className="space-y-4">
@@ -215,6 +250,34 @@ export default function SystemDQAAppPage() {
               <SpecTextBox label="SoC integration specification" required={!systemRtlWorkflowId.trim()} value={socIntegrationSpecText} onChange={setSocIntegrationSpecText} rows={6} voiceTitle="SoC Voice Spec" voiceLoopType="system" voiceTarget="SoC integration spec" uploadLabel="Upload SoC integration spec" uploadHelper="Used only when no System RTL workflow id is supplied." placeholder="Paste SoC integration spec here..." />
             </div>
           </div>
+
+          {workflowId ? (
+            <div className="mt-6 space-y-4">
+              <div className="rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+                <div className="font-semibold text-slate-100">Run Status</div>
+                <div className="mt-2">workflow_id: <span className="break-all text-slate-100">{workflowId}</span></div>
+                <div>run_id: <span className="break-all text-slate-100">{runId}</span></div>
+                <div>status: <span className="text-slate-100">{workflowRow?.status || "running"}</span></div>
+                <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">Download ZIP (full=1)</button>
+                <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-cyan-200">Run next workflow</label>
+                  <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
+                    <select value={nextFlow} onChange={(e) => setNextFlow(e.target.value as typeof nextFlow)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-cyan-400">
+                      <option value="system-synthesis">System Synthesis</option>
+                      <option value="system-pd">System PD</option>
+                      <option value="system-firmware">System Firmware</option>
+                    </select>
+                    <button onClick={openNextFlow} className="rounded-lg bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500">Open</button>
+                  </div>
+                  <div className="mt-2 text-xs text-slate-400">
+                    Source System RTL: <span className="break-all text-slate-200">{systemRtlWorkflowId.trim() || workflowId}</span>
+                  </div>
+                </div>
+              </div>
+              <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="dqa" logs={workflowRow?.logs} />
+              <AskThisRunPanel workflowId={workflowId} compact />
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
             <div className="text-sm font-semibold">Live logs</div>

@@ -61,6 +61,7 @@ export default function SystemPDAppPage() {
   const [analogPhysicalMode, setAnalogPhysicalMode] = useState<"blackbox" | "generate_sky130_gds" | "provided_gds">("blackbox");
   const [analogPdk, setAnalogPdk] = useState("sky130A");
   const [analogSpiceText, setAnalogSpiceText] = useState("");
+  const [nextFlow, setNextFlow] = useState<"system-firmware">("system-firmware");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -210,6 +211,22 @@ export default function SystemPDAppPage() {
   function downloadZip() {
     if (!workflowId) return;
     window.open(`${API_BASE}/workflow/${workflowId}/download_zip?full=1`, "_blank");
+  }
+
+  function openNextFlow() {
+    if (!workflowId || typeof window === "undefined") return;
+    const sourceSystemRtlWorkflowId = systemRtlWorkflowId.trim() || workflowId;
+    let context: DesignChainContext = {};
+    try {
+      context = JSON.parse(window.localStorage.getItem(DESIGN_CHAIN_CONTEXT_KEY) || "{}") as DesignChainContext;
+    } catch {
+      context = {};
+    }
+    context.systemRtlWorkflowId = sourceSystemRtlWorkflowId;
+    context.systemPdWorkflowId = workflowId;
+    context.systemPdRunId = runId || undefined;
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
+    router.push(`/apps/${nextFlow}?handoff=1&from_workflow_id=${encodeURIComponent(sourceSystemRtlWorkflowId)}&parent_workflow_id=${encodeURIComponent(workflowId)}`);
   }
 
   if (loading) {
@@ -369,6 +386,18 @@ export default function SystemPDAppPage() {
                   <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                     Download ZIP (full=1)
                   </button>
+                  <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+                    <label className="text-xs font-semibold uppercase tracking-wide text-cyan-200">Run next workflow</label>
+                    <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
+                      <select value={nextFlow} onChange={(e) => setNextFlow(e.target.value as typeof nextFlow)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-cyan-400">
+                        <option value="system-firmware">System Firmware</option>
+                      </select>
+                      <button onClick={openNextFlow} className="rounded-lg bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500">Open</button>
+                    </div>
+                    <div className="mt-2 text-xs text-slate-400">
+                      Source System RTL: <span className="break-all text-slate-200">{systemRtlWorkflowId.trim() || workflowId}</span>
+                    </div>
+                  </div>
                   <div className="mt-4">
                     <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
                   </div>

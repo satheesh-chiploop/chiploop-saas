@@ -783,6 +783,12 @@ export type DesignChainContext = {
   arch2rtlRunId?: string;
   systemRtlWorkflowId?: string;
   systemRtlRunId?: string;
+  systemDqaWorkflowId?: string;
+  systemDqaRunId?: string;
+  systemSynthesisWorkflowId?: string;
+  systemSynthesisRunId?: string;
+  systemPdWorkflowId?: string;
+  systemPdRunId?: string;
   systemSimWorkflowId?: string;
   systemSimRunId?: string;
   systemFirmwareWorkflowId?: string;

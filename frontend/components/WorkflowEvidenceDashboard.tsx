@@ -324,19 +324,35 @@ function ToolStrip({ used, available, defaultTool }: { used: string[]; available
   );
 }
 
-function CheckCard({ title, status, tool, detail }: { title: string; status: string; tool: string; detail?: string | number }) {
+function CheckCard({ title, status, detail }: { title: string; status: string; tool?: string; detail?: string | number }) {
   return (
     <div className="min-w-0 rounded-lg border border-slate-800 bg-black/30 p-3">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="text-xs text-slate-400">{title}</div>
-          <div className="mt-1 break-words text-base font-semibold leading-snug text-slate-100">{status}</div>
-        </div>
-        <span className="shrink-0 rounded border border-cyan-700/70 bg-cyan-950/40 px-2 py-1 text-[11px] font-semibold text-cyan-100">
-          {tool}
-        </span>
-      </div>
+      <div className="text-xs text-slate-400">{title}</div>
+      <div className="mt-1 break-words text-base font-semibold leading-snug text-slate-100">{status}</div>
       {detail !== undefined ? <div className="mt-2 text-xs text-slate-500">{detail}</div> : null}
+    </div>
+  );
+}
+
+function CheckTable({ rows }: { rows: Array<{ check: string; status: string; detail: string; tool: string }> }) {
+  return (
+    <div className="overflow-x-auto rounded-lg border border-slate-800">
+      <div className="min-w-[640px]">
+        <div className="grid grid-cols-[1fr_1fr_1.4fr_1fr] border-b border-slate-800 bg-slate-950/70 px-4 py-2 text-xs font-semibold uppercase text-slate-400">
+          <div>Check</div>
+          <div>Status</div>
+          <div>Evidence</div>
+          <div>Tool</div>
+        </div>
+        {rows.map((row) => (
+          <div key={row.check} className="grid grid-cols-[1fr_1fr_1.4fr_1fr] border-b border-slate-800 px-4 py-3 text-sm last:border-b-0">
+            <div className="text-slate-300">{row.check}</div>
+            <div className="font-semibold text-slate-100">{row.status}</div>
+            <div className="text-slate-400">{row.detail}</div>
+            <div className="text-cyan-100">{row.tool}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -379,7 +395,6 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "system_integration_intent.json",
       ],
       dqa: [
-        "digital/handoff/rtl_handoff_ingest_manifest.json",
         "rtl_lint_report.json",
         "cdc_findings.json",
         "reset_integrity_findings.json",
@@ -388,6 +403,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "tool_execution_summary.json",
         "tool_profile_used.json",
         "executive_summary.json",
+        "digital/handoff/rtl_handoff_ingest_manifest.json",
+        "digital/rtl_lint_report.json",
+        "digital/cdc_findings.json",
+        "digital/reset_integrity_findings.json",
+        "signoff/synthesis_readiness_findings.json",
+        "digital/dqa/dqa_summary.json",
+        "digital/tool_execution_summary.json",
+        "digital/tool_profile_used.json",
       ],
       smoke: [
         "digital/handoff/rtl_handoff_ingest_manifest.json",
@@ -670,6 +693,17 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthTool = record(readiness.yosys).available === true ? "yosys" : "not available";
       const readinessScore = firstPresent(readiness.score);
       const yosysErrors = array(record(readiness.yosys).errors).length;
+      const checkRows = [
+        { check: "RTL Lint", status: lintVerdict(lint), detail: `${findingCount(lint)} findings`, tool: lintTool },
+        { check: "CDC", status: findingsVerdict(cdc), detail: `${findingCount(cdc)} findings`, tool: "heuristic scan" },
+        { check: "Reset", status: findingsVerdict(reset), detail: `${findingCount(reset)} findings`, tool: "heuristic scan" },
+        {
+          check: "Synth Ready",
+          status: synthesisReadinessVerdict(readiness),
+          detail: readinessScore !== undefined ? `score ${String(readinessScore)}${yosysErrors ? `, ${yosysErrors} yosys error(s)` : ""}` : "not produced",
+          tool: synthTool,
+        },
+      ];
       const rtlFiles = firstNumber(
         summary.rtl_file_count,
         handoff.rtl_file_count,
@@ -682,11 +716,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <CheckCard title="RTL Lint" status={lintVerdict(lint)} tool={lintTool} detail={`${findingCount(lint)} findings`} />
-            <CheckCard title="CDC" status={findingsVerdict(cdc)} tool="heuristic scan" detail={`${findingCount(cdc)} findings`} />
-            <CheckCard title="Reset" status={findingsVerdict(reset)} tool="heuristic scan" detail={`${findingCount(reset)} findings`} />
-            <CheckCard title="Synth Ready" status={synthesisReadinessVerdict(readiness)} tool={synthTool} detail={readinessScore !== undefined ? `score ${String(readinessScore)}${yosysErrors ? `, ${yosysErrors} yosys error(s)` : ""}` : undefined} />
+            {checkRows.map((row) => (
+              <CheckCard key={row.check} title={row.check} status={row.status} detail={row.detail} />
+            ))}
           </div>
+          <CheckTable rows={checkRows} />
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Stat title="Source" value={firstString(handoff.source_mode, "imported").replaceAll("_", " ")} />
             <Stat title="RTL Files" value={rtlFiles} />
