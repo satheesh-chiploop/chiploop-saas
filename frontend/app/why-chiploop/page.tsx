@@ -5,7 +5,7 @@ import TopNav from "@/components/TopNav";
 
 const rows = [
   ["One platform", "Separate tools per loop", "Products, Apps, and Studio in one place"],
-  ["Ask to run", "Users manually assemble run steps", "Ask for a loop or product run and review the generated setup"],
+  ["Ask this run", "Users inspect logs and artifacts manually", "Ask about the run, summarize loops, and get recommended next steps"],
   ["Run across loops", "Teams stitch loop execution manually", "Run within one loop or across multiple loops"],
   ["Architecture to RTL", "Architecture intent converts through manual setup", "Move from architecture intent to RTL execution"],
   ["Repair loops", "Fixes stay local to one tool", "Repair and iterate within a loop or across connected loops"],
