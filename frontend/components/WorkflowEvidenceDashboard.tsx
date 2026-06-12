@@ -527,6 +527,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const registers = array(record(evidence["digital_regmap.json"]?.regmap).registers);
       const systemDashboard = record(evidence["system_rtl_dashboard.json"]);
       if (Object.keys(systemDashboard).length) {
+        const compileSummary = record(evidence["system_full_compile_summary.json"]);
+        const simCompile = record(compileSummary.sim);
+        const simTools = record(simCompile.tools);
+        const compileTool = firstString(simTools.compile, "iverilog");
+        const lintTool = firstString(simTools.lint, "verilator");
+        const simIverilog = firstPresent(simCompile.iverilog_ok_pass2, simCompile.iverilog_ok_pass1);
+        const simVerilator = firstPresent(simCompile.verilator_ok_pass2, simCompile.verilator_ok_pass1);
+        const toolDetail = `compile ${simIverilog === true ? "pass" : simIverilog === false ? "fail" : "not run"}, lint ${simVerilator === true ? "pass" : simVerilator === false ? "fail" : "not run"}`;
         const scopes = record(systemDashboard.scopes);
         const compile = record(systemDashboard.compile);
         const systemScope = record(scopes.system);
@@ -549,6 +557,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const physCompile = firstString(compile.phys);
         return (
           <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+            <div className="2xl:col-span-2">
+              <ToolStrip used={[compileTool, lintTool]} available={[compileTool, lintTool]} defaultTool={`${compileTool} / ${lintTool}`} />
+            </div>
             <div className="space-y-3">
               <Bar label="SoC input bits" value={number(iface.input_count)} total={bitTotal} color="bg-cyan-500" />
               <Bar label="SoC output bits" value={number(iface.output_count)} total={bitTotal} color="bg-emerald-500" />
@@ -563,10 +574,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               {agentCount !== null ? <Bar label="Agents participated" value={agentCount} total={participatedTotal} color="bg-slate-400" /> : null}
             </div>
             <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
-              <Stat title="Digital Lint" value={firstString(lintSummary.digital, record(digitalScope.lint).status, "not run")} />
-              <Stat title="Analog Lint" value={firstString(lintSummary.analog, record(analogScope.lint).status, "not run")} />
-              <Stat title="SoC Lint" value={firstString(lintSummary.soc, compile.sim, "not produced")} />
-              <Stat title="System Lint" value={firstString(lintSummary.system, record(systemScope.lint).status, "not run")} />
+              <CheckCard title="Digital Lint" status={firstString(lintSummary.digital, record(digitalScope.lint).status, "not run")} tool="verilator" />
+              <CheckCard title="Analog Lint" status={firstString(lintSummary.analog, record(analogScope.lint).status, "not run")} tool="verilator" detail="behavioral model lint" />
+              <CheckCard title="SoC Lint" status={firstString(lintSummary.soc, compile.sim, "not produced")} tool={`${compileTool} / ${lintTool}`} detail={toolDetail} />
+              <CheckCard title="System Lint" status={firstString(lintSummary.system, record(systemScope.lint).status, "not run")} tool={`${compileTool} / ${lintTool}`} detail="Digital + analog + SoC roll-up" />
               <Stat title="Full-cycle Paths" value={number(timing.full_cycle_path_count)} />
               <Stat title="Half-cycle Paths" value={number(timing.half_cycle_path_count)} />
               <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
