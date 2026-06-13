@@ -299,25 +299,19 @@ function Stat({ title, value }: { title: string; value: string | number }) {
   );
 }
 
-function ToolStrip({ used, available, defaultTool }: { used: string[]; available: string[]; defaultTool: string }) {
-  const visibleTools = available.length ? available : used;
+function ToolStrip({ used, defaultTool }: { used: string[]; defaultTool: string }) {
   return (
     <div className="rounded-lg border border-slate-800 bg-black/30 p-3">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
-        <div className="min-w-0 lg:w-64">
-          <div className="text-xs text-slate-400">Tools Used</div>
-          <div className="mt-1 break-words text-base font-semibold leading-snug text-slate-100">{defaultTool}</div>
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="text-xs text-slate-400">Available Tools</div>
-          <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-            {visibleTools.map((tool) => (
-              <span key={tool} className="shrink-0 rounded border border-slate-700 bg-slate-950 px-2.5 py-1 text-xs font-semibold text-cyan-100">
-                {tool}
-              </span>
-            ))}
-            {!visibleTools.length ? <span className="text-sm text-slate-500">not reported</span> : null}
-          </div>
+      <div className="min-w-0">
+        <div className="text-xs text-slate-400">Tools Used</div>
+        <div className="mt-1 break-words text-base font-semibold leading-snug text-slate-100">{defaultTool}</div>
+        <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+          {used.map((tool) => (
+            <span key={tool} className="shrink-0 rounded border border-slate-700 bg-slate-950 px-2.5 py-1 text-xs font-semibold text-cyan-100">
+              {tool}
+            </span>
+          ))}
+          {!used.length ? <span className="text-sm text-slate-500">not reported</span> : null}
         </div>
       </div>
     </div>
@@ -421,10 +415,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       synthesis: [
         "digital/handoff/rtl_handoff_ingest_manifest.json",
         "implementation_setup_summary.json",
-        "synth_summary.json",
-        "metrics.json",
-        "synthesis_metrics.json",
-        "lec_summary.json",
+        "digital/synth/synth_summary.json",
+        "digital/synth/metrics.json",
+        "digital/synthesis_metrics.json",
+        "digital/lec/lec_summary.json",
         "upf_static_check.json",
         "scan_summary.json",
         "atpg_summary.json",
@@ -435,10 +429,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       tapeout: [
         "digital/handoff/rtl_handoff_ingest_manifest.json",
         "implementation_setup_summary.json",
-        "synth_summary.json",
-        "metrics.json",
-        "synthesis_metrics.json",
-        "lec_summary.json",
+        "digital/synth/synth_summary.json",
+        "digital/synth/metrics.json",
+        "digital/synthesis_metrics.json",
+        "digital/lec/lec_summary.json",
         "upf_static_check.json",
         "scan_summary.json",
         "atpg_summary.json",
@@ -583,7 +577,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         return (
           <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
             <div className="2xl:col-span-2">
-              <ToolStrip used={[compileTool, lintTool]} available={[compileTool, lintTool]} defaultTool={`${compileTool} / ${lintTool}`} />
+              <ToolStrip used={[compileTool, lintTool]} defaultTool={`${compileTool} / ${lintTool}`} />
             </div>
             <div className="space-y-3">
               <Bar label="SoC input bits" value={number(iface.input_count)} total={bitTotal} color="bg-cyan-500" />
@@ -713,7 +707,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       );
       return (
         <div className="mt-5 space-y-5">
-          <ToolStrip used={toolSummary.used} available={toolSummary.available} defaultTool={toolSummary.defaultTool} />
+          <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
           <div className="grid gap-3 sm:grid-cols-1">
             <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
           </div>
@@ -813,8 +807,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       );
       const area = metricValue(summary.area, synth.area, synth.design__instance__area, synth.design__core__area);
       const cells = metricValue(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count);
-      const flipflops = metricValue(synth.chiploop__flipflop_count, synth.flipflops, synth.ff_count, synth.registers, synth.design__instance__ff_count, synth["design__instance__count:flop"]);
-      const latches = metricValue(synth.chiploop__latch_count, synth.latches, synth.latch_count, synth.design__instance__latch_count);
+      const flipflops = metricValue(summary.flipflop_count, synth.chiploop__flipflop_count, synth.flipflops, synth.ff_count, synth.registers, synth.design__instance__ff_count, synth["design__instance__count:flop"]);
+      const latches = metricValue(summary.latch_count, synth.chiploop__latch_count, synth.latches, synth.latch_count, synth.design__instance__latch_count);
       const unmapped = metricValue(synth.chiploop__unmapped_cell_count, synth.design__instance_unmapped__count);
       const checkErrors = metricValue(synth.chiploop__synthesis_check_error_count, synth.synthesis__check_error__count);
       const netlistStatus = synth.chiploop__netlist_present === true || firstString(record(synthSummary.outputs).netlist) ? "generated" : "not produced";
@@ -863,10 +857,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         firstString(tapeoutSummary.tool),
         firstString(tapeoutLec.tool),
       ]);
-      const availableTools = uniqueStrings([...usedTools, "yosys", "openlane2", "openroad", "magic", "netgen", "klayout"]);
       return (
         <div className="mt-5 space-y-5">
-          <ToolStrip used={usedTools} available={availableTools} defaultTool={usedTools.join(" / ") || "not reported"} />
+          <ToolStrip used={usedTools} defaultTool={usedTools.join(" / ") || "not reported"} />
           <div className="grid gap-3 sm:grid-cols-2">
             <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
             <Bar label="Leaf cells" value={typeof cells === "number" ? cells : firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count)} total={Math.max(firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count), 1)} color="bg-violet-500" />
