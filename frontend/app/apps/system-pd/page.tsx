@@ -417,31 +417,6 @@ export default function SystemPDAppPage() {
 
               {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
 
-              {workflowId ? (
-                <div className="mt-4 rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
-                  <div>workflow_id: <span className="text-slate-100">{workflowId}</span></div>
-                  <div>run_id: <span className="text-slate-100">{runId}</span></div>
-                  <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
-                    Download ZIP (full=1)
-                  </button>
-                  <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                    <label className="text-xs font-semibold uppercase tracking-wide text-cyan-200">Run next workflow</label>
-                    <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
-                      <select value={nextFlow} onChange={(e) => setNextFlow(e.target.value as typeof nextFlow)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-cyan-400">
-                        <option value="system-firmware">System Firmware</option>
-                      </select>
-                      <button onClick={openNextFlow} className="rounded-lg bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500">Open</button>
-                    </div>
-                    <div className="mt-2 text-xs text-slate-400">
-                      Source System RTL: <span className="break-all text-slate-200">{systemRtlWorkflowId.trim() || workflowId}</span>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
-                  </div>
-                  <AskThisRunPanel workflowId={workflowId} compact />
-                </div>
-              ) : null}
             </div>
 
             <div className="space-y-4">
@@ -458,6 +433,34 @@ export default function SystemPDAppPage() {
               </div>
             </div>
           </div>
+
+          {workflowId ? (
+            <div className="mt-6 w-full rounded-xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
+              <div>workflow_id: <span className="text-slate-100">{workflowId}</span></div>
+              <div>run_id: <span className="text-slate-100">{runId}</span></div>
+              <button onClick={downloadZip} className="mt-3 rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
+                Download ZIP (full=1)
+              </button>
+              <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+                <label className="text-xs font-semibold uppercase tracking-wide text-cyan-200">Run next workflow</label>
+                <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
+                  <select value={nextFlow} onChange={(e) => setNextFlow(e.target.value as typeof nextFlow)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-cyan-400">
+                    <option value="system-firmware">System Firmware</option>
+                  </select>
+                  <button onClick={openNextFlow} className="rounded-lg bg-cyan-600 px-4 py-2 font-semibold text-white hover:bg-cyan-500">Open</button>
+                </div>
+                <div className="mt-2 text-xs text-slate-400">
+                  Source System RTL: <span className="break-all text-slate-200">{systemRtlWorkflowId.trim() || workflowId}</span>
+                </div>
+              </div>
+              <div className="mt-4 w-full">
+                <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
+              </div>
+              <div className="mt-4 w-full">
+                <AskThisRunPanel workflowId={workflowId} compact />
+              </div>
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
             <div className="text-sm font-semibold">Live logs</div>

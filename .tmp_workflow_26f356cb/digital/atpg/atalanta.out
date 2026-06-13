@@ -1,0 +1,5 @@
+Error: floating net u_digital_adc_valid
+Workaround. You have to take one of the two actions:
+   1. Remove all the floating input and associated gates, or
+   2. Make each floating input a primary output.
+Fatal error:  Error in circuit file

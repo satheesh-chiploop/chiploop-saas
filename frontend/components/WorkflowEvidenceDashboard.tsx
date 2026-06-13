@@ -448,9 +448,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "placement_metrics.json",
         "place_summary.json",
         "cts_summary.json",
+        "sta_postroute_summary.json",
         "route_metrics.json",
         "route_summary.json",
         "fill_summary.json",
+        "sta_postfill_summary.json",
         "drc_summary.json",
         "lvs_summary.json",
         "tapeout_package.json",
@@ -782,12 +784,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const tapeoutLec = record(evidence["tapeout_lec_summary.json"]);
       const summary = record(evidence["executive_summary.json"]);
       const staStages = record(summary.sta_stages);
+      const postfill = record(staStages.sta_postfill);
       const postroute = record(staStages.sta_postroute);
       const postcts = record(staStages.sta_postcts);
       const postplace = record(staStages.sta_postplace);
       const preplace = record(staStages.sta_preplace);
       const wns = firstPresent(
         summary.worst_slack,
+        postfill.worst_slack,
         postroute.worst_slack,
         postcts.worst_slack,
         postplace.worst_slack,
@@ -798,6 +802,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       );
       const tns = firstPresent(
         summary.tns,
+        postfill.tns,
         postroute.tns,
         postcts.tns,
         postplace.tns,
@@ -843,8 +848,25 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       );
       const xor = metricValue(record(tapeoutSummary.signoff_inputs).xor_differences, tapeoutSummary.xor_differences, drcSummary.xor_differences, lvsSummary.xor_differences);
       const overall = stage === "tapeout" ? firstString(tapeoutSummary.status, summary.status, summary.verdict, status || "running") : firstString(summary.status, summary.verdict, synthSummary.status, status || "running");
+      const usedTools = uniqueStrings([
+        firstString(synthSummary.tool),
+        firstString(lec.tool),
+        firstString(dft.tool),
+        firstString(atpg.tool),
+        firstString(floorplan.tool),
+        firstString(place.tool),
+        firstString(cts.tool),
+        firstString(route.tool),
+        firstString(fill.tool),
+        firstString(drcSummary.tool),
+        firstString(lvsSummary.tool),
+        firstString(tapeoutSummary.tool),
+        firstString(tapeoutLec.tool),
+      ]);
+      const availableTools = uniqueStrings([...usedTools, "yosys", "openlane2", "openroad", "magic", "netgen", "klayout"]);
       return (
         <div className="mt-5 space-y-5">
+          <ToolStrip used={usedTools} available={availableTools} defaultTool={usedTools.join(" / ") || "not reported"} />
           <div className="grid gap-3 sm:grid-cols-2">
             <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
             <Bar label="Leaf cells" value={typeof cells === "number" ? cells : firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count)} total={Math.max(firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count), 1)} color="bg-violet-500" />
@@ -888,7 +910,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {stage === "tapeout" ? <Stat title="Place" value={statusLabel(place.status)} /> : null}
             {stage === "tapeout" ? <Stat title="CTS" value={statusLabel(cts.status)} /> : null}
             {stage === "tapeout" ? <Stat title="Route" value={statusLabel(route.status)} /> : null}
+            {stage === "tapeout" ? <Stat title="PostRoute STA" value={statusLabel(record(evidence["sta_postroute_summary.json"]).status || postroute.status)} /> : null}
             {stage === "tapeout" ? <Stat title="Fill" value={statusLabel(fill.status)} /> : null}
+            {stage === "tapeout" ? <Stat title="PostFill STA" value={statusLabel(record(evidence["sta_postfill_summary.json"]).status || postfill.status)} /> : null}
             {stage === "tapeout" ? <Stat title="DRC Violations" value={drc} /> : null}
             {stage === "tapeout" ? <Stat title="LVS" value={lvs} /> : null}
             {stage === "tapeout" ? <Stat title="XOR Differences" value={xor} /> : null}
@@ -1152,7 +1176,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
   }, [agentCount, evidence, error, stage, status, workflowId]);
 
   return (
-    <section className="rounded-lg border border-slate-800 bg-slate-950/45 p-5">
+    <section className="w-full rounded-lg border border-slate-800 bg-slate-950/45 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-sm font-semibold text-white">Dashboard - Run Summary</div>

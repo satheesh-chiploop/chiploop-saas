@@ -1,0 +1,287 @@
+VERSION 5.7 ;
+  NOWIREEXTENSIONATPIN ON ;
+  DIVIDERCHAR "/" ;
+  BUSBITCHARS "[]" ;
+MACRO temp_sensor_adc_model
+  CLASS BLOCK ;
+  FOREIGN temp_sensor_adc_model ;
+  ORIGIN 0.000 0.000 ;
+  SIZE 100.000 BY 100.000 ;
+  PIN VGND
+    DIRECTION INOUT ;
+    USE GROUND ;
+      SHAPE ABUTMENT ;
+    PORT
+      LAYER met4 ;
+        RECT 97.000 0.000 100.000 100.000 ;
+    END
+  END VGND
+  PIN VPWR
+    DIRECTION INOUT ;
+    USE POWER ;
+      SHAPE ABUTMENT ;
+    PORT
+      LAYER met4 ;
+        RECT 92.500 0.000 95.500 100.000 ;
+    END
+  END VPWR
+  PIN adc_code[0]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 2.500 3.000 3.952 ;
+    END
+  END adc_code[0]
+  PIN adc_code[10]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 5.726 100.000 7.177 ;
+    END
+  END adc_code[10]
+  PIN adc_code[11]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 8.952 3.000 10.403 ;
+    END
+  END adc_code[11]
+  PIN adc_code[1]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 12.177 100.000 13.629 ;
+    END
+  END adc_code[1]
+  PIN adc_code[2]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 15.403 3.000 16.855 ;
+    END
+  END adc_code[2]
+  PIN adc_code[3]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 18.629 100.000 20.081 ;
+    END
+  END adc_code[3]
+  PIN adc_code[4]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 21.855 3.000 23.306 ;
+    END
+  END adc_code[4]
+  PIN adc_code[5]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 25.081 100.000 26.532 ;
+    END
+  END adc_code[5]
+  PIN adc_code[6]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 28.306 3.000 29.758 ;
+    END
+  END adc_code[6]
+  PIN adc_code[7]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 31.532 100.000 32.984 ;
+    END
+  END adc_code[7]
+  PIN adc_code[8]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 34.758 3.000 36.210 ;
+    END
+  END adc_code[8]
+  PIN adc_code[9]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 37.984 100.000 39.435 ;
+    END
+  END adc_code[9]
+  PIN adc_valid
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 41.210 3.000 42.661 ;
+    END
+  END adc_valid
+  PIN avdd
+    DIRECTION INOUT ;
+    USE POWER ;
+      SHAPE ABUTMENT ;
+    PORT
+      LAYER met4 ;
+        RECT 92.500 0.000 95.500 100.000 ;
+    END
+  END avdd
+  PIN avss
+    DIRECTION INOUT ;
+    USE GROUND ;
+      SHAPE ABUTMENT ;
+    PORT
+      LAYER met4 ;
+        RECT 97.000 0.000 100.000 100.000 ;
+    END
+  END avss
+  PIN sample_req
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 44.435 100.000 45.887 ;
+    END
+  END sample_req
+  PIN sensor_temp_celsius[0]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 47.661 3.000 49.113 ;
+    END
+  END sensor_temp_celsius[0]
+  PIN sensor_temp_celsius[10]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 50.887 100.000 52.339 ;
+    END
+  END sensor_temp_celsius[10]
+  PIN sensor_temp_celsius[11]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 54.113 3.000 55.565 ;
+    END
+  END sensor_temp_celsius[11]
+  PIN sensor_temp_celsius[12]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 57.339 100.000 58.790 ;
+    END
+  END sensor_temp_celsius[12]
+  PIN sensor_temp_celsius[13]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 60.565 3.000 62.016 ;
+    END
+  END sensor_temp_celsius[13]
+  PIN sensor_temp_celsius[14]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 63.790 100.000 65.242 ;
+    END
+  END sensor_temp_celsius[14]
+  PIN sensor_temp_celsius[15]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 67.016 3.000 68.468 ;
+    END
+  END sensor_temp_celsius[15]
+  PIN sensor_temp_celsius[1]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 70.242 100.000 71.694 ;
+    END
+  END sensor_temp_celsius[1]
+  PIN sensor_temp_celsius[2]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 73.468 3.000 74.919 ;
+    END
+  END sensor_temp_celsius[2]
+  PIN sensor_temp_celsius[3]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 76.694 100.000 78.145 ;
+    END
+  END sensor_temp_celsius[3]
+  PIN sensor_temp_celsius[4]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 79.919 3.000 81.371 ;
+    END
+  END sensor_temp_celsius[4]
+  PIN sensor_temp_celsius[5]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 83.145 100.000 84.597 ;
+    END
+  END sensor_temp_celsius[5]
+  PIN sensor_temp_celsius[6]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 86.371 3.000 87.823 ;
+    END
+  END sensor_temp_celsius[6]
+  PIN sensor_temp_celsius[7]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 89.597 100.000 91.048 ;
+    END
+  END sensor_temp_celsius[7]
+  PIN sensor_temp_celsius[8]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 0.000 92.823 3.000 94.274 ;
+    END
+  END sensor_temp_celsius[8]
+  PIN sensor_temp_celsius[9]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+        RECT 97.000 96.048 100.000 97.500 ;
+    END
+  END sensor_temp_celsius[9]
+END temp_sensor_adc_model
+END LIBRARY

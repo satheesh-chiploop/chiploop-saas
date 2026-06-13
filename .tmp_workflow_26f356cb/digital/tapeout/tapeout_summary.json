@@ -1,0 +1,33 @@
+{
+  "workflow_id": "26f356cb-6d29-43be-a1da-649876540ea6",
+  "agent": "Digital Tapeout Agent",
+  "status": "failed",
+  "return_code": 2,
+  "failure_reasons": [
+    "streamout_command_failed",
+    "drc_not_clean",
+    "lvs_not_clean",
+    "gds_not_produced"
+  ],
+  "signoff_inputs": {
+    "drc_status": "failed",
+    "lvs_status": "failed",
+    "xor_differences": null,
+    "xor_differences_total": null,
+    "xor_layer_counts": {},
+    "xor_nonblocking_layers": [
+      "235/4"
+    ],
+    "gds_produced": false
+  },
+  "outputs": {
+    "sdc": "digital/tapeout/constraints/top.sdc",
+    "metrics_json": null,
+    "xor_report_xml": null,
+    "klayout_gds": null,
+    "magic_gds": null,
+    "log": "digital/tapeout/logs/openlane_tapeout.log",
+    "input_resolution_log": "digital/tapeout/logs/tapeout_input_resolution.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/26f356cb-6d29-43be-a1da-649876540ea6/6d479abf-c006-4bf3-b6cb-21bcf6d57fc4/digital/digital/run_work/tapeout/runs/System_PD_26f356cb-6d29-43be-a1da-649876540ea6"
+  }
+}

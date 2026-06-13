@@ -70,7 +70,11 @@ def _candidate_texts(state: dict) -> List[tuple[str, str]]:
 
 
 def _has_real_devices(text: str) -> bool:
-    device_re = re.compile(r"^\s*[mrcx][A-Za-z0-9_:$.-]*\s+", re.IGNORECASE | re.MULTILINE)
+    device_re = re.compile(
+        r"^\s*M[A-Za-z0-9_:$.-]*\s+\S+\s+\S+\s+\S+\s+\S+\s+sky130_fd_pr__(?:nfet|pfet)_\S+"
+        r"(?=.*\bW\s*=)(?=.*\bL\s*=)",
+        re.IGNORECASE | re.MULTILINE,
+    )
     return bool(device_re.search(text or ""))
 
 
@@ -79,7 +83,7 @@ def _has_subckt(text: str) -> bool:
 
 
 def _sky130_include() -> str:
-    return '.include "$PDK_ROOT/sky130A/libs.tech/ngspice/sky130.lib.spice"\n.lib "$PDK_ROOT/sky130A/libs.tech/ngspice/sky130.lib.spice" tt\n'
+    return '.lib "$PDK_ROOT/sky130A/libs.tech/ngspice/sky130.lib.spice" tt\n'
 
 
 def _normalise_sky130_spice(text: str, module_name: str, ports: List[str]) -> str:
@@ -139,9 +143,11 @@ Analog spec text, if any:
 Strict requirements:
 - Return SPICE text only. No Markdown.
 - Must include exactly one .subckt named {module_name}.
-- Must include transistor-level MOS devices using sky130_fd_pr__nfet_01v8 and/or sky130_fd_pr__pfet_01v8.
+- Must include transistor-level MOS device lines that start with M, using sky130_fd_pr__nfet_01v8 and/or sky130_fd_pr__pfet_01v8.
+- Do not instantiate Sky130 MOS models with X lines; X is for subcircuit calls and is not accepted as a MOS device.
 - Preserve the required port order in the .subckt line.
 - Include explicit W and L parameters on MOS devices.
+- Use Sky130 Magic-compatible dimensions: W >= 0.42u and L >= 0.15u for every MOS device.
 - Do not emit placeholder comments instead of devices.
 - Do not emit only R/C/load scaffolding.
 - End with .ends {module_name}.

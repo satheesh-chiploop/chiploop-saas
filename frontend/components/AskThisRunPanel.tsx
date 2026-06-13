@@ -94,7 +94,7 @@ export default function AskThisRunPanel({ workflowId, compact = false }: Props) 
   if (!workflowId || !finished) return null;
 
   return (
-    <div className={`rounded-xl border border-cyan-900/60 bg-cyan-950/20 ${compact ? "p-4" : "p-5"}`}>
+    <div className={`w-full rounded-xl border border-cyan-900/60 bg-cyan-950/20 ${compact ? "p-4" : "p-5"}`}>
       <div className="font-semibold text-cyan-200">Ask This Run</div>
       <p className="mt-1 text-sm leading-6 text-cyan-100/80">
         Ask questions about this run&apos;s logs, generated files, reports, warnings, and next steps.
