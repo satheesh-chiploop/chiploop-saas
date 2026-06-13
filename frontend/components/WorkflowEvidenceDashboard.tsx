@@ -447,6 +447,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "route_summary.json",
         "fill_summary.json",
         "sta_postfill_summary.json",
+        "analog/signoff/analog_signoff_summary.json",
         "drc_summary.json",
         "lvs_summary.json",
         "tapeout_package.json",
@@ -774,6 +775,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const fill = record(evidence["fill_summary.json"]);
       const drcSummary = record(evidence["drc_summary.json"]);
       const lvsSummary = record(evidence["lvs_summary.json"]);
+      const analogSignoff = record(evidence["analog_signoff_summary.json"]);
+      const analogDrc = record(analogSignoff.drc);
+      const analogLvs = record(analogSignoff.lvs);
+      const analogXor = record(analogSignoff.xor);
       const tapeoutSummary = record(evidence["tapeout_summary.json"]);
       const tapeoutLec = record(evidence["tapeout_lec_summary.json"]);
       const summary = record(evidence["executive_summary.json"]);
@@ -906,6 +911,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {stage === "tapeout" ? <Stat title="PostRoute STA" value={statusLabel(record(evidence["sta_postroute_summary.json"]).status || postroute.status)} /> : null}
             {stage === "tapeout" ? <Stat title="Fill" value={statusLabel(fill.status)} /> : null}
             {stage === "tapeout" ? <Stat title="PostFill STA" value={statusLabel(record(evidence["sta_postfill_summary.json"]).status || postfill.status)} /> : null}
+            {stage === "tapeout" && Object.keys(analogSignoff).length ? <Stat title="Analog DRC" value={statusLabel(analogDrc.status)} /> : null}
+            {stage === "tapeout" && Object.keys(analogSignoff).length ? <Stat title="Analog DRC Issues" value={metricValue(analogDrc.feedback_problem_count)} /> : null}
+            {stage === "tapeout" && Object.keys(analogSignoff).length ? <Stat title="Analog LVS" value={statusLabel(analogLvs.status)} /> : null}
+            {stage === "tapeout" && Object.keys(analogSignoff).length ? <Stat title="Analog XOR" value={statusLabel(analogXor.status)} /> : null}
             {stage === "tapeout" ? <Stat title="DRC Violations" value={drc} /> : null}
             {stage === "tapeout" ? <Stat title="LVS" value={lvs} /> : null}
             {stage === "tapeout" ? <Stat title="XOR Differences" value={xor} /> : null}
