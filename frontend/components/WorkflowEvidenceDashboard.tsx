@@ -75,16 +75,28 @@ function firstPresent(...values: unknown[]): unknown {
 
 function metricValue(...values: unknown[]): string | number {
   const value = firstPresent(...values);
-  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "number" && Number.isFinite(value)) return formatNumber(value);
   if (typeof value === "string" && value.trim()) return value.trim();
   return "not produced";
 }
 
 function signedMetric(...values: unknown[]): string | number {
   const value = firstPresent(...values);
-  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "number" && Number.isFinite(value)) return formatNumber(value);
   if (typeof value === "string" && value.trim()) return value.trim();
   return "not run";
+}
+
+function formatNumber(value: number): string | number {
+  if (!Number.isFinite(value)) return "not produced";
+  if (Number.isInteger(value)) return value;
+  return Number(value.toFixed(3)).toString();
+}
+
+function unprovenMetric(status: unknown, value: unknown): string | number {
+  const text = typeof status === "string" ? status.trim().toLowerCase() : "";
+  if (["pass", "ok", "clean"].includes(text)) return 0;
+  return metricValue(value);
 }
 
 function pct(value: unknown): string {
@@ -390,7 +402,7 @@ function ClosureTrend({ title, chart, metrics }: { title: string; chart: JsonMap
             <div key={`${point.label || "run"}-${index}`} className="grid border-b border-slate-800 px-3 py-3 text-sm last:border-b-0" style={{ gridTemplateColumns: `140px repeat(${metrics.length}, minmax(110px, 1fr))` }}>
               <div className="font-semibold text-slate-100">{firstString(point.label, `iteration ${index}`)}</div>
               {metrics.map((metric) => (
-                <div key={metric.key} className="text-slate-300">{metricValue(point[metric.key])}</div>
+                <div key={metric.key} className="break-words text-slate-300">{metricValue(point[metric.key])}</div>
               ))}
             </div>
           ))}
@@ -978,20 +990,20 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Synthesis Errors" value={checkErrors} />
             <Stat title="Netlist" value={netlistStatus} />
             <Stat title={stage === "tapeout" ? "Synthesis LEC" : "LEC"} value={lecDashboardStatus(lec)} />
-            <Stat title={stage === "tapeout" ? "Synthesis LEC Unproven" : "LEC Unproven"} value={metricValue(lec.unproven_points)} />
+            <Stat title={stage === "tapeout" ? "Synthesis LEC Unproven" : "LEC Unproven"} value={unprovenMetric(lec.status, lec.unproven_points)} />
             {stage === "tapeout" ? <Stat title="Tapeout LEC" value={lecDashboardStatus(tapeoutLec)} /> : null}
-            {stage === "tapeout" ? <Stat title="Tapeout LEC Unproven" value={metricValue(tapeoutLec.unproven_points)} /> : null}
+            {stage === "tapeout" ? <Stat title="Tapeout LEC Unproven" value={unprovenMetric(tapeoutLec.status, tapeoutLec.unproven_points)} /> : null}
             {hasUpf ? <Stat title="UPF Static" value={statusLabel(upf.status)} /> : null}
             {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
             {hasUpf ? <Stat title="Isolation Rules" value={metricValue(upf.isolation_rule_count)} /> : null}
             {hasUpf ? <Stat title="Retention Rules" value={metricValue(upf.retention_rule_count)} /> : null}
             <Stat title="DFT" value={dftDashboardStatus(dft)} />
             <Stat title="Post-DFT LEC" value={lecDashboardStatus(postDftLec)} />
-            <Stat title="Post-DFT LEC Unproven" value={metricValue(postDftLec.unproven_points)} />
+            <Stat title="Post-DFT LEC Unproven" value={unprovenMetric(postDftLec.status, postDftLec.unproven_points)} />
             <Stat title="Scan Chains" value={scanMetric(dft.status, firstPresent(dft.actual_scan_chains, dft.scan_chains))} />
             <Stat title="Scan Candidates" value={metricValue(dft.scan_flops)} />
             <Stat title="ATPG" value={atpgDashboardStatus(atpg)} />
-            <Stat title="Patterns" value={atpgMetric(atpg.status, atpg.pattern_count)} />
+            <Stat title="ATPG Patterns" value={atpgMetric(atpg.status, atpg.pattern_count)} />
             <Stat title="Stuck-at Coverage" value={atpgMetric(atpg.status, atpg.stuck_at_coverage_pct)} />
             <Stat title="MBIST" value={statusLabel(mbist.status)} />
             <Stat title="Memories" value={metricValue(mbist.memory_count)} />
