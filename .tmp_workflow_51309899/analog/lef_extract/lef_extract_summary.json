@@ -1,0 +1,17 @@
+{
+  "workflow_id": "51309899-ca8a-4d6b-9dea-fe920ed5245a",
+  "agent": "Analog LEF Extraction Agent",
+  "generated_at": "2026-06-14T06:23:49.119146Z",
+  "module": "temp_sensor_adc_model",
+  "gds": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/51309899-ca8a-4d6b-9dea-fe920ed5245a/dcd843f9-fbf5-4346-87d3-d80a96d61c3d/digital/analog/gds/temp_sensor_adc_model.gds",
+  "prior_lef": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/1c26c665-b3c7-4efb-9aa2-6bedaca6010c/f83e3cb6-1af6-4ab4-b445-8c734aa32592/digital/analog/abstract/temp_sensor_adc_model.lef",
+  "status": "extracted",
+  "lef": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/51309899-ca8a-4d6b-9dea-fe920ed5245a/dcd843f9-fbf5-4346-87d3-d80a96d61c3d/digital/analog/lef_extract/temp_sensor_adc_model.lef",
+  "log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/51309899-ca8a-4d6b-9dea-fe920ed5245a/dcd843f9-fbf5-4346-87d3-d80a96d61c3d/digital/analog/lef_extract/magic_lef_extract.log",
+  "return_code": 0,
+  "tool_mode": "docker",
+  "image": "ghcr.io/efabless/openlane2:2.4.0.dev1",
+  "pinized_from_macro_interface": true,
+  "pin_source": "prior_lef",
+  "pin_count": 34
+}

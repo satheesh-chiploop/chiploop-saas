@@ -1,0 +1,27 @@
+{
+  "workflow_id": "e75e64c3-66e3-423d-8ea2-9c56a222afcc",
+  "agent": "Analog GDS Generation Agent",
+  "generated_at": "2026-06-14T04:57:16.949970Z",
+  "module": "temp_sensor_adc_model",
+  "pdk": "sky130A",
+  "backend": "magic",
+  "gds": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/e75e64c3-66e3-423d-8ea2-9c56a222afcc/58c6a884-0b71-405a-9c37-f42f282a7c0f/digital/analog/gds/temp_sensor_adc_model.gds",
+  "log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/e75e64c3-66e3-423d-8ea2-9c56a222afcc/58c6a884-0b71-405a-9c37-f42f282a7c0f/digital/analog/gds/magic_gds.log",
+  "drc": {
+    "status": "violations_found",
+    "tool": "magic",
+    "feedback_problem_count": 199,
+    "reason": "magic_feedback_problems"
+  },
+  "lvs": {
+    "status": "blocked",
+    "tool": "netgen",
+    "reason": "gds_not_clean"
+  },
+  "xor": {
+    "status": "blocked",
+    "tool": "magic/klayout",
+    "difference_count": null,
+    "reason": "gds_not_clean"
+  }
+}

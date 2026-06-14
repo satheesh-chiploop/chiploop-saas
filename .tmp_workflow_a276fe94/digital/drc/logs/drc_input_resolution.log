@@ -1,0 +1,13 @@
+[2026-06-14T03:17:36.495626Z] Digital DRC Agent
+workflow_id=a276fe94-5253-47b7-8ecc-34ee2c78817c
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/a276fe94-5253-47b7-8ecc-34ee2c78817c/3e47c6ea-bdee-4a3a-acfe-3193056b82c1/digital
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/a276fe94-5253-47b7-8ecc-34ee2c78817c/3e47c6ea-bdee-4a3a-acfe-3193056b82c1/digital/digital/fill/constraints/top.sdc
+sdc_basename=top.sdc
+stage_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/a276fe94-5253-47b7-8ecc-34ee2c78817c/3e47c6ea-bdee-4a3a-acfe-3193056b82c1/digital/digital/drc/constraints/top.sdc
+base_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/a276fe94-5253-47b7-8ecc-34ee2c78817c/3e47c6ea-bdee-4a3a-acfe-3193056b82c1/digital/digital/fill/config.json
+run_work_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/a276fe94-5253-47b7-8ecc-34ee2c78817c/3e47c6ea-bdee-4a3a-acfe-3193056b82c1/digital/digital/run_work
+run_tag=System_PD_a276fe94-5253-47b7-8ecc-34ee2c78817c
+top_module=temp_monitor_soc_phys
+netlist_count=1
+macro_placement_cfg=dir::inputs/macros/macro_placement.cfg
+macro_placement_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/a276fe94-5253-47b7-8ecc-34ee2c78817c/3e47c6ea-bdee-4a3a-acfe-3193056b82c1/digital/digital/run_work/drc/inputs/macros/macro_placement.cfg

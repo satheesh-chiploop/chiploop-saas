@@ -1,0 +1,11 @@
+{
+  "pattern_count": 0,
+  "stuck_at_coverage_pct": 98.97,
+  "faults_detected": null,
+  "faults_undetected": null,
+  "faults_aborted": 11,
+  "collapsed_faults": 1650,
+  "redundant_faults": 6,
+  "atalanta_output": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/bb3eda37-c190-4b9b-a299-9e124ad2ce8c/1957c126-28cd-4a44-9374-9662ed557782/digital/digital/atpg/atalanta.out",
+  "pattern_file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/bb3eda37-c190-4b9b-a299-9e124ad2ce8c/1957c126-28cd-4a44-9374-9662ed557782/digital/digital/atpg/patterns/atalanta.test"
+}

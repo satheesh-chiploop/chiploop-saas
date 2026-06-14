@@ -366,6 +366,40 @@ function Bar({ label, value, total, color }: { label: string; value: number; tot
   );
 }
 
+function ClosureTrend({ title, chart, metrics }: { title: string; chart: JsonMap; metrics: Array<{ key: string; label: string }> }) {
+  const series = array(chart.series).map(record);
+  if (!series.length) return null;
+  return (
+    <div className="rounded-lg border border-slate-800 bg-black/30 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="text-sm font-semibold text-slate-100">{title}</div>
+          <div className="mt-1 text-xs text-slate-500">
+            {chart.baseline_only === true ? "Baseline only: no closure iteration artifact yet." : "Baseline and completed closure iterations."}
+          </div>
+        </div>
+        <div className="text-xs text-slate-500">{chart.no_fake_iterations === true ? "real artifacts only" : ""}</div>
+      </div>
+      <div className="mt-4 overflow-x-auto">
+        <div className="min-w-[720px]">
+          <div className={`grid border-b border-slate-800 bg-slate-950/70 px-3 py-2 text-xs font-semibold uppercase text-slate-400`} style={{ gridTemplateColumns: `140px repeat(${metrics.length}, minmax(110px, 1fr))` }}>
+            <div>Run</div>
+            {metrics.map((metric) => <div key={metric.key}>{metric.label}</div>)}
+          </div>
+          {series.map((point, index) => (
+            <div key={`${point.label || "run"}-${index}`} className="grid border-b border-slate-800 px-3 py-3 text-sm last:border-b-0" style={{ gridTemplateColumns: `140px repeat(${metrics.length}, minmax(110px, 1fr))` }}>
+              <div className="font-semibold text-slate-100">{firstString(point.label, `iteration ${index}`)}</div>
+              {metrics.map((metric) => (
+                <div key={metric.key} className="text-slate-300">{metricValue(point[metric.key])}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function WorkflowEvidenceDashboard({ workflowId, status, stage, logs }: Props) {
   const [evidence, setEvidence] = useState<Record<string, JsonMap | null>>({});
   const [error, setError] = useState<string | null>(null);
@@ -419,6 +453,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/synth/metrics.json",
         "digital/synthesis_metrics.json",
         "digital/lec/lec_summary.json",
+        "digital/synthesis_closure/synthesis_closure_plan.json",
+        "digital/synthesis_closure/synthesis_closure_chart.json",
         "upf_static_check.json",
         "scan_summary.json",
         "atpg_summary.json",
@@ -433,6 +469,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/synth/metrics.json",
         "digital/synthesis_metrics.json",
         "digital/lec/lec_summary.json",
+        "digital/synthesis_closure/synthesis_closure_plan.json",
+        "digital/synthesis_closure/synthesis_closure_chart.json",
         "upf_static_check.json",
         "scan_summary.json",
         "atpg_summary.json",
@@ -453,6 +491,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "tapeout_package.json",
         "tapeout_summary.json",
         "tapeout_lec_summary.json",
+        "digital/signoff_closure/signoff_closure_plan.json",
+        "digital/signoff_closure/signoff_closure_chart.json",
         "executive_summary.json",
       ],
       verification: ["simulation_summary_coverage.json", "system_sim_dashboard.json"],
@@ -763,6 +803,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthSummary = record(evidence["synth_summary.json"]);
       const synth = record(evidence["metrics.json"] || evidence["synthesis_metrics.json"]);
       const lec = record(evidence["lec_summary.json"]);
+      const synthesisClosureChart = record(evidence["synthesis_closure_chart.json"]);
       const upf = record(evidence["upf_static_check.json"]);
       const hasUpf = Object.keys(upf).length > 0;
       const dft = record(evidence["scan_summary.json"]);
@@ -781,6 +822,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const analogXor = record(analogSignoff.xor);
       const tapeoutSummary = record(evidence["tapeout_summary.json"]);
       const tapeoutLec = record(evidence["tapeout_lec_summary.json"]);
+      const signoffClosure = record(evidence["signoff_closure_plan.json"]);
+      const signoffClosureChart = record(evidence["signoff_closure_chart.json"]);
       const summary = record(evidence["executive_summary.json"]);
       const staStages = record(summary.sta_stages);
       const postfill = record(staStages.sta_postfill);
@@ -809,6 +852,20 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         synth.chiploop__sta_preplace_tns,
         synth.tns,
         synth.timing__setup__tns
+      );
+      const postfillWns = firstPresent(postfill.worst_slack, record(evidence["sta_postfill_summary.json"]).worst_slack);
+      const postfillTns = firstPresent(postfill.tns, record(evidence["sta_postfill_summary.json"]).tns);
+      const postfillSetupViolations = firstPresent(
+        postfill.setup_violations,
+        postfill.timing__setup__violation_count,
+        postfill.timing__setup__vio__count,
+        record(evidence["sta_postfill_summary.json"]).setup_violations
+      );
+      const postfillHoldViolations = firstPresent(
+        postfill.hold_violations,
+        postfill.timing__hold__violation_count,
+        postfill.timing__hold__vio__count,
+        record(evidence["sta_postfill_summary.json"]).hold_violations
       );
       const area = metricValue(summary.area, synth.area, synth.design__instance__area, synth.design__core__area);
       const cells = metricValue(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count);
@@ -845,7 +902,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         lvsSummary.lvs_status,
         firstString(lvsSummary.status) ? statusLabel(lvsSummary.status) : undefined
       );
-      const xor = metricValue(record(tapeoutSummary.signoff_inputs).xor_differences, tapeoutSummary.xor_differences, drcSummary.xor_differences, lvsSummary.xor_differences);
+      const tapeoutSignoff = record(tapeoutSummary.signoff_inputs);
+      const xor = firstString(tapeoutSignoff.xor_status, tapeoutSummary.xor_status) === "not_applicable"
+        ? "not applicable"
+        : metricValue(tapeoutSignoff.xor_differences, tapeoutSummary.xor_differences, drcSummary.xor_differences, lvsSummary.xor_differences);
       const overall = stage === "tapeout" ? firstString(tapeoutSummary.status, summary.status, summary.verdict, status || "running") : firstString(summary.status, summary.verdict, synthSummary.status, status || "running");
       const usedTools = uniqueStrings([
         firstString(synthSummary.tool),
@@ -865,6 +925,32 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       return (
         <div className="mt-5 space-y-5">
           <ToolStrip used={usedTools} defaultTool={usedTools.join(" / ") || "not reported"} />
+          <ClosureTrend
+            title="Synthesis Closure Trend"
+            chart={synthesisClosureChart}
+            metrics={[
+              { key: "wns", label: "WNS" },
+              { key: "tns", label: "TNS" },
+              { key: "setup_violations", label: "Setup Vios" },
+              { key: "lec_status", label: "LEC" },
+              { key: "lec_unproven_points", label: "LEC Unproven" },
+            ]}
+          />
+          {stage === "tapeout" ? (
+            <ClosureTrend
+              title="PD Signoff Closure Trend"
+              chart={signoffClosureChart}
+              metrics={[
+                { key: "postfill_wns", label: "PostFill WNS" },
+                { key: "postfill_tns", label: "PostFill TNS" },
+                { key: "postfill_setup_violations", label: "Setup Vios" },
+                { key: "postfill_hold_violations", label: "Hold Vios" },
+                { key: "drc_violations", label: "DRC" },
+                { key: "lvs_status", label: "LVS" },
+                { key: "tapeout_lec_status", label: "Tapeout LEC" },
+              ]}
+            />
+          ) : null}
           <div className="grid gap-3 sm:grid-cols-2">
             <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
             <Bar label="Leaf cells" value={typeof cells === "number" ? cells : firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count)} total={Math.max(firstNumber(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count), 1)} color="bg-violet-500" />
@@ -911,6 +997,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {stage === "tapeout" ? <Stat title="PostRoute STA" value={statusLabel(record(evidence["sta_postroute_summary.json"]).status || postroute.status)} /> : null}
             {stage === "tapeout" ? <Stat title="Fill" value={statusLabel(fill.status)} /> : null}
             {stage === "tapeout" ? <Stat title="PostFill STA" value={statusLabel(record(evidence["sta_postfill_summary.json"]).status || postfill.status)} /> : null}
+            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill WNS" value={signedMetric(postfillWns)} /> : null}
+            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill TNS" value={signedMetric(postfillTns)} /> : null}
+            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill Setup Violations" value={metricValue(postfillSetupViolations)} /> : null}
+            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill Hold Violations" value={metricValue(postfillHoldViolations)} /> : null}
             {stage === "tapeout" && Object.keys(analogSignoff).length ? <Stat title="Analog DRC" value={statusLabel(analogDrc.status)} /> : null}
             {stage === "tapeout" && Object.keys(analogSignoff).length ? <Stat title="Analog DRC Issues" value={metricValue(analogDrc.feedback_problem_count)} /> : null}
             {stage === "tapeout" && Object.keys(analogSignoff).length ? <Stat title="Analog LVS" value={statusLabel(analogLvs.status)} /> : null}
@@ -919,6 +1009,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {stage === "tapeout" ? <Stat title="LVS" value={lvs} /> : null}
             {stage === "tapeout" ? <Stat title="XOR Differences" value={xor} /> : null}
             {stage === "tapeout" ? <Stat title="Tapeout" value={statusLabel(tapeoutSummary.status)} /> : null}
+            {stage === "tapeout" && Object.keys(signoffClosure).length ? <Stat title="Closure Loop" value={statusLabel(signoffClosure.status || signoffClosure.stop_reason)} /> : null}
+            {stage === "tapeout" && Object.keys(signoffClosure).length ? <Stat title="Closure Restart" value={firstString(signoffClosure.selected_restart_stage, "none")} /> : null}
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Summary" value={statusLabel(overall)} />
           </div>

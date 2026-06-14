@@ -81,6 +81,12 @@ export default function Arch2SynthesisAppPage() {
   const [clockRows, setClockRows] = useState<ClockRow[]>([]);
   const [resetRows, setResetRows] = useState<any[]>([]);
   const [clockProbeStatus, setClockProbeStatus] = useState("");
+  const [runSynthesisClosureLoop, setRunSynthesisClosureLoop] = useState(false);
+  const [maxSynthesisClosureIterations, setMaxSynthesisClosureIterations] = useState("1");
+  const [allowSynthesisTimingRepair, setAllowSynthesisTimingRepair] = useState(true);
+  const [allowSynthesisLecRepair, setAllowSynthesisLecRepair] = useState(true);
+  const [stopOnSynthesisClosureFailure, setStopOnSynthesisClosureFailure] = useState(false);
+  const [stopOnSynthesisLecFailure, setStopOnSynthesisLecFailure] = useState(false);
 
   // --- Stage control ---
   const [startStage, setStartStage] = useState<"arch2rtl" | "synth">("arch2rtl");
@@ -300,6 +306,20 @@ export default function Arch2SynthesisAppPage() {
         target_frequency_mhz: targetFreqMhz.trim() ? Number(targetFreqMhz) : undefined,
         constraints_sdc: constraintsSdc.trim() ? constraintsSdc : undefined,
         clock_constraints: clockConstraintsPayload(),
+        run_synthesis_closure_loop: runSynthesisClosureLoop,
+        max_synthesis_closure_iterations: runSynthesisClosureLoop ? Number(maxSynthesisClosureIterations) : 1,
+        allow_synthesis_timing_repair: allowSynthesisTimingRepair,
+        allow_synthesis_lec_repair: allowSynthesisLecRepair,
+        stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
+        stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
+        synthesis_closure: {
+          enabled: runSynthesisClosureLoop,
+          max_iterations: runSynthesisClosureLoop ? Number(maxSynthesisClosureIterations) : 1,
+          allow_synthesis_timing_repair: allowSynthesisTimingRepair,
+          allow_synthesis_lec_repair: allowSynthesisLecRepair,
+          stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
+          stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
+        },
 
         // stage control
         start_stage: startStage,
@@ -311,6 +331,11 @@ export default function Arch2SynthesisAppPage() {
           gen_packaging: genPackaging,
           enable_scan_dft: enableScanDft,
           run_spec2rtl_check: runSpec2RtlCheck,
+          run_synthesis_closure_loop: runSynthesisClosureLoop,
+          allow_synthesis_timing_repair: allowSynthesisTimingRepair,
+          allow_synthesis_lec_repair: allowSynthesisLecRepair,
+          stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
+          stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
           skip_arch2rtl: rtlSourceMode !== "none" || startStage !== "arch2rtl",
         },
       });
@@ -551,6 +576,30 @@ export default function Arch2SynthesisAppPage() {
                 className="w-full rounded-2xl border border-slate-800 bg-black/30 p-3 text-slate-100"
                 placeholder="create_clock ...\nset_input_delay ..."
               />
+
+              <div className="rounded-xl border border-slate-800 bg-black/20 p-4">
+                <label className="flex items-start gap-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={runSynthesisClosureLoop} onChange={(e) => setRunSynthesisClosureLoop(e.target.checked)} className="mt-1" />
+                  <span>Run synthesis closure loop</span>
+                </label>
+                {runSynthesisClosureLoop ? (
+                  <div className="mt-3 space-y-3">
+                    <label className="block text-sm text-slate-300">
+                      Max iterations
+                      <select value={maxSynthesisClosureIterations} onChange={(e) => setMaxSynthesisClosureIterations(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                      </select>
+                    </label>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowSynthesisTimingRepair} onChange={(e) => setAllowSynthesisTimingRepair(e.target.checked)} /> Setup timing repair</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowSynthesisLecRepair} onChange={(e) => setAllowSynthesisLecRepair(e.target.checked)} /> Synthesis LEC repair</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={stopOnSynthesisClosureFailure} onChange={(e) => setStopOnSynthesisClosureFailure(e.target.checked)} /> Stop downstream on closure failure</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={stopOnSynthesisLecFailure} onChange={(e) => setStopOnSynthesisLecFailure(e.target.checked)} /> Stop downstream on LEC failure</label>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
 
               <label className="block text-sm text-slate-300">Start stage</label>
               <select

@@ -1,0 +1,45 @@
+{
+  "workflow_id": "e75e64c3-66e3-423d-8ea2-9c56a222afcc",
+  "agent": "Digital Implementation Setup Agent",
+  "status": "ok",
+  "outputs": {
+    "filelist": "digital/impl_setup/filelist.f",
+    "sdc": "digital/impl_setup/constraints/top.sdc",
+    "corners_json": "digital/impl_setup/corners.json",
+    "openlane_config": "digital/impl_setup/openlane/config.json",
+    "input_resolution_log": "digital/impl_setup/logs/implementation_setup_input_resolution.log",
+    "setup_log": "digital/impl_setup/implementation_setup.log"
+  },
+  "clock_intent": {
+    "type": "digital_clock_intent",
+    "clocks": [
+      {
+        "name": "clk",
+        "port": "clk",
+        "frequency_mhz": null,
+        "period_ns": null,
+        "source": "rtl_port_inference",
+        "needs_user_frequency": true
+      }
+    ],
+    "resets": [
+      {
+        "name": "reset_n",
+        "port": "reset_n",
+        "active_low": true,
+        "source": "rtl_port_inference"
+      }
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n",
+    "needs_user_review": true,
+    "provenance": {
+      "requested": false,
+      "sdc_clocks": 0,
+      "spec_clocks": 0,
+      "rtl_clocks": 1,
+      "spec_resets": 0,
+      "rtl_resets": 1
+    }
+  }
+}

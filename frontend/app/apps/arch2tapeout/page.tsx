@@ -87,6 +87,18 @@ export default function Arch2TapeoutAppPage() {
   const [runFill, setRunFill] = useState(true);
   const [runDrc, setRunDrc] = useState(true);
   const [runLvs, setRunLvs] = useState(true);
+  const [runSignoffClosureLoop, setRunSignoffClosureLoop] = useState(false);
+  const [maxSignoffClosureIterations, setMaxSignoffClosureIterations] = useState("1");
+  const [allowTimingRepair, setAllowTimingRepair] = useState(true);
+  const [allowDrcRepair, setAllowDrcRepair] = useState(true);
+  const [allowLvsRepair, setAllowLvsRepair] = useState(true);
+  const [allowLecRepair, setAllowLecRepair] = useState(true);
+  const [runSynthesisClosureLoop, setRunSynthesisClosureLoop] = useState(false);
+  const [maxSynthesisClosureIterations, setMaxSynthesisClosureIterations] = useState("1");
+  const [allowSynthesisTimingRepair, setAllowSynthesisTimingRepair] = useState(true);
+  const [allowSynthesisLecRepair, setAllowSynthesisLecRepair] = useState(true);
+  const [stopOnSynthesisClosureFailure, setStopOnSynthesisClosureFailure] = useState(false);
+  const [stopOnSynthesisLecFailure, setStopOnSynthesisLecFailure] = useState(false);
 
   // --- Stage control ---
   const [startStage, setStartStage] = useState<"arch2rtl" | "synth" | "floorplan">("arch2rtl");
@@ -313,6 +325,34 @@ export default function Arch2TapeoutAppPage() {
         run_fill: runFill,
         run_drc: runDrc,
         run_lvs: runLvs,
+        run_signoff_closure_loop: runSignoffClosureLoop,
+        max_signoff_closure_iterations: runSignoffClosureLoop ? Number(maxSignoffClosureIterations) : 1,
+        allow_timing_repair: allowTimingRepair,
+        allow_drc_repair: allowDrcRepair,
+        allow_lvs_repair: allowLvsRepair,
+        allow_lec_repair: allowLecRepair,
+        run_synthesis_closure_loop: runSynthesisClosureLoop,
+        max_synthesis_closure_iterations: runSynthesisClosureLoop ? Number(maxSynthesisClosureIterations) : 1,
+        allow_synthesis_timing_repair: allowSynthesisTimingRepair,
+        allow_synthesis_lec_repair: allowSynthesisLecRepair,
+        stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
+        stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
+        signoff_closure: {
+          enabled: runSignoffClosureLoop,
+          max_iterations: runSignoffClosureLoop ? Number(maxSignoffClosureIterations) : 1,
+          allow_timing_repair: allowTimingRepair,
+          allow_drc_repair: allowDrcRepair,
+          allow_lvs_repair: allowLvsRepair,
+          allow_lec_repair: allowLecRepair,
+        },
+        synthesis_closure: {
+          enabled: runSynthesisClosureLoop,
+          max_iterations: runSynthesisClosureLoop ? Number(maxSynthesisClosureIterations) : 1,
+          allow_synthesis_timing_repair: allowSynthesisTimingRepair,
+          allow_synthesis_lec_repair: allowSynthesisLecRepair,
+          stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
+          stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
+        },
 
         // stage control
         start_stage: startStage,
@@ -324,6 +364,16 @@ export default function Arch2TapeoutAppPage() {
           gen_packaging: genPackaging,
           enable_scan_dft: enableScanDft,
           run_spec2rtl_check: runSpec2RtlCheck,
+          run_signoff_closure_loop: runSignoffClosureLoop,
+          allow_timing_repair: allowTimingRepair,
+          allow_drc_repair: allowDrcRepair,
+          allow_lvs_repair: allowLvsRepair,
+          allow_lec_repair: allowLecRepair,
+          run_synthesis_closure_loop: runSynthesisClosureLoop,
+          allow_synthesis_timing_repair: allowSynthesisTimingRepair,
+          allow_synthesis_lec_repair: allowSynthesisLecRepair,
+          stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
+          stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
           skip_arch2rtl: rtlSourceMode !== "none" || startStage !== "arch2rtl",
           // (optional future: if your workflow supports it)
           // skip_synth: startStage === "floorplan",
@@ -591,6 +641,54 @@ export default function Arch2TapeoutAppPage() {
                   <input type="checkbox" checked={runLvs} onChange={(e) => setRunLvs(e.target.checked)} />
                   Run LVS
                 </label>
+              </div>
+
+              <div className="mt-3 rounded-xl border border-slate-800 bg-black/20 p-4">
+                <label className="flex items-start gap-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={runSynthesisClosureLoop} onChange={(e) => setRunSynthesisClosureLoop(e.target.checked)} className="mt-1" />
+                  <span>Run synthesis closure loop</span>
+                </label>
+                {runSynthesisClosureLoop ? (
+                  <div className="mt-3 space-y-3">
+                    <label className="block text-sm text-slate-300">
+                      Max iterations
+                      <select value={maxSynthesisClosureIterations} onChange={(e) => setMaxSynthesisClosureIterations(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                      </select>
+                    </label>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowSynthesisTimingRepair} onChange={(e) => setAllowSynthesisTimingRepair(e.target.checked)} /> Setup timing repair</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowSynthesisLecRepair} onChange={(e) => setAllowSynthesisLecRepair(e.target.checked)} /> Synthesis LEC repair</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={stopOnSynthesisClosureFailure} onChange={(e) => setStopOnSynthesisClosureFailure(e.target.checked)} /> Stop downstream on closure failure</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={stopOnSynthesisLecFailure} onChange={(e) => setStopOnSynthesisLecFailure(e.target.checked)} /> Stop downstream on LEC failure</label>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="mt-3 rounded-xl border border-slate-800 bg-black/20 p-4">
+                <label className="flex items-start gap-3 text-sm text-slate-300">
+                  <input type="checkbox" checked={runSignoffClosureLoop} onChange={(e) => setRunSignoffClosureLoop(e.target.checked)} className="mt-1" />
+                  <span>Run signoff closure loop</span>
+                </label>
+                {runSignoffClosureLoop ? (
+                  <div className="mt-3 space-y-3">
+                    <label className="block text-sm text-slate-300">
+                      Max iterations
+                      <select value={maxSignoffClosureIterations} onChange={(e) => setMaxSignoffClosureIterations(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                      </select>
+                    </label>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowTimingRepair} onChange={(e) => setAllowTimingRepair(e.target.checked)} /> Timing repair</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowDrcRepair} onChange={(e) => setAllowDrcRepair(e.target.checked)} /> DRC repair</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowLvsRepair} onChange={(e) => setAllowLvsRepair(e.target.checked)} /> LVS repair</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowLecRepair} onChange={(e) => setAllowLecRepair(e.target.checked)} /> LEC repair</label>
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               <label className="block text-sm text-slate-300 mt-2">Start stage</label>

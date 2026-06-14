@@ -1,0 +1,11 @@
+{
+  "workflow_id": "a276fe94-5253-47b7-8ecc-34ee2c78817c",
+  "agent": "Digital STA PrePlace Agent",
+  "status": "ok",
+  "return_code": 0,
+  "outputs": {
+    "metrics_json": "digital/sta_preplace/metrics.json",
+    "log": "digital/sta_preplace/logs/openlane_sta_preplace.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/a276fe94-5253-47b7-8ecc-34ee2c78817c/3e47c6ea-bdee-4a3a-acfe-3193056b82c1/digital/digital/run_work/sta_preplace/runs/System_PD_a276fe94-5253-47b7-8ecc-34ee2c78817c"
+  }
+}
