@@ -245,6 +245,7 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital Logic Equivalence Check Agent",
     "Digital Synthesis Closure Agent",
     "Digital DFT Scan Stitching Agent",
+    "Digital Post-DFT Logic Equivalence Check Agent",
     "Digital Scan ATPG Coverage Agent",
     "Digital MBIST Collateral Agent",
   ]),
@@ -284,6 +285,7 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital Logic Equivalence Check Agent",
     "Digital Synthesis Closure Agent",
     "Digital DFT Scan Stitching Agent",
+    "Digital Post-DFT Logic Equivalence Check Agent",
     "Digital Scan ATPG Coverage Agent",
     "Digital MBIST Collateral Agent",
     "Digital STA PrePlace Agent",
@@ -450,6 +452,7 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital Logic Equivalence Check Agent",
     "System Synthesis Closure Agent",
     "Digital DFT Scan Stitching Agent",
+    "Digital Post-DFT Logic Equivalence Check Agent",
     "Digital Scan ATPG Coverage Agent",
     "Digital MBIST Collateral Agent",
   ]),
@@ -498,7 +501,9 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital Implementation Setup Agent",
     "Digital Synthesis Agent",
     "Digital Logic Equivalence Check Agent",
+    "System Synthesis Closure Agent",
     "Digital DFT Scan Stitching Agent",
+    "Digital Post-DFT Logic Equivalence Check Agent",
     "Digital Scan ATPG Coverage Agent",
     "Digital MBIST Collateral Agent",
     "Analog Sky130 SPICE Netlist Agent",
@@ -733,6 +738,11 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       uiLabel: "Digital DFT Scan Stitching Agent",
       backendLabel: "Digital DFT Scan Stitching Agent",
       desc: "Generates scan stitching collateral and runs OpenROAD DFT when available; reports scan chains, scan flops, and tool readiness."
+    },
+    {
+      uiLabel: "Digital Post-DFT Logic Equivalence Check Agent",
+      backendLabel: "Digital Post-DFT Logic Equivalence Check Agent",
+      desc: "Compares the synthesized netlist against the scan-stitched/post-DFT netlist using Yosys and reports real proof, inconclusive, or fail evidence."
     },
     {
       uiLabel: "Digital Scan ATPG Coverage Agent",

@@ -455,6 +455,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/lec/lec_summary.json",
         "digital/synthesis_closure/synthesis_closure_plan.json",
         "digital/synthesis_closure/synthesis_closure_chart.json",
+        "digital/post_dft_lec/post_dft_lec_summary.json",
         "upf_static_check.json",
         "scan_summary.json",
         "atpg_summary.json",
@@ -471,6 +472,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/lec/lec_summary.json",
         "digital/synthesis_closure/synthesis_closure_plan.json",
         "digital/synthesis_closure/synthesis_closure_chart.json",
+        "digital/post_dft_lec/post_dft_lec_summary.json",
         "upf_static_check.json",
         "scan_summary.json",
         "atpg_summary.json",
@@ -807,6 +809,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const upf = record(evidence["upf_static_check.json"]);
       const hasUpf = Object.keys(upf).length > 0;
       const dft = record(evidence["scan_summary.json"]);
+      const postDftLec = record(evidence["post_dft_lec_summary.json"]);
       const atpg = record(evidence["atpg_summary.json"]);
       const mbist = record(evidence["mbist_summary.json"]);
       const floorplan = record(evidence["floorplan_summary.json"]);
@@ -911,6 +914,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         firstString(synthSummary.tool),
         firstString(lec.tool),
         firstString(dft.tool),
+        firstString(postDftLec.tool),
         firstString(atpg.tool),
         firstString(floorplan.tool),
         firstString(place.tool),
@@ -980,6 +984,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {hasUpf ? <Stat title="Isolation Rules" value={metricValue(upf.isolation_rule_count)} /> : null}
             {hasUpf ? <Stat title="Retention Rules" value={metricValue(upf.retention_rule_count)} /> : null}
             <Stat title="DFT" value={dftDashboardStatus(dft)} />
+            <Stat title="Post-DFT LEC" value={lecDashboardStatus(postDftLec)} />
+            <Stat title="Post-DFT LEC Unproven" value={metricValue(postDftLec.unproven_points)} />
             <Stat title="Scan Chains" value={scanMetric(dft.status, firstPresent(dft.actual_scan_chains, dft.scan_chains))} />
             <Stat title="Scan Candidates" value={metricValue(dft.scan_flops)} />
             <Stat title="ATPG" value={atpgDashboardStatus(atpg)} />
