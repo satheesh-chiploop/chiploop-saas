@@ -938,6 +938,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               { key: "setup_violations", label: "Setup Vios" },
               { key: "lec_status", label: "LEC" },
               { key: "lec_unproven_points", label: "LEC Unproven" },
+              { key: "post_dft_lec_status", label: "Post-DFT LEC" },
+              { key: "post_dft_lec_unproven_points", label: "Post-DFT Unproven" },
             ]}
           />
           {stage === "tapeout" ? (
