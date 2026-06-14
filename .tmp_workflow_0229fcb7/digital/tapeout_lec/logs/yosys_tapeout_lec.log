@@ -1,0 +1,2865 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Executing script file `/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/yosys_tapeout_lec.ys' --
+
+1. Executing Verilog-2005 frontend: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller.v
+Parsing SystemVerilog input from `/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller.v' to AST representation.
+Generating RTLIL representation for module `\pwm_controller'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v
+Parsing SystemVerilog input from `/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v' to AST representation.
+Generating RTLIL representation for module `\pwm_controller_regs'.
+Successfully finished Verilog frontend.
+
+3. Executing HIERARCHY pass (managing design hierarchy).
+
+3.1. Analyzing design hierarchy..
+Top module:  \pwm_controller
+Used module:     \pwm_controller_regs
+
+3.2. Analyzing design hierarchy..
+Top module:  \pwm_controller
+Used module:     \pwm_controller_regs
+Removed 0 unused modules.
+
+4. Executing PROC pass (convert processes to netlists).
+
+4.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+4.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 4 switch rules as full_case in process $proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3 in module pwm_controller_regs.
+Removed a total of 0 dead cases.
+
+4.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 1 redundant assignment.
+Promoted 0 assignments to connections.
+
+4.4. Executing PROC_INIT pass (extract init attributes).
+
+4.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset_n in `\pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+
+4.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~6 debug messages>
+
+4.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+     1/6: $0\rd_data[7:0]
+     2/6: $0\control_reg[7:0]
+     3/6: $0\period[7:0]
+     4/6: $0\duty_cycle[7:0]
+     5/6: $0\enable[0:0]
+     6/6: $0\counter_value[7:0]
+
+4.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+4.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\pwm_controller_regs.\rd_data' using process `\pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+  created $adff cell `$procdff$44' with positive edge clock and negative level reset.
+Creating register for signal `\pwm_controller_regs.\counter_value' using process `\pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+  created $adff cell `$procdff$45' with positive edge clock and negative level reset.
+Creating register for signal `\pwm_controller_regs.\enable' using process `\pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+  created $adff cell `$procdff$46' with positive edge clock and negative level reset.
+Creating register for signal `\pwm_controller_regs.\duty_cycle' using process `\pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+  created $adff cell `$procdff$47' with positive edge clock and negative level reset.
+Creating register for signal `\pwm_controller_regs.\period' using process `\pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+  created $adff cell `$procdff$48' with positive edge clock and negative level reset.
+Creating register for signal `\pwm_controller_regs.\control_reg' using process `\pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+  created $adff cell `$procdff$49' with positive edge clock and negative level reset.
+
+4.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+4.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 6 empty switches in `\pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+Removing empty process `pwm_controller_regs.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:30$3'.
+Cleaned up 6 empty switches.
+
+4.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller_regs.
+<suppressed ~4 debug messages>
+Optimizing module pwm_controller.
+
+5. Executing OPT pass (performing simple optimizations).
+
+5.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller_regs.
+Optimizing module pwm_controller.
+
+5.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller_regs'.
+<suppressed ~3 debug messages>
+Finding identical cells in module `\pwm_controller'.
+Removed a total of 1 cells.
+
+5.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \pwm_controller_regs..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \pwm_controller..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+5.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \pwm_controller_regs.
+  Optimizing cells in module \pwm_controller.
+Performed a total of 0 changes.
+
+5.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller_regs'.
+Finding identical cells in module `\pwm_controller'.
+Removed a total of 0 cells.
+
+5.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$49 ($adff) from module pwm_controller_regs (D = { 7'0000000 \wr_data [0] }, Q = \control_reg).
+Adding EN signal on $procdff$45 ($adff) from module pwm_controller_regs (D = $procmux$40_Y, Q = \counter_value).
+Adding EN signal on $procdff$46 ($adff) from module pwm_controller_regs (D = \wr_data [0], Q = \enable).
+Adding EN signal on $procdff$47 ($adff) from module pwm_controller_regs (D = \wr_data, Q = \duty_cycle).
+Adding EN signal on $procdff$48 ($adff) from module pwm_controller_regs (D = \wr_data, Q = \period).
+Setting constant 0-bit at position 1 on $auto$ff.cc:266:slice$50 ($adffe) from module pwm_controller_regs.
+Setting constant 0-bit at position 2 on $auto$ff.cc:266:slice$50 ($adffe) from module pwm_controller_regs.
+Setting constant 0-bit at position 3 on $auto$ff.cc:266:slice$50 ($adffe) from module pwm_controller_regs.
+Setting constant 0-bit at position 4 on $auto$ff.cc:266:slice$50 ($adffe) from module pwm_controller_regs.
+Setting constant 0-bit at position 5 on $auto$ff.cc:266:slice$50 ($adffe) from module pwm_controller_regs.
+Setting constant 0-bit at position 6 on $auto$ff.cc:266:slice$50 ($adffe) from module pwm_controller_regs.
+Setting constant 0-bit at position 7 on $auto$ff.cc:266:slice$50 ($adffe) from module pwm_controller_regs.
+
+5.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller_regs..
+Finding unused cells or wires in module \pwm_controller..
+Removed 10 unused cells and 25 unused wires.
+<suppressed ~12 debug messages>
+
+5.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module pwm_controller_regs.
+
+5.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \pwm_controller..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \pwm_controller_regs..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~2 debug messages>
+
+5.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \pwm_controller.
+  Optimizing cells in module \pwm_controller_regs.
+Performed a total of 0 changes.
+
+5.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller'.
+Finding identical cells in module `\pwm_controller_regs'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+5.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \pwm_controller_regs..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+5.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module pwm_controller_regs.
+
+5.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \pwm_controller..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \pwm_controller_regs..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~2 debug messages>
+
+5.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \pwm_controller.
+  Optimizing cells in module \pwm_controller_regs.
+Performed a total of 0 changes.
+
+5.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller'.
+Finding identical cells in module `\pwm_controller_regs'.
+Removed a total of 0 cells.
+
+5.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \pwm_controller_regs..
+
+5.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module pwm_controller_regs.
+
+5.23. Finished OPT passes. (There is nothing left to do.)
+
+6. Executing MEMORY pass.
+
+6.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+6.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+6.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+6.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+6.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+6.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \pwm_controller_regs..
+
+6.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+6.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+6.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \pwm_controller_regs..
+
+6.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+6.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+7. Executing OPT pass (performing simple optimizations).
+
+7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module pwm_controller_regs.
+
+7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller'.
+Finding identical cells in module `\pwm_controller_regs'.
+Removed a total of 0 cells.
+
+7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \pwm_controller..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \pwm_controller_regs..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~2 debug messages>
+
+7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \pwm_controller.
+  Optimizing cells in module \pwm_controller_regs.
+Performed a total of 0 changes.
+
+7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller'.
+Finding identical cells in module `\pwm_controller_regs'.
+Removed a total of 0 cells.
+
+7.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \pwm_controller_regs..
+
+7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module pwm_controller_regs.
+
+7.9. Finished OPT passes. (There is nothing left to do.)
+
+8. Executing ASYNC2SYNC pass.
+Replacing pwm_controller_regs.$auto$ff.cc:266:slice$53 ($adffe): ARST=\reset_n, D=$procmux$40_Y, Q=\counter_value
+Replacing pwm_controller_regs.$auto$ff.cc:266:slice$54 ($adffe): ARST=\reset_n, D=\wr_data [0], Q=\enable
+Replacing pwm_controller_regs.$auto$ff.cc:266:slice$57 ($adffe): ARST=\reset_n, D=\wr_data, Q=\duty_cycle
+Replacing pwm_controller_regs.$auto$ff.cc:266:slice$60 ($adffe): ARST=\reset_n, D=\wr_data, Q=\period
+Replacing pwm_controller_regs.$procdff$44 ($adff): ARST=\reset_n, D=$0\rd_data[7:0], Q=\rd_data
+
+9. Executing FLATTEN pass (flatten design).
+Deleting now unused module pwm_controller_regs.
+<suppressed ~1 debug messages>
+
+10. Executing SPLITNETS pass (splitting up multi-bit signals).
+
+11. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Renaming module pwm_controller to gold.
+
+12. Executing Verilog-2005 frontend: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v
+Parsing SystemVerilog input from `/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v' to AST representation.
+Generating RTLIL representation for module `\sky130_ef_sc_hd__decap_12'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21bo_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21o_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21oi_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221o_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22o_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2b_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_16'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_2'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_4'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_3'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_4'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_6'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_8'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtp_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtp_2'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtp_4'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlymetal6s2s_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_2'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_2'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2b_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_2'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3_4'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4b_4'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111a_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211a_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21a_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ai_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221a_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22a_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311a_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_4'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3_4'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3b_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3b_2'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4_2'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4b_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tapvpwrvgnd_1'.
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor2_1'.
+Successfully finished Verilog frontend.
+
+13. Executing Verilog-2005 frontend: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/pwm_controller.pnl.v
+Parsing SystemVerilog input from `/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/pwm_controller.pnl.v' to AST representation.
+Generating RTLIL representation for module `\pwm_controller'.
+Successfully finished Verilog frontend.
+
+14. Executing HIERARCHY pass (managing design hierarchy).
+
+14.1. Analyzing design hierarchy..
+Top module:  \pwm_controller
+Used module:     \sky130_fd_sc_hd__clkbuf_16
+Used module:     \sky130_fd_sc_hd__buf_1
+Used module:     \sky130_fd_sc_hd__clkbuf_1
+Used module:     \sky130_fd_sc_hd__clkbuf_2
+Used module:     \sky130_fd_sc_hd__dlymetal6s2s_1
+Used module:     \sky130_fd_sc_hd__dfrtp_1
+Used module:     \sky130_fd_sc_hd__dfrtp_2
+Used module:     \sky130_fd_sc_hd__dfrtp_4
+Used module:     \sky130_fd_sc_hd__and2_1
+Used module:     \sky130_fd_sc_hd__o21a_1
+Used module:     \sky130_fd_sc_hd__a22o_1
+Used module:     \sky130_fd_sc_hd__a221o_1
+Used module:     \sky130_fd_sc_hd__a21bo_1
+Used module:     \sky130_fd_sc_hd__or4b_1
+Used module:     \sky130_fd_sc_hd__nor3_4
+Used module:     \sky130_fd_sc_hd__nor2_2
+Used module:     \sky130_fd_sc_hd__or3b_2
+Used module:     \sky130_fd_sc_hd__or2_1
+Used module:     \sky130_fd_sc_hd__or4_2
+Used module:     \sky130_fd_sc_hd__or3_1
+Used module:     \sky130_fd_sc_hd__inv_2
+Used module:     \sky130_fd_sc_hd__mux2_1
+Used module:     \sky130_fd_sc_hd__nor4b_4
+Used module:     \sky130_fd_sc_hd__o311a_1
+Used module:     \sky130_fd_sc_hd__a21o_1
+Used module:     \sky130_fd_sc_hd__o211a_1
+Used module:     \sky130_fd_sc_hd__and3_1
+Used module:     \sky130_fd_sc_hd__a21oi_1
+Used module:     \sky130_fd_sc_hd__nand2_1
+Used module:     \sky130_fd_sc_hd__o2111a_1
+Used module:     \sky130_fd_sc_hd__nor2_1
+Used module:     \sky130_fd_sc_hd__o21ai_1
+Used module:     \sky130_fd_sc_hd__or3_4
+Used module:     \sky130_fd_sc_hd__or4_1
+Used module:     \sky130_fd_sc_hd__xor2_1
+Used module:     \sky130_fd_sc_hd__or2_4
+Used module:     \sky130_fd_sc_hd__or3b_1
+Used module:     \sky130_fd_sc_hd__o221a_1
+Used module:     \sky130_fd_sc_hd__o22a_1
+Used module:     \sky130_fd_sc_hd__and2b_1
+Used module:     \sky130_fd_sc_hd__nand2b_1
+
+14.2. Analyzing design hierarchy..
+Top module:  \pwm_controller
+Used module:     \sky130_fd_sc_hd__clkbuf_16
+Used module:     \sky130_fd_sc_hd__buf_1
+Used module:     \sky130_fd_sc_hd__clkbuf_1
+Used module:     \sky130_fd_sc_hd__clkbuf_2
+Used module:     \sky130_fd_sc_hd__dlymetal6s2s_1
+Used module:     \sky130_fd_sc_hd__dfrtp_1
+Used module:     \sky130_fd_sc_hd__dfrtp_2
+Used module:     \sky130_fd_sc_hd__dfrtp_4
+Used module:     \sky130_fd_sc_hd__and2_1
+Used module:     \sky130_fd_sc_hd__o21a_1
+Used module:     \sky130_fd_sc_hd__a22o_1
+Used module:     \sky130_fd_sc_hd__a221o_1
+Used module:     \sky130_fd_sc_hd__a21bo_1
+Used module:     \sky130_fd_sc_hd__or4b_1
+Used module:     \sky130_fd_sc_hd__nor3_4
+Used module:     \sky130_fd_sc_hd__nor2_2
+Used module:     \sky130_fd_sc_hd__or3b_2
+Used module:     \sky130_fd_sc_hd__or2_1
+Used module:     \sky130_fd_sc_hd__or4_2
+Used module:     \sky130_fd_sc_hd__or3_1
+Used module:     \sky130_fd_sc_hd__inv_2
+Used module:     \sky130_fd_sc_hd__mux2_1
+Used module:     \sky130_fd_sc_hd__nor4b_4
+Used module:     \sky130_fd_sc_hd__o311a_1
+Used module:     \sky130_fd_sc_hd__a21o_1
+Used module:     \sky130_fd_sc_hd__o211a_1
+Used module:     \sky130_fd_sc_hd__and3_1
+Used module:     \sky130_fd_sc_hd__a21oi_1
+Used module:     \sky130_fd_sc_hd__nand2_1
+Used module:     \sky130_fd_sc_hd__o2111a_1
+Used module:     \sky130_fd_sc_hd__nor2_1
+Used module:     \sky130_fd_sc_hd__o21ai_1
+Used module:     \sky130_fd_sc_hd__or3_4
+Used module:     \sky130_fd_sc_hd__or4_1
+Used module:     \sky130_fd_sc_hd__xor2_1
+Used module:     \sky130_fd_sc_hd__or2_4
+Used module:     \sky130_fd_sc_hd__or3b_1
+Used module:     \sky130_fd_sc_hd__o221a_1
+Used module:     \sky130_fd_sc_hd__o22a_1
+Used module:     \sky130_fd_sc_hd__and2b_1
+Used module:     \sky130_fd_sc_hd__nand2b_1
+Removed 0 unused modules.
+
+15. Executing PROC pass (convert processes to netlists).
+
+15.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+15.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:227$110 in module sky130_fd_sc_hd__dfrtp_4.
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:210$108 in module sky130_fd_sc_hd__dfrtp_2.
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:193$106 in module sky130_fd_sc_hd__dfrtp_1.
+Removed a total of 0 dead cases.
+
+15.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 3 redundant assignments.
+Promoted 0 assignments to connections.
+
+15.4. Executing PROC_INIT pass (extract init attributes).
+
+15.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \RESET_B in `\sky130_fd_sc_hd__dfrtp_4.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:227$110'.
+Found async reset \RESET_B in `\sky130_fd_sc_hd__dfrtp_2.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:210$108'.
+Found async reset \RESET_B in `\sky130_fd_sc_hd__dfrtp_1.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:193$106'.
+
+15.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+15.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\sky130_fd_sc_hd__dfrtp_4.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:227$110'.
+     1/1: $0\q_reg[0:0]
+Creating decoders for process `\sky130_fd_sc_hd__dfrtp_2.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:210$108'.
+     1/1: $0\q_reg[0:0]
+Creating decoders for process `\sky130_fd_sc_hd__dfrtp_1.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:193$106'.
+     1/1: $0\q_reg[0:0]
+
+15.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+15.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\sky130_fd_sc_hd__dfrtp_4.\q_reg' using process `\sky130_fd_sc_hd__dfrtp_4.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:227$110'.
+  created $adff cell `$procdff$237' with positive edge clock and negative level reset.
+Creating register for signal `\sky130_fd_sc_hd__dfrtp_2.\q_reg' using process `\sky130_fd_sc_hd__dfrtp_2.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:210$108'.
+  created $adff cell `$procdff$238' with positive edge clock and negative level reset.
+Creating register for signal `\sky130_fd_sc_hd__dfrtp_1.\q_reg' using process `\sky130_fd_sc_hd__dfrtp_1.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:193$106'.
+  created $adff cell `$procdff$239' with positive edge clock and negative level reset.
+
+15.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+15.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `sky130_fd_sc_hd__dfrtp_4.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:227$110'.
+Removing empty process `sky130_fd_sc_hd__dfrtp_2.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:210$108'.
+Removing empty process `sky130_fd_sc_hd__dfrtp_1.$proc$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:193$106'.
+Cleaned up 0 empty switches.
+
+15.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module sky130_fd_sc_hd__xor2_1.
+Optimizing module sky130_fd_sc_hd__or4b_1.
+Optimizing module sky130_fd_sc_hd__or4_2.
+Optimizing module sky130_fd_sc_hd__or4_1.
+Optimizing module sky130_fd_sc_hd__or3b_2.
+Optimizing module sky130_fd_sc_hd__or3b_1.
+Optimizing module sky130_fd_sc_hd__or3_4.
+Optimizing module sky130_fd_sc_hd__or3_1.
+Optimizing module sky130_fd_sc_hd__or2_4.
+Optimizing module sky130_fd_sc_hd__or2_1.
+Optimizing module sky130_fd_sc_hd__o311a_1.
+Optimizing module sky130_fd_sc_hd__o22a_1.
+Optimizing module sky130_fd_sc_hd__o221a_1.
+Optimizing module sky130_fd_sc_hd__o21ai_1.
+Optimizing module sky130_fd_sc_hd__o21a_1.
+Optimizing module sky130_fd_sc_hd__o211a_1.
+Optimizing module sky130_fd_sc_hd__o2111a_1.
+Optimizing module sky130_fd_sc_hd__nor4b_4.
+Optimizing module sky130_fd_sc_hd__nor3_4.
+Optimizing module sky130_fd_sc_hd__nor2_2.
+Optimizing module sky130_fd_sc_hd__nor2_1.
+Optimizing module sky130_fd_sc_hd__nand2b_1.
+Optimizing module sky130_fd_sc_hd__nand2_1.
+Optimizing module sky130_fd_sc_hd__mux2_1.
+Optimizing module sky130_fd_sc_hd__inv_2.
+Optimizing module sky130_fd_sc_hd__dlymetal6s2s_1.
+Optimizing module sky130_fd_sc_hd__dfrtp_4.
+Optimizing module sky130_fd_sc_hd__dfrtp_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_2.
+Optimizing module sky130_fd_sc_hd__clkbuf_16.
+Optimizing module sky130_fd_sc_hd__clkbuf_1.
+Optimizing module sky130_fd_sc_hd__buf_1.
+Optimizing module sky130_fd_sc_hd__and3_1.
+Optimizing module sky130_fd_sc_hd__and2b_1.
+Optimizing module sky130_fd_sc_hd__and2_1.
+Optimizing module sky130_fd_sc_hd__a22o_1.
+Optimizing module sky130_fd_sc_hd__a221o_1.
+Optimizing module sky130_fd_sc_hd__a21oi_1.
+Optimizing module sky130_fd_sc_hd__a21o_1.
+Optimizing module sky130_fd_sc_hd__a21bo_1.
+
+16. Executing OPT pass (performing simple optimizations).
+
+16.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module sky130_fd_sc_hd__xor2_1.
+Optimizing module sky130_fd_sc_hd__or4b_1.
+Optimizing module sky130_fd_sc_hd__or4_2.
+Optimizing module sky130_fd_sc_hd__or4_1.
+Optimizing module sky130_fd_sc_hd__or3b_2.
+Optimizing module sky130_fd_sc_hd__or3b_1.
+Optimizing module sky130_fd_sc_hd__or3_4.
+Optimizing module sky130_fd_sc_hd__or3_1.
+Optimizing module sky130_fd_sc_hd__or2_4.
+Optimizing module sky130_fd_sc_hd__or2_1.
+Optimizing module sky130_fd_sc_hd__o311a_1.
+Optimizing module sky130_fd_sc_hd__o22a_1.
+Optimizing module sky130_fd_sc_hd__o221a_1.
+Optimizing module sky130_fd_sc_hd__o21ai_1.
+Optimizing module sky130_fd_sc_hd__o21a_1.
+Optimizing module sky130_fd_sc_hd__o211a_1.
+Optimizing module sky130_fd_sc_hd__o2111a_1.
+Optimizing module sky130_fd_sc_hd__nor4b_4.
+Optimizing module sky130_fd_sc_hd__nor3_4.
+Optimizing module sky130_fd_sc_hd__nor2_2.
+Optimizing module sky130_fd_sc_hd__nor2_1.
+Optimizing module sky130_fd_sc_hd__nand2b_1.
+Optimizing module sky130_fd_sc_hd__nand2_1.
+Optimizing module sky130_fd_sc_hd__mux2_1.
+Optimizing module sky130_fd_sc_hd__inv_2.
+Optimizing module sky130_fd_sc_hd__dlymetal6s2s_1.
+Optimizing module sky130_fd_sc_hd__dfrtp_4.
+Optimizing module sky130_fd_sc_hd__dfrtp_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_2.
+Optimizing module sky130_fd_sc_hd__clkbuf_16.
+Optimizing module sky130_fd_sc_hd__clkbuf_1.
+Optimizing module sky130_fd_sc_hd__buf_1.
+Optimizing module sky130_fd_sc_hd__and3_1.
+Optimizing module sky130_fd_sc_hd__and2b_1.
+Optimizing module sky130_fd_sc_hd__and2_1.
+Optimizing module sky130_fd_sc_hd__a22o_1.
+Optimizing module sky130_fd_sc_hd__a221o_1.
+Optimizing module sky130_fd_sc_hd__a21oi_1.
+Optimizing module sky130_fd_sc_hd__a21o_1.
+Optimizing module sky130_fd_sc_hd__a21bo_1.
+
+16.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller'.
+Finding identical cells in module `\sky130_fd_sc_hd__xor2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o311a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o22a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o221a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21ai_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o211a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o2111a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor4b_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__mux2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__inv_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dlymetal6s2s_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_16'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__buf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a22o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a221o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21oi_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21bo_1'.
+Removed a total of 0 cells.
+
+16.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \pwm_controller..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__xor2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or4b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or4_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or4_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3b_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or2_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o311a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o22a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o221a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o21ai_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o21a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o211a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o2111a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor4b_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor3_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor2_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nand2b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nand2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__mux2_1..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \sky130_fd_sc_hd__inv_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dlymetal6s2s_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dfrtp_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dfrtp_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dfrtp_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__clkbuf_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__clkbuf_16..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__clkbuf_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__buf_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__and3_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__and2b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__and2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a22o_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a221o_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a21oi_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a21o_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a21bo_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+16.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \pwm_controller.
+  Optimizing cells in module \sky130_fd_sc_hd__xor2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or4b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or4_2.
+  Optimizing cells in module \sky130_fd_sc_hd__or4_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or3b_2.
+  Optimizing cells in module \sky130_fd_sc_hd__or3b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or3_4.
+  Optimizing cells in module \sky130_fd_sc_hd__or3_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or2_4.
+  Optimizing cells in module \sky130_fd_sc_hd__or2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o311a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o22a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o221a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o21ai_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o21a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o211a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o2111a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nor4b_4.
+  Optimizing cells in module \sky130_fd_sc_hd__nor3_4.
+  Optimizing cells in module \sky130_fd_sc_hd__nor2_2.
+  Optimizing cells in module \sky130_fd_sc_hd__nor2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nand2b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nand2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__mux2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__inv_2.
+  Optimizing cells in module \sky130_fd_sc_hd__dlymetal6s2s_1.
+  Optimizing cells in module \sky130_fd_sc_hd__dfrtp_4.
+  Optimizing cells in module \sky130_fd_sc_hd__dfrtp_2.
+  Optimizing cells in module \sky130_fd_sc_hd__dfrtp_1.
+  Optimizing cells in module \sky130_fd_sc_hd__clkbuf_2.
+  Optimizing cells in module \sky130_fd_sc_hd__clkbuf_16.
+  Optimizing cells in module \sky130_fd_sc_hd__clkbuf_1.
+  Optimizing cells in module \sky130_fd_sc_hd__buf_1.
+  Optimizing cells in module \sky130_fd_sc_hd__and3_1.
+  Optimizing cells in module \sky130_fd_sc_hd__and2b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__and2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a22o_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a221o_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a21oi_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a21o_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a21bo_1.
+Performed a total of 0 changes.
+
+16.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller'.
+Finding identical cells in module `\sky130_fd_sc_hd__xor2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o311a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o22a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o221a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21ai_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o211a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o2111a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor4b_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__mux2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__inv_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dlymetal6s2s_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_16'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__buf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a22o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a221o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21oi_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21bo_1'.
+Removed a total of 0 cells.
+
+16.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+16.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \sky130_fd_sc_hd__xor2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o311a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o22a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o221a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21ai_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o211a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o2111a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor4b_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__mux2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__inv_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dlymetal6s2s_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_16..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__buf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a22o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a221o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21oi_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21bo_1..
+Removed 902 unused cells and 39 unused wires.
+<suppressed ~938 debug messages>
+
+16.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module sky130_fd_sc_hd__a21bo_1.
+Optimizing module sky130_fd_sc_hd__a21o_1.
+Optimizing module sky130_fd_sc_hd__a21oi_1.
+Optimizing module sky130_fd_sc_hd__a221o_1.
+Optimizing module sky130_fd_sc_hd__a22o_1.
+Optimizing module sky130_fd_sc_hd__and2_1.
+Optimizing module sky130_fd_sc_hd__and2b_1.
+Optimizing module sky130_fd_sc_hd__and3_1.
+Optimizing module sky130_fd_sc_hd__buf_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_16.
+Optimizing module sky130_fd_sc_hd__clkbuf_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_1.
+Optimizing module sky130_fd_sc_hd__dfrtp_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_4.
+Optimizing module sky130_fd_sc_hd__dlymetal6s2s_1.
+Optimizing module sky130_fd_sc_hd__inv_2.
+Optimizing module sky130_fd_sc_hd__mux2_1.
+Optimizing module sky130_fd_sc_hd__nand2_1.
+Optimizing module sky130_fd_sc_hd__nand2b_1.
+Optimizing module sky130_fd_sc_hd__nor2_1.
+Optimizing module sky130_fd_sc_hd__nor2_2.
+Optimizing module sky130_fd_sc_hd__nor3_4.
+Optimizing module sky130_fd_sc_hd__nor4b_4.
+Optimizing module sky130_fd_sc_hd__o2111a_1.
+Optimizing module sky130_fd_sc_hd__o211a_1.
+Optimizing module sky130_fd_sc_hd__o21a_1.
+Optimizing module sky130_fd_sc_hd__o21ai_1.
+Optimizing module sky130_fd_sc_hd__o221a_1.
+Optimizing module sky130_fd_sc_hd__o22a_1.
+Optimizing module sky130_fd_sc_hd__o311a_1.
+Optimizing module sky130_fd_sc_hd__or2_1.
+Optimizing module sky130_fd_sc_hd__or2_4.
+Optimizing module sky130_fd_sc_hd__or3_1.
+Optimizing module sky130_fd_sc_hd__or3_4.
+Optimizing module sky130_fd_sc_hd__or3b_1.
+Optimizing module sky130_fd_sc_hd__or3b_2.
+Optimizing module sky130_fd_sc_hd__or4_1.
+Optimizing module sky130_fd_sc_hd__or4_2.
+Optimizing module sky130_fd_sc_hd__or4b_1.
+Optimizing module sky130_fd_sc_hd__xor2_1.
+
+16.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+16.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \pwm_controller..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a21bo_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a21o_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a21oi_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a221o_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a22o_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__and2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__and2b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__and3_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__buf_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__clkbuf_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__clkbuf_16..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__clkbuf_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dfrtp_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dfrtp_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dfrtp_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dlymetal6s2s_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__inv_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__mux2_1..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nand2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nand2b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor2_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor3_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor4b_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o2111a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o211a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o21a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o21ai_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o221a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o22a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o311a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or2_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3b_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or4_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or4_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or4b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__xor2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+16.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \pwm_controller.
+  Optimizing cells in module \sky130_fd_sc_hd__a21bo_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a21o_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a21oi_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a221o_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a22o_1.
+  Optimizing cells in module \sky130_fd_sc_hd__and2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__and2b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__and3_1.
+  Optimizing cells in module \sky130_fd_sc_hd__buf_1.
+  Optimizing cells in module \sky130_fd_sc_hd__clkbuf_1.
+  Optimizing cells in module \sky130_fd_sc_hd__clkbuf_16.
+  Optimizing cells in module \sky130_fd_sc_hd__clkbuf_2.
+  Optimizing cells in module \sky130_fd_sc_hd__dfrtp_1.
+  Optimizing cells in module \sky130_fd_sc_hd__dfrtp_2.
+  Optimizing cells in module \sky130_fd_sc_hd__dfrtp_4.
+  Optimizing cells in module \sky130_fd_sc_hd__dlymetal6s2s_1.
+  Optimizing cells in module \sky130_fd_sc_hd__inv_2.
+  Optimizing cells in module \sky130_fd_sc_hd__mux2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nand2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nand2b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nor2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nor2_2.
+  Optimizing cells in module \sky130_fd_sc_hd__nor3_4.
+  Optimizing cells in module \sky130_fd_sc_hd__nor4b_4.
+  Optimizing cells in module \sky130_fd_sc_hd__o2111a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o211a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o21a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o21ai_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o221a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o22a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o311a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or2_4.
+  Optimizing cells in module \sky130_fd_sc_hd__or3_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or3_4.
+  Optimizing cells in module \sky130_fd_sc_hd__or3b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or3b_2.
+  Optimizing cells in module \sky130_fd_sc_hd__or4_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or4_2.
+  Optimizing cells in module \sky130_fd_sc_hd__or4b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__xor2_1.
+Performed a total of 0 changes.
+
+16.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21bo_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21oi_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a221o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a22o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__buf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_16'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__dlymetal6s2s_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__inv_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__mux2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor4b_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__o2111a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o211a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21ai_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o221a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o22a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o311a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__xor2_1'.
+Removed a total of 0 cells.
+
+16.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+16.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21bo_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21oi_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a221o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a22o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__buf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_16..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dlymetal6s2s_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__inv_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__mux2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor4b_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o2111a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o211a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21ai_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o221a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o22a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o311a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__xor2_1..
+
+16.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module sky130_fd_sc_hd__a21bo_1.
+Optimizing module sky130_fd_sc_hd__a21o_1.
+Optimizing module sky130_fd_sc_hd__a21oi_1.
+Optimizing module sky130_fd_sc_hd__a221o_1.
+Optimizing module sky130_fd_sc_hd__a22o_1.
+Optimizing module sky130_fd_sc_hd__and2_1.
+Optimizing module sky130_fd_sc_hd__and2b_1.
+Optimizing module sky130_fd_sc_hd__and3_1.
+Optimizing module sky130_fd_sc_hd__buf_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_16.
+Optimizing module sky130_fd_sc_hd__clkbuf_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_1.
+Optimizing module sky130_fd_sc_hd__dfrtp_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_4.
+Optimizing module sky130_fd_sc_hd__dlymetal6s2s_1.
+Optimizing module sky130_fd_sc_hd__inv_2.
+Optimizing module sky130_fd_sc_hd__mux2_1.
+Optimizing module sky130_fd_sc_hd__nand2_1.
+Optimizing module sky130_fd_sc_hd__nand2b_1.
+Optimizing module sky130_fd_sc_hd__nor2_1.
+Optimizing module sky130_fd_sc_hd__nor2_2.
+Optimizing module sky130_fd_sc_hd__nor3_4.
+Optimizing module sky130_fd_sc_hd__nor4b_4.
+Optimizing module sky130_fd_sc_hd__o2111a_1.
+Optimizing module sky130_fd_sc_hd__o211a_1.
+Optimizing module sky130_fd_sc_hd__o21a_1.
+Optimizing module sky130_fd_sc_hd__o21ai_1.
+Optimizing module sky130_fd_sc_hd__o221a_1.
+Optimizing module sky130_fd_sc_hd__o22a_1.
+Optimizing module sky130_fd_sc_hd__o311a_1.
+Optimizing module sky130_fd_sc_hd__or2_1.
+Optimizing module sky130_fd_sc_hd__or2_4.
+Optimizing module sky130_fd_sc_hd__or3_1.
+Optimizing module sky130_fd_sc_hd__or3_4.
+Optimizing module sky130_fd_sc_hd__or3b_1.
+Optimizing module sky130_fd_sc_hd__or3b_2.
+Optimizing module sky130_fd_sc_hd__or4_1.
+Optimizing module sky130_fd_sc_hd__or4_2.
+Optimizing module sky130_fd_sc_hd__or4b_1.
+Optimizing module sky130_fd_sc_hd__xor2_1.
+
+16.16. Finished OPT passes. (There is nothing left to do.)
+
+17. Executing MEMORY pass.
+
+17.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+17.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+17.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+17.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+17.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+17.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21bo_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21oi_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a221o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a22o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__buf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_16..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dlymetal6s2s_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__inv_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__mux2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor4b_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o2111a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o211a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21ai_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o221a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o22a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o311a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__xor2_1..
+
+17.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+17.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+17.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21bo_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21oi_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a221o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a22o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__buf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_16..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dlymetal6s2s_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__inv_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__mux2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor4b_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o2111a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o211a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21ai_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o221a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o22a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o311a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__xor2_1..
+
+17.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+17.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+18. Executing OPT pass (performing simple optimizations).
+
+18.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module sky130_fd_sc_hd__a21bo_1.
+Optimizing module sky130_fd_sc_hd__a21o_1.
+Optimizing module sky130_fd_sc_hd__a21oi_1.
+Optimizing module sky130_fd_sc_hd__a221o_1.
+Optimizing module sky130_fd_sc_hd__a22o_1.
+Optimizing module sky130_fd_sc_hd__and2_1.
+Optimizing module sky130_fd_sc_hd__and2b_1.
+Optimizing module sky130_fd_sc_hd__and3_1.
+Optimizing module sky130_fd_sc_hd__buf_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_16.
+Optimizing module sky130_fd_sc_hd__clkbuf_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_1.
+Optimizing module sky130_fd_sc_hd__dfrtp_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_4.
+Optimizing module sky130_fd_sc_hd__dlymetal6s2s_1.
+Optimizing module sky130_fd_sc_hd__inv_2.
+Optimizing module sky130_fd_sc_hd__mux2_1.
+Optimizing module sky130_fd_sc_hd__nand2_1.
+Optimizing module sky130_fd_sc_hd__nand2b_1.
+Optimizing module sky130_fd_sc_hd__nor2_1.
+Optimizing module sky130_fd_sc_hd__nor2_2.
+Optimizing module sky130_fd_sc_hd__nor3_4.
+Optimizing module sky130_fd_sc_hd__nor4b_4.
+Optimizing module sky130_fd_sc_hd__o2111a_1.
+Optimizing module sky130_fd_sc_hd__o211a_1.
+Optimizing module sky130_fd_sc_hd__o21a_1.
+Optimizing module sky130_fd_sc_hd__o21ai_1.
+Optimizing module sky130_fd_sc_hd__o221a_1.
+Optimizing module sky130_fd_sc_hd__o22a_1.
+Optimizing module sky130_fd_sc_hd__o311a_1.
+Optimizing module sky130_fd_sc_hd__or2_1.
+Optimizing module sky130_fd_sc_hd__or2_4.
+Optimizing module sky130_fd_sc_hd__or3_1.
+Optimizing module sky130_fd_sc_hd__or3_4.
+Optimizing module sky130_fd_sc_hd__or3b_1.
+Optimizing module sky130_fd_sc_hd__or3b_2.
+Optimizing module sky130_fd_sc_hd__or4_1.
+Optimizing module sky130_fd_sc_hd__or4_2.
+Optimizing module sky130_fd_sc_hd__or4b_1.
+Optimizing module sky130_fd_sc_hd__xor2_1.
+
+18.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21bo_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21oi_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a221o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a22o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__buf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_16'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__dlymetal6s2s_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__inv_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__mux2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor4b_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__o2111a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o211a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21ai_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o221a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o22a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o311a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__xor2_1'.
+Removed a total of 0 cells.
+
+18.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \pwm_controller..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a21bo_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a21o_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a21oi_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a221o_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__a22o_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__and2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__and2b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__and3_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__buf_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__clkbuf_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__clkbuf_16..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__clkbuf_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dfrtp_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dfrtp_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dfrtp_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__dlymetal6s2s_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__inv_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__mux2_1..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nand2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nand2b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor2_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor3_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__nor4b_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o2111a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o211a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o21a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o21ai_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o221a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o22a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__o311a_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or2_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3_4..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or3b_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or4_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or4_2..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__or4b_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \sky130_fd_sc_hd__xor2_1..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+18.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \pwm_controller.
+  Optimizing cells in module \sky130_fd_sc_hd__a21bo_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a21o_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a21oi_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a221o_1.
+  Optimizing cells in module \sky130_fd_sc_hd__a22o_1.
+  Optimizing cells in module \sky130_fd_sc_hd__and2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__and2b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__and3_1.
+  Optimizing cells in module \sky130_fd_sc_hd__buf_1.
+  Optimizing cells in module \sky130_fd_sc_hd__clkbuf_1.
+  Optimizing cells in module \sky130_fd_sc_hd__clkbuf_16.
+  Optimizing cells in module \sky130_fd_sc_hd__clkbuf_2.
+  Optimizing cells in module \sky130_fd_sc_hd__dfrtp_1.
+  Optimizing cells in module \sky130_fd_sc_hd__dfrtp_2.
+  Optimizing cells in module \sky130_fd_sc_hd__dfrtp_4.
+  Optimizing cells in module \sky130_fd_sc_hd__dlymetal6s2s_1.
+  Optimizing cells in module \sky130_fd_sc_hd__inv_2.
+  Optimizing cells in module \sky130_fd_sc_hd__mux2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nand2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nand2b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nor2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__nor2_2.
+  Optimizing cells in module \sky130_fd_sc_hd__nor3_4.
+  Optimizing cells in module \sky130_fd_sc_hd__nor4b_4.
+  Optimizing cells in module \sky130_fd_sc_hd__o2111a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o211a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o21a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o21ai_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o221a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o22a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__o311a_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or2_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or2_4.
+  Optimizing cells in module \sky130_fd_sc_hd__or3_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or3_4.
+  Optimizing cells in module \sky130_fd_sc_hd__or3b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or3b_2.
+  Optimizing cells in module \sky130_fd_sc_hd__or4_1.
+  Optimizing cells in module \sky130_fd_sc_hd__or4_2.
+  Optimizing cells in module \sky130_fd_sc_hd__or4b_1.
+  Optimizing cells in module \sky130_fd_sc_hd__xor2_1.
+Performed a total of 0 changes.
+
+18.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\pwm_controller'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21bo_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a21oi_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a221o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__a22o_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__and3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__buf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_16'.
+Finding identical cells in module `\sky130_fd_sc_hd__clkbuf_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__dfrtp_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__dlymetal6s2s_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__inv_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__mux2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nand2b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor2_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__nor4b_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__o2111a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o211a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o21ai_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o221a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o22a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__o311a_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or2_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3_4'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or3b_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4_2'.
+Finding identical cells in module `\sky130_fd_sc_hd__or4b_1'.
+Finding identical cells in module `\sky130_fd_sc_hd__xor2_1'.
+Removed a total of 0 cells.
+
+18.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+18.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21bo_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a21oi_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a221o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__a22o_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__and3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__buf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_16..
+Finding unused cells or wires in module \sky130_fd_sc_hd__clkbuf_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dfrtp_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__dlymetal6s2s_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__inv_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__mux2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nand2b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor2_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__nor4b_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o2111a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o211a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o21ai_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o221a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o22a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__o311a_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or2_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3_4..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or3b_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4_2..
+Finding unused cells or wires in module \sky130_fd_sc_hd__or4b_1..
+Finding unused cells or wires in module \sky130_fd_sc_hd__xor2_1..
+
+18.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module pwm_controller.
+Optimizing module sky130_fd_sc_hd__a21bo_1.
+Optimizing module sky130_fd_sc_hd__a21o_1.
+Optimizing module sky130_fd_sc_hd__a21oi_1.
+Optimizing module sky130_fd_sc_hd__a221o_1.
+Optimizing module sky130_fd_sc_hd__a22o_1.
+Optimizing module sky130_fd_sc_hd__and2_1.
+Optimizing module sky130_fd_sc_hd__and2b_1.
+Optimizing module sky130_fd_sc_hd__and3_1.
+Optimizing module sky130_fd_sc_hd__buf_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_1.
+Optimizing module sky130_fd_sc_hd__clkbuf_16.
+Optimizing module sky130_fd_sc_hd__clkbuf_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_1.
+Optimizing module sky130_fd_sc_hd__dfrtp_2.
+Optimizing module sky130_fd_sc_hd__dfrtp_4.
+Optimizing module sky130_fd_sc_hd__dlymetal6s2s_1.
+Optimizing module sky130_fd_sc_hd__inv_2.
+Optimizing module sky130_fd_sc_hd__mux2_1.
+Optimizing module sky130_fd_sc_hd__nand2_1.
+Optimizing module sky130_fd_sc_hd__nand2b_1.
+Optimizing module sky130_fd_sc_hd__nor2_1.
+Optimizing module sky130_fd_sc_hd__nor2_2.
+Optimizing module sky130_fd_sc_hd__nor3_4.
+Optimizing module sky130_fd_sc_hd__nor4b_4.
+Optimizing module sky130_fd_sc_hd__o2111a_1.
+Optimizing module sky130_fd_sc_hd__o211a_1.
+Optimizing module sky130_fd_sc_hd__o21a_1.
+Optimizing module sky130_fd_sc_hd__o21ai_1.
+Optimizing module sky130_fd_sc_hd__o221a_1.
+Optimizing module sky130_fd_sc_hd__o22a_1.
+Optimizing module sky130_fd_sc_hd__o311a_1.
+Optimizing module sky130_fd_sc_hd__or2_1.
+Optimizing module sky130_fd_sc_hd__or2_4.
+Optimizing module sky130_fd_sc_hd__or3_1.
+Optimizing module sky130_fd_sc_hd__or3_4.
+Optimizing module sky130_fd_sc_hd__or3b_1.
+Optimizing module sky130_fd_sc_hd__or3b_2.
+Optimizing module sky130_fd_sc_hd__or4_1.
+Optimizing module sky130_fd_sc_hd__or4_2.
+Optimizing module sky130_fd_sc_hd__or4b_1.
+Optimizing module sky130_fd_sc_hd__xor2_1.
+
+18.9. Finished OPT passes. (There is nothing left to do.)
+
+19. Executing ASYNC2SYNC pass.
+Replacing sky130_fd_sc_hd__dfrtp_1.$procdff$239 ($adff): ARST=\RESET_B, D=\D, Q=\q_reg
+Replacing sky130_fd_sc_hd__dfrtp_2.$procdff$238 ($adff): ARST=\RESET_B, D=\D, Q=\q_reg
+Replacing sky130_fd_sc_hd__dfrtp_4.$procdff$237 ($adff): ARST=\RESET_B, D=\D, Q=\q_reg
+
+20. Executing FLATTEN pass (flatten design).
+Deleting now unused module sky130_fd_sc_hd__a21bo_1.
+Deleting now unused module sky130_fd_sc_hd__a21o_1.
+Deleting now unused module sky130_fd_sc_hd__a21oi_1.
+Deleting now unused module sky130_fd_sc_hd__a221o_1.
+Deleting now unused module sky130_fd_sc_hd__a22o_1.
+Deleting now unused module sky130_fd_sc_hd__and2_1.
+Deleting now unused module sky130_fd_sc_hd__and2b_1.
+Deleting now unused module sky130_fd_sc_hd__and3_1.
+Deleting now unused module sky130_fd_sc_hd__buf_1.
+Deleting now unused module sky130_fd_sc_hd__clkbuf_1.
+Deleting now unused module sky130_fd_sc_hd__clkbuf_16.
+Deleting now unused module sky130_fd_sc_hd__clkbuf_2.
+Deleting now unused module sky130_fd_sc_hd__dfrtp_1.
+Deleting now unused module sky130_fd_sc_hd__dfrtp_2.
+Deleting now unused module sky130_fd_sc_hd__dfrtp_4.
+Deleting now unused module sky130_fd_sc_hd__dlymetal6s2s_1.
+Deleting now unused module sky130_fd_sc_hd__inv_2.
+Deleting now unused module sky130_fd_sc_hd__mux2_1.
+Deleting now unused module sky130_fd_sc_hd__nand2_1.
+Deleting now unused module sky130_fd_sc_hd__nand2b_1.
+Deleting now unused module sky130_fd_sc_hd__nor2_1.
+Deleting now unused module sky130_fd_sc_hd__nor2_2.
+Deleting now unused module sky130_fd_sc_hd__nor3_4.
+Deleting now unused module sky130_fd_sc_hd__nor4b_4.
+Deleting now unused module sky130_fd_sc_hd__o2111a_1.
+Deleting now unused module sky130_fd_sc_hd__o211a_1.
+Deleting now unused module sky130_fd_sc_hd__o21a_1.
+Deleting now unused module sky130_fd_sc_hd__o21ai_1.
+Deleting now unused module sky130_fd_sc_hd__o221a_1.
+Deleting now unused module sky130_fd_sc_hd__o22a_1.
+Deleting now unused module sky130_fd_sc_hd__o311a_1.
+Deleting now unused module sky130_fd_sc_hd__or2_1.
+Deleting now unused module sky130_fd_sc_hd__or2_4.
+Deleting now unused module sky130_fd_sc_hd__or3_1.
+Deleting now unused module sky130_fd_sc_hd__or3_4.
+Deleting now unused module sky130_fd_sc_hd__or3b_1.
+Deleting now unused module sky130_fd_sc_hd__or3b_2.
+Deleting now unused module sky130_fd_sc_hd__or4_1.
+Deleting now unused module sky130_fd_sc_hd__or4_2.
+Deleting now unused module sky130_fd_sc_hd__or4b_1.
+Deleting now unused module sky130_fd_sc_hd__xor2_1.
+<suppressed ~196 debug messages>
+
+21. Executing SPLITNETS pass (splitting up multi-bit signals).
+
+22. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \pwm_controller..
+Removed 0 unused cells and 113 unused wires.
+<suppressed ~1 debug messages>
+Renaming module pwm_controller to gate.
+
+23. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: counter_value[0]_gold (\u_pwm_controller_regs.counter_value[0]_gold), counter_value[0]_gate (\_119_.A_N_gate) -> counter_value[0]
+Presumably equivalent wires: counter_value[1]_gold (\u_pwm_controller_regs.counter_value[1]_gold), counter_value[1]_gate (\_117_.A_N_gate) -> counter_value[1]
+Presumably equivalent wires: counter_value[2]_gold (\u_pwm_controller_regs.counter_value[2]_gold), counter_value[2]_gate (\_153_.B_gate) -> counter_value[2]
+Presumably equivalent wires: counter_value[3]_gold (\u_pwm_controller_regs.counter_value[3]_gold), counter_value[3]_gate (\_147_.B_gate) -> counter_value[3]
+Presumably equivalent wires: counter_value[4]_gold (\u_pwm_controller_regs.counter_value[4]_gold), counter_value[4]_gate (\_145_.B_gate) -> counter_value[4]
+Presumably equivalent wires: counter_value[5]_gold (\u_pwm_controller_regs.counter_value[5]_gold), counter_value[5]_gate (\_152_.B_gate) -> counter_value[5]
+Presumably equivalent wires: counter_value[6]_gold (\u_pwm_controller_regs.counter_value[6]_gold), counter_value[6]_gate (\_151_.B_gate) -> counter_value[6]
+Presumably equivalent wires: counter_value[7]_gold (\u_pwm_controller_regs.counter_value[7]_gold), counter_value[7]_gate (\_113_.A1_gate) -> counter_value[7]
+Presumably equivalent wires: duty_cycle[0]_gold (\u_pwm_controller_regs.duty_cycle[0]_gold), duty_cycle[0]_gate (\_119_.B_gate) -> duty_cycle[0]
+Presumably equivalent wires: duty_cycle[1]_gold (\u_pwm_controller_regs.duty_cycle[1]_gold), duty_cycle[1]_gate (\_117_.B_gate) -> duty_cycle[1]
+Presumably equivalent wires: duty_cycle[2]_gold (\u_pwm_controller_regs.duty_cycle[2]_gold), duty_cycle[2]_gate (\_120_.A2_gate) -> duty_cycle[2]
+Presumably equivalent wires: duty_cycle[3]_gold (\u_pwm_controller_regs.duty_cycle[3]_gold), duty_cycle[3]_gate (\_121_.B1_gate) -> duty_cycle[3]
+Presumably equivalent wires: duty_cycle[4]_gold (\u_pwm_controller_regs.duty_cycle[4]_gold), duty_cycle[4]_gate (\_116_.A2_gate) -> duty_cycle[4]
+Presumably equivalent wires: duty_cycle[5]_gold (\u_pwm_controller_regs.duty_cycle[5]_gold), duty_cycle[5]_gate (\_116_.B1_gate) -> duty_cycle[5]
+Presumably equivalent wires: duty_cycle[6]_gold (\u_pwm_controller_regs.duty_cycle[6]_gold), duty_cycle[6]_gate (\_115_.A2_gate) -> duty_cycle[6]
+Presumably equivalent wires: duty_cycle[7]_gold (\u_pwm_controller_regs.duty_cycle[7]_gold), duty_cycle[7]_gate (\_115_.B1_gate) -> duty_cycle[7]
+Presumably equivalent wires: enable_gold (\u_pwm_controller_regs.enable_gold), enable_gate (\_126_.C1_gate) -> enable
+Presumably equivalent wires: period[0]_gold (\u_pwm_controller_regs.period[0]_gold), period[0]_gate (\_143_.B_gate) -> period[0]
+Presumably equivalent wires: period[1]_gold (\u_pwm_controller_regs.period[1]_gold), period[1]_gate (\_143_.A_gate) -> period[1]
+Presumably equivalent wires: period[2]_gold (\u_pwm_controller_regs.period[2]_gold), period[2]_gate (\_143_.D_gate) -> period[2]
+Presumably equivalent wires: period[3]_gold (\u_pwm_controller_regs.period[3]_gold), period[3]_gate (\_143_.C_gate) -> period[3]
+Presumably equivalent wires: period[4]_gold (\u_pwm_controller_regs.period[4]_gold), period[4]_gate (\_142_.B_gate) -> period[4]
+Presumably equivalent wires: period[5]_gold (\u_pwm_controller_regs.period[5]_gold), period[5]_gate (\_142_.A_gate) -> period[5]
+Presumably equivalent wires: period[6]_gold (\u_pwm_controller_regs.period[6]_gold), period[6]_gate (\_142_.D_gate) -> period[6]
+Presumably equivalent wires: period[7]_gold (\u_pwm_controller_regs.period[7]_gold), period[7]_gate (\_113_.B2_gate) -> period[7]
+Presumably equivalent wires: pwm_out_gold (\pwm_out_gold), pwm_out_gate (\_126_.X_gate) -> pwm_out
+Presumably equivalent wires: rd_addr[0]_gold (\rd_addr[0]_gold), rd_addr[0]_gate (\rd_addr[0]_gate) -> rd_addr[0]
+Presumably equivalent wires: rd_addr[1]_gold (\rd_addr[1]_gold), rd_addr[1]_gate (\rd_addr[1]_gate) -> rd_addr[1]
+Presumably equivalent wires: rd_addr[2]_gold (\rd_addr[2]_gold), rd_addr[2]_gate (\rd_addr[2]_gate) -> rd_addr[2]
+Presumably equivalent wires: rd_addr[3]_gold (\rd_addr[3]_gold), rd_addr[3]_gate (\rd_addr[3]_gate) -> rd_addr[3]
+Presumably equivalent wires: rd_addr[4]_gold (\rd_addr[4]_gold), rd_addr[4]_gate (\rd_addr[4]_gate) -> rd_addr[4]
+Presumably equivalent wires: rd_addr[5]_gold (\rd_addr[5]_gold), rd_addr[5]_gate (\rd_addr[5]_gate) -> rd_addr[5]
+Presumably equivalent wires: rd_addr[6]_gold (\rd_addr[6]_gold), rd_addr[6]_gate (\rd_addr[6]_gate) -> rd_addr[6]
+Presumably equivalent wires: rd_addr[7]_gold (\rd_addr[7]_gold), rd_addr[7]_gate (\rd_addr[7]_gate) -> rd_addr[7]
+Presumably equivalent wires: rd_data[0]_gold (\u_pwm_controller_regs.rd_data[0]_gold), rd_data[0]_gate (\_244_.q_reg_gate) -> rd_data[0]
+Presumably equivalent wires: rd_data[1]_gold (\u_pwm_controller_regs.rd_data[1]_gold), rd_data[1]_gate (\_245_.q_reg_gate) -> rd_data[1]
+Presumably equivalent wires: rd_data[2]_gold (\u_pwm_controller_regs.rd_data[2]_gold), rd_data[2]_gate (\_246_.q_reg_gate) -> rd_data[2]
+Presumably equivalent wires: rd_data[3]_gold (\u_pwm_controller_regs.rd_data[3]_gold), rd_data[3]_gate (\_247_.q_reg_gate) -> rd_data[3]
+Presumably equivalent wires: rd_data[4]_gold (\u_pwm_controller_regs.rd_data[4]_gold), rd_data[4]_gate (\_248_.q_reg_gate) -> rd_data[4]
+Presumably equivalent wires: rd_data[5]_gold (\u_pwm_controller_regs.rd_data[5]_gold), rd_data[5]_gate (\_249_.q_reg_gate) -> rd_data[5]
+Presumably equivalent wires: rd_data[6]_gold (\u_pwm_controller_regs.rd_data[6]_gold), rd_data[6]_gate (\_250_.q_reg_gate) -> rd_data[6]
+Presumably equivalent wires: rd_data[7]_gold (\u_pwm_controller_regs.rd_data[7]_gold), rd_data[7]_gate (\_251_.q_reg_gate) -> rd_data[7]
+Presumably equivalent wires: rd_en_gold (\rd_en_gold), rd_en_gate (\rd_en_gate) -> rd_en
+Presumably equivalent wires: reset_n_gold (\reset_n_gold), reset_n_gate (\reset_n_gate) -> reset_n
+Presumably equivalent wires: wr_addr[0]_gold (\wr_addr[0]_gold), wr_addr[0]_gate (\wr_addr[0]_gate) -> wr_addr[0]
+Presumably equivalent wires: wr_addr[1]_gold (\wr_addr[1]_gold), wr_addr[1]_gate (\wr_addr[1]_gate) -> wr_addr[1]
+Presumably equivalent wires: wr_addr[2]_gold (\wr_addr[2]_gold), wr_addr[2]_gate (\wr_addr[2]_gate) -> wr_addr[2]
+Presumably equivalent wires: wr_addr[3]_gold (\wr_addr[3]_gold), wr_addr[3]_gate (\wr_addr[3]_gate) -> wr_addr[3]
+Presumably equivalent wires: wr_addr[4]_gold (\wr_addr[4]_gold), wr_addr[4]_gate (\wr_addr[4]_gate) -> wr_addr[4]
+Presumably equivalent wires: wr_addr[5]_gold (\wr_addr[5]_gold), wr_addr[5]_gate (\wr_addr[5]_gate) -> wr_addr[5]
+Presumably equivalent wires: wr_addr[6]_gold (\wr_addr[6]_gold), wr_addr[6]_gate (\wr_addr[6]_gate) -> wr_addr[6]
+Presumably equivalent wires: wr_addr[7]_gold (\wr_addr[7]_gold), wr_addr[7]_gate (\wr_addr[7]_gate) -> wr_addr[7]
+Presumably equivalent wires: wr_data[0]_gold (\wr_data[0]_gold), wr_data[0]_gate (\wr_data[0]_gate) -> wr_data[0]
+Presumably equivalent wires: wr_data[1]_gold (\wr_data[1]_gold), wr_data[1]_gate (\wr_data[1]_gate) -> wr_data[1]
+Presumably equivalent wires: wr_data[2]_gold (\wr_data[2]_gold), wr_data[2]_gate (\wr_data[2]_gate) -> wr_data[2]
+Presumably equivalent wires: wr_data[3]_gold (\wr_data[3]_gold), wr_data[3]_gate (\wr_data[3]_gate) -> wr_data[3]
+Presumably equivalent wires: wr_data[4]_gold (\wr_data[4]_gold), wr_data[4]_gate (\wr_data[4]_gate) -> wr_data[4]
+Presumably equivalent wires: wr_data[5]_gold (\wr_data[5]_gold), wr_data[5]_gate (\wr_data[5]_gate) -> wr_data[5]
+Presumably equivalent wires: wr_data[6]_gold (\wr_data[6]_gold), wr_data[6]_gate (\wr_data[6]_gate) -> wr_data[6]
+Presumably equivalent wires: wr_data[7]_gold (\wr_data[7]_gold), wr_data[7]_gate (\wr_data[7]_gate) -> wr_data[7]
+Presumably equivalent wires: wr_en_gold (\wr_en_gold), wr_en_gate (\wr_en_gate) -> wr_en
+Changing input A of cell $flatten\_117_.$not$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:92$94_gate ($not): \_117_.A_N_gate -> \counter_value[1]
+Changing input B of cell $flatten\_118_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:299$121_gate ($and): \_117_.A_N_gate -> \counter_value[1]
+Changing input A of cell $flatten\_119_.$not$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:92$94_gate ($not): \_119_.A_N_gate -> \counter_value[0]
+Changing input B of cell $flatten\_145_.$xor$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:563$236_gate ($xor): \_145_.B_gate -> \counter_value[4]
+Changing input B of cell $flatten\_146_.$xor$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:563$236_gate ($xor): \_117_.A_N_gate -> \counter_value[1]
+Changing input B of cell $flatten\_147_.$xor$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:563$236_gate ($xor): \_147_.B_gate -> \counter_value[3]
+Changing input B of cell $flatten\_148_.$xor$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:563$236_gate ($xor): \_113_.A1_gate -> \counter_value[7]
+Changing input B of cell $flatten\_150_.$xor$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:563$236_gate ($xor): \_119_.A_N_gate -> \counter_value[0]
+Changing input B of cell $flatten\_151_.$xor$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:563$236_gate ($xor): \_151_.B_gate -> \counter_value[6]
+Changing input B of cell $flatten\_152_.$xor$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:563$236_gate ($xor): \_152_.B_gate -> \counter_value[5]
+Changing input B of cell $flatten\_153_.$xor$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:563$236_gate ($xor): \_153_.B_gate -> \counter_value[2]
+Changing input B of cell $flatten\_156_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:373$161_gate ($and): \_119_.A_N_gate -> \counter_value[0]
+Changing input A of cell $flatten\_159_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:81$89_gate ($and): \_119_.A_N_gate -> \counter_value[0]
+Changing input B of cell $flatten\_159_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:81$89_gate ($and): \_117_.A_N_gate -> \counter_value[1]
+Changing input A of cell $flatten\_160_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:81$89_gate ($and): \_117_.A_N_gate -> \counter_value[1]
+Changing input A of cell $flatten\_161_.$or$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:397$164_gate ($or): \_117_.A_N_gate -> \counter_value[1]
+Changing input A of cell $flatten\_163_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:288$114_gate ($and): \_153_.B_gate -> \counter_value[2]
+Changing input A of cell $flatten\_164_.$or$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:373$159_gate ($or): \_153_.B_gate -> \counter_value[2]
+Changing input A of cell $flatten\_165_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:81$89_gate ($and): \_153_.B_gate -> \counter_value[2]
+Changing input B of cell $flatten\_165_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:81$89_gate ($and): \_147_.B_gate -> \counter_value[3]
+Changing input A of cell $flatten\_170_.$or$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:449$178_gate ($or): \_145_.B_gate -> \counter_value[4]
+Changing input A of cell $flatten\_172_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:31$77_gate ($and): \_145_.B_gate -> \counter_value[4]
+Changing input B of cell $flatten\_172_.$or$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:31$78_gate ($or): \_152_.B_gate -> \counter_value[5]
+Changing input A of cell $flatten\_173_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:104$100_gate ($and): \_145_.B_gate -> \counter_value[4]
+Changing input B of cell $flatten\_173_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:104$100_gate ($and): \_152_.B_gate -> \counter_value[5]
+Changing input A of cell $flatten\_176_.$or$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:449$178_gate ($or): \_151_.B_gate -> \counter_value[6]
+Changing input A of cell $flatten\_178_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:31$77_gate ($and): \_151_.B_gate -> \counter_value[6]
+Changing input B of cell $flatten\_178_.$or$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:31$78_gate ($or): \_113_.A1_gate -> \counter_value[7]
+Changing input A of cell $flatten\_189_.$not$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:265$112_gate ($not): \_119_.A_N_gate -> \counter_value[0]
+Changing input A of cell $flatten\_190_.$not$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:265$112_gate ($not): \_153_.B_gate -> \counter_value[2]
+Changing input A of cell $flatten\_191_.$not$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:265$112_gate ($not): \_147_.B_gate -> \counter_value[3]
+Changing input A of cell $flatten\_192_.$not$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:265$112_gate ($not): \_145_.B_gate -> \counter_value[4]
+Changing input A of cell $flatten\_193_.$not$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:265$112_gate ($not): \_152_.B_gate -> \counter_value[5]
+Changing input A of cell $flatten\_194_.$not$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:265$112_gate ($not): \_151_.B_gate -> \counter_value[6]
+Changing input A of cell $flatten\_195_.$not$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:265$112_gate ($not): \_113_.A1_gate -> \counter_value[7]
+Changing input B of cell $flatten\_206_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:57$83_gate ($and): \_119_.A_N_gate -> \counter_value[0]
+Changing input A of cell $flatten\_209_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:70$86_gate ($and): \_117_.A_N_gate -> \counter_value[1]
+Changing input B of cell $flatten\_212_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:57$83_gate ($and): \_153_.B_gate -> \counter_value[2]
+Changing input A of cell $flatten\_215_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:70$86_gate ($and): \_147_.B_gate -> \counter_value[3]
+Changing input A of cell $flatten\_218_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:70$86_gate ($and): \_145_.B_gate -> \counter_value[4]
+Changing input A of cell $flatten\_220_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:81$89_gate ($and): \_152_.B_gate -> \counter_value[5]
+Changing input A of cell $flatten\_223_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:81$89_gate ($and): \_151_.B_gate -> \counter_value[6]
+Changing input A of cell $flatten\_113_.$and$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/tapeout_lec/input/stdcell_functional_wrappers.v:70$86_gate ($and): \_113_.A1_gate -> \counter_value[7]
+Changing input A of cell $flatten\u_pwm_controller_regs.$add$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:60$8_gold ($add): { \u_pwm_controller_regs.counter_value[7]_gold \u_pwm_controller_regs.counter_value[6]_gold \u_pwm_controller_regs.counter_value[5]_gold \u_pwm_controller_regs.counter_value[4]_gold \u_pwm_controller_regs.counter_value[3]_gold \u_pwm_controller_regs.counter_value[2]_gold \u_pwm_controller_regs.counter_value[1]_gold \u_pwm_controller_regs.counter_value[0]_gold } -> { \counter_value[7] \counter_value[6] \counter_value[5] \counter_value[4] \counter_value[3] \counter_value[2] \counter_value[1] \counter_value[0] }
+Changing input A of cell $flatten\u_pwm_controller_regs.$eq$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller_regs.v:57$7_gold ($eq): { \u_pwm_controller_regs.counter_value[7]_gold \u_pwm_controller_regs.counter_value[6]_gold \u_pwm_controller_regs.counter_value[5]_gold \u_pwm_controller_regs.counter_value[4]_gold \u_pwm_controller_regs.counter_value[3]_gold \u_pwm_controller_regs.counter_value[2]_gold \u_pwm_controller_regs.counter_value[1]_gold \u_pwm_controller_regs.counter_value[0]_gold } -> { \counter_value[7] \counter_value[6] \counter_value[5] \counter_value[4] \counter_value[3] \counter_value[2] \counter_value[1] \counter_value[0] }
+Changing input B of cell $flatten\u_pwm_controller_regs.$procmux$11_gold ($pmux): { 7'0000000 \u_pwm_controller_regs.enable_gold \u_pwm_controller_regs.duty_cycle[7]_gold \u_pwm_controller_regs.duty_cycle[6]_gold \u_pwm_controller_regs.duty_cycle[5]_gold \u_pwm_controller_regs.duty_cycle[4]_gold \u_pwm_controller_regs.duty_cycle[3]_gold \u_pwm_controller_regs.duty_cycle[2]_gold \u_pwm_controller_regs.duty_cycle[1]_gold \u_pwm_controller_regs.duty_cycle[0]_gold \u_pwm_controller_regs.period[7]_gold \u_pwm_controller_regs.period[6]_gold \u_pwm_controller_regs.period[5]_gold \u_pwm_controller_regs.period[4]_gold \u_pwm_controller_regs.period[3]_gold \u_pwm_controller_regs.period[2]_gold \u_pwm_controller_regs.period[1]_gold \u_pwm_controller_regs.period[0]_gold \u_pwm_controller_regs.counter_value[7]_gold \u_pwm_controller_regs.counter_value[6]_gold \u_pwm_controller_regs.counter_value[5]_gold \u_pwm_controller_regs.counter_value[4]_gold \u_pwm_controller_regs.counter_value[3]_gold \u_pwm_controller_regs.counter_value[2]_gold \u_pwm_controller_regs.counter_value[1]_gold \u_pwm_controller_regs.counter_value[0]_gold } -> { 7'0000000 \u_pwm_controller_regs.enable_gold \u_pwm_controller_regs.duty_cycle[7]_gold \u_pwm_controller_regs.duty_cycle[6]_gold \u_pwm_controller_regs.duty_cycle[5]_gold \u_pwm_controller_regs.duty_cycle[4]_gold \u_pwm_controller_regs.duty_cycle[3]_gold \u_pwm_controller_regs.duty_cycle[2]_gold \u_pwm_controller_regs.duty_cycle[1]_gold \u_pwm_controller_regs.duty_cycle[0]_gold \u_pwm_controller_regs.period[7]_gold \u_pwm_controller_regs.period[6]_gold \u_pwm_controller_regs.period[5]_gold \u_pwm_controller_regs.period[4]_gold \u_pwm_controller_regs.period[3]_gold \u_pwm_controller_regs.period[2]_gold \u_pwm_controller_regs.period[1]_gold \u_pwm_controller_regs.period[0]_gold \counter_value[7] \counter_value[6] \counter_value[5] \counter_value[4] \counter_value[3] \counter_value[2] \counter_value[1] \counter_value[0] }
+Changing input A of cell $lt$/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/handoff/rtl/pwm_controller.v:30$1_gold ($lt): { \u_pwm_controller_regs.counter_value[7]_gold \u_pwm_controller_regs.counter_value[6]_gold \u_pwm_controller_regs.counter_value[5]_gold \u_pwm_controller_regs.counter_value[4]_gold \u_pwm_controller_regs.counter_value[3]_gold \u_pwm_controller_regs.counter_value[2]_gold \u_pwm_controller_regs.counter_value[1]_gold \u_pwm_controller_regs.counter_value[0]_gold } -> { \counter_value[7] \counter_value[6] \counter_value[5] \counter_value[4] \counter_value[3] \counter_value[2] \counter_value[1] \counter_value[0] }
+Setting undriven nets to undef: \VPWR_gate
+Setting undriven nets to undef: \VGND_gate
+
+24. Executing HIERARCHY pass (managing design hierarchy).
+
+24.1. Analyzing design hierarchy..
+Top module:  \equiv
+
+24.2. Analyzing design hierarchy..
+Top module:  \equiv
+Removing unused module `\gate'.
+Removing unused module `\gold'.
+Removed 2 unused modules.
+
+25. Executing EQUIV_SIMPLE pass.
+Found 34 unproven $equiv cells (34 groups) in equiv:
+  Trying to prove $equiv for \pwm_out: failed.
+  Trying to prove $equiv for \enable: failed.
+  Trying to prove $equiv for \rd_data[7]: failed.
+  Trying to prove $equiv for \period[2]: failed.
+  Trying to prove $equiv for \rd_data[4]: failed.
+  Trying to prove $equiv for \rd_data[5]: failed.
+  Trying to prove $equiv for \rd_data[6]: failed.
+  Trying to prove $equiv for \period[0]: failed.
+  Trying to prove $equiv for \period[1]: failed.
+  Trying to prove $equiv for \rd_data[3]: failed.
+  Trying to prove $equiv for \rd_data[2]: failed.
+  Trying to prove $equiv for \rd_data[1]: failed.
+  Trying to prove $equiv for \rd_data[0]: failed.
+  Trying to prove $equiv for \period[7]: failed.
+  Trying to prove $equiv for \period[6]: failed.
+  Trying to prove $equiv for \period[5]: failed.
+  Trying to prove $equiv for \period[4]: failed.
+  Trying to prove $equiv for \period[3]: failed.
+  Trying to prove $equiv for \counter_value[0]: failed.
+  Trying to prove $equiv for \counter_value[1]: failed.
+  Trying to prove $equiv for \counter_value[2]: failed.
+  Trying to prove $equiv for \counter_value[3]: failed.
+  Trying to prove $equiv for \counter_value[4]: failed.
+  Trying to prove $equiv for \counter_value[5]: failed.
+  Trying to prove $equiv for \counter_value[6]: failed.
+  Trying to prove $equiv for \counter_value[7]: failed.
+  Trying to prove $equiv for \duty_cycle[0]: failed.
+  Trying to prove $equiv for \duty_cycle[1]: failed.
+  Trying to prove $equiv for \duty_cycle[2]: failed.
+  Trying to prove $equiv for \duty_cycle[3]: failed.
+  Trying to prove $equiv for \duty_cycle[4]: failed.
+  Trying to prove $equiv for \duty_cycle[5]: failed.
+  Trying to prove $equiv for \duty_cycle[6]: failed.
+  Trying to prove $equiv for \duty_cycle[7]: failed.
+Proved 0 previously unproven $equiv cells.
+
+26. Executing EQUIV_INDUCT pass.
+Found 34 unproven $equiv cells in module equiv:
+  Undef modelling: force def on 66 initial reg values and 28 inputs.
+  Proving existence of base case for step 1. (28158 clauses over 10757 variables)
+  Proving induction step 1. (61355 clauses over 23215 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 2. (61356 clauses over 23215 variables)
+  Proving induction step 2. (94553 clauses over 35673 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 3. (94554 clauses over 35673 variables)
+  Proving induction step 3. (127751 clauses over 48131 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 4. (127752 clauses over 48131 variables)
+  Proving induction step 4. (160949 clauses over 60589 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 5. (160950 clauses over 60589 variables)
+  Proving induction step 5. (194147 clauses over 73047 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 6. (194148 clauses over 73047 variables)
+  Proving induction step 6. (227345 clauses over 85505 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 7. (227346 clauses over 85505 variables)
+  Proving induction step 7. (260543 clauses over 97963 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 8. (260544 clauses over 97963 variables)
+  Proving induction step 8. (293741 clauses over 110421 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 9. (293742 clauses over 110421 variables)
+  Proving induction step 9. (326939 clauses over 122879 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 10. (326940 clauses over 122879 variables)
+  Proving induction step 10. (360137 clauses over 135337 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 11. (360138 clauses over 135337 variables)
+  Proving induction step 11. (393335 clauses over 147795 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 12. (393336 clauses over 147795 variables)
+  Proving induction step 12. (426533 clauses over 160253 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 13. (426534 clauses over 160253 variables)
+  Proving induction step 13. (459731 clauses over 172711 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 14. (459732 clauses over 172711 variables)
+  Proving induction step 14. (492929 clauses over 185169 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 15. (492930 clauses over 185169 variables)
+  Proving induction step 15. (526127 clauses over 197627 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 16. (526128 clauses over 197627 variables)
+  Proving induction step 16. (559325 clauses over 210085 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 17. (559326 clauses over 210085 variables)
+  Proving induction step 17. (592523 clauses over 222543 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 18. (592524 clauses over 222543 variables)
+  Proving induction step 18. (625721 clauses over 235001 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 19. (625722 clauses over 235001 variables)
+  Proving induction step 19. (658919 clauses over 247459 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 20. (658920 clauses over 247459 variables)
+  Proving induction step 20. (692117 clauses over 259917 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 21. (692118 clauses over 259917 variables)
+  Proving induction step 21. (725315 clauses over 272375 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 22. (725316 clauses over 272375 variables)
+  Proving induction step 22. (758513 clauses over 284833 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 23. (758514 clauses over 284833 variables)
+  Proving induction step 23. (791711 clauses over 297291 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 24. (791712 clauses over 297291 variables)
+  Proving induction step 24. (824909 clauses over 309749 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 25. (824910 clauses over 309749 variables)
+  Proving induction step 25. (858107 clauses over 322207 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 26. (858108 clauses over 322207 variables)
+  Proving induction step 26. (891305 clauses over 334665 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 27. (891306 clauses over 334665 variables)
+  Proving induction step 27. (924503 clauses over 347123 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 28. (924504 clauses over 347123 variables)
+  Proving induction step 28. (957701 clauses over 359581 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 29. (957702 clauses over 359581 variables)
+  Proving induction step 29. (990899 clauses over 372039 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 30. (990900 clauses over 372039 variables)
+  Proving induction step 30. (1024097 clauses over 384497 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 31. (1024098 clauses over 384497 variables)
+  Proving induction step 31. (1057295 clauses over 396955 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 32. (1057296 clauses over 396955 variables)
+  Proving induction step 32. (1090493 clauses over 409413 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 33. (1090494 clauses over 409413 variables)
+  Proving induction step 33. (1123691 clauses over 421871 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 34. (1123692 clauses over 421871 variables)
+  Proving induction step 34. (1156889 clauses over 434329 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 35. (1156890 clauses over 434329 variables)
+  Proving induction step 35. (1190087 clauses over 446787 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 36. (1190088 clauses over 446787 variables)
+  Proving induction step 36. (1223285 clauses over 459245 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 37. (1223286 clauses over 459245 variables)
+  Proving induction step 37. (1256483 clauses over 471703 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 38. (1256484 clauses over 471703 variables)
+  Proving induction step 38. (1289681 clauses over 484161 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 39. (1289682 clauses over 484161 variables)
+  Proving induction step 39. (1322879 clauses over 496619 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 40. (1322880 clauses over 496619 variables)
+  Proving induction step 40. (1356077 clauses over 509077 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 41. (1356078 clauses over 509077 variables)
+  Proving induction step 41. (1389275 clauses over 521535 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 42. (1389276 clauses over 521535 variables)
+  Proving induction step 42. (1422473 clauses over 533993 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 43. (1422474 clauses over 533993 variables)
+  Proving induction step 43. (1455671 clauses over 546451 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 44. (1455672 clauses over 546451 variables)
+  Proving induction step 44. (1488869 clauses over 558909 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 45. (1488870 clauses over 558909 variables)
+  Proving induction step 45. (1522067 clauses over 571367 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 46. (1522068 clauses over 571367 variables)
+  Proving induction step 46. (1555265 clauses over 583825 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 47. (1555266 clauses over 583825 variables)
+  Proving induction step 47. (1588463 clauses over 596283 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 48. (1588464 clauses over 596283 variables)
+  Proving induction step 48. (1621661 clauses over 608741 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 49. (1621662 clauses over 608741 variables)
+  Proving induction step 49. (1654859 clauses over 621199 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 50. (1654860 clauses over 621199 variables)
+  Proving induction step 50. (1688057 clauses over 633657 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 51. (1688058 clauses over 633657 variables)
+  Proving induction step 51. (1721255 clauses over 646115 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 52. (1721256 clauses over 646115 variables)
+  Proving induction step 52. (1754453 clauses over 658573 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 53. (1754454 clauses over 658573 variables)
+  Proving induction step 53. (1787651 clauses over 671031 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 54. (1787652 clauses over 671031 variables)
+  Proving induction step 54. (1820849 clauses over 683489 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 55. (1820850 clauses over 683489 variables)
+  Proving induction step 55. (1854047 clauses over 695947 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 56. (1854048 clauses over 695947 variables)
+  Proving induction step 56. (1887245 clauses over 708405 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 57. (1887246 clauses over 708405 variables)
+  Proving induction step 57. (1920443 clauses over 720863 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 58. (1920444 clauses over 720863 variables)
+  Proving induction step 58. (1953641 clauses over 733321 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 59. (1953642 clauses over 733321 variables)
+  Proving induction step 59. (1986839 clauses over 745779 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 60. (1986840 clauses over 745779 variables)
+  Proving induction step 60. (2020037 clauses over 758237 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 61. (2020038 clauses over 758237 variables)
+  Proving induction step 61. (2053235 clauses over 770695 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 62. (2053236 clauses over 770695 variables)
+  Proving induction step 62. (2086433 clauses over 783153 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 63. (2086434 clauses over 783153 variables)
+  Proving induction step 63. (2119631 clauses over 795611 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 64. (2119632 clauses over 795611 variables)
+  Proving induction step 64. (2152829 clauses over 808069 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 65. (2152830 clauses over 808069 variables)
+  Proving induction step 65. (2186027 clauses over 820527 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 66. (2186028 clauses over 820527 variables)
+  Proving induction step 66. (2219225 clauses over 832985 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 67. (2219226 clauses over 832985 variables)
+  Proving induction step 67. (2252423 clauses over 845443 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 68. (2252424 clauses over 845443 variables)
+  Proving induction step 68. (2285621 clauses over 857901 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 69. (2285622 clauses over 857901 variables)
+  Proving induction step 69. (2318819 clauses over 870359 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 70. (2318820 clauses over 870359 variables)
+  Proving induction step 70. (2352017 clauses over 882817 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 71. (2352018 clauses over 882817 variables)
+  Proving induction step 71. (2385215 clauses over 895275 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 72. (2385216 clauses over 895275 variables)
+  Proving induction step 72. (2418413 clauses over 907733 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 73. (2418414 clauses over 907733 variables)
+  Proving induction step 73. (2451611 clauses over 920191 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 74. (2451612 clauses over 920191 variables)
+  Proving induction step 74. (2484809 clauses over 932649 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 75. (2484810 clauses over 932649 variables)
+  Proving induction step 75. (2518007 clauses over 945107 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 76. (2518008 clauses over 945107 variables)
+  Proving induction step 76. (2551205 clauses over 957565 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 77. (2551206 clauses over 957565 variables)
+  Proving induction step 77. (2584403 clauses over 970023 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 78. (2584404 clauses over 970023 variables)
+  Proving induction step 78. (2617601 clauses over 982481 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 79. (2617602 clauses over 982481 variables)
+  Proving induction step 79. (2650799 clauses over 994939 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 80. (2650800 clauses over 994939 variables)
+  Proving induction step 80. (2683997 clauses over 1007397 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 81. (2683998 clauses over 1007397 variables)
+  Proving induction step 81. (2717195 clauses over 1019855 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 82. (2717196 clauses over 1019855 variables)
+  Proving induction step 82. (2750393 clauses over 1032313 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 83. (2750394 clauses over 1032313 variables)
+  Proving induction step 83. (2783591 clauses over 1044771 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 84. (2783592 clauses over 1044771 variables)
+  Proving induction step 84. (2816789 clauses over 1057229 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 85. (2816790 clauses over 1057229 variables)
+  Proving induction step 85. (2849987 clauses over 1069687 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 86. (2849988 clauses over 1069687 variables)
+  Proving induction step 86. (2883185 clauses over 1082145 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 87. (2883186 clauses over 1082145 variables)
+  Proving induction step 87. (2916383 clauses over 1094603 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 88. (2916384 clauses over 1094603 variables)
+  Proving induction step 88. (2949581 clauses over 1107061 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 89. (2949582 clauses over 1107061 variables)
+  Proving induction step 89. (2982779 clauses over 1119519 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 90. (2982780 clauses over 1119519 variables)
+  Proving induction step 90. (3015977 clauses over 1131977 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 91. (3015978 clauses over 1131977 variables)
+  Proving induction step 91. (3049175 clauses over 1144435 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 92. (3049176 clauses over 1144435 variables)
+  Proving induction step 92. (3082373 clauses over 1156893 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 93. (3082374 clauses over 1156893 variables)
+  Proving induction step 93. (3115571 clauses over 1169351 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 94. (3115572 clauses over 1169351 variables)
+  Proving induction step 94. (3148769 clauses over 1181809 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 95. (3148770 clauses over 1181809 variables)
+  Proving induction step 95. (3181967 clauses over 1194267 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 96. (3181968 clauses over 1194267 variables)
+  Proving induction step 96. (3215165 clauses over 1206725 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 97. (3215166 clauses over 1206725 variables)
+  Proving induction step 97. (3248363 clauses over 1219183 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 98. (3248364 clauses over 1219183 variables)
+  Proving induction step 98. (3281561 clauses over 1231641 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 99. (3281562 clauses over 1231641 variables)
+  Proving induction step 99. (3314759 clauses over 1244099 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 100. (3314760 clauses over 1244099 variables)
+  Proving induction step 100. (3347957 clauses over 1256557 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 101. (3347958 clauses over 1256557 variables)
+  Proving induction step 101. (3381155 clauses over 1269015 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 102. (3381156 clauses over 1269015 variables)
+  Proving induction step 102. (3414353 clauses over 1281473 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 103. (3414354 clauses over 1281473 variables)
+  Proving induction step 103. (3447551 clauses over 1293931 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 104. (3447552 clauses over 1293931 variables)
+  Proving induction step 104. (3480749 clauses over 1306389 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 105. (3480750 clauses over 1306389 variables)
+  Proving induction step 105. (3513947 clauses over 1318847 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 106. (3513948 clauses over 1318847 variables)
+  Proving induction step 106. (3547145 clauses over 1331305 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 107. (3547146 clauses over 1331305 variables)
+  Proving induction step 107. (3580343 clauses over 1343763 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 108. (3580344 clauses over 1343763 variables)
+  Proving induction step 108. (3613541 clauses over 1356221 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 109. (3613542 clauses over 1356221 variables)
+  Proving induction step 109. (3646739 clauses over 1368679 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 110. (3646740 clauses over 1368679 variables)
+  Proving induction step 110. (3679937 clauses over 1381137 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 111. (3679938 clauses over 1381137 variables)
+  Proving induction step 111. (3713135 clauses over 1393595 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 112. (3713136 clauses over 1393595 variables)
+  Proving induction step 112. (3746333 clauses over 1406053 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 113. (3746334 clauses over 1406053 variables)
+  Proving induction step 113. (3779531 clauses over 1418511 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 114. (3779532 clauses over 1418511 variables)
+  Proving induction step 114. (3812729 clauses over 1430969 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 115. (3812730 clauses over 1430969 variables)
+  Proving induction step 115. (3845927 clauses over 1443427 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 116. (3845928 clauses over 1443427 variables)
+  Proving induction step 116. (3879125 clauses over 1455885 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 117. (3879126 clauses over 1455885 variables)
+  Proving induction step 117. (3912323 clauses over 1468343 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 118. (3912324 clauses over 1468343 variables)
+  Proving induction step 118. (3945521 clauses over 1480801 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 119. (3945522 clauses over 1480801 variables)
+  Proving induction step 119. (3978719 clauses over 1493259 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 120. (3978720 clauses over 1493259 variables)
+  Proving induction step 120. (4011917 clauses over 1505717 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 121. (4011918 clauses over 1505717 variables)
+  Proving induction step 121. (4045115 clauses over 1518175 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 122. (4045116 clauses over 1518175 variables)
+  Proving induction step 122. (4078313 clauses over 1530633 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 123. (4078314 clauses over 1530633 variables)
+  Proving induction step 123. (4111511 clauses over 1543091 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 124. (4111512 clauses over 1543091 variables)
+  Proving induction step 124. (4144709 clauses over 1555549 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 125. (4144710 clauses over 1555549 variables)
+  Proving induction step 125. (4177907 clauses over 1568007 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 126. (4177908 clauses over 1568007 variables)
+  Proving induction step 126. (4211105 clauses over 1580465 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 127. (4211106 clauses over 1580465 variables)
+  Proving induction step 127. (4244303 clauses over 1592923 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 128. (4244304 clauses over 1592923 variables)
+  Proving induction step 128. (4277501 clauses over 1605381 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 129. (4277502 clauses over 1605381 variables)
+  Proving induction step 129. (4310699 clauses over 1617839 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 130. (4310700 clauses over 1617839 variables)
+  Proving induction step 130. (4343897 clauses over 1630297 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 131. (4343898 clauses over 1630297 variables)
+  Proving induction step 131. (4377095 clauses over 1642755 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 132. (4377096 clauses over 1642755 variables)
+  Proving induction step 132. (4410293 clauses over 1655213 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 133. (4410294 clauses over 1655213 variables)
+  Proving induction step 133. (4443491 clauses over 1667671 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 134. (4443492 clauses over 1667671 variables)
+  Proving induction step 134. (4476689 clauses over 1680129 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 135. (4476690 clauses over 1680129 variables)
+  Proving induction step 135. (4509887 clauses over 1692587 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 136. (4509888 clauses over 1692587 variables)
+  Proving induction step 136. (4543085 clauses over 1705045 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 137. (4543086 clauses over 1705045 variables)
+  Proving induction step 137. (4576283 clauses over 1717503 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 138. (4576284 clauses over 1717503 variables)
+  Proving induction step 138. (4609481 clauses over 1729961 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 139. (4609482 clauses over 1729961 variables)
+  Proving induction step 139. (4642679 clauses over 1742419 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 140. (4642680 clauses over 1742419 variables)
+  Proving induction step 140. (4675877 clauses over 1754877 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 141. (4675878 clauses over 1754877 variables)
+  Proving induction step 141. (4709075 clauses over 1767335 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 142. (4709076 clauses over 1767335 variables)
+  Proving induction step 142. (4742273 clauses over 1779793 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 143. (4742274 clauses over 1779793 variables)
+  Proving induction step 143. (4775471 clauses over 1792251 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 144. (4775472 clauses over 1792251 variables)
+  Proving induction step 144. (4808669 clauses over 1804709 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 145. (4808670 clauses over 1804709 variables)
+  Proving induction step 145. (4841867 clauses over 1817167 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 146. (4841868 clauses over 1817167 variables)
+  Proving induction step 146. (4875065 clauses over 1829625 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 147. (4875066 clauses over 1829625 variables)
+  Proving induction step 147. (4908263 clauses over 1842083 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 148. (4908264 clauses over 1842083 variables)
+  Proving induction step 148. (4941461 clauses over 1854541 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 149. (4941462 clauses over 1854541 variables)
+  Proving induction step 149. (4974659 clauses over 1866999 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 150. (4974660 clauses over 1866999 variables)
+  Proving induction step 150. (5007857 clauses over 1879457 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 151. (5007858 clauses over 1879457 variables)
+  Proving induction step 151. (5041055 clauses over 1891915 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 152. (5041056 clauses over 1891915 variables)
+  Proving induction step 152. (5074253 clauses over 1904373 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 153. (5074254 clauses over 1904373 variables)
+  Proving induction step 153. (5107451 clauses over 1916831 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 154. (5107452 clauses over 1916831 variables)
+  Proving induction step 154. (5140649 clauses over 1929289 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 155. (5140650 clauses over 1929289 variables)
+  Proving induction step 155. (5173847 clauses over 1941747 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 156. (5173848 clauses over 1941747 variables)
+  Proving induction step 156. (5207045 clauses over 1954205 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 157. (5207046 clauses over 1954205 variables)
+  Proving induction step 157. (5240243 clauses over 1966663 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 158. (5240244 clauses over 1966663 variables)
+  Proving induction step 158. (5273441 clauses over 1979121 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 159. (5273442 clauses over 1979121 variables)
+  Proving induction step 159. (5306639 clauses over 1991579 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 160. (5306640 clauses over 1991579 variables)
+  Proving induction step 160. (5339837 clauses over 2004037 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 161. (5339838 clauses over 2004037 variables)
+  Proving induction step 161. (5373035 clauses over 2016495 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 162. (5373036 clauses over 2016495 variables)
+  Proving induction step 162. (5406233 clauses over 2028953 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 163. (5406234 clauses over 2028953 variables)
+  Proving induction step 163. (5439431 clauses over 2041411 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 164. (5439432 clauses over 2041411 variables)
+  Proving induction step 164. (5472629 clauses over 2053869 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 165. (5472630 clauses over 2053869 variables)
+  Proving induction step 165. (5505827 clauses over 2066327 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 166. (5505828 clauses over 2066327 variables)
+  Proving induction step 166. (5539025 clauses over 2078785 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 167. (5539026 clauses over 2078785 variables)
+  Proving induction step 167. (5572223 clauses over 2091243 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 168. (5572224 clauses over 2091243 variables)
+  Proving induction step 168. (5605421 clauses over 2103701 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 169. (5605422 clauses over 2103701 variables)
+  Proving induction step 169. (5638619 clauses over 2116159 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 170. (5638620 clauses over 2116159 variables)
+  Proving induction step 170. (5671817 clauses over 2128617 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 171. (5671818 clauses over 2128617 variables)
+  Proving induction step 171. (5705015 clauses over 2141075 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 172. (5705016 clauses over 2141075 variables)
+  Proving induction step 172. (5738213 clauses over 2153533 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 173. (5738214 clauses over 2153533 variables)
+  Proving induction step 173. (5771411 clauses over 2165991 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 174. (5771412 clauses over 2165991 variables)
+  Proving induction step 174. (5804609 clauses over 2178449 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 175. (5804610 clauses over 2178449 variables)
+  Proving induction step 175. (5837807 clauses over 2190907 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 176. (5837808 clauses over 2190907 variables)
+  Proving induction step 176. (5871005 clauses over 2203365 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 177. (5871006 clauses over 2203365 variables)
+  Proving induction step 177. (5904203 clauses over 2215823 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 178. (5904204 clauses over 2215823 variables)
+  Proving induction step 178. (5937401 clauses over 2228281 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 179. (5937402 clauses over 2228281 variables)
+  Proving induction step 179. (5970599 clauses over 2240739 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 180. (5970600 clauses over 2240739 variables)
+  Proving induction step 180. (6003797 clauses over 2253197 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 181. (6003798 clauses over 2253197 variables)
+  Proving induction step 181. (6036995 clauses over 2265655 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 182. (6036996 clauses over 2265655 variables)
+  Proving induction step 182. (6070193 clauses over 2278113 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 183. (6070194 clauses over 2278113 variables)
+  Proving induction step 183. (6103391 clauses over 2290571 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 184. (6103392 clauses over 2290571 variables)
+  Proving induction step 184. (6136589 clauses over 2303029 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 185. (6136590 clauses over 2303029 variables)
+  Proving induction step 185. (6169787 clauses over 2315487 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 186. (6169788 clauses over 2315487 variables)
+  Proving induction step 186. (6202985 clauses over 2327945 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 187. (6202986 clauses over 2327945 variables)
+  Proving induction step 187. (6236183 clauses over 2340403 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 188. (6236184 clauses over 2340403 variables)
+  Proving induction step 188. (6269381 clauses over 2352861 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 189. (6269382 clauses over 2352861 variables)
+  Proving induction step 189. (6302579 clauses over 2365319 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 190. (6302580 clauses over 2365319 variables)
+  Proving induction step 190. (6335777 clauses over 2377777 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 191. (6335778 clauses over 2377777 variables)
+  Proving induction step 191. (6368975 clauses over 2390235 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 192. (6368976 clauses over 2390235 variables)
+  Proving induction step 192. (6402173 clauses over 2402693 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 193. (6402174 clauses over 2402693 variables)
+  Proving induction step 193. (6435371 clauses over 2415151 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 194. (6435372 clauses over 2415151 variables)
+  Proving induction step 194. (6468569 clauses over 2427609 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 195. (6468570 clauses over 2427609 variables)
+  Proving induction step 195. (6501767 clauses over 2440067 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 196. (6501768 clauses over 2440067 variables)
+  Proving induction step 196. (6534965 clauses over 2452525 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 197. (6534966 clauses over 2452525 variables)
+  Proving induction step 197. (6568163 clauses over 2464983 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 198. (6568164 clauses over 2464983 variables)
+  Proving induction step 198. (6601361 clauses over 2477441 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 199. (6601362 clauses over 2477441 variables)
+  Proving induction step 199. (6634559 clauses over 2489899 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 200. (6634560 clauses over 2489899 variables)
+  Proving induction step 200. (6667757 clauses over 2502357 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 201. (6667758 clauses over 2502357 variables)
+  Proving induction step 201. (6700955 clauses over 2514815 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 202. (6700956 clauses over 2514815 variables)
+  Proving induction step 202. (6734153 clauses over 2527273 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 203. (6734154 clauses over 2527273 variables)
+  Proving induction step 203. (6767351 clauses over 2539731 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 204. (6767352 clauses over 2539731 variables)
+  Proving induction step 204. (6800549 clauses over 2552189 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 205. (6800550 clauses over 2552189 variables)
+  Proving induction step 205. (6833747 clauses over 2564647 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 206. (6833748 clauses over 2564647 variables)
+  Proving induction step 206. (6866945 clauses over 2577105 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 207. (6866946 clauses over 2577105 variables)
+  Proving induction step 207. (6900143 clauses over 2589563 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 208. (6900144 clauses over 2589563 variables)
+  Proving induction step 208. (6933341 clauses over 2602021 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 209. (6933342 clauses over 2602021 variables)
+  Proving induction step 209. (6966539 clauses over 2614479 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 210. (6966540 clauses over 2614479 variables)
+  Proving induction step 210. (6999737 clauses over 2626937 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 211. (6999738 clauses over 2626937 variables)
+  Proving induction step 211. (7032935 clauses over 2639395 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 212. (7032936 clauses over 2639395 variables)
+  Proving induction step 212. (7066133 clauses over 2651853 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 213. (7066134 clauses over 2651853 variables)
+  Proving induction step 213. (7099331 clauses over 2664311 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 214. (7099332 clauses over 2664311 variables)
+  Proving induction step 214. (7132529 clauses over 2676769 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 215. (7132530 clauses over 2676769 variables)
+  Proving induction step 215. (7165727 clauses over 2689227 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 216. (7165728 clauses over 2689227 variables)
+  Proving induction step 216. (7198925 clauses over 2701685 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 217. (7198926 clauses over 2701685 variables)
+  Proving induction step 217. (7232123 clauses over 2714143 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 218. (7232124 clauses over 2714143 variables)
+  Proving induction step 218. (7265321 clauses over 2726601 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 219. (7265322 clauses over 2726601 variables)
+  Proving induction step 219. (7298519 clauses over 2739059 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 220. (7298520 clauses over 2739059 variables)
+  Proving induction step 220. (7331717 clauses over 2751517 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 221. (7331718 clauses over 2751517 variables)
+  Proving induction step 221. (7364915 clauses over 2763975 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 222. (7364916 clauses over 2763975 variables)
+  Proving induction step 222. (7398113 clauses over 2776433 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 223. (7398114 clauses over 2776433 variables)
+  Proving induction step 223. (7431311 clauses over 2788891 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 224. (7431312 clauses over 2788891 variables)
+  Proving induction step 224. (7464509 clauses over 2801349 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 225. (7464510 clauses over 2801349 variables)
+  Proving induction step 225. (7497707 clauses over 2813807 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 226. (7497708 clauses over 2813807 variables)
+  Proving induction step 226. (7530905 clauses over 2826265 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 227. (7530906 clauses over 2826265 variables)
+  Proving induction step 227. (7564103 clauses over 2838723 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 228. (7564104 clauses over 2838723 variables)
+  Proving induction step 228. (7597301 clauses over 2851181 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 229. (7597302 clauses over 2851181 variables)
+  Proving induction step 229. (7630499 clauses over 2863639 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 230. (7630500 clauses over 2863639 variables)
+  Proving induction step 230. (7663697 clauses over 2876097 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 231. (7663698 clauses over 2876097 variables)
+  Proving induction step 231. (7696895 clauses over 2888555 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 232. (7696896 clauses over 2888555 variables)
+  Proving induction step 232. (7730093 clauses over 2901013 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 233. (7730094 clauses over 2901013 variables)
+  Proving induction step 233. (7763291 clauses over 2913471 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 234. (7763292 clauses over 2913471 variables)
+  Proving induction step 234. (7796489 clauses over 2925929 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 235. (7796490 clauses over 2925929 variables)
+  Proving induction step 235. (7829687 clauses over 2938387 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 236. (7829688 clauses over 2938387 variables)
+  Proving induction step 236. (7862885 clauses over 2950845 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 237. (7862886 clauses over 2950845 variables)
+  Proving induction step 237. (7896083 clauses over 2963303 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 238. (7896084 clauses over 2963303 variables)
+  Proving induction step 238. (7929281 clauses over 2975761 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 239. (7929282 clauses over 2975761 variables)
+  Proving induction step 239. (7962479 clauses over 2988219 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 240. (7962480 clauses over 2988219 variables)
+  Proving induction step 240. (7995677 clauses over 3000677 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 241. (7995678 clauses over 3000677 variables)
+  Proving induction step 241. (8028875 clauses over 3013135 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 242. (8028876 clauses over 3013135 variables)
+  Proving induction step 242. (8062073 clauses over 3025593 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 243. (8062074 clauses over 3025593 variables)
+  Proving induction step 243. (8095271 clauses over 3038051 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 244. (8095272 clauses over 3038051 variables)
+  Proving induction step 244. (8128469 clauses over 3050509 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 245. (8128470 clauses over 3050509 variables)
+  Proving induction step 245. (8161667 clauses over 3062967 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 246. (8161668 clauses over 3062967 variables)
+  Proving induction step 246. (8194865 clauses over 3075425 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 247. (8194866 clauses over 3075425 variables)
+  Proving induction step 247. (8228063 clauses over 3087883 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 248. (8228064 clauses over 3087883 variables)
+  Proving induction step 248. (8261261 clauses over 3100341 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 249. (8261262 clauses over 3100341 variables)
+  Proving induction step 249. (8294459 clauses over 3112799 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 250. (8294460 clauses over 3112799 variables)
+  Proving induction step 250. (8327657 clauses over 3125257 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 251. (8327658 clauses over 3125257 variables)
+  Proving induction step 251. (8360855 clauses over 3137715 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 252. (8360856 clauses over 3137715 variables)
+  Proving induction step 252. (8394053 clauses over 3150173 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 253. (8394054 clauses over 3150173 variables)
+  Proving induction step 253. (8427251 clauses over 3162631 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 254. (8427252 clauses over 3162631 variables)
+  Proving induction step 254. (8460449 clauses over 3175089 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 255. (8460450 clauses over 3175089 variables)
+  Proving induction step 255. (8493647 clauses over 3187547 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 256. (8493648 clauses over 3187547 variables)
+  Proving induction step 256. (8526845 clauses over 3200005 variables)
+  Proof for induction step failed. Trying to prove individual $equiv from workset.
+  Trying to prove $equiv for \counter_value[6]: failed.
+  Trying to prove $equiv for \counter_value[5]: success!
+  Trying to prove $equiv for \duty_cycle[2]: failed.
+  Trying to prove $equiv for \period[5]: failed.
+  Trying to prove $equiv for \period[6]: failed.
+  Trying to prove $equiv for \duty_cycle[3]: failed.
+  Trying to prove $equiv for \duty_cycle[4]: failed.
+  Trying to prove $equiv for \duty_cycle[5]: failed.
+  Trying to prove $equiv for \duty_cycle[6]: failed.
+  Trying to prove $equiv for \duty_cycle[7]: failed.
+  Trying to prove $equiv for \enable: failed.
+  Trying to prove $equiv for \period[2]: failed.
+  Trying to prove $equiv for \period[3]: failed.
+  Trying to prove $equiv for \period[4]: failed.
+  Trying to prove $equiv for \rd_data[4]: failed.
+  Trying to prove $equiv for \rd_data[5]: failed.
+  Trying to prove $equiv for \rd_data[6]: failed.
+  Trying to prove $equiv for \rd_data[7]: failed.
+  Trying to prove $equiv for \rd_data[1]: failed.
+  Trying to prove $equiv for \rd_data[2]: failed.
+  Trying to prove $equiv for \rd_data[3]: failed.
+  Trying to prove $equiv for \period[0]: failed.
+  Trying to prove $equiv for \period[1]: failed.
+  Trying to prove $equiv for \counter_value[0]: success!
+  Trying to prove $equiv for \counter_value[1]: success!
+  Trying to prove $equiv for \counter_value[3]: success!
+  Trying to prove $equiv for \counter_value[2]: success!
+  Trying to prove $equiv for \counter_value[7]: success!
+  Trying to prove $equiv for \duty_cycle[0]: failed.
+  Trying to prove $equiv for \duty_cycle[1]: failed.
+  Trying to prove $equiv for \counter_value[4]: failed.
+  Trying to prove $equiv for \period[7]: failed.
+  Trying to prove $equiv for \pwm_out: failed.
+  Trying to prove $equiv for \rd_data[0]: failed.
+Proved 6 previously unproven $equiv cells.
+
+27. Executing EQUIV_SIMPLE pass.
+Found 28 unproven $equiv cells (28 groups) in equiv:
+  Trying to prove $equiv for \pwm_out: failed.
+  Trying to prove $equiv for \enable: failed.
+  Trying to prove $equiv for \rd_data[7]: failed.
+  Trying to prove $equiv for \period[2]: failed.
+  Trying to prove $equiv for \rd_data[4]: failed.
+  Trying to prove $equiv for \rd_data[5]: failed.
+  Trying to prove $equiv for \rd_data[6]: failed.
+  Trying to prove $equiv for \period[0]: failed.
+  Trying to prove $equiv for \period[1]: failed.
+  Trying to prove $equiv for \rd_data[3]: failed.
+  Trying to prove $equiv for \rd_data[2]: failed.
+  Trying to prove $equiv for \rd_data[1]: failed.
+  Trying to prove $equiv for \rd_data[0]: failed.
+  Trying to prove $equiv for \period[7]: failed.
+  Trying to prove $equiv for \period[6]: failed.
+  Trying to prove $equiv for \period[5]: failed.
+  Trying to prove $equiv for \period[4]: failed.
+  Trying to prove $equiv for \period[3]: failed.
+  Trying to prove $equiv for \counter_value[4]: failed.
+  Trying to prove $equiv for \counter_value[6]: failed.
+  Trying to prove $equiv for \duty_cycle[0]: failed.
+  Trying to prove $equiv for \duty_cycle[1]: failed.
+  Trying to prove $equiv for \duty_cycle[2]: failed.
+  Trying to prove $equiv for \duty_cycle[3]: failed.
+  Trying to prove $equiv for \duty_cycle[4]: failed.
+  Trying to prove $equiv for \duty_cycle[5]: failed.
+  Trying to prove $equiv for \duty_cycle[6]: failed.
+  Trying to prove $equiv for \duty_cycle[7]: failed.
+Proved 0 previously unproven $equiv cells.
+
+28. Executing EQUIV_STATUS pass.
+ERROR: Found 28 unproven $equiv cells in 'equiv_status -assert'.

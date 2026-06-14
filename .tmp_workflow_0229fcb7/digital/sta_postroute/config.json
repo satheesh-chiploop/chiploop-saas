@@ -1,0 +1,18 @@
+{
+  "DESIGN_NAME": "pwm_controller",
+  "PDK": "sky130A",
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 20.0,
+  "VERILOG_FILES": [
+    "inputs/netlist/pwm_controller_synth.v"
+  ],
+  "PNR_SDC_FILE": "inputs/constraints/pwm_controller.sdc",
+  "CHIPLOOP_SOURCE_SPEC_JSON": null,
+  "CHIPLOOP_FILELIST": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/0229fcb7-ede5-4185-95d5-2deefa86134d/0ac7a25b-9f47-49dd-8c66-c437397a9518/digital/arch2tapeout/digital/impl_setup/filelist.f",
+  "CHIPLOOP_UPSTREAM_SDC_SOURCE": "fallback_generated",
+  "FP_CORE_UTIL": 20,
+  "PL_TARGET_DENSITY": 0.25,
+  "DIE_AREA": "0 0 120 120",
+  "RUN_LINTER": false,
+  "RUN_SPEF_EXTRACTION": true
+}

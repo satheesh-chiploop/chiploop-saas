@@ -85,6 +85,8 @@ export default function Arch2SynthesisAppPage() {
   const [maxSynthesisClosureIterations, setMaxSynthesisClosureIterations] = useState("1");
   const [allowSynthesisTimingRepair, setAllowSynthesisTimingRepair] = useState(true);
   const [allowSynthesisLecRepair, setAllowSynthesisLecRepair] = useState(true);
+  const [allowSynthesisRetiming, setAllowSynthesisRetiming] = useState(false);
+  const [allowSynthesisHierarchyFlattening, setAllowSynthesisHierarchyFlattening] = useState(false);
   const [stopOnSynthesisClosureFailure, setStopOnSynthesisClosureFailure] = useState(false);
   const [stopOnSynthesisLecFailure, setStopOnSynthesisLecFailure] = useState(false);
 
@@ -310,6 +312,8 @@ export default function Arch2SynthesisAppPage() {
         max_synthesis_closure_iterations: runSynthesisClosureLoop ? Number(maxSynthesisClosureIterations) : 1,
         allow_synthesis_timing_repair: allowSynthesisTimingRepair,
         allow_synthesis_lec_repair: allowSynthesisLecRepair,
+        allow_synthesis_retiming: allowSynthesisRetiming,
+        allow_synthesis_hierarchy_flattening: allowSynthesisHierarchyFlattening,
         stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
         stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
         synthesis_closure: {
@@ -317,6 +321,8 @@ export default function Arch2SynthesisAppPage() {
           max_iterations: runSynthesisClosureLoop ? Number(maxSynthesisClosureIterations) : 1,
           allow_synthesis_timing_repair: allowSynthesisTimingRepair,
           allow_synthesis_lec_repair: allowSynthesisLecRepair,
+          allow_synthesis_retiming: allowSynthesisRetiming,
+          allow_synthesis_hierarchy_flattening: allowSynthesisHierarchyFlattening,
           stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
           stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
         },
@@ -334,6 +340,8 @@ export default function Arch2SynthesisAppPage() {
           run_synthesis_closure_loop: runSynthesisClosureLoop,
           allow_synthesis_timing_repair: allowSynthesisTimingRepair,
           allow_synthesis_lec_repair: allowSynthesisLecRepair,
+          allow_synthesis_retiming: allowSynthesisRetiming,
+          allow_synthesis_hierarchy_flattening: allowSynthesisHierarchyFlattening,
           stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
           stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
           skip_arch2rtl: rtlSourceMode !== "none" || startStage !== "arch2rtl",
@@ -594,6 +602,8 @@ export default function Arch2SynthesisAppPage() {
                     <div className="grid gap-2 sm:grid-cols-2">
                       <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowSynthesisTimingRepair} onChange={(e) => setAllowSynthesisTimingRepair(e.target.checked)} /> Setup timing repair</label>
                       <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowSynthesisLecRepair} onChange={(e) => setAllowSynthesisLecRepair(e.target.checked)} /> Synthesis LEC repair</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowSynthesisRetiming} onChange={(e) => setAllowSynthesisRetiming(e.target.checked)} /> Allow retiming</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowSynthesisHierarchyFlattening} onChange={(e) => setAllowSynthesisHierarchyFlattening(e.target.checked)} /> Allow hierarchy flattening</label>
                       <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={stopOnSynthesisClosureFailure} onChange={(e) => setStopOnSynthesisClosureFailure(e.target.checked)} /> Stop downstream on closure failure</label>
                       <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={stopOnSynthesisLecFailure} onChange={(e) => setStopOnSynthesisLecFailure(e.target.checked)} /> Stop downstream on LEC failure</label>
                     </div>

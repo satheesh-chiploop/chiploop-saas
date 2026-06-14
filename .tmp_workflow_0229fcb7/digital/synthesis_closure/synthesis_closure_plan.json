@@ -1,0 +1,7 @@
+{
+  "type": "digital_synthesis_closure_plan",
+  "agent": "Digital Synthesis Closure Agent",
+  "enabled": false,
+  "status": "skipped",
+  "reason": "synthesis_closure_loop_not_enabled"
+}

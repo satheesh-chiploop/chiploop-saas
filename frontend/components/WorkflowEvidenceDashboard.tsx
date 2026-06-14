@@ -87,6 +87,12 @@ function signedMetric(...values: unknown[]): string | number {
   return "not run";
 }
 
+function zeroWhenClean(status: unknown, value: unknown): unknown {
+  if (value !== undefined && value !== null && value !== "") return value;
+  const text = typeof status === "string" ? status.trim().toLowerCase() : "";
+  return ["ok", "clean", "pass", "completed", "generated"].includes(text) ? 0 : value;
+}
+
 function formatNumber(value: number): string | number {
   if (!Number.isFinite(value)) return "not produced";
   if (Number.isInteger(value)) return value;
@@ -868,20 +874,28 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         synth.tns,
         synth.timing__setup__tns
       );
-      const postfillWns = firstPresent(postfill.worst_slack, record(evidence["sta_postfill_summary.json"]).worst_slack);
-      const postfillTns = firstPresent(postfill.tns, record(evidence["sta_postfill_summary.json"]).tns);
-      const postfillSetupViolations = firstPresent(
+      const postfillSummary = record(evidence["sta_postfill_summary.json"]);
+      const postfillStatus = firstString(postfillSummary.status, postfill.status);
+      const postfillSetupWns = firstPresent(postfill.setup_wns, postfill.timing__setup__wns, postfill.timing__setup__ws, postfill.worst_slack, postfillSummary.setup_wns, postfillSummary.worst_slack);
+      const postfillSetupTns = firstPresent(postfill.setup_tns, postfill.timing__setup__tns, postfill.tns, postfillSummary.setup_tns, postfillSummary.tns);
+      const postfillHoldWns = firstPresent(postfill.hold_wns, postfill.timing__hold__wns, postfill.timing__hold__ws, postfillSummary.hold_wns);
+      const postfillHoldTns = firstPresent(postfill.hold_tns, postfill.timing__hold__tns, postfillSummary.hold_tns);
+      const postfillSetupViolations = zeroWhenClean(postfillStatus, firstPresent(
         postfill.setup_violations,
         postfill.timing__setup__violation_count,
         postfill.timing__setup__vio__count,
-        record(evidence["sta_postfill_summary.json"]).setup_violations
-      );
-      const postfillHoldViolations = firstPresent(
+        postfill.timing__setup_vio__count,
+        postfill.timing__setup_r2r_vio__count,
+        postfillSummary.setup_violations
+      ));
+      const postfillHoldViolations = zeroWhenClean(postfillStatus, firstPresent(
         postfill.hold_violations,
         postfill.timing__hold__violation_count,
         postfill.timing__hold__vio__count,
-        record(evidence["sta_postfill_summary.json"]).hold_violations
-      );
+        postfill.timing__hold_vio__count,
+        postfill.timing__hold_r2r_vio__count,
+        postfillSummary.hold_violations
+      ));
       const area = metricValue(summary.area, synth.area, synth.design__instance__area, synth.design__core__area);
       const cells = metricValue(summary.cell_count, synth.cells, synth.cell_count, synth.design__instance__count);
       const flipflops = metricValue(summary.flipflop_count, synth.chiploop__flipflop_count, synth.flipflops, synth.ff_count, synth.registers, synth.design__instance__ff_count, synth["design__instance__count:flop"]);
@@ -961,6 +975,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               metrics={[
                 { key: "postfill_wns", label: "PostFill WNS" },
                 { key: "postfill_tns", label: "PostFill TNS" },
+                { key: "postfill_setup_wns", label: "Setup WNS" },
+                { key: "postfill_setup_tns", label: "Setup TNS" },
+                { key: "postfill_hold_wns", label: "Hold WNS" },
+                { key: "postfill_hold_tns", label: "Hold TNS" },
                 { key: "postfill_setup_violations", label: "Setup Vios" },
                 { key: "postfill_hold_violations", label: "Hold Vios" },
                 { key: "drc_violations", label: "DRC" },
@@ -1016,9 +1034,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {stage === "tapeout" ? <Stat title="Route" value={statusLabel(route.status)} /> : null}
             {stage === "tapeout" ? <Stat title="PostRoute STA" value={statusLabel(record(evidence["sta_postroute_summary.json"]).status || postroute.status)} /> : null}
             {stage === "tapeout" ? <Stat title="Fill" value={statusLabel(fill.status)} /> : null}
-            {stage === "tapeout" ? <Stat title="PostFill STA" value={statusLabel(record(evidence["sta_postfill_summary.json"]).status || postfill.status)} /> : null}
-            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill WNS" value={signedMetric(postfillWns)} /> : null}
-            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill TNS" value={signedMetric(postfillTns)} /> : null}
+            {stage === "tapeout" ? <Stat title="PostFill STA" value={statusLabel(postfillStatus)} /> : null}
+            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill Setup WNS" value={signedMetric(postfillSetupWns)} /> : null}
+            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill Setup TNS" value={signedMetric(postfillSetupTns)} /> : null}
+            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill Hold WNS" value={signedMetric(postfillHoldWns)} /> : null}
+            {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill Hold TNS" value={signedMetric(postfillHoldTns)} /> : null}
             {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill Setup Violations" value={metricValue(postfillSetupViolations)} /> : null}
             {stage === "tapeout" && Object.keys(postfill).length ? <Stat title="PostFill Hold Violations" value={metricValue(postfillHoldViolations)} /> : null}
             {stage === "tapeout" && Object.keys(analogSignoff).length ? <Stat title="Analog DRC" value={statusLabel(analogDrc.status)} /> : null}
