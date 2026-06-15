@@ -1,0 +1,31 @@
+{
+  "workflow_id": "66824e7a-3cde-48fb-b749-103e943218da",
+  "agent": "Analog GDS Generation Agent",
+  "generated_at": "2026-06-15T03:44:41.617305Z",
+  "module": "temp_sensor_adc_model",
+  "pdk": "sky130A",
+  "backend": "magic",
+  "gds": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/66824e7a-3cde-48fb-b749-103e943218da/a7fd894e-4881-4694-96f6-fb332687c994/digital/analog/gds/temp_sensor_adc_model.gds",
+  "log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/66824e7a-3cde-48fb-b749-103e943218da/a7fd894e-4881-4694-96f6-fb332687c994/digital/analog/gds/magic_gds.log",
+  "drc": {
+    "status": "clean",
+    "tool": "magic",
+    "feedback_problem_count": 0,
+    "reason": null
+  },
+  "lvs": {
+    "status": "mismatch",
+    "tool": "netgen",
+    "reason": "mismatch",
+    "return_code": 0,
+    "extracted_spice": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/66824e7a-3cde-48fb-b749-103e943218da/a7fd894e-4881-4694-96f6-fb332687c994/digital/analog/gds/temp_sensor_adc_model_extracted.spice",
+    "extract_log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/66824e7a-3cde-48fb-b749-103e943218da/a7fd894e-4881-4694-96f6-fb332687c994/digital/analog/gds/analog_lvs_magic_extract.log",
+    "log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/66824e7a-3cde-48fb-b749-103e943218da/a7fd894e-4881-4694-96f6-fb332687c994/digital/analog/gds/analog_lvs_netgen.log"
+  },
+  "xor": {
+    "status": "not_applicable",
+    "tool": "magic/klayout",
+    "difference_count": null,
+    "reason": "analog_xor_not_applicable"
+  }
+}
