@@ -1,0 +1,254 @@
+{
+  "type": "system_rtl_dashboard",
+  "version": "1.0",
+  "filelists": {
+    "sim_count": 0,
+    "phys_count": 0
+  },
+  "compile": {
+    "sim": "fail",
+    "phys": "not produced",
+    "phys_reason": null
+  },
+  "lint_summary": {
+    "digital": "pass",
+    "analog": "not produced",
+    "soc": "fail",
+    "system": "fail"
+  },
+  "scopes": {
+    "system": {
+      "scope": "system",
+      "top_module": "temp_monitor_soc_sim",
+      "rtl_file_count": 0,
+      "module_count": 0,
+      "modules": [],
+      "interface": {
+        "input_count": 0,
+        "output_count": 0,
+        "inout_count": 0,
+        "input_port_count": 0,
+        "output_port_count": 0,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": []
+      },
+      "clock_reset": {
+        "clock_names": [],
+        "reset_names": [],
+        "primary_clock": null,
+        "primary_reset": null
+      },
+      "storage": {
+        "flipflop_count": 0,
+        "latch_count": 0,
+        "storage_target_count": 0,
+        "latch_target_count": 0,
+        "sequential_blocks": 0,
+        "posedge_blocks": 0,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [],
+        "sampled_latch_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 5,
+        "sdc_files": [
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/dft/input/constraints.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/impl_setup/constraints/top.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/constraints/top.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/runs/System_Synthesis_c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/02-yosys-synthesis/synthesis.abc.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/runs/System_Synthesis_c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/10-yosys-synthesis/synthesis.abc.sdc"
+        ],
+        "full_cycle_path_count": 0,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 3,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      },
+      "lint": {
+        "status": "fail",
+        "basis": "Lint means Icarus compile plus Verilator lint for the relevant scope; System Lint is the Digital + Analog + SoC roll-up."
+      }
+    },
+    "soc": {
+      "scope": "soc",
+      "top_module": "temp_monitor_soc_sim",
+      "rtl_file_count": 0,
+      "module_count": 0,
+      "modules": [],
+      "interface": {
+        "input_count": 0,
+        "output_count": 0,
+        "inout_count": 0,
+        "input_port_count": 0,
+        "output_port_count": 0,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": []
+      },
+      "clock_reset": {
+        "clock_names": [],
+        "reset_names": [],
+        "primary_clock": null,
+        "primary_reset": null
+      },
+      "storage": {
+        "flipflop_count": 0,
+        "latch_count": 0,
+        "storage_target_count": 0,
+        "latch_target_count": 0,
+        "sequential_blocks": 0,
+        "posedge_blocks": 0,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [],
+        "sampled_latch_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 5,
+        "sdc_files": [
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/dft/input/constraints.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/impl_setup/constraints/top.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/constraints/top.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/runs/System_Synthesis_c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/02-yosys-synthesis/synthesis.abc.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/runs/System_Synthesis_c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/10-yosys-synthesis/synthesis.abc.sdc"
+        ],
+        "full_cycle_path_count": 0,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 3,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      },
+      "lint": {
+        "status": "fail",
+        "basis": "Lint means Icarus compile plus Verilator lint for the relevant scope; System Lint is the Digital + Analog + SoC roll-up."
+      }
+    },
+    "digital": {
+      "scope": "digital",
+      "top_module": "temp_monitor_soc_phys",
+      "rtl_file_count": 0,
+      "module_count": 0,
+      "modules": [],
+      "interface": {
+        "input_count": 0,
+        "output_count": 0,
+        "inout_count": 0,
+        "input_port_count": 0,
+        "output_port_count": 0,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": []
+      },
+      "clock_reset": {
+        "clock_names": [],
+        "reset_names": [],
+        "primary_clock": null,
+        "primary_reset": null
+      },
+      "storage": {
+        "flipflop_count": 0,
+        "latch_count": 0,
+        "storage_target_count": 0,
+        "latch_target_count": 0,
+        "sequential_blocks": 0,
+        "posedge_blocks": 0,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [],
+        "sampled_latch_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 5,
+        "sdc_files": [
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/dft/input/constraints.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/impl_setup/constraints/top.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/constraints/top.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/runs/System_Synthesis_c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/02-yosys-synthesis/synthesis.abc.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/runs/System_Synthesis_c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/10-yosys-synthesis/synthesis.abc.sdc"
+        ],
+        "full_cycle_path_count": 0,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 3,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      },
+      "lint": {
+        "status": "pass",
+        "basis": "Lint means Icarus compile plus Verilator lint for the relevant scope; System Lint is the Digital + Analog + SoC roll-up."
+      }
+    },
+    "analog": {
+      "scope": "analog",
+      "top_module": "analog_macro",
+      "rtl_file_count": 0,
+      "module_count": 0,
+      "modules": [],
+      "interface": {
+        "input_count": 0,
+        "output_count": 0,
+        "inout_count": 0,
+        "input_port_count": 0,
+        "output_port_count": 0,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": []
+      },
+      "clock_reset": {
+        "clock_names": [],
+        "reset_names": [],
+        "primary_clock": null,
+        "primary_reset": null
+      },
+      "storage": {
+        "flipflop_count": 0,
+        "latch_count": 0,
+        "storage_target_count": 0,
+        "latch_target_count": 0,
+        "sequential_blocks": 0,
+        "posedge_blocks": 0,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [],
+        "sampled_latch_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 5,
+        "sdc_files": [
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/dft/input/constraints.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/impl_setup/constraints/top.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/constraints/top.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/runs/System_Synthesis_c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/02-yosys-synthesis/synthesis.abc.sdc",
+          "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/cbb78863-9149-4da3-9575-552760876980/digital/digital/synth/runs/System_Synthesis_c99db5c7-c3b5-469e-b2dc-3ea8462d7caf/10-yosys-synthesis/synthesis.abc.sdc"
+        ],
+        "full_cycle_path_count": 0,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 3,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      },
+      "lint": {
+        "status": "not produced",
+        "basis": "Lint means Icarus compile plus Verilator lint for the relevant scope; System Lint is the Digital + Analog + SoC roll-up."
+      }
+    }
+  },
+  "classification": {
+    "basis": "filelist path/module-name classification; SoC tops separated from analog macro and digital RTL files",
+    "analog_patterns": [
+      "analog",
+      "macro",
+      "ams",
+      "behavioral",
+      "sensor",
+      "temp",
+      "adc",
+      "dac",
+      "pll",
+      "ldo",
+      "bandgap",
+      "opamp"
+    ]
+  }
+}

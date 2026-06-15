@@ -21,6 +21,15 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
+type ClockRow = {
+  name: string;
+  port: string;
+  frequency_mhz: string;
+  period_ns?: number | null;
+  source?: string;
+  needs_user_frequency?: boolean;
+};
+
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
   return logs.split("\n").map((line) => line.trimEnd()).filter((line) => line.trim().length > 0);
@@ -47,6 +56,9 @@ export default function SystemSynthesisAppPage() {
   const [toolchain, setToolchain] = useState("openlane2");
   const [targetFreqMhz, setTargetFreqMhz] = useState("");
   const [constraintsSdc, setConstraintsSdc] = useState("");
+  const [clockRows, setClockRows] = useState<ClockRow[]>([]);
+  const [resetRows, setResetRows] = useState<any[]>([]);
+  const [clockProbeStatus, setClockProbeStatus] = useState("");
   const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
   const [enableScanDft, setEnableScanDft] = useState(false);
   const [runSynthesisClosureLoop, setRunSynthesisClosureLoop] = useState(false);
@@ -79,6 +91,17 @@ export default function SystemSynthesisAppPage() {
       method: "POST",
       headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(body),
+    });
+    if (!resp.ok) {
+      const text = await resp.text().catch(() => "");
+      throw new Error(`${resp.status} ${resp.statusText}${text ? ` - ${text}` : ""}`);
+    }
+    return resp.json();
+  }
+
+  async function getJSON<T>(path: string): Promise<T> {
+    const resp = await fetch(`${API_BASE}${path}`, {
+      headers: { ...authHeaders() },
     });
     if (!resp.ok) {
       const text = await resp.text().catch(() => "");
@@ -137,6 +160,61 @@ export default function SystemSynthesisAppPage() {
     };
   }, [workflowId]);
 
+  useEffect(() => {
+    if (loading || !systemRtlWorkflowId.trim()) {
+      setClockRows([]);
+      setResetRows([]);
+      setClockProbeStatus("");
+      return;
+    }
+    let cancelled = false;
+    setClockProbeStatus("Detecting clocks from System RTL handoff...");
+    (async () => {
+      try {
+        const data = await getJSON<{ clock_intent?: any }>(`/apps/digital/clock-candidates/${systemRtlWorkflowId.trim()}`);
+        if (cancelled) return;
+        const clocks = Array.isArray(data.clock_intent?.clocks) ? data.clock_intent.clocks : [];
+        const resets = Array.isArray(data.clock_intent?.resets) ? data.clock_intent.resets : [];
+        setClockRows(clocks.map((clock: any) => ({
+          name: String(clock.name || clock.port || "clk"),
+          port: String(clock.port || clock.name || "clk"),
+          frequency_mhz: clock.frequency_mhz ? String(Number(clock.frequency_mhz).toFixed(3).replace(/\.?0+$/, "")) : "",
+          period_ns: clock.period_ns ?? null,
+          source: clock.source || "inferred",
+          needs_user_frequency: Boolean(clock.needs_user_frequency),
+        })));
+        setResetRows(resets);
+        setClockProbeStatus(clocks.length ? "Review detected clocks before synthesis." : "No clock ports detected; enter target frequency or SDC manually.");
+      } catch (error: any) {
+        if (!cancelled) setClockProbeStatus(error?.message || "Clock detection failed.");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, systemRtlWorkflowId]);
+
+  function updateClockFrequency(index: number, value: string) {
+    setClockRows((rows) => rows.map((row, idx) => (idx === index ? { ...row, frequency_mhz: value } : row)));
+  }
+
+  function clockConstraintsPayload() {
+    if (!clockRows.length) return undefined;
+    return {
+      source: "ui_clock_table",
+      clocks: clockRows.map((row) => {
+        const mhz = Number(row.frequency_mhz);
+        return {
+          name: row.name || row.port,
+          port: row.port || row.name,
+          frequency_mhz: Number.isFinite(mhz) && mhz > 0 ? mhz : undefined,
+          source: row.source || "ui_clock_table",
+        };
+      }),
+      resets: resetRows,
+    };
+  }
+
   const canRun = useMemo(() => {
     if (running) return false;
     if (systemRtlWorkflowId.trim()) return true;
@@ -161,6 +239,7 @@ export default function SystemSynthesisAppPage() {
         toolchain,
         target_frequency_mhz: Number.isFinite(freq) && freq > 0 ? freq : undefined,
         constraints_sdc: constraintsSdc || undefined,
+        clock_constraints: clockConstraintsPayload(),
         run_synthesis_closure_loop: runSynthesisClosureLoop,
         max_synthesis_closure_iterations: runSynthesisClosureLoop ? Number(maxSynthesisClosureIterations) : 1,
         allow_synthesis_timing_repair: allowSynthesisTimingRepair,
@@ -227,7 +306,7 @@ export default function SystemSynthesisAppPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <div className="mx-auto w-full max-w-none px-6 py-10">
         <div className="flex items-center justify-between">
           <button onClick={() => router.push("/apps")} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">Back to Apps</button>
           <button onClick={() => router.push("/workflow")} className="rounded-xl border border-slate-700 px-4 py-2 hover:bg-slate-900">Studio</button>
@@ -269,6 +348,53 @@ export default function SystemSynthesisAppPage() {
                 Target frequency MHz
                 <input value={targetFreqMhz} onChange={(e) => setTargetFreqMhz(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" placeholder="Optional" />
               </label>
+
+              {systemRtlWorkflowId.trim() ? (
+                <div className="rounded-xl border border-slate-800 bg-black/30 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-sm font-semibold text-slate-200">Detected clock table</div>
+                    <div className="text-xs text-slate-500">{clockProbeStatus}</div>
+                  </div>
+                  {clockRows.length ? (
+                    <div className="mt-3 overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead className="text-slate-400">
+                          <tr>
+                            <th className="py-1 pr-2">Clock</th>
+                            <th className="py-1 pr-2">Port</th>
+                            <th className="py-1 pr-2">MHz</th>
+                            <th className="py-1">Source</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {clockRows.map((clock, idx) => (
+                            <tr key={`${clock.port}-${idx}`} className="border-t border-slate-800">
+                              <td className="py-2 pr-2 text-slate-200">{clock.name}</td>
+                              <td className="py-2 pr-2 text-slate-300">{clock.port}</td>
+                              <td className="py-2 pr-2">
+                                <input
+                                  value={clock.frequency_mhz}
+                                  onChange={(e) => updateClockFrequency(idx, e.target.value)}
+                                  className="w-24 rounded-lg border border-slate-800 bg-black/40 px-2 py-1 text-slate-100"
+                                  placeholder="MHz"
+                                />
+                              </td>
+                              <td className="py-2 text-slate-500">{clock.source || "inferred"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="mt-2 text-xs text-slate-500">Clock rows will appear after a valid System RTL workflow ID is loaded.</div>
+                  )}
+                  {resetRows.length ? (
+                    <div className="mt-2 text-xs text-slate-500">
+                      Resets: {resetRows.map((reset: any) => reset.port || reset.name).filter(Boolean).join(", ")}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
 
               <label className="block text-sm text-slate-300">
                 SDC constraints
@@ -335,10 +461,6 @@ export default function SystemSynthesisAppPage() {
                       Source System RTL: <span className="break-all text-slate-200">{systemRtlWorkflowId.trim() || workflowId}</span>
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="synthesis" logs={workflowRow?.logs} />
-                  </div>
-                  <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}
             </div>
@@ -349,6 +471,13 @@ export default function SystemSynthesisAppPage() {
               <SpecTextBox label="SoC integration specification" required value={socIntegrationSpecText} onChange={setSocIntegrationSpecText} rows={6} voiceTitle="SoC Voice Spec" voiceLoopType="system" voiceTarget="SoC integration spec" uploadLabel="Upload SoC integration spec" uploadHelper="Top-level integration, macro hookups, clock/reset/power assumptions, and system scenarios." placeholder="Paste SoC integration spec here..." />
             </div>
           </div>
+
+          {workflowId ? (
+            <div className="mt-6 space-y-4">
+              <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="synthesis" logs={workflowRow?.logs} />
+              <AskThisRunPanel workflowId={workflowId} compact />
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
             <div className="text-sm font-semibold">Live logs</div>

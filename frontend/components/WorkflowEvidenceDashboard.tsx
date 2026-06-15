@@ -819,8 +819,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
 
     if (stage === "synthesis" || stage === "tapeout") {
       const handoff = record(evidence["rtl_handoff_ingest_manifest.json"]);
+      const systemDashboard = record(evidence["system_rtl_dashboard.json"]);
+      const systemDashboardFilelists = record(systemDashboard.filelists);
+      const systemDashboardScopes = record(systemDashboard.scopes);
+      const systemDashboardSystemScope = record(systemDashboardScopes.system);
       const setup = record(evidence["implementation_setup_summary.json"]);
       const synthSummary = record(evidence["synth_summary.json"]);
+      const synthInputs = record(synthSummary.inputs);
       const synth = record(evidence["metrics.json"] || evidence["synthesis_metrics.json"]);
       const lec = record(evidence["lec_summary.json"]);
       const synthesisClosureChart = record(evidence["synthesis_closure_chart.json"]);
@@ -917,7 +922,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           synth.sta__setup__violation_count
         )
       );
-      const rtlFiles = firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length);
+      const rtlFiles = Math.max(
+        firstNumber(handoff.rtl_file_count),
+        array(handoff.rtl_files).length,
+        array(synthInputs.rtl_files).length,
+        firstNumber(systemDashboardFilelists.sim_count),
+        firstNumber(systemDashboardFilelists.phys_count),
+        firstNumber(systemDashboardSystemScope.rtl_file_count)
+      );
       const drc = metricValue(
         summary.drc_violations,
         record(evidence["route_metrics.json"]).drc_violations,
@@ -993,7 +1005,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Stat title="Source" value={firstString(handoff.source_mode, "imported").replaceAll("_", " ")} />
-            <Stat title="Top Module" value={firstString(record(synthSummary.inputs).top_module, handoff.top_module, summary.design_name, "not inferred")} />
+            <Stat title="Top Module" value={firstString(synthInputs.top_module, handoff.top_module, summary.design_name, "not inferred")} />
             <Stat title="RTL Files" value={rtlFiles} />
             <Stat title="SDC Checks" value={sdcStatus(setup, synthSummary)} />
             <Stat title="Synthesis" value={synthesisStatus(synthSummary)} />
