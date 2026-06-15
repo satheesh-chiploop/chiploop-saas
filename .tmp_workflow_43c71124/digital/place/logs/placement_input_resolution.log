@@ -1,0 +1,19 @@
+[2026-06-15T14:31:23.089070Z] Digital Placement Agent
+workflow_id=43c71124-316e-411a-ba15-1e794fa059b8
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/floorplan/constraints/top.sdc
+sdc_basename=top.sdc
+stage_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/place/constraints/top.sdc
+base_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/floorplan/config.json
+run_work_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/run_work
+run_tag=System_PD_43c71124-316e-411a-ba15-1e794fa059b8
+top_module=temp_monitor_soc_phys
+netlist_count=1
+macro_lef_count=1
+macro_lib_count=1
+macro_gds_count=1
+fp_def_template=None
+pl_skip_initial_placement=None
+macro_placement_cfg=dir::inputs/macros/macro_placement.cfg
+macro_placement_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/run_work/place/inputs/macros/macro_placement.cfg
+closure_overrides={"CHIPLOOP_SIGNOFF_CLOSURE_ECO": "drc_floorplan_spacing_iter_1", "DIE_AREA": "-9 -9 129 129", "FP_CORE_UTIL": 17.0, "FP_PDN_HORIZONTAL_HALO": 8, "FP_PDN_VERTICAL_HALO": 8, "FP_TAPCELL_DIST": 10.5, "PL_MACRO_HALO": 8, "PL_TARGET_DENSITY": 0.2125, "PL_TARGET_DENSITY_PCT": 21.25}

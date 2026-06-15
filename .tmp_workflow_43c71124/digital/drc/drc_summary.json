@@ -1,0 +1,16 @@
+{
+  "workflow_id": "43c71124-316e-411a-ba15-1e794fa059b8",
+  "agent": "Digital DRC Agent",
+  "status": "violations_found",
+  "drc_status": "violations_found",
+  "drc_violations": 429,
+  "xor_differences": null,
+  "return_code": 1,
+  "outputs": {
+    "sdc": "digital/drc/constraints/top.sdc",
+    "metrics_json": null,
+    "drc_report_xml": "digital/drc/reports/drc_violations.klayout.xml",
+    "log": "digital/drc/logs/openlane_drc.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/run_work/drc/runs/System_PD_43c71124-316e-411a-ba15-1e794fa059b8"
+  }
+}

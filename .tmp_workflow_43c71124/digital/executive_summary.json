@@ -1,0 +1,78 @@
+{
+  "workflow_id": "43c71124-316e-411a-ba15-1e794fa059b8",
+  "digital_run_tag": "System_PD_43c71124-316e-411a-ba15-1e794fa059b8",
+  "digital_run_work_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/run_work",
+  "cell_count": 253,
+  "area": 3429.5392,
+  "flipflop_count": 65,
+  "latch_count": 0,
+  "sta_best_stage": "sta_postfill",
+  "worst_slack": -0.5233698067512442,
+  "tns": -1.4160859552453542,
+  "drc_violations": 429,
+  "drc_status": "violations_found",
+  "lvs_status": "mismatch",
+  "tapeout_status": "failed",
+  "tapeout_failure_reasons": [
+    "streamout_command_failed",
+    "drc_not_clean",
+    "lvs_not_clean"
+  ],
+  "tapeout_lec_status": "blocked",
+  "atpg_status": "patterns_generated",
+  "sta_stages": {
+    "sta_preplace": {
+      "worst_slack": -1.7251529582059861,
+      "tns": -5.413451173888797
+    },
+    "sta_postplace": {
+      "worst_slack": 1.51806,
+      "tns": 0
+    },
+    "sta_postcts": {
+      "worst_slack": null,
+      "tns": null
+    },
+    "sta_postroute": {
+      "worst_slack": -0.5233698067512442,
+      "tns": -1.4160859552453542
+    },
+    "sta_postfill": {
+      "worst_slack": -0.5233698067512442,
+      "tns": -1.4160859552453542,
+      "setup_wns": -0.5233698067512442,
+      "setup_tns": -1.4160859552453542,
+      "hold_wns": 0,
+      "hold_tns": 0,
+      "setup_violations": 12,
+      "hold_violations": 0
+    }
+  },
+  "gds_paths": {
+    "klayout": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/tapeout/gds/klayout.gds",
+    "magic": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/tapeout/gds/magic.gds"
+  },
+  "artifact_map": {
+    "synth_metrics": "digital/synth/metrics.json",
+    "sta_preplace_metrics": "digital/sta_preplace/metrics.json",
+    "sta_postplace_metrics": "digital/sta_postplace/metrics.json",
+    "sta_postcts_metrics": null,
+    "sta_postroute_metrics": "digital/sta_postroute/metrics.json",
+    "sta_postfill_metrics": "digital/sta_postfill/metrics.json",
+    "drc_metrics": null,
+    "lvs_metrics": null,
+    "tapeout_metrics": "digital/tapeout/metrics.json"
+  },
+  "next_iteration_suggestions": [
+    "If worst_slack < 0: relax constraints or improve synthesis/placement/CTS/route parameters.",
+    "If DRC violations > 0: inspect DRC logs and rerun with adjusted floorplan/route settings.",
+    "If LVS not clean: check extraction/streamout mismatch and netlist naming."
+  ],
+  "blocking_issues": [
+    "tapeout:failed",
+    "drc:violations_found",
+    "lvs:mismatch",
+    "tapeout_lec:blocked"
+  ],
+  "status": "failed"
+}

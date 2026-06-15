@@ -1,0 +1,7 @@
+[2026-06-15T14:14:24.137631Z] Digital Foundry Profile Agent
+workflow_id=43c71124-316e-411a-ba15-1e794fa059b8
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital
+pdk_root=/root/chiploop-backend/backend/pdk
+pdk=sky130A
+pdk_path=/root/chiploop-backend/backend/pdk/sky130A
+pdk_ok=True

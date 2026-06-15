@@ -1,0 +1,29 @@
+{
+  "workflow_id": "43c71124-316e-411a-ba15-1e794fa059b8",
+  "agent": "Digital Post-DFT Logic Equivalence Check Agent",
+  "status": "inconclusive_unresolved_cells",
+  "tool": "yosys",
+  "tool_available": true,
+  "return_code": 1,
+  "top_module": "temp_monitor_soc_phys",
+  "synthesis_netlist": "temp_monitor_soc_phys_synth.v",
+  "post_dft_netlist": "scan_stitched_netlist.v",
+  "ignored_gate_only_ports": [
+    "scan_en",
+    "scan_in",
+    "scan_out"
+  ],
+  "macro_blackbox_stubs": [],
+  "stdcell_model_files": [
+    "stdcell_functional_wrappers.v"
+  ],
+  "stdcell_model_reference": "cell_reference_netlists.v",
+  "missing_stdcell_models": [],
+  "unproven_points": 0,
+  "failure_reason": "yosys_inconclusive_see_post_dft_lec_log",
+  "artifacts": {
+    "script": "digital/post_dft_lec/yosys_post_dft_lec.ys",
+    "log": "digital/post_dft_lec/logs/yosys_post_dft_lec.log",
+    "summary": "digital/post_dft_lec/post_dft_lec_summary.json"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "workflow_id": "43c71124-316e-411a-ba15-1e794fa059b8",
+  "agent": "Digital Tapeout Agent",
+  "status": "failed",
+  "return_code": 1,
+  "failure_reasons": [
+    "streamout_command_failed",
+    "drc_not_clean",
+    "lvs_not_clean"
+  ],
+  "signoff_inputs": {
+    "drc_status": "violations_found",
+    "lvs_status": "mismatch",
+    "xor_status": "not_applicable",
+    "xor_differences": null,
+    "xor_differences_observed": 2369,
+    "xor_differences_total": null,
+    "xor_layer_counts": {
+      "235/4": 1,
+      "64/20": 26,
+      "65/20": 52,
+      "65/44": 52,
+      "66/20": 52,
+      "66/44": 1052,
+      "67/20": 260,
+      "67/44": 312,
+      "68/20": 331,
+      "68/5": 124,
+      "93/44": 2,
+      "94/20": 2,
+      "95/20": 104
+    },
+    "xor_nonblocking_layers": [
+      "235/4"
+    ],
+    "gds_produced": true
+  },
+  "outputs": {
+    "sdc": "digital/tapeout/constraints/top.sdc",
+    "metrics_json": "digital/tapeout/metrics.json",
+    "xor_report_xml": "digital/tapeout/reports/xor.xml",
+    "klayout_gds": "digital/tapeout/gds/klayout.gds",
+    "magic_gds": "digital/tapeout/gds/magic.gds",
+    "log": "digital/tapeout/logs/openlane_tapeout.log",
+    "input_resolution_log": "digital/tapeout/logs/tapeout_input_resolution.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/run_work/tapeout/runs/System_PD_43c71124-316e-411a-ba15-1e794fa059b8"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "DESIGN_NAME": "temp_monitor_soc_phys",
+  "PDK": "sky130A",
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 4.291845493562231,
+  "VERILOG_FILES": [
+    "inputs/netlist/temp_monitor_soc_phys_synth.v"
+  ],
+  "PNR_SDC_FILE": "inputs/constraints/top.sdc",
+  "CHIPLOOP_SOURCE_SPEC_JSON": null,
+  "CHIPLOOP_FILELIST": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/43c71124-316e-411a-ba15-1e794fa059b8/de6a80c1-7843-495a-a19e-f72bbbbc2fce/digital/digital/impl_setup/filelist.f",
+  "CHIPLOOP_UPSTREAM_SDC_SOURCE": "request_clock_constraints",
+  "FP_CORE_UTIL": 17.0,
+  "PL_TARGET_DENSITY": 0.2125,
+  "DIE_AREA": "-9 -9 129 129",
+  "RUN_LINTER": false,
+  "EXTRA_LEFS": [
+    "dir::inputs/macros/lef/temp_sensor_adc_model.lef"
+  ],
+  "EXTRA_LIBS": [
+    "dir::inputs/macros/lib/temp_sensor_adc_model.lib"
+  ],
+  "EXTRA_GDS_FILES": [
+    "dir::inputs/macros/gds/temp_sensor_adc_model.gds"
+  ],
+  "PL_TARGET_DENSITY_PCT": 21.25,
+  "FP_TAPCELL_DIST": 10.5,
+  "FP_PDN_HORIZONTAL_HALO": 8,
+  "FP_PDN_VERTICAL_HALO": 8,
+  "PL_MACRO_HALO": 8,
+  "CHIPLOOP_SIGNOFF_CLOSURE_ECO": "drc_route_contact_metal_iter_1",
+  "MACRO_PLACEMENT_CFG": "dir::inputs/macros/macro_placement.cfg",
+  "RUN_SPEF_EXTRACTION": true,
+  "GRT_ALLOW_CONGESTION": true,
+  "GRT_ADJUSTMENT": 0.45,
+  "DRT_OPT_ITERS": 96,
+  "RUN_HEURISTIC_DIODE_INSERTION": true,
+  "DIODE_INSERTION_STRATEGY": 3,
+  "CHIPLOOP_TIMING_CLOSURE_ECO": "setup_iter_1"
+}
