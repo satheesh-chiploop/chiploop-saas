@@ -1,0 +1,14 @@
+{
+  "workflow_id": "89d401d5-3193-4ed9-991f-efda69c754f9",
+  "agent": "Digital Placement Agent",
+  "status": "ok",
+  "return_code": 0,
+  "outputs": {
+    "sdc": "digital/place/constraints/top.sdc",
+    "metrics_json": "digital/place/metrics.json",
+    "primary_def": "digital/place/primary.def",
+    "macro_placement_cfg": "digital/place/macro_placement.cfg",
+    "log": "digital/place/logs/openlane_place.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/run_work/place/runs/System_PD_89d401d5-3193-4ed9-991f-efda69c754f9"
+  }
+}

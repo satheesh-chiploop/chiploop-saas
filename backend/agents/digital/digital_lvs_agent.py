@@ -38,10 +38,31 @@ def _write_text(path: str, content: str) -> None:
 def _select_single_top_netlist(paths: list[str]) -> list[str]:
     if len(paths) <= 1:
         return paths
+    logical = [p for p in paths if not os.path.basename(p).endswith((".pnl.v", ".nl.v"))]
+    if logical:
+        return [sorted(logical, key=lambda p: (0 if "synth" in os.path.basename(p).lower() else 1, len(p)))[0]]
     physical = [p for p in paths if os.path.basename(p).endswith((".pnl.v", ".nl.v"))]
     if physical:
         return [sorted(physical, key=lambda p: (0 if ".pnl." in os.path.basename(p).lower() else 1, 0 if ".nl." in os.path.basename(p).lower() else 1, len(p)))[0]]
     return [sorted(paths, key=lambda p: (0 if "synth" in os.path.basename(p).lower() else 1, len(p)))[0]]
+
+
+def _clear_stage_netlists(netlist_dir: str) -> None:
+    for old in glob.glob(os.path.join(netlist_dir, "*.v")):
+        try:
+            os.remove(old)
+        except OSError:
+            logger.warning(f"{AGENT_NAME}: could not remove stale netlist {old}")
+
+
+def _closure_overrides(state: dict, workflow_dir: str, stage: str) -> dict:
+    plan = state.get("signoff_closure_plan") if isinstance(state.get("signoff_closure_plan"), dict) else {}
+    if not plan:
+        plan = _read_json(os.path.join(workflow_dir, "digital", "signoff_closure", "signoff_closure_plan.json"))
+    eco = plan.get("eco_profile") if isinstance(plan.get("eco_profile"), dict) else {}
+    overrides = eco.get("config_overrides") if isinstance(eco.get("config_overrides"), dict) else {}
+    stage_overrides = overrides.get(stage) if isinstance(overrides.get(stage), dict) else {}
+    return dict(stage_overrides)
 
 
 def _run(cmd: list[str], cwd: str, state: dict | None = None) -> tuple[int, str]:
@@ -235,6 +256,120 @@ def _resolve_macro_files_from_workflow(workflow_dir: str, exts: tuple[str, ...])
     return out
 
 
+def _resolve_stdcell_spice_models(state: dict, workflow_dir: str) -> list[str]:
+    digital = state.get("digital") if isinstance(state.get("digital"), dict) else {}
+    explicit: list[str] = []
+    for value in (
+        state.get("stdcell_spice"),
+        state.get("stdcell_spice_models"),
+        digital.get("stdcell_spice"),
+        digital.get("stdcell_spice_models"),
+    ):
+        values = value if isinstance(value, list) else [value]
+        for item in values:
+            if isinstance(item, str):
+                cand = item if os.path.isabs(item) else os.path.join(workflow_dir, item)
+                if os.path.exists(cand):
+                    explicit.append(os.path.abspath(cand))
+
+    pdk_variant = state.get("pdk_variant") or state.get("pdk") or DEFAULT_PDK_VARIANT
+    pdk_root_host = state.get("pdk_root_host") or os.getenv("CHIPLOOP_PDK_ROOT_HOST") or "backend/pdk"
+    pdk_root_host = os.path.abspath(pdk_root_host)
+    patterns = [
+        os.path.join(pdk_root_host, pdk_variant, "libs.ref", "sky130_fd_sc_hd", "spice", "*.spice"),
+        os.path.join(pdk_root_host, pdk_variant, "libs.ref", "sky130_fd_sc_hd", "spice", "*.sp"),
+        os.path.join(pdk_root_host, pdk_variant, "libs.ref", "sky130_fd_sc_hd", "cdl", "*.cdl"),
+        os.path.join(pdk_root_host, pdk_variant, "libs.ref", "sky130_fd_sc_hd", "**", "*.spice"),
+        os.path.join(pdk_root_host, pdk_variant, "libs.ref", "sky130_fd_sc_hd", "**", "*.sp"),
+        os.path.join(pdk_root_host, pdk_variant, "libs.ref", "sky130_fd_sc_hd", "**", "*.cdl"),
+    ]
+    discovered: list[str] = []
+    for pattern in patterns:
+        discovered.extend(glob.glob(pattern, recursive=True))
+        if discovered:
+            break
+    out: list[str] = []
+    seen: set[str] = set()
+    for path in explicit + discovered:
+        ap = os.path.abspath(path)
+        if ap in seen or not os.path.exists(ap):
+            continue
+        seen.add(ap)
+        out.append(ap)
+    return out
+
+
+def _resolve_macro_spice_models(state: dict, workflow_dir: str) -> list[str]:
+    digital = state.get("digital") if isinstance(state.get("digital"), dict) else {}
+    candidates: list[str] = []
+    for summary_path in (
+        os.path.join(workflow_dir, "analog", "physical_package", "analog_physical_collateral_package.json"),
+        os.path.join(workflow_dir, "analog", "sky130", "sky130_spice_summary.json"),
+    ):
+        summary = _read_json(summary_path)
+        for value in (
+            summary.get("spice"),
+            (summary.get("spice_generation") or {}).get("spice") if isinstance(summary.get("spice_generation"), dict) else None,
+        ):
+            if isinstance(value, str):
+                cand = value if os.path.isabs(value) else os.path.join(workflow_dir, value)
+                if os.path.exists(cand):
+                    candidates.append(os.path.abspath(cand))
+    for value in (
+        state.get("analog_spice_path"),
+        state.get("analog_netlist_path"),
+        state.get("macro_spice"),
+        digital.get("macro_spice"),
+        digital.get("macro_spice_models"),
+    ):
+        values = value if isinstance(value, list) else [value]
+        for item in values:
+            if isinstance(item, str):
+                cand = item if os.path.isabs(item) else os.path.join(workflow_dir, item)
+                if os.path.exists(cand):
+                    candidates.append(os.path.abspath(cand))
+    candidates.extend(_resolve_macro_files_from_workflow(workflow_dir, (".spice", ".sp", ".cdl")))
+    out: list[str] = []
+    seen: set[str] = set()
+    for path in candidates:
+        norm = path.replace("\\", "/").lower()
+        base = os.path.basename(path).lower()
+        if (
+            "ngspice_characterization" in base
+            or "characterize_" in base
+            or "_extracted" in base
+            or "/analog/signoff/" in norm
+            or "/analog/lib_char/" in norm
+            or "/analog/gds/" in norm
+        ):
+            continue
+        ap = os.path.abspath(path)
+        if ap in seen or not os.path.exists(ap):
+            continue
+        seen.add(ap)
+        out.append(ap)
+    return out
+
+
+def _stage_spice_models(work_stage_dir: str, stdcell_spice: list[str], macro_spice: list[str]) -> tuple[list[str], list[str]]:
+    spice_dir = os.path.join(work_stage_dir, "inputs", "spice")
+    _ensure_dir(spice_dir)
+    staged_stdcell: list[str] = []
+    staged_extra: list[str] = []
+    seen: set[str] = set()
+    for bucket, srcs in ((staged_stdcell, stdcell_spice), (staged_extra, macro_spice)):
+        for src in srcs:
+            basename = os.path.basename(src)
+            dst = os.path.join(spice_dir, basename)
+            if os.path.abspath(src) != os.path.abspath(dst):
+                shutil.copy2(src, dst)
+            rel = f"dir::inputs/spice/{basename}"
+            if rel not in seen:
+                seen.add(rel)
+                bucket.append(rel)
+    return staged_stdcell, staged_extra
+
+
 def _stage_macro_inputs(state: dict, workflow_dir: str, work_stage_dir: str) -> tuple[list[str], list[str], list[str]]:
     digital = state.get("digital") or {}
 
@@ -367,10 +502,11 @@ def run_agent(state: dict) -> dict:
     if not stage_netlists:
         raise RuntimeError("LVS: missing run_work/inputs/netlist/*.v (synth/floorplan should populate it).")
 
+    _clear_stage_netlists(netlist_dir)
     for nl in stage_netlists:
         shutil.copy2(nl, os.path.join(netlist_dir, os.path.basename(nl)))
 
-    stage_netlists_local = sorted(glob.glob(os.path.join(netlist_dir, "*.v")))
+    stage_netlists_local = _select_single_top_netlist(sorted(glob.glob(os.path.join(netlist_dir, "*.v"))))
     cfg["VERILOG_FILES"] = [f"inputs/netlist/{os.path.basename(p)}" for p in stage_netlists_local]
 
     inferred = None
@@ -399,6 +535,11 @@ def run_agent(state: dict) -> dict:
 
     staged_lefs, staged_libs, staged_gds = _stage_macro_inputs(state, workflow_dir, work_stage_dir)
     macro_placement_cfg = _stage_macro_placement_cfg_if_needed(cfg, state, workflow_dir, work_stage_dir)
+    staged_cell_spice, staged_extra_spice = _stage_spice_models(
+        work_stage_dir,
+        _resolve_stdcell_spice_models(state, workflow_dir),
+        _resolve_macro_spice_models(state, workflow_dir),
+    )
 
     if staged_lefs:
         cfg["EXTRA_LEFS"] = staged_lefs
@@ -406,6 +547,10 @@ def run_agent(state: dict) -> dict:
         cfg["EXTRA_LIBS"] = staged_libs
     if staged_gds:
         cfg["EXTRA_GDS_FILES"] = staged_gds
+    if staged_cell_spice:
+        cfg["CELL_SPICE_MODELS"] = staged_cell_spice
+    if staged_extra_spice:
+        cfg["EXTRA_SPICE_MODELS"] = staged_extra_spice
     if not (staged_lefs or staged_libs or staged_gds):
         cfg.pop("EXTRA_LEFS", None)
         cfg.pop("EXTRA_LIBS", None)
@@ -414,9 +559,14 @@ def run_agent(state: dict) -> dict:
         cfg.pop("MACROS", None)
         cfg.pop("FP_DEF_TEMPLATE", None)
 
+    closure_overrides = _closure_overrides(state, workflow_dir, "lvs")
+    cfg.update(closure_overrides)
+
     logger.info(f"{AGENT_NAME}: staged macro LEFs -> {staged_lefs}")
     logger.info(f"{AGENT_NAME}: staged macro LIBs -> {staged_libs}")
     logger.info(f"{AGENT_NAME}: staged macro GDS -> {staged_gds}")
+    logger.info(f"{AGENT_NAME}: staged stdcell SPICE -> {staged_cell_spice}")
+    logger.info(f"{AGENT_NAME}: staged extra SPICE -> {staged_extra_spice}")
 
     config_path = os.path.join(stage_dir, "config.json")
     _write_text(config_path, json.dumps(cfg, indent=2))
@@ -494,6 +644,9 @@ def run_agent(state: dict) -> dict:
         f"netlist_count={len(stage_netlists_local)}",
         f"macro_placement_cfg={cfg.get('MACRO_PLACEMENT_CFG')}",
         f"macro_placement_cfg_path={macro_placement_cfg}",
+        f"cell_spice_count={len(staged_cell_spice)}",
+        f"extra_spice_count={len(staged_extra_spice)}",
+        f"closure_overrides={json.dumps(closure_overrides, sort_keys=True)}",
     ]) + "\n"
     _write_text(os.path.join(logs_dir, "lvs_input_resolution.log"), input_log)
 

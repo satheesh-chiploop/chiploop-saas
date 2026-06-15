@@ -22,6 +22,15 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
+type ClockRow = {
+  name: string;
+  port: string;
+  frequency_mhz: string;
+  period_ns?: number | null;
+  source?: string;
+  needs_user_frequency?: boolean;
+};
+
 function parseLogLines(logs: string | null | undefined): string[] {
   if (!logs) return [];
   return logs.split("\n").map((l) => l.trimEnd()).filter((l) => l.trim().length > 0);
@@ -53,6 +62,9 @@ export default function SystemPDAppPage() {
   const [toolchain, setToolchain] = useState("openlane2");
   const [targetFreqMhz, setTargetFreqMhz] = useState("");
   const [constraintsSdc, setConstraintsSdc] = useState("");
+  const [clockRows, setClockRows] = useState<ClockRow[]>([]);
+  const [resetRows, setResetRows] = useState<any[]>([]);
+  const [clockProbeStatus, setClockProbeStatus] = useState("");
   const [effort, setEffort] = useState<"fast" | "balanced" | "signoff">("balanced");
   const [runFill, setRunFill] = useState(true);
   const [runDrc, setRunDrc] = useState(true);
@@ -108,6 +120,17 @@ export default function SystemPDAppPage() {
     return resp.json();
   }
 
+  async function getJSON<T>(path: string): Promise<T> {
+    const resp = await fetch(`${API_BASE}${path}`, {
+      headers: { ...authHeaders() },
+    });
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => "");
+      throw new Error(`${resp.status} ${resp.statusText}${txt ? ` - ${txt}` : ""}`);
+    }
+    return resp.json();
+  }
+
   // Auth gate
   useEffect(() => {
     (async () => {
@@ -133,6 +156,40 @@ export default function SystemPDAppPage() {
       // ignore malformed handoff context
     }
   }, [loading]);
+
+  useEffect(() => {
+    if (loading || !systemRtlWorkflowId.trim()) {
+      setClockRows([]);
+      setResetRows([]);
+      setClockProbeStatus("");
+      return;
+    }
+    let cancelled = false;
+    setClockProbeStatus("Detecting clocks from System RTL handoff...");
+    (async () => {
+      try {
+        const data = await getJSON<{ clock_intent?: any }>(`/apps/digital/clock-candidates/${systemRtlWorkflowId.trim()}`);
+        if (cancelled) return;
+        const clocks = Array.isArray(data.clock_intent?.clocks) ? data.clock_intent.clocks : [];
+        const resets = Array.isArray(data.clock_intent?.resets) ? data.clock_intent.resets : [];
+        setClockRows(clocks.map((clock: any) => ({
+          name: String(clock.name || clock.port || "clk"),
+          port: String(clock.port || clock.name || "clk"),
+          frequency_mhz: clock.frequency_mhz ? String(Number(clock.frequency_mhz).toFixed(3).replace(/\.?0+$/, "")) : "",
+          period_ns: clock.period_ns ?? null,
+          source: clock.source || "inferred",
+          needs_user_frequency: Boolean(clock.needs_user_frequency),
+        })));
+        setResetRows(resets);
+        setClockProbeStatus(clocks.length ? "Review detected clocks before physical design." : "No clock ports detected; enter target frequency or SDC manually.");
+      } catch (error: any) {
+        if (!cancelled) setClockProbeStatus(error?.message || "Clock detection failed.");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, systemRtlWorkflowId]);
 
   // Live workflow updates
   useEffect(() => {
@@ -183,6 +240,27 @@ export default function SystemPDAppPage() {
     return true;
   }, [running, systemRtlWorkflowId, digitalSpecText, analogSpecText, socIntegrationSpecText]);
 
+  function updateClockFrequency(index: number, value: string) {
+    setClockRows((rows) => rows.map((row, idx) => (idx === index ? { ...row, frequency_mhz: value } : row)));
+  }
+
+  function clockConstraintsPayload() {
+    if (!clockRows.length) return undefined;
+    return {
+      source: "ui_clock_table",
+      clocks: clockRows.map((row) => {
+        const mhz = Number(row.frequency_mhz);
+        return {
+          name: row.name || row.port,
+          port: row.port || row.name,
+          frequency_mhz: Number.isFinite(mhz) && mhz > 0 ? mhz : undefined,
+          source: row.source || "ui_clock_table",
+        };
+      }),
+      resets: resetRows,
+    };
+  }
+
   async function runNow() {
     setErr(null);
     setRunning(true);
@@ -203,6 +281,7 @@ export default function SystemPDAppPage() {
           toolchain,
           target_frequency_mhz: Number.isFinite(freq) && freq > 0 ? freq : undefined,
           constraints_sdc: constraintsSdc || undefined,
+          clock_constraints: clockConstraintsPayload(),
           effort,
           run_fill: runFill,
           run_drc: runDrc,
@@ -300,7 +379,7 @@ export default function SystemPDAppPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <div className="mx-auto w-full max-w-none px-6 py-10">
         <div className="flex items-center justify-between">
           <button onClick={() => router.push("/apps")} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
             Back to Apps
@@ -351,6 +430,53 @@ export default function SystemPDAppPage() {
                 Target frequency MHz
                 <input value={targetFreqMhz} onChange={(e) => setTargetFreqMhz(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100" placeholder="Optional" />
               </label>
+
+              {systemRtlWorkflowId.trim() ? (
+                <div className="rounded-xl border border-slate-800 bg-black/30 p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-sm font-semibold text-slate-200">Detected clock table</div>
+                    <div className="text-xs text-slate-500">{clockProbeStatus}</div>
+                  </div>
+                  {clockRows.length ? (
+                    <div className="mt-3 overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead className="text-slate-400">
+                          <tr>
+                            <th className="py-1 pr-2">Clock</th>
+                            <th className="py-1 pr-2">Port</th>
+                            <th className="py-1 pr-2">MHz</th>
+                            <th className="py-1">Source</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {clockRows.map((clock, idx) => (
+                            <tr key={`${clock.port}-${idx}`} className="border-t border-slate-800">
+                              <td className="py-2 pr-2 text-slate-200">{clock.name}</td>
+                              <td className="py-2 pr-2 text-slate-300">{clock.port}</td>
+                              <td className="py-2 pr-2">
+                                <input
+                                  value={clock.frequency_mhz}
+                                  onChange={(e) => updateClockFrequency(idx, e.target.value)}
+                                  className="w-24 rounded-lg border border-slate-800 bg-black/40 px-2 py-1 text-slate-100"
+                                  placeholder="MHz"
+                                />
+                              </td>
+                              <td className="py-2 text-slate-500">{clock.source || "inferred"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="mt-2 text-xs text-slate-500">Clock rows will appear after a valid System RTL workflow ID is loaded.</div>
+                  )}
+                  {resetRows.length ? (
+                    <div className="mt-2 text-xs text-slate-500">
+                      Resets: {resetRows.map((reset: any) => reset.port || reset.name).filter(Boolean).join(", ")}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
 
               <label className="block text-sm text-slate-300">
                 SDC constraints

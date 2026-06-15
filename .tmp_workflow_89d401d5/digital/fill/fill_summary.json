@@ -1,0 +1,13 @@
+{
+  "workflow_id": "89d401d5-3193-4ed9-991f-efda69c754f9",
+  "agent": "Digital Fill Agent",
+  "status": "failed",
+  "return_code": 2,
+  "outputs": {
+    "sdc": "digital/fill/constraints/top.sdc",
+    "metrics_json": "digital/fill/metrics.json",
+    "primary_def": "digital/fill/primary.def",
+    "log": "digital/fill/logs/openlane_fill.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/run_work/fill/runs/System_PD_89d401d5-3193-4ed9-991f-efda69c754f9"
+  }
+}

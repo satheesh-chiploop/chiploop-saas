@@ -1,0 +1,18 @@
+{
+  "workflow_id": "89d401d5-3193-4ed9-991f-efda69c754f9",
+  "agent": "Analog Liberty Characterization Agent",
+  "generated_at": "2026-06-15T05:49:40.906837Z",
+  "module": "temp_sensor_adc_model",
+  "spice": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/analog/sky130/temp_sensor_adc_model.spice",
+  "prior_lib": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/a1dc7834-6e30-4b2c-a8f7-ad8bb597af20/fb2ce7e2-7dcb-4414-9a51-f8100c4c1892/digital/analog/abstract/temp_sensor_adc_model.lib",
+  "pdk_root_host": "/root/chiploop-backend/backend/pdk",
+  "status": "validated",
+  "reason": "liberty_not_produced",
+  "return_code": 0,
+  "log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/analog/lib_char/ngspice_characterization.log",
+  "characterization_deck": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/analog/lib_char/characterize_ngspice.sp",
+  "generated_liberty": false,
+  "generated_abstract_liberty": true,
+  "lib": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/analog/lib_char/temp_sensor_adc_model.lib",
+  "note": "ngspice ran successfully. No measured Liberty was produced. The flow records SPICE validation and uses a conservative abstract Liberty for macro PnR if a macro interface contract is available."
+}

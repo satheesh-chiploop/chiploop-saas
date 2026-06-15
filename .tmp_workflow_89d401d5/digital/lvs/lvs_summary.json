@@ -1,0 +1,15 @@
+{
+  "workflow_id": "89d401d5-3193-4ed9-991f-efda69c754f9",
+  "agent": "Digital LVS Agent",
+  "status": "mismatch",
+  "lvs_status": "mismatch",
+  "xor_differences": null,
+  "return_code": 2,
+  "outputs": {
+    "sdc": "digital/lvs/constraints/top.sdc",
+    "metrics_json": null,
+    "lvs_report": "digital/lvs/reports/netgen-lvs.log",
+    "log": "digital/lvs/logs/openlane_lvs.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/run_work/lvs/runs/System_PD_89d401d5-3193-4ed9-991f-efda69c754f9"
+  }
+}

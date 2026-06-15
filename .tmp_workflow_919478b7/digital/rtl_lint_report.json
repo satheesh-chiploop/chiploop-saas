@@ -1,0 +1,103 @@
+{
+  "type": "rtl_lint_report",
+  "version": "1.0",
+  "status": "pass",
+  "rtl_file_count": 4,
+  "heuristic_issues": [],
+  "verilator_lint": {
+    "available": true,
+    "reason": null,
+    "returncode": 0
+  },
+  "summary": {
+    "heuristic_issue_count": 0,
+    "recommended_action": "Fix warnings before CDC/reset checks; keep lint clean for better downstream signal inference."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "executions": [
+      {
+        "profile_id": "chiploop_saas_default",
+        "runner": "local_saas",
+        "capability": "rtl_lint",
+        "tool": "verilator",
+        "executable": "/usr/local/bin/verilator",
+        "command": [
+          "/usr/local/bin/verilator",
+          "--lint-only",
+          "-Wall",
+          "-Wno-fatal",
+          "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_digital.v",
+          "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_soc_phys.sv",
+          "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_soc_sim.sv",
+          "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v"
+        ],
+        "cwd": null,
+        "returncode": 0,
+        "stdout": "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b\n- Verilator: Built from 0.131 MB sources in 5 modules, into 0.083 MB in 3 C++ files needing 0.000 MB\n- Verilator: Walltime 0.024 s (elab=0.002, cvt=0.012, bld=0.000); cpu 0.024 s on 1 threads; allocated 32.355 MB\n",
+        "stderr": "%Warning-MULTITOP: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_soc_sim.sv:1:8: Multiple top level modules\n                                                                                                                                                                                                                          : ... Suggest see manual; fix the duplicates, or use --top-module to select top.\n                   ... For warning description see https://verilator.org/warn/MULTITOP?v=5.047\n                   ... Use \"/* verilator lint_off MULTITOP */\" and lint_on around source to disable this message.\n                                                                                                                                                                                                                          : ... Top module 'temp_monitor_soc_phys'\n    1 | module temp_monitor_soc_phys (\n      |        ^~~~~~~~~~~~~~~~~~~~~\n                                                                                                                                                                                                                          : ... Top module 'temp_monitor_soc_sim'\n    1 | module temp_monitor_soc_sim (\n      |        ^~~~~~~~~~~~~~~~~~~~\n%Warning-WIDTHEXPAND: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:27:19: Operator ASSIGN expects 32 bits on the Assign RHS, but Assign RHS's SIGNED generates 17 bits.\n                                                                                                                                                                                                                               : ... note: In instance 'temp_monitor_soc_sim.u_analog'\n   27 |         temp_term = $signed({1'b0, sensor_temp_celsius});\n      |                   ^\n                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047\n                      ... Use \"/* verilator lint_off WIDTHEXPAND */\" and lint_on around source to disable this message.\n%Warning-ALWNEVER: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_digital.v:122:1: 'always @*' will never execute as expression list is empty (no variables read)\n                                                                                                                                                                                                                           : ... note: In instance 'temp_monitor_soc_sim.u_digital'\n                                                                                                                                                                                                                           : ... Suggest use 'always_comb'\n  122 | always @(*) begin\n      | ^~~~~~\n                   ... For warning description see https://verilator.org/warn/ALWNEVER?v=5.047\n                   ... Use \"/* verilator lint_off ALWNEVER */\" and lint_on around source to disable this message.\n%Warning-ALWNEVER: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_digital.v:125:1: 'always @*' will never execute as expression list is empty (no variables read)\n                                                                                                                                                                                                                           : ... note: In instance 'temp_monitor_soc_sim.u_digital'\n                                                                                                                                                                                                                           : ... Suggest use 'always_comb'\n  125 | always @(*) begin\n      | ^~~~~~\n%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_digital.v:23:14: Bits of signal are not used: 'wr_data'[15:12]\n                                                                                                                                                                                                                               : ... note: In instance 'temp_monitor_soc_sim.u_digital'\n   23 | input [15:0] wr_data;\n      |              ^~~~~~~\n                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047\n                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_digital.v:68:13: Signal is not used: 'rd_data_mux'\n                                                                                                                                                                                                                               : ... note: In instance 'temp_monitor_soc_sim.u_digital'\n   68 | wire [15:0] rd_data_mux;\n      |             ^~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:17:16: Signal is not used: 'req_d'\n                                                                                                                                                                                                                                : ... note: In instance 'temp_monitor_soc_sim.u_analog'\n   17 |     reg        req_d;\n      |                ^~~~~\n%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:19:16: Signal is not used: 'latency_cnt'\n                                                                                                                                                                                                                                : ... note: In instance 'temp_monitor_soc_sim.u_analog'\n   19 |     reg [31:0] latency_cnt;\n      |                ^~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:20:23: Bits of signal are not used: 'sampled_code'[31:12]\n                                                                                                                                                                                                                                : ... note: In instance 'temp_monitor_soc_sim.u_analog'\n   20 |     reg signed [31:0] sampled_code;\n      |                       ^~~~~~~~~~~~\n%Warning-SYNCASYNCNET: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_soc_phys.sv:4:15: Signal flopped as both synchronous and async: 'temp_monitor_soc_phys.avdd'\n                       /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:41:13: ... Location of async usage\n   41 |         if (avdd === 1'b0 || avss === 1'b1) begin\n      |             ^~~~\n                       /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:60:13: ... Location of sync usage\n   60 |         if (avdd === 1'b1 && avss === 1'b0) begin\n      |             ^~~~\n                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047\n                       ... Use \"/* verilator lint_off SYNCASYNCNET */\" and lint_on around source to disable this message.\n%Warning-SYNCASYNCNET: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_soc_phys.sv:5:15: Signal flopped as both synchronous and async: 'temp_monitor_soc_phys.avss'\n                       /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:41:30: ... Location of async usage\n   41 |         if (avdd === 1'b0 || avss === 1'b1) begin\n      |                              ^~~~\n                       /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:60:30: ... Location of sync usage\n   60 |         if (avdd === 1'b1 && avss === 1'b0) begin\n      |                              ^~~~\n%Warning-SYNCASYNCNET: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_soc_sim.sv:4:15: Signal flopped as both synchronous and async: 'temp_monitor_soc_sim.avdd'\n                       /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:41:13: ... Location of async usage\n   41 |         if (avdd === 1'b0 || avss === 1'b1) begin\n      |             ^~~~\n                       /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:60:13: ... Location of sync usage\n   60 |         if (avdd === 1'b1 && avss === 1'b0) begin\n      |             ^~~~\n%Warning-SYNCASYNCNET: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_soc_sim.sv:5:15: Signal flopped as both synchronous and async: 'temp_monitor_soc_sim.avss'\n                       /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:41:30: ... Location of async usage\n   41 |         if (avdd === 1'b0 || avss === 1'b1) begin\n      |                              ^~~~\n                       /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:60:30: ... Location of sync usage\n   60 |         if (avdd === 1'b1 && avss === 1'b0) begin\n      |                              ^~~~\n%Warning-MULTIDRIVEN: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_soc_phys.sv:24:9: Signal has multiple driving blocks with different clocking: 'temp_monitor_soc_phys.w_2_u_analog_adc_valid_u_digital_adc_valid'\n                      /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:45:13: ... Location of first driving block\n   45 |             adc_valid <= 1'b0;\n      |             ^~~~~~~~~\n                      /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:68:21: ... Location of other driving block\n   68 |                     adc_valid <= 1'b0;\n      |                     ^~~~~~~~~\n                      ... For warning description see https://verilator.org/warn/MULTIDRIVEN?v=5.047\n                      ... Use \"/* verilator lint_off MULTIDRIVEN */\" and lint_on around source to disable this message.\n%Warning-MULTIDRIVEN: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_monitor_soc_sim.sv:22:9: Signal has multiple driving blocks with different clocking: 'temp_monitor_soc_sim.w_2_u_analog_adc_valid_u_digital_adc_valid'\n                      /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:45:13: ... Location of first driving block\n   45 |             adc_valid <= 1'b0;\n      |             ^~~~~~~~~\n                      /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/system/imported_rtl/temp_sensor_adc_model.v:68:21: ... Location of other driving block\n   68 |                     adc_valid <= 1'b0;\n      |                     ^~~~~~~~~\n",
+        "status": "success",
+        "error": null,
+        "started_at": "2026-06-15T06:38:33.132620+00:00",
+        "ended_at": "2026-06-15T06:38:33.258748+00:00",
+        "elapsed_ms": 126
+      }
+    ]
+  }
+}

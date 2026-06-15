@@ -1,0 +1,14 @@
+{
+  "workflow_id": "50cb100c-b2cd-4c0d-9eee-0c8b7ddc5f38",
+  "agent": "Digital Route Agent",
+  "status": "ok",
+  "return_code": 0,
+  "outputs": {
+    "sdc": "digital/route/constraints/top.sdc",
+    "metrics_json": "digital/route/metrics.json",
+    "primary_def": "digital/route/primary.def",
+    "route_netlist": "digital/route/netlist/temp_monitor_soc_phys.nl.v",
+    "log": "digital/route/logs/openlane_route.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/50cb100c-b2cd-4c0d-9eee-0c8b7ddc5f38/981a3b76-c90b-4b3b-ad51-ac5cc8eacaf9/digital/digital/run_work/route/runs/System_PD_50cb100c-b2cd-4c0d-9eee-0c8b7ddc5f38"
+  }
+}

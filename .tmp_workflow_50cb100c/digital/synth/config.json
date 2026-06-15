@@ -1,0 +1,25 @@
+{
+  "DESIGN_NAME": "temp_monitor_soc_phys",
+  "VERILOG_FILES": [
+    "rtl/temp_sensor_adc_model.v",
+    "rtl/temp_monitor_digital.v",
+    "rtl/temp_monitor_soc_phys.sv",
+    "rtl/temp_monitor_soc_sim.sv"
+  ],
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 10.0,
+  "SYNTH_STRATEGY": "AREA 0",
+  "SYNTH_SDC_FILE": "constraints/top.sdc",
+  "PNR_SDC_FILE": "constraints/top.sdc",
+  "EXTRA_LIBS": [
+    "dir::macro_libs/temp_sensor_adc_model.lib"
+  ],
+  "CHIPLOOP_WORKFLOW_ID": "50cb100c-b2cd-4c0d-9eee-0c8b7ddc5f38",
+  "CHIPLOOP_GENERATED_BY": "Digital Synthesis Agent",
+  "CHIPLOOP_GENERATED_AT": "2026-06-15T04:53:12.559195Z",
+  "CHIPLOOP_MACRO_LIBS": [
+    "macro_libs/temp_sensor_adc_model.lib"
+  ],
+  "CHIPLOOP_YOSYS_MACRO_LIB_SCRIPT": "yosys_macro_libs.ys",
+  "RUN_LINTER": false
+}

@@ -1,0 +1,6669 @@
+<?xml version="1.0" encoding="utf-8"?>
+<report-database>
+ <description>SKY130 DRC runset</description>
+ <original-file/>
+ <generator>drc: script='/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/libs.tech/klayout/drc/sky130A_mr.drc'</generator>
+ <top-cell>temp_monitor_soc_phys</top-cell>
+ <tags>
+ </tags>
+ <categories>
+  <category>
+   <name>dnwell.1</name>
+   <description>dnwell.1: min. dnwell width : 3.0um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>dnwell.2</name>
+   <description>dnwell.2 : min. dnwell spacing : 6.3um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nwell.1</name>
+   <description>nwell.1 : min. nwell width : 0.84um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nwell.2a</name>
+   <description>nwell.2a : min. nwell spacing (merged if less) : 1.27um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nwell.6</name>
+   <description>nwell.6 : min enclosure of nwellHole by dnwell : 1.03um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nwell.9</name>
+   <description>nwell.9 : HVnwell must be enclosed by hv marker</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvtp.1</name>
+   <description>hvtp.1 : min. hvtp width : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvtp.2</name>
+   <description>hvtp.2 : min. hvtp spacing : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwde.1</name>
+   <description>pwde.1 : min. pwde width : 0.84um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwde.2</name>
+   <description>pwde.2 : min. pwde inside v20 spacing : 1.27um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvtr.1</name>
+   <description>hvtr.1 : min. hvtr width : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvtr.2</name>
+   <description>hvtr.2 : min. hvtr spacing : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvtr.2_a</name>
+   <description>hvtr.2_a : hvtr must not overlap hvtp</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>lvtn.1a</name>
+   <description>lvtn.1a : min. lvtn width : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>lvtn.2</name>
+   <description>lvtn.2 : min. lvtn spacing : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ncm.1</name>
+   <description>ncm.1 : min. ncm width : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ncm.2a</name>
+   <description>ncm.2a : min. ncm spacing : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>difftap.1</name>
+   <description>difftap.1 : min. diff width across areaid:ce : 0.15um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>difftap.1_a</name>
+   <description>difftap.1_a : min. diff width in periphery : 0.15um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>difftap.2</name>
+   <description>difftap.2 : min. diff width inside areadid:ce : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>difftap.1_b</name>
+   <description>difftap.1_b : min. tap width across areaid:ce : 0.15um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>difftap.1_c</name>
+   <description>difftap.1_c : min. tap width in periphery : 0.15um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>difftap.3</name>
+   <description>difftap.3 : min. difftap spacing : 0.27um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>tunm.1</name>
+   <description>tunm.1 : min. tunm width : 0.41um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>tunm.2</name>
+   <description>tunm.2 : min. tunm spacing : 0.5um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>thkox.1</name>
+   <description>thkox.1 : min. thkox width inside periphery : 0.6um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>thkox.2</name>
+   <description>thkox.2 : min. thkox spacing inside periphery : 0.7um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>poly.1a</name>
+   <description>poly.1a : min. poly width : 0.15um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>poly.2</name>
+   <description>poly.2 : min. poly spacing : 0.21um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>poly.3</name>
+   <description>poly.3 : min. poly spacing inside areaid:core : 0.16um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ldntm.1</name>
+   <description>ldntm.1 : min. ldntm width inside areaid:core : 0.7um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ldntm.2</name>
+   <description>ldntm.2 : min. ldntm spacing inside areaid:core : 0.7um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>rpm.1a</name>
+   <description>rpm.1a : min. rpm width : 1.27um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>rpm.2</name>
+   <description>rpm.2 : min. rpm spacing : 0.84um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>urpm.1a</name>
+   <description>urpm.1a : min. rpm width : 1.27um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>urpm.2</name>
+   <description>urpm.2 : min. rpm spacing : 0.84um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>npc.1</name>
+   <description>npc.1 : min. npc width : 0.27um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>npc.2</name>
+   <description>npc.2 : min. npc spacing, should be manually merged if less than : 0.27um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.1</name>
+   <description>nsdm.1 : min. nsdm spacing in periphery : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.2</name>
+   <description>nsdm.2 : min. nsdm width in periphery : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.3</name>
+   <description>nsdm.3 : min. diff width across areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.4</name>
+   <description>nsdm.4 : min. spacing across areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.5</name>
+   <description>nsdm.5 : min. nsdm width in areaid:ce : 0.29um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.6</name>
+   <description>nsdm.6 : min. nsdm spacing in areaid:ce : 0.29um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm.6a</name>
+   <description>nsdm.6a : min. nsdm spacing on parallel edges in areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.1</name>
+   <description>psdm.1 : min. psdm spacing in periphery : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.2</name>
+   <description>psdm.2 : min. psdm width in periphery : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.3</name>
+   <description>psdm.3 : min. diff width across areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.4</name>
+   <description>psdm.4 : min. spacing across areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.5</name>
+   <description>psdm.5 : min. psdm width in areaid:ce : 0.29um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.6</name>
+   <description>psdm.6 : min. psdm spacing in areaid:ce : 0.29um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm.6a</name>
+   <description>psdm.6a : min. psdm spacing on parallel edges in areaid:ce : 0.38um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm_psdm_overlap</name>
+   <description>nsdm_psdm_overlap : nsdm overlaps psdm over active</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon.1</name>
+   <description>licon.1 : licon should be rectangle</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon.2</name>
+   <description>licon.2: min. licon spacing in periphery : 0.17um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon.3</name>
+   <description>licon.3: min. licon width : 0.17um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon.4</name>
+   <description>licon.4:  min. licon on diff spacing to npc in periphery : 0.09um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon.4_a</name>
+   <description>licon.4_a:  licon on diff in periphery can't overlap npc</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon.5</name>
+   <description>licon.5 : Licons may not overlap both poly and (diff or tap)</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon.6</name>
+   <description>licon.6 : npc min enclosure of poly_licon inside areaid:core : 0.045um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsm.1</name>
+   <description>nsm.1 : nsm min. spacing : 4.0um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsm.2</name>
+   <description>nsm.2 : nsm min. width : 3.0um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>capm.1</name>
+   <description>capm.1 : min. capm width : 1.0um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>capm.2a</name>
+   <description>capm.2a : min. capm spacing : 0.84um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>capm.2b</name>
+   <description>capm.2b : min. spacing between met3_bot_plate : 1.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>capm.2b_a</name>
+   <description>capm.2b_a : min. spacing between met3_bot_plate and met3 : 1.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>capm.3</name>
+   <description>capm.3 : min. m3 enclosure of capm : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>capm.4</name>
+   <description>capm.4 : min. capm enclosure of via3 : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>capm.5</name>
+   <description>capm.5 : min. capm spacing to via3 : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>capm.11</name>
+   <description>capm.11 : Min spacing of capm and met3 not overlapping capm : 0.5um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>cap2m.1</name>
+   <description>cap2m.1 : min. cap2m width : 1.0um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>cap2m.2a</name>
+   <description>cap2m.2a : min. cap2m spacing : 0.84um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>cap2m.2b</name>
+   <description>cap2m.2b : min. cap2m spacing : 1.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>cap2m.2b_a</name>
+   <description>cap2m.2b_a : min. spacing of m4_bot_plate : 1.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>cap2m.3</name>
+   <description>cap2m.3 : min. m4 enclosure of cap2m : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>cap2m.3_a</name>
+   <description>cap2m.3_a : min. m4 enclosure of cap2m : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>cap2m.4</name>
+   <description>cap2m.4 : min. cap2m enclosure of via4 : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>cap2m.5</name>
+   <description>cap2m.5 : min. cap2m spacing to via4 : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>cap2m.11</name>
+   <description>cap2m.11 : Min spacing of cap2m and met4 not overlapping cap2m : 0.5um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li.1</name>
+   <description>li.1 : min. li width outside or crossing areaid:ce : 0.17um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li.3</name>
+   <description>li.3 : min. li spacing outside or crossing areaid:ce : 0.17um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li.5</name>
+   <description>li.5 : min. li enclosure of licon of 2 adjacent edges : 0.08um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li.6</name>
+   <description>li.6 : min. li area : 0.0561um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li.7</name>
+   <description>li.7 : min. li core spacing : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li.8</name>
+   <description>li.8 : min. li core width : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct.1</name>
+   <description>ct.1: non-ring mcon should be rectangular</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct.1_a</name>
+   <description>ct.1_a : minimum width of mcon : 0.17um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct.1_b</name>
+   <description>ct.1_b : maximum length of mcon : 0.17um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct.2</name>
+   <description>ct.2 : min. mcon spacing : 0.19um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct.3</name>
+   <description>ct.3 : min. width of ring-shaped mcon : 0.17um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct.3_a</name>
+   <description>ct.3_a : max. width of ring-shaped mcon : 0.175um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct.3_b</name>
+   <description>ct.3_b: ring-shaped mcon must be enclosed by areaid_sl</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct.4</name>
+   <description>ct.4 : mcon should covered by li</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1.1</name>
+   <description>m1.1 : min. m1 width : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1.2</name>
+   <description>m1.2 : min. m1 spacing : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1.3ab</name>
+   <description>m1.3ab : min. 3um.m1 spacing m1 : 0.28um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>791_m1.4</name>
+   <description>791_m1.4 : min. m1 enclosure of mcon : 0.03um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1.4</name>
+   <description>m1.4 : mcon periphery must be enclosed by m1</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1.4a</name>
+   <description>m1.4a : min. m1 enclosure of mcon for specific cells : 0.005um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1.4a_a</name>
+   <description>m1.4a_a : mcon periph must be enclosed by met1 for specific cells</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1.6</name>
+   <description>m1.6 : min. m1 area : 0.083um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1.7</name>
+   <description>m1.7 : min. m1 with holes area : 0.14um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1.5</name>
+   <description>m1.5 : min. m1 enclosure of mcon of 2 adjacent edges : 0.06um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.1a</name>
+   <description>via.1a : via outside of moduleCut should be rectangular</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.1a_a</name>
+   <description>via.1a_a : min. width of via outside of moduleCut : 0.15um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.1a_b</name>
+   <description>via.1a_b : maximum length of via : 0.15um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.2</name>
+   <description>via.2 : min. via spacing : 0.17um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.3</name>
+   <description>via.3 : min. width of ring-shaped via : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.3_a</name>
+   <description>via.3_a : max. width of ring-shaped via : 0.205um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.3_b</name>
+   <description>via.3_b: ring-shaped via must be enclosed by areaid_sl</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.4a</name>
+   <description>via.4a : min. m1 enclosure of 0.15um via : 0.055um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.4a_a</name>
+   <description>via.4a_a : 0.15um via must be enclosed by met1</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via.5a</name>
+   <description>via.5a : min. m1 enclosure of 0.15um via of 2 adjacent edges : 0.085um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2.1</name>
+   <description>m2.1 : min. m2 width : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2.2</name>
+   <description>m2.2 : min. m2 spacing : 0.14um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2.3ab</name>
+   <description>m2.3ab : min. 3um.m2 spacing m2 : 0.28um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2.6</name>
+   <description>m2.6 : min. m2 area : 0.0676um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2.7</name>
+   <description>m2.7 : min. m2 holes area : 0.14um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2.4</name>
+   <description>m2.4 : min. m2 enclosure of via : 0.055um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2.4_a</name>
+   <description>m2.4_a : via in periphery must be enclosed by met2</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2.4_b</name>
+   <description>m2.4_B : min. m2 enclosure of via inside areaid:core : 0.045um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2.5</name>
+   <description>m2.5 : min. m2 enclosure of via of 2 adjacent edges : 0.085um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.1a</name>
+   <description>via2.1a : via2 outside of moduleCut should be rectangular</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.1a_a</name>
+   <description>via2.1a_a : min. width of via2 outside of moduleCut : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.1a_b</name>
+   <description>via2.1a_b : maximum length of via2 : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.2</name>
+   <description>via2.2 : min. via2 spacing : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.3</name>
+   <description>via2.3 : min. width of ring-shaped via2 : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.3_a</name>
+   <description>via2.3_a : max. width of ring-shaped via2 : 0.205um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.3_b</name>
+   <description>via2.3_b: ring-shaped via2 must be enclosed by areaid_sl</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.4</name>
+   <description>via2.4 : min. m2 enclosure of via2 : 0.04um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.4_a</name>
+   <description>via2.4_a : via must be enclosed by met2</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2.5</name>
+   <description>via2.5 : min. m3 enclosure of via2 of 2 adjacent edges : 0.085um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3.1</name>
+   <description>m3.1 : min. m3 width : 0.3um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3.2</name>
+   <description>m3.2 : min. m3 spacing : 0.3um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3.3cd</name>
+   <description>m3.3cd : min. 3um.m3 spacing m3 : 0.4um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3.4</name>
+   <description>m3.4 : min. m3 enclosure of via2 : 0.065um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3.4_a</name>
+   <description>m3.4_a : via2 must be enclosed by met3</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3.6</name>
+   <description>m3.6 : min. m3 area : 0.240um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3.7</name>
+   <description>m3.7 : min. m3 holes area : 0.2um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via3.1</name>
+   <description>via3.1 : via3 outside of moduleCut should be rectangular</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via3.1_a</name>
+   <description>via3.1_a : min. width of via3 outside of moduleCut : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via3.1_b</name>
+   <description>via3.1_b : maximum length of via3 : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via3.2</name>
+   <description>via3.2 : min. via3 spacing : 0.2um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via3.4</name>
+   <description>via3.4 : min. m3 enclosure of via3 : 0.06um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via3.4_a</name>
+   <description>via3.4_a : non-ring via3 must be enclosed by met3</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via3.5</name>
+   <description>via3.5 : min. m3 enclosure of via3 of 2 adjacent edges : 0.09um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4.1</name>
+   <description>m4.1 : min. m4 width : 0.3um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4.2</name>
+   <description>m4.2 : min. m4 spacing : 0.3um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4.4a</name>
+   <description>m4.4a : min. m4 area : 0.240um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4.5ab</name>
+   <description>m4.5ab : min. 3um.m4 spacing m4 : 0.4um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4.3</name>
+   <description>m4.3 : min. m4 enclosure of via3 : 0.065um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4.3_a</name>
+   <description>m4.3_a : via3 must be enclosed by met4</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4.7</name>
+   <description>m4.7 : min. m4 holes area : 0.2um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4.1</name>
+   <description>via4.1 : via4 outside of moduleCut should be rectangular</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4.1_a</name>
+   <description>via4.1_a : min. width of via4 outside of moduleCut : 0.8um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4.1_b</name>
+   <description>via4.1_b : maximum length of via4 : 0.8um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4.2</name>
+   <description>via4.2 : min. via4 spacing : 0.8um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4.3</name>
+   <description>via4.3 : min. width of ring-shaped via4 : 0.8um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4.3_a</name>
+   <description>via4.3_a : max. width of ring-shaped via4 : 0.805um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4.3_b</name>
+   <description>via4.3_b: ring-shaped via4 must be enclosed by areaid_sl</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4.4</name>
+   <description>via4.4 : min. m4 enclosure of via4 : 0.19um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4.4_a</name>
+   <description>via4.4_a : m4 must enclose all via4</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m5.1</name>
+   <description>m5.1 : min. m5 width : 1.6um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m5.2</name>
+   <description>m5.2 : min. m5 spacing : 1.6um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m5.3</name>
+   <description>m5.3 : min. m5 enclosure of via4 : 0.31um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m5.3_a</name>
+   <description>m5.3_a : via must be enclosed by m5</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m5.4</name>
+   <description>m5.4 : min. m5 area : 4.0um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m5.7</name>
+   <description>m5.7 : min. m5 holes area : 0.14um²</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pad.2</name>
+   <description>pad.2 : min. pad spacing : 1.27um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvi.1</name>
+   <description>hvi.1 : min. hvi width : 0.6um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvi.2a</name>
+   <description>hvi.2a : min. hvi spacing : 0.7um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvntm.1</name>
+   <description>hvntm.1 : min. hvntm width : 0.7um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvntm.2</name>
+   <description>hvntm.2 : min. hvntm spacing : 0.7um</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>dnwell_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on dnwell</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>dnwell_angle</name>
+   <description>x.3a : non 45 degree angle dnwell</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nwell_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on nwell</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nwell_angle</name>
+   <description>x.3a : non 45 degree angle nwell</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwbm_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on pwbm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwbm_angle</name>
+   <description>x.3a : non 45 degree angle pwbm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwde_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on pwde</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwde_angle</name>
+   <description>x.3a : non 45 degree angle pwde</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvtp_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on hvtp</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvtp_angle</name>
+   <description>x.3a : non 45 degree angle hvtp</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvtr_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on hvtr</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvtr_angle</name>
+   <description>x.3a : non 45 degree angle hvtr</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>lvtn_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on lvtn</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>lvtn_angle</name>
+   <description>x.3a : non 45 degree angle lvtn</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ncm_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on ncm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ncm_angle</name>
+   <description>x.3a : non 45 degree angle ncm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>diff_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on diff</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>tap_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on tap</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>diff_angle</name>
+   <description>x.2c : non 45 degree angle diff</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>tap_angle</name>
+   <description>x.2c : non 45 degree angle tap</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>tunm_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on tunm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>tunm_angle</name>
+   <description>x.3a : non 45 degree angle tunm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>poly_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on poly</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>poly_angle</name>
+   <description>x.2 : non 90 degree angle poly</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>rpm_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on rpm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>rpm_angle</name>
+   <description>x.3a : non 45 degree angle rpm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>npc_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on npc</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>npc_angle</name>
+   <description>x.3a : non 45 degree angle npc</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on nsdm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsdm_angle</name>
+   <description>x.3a : non 45 degree angle nsdm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on psdm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>psdm_angle</name>
+   <description>x.3a : non 45 degree angle psdm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on licon</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>licon_angle</name>
+   <description>x.2 : non 90 degree angle licon</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on li</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>li_angle</name>
+   <description>x.3a : non 45 degree angle li</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on mcon</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>ct_angle</name>
+   <description>x.2 : non 90 degree angle mcon</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>vpp_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on vpp</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>vpp_angle</name>
+   <description>x.3a : non 45 degree angle vpp</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on m1</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m1_angle</name>
+   <description>x.3a : non 45 degree angle m1</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on via</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via_angle</name>
+   <description>x.2 : non 90 degree angle via</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on m2</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m2_angle</name>
+   <description>x.3a : non 45 degree angle m2</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on via2</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via2_angle</name>
+   <description>x.2 : non 90 degree angle via2</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on m3</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m3_angle</name>
+   <description>x.3a : non 45 degree angle m3</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via3_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on via3</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via3_angle</name>
+   <description>x.2 : non 90 degree angle via3</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsm_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on nsm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>nsm_angle</name>
+   <description>x.3a : non 45 degree angle nsm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on m4</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m4_angle</name>
+   <description>x.3a : non 45 degree angle m4</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on via4</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>via4_angle</name>
+   <description>x.2 : non 90 degree angle via4</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m5_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on m5</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>m5_angle</name>
+   <description>x.3a : non 45 degree angle m5</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pad_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on pad</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pad_angle</name>
+   <description>x.3a : non 45 degree angle pad</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>mf_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on mf</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>mf_angle</name>
+   <description>x.2 : non 90 degree angle mf</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvi_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on hvi</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvi_angle</name>
+   <description>x.3a : non 45 degree angle hvi</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvntm_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on hvntm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>hvntm_angle</name>
+   <description>x.3a : non 45 degree angle hvntm</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>vhvi_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on vhvi</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>vhvi_angle</name>
+   <description>x.3a : non 45 degree angle vhvi</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>uhvi_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on uhvi</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>uhvi_angle</name>
+   <description>x.3a : non 45 degree angle uhvi</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwell_rs_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on pwell_rs</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>pwell_rs_angle</name>
+   <description>x.3a : non 45 degree angle pwell_rs</description>
+   <categories>
+   </categories>
+  </category>
+  <category>
+   <name>areaid_re_OFFGRID</name>
+   <description>x.1b : OFFGRID vertex on areaid.re</description>
+   <categories>
+   </categories>
+  </category>
+ </categories>
+ <cells>
+  <cell>
+   <name>temp_monitor_soc_phys</name>
+   <variant/>
+   <layout-name/>
+   <references>
+   </references>
+  </cell>
+  <cell>
+   <name>temp_sensor_adc_model</name>
+   <variant/>
+   <layout-name>temp_sensor_adc_model</layout-name>
+   <references>
+    <ref>
+     <parent>temp_monitor_soc_phys</parent>
+     <trans>r0 *1 18.27,146.97</trans>
+    </ref>
+   </references>
+  </cell>
+ </cells>
+ <items>
+  <item>
+   <tags/>
+   <category>'nwell.1'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.89,-119.4;1.62,-119.4)|(0.856,-119.05;1.89,-119.05)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'nwell.1'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.67,-120.1;5.4,-120.1)|(4.636,-119.75;5.67,-119.75)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'nwell.1'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.23,-121.18;12.96,-121.18)|(12.196,-120.83;13.23,-120.83)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'nwell.1'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (17.01,-121.72;16.74,-121.72)|(15.976,-121.37;17.01,-121.37)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'nwell.1'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (27.255,-126.05;26.19,-126.05)|(26.19,-125.78;26.46,-125.78)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'nwell.1'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (34.815,-127.13;33.75,-127.13)|(33.75,-126.86;34.02,-126.86)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'nwell.1'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (42.375,-128.21;41.31,-128.21)|(41.31,-127.94;41.58,-127.94)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.7,-125.035;20.7,-122.45)|(20.61,-122.195;20.61,-124.78)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.71,-122.45;20.71,-122.44)|(20.61,-122.189;20.61,-122.701)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.81,-124.765;18.81,-122.1)|(18.72,-121.91;18.72,-124.51)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.82,-122.1;18.82,-122.09)|(18.72,-121.91;18.72,-122.351)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.26,-126.121;28.26,-125.609)|(28.16,-125.86;28.16,-125.87)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.38,-123.18;26.38,-123.17)|(26.28,-122.99;26.28,-123.431)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.37,-125.851;26.37,-125.339)|(26.27,-125.59;26.27,-125.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.59,-125.305;22.59,-122.64)|(22.5,-122.45;22.5,-125.05)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.59,-125.311;22.59,-124.799)|(22.49,-125.05;22.49,-125.06)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.6,-122.64;22.6,-122.63)|(22.5,-122.45;22.5,-122.891)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.82,-127.195;35.82,-124.61)|(35.73,-124.355;35.73,-126.94)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.81,-124.771;18.81,-124.259)|(18.71,-124.51;18.71,-124.52)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.37,-120.83;9.37,-120.82)|(9.27,-120.569;9.27,-121.081)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.48,-125.575;24.48,-122.99)|(24.39,-122.735;24.39,-125.32)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.7,-119.94;3.7,-119.93)|(3.6,-119.679;3.6,-120.191)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.14,-123.955;13.14,-121.37)|(13.05,-121.115;13.05,-123.7)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.15,-121.37;13.15,-121.36)|(13.05,-121.109;13.05,-121.621)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.92,-124.501;16.92,-123.989)|(16.82,-124.24;16.82,-124.25)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.92,-124.495;16.92,-121.91)|(16.83,-121.655;16.83,-124.24)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.7,-125.041;20.7,-124.529)|(20.6,-124.78;20.6,-124.79)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.26,-121.02;11.26,-121.01)|(11.16,-120.83;11.16,-121.271)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.27,-123.53;28.27,-123.52)|(28.17,-123.269;28.17,-123.781)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.47,-123.145;7.47,-120.48)|(7.38,-120.29;7.38,-122.89)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.47,-123.151;7.47,-122.639)|(7.37,-122.89;7.37,-122.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.69,-122.605;3.69,-119.94)|(3.6,-119.685;3.6,-122.35)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.17,-126.23;47.17,-126.22)|(47.07,-125.969;47.07,-126.481)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.83,-124.61;35.83,-124.6)|(35.73,-124.349;35.73,-124.861)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.81,-119.59;1.81,-119.58)|(1.71,-119.329;1.71,-119.841)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.37,-125.845;26.37,-123.18)|(26.28,-122.99;26.28,-125.59)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.93,-121.91;16.93,-121.9)|(16.83,-121.649;16.83,-122.161)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.26,-126.115;28.26,-123.53)|(28.17,-123.275;28.17,-125.86)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.16,-128.821;47.16,-128.309)|(47.06,-128.56;47.06,-128.57)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.25,-123.691;11.25,-123.179)|(11.15,-123.43;11.15,-123.44)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.15,-126.391;30.15,-125.879)|(30.05,-126.13;30.05,-126.14)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.15,-126.385;30.15,-123.72)|(30.06,-123.53;30.06,-126.13)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.36,-123.421;9.36,-122.909)|(9.26,-123.16;9.26,-123.17)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.69,-122.611;3.69,-122.099)|(3.59,-122.35;3.59,-122.36)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.82,-127.201;35.82,-126.689)|(35.72,-126.94;35.72,-126.95)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.61,-125.15;39.61,-125.14)|(39.51,-124.889;39.51,-125.401)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.8,-122.341;1.8,-121.829)|(1.7,-122.08;1.7,-122.09)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.49,-128.011;41.49,-127.499)|(41.39,-127.75;41.39,-127.76)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.8,-122.335;1.8,-119.59)|(1.71,-119.335;1.71,-122.08)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.72,-124.8;37.72,-124.79)|(37.62,-124.61;37.62,-125.051)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.6,-127.741;39.6,-127.229)|(39.5,-127.48;39.5,-127.49)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.03,-124.225;15.03,-121.56)|(14.94,-121.37;14.94,-123.97)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.25,-123.685;11.25,-121.02)|(11.16,-120.83;11.16,-123.43)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.36,-123.415;9.36,-120.83)|(9.27,-120.575;9.27,-123.16)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.49,-122.99;24.49,-122.98)|(24.39,-122.729;24.39,-123.241)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.14,-123.961;13.14,-123.449)|(13.04,-123.7;13.04,-123.71)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.93,-126.931;33.93,-126.419)|(33.83,-126.67;33.83,-126.68)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.59,-120.29;5.59,-120.28)|(5.49,-120.029;5.49,-120.541)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.93,-126.925;33.93,-124.26)|(33.84,-124.07;33.84,-126.67)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.03,-124.231;15.03,-123.719)|(14.93,-123.97;14.93,-123.98)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.58,-122.881;5.58,-122.369)|(5.48,-122.62;5.48,-122.63)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.05,-124.07;32.05,-124.06)|(31.95,-123.809;31.95,-124.321)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.6,-127.735;39.6,-125.15)|(39.51,-124.895;39.51,-127.48)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.27,-128.551;45.27,-128.039)|(45.17,-128.29;45.17,-128.3)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.58,-122.875;5.58,-120.29)|(5.49,-120.035;5.49,-122.62)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.04,-126.661;32.04,-126.149)|(31.94,-126.4;31.94,-126.41)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.39,-125.69;43.39,-125.68)|(43.29,-125.429;43.29,-125.941)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.16,-123.72;30.16,-123.71)|(30.06,-123.53;30.06,-123.971)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.04,-121.56;15.04,-121.55)|(14.94,-121.37;14.94,-121.811)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.71,-127.471;37.71,-126.959)|(37.61,-127.21;37.61,-127.22)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.48,-125.581;24.48,-125.069)|(24.38,-125.32;24.38,-125.33)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.94,-124.26;33.94,-124.25)|(33.84,-124.07;33.84,-124.511)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.71,-127.465;37.71,-124.8)|(37.62,-124.61;37.62,-127.21)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.38,-128.281;43.38,-127.769)|(43.28,-128.02;43.28,-128.03)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.5,-125.34;41.5,-125.33)|(41.4,-125.15;41.4,-125.591)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.04,-126.655;32.04,-124.07)|(31.95,-123.815;31.95,-126.4)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.38,-128.275;43.38,-125.69)|(43.29,-125.435;43.29,-128.02)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.28,-125.88;45.28,-125.87)|(45.18,-125.69;45.18,-126.131)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.49,-128.005;41.49,-125.34)|(41.4,-125.15;41.4,-127.75)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.27,-128.545;45.27,-125.88)|(45.18,-125.69;45.18,-128.29)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.48,-120.48;7.48,-120.47)|(7.38,-120.29;7.38,-120.731)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'difftap.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.16,-128.815;47.16,-126.23)|(47.07,-125.975;47.07,-128.56)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.485,-124.375;24.485,-124.205)|(24.385,-124.235;24.385,-124.405)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.485,-124.715;24.485,-124.545)|(24.385,-124.575;24.385,-124.745)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.485,-123.695;24.485,-123.525)|(24.385,-123.555;24.385,-123.725)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.485,-124.035;24.485,-123.865)|(24.385,-123.895;24.385,-124.065)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-123.925;26.375,-123.755)|(26.275,-123.865;26.275,-124.035)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.825,-125.995;35.825,-125.825)|(35.725,-125.855;35.725,-126.025)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-124.172;26.375,-124.095)|(26.275,-123.958;26.275,-124.035)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.825,-125.315;35.825,-125.145)|(35.725,-125.175;35.725,-125.345)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.825,-125.655;35.825,-125.485)|(35.725,-125.515;35.725,-125.685)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.825,-126.335;35.825,-126.165)|(35.725,-126.195;35.725,-126.365)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-123.755;26.434,-123.755)|(26.275,-123.695;26.216,-123.695)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-123.832;26.375,-123.755)|(26.275,-123.618;26.275,-123.695)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-126.025;33.935,-125.855)|(33.835,-125.965;33.835,-126.135)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-125.855;33.994,-125.855)|(33.835,-125.795;33.776,-125.795)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-125.592;33.935,-125.515)|(33.835,-125.378;33.835,-125.455)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-126.195;33.994,-126.195)|(33.835,-126.135;33.776,-126.135)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-125.252;33.935,-125.175)|(33.835,-125.038;33.835,-125.115)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-125.485;30.155,-125.315)|(30.055,-125.425;30.055,-125.595)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-125.685;33.935,-125.515)|(33.835,-125.625;33.835,-125.795)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-124.945;26.375,-124.775)|(26.275,-124.885;26.275,-125.055)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-125.732;30.155,-125.655)|(30.055,-125.518;30.055,-125.595)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-125.655;30.214,-125.655)|(30.055,-125.595;29.996,-125.595)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.265,-124.915;28.265,-124.745)|(28.165,-124.775;28.165,-124.945)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-124.805;30.155,-124.635)|(30.055,-124.745;30.055,-124.915)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-124.635;30.214,-124.635)|(30.055,-124.575;29.996,-124.575)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-124.712;30.155,-124.635)|(30.055,-124.498;30.055,-124.575)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-125.005;33.935,-124.835)|(33.835,-124.945;33.835,-125.115)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-125.315;30.214,-125.315)|(30.055,-125.255;29.996,-125.255)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-126.272;33.935,-126.195)|(33.835,-126.058;33.835,-126.135)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-124.435;26.434,-124.435)|(26.275,-124.375;26.216,-124.375)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-124.465;30.155,-124.295)|(30.055,-124.405;30.055,-124.575)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-124.265;26.375,-124.095)|(26.275,-124.205;26.275,-124.375)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.265,-124.575;28.265,-124.405)|(28.165,-124.435;28.165,-124.605)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.045,-125.795;32.045,-125.625)|(31.945,-125.655;31.945,-125.825)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-124.852;26.375,-124.775)|(26.275,-124.638;26.275,-124.715)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.045,-124.775;32.045,-124.605)|(31.945,-124.635;31.945,-124.805)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.045,-125.115;32.045,-124.945)|(31.945,-124.975;31.945,-125.145)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-124.372;30.155,-124.295)|(30.055,-124.158;30.055,-124.235)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.265,-125.255;28.265,-125.085)|(28.165,-125.115;28.165,-125.285)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-124.835;33.994,-124.835)|(33.835,-124.775;33.776,-124.775)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-125.345;33.935,-125.175)|(33.835,-125.285;33.835,-125.455)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-124.775;26.434,-124.775)|(26.275,-124.715;26.216,-124.715)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-124.295;30.214,-124.295)|(30.055,-124.235;29.996,-124.235)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.265,-124.235;28.265,-124.065)|(28.165,-124.095;28.165,-124.265)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-125.515;33.994,-125.515)|(33.835,-125.455;33.776,-125.455)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-125.175;33.994,-125.175)|(33.835,-125.115;33.776,-125.115)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-125.932;33.935,-125.855)|(33.835,-125.718;33.835,-125.795)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-125.192;26.375,-125.115)|(26.275,-124.978;26.275,-125.055)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-125.052;30.155,-124.975)|(30.055,-124.838;30.055,-124.915)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-125.392;30.155,-125.315)|(30.055,-125.178;30.055,-125.255)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-125.115;26.434,-125.115)|(26.275,-125.055;26.216,-125.055)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.045,-125.455;32.045,-125.285)|(31.945,-125.315;31.945,-125.485)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-124.095;26.434,-124.095)|(26.275,-124.035;26.216,-124.035)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-125.145;30.155,-124.975)|(30.055,-125.085;30.055,-125.255)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.935,-124.912;33.935,-124.835)|(33.835,-124.698;33.835,-124.775)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-124.512;26.375,-124.435)|(26.275,-124.298;26.275,-124.375)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.375,-124.605;26.375,-124.435)|(26.275,-124.545;26.275,-124.715)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.155,-124.975;30.214,-124.975)|(30.055,-124.915;29.996,-124.915)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-126.225;37.715,-126.055)|(37.615,-126.165;37.615,-126.335)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-125.792;37.715,-125.715)|(37.615,-125.578;37.615,-125.655)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-127.275;41.554,-127.275)|(41.395,-127.215;41.336,-127.215)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-126.455;45.334,-126.455)|(45.175,-126.395;45.116,-126.395)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-126.532;45.275,-126.455)|(45.175,-126.318;45.175,-126.395)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-126.055;37.774,-126.055)|(37.615,-125.995;37.556,-125.995)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-127.815;45.334,-127.815)|(45.175,-127.755;45.116,-127.755)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.385,-127.415;43.385,-127.245)|(43.285,-127.275;43.285,-127.445)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-125.545;37.715,-125.375)|(37.615,-125.485;37.615,-125.655)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.605,-126.195;39.605,-126.025)|(39.505,-126.055;39.505,-126.225)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.385,-126.395;43.385,-126.225)|(43.285,-126.255;43.285,-126.425)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-127.352;41.495,-127.275)|(41.395,-127.138;41.395,-127.215)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-127.475;45.334,-127.475)|(45.175,-127.415;45.116,-127.415)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-126.595;41.554,-126.595)|(41.395,-126.535;41.336,-126.535)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-126.672;41.495,-126.595)|(41.395,-126.458;41.395,-126.535)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-126.425;41.495,-126.255)|(41.395,-126.365;41.395,-126.535)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-126.565;37.715,-126.395)|(37.615,-126.505;37.615,-126.675)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-127.305;45.275,-127.135)|(45.175,-127.245;45.175,-127.415)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.385,-126.735;43.385,-126.565)|(43.285,-126.595;43.285,-126.765)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-126.132;37.715,-126.055)|(37.615,-125.918;37.615,-125.995)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.165,-126.935;47.165,-126.765)|(47.065,-126.795;47.065,-126.965)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-127.645;45.275,-127.475)|(45.175,-127.585;45.175,-127.755)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.165,-127.955;47.165,-127.785)|(47.065,-127.815;47.065,-127.985)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.165,-127.615;47.165,-127.445)|(47.065,-127.475;47.065,-127.645)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-126.872;45.275,-126.795)|(45.175,-126.658;45.175,-126.735)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-126.395;37.774,-126.395)|(37.615,-126.335;37.556,-126.335)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-126.795;45.334,-126.795)|(45.175,-126.735;45.116,-126.735)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-126.472;37.715,-126.395)|(37.615,-126.258;37.615,-126.335)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-127.212;45.275,-127.135)|(45.175,-126.998;45.175,-127.075)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-127.552;45.275,-127.475)|(45.175,-127.338;45.175,-127.415)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-126.965;45.275,-126.795)|(45.175,-126.905;45.175,-127.075)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.385,-127.075;43.385,-126.905)|(43.285,-126.935;43.285,-127.105)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-127.892;45.275,-127.815)|(45.175,-127.678;45.175,-127.755)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-125.992;41.495,-125.915)|(41.395,-125.778;41.395,-125.855)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-126.935;41.554,-126.935)|(41.395,-126.875;41.336,-126.875)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-127.012;41.495,-126.935)|(41.395,-126.798;41.395,-126.875)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-126.765;41.495,-126.595)|(41.395,-126.705;41.395,-126.875)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.605,-126.875;39.605,-126.705)|(39.505,-126.735;39.505,-126.905)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.605,-126.535;39.605,-126.365)|(39.505,-126.395;39.505,-126.565)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-126.735;37.774,-126.735)|(37.615,-126.675;37.556,-126.675)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-126.812;37.715,-126.735)|(37.615,-126.598;37.615,-126.675)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-125.715;37.774,-125.715)|(37.615,-125.655;37.556,-125.655)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-127.135;45.334,-127.135)|(45.175,-127.075;45.116,-127.075)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-125.915;41.554,-125.915)|(41.395,-125.855;41.336,-125.855)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-126.085;41.495,-125.915)|(41.395,-126.025;41.395,-126.195)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-125.885;37.715,-125.715)|(37.615,-125.825;37.615,-125.995)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-125.452;37.715,-125.375)|(37.615,-125.238;37.615,-125.315)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.715,-125.375;37.774,-125.375)|(37.615,-125.315;37.556,-125.315)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.165,-127.275;47.165,-127.105)|(47.065,-127.135;47.065,-127.305)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.275,-126.625;45.275,-126.455)|(45.175,-126.565;45.175,-126.735)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.605,-125.855;39.605,-125.685)|(39.505,-125.715;39.505,-125.885)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-127.105;41.495,-126.935)|(41.395,-127.045;41.395,-127.215)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-126.255;41.554,-126.255)|(41.395,-126.195;41.336,-126.195)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.495,-126.332;41.495,-126.255)|(41.395,-126.118;41.395,-126.195)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-124.035;18.874,-124.035)|(18.715,-123.975;18.656,-123.975)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.705,-124.175;20.705,-124.005)|(20.605,-124.035;20.605,-124.205)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-124.065;22.595,-123.895)|(22.495,-124.005;22.495,-124.175)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-124.112;18.815,-124.035)|(18.715,-123.898;18.715,-123.975)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-123.185;18.815,-123.015)|(18.715,-123.125;18.715,-123.295)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-122.675;18.874,-122.675)|(18.715,-122.615;18.656,-122.615)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-123.015;18.874,-123.015)|(18.715,-122.955;18.656,-122.955)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.705,-123.835;20.705,-123.665)|(20.605,-123.695;20.605,-123.865)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.925,-122.615;16.925,-122.445)|(16.825,-122.475;16.825,-122.645)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-123.772;18.815,-123.695)|(18.715,-123.558;18.715,-123.635)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-123.092;18.815,-123.015)|(18.715,-122.878;18.715,-122.955)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.705,-123.155;20.705,-122.985)|(20.605,-123.015;20.605,-123.185)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-123.355;18.874,-123.355)|(18.715,-123.295;18.656,-123.295)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.145,-122.755;13.145,-122.585)|(13.045,-122.615;13.045,-122.785)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-123.432;18.815,-123.355)|(18.715,-123.218;18.715,-123.295)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-122.752;18.815,-122.675)|(18.715,-122.538;18.715,-122.615)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-123.385;22.595,-123.215)|(22.495,-123.325;22.495,-123.495)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-123.725;22.595,-123.555)|(22.495,-123.665;22.495,-123.835)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-123.895;22.654,-123.895)|(22.495,-123.835;22.436,-123.835)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-123.695;18.874,-123.695)|(18.715,-123.635;18.656,-123.635)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-123.865;18.815,-123.695)|(18.715,-123.805;18.715,-123.975)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-123.215;22.654,-123.215)|(22.495,-123.155;22.436,-123.155)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-123.292;22.595,-123.215)|(22.495,-123.078;22.495,-123.155)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-123.525;18.815,-123.355)|(18.715,-123.465;18.715,-123.635)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.145,-122.075;13.145,-121.905)|(13.045,-121.935;13.045,-122.105)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-123.972;22.595,-123.895)|(22.495,-123.758;22.495,-123.835)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-123.495;15.094,-123.495)|(14.935,-123.435;14.876,-123.435)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-123.325;15.035,-123.155)|(14.935,-123.265;14.935,-123.435)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-122.135;15.094,-122.135)|(14.935,-122.075;14.876,-122.075)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-123.572;15.035,-123.495)|(14.935,-123.358;14.935,-123.435)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.925,-123.295;16.925,-123.125)|(16.825,-123.155;16.825,-123.325)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-122.552;15.035,-122.475)|(14.935,-122.338;14.935,-122.415)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-123.155;15.094,-123.155)|(14.935,-123.095;14.876,-123.095)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-123.232;15.035,-123.155)|(14.935,-123.018;14.935,-123.095)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-122.475;15.094,-122.475)|(14.935,-122.415;14.876,-122.415)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-123.632;22.595,-123.555)|(22.495,-123.418;22.495,-123.495)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.925,-122.955;16.925,-122.785)|(16.825,-122.815;16.825,-122.985)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-122.815;15.094,-122.815)|(14.935,-122.755;14.876,-122.755)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-122.985;15.035,-122.815)|(14.935,-122.925;14.935,-123.095)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-123.555;22.654,-123.555)|(22.495,-123.495;22.436,-123.495)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.145,-123.095;13.145,-122.925)|(13.045,-122.955;13.045,-123.125)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-122.305;15.035,-122.135)|(14.935,-122.245;14.935,-122.415)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-122.645;15.035,-122.475)|(14.935,-122.585;14.935,-122.755)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.145,-122.415;13.145,-122.245)|(13.045,-122.275;13.045,-122.445)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.705,-123.495;20.705,-123.325)|(20.605,-123.355;20.605,-123.525)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-122.892;15.035,-122.815)|(14.935,-122.678;14.935,-122.755)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.035,-122.212;15.035,-122.135)|(14.935,-121.998;14.935,-122.075)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.925,-123.635;16.925,-123.465)|(16.825,-123.495;16.825,-123.665)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.815,-122.845;18.815,-122.675)|(18.715,-122.785;18.715,-122.955)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.805,-121.052;1.805,-120.885)|(1.705,-120.748;1.705,-120.915)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.705,-121.085;1.705,-121.192)|(1.805,-121.055;1.805,-120.948)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-121.055;7.534,-121.055)|(7.375,-120.995;7.316,-120.995)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-122.105;11.255,-121.935)|(11.155,-122.045;11.155,-122.215)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-121.735;7.534,-121.735)|(7.375,-121.675;7.316,-121.675)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-122.245;7.475,-122.075)|(7.375,-122.185;7.375,-122.355)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-122.075;7.534,-122.075)|(7.375,-122.015;7.316,-122.015)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-122.692;11.255,-122.615)|(11.155,-122.478;11.155,-122.555)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-121.225;7.475,-121.055)|(7.375,-121.165;7.375,-121.335)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.365,-121.875;9.365,-121.705)|(9.265,-121.735;9.265,-121.905)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-122.492;7.475,-122.415)|(7.375,-122.278;7.375,-122.355)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-122.275;11.314,-122.275)|(11.155,-122.215;11.096,-122.215)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.365,-122.215;9.365,-122.045)|(9.265,-122.075;9.265,-122.245)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-122.415;7.534,-122.415)|(7.375,-122.355;7.316,-122.355)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-121.395;7.534,-121.395)|(7.375,-121.335;7.316,-121.335)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-122.012;11.255,-121.935)|(11.155,-121.798;11.155,-121.875)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-122.785;11.255,-122.615)|(11.155,-122.725;11.155,-122.895)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.705,-120.745;1.705,-120.852)|(1.805,-120.715;1.805,-120.608)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.695,-121.025;3.695,-120.855)|(3.595,-120.885;3.595,-121.055)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.805,-120.712;1.805,-120.545)|(1.705,-120.408;1.705,-120.575)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-122.615;11.314,-122.615)|(11.155,-122.555;11.096,-122.555)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-122.152;7.475,-122.075)|(7.375,-121.938;7.375,-122.015)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.585,-121.675;5.585,-121.505)|(5.485,-121.535;5.485,-121.705)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.805,-121.392;1.805,-121.225)|(1.705,-121.088;1.705,-121.255)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.638,-121.085;1.705,-121.085)|(1.872,-121.055;1.805,-121.055)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.638,-120.405;1.705,-120.405)|(1.872,-120.375;1.805,-120.375)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.638,-121.425;1.705,-121.425)|(1.872,-121.395;1.805,-121.395)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.585,-120.995;5.585,-120.825)|(5.485,-120.855;5.485,-121.025)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.705,-121.425;1.705,-121.532)|(1.805,-121.395;1.805,-121.288)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-121.595;11.314,-121.595)|(11.155,-121.535;11.096,-121.535)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-121.905;7.475,-121.735)|(7.375,-121.845;7.375,-122.015)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.705,-120.405;1.705,-120.512)|(1.805,-120.375;1.805,-120.268)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.585,-121.335;5.585,-121.165)|(5.485,-121.195;5.485,-121.365)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-121.812;7.475,-121.735)|(7.375,-121.598;7.375,-121.675)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-121.935;11.314,-121.935)|(11.155,-121.875;11.096,-121.875)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.695,-121.365;3.695,-121.195)|(3.595,-121.225;3.595,-121.395)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-121.765;11.255,-121.595)|(11.155,-121.705;11.155,-121.875)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-121.132;7.475,-121.055)|(7.375,-120.918;7.375,-120.995)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-121.472;7.475,-121.395)|(7.375,-121.258;7.375,-121.335)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-122.955;11.314,-122.955)|(11.155,-122.895;11.096,-122.895)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.805,-121.732;1.805,-121.565)|(1.705,-121.428;1.705,-121.595)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-122.445;11.255,-122.275)|(11.155,-122.385;11.155,-122.555)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.475,-121.565;7.475,-121.395)|(7.375,-121.505;7.375,-121.675)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.365,-121.535;9.365,-121.365)|(9.265,-121.395;9.265,-121.565)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.805,-120.372;1.805,-120.205)|(1.705,-120.068;1.705,-120.235)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.695,-121.705;3.695,-121.535)|(3.595,-121.565;3.595,-121.735)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.695,-120.685;3.695,-120.515)|(3.595,-120.545;3.595,-120.715)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-122.352;11.255,-122.275)|(11.155,-122.138;11.155,-122.215)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-121.672;11.255,-121.595)|(11.155,-121.458;11.155,-121.535)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.638,-120.745;1.705,-120.745)|(1.872,-120.715;1.805,-120.715)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.585,-122.015;5.585,-121.845)|(5.485,-121.875;5.485,-122.045)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.365,-122.555;9.365,-122.385)|(9.265,-122.415;9.265,-122.585)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.255,-123.032;11.255,-122.955)|(11.155,-122.818;11.155,-122.895)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-124.312;22.595,-124.235)|(22.495,-124.098;22.495,-124.175)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-124.652;22.595,-124.575)|(22.495,-124.438;22.495,-124.515)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-124.235;22.654,-124.235)|(22.495,-124.175;22.436,-124.175)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-124.405;22.595,-124.235)|(22.495,-124.345;22.495,-124.515)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'licon.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.595,-124.575;22.654,-124.575)|(22.495,-124.515;22.436,-124.515)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.58,-122.767;5.58,-122.483)|(5.48,-122.62;5.48,-122.63)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.59,-120.29;5.59,-120.28)|(5.49,-120.143;5.49,-120.427)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (5.58,-122.764;5.58,-120.29)|(5.49,-120.146;5.49,-122.62)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.8,-122.224;1.8,-119.59)|(1.71,-119.446;1.71,-122.08)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.8,-122.227;1.8,-121.943)|(1.7,-122.08;1.7,-122.09)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1.81,-119.59;1.81,-119.58)|(1.71,-119.443;1.71,-119.727)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.69,-122.494;3.69,-119.94)|(3.6,-119.796;3.6,-122.35)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.7,-119.94;3.7,-119.93)|(3.6,-119.793;3.6,-120.077)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.26,-121.02;11.26,-121.01)|(11.16,-120.873;11.16,-121.157)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.25,-123.577;11.25,-123.293)|(11.15,-123.43;11.15,-123.44)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.36,-123.304;9.36,-120.83)|(9.27,-120.686;9.27,-123.16)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.27,-128.434;45.27,-125.88)|(45.18,-125.736;45.18,-128.29)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.05,-124.07;32.05,-124.06)|(31.95,-123.923;31.95,-124.207)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.6,-127.624;39.6,-125.15)|(39.51,-125.006;39.51,-127.48)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.49,-127.897;41.49,-127.613)|(41.39,-127.75;41.39,-127.76)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.6,-122.64;22.6,-122.63)|(22.5,-122.493;22.5,-122.777)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (3.69,-122.497;3.69,-122.213)|(3.59,-122.35;3.59,-122.36)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.39,-125.69;43.39,-125.68)|(43.29,-125.543;43.29,-125.827)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.81,-124.657;18.81,-124.373)|(18.71,-124.51;18.71,-124.52)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.5,-125.34;41.5,-125.33)|(41.4,-125.193;41.4,-125.477)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.61,-125.15;39.61,-125.14)|(39.51,-125.003;39.51,-125.287)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.83,-124.61;35.83,-124.6)|(35.73,-124.463;35.73,-124.747)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (41.49,-127.894;41.49,-125.34)|(41.4,-125.196;41.4,-127.75)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.14,-123.847;13.14,-123.563)|(13.04,-123.7;13.04,-123.71)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.93,-126.817;33.93,-126.533)|(33.83,-126.67;33.83,-126.68)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.48,-125.467;24.48,-125.183)|(24.38,-125.32;24.38,-125.33)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.16,-123.72;30.16,-123.71)|(30.06,-123.573;30.06,-123.857)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.72,-124.8;37.72,-124.79)|(37.62,-124.653;37.62,-124.937)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.38,-123.18;26.38,-123.17)|(26.28,-123.033;26.28,-123.317)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (39.6,-127.627;39.6,-127.343)|(39.5,-127.48;39.5,-127.49)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.82,-127.084;35.82,-124.61)|(35.73,-124.466;35.73,-126.94)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.71,-127.354;37.71,-124.8)|(37.62,-124.656;37.62,-127.21)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.47,-123.037;7.47,-122.753)|(7.37,-122.89;7.37,-122.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.38,-128.167;43.38,-127.883)|(43.28,-128.02;43.28,-128.03)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.7,-124.927;20.7,-124.643)|(20.6,-124.78;20.6,-124.79)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.37,-125.737;26.37,-125.453)|(26.27,-125.59;26.27,-125.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.04,-126.544;32.04,-124.07)|(31.95,-123.926;31.95,-126.4)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (32.04,-126.547;32.04,-126.263)|(31.94,-126.4;31.94,-126.41)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.94,-124.26;33.94,-124.25)|(33.84,-124.113;33.84,-124.397)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.26,-126.007;28.26,-125.723)|(28.16,-125.86;28.16,-125.87)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.26,-126.004;28.26,-123.53)|(28.17,-123.386;28.17,-125.86)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.17,-126.23;47.17,-126.22)|(47.07,-126.083;47.07,-126.367)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (11.25,-123.574;11.25,-121.02)|(11.16,-120.876;11.16,-123.43)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.47,-123.034;7.47,-120.48)|(7.38,-120.336;7.38,-122.89)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (26.37,-125.734;26.37,-123.18)|(26.28,-123.036;26.28,-125.59)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.82,-122.1;18.82,-122.09)|(18.72,-121.953;18.72,-122.237)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.27,-128.437;45.27,-128.153)|(45.17,-128.29;45.17,-128.3)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (35.82,-127.087;35.82,-126.803)|(35.72,-126.94;35.72,-126.95)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.03,-124.117;15.03,-123.833)|(14.93,-123.97;14.93,-123.98)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.15,-126.277;30.15,-125.993)|(30.05,-126.13;30.05,-126.14)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.48,-125.464;24.48,-122.99)|(24.39,-122.846;24.39,-125.32)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (33.93,-126.814;33.93,-124.26)|(33.84,-124.116;33.84,-126.67)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (28.27,-123.53;28.27,-123.52)|(28.17,-123.383;28.17,-123.667)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (37.71,-127.357;37.71,-127.073)|(37.61,-127.21;37.61,-127.22)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (45.28,-125.88;45.28,-125.87)|(45.18,-125.733;45.18,-126.017)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.16,-128.707;47.16,-128.423)|(47.06,-128.56;47.06,-128.57)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (47.16,-128.704;47.16,-126.23)|(47.07,-126.086;47.07,-128.56)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.59,-125.194;22.59,-122.64)|(22.5,-122.496;22.5,-125.05)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.71,-122.45;20.71,-122.44)|(20.61,-122.303;20.61,-122.587)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (20.7,-124.924;20.7,-122.45)|(20.61,-122.306;20.61,-124.78)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (43.38,-128.164;43.38,-125.69)|(43.29,-125.546;43.29,-128.02)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (22.59,-125.197;22.59,-124.913)|(22.49,-125.05;22.49,-125.06)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.81,-124.654;18.81,-122.1)|(18.72,-121.956;18.72,-124.51)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.93,-121.91;16.93,-121.9)|(16.83,-121.763;16.83,-122.047)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (7.48,-120.48;7.48,-120.47)|(7.38,-120.333;7.38,-120.617)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.03,-124.114;15.03,-121.56)|(14.94,-121.416;14.94,-123.97)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (24.49,-122.99;24.49,-122.98)|(24.39,-122.843;24.39,-123.127)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (30.15,-126.274;30.15,-123.72)|(30.06,-123.576;30.06,-126.13)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.92,-124.384;16.92,-121.91)|(16.83,-121.766;16.83,-124.24)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (16.92,-124.387;16.92,-124.103)|(16.82,-124.24;16.82,-124.25)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (15.04,-121.56;15.04,-121.55)|(14.94,-121.413;14.94,-121.697)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.15,-121.37;13.15,-121.36)|(13.05,-121.223;13.05,-121.507)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.36,-123.307;9.36,-123.023)|(9.26,-123.16;9.26,-123.17)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (13.14,-123.844;13.14,-121.37)|(13.05,-121.226;13.05,-123.7)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'li.3'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (9.37,-120.83;9.37,-120.82)|(9.27,-120.683;9.27,-120.967)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.1'</category>
+   <cell>temp_monitor_soc_phys</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.41,68.97;18.33,68.97)|(18.19,68.98;18.27,68.98)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.1'</category>
+   <cell>temp_monitor_soc_phys</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.33,68.97;18.33,68.854)|(18.27,68.98;18.27,69.096)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.2'</category>
+   <cell>temp_monitor_soc_phys</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (18.451,132.97;18.27,132.97)/(18.149,132.9;18.33,132.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (1,-8;0,-8)/(-0.14,-8.01;1.14,-8.01)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (42.24,-125.82;42.54,-125.82)/(42.677,-125.79;42.103,-125.79)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.2'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>edge-pair: (38.76,-125.52;38.46,-125.52)/(38.408,-125.65;38.812,-125.65)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (4.44,-122.14;4.44,-121.9;4.74,-121.9;4.74,-122.14)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (6.33,-122.41;6.33,-122.17;6.63,-122.17;6.63,-122.41)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (12,-121.74;12,-121.5;12.3,-121.5;12.3,-121.74)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (10.11,-121.55;10.11,-121.31;10.41,-121.31;10.41,-121.55)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (2.55,-121.87;2.55,-121.63;2.85,-121.63;2.85,-121.87)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (8.22,-121.2;8.22,-120.96;8.52,-120.96;8.52,-121.2)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (6.33,-121.01;6.33,-120.77;6.63,-120.77;6.63,-121.01)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (4.44,-120.66;4.44,-120.42;4.74,-120.42;4.74,-120.66)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (2.55,-120.31;2.55,-120.07;2.85,-120.07;2.85,-120.31)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (23.34,-124.84;23.34,-124.6;23.64,-124.6;23.64,-124.84)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (19.56,-124.3;19.56,-124.06;19.86,-124.06;19.86,-124.3)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (21.45,-124.57;21.45,-124.33;21.75,-124.33;21.75,-124.57)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (15.78,-123.76;15.78,-123.52;16.08,-123.52;16.08,-123.76)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (17.67,-124.03;17.67,-123.79;17.97,-123.79;17.97,-124.03)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (23.34,-123.36;23.34,-123.12;23.64,-123.12;23.64,-123.36)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (21.45,-123.17;21.45,-122.93;21.75,-122.93;21.75,-123.17)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (12,-123.22;12,-122.98;12.3,-122.98;12.3,-123.22)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (13.89,-123.49;13.89,-123.25;14.19,-123.25;14.19,-123.49)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (19.56,-122.82;19.56,-122.58;19.86,-122.58;19.86,-122.82)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (17.67,-122.63;17.67,-122.39;17.97,-122.39;17.97,-122.63)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (8.22,-122.68;8.22,-122.44;8.52,-122.44;8.52,-122.68)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (10.11,-122.95;10.11,-122.71;10.41,-122.71;10.41,-122.95)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (15.78,-122.28;15.78,-122.04;16.08,-122.04;16.08,-122.28)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (13.89,-122.09;13.89,-121.85;14.19,-121.85;14.19,-122.09)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (42.24,-126.06;42.24,-125.82;42.54,-125.82;42.54,-126.06)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (32.79,-126.19;32.79,-125.95;33.09,-125.95;33.09,-126.19)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (38.46,-125.52;38.46,-125.28;38.76,-125.28;38.76,-125.52)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (36.57,-125.33;36.57,-125.09;36.87,-125.09;36.87,-125.33)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (27.12,-125.38;27.12,-125.14;27.42,-125.14;27.42,-125.38)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (34.68,-124.98;34.68,-124.74;34.98,-124.74;34.98,-124.98)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (32.79,-124.79;32.79,-124.55;33.09,-124.55;33.09,-124.79)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (47.91,-128.35;47.91,-128.11;48.21,-128.11;48.21,-128.35)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (25.23,-125.11;25.23,-124.87;25.53,-124.87;25.53,-125.11)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (30.9,-124.44;30.9,-124.2;31.2,-124.2;31.2,-124.44)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (29.01,-124.25;29.01,-124.01;29.31,-124.01;29.31,-124.25)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (46.02,-128.08;46.02,-127.84;46.32,-127.84;46.32,-128.08)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (27.12,-123.9;27.12,-123.66;27.42,-123.66;27.42,-123.9)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (25.23,-123.71;25.23,-123.47;25.53,-123.47;25.53,-123.71)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (42.24,-127.54;42.24,-127.3;42.54,-127.3;42.54,-127.54)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (44.13,-127.81;44.13,-127.57;44.43,-127.57;44.43,-127.81)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (47.91,-126.95;47.91,-126.71;48.21,-126.71;48.21,-126.95)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (38.46,-127;38.46,-126.76;38.76,-126.76;38.76,-127)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (40.35,-127.27;40.35,-127.03;40.65,-127.03;40.65,-127.27)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (46.02,-126.6;46.02,-126.36;46.32,-126.36;46.32,-126.6)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (44.13,-126.41;44.13,-126.17;44.43,-126.17;44.43,-126.41)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (34.68,-126.46;34.68,-126.22;34.98,-126.22;34.98,-126.46)</value>
+   </values>
+  </item>
+  <item>
+   <tags/>
+   <category>'m1.6'</category>
+   <cell>temp_sensor_adc_model</cell>
+   <visited>false</visited>
+   <multiplicity>1</multiplicity>
+   <comment/>
+   <image/>
+   <values>
+    <value>polygon: (36.57,-126.73;36.57,-126.49;36.87,-126.49;36.87,-126.73)</value>
+   </values>
+  </item>
+ </items>
+</report-database>

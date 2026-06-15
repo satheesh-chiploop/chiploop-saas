@@ -1,0 +1,13 @@
+{
+  "workflow_id": "919478b7-46be-40fa-8ff0-688455fbfa56",
+  "agent": "Analog Sky130 SPICE Netlist Agent",
+  "pdk": "sky130A",
+  "module": "temp_sensor_adc_model",
+  "source": "generated_by_sky130_spice_agent",
+  "status": "ready",
+  "spice": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/919478b7-46be-40fa-8ff0-688455fbfa56/bd979697-7a54-4d39-b158-657e0fb25348/digital/analog/sky130/temp_sensor_adc_model.spice",
+  "relpath": "analog/sky130/temp_sensor_adc_model.spice",
+  "device_level": true,
+  "generated": true,
+  "repair_applied": false
+}

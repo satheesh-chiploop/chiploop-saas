@@ -1,0 +1,50 @@
+{
+  "workflow_id": "89d401d5-3193-4ed9-991f-efda69c754f9",
+  "agent": "Digital Synthesis Agent",
+  "status": "ok",
+  "return_code": 0,
+  "inputs": {
+    "rtl_files": [
+      "temp_sensor_adc_model.v",
+      "temp_monitor_digital.v",
+      "temp_monitor_soc_phys.sv",
+      "temp_monitor_soc_sim.sv"
+    ],
+    "pre_synthesis_rtl_repairs": {},
+    "macro_libs": [
+      "temp_sensor_adc_model.lib"
+    ],
+    "top_module": "temp_monitor_soc_phys",
+    "clock_port": "clk",
+    "clock_period_ns": 10.0,
+    "synthesis_closure_iteration": 0,
+    "synthesis_closure_timing_repair_enabled": true,
+    "synthesis_closure_optimization_profile": {
+      "enabled": false,
+      "iteration": 0,
+      "clock_margin": 1.0,
+      "strategy": "AREA 0",
+      "allow_retiming": false,
+      "allow_flattening": false,
+      "techniques": []
+    },
+    "synthesis_closure_openlane_overrides": {},
+    "pdk_variant": "sky130A",
+    "openlane_image": "ghcr.io/efabless/openlane2:2.4.0.dev1",
+    "openlane_to_step": "OpenROAD.STAPrePNR",
+    "pdk_root_host": "/root/chiploop-backend/backend/pdk"
+  },
+  "outputs": {
+    "stage_dir": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/synth",
+    "config_json": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/synth/config.json",
+    "sdc": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/synth/constraints/top.sdc",
+    "run_sh": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/synth/run.sh",
+    "exec_log": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/synth/logs/openlane_synth.log",
+    "metrics_json": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/synth/metrics.json",
+    "netlist": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/synth/netlist/temp_monitor_soc_phys_synth.v",
+    "netlist_candidates": [
+      "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89d401d5-3193-4ed9-991f-efda69c754f9/8fe6c416-1ab8-45e7-b3ac-dade936281f4/digital/digital/synth/runs/System_PD_89d401d5-3193-4ed9-991f-efda69c754f9/02-yosys-synthesis/temp_monitor_soc_phys.nl.v"
+    ],
+    "enriched_metrics": true
+  }
+}
