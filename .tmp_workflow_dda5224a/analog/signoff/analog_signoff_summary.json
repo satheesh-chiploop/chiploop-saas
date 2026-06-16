@@ -1,0 +1,50 @@
+{
+  "workflow_id": "dda5224a-c8b1-449c-bf86-ea84c3c162ed",
+  "agent": "Analog GDS Generation Agent",
+  "generated_at": "2026-06-16T05:25:56.527971Z",
+  "module": "temp_sensor_adc_model",
+  "pdk": "sky130A",
+  "backend": "magic",
+  "gds": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/analog/gds/temp_sensor_adc_model.gds",
+  "log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/analog/gds/magic_gds.log",
+  "drc": {
+    "status": "clean",
+    "tool": "magic",
+    "feedback_problem_count": 0,
+    "reason": null
+  },
+  "lvs": {
+    "status": "mismatch",
+    "tool": "netgen",
+    "reason": "mismatch",
+    "return_code": 0,
+    "extracted_spice": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/analog/gds/temp_sensor_adc_model_extracted.spice",
+    "extract_log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/analog/gds/analog_lvs_magic_extract.log",
+    "log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/analog/gds/analog_lvs_netgen.log",
+    "counts": {
+      "extracted_devices": 3,
+      "source_devices": 26,
+      "extracted_nets": 22,
+      "source_nets": 132
+    },
+    "failure_class": "pin_mismatch",
+    "repair_attempted": true,
+    "repair_applied": true,
+    "pass1": {
+      "status": "mismatch",
+      "counts": {
+        "extracted_devices": 3,
+        "source_devices": 26,
+        "extracted_nets": 22,
+        "source_nets": 132
+      },
+      "failure_class": "pin_mismatch"
+    }
+  },
+  "xor": {
+    "status": "not_applicable",
+    "tool": "magic/klayout",
+    "difference_count": null,
+    "reason": "analog_xor_not_applicable"
+  }
+}

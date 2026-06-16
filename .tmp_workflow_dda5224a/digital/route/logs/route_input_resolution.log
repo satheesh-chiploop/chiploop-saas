@@ -1,0 +1,15 @@
+[2026-06-16T05:42:02.321560Z] Digital Route Agent
+workflow_id=dda5224a-c8b1-449c-bf86-ea84c3c162ed
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/digital/cts/constraints/top.sdc
+sdc_basename=top.sdc
+stage_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/digital/route/constraints/top.sdc
+base_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/digital/cts/config.json
+run_work_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/digital/run_work
+run_tag=System_PD_dda5224a-c8b1-449c-bf86-ea84c3c162ed
+top_module=temp_monitor_soc_phys
+verilog_files_mode=explicit_from_synth_only
+verilog_files=inputs/netlist/temp_monitor_soc_phys_synth.v
+macro_placement_cfg=dir::inputs/macros/macro_placement.cfg
+macro_placement_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dda5224a-c8b1-449c-bf86-ea84c3c162ed/0fa4930c-0d34-4eaa-8538-5cafb6bc569d/digital/digital/run_work/route/inputs/macros/macro_placement.cfg
+closure_overrides={"CHIPLOOP_SIGNOFF_CLOSURE_ECO": "drc_route_contact_metal_iter_1", "CHIPLOOP_TIMING_CLOSURE_ECO": "setup_iter_1", "RUN_SPEF_EXTRACTION": true}

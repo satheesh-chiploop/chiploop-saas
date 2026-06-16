@@ -1,0 +1,14 @@
+{
+  "workflow_id": "dda5224a-c8b1-449c-bf86-ea84c3c162ed",
+  "agent": "Digital Fill Agent",
+  "status": "skipped_disabled",
+  "return_code": 0,
+  "reason": "RUN_FILL_INSERTION=false",
+  "outputs": {
+    "sdc": "digital/fill/constraints/top.sdc",
+    "metrics_json": "digital/fill/metrics.json",
+    "primary_def": "digital/fill/primary.def",
+    "log": "digital/fill/logs/openlane_fill.log",
+    "openlane_run_dir": null
+  }
+}
