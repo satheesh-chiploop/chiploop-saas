@@ -1,0 +1,44 @@
+{
+  "workflow_id": "3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc",
+  "agent": "Analog GDS Generation Agent",
+  "generated_at": "2026-06-16T01:41:23.776016Z",
+  "module": "temp_sensor_adc_model",
+  "pdk": "sky130A",
+  "backend": "magic",
+  "gds": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital/analog/gds/temp_sensor_adc_model.gds",
+  "log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital/analog/gds/magic_gds.log",
+  "drc": {
+    "status": "clean",
+    "tool": "magic",
+    "feedback_problem_count": 0,
+    "reason": null
+  },
+  "lvs": {
+    "status": "mismatch",
+    "tool": "netgen",
+    "reason": "mismatch",
+    "return_code": 0,
+    "extracted_spice": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital/analog/gds/temp_sensor_adc_model_extracted.spice",
+    "extract_log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital/analog/gds/analog_lvs_magic_extract.log",
+    "log": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital/analog/gds/analog_lvs_netgen.log",
+    "counts": {
+      "extracted_devices": 3,
+      "source_devices": 26,
+      "extracted_nets": 22,
+      "source_nets": 132
+    },
+    "failure_class": "pin_mismatch",
+    "repair_attempted": true,
+    "repair_applied": false,
+    "repair_reason": "lvs_repair_spice_not_layout_safe",
+    "repair_layout_issues": [
+      "duplicate_scalar_bus_pins:sensor_temp_celsius"
+    ]
+  },
+  "xor": {
+    "status": "not_applicable",
+    "tool": "magic/klayout",
+    "difference_count": null,
+    "reason": "analog_xor_not_applicable"
+  }
+}

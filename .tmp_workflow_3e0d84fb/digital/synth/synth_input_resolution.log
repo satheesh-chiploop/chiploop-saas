@@ -1,0 +1,16 @@
+[2026-06-16T01:40:43.271544Z] Digital Synthesis Agent
+workflow_id=3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital
+spec_json=None
+top_module=temp_monitor_soc_phys
+rtl_count=4
+request_target_frequency_mhz=None
+clock_period_ns=10.0
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital/digital/impl_setup/constraints/top.sdc
+sdc_basename=top.sdc
+synth_sdc_path=artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital/digital/synth/constraints/top.sdc
+state_constraints_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital/digital/impl_setup/constraints/top.sdc
+pdk_variant=sky130A
+macro_lib_count=1
+yosys_macro_lib_script=artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc/e297e8a2-39e1-4a30-882c-43b9cde8dfbe/digital/digital/synth/yosys_macro_libs.ys
+pre_synthesis_rtl_repairs={}

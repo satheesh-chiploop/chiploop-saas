@@ -1,0 +1,18 @@
+
+Magic 8.3 revision 489 - Compiled on Thu Aug 22 13:45:15 UTC 2024.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+Using NULL graphics device.
+Input style sky130(): scaleFactor=2, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    ubm 
+Processing system .magicrc file
+Loading "/work/magic_extract_lvs.tcl" from command line.
+Loading sky130A Device Generator Menu ...
+Cell temp_sensor_adc_model read from current working directory
+Extracting temp_sensor_adc_model into temp_sensor_adc_model.ext:
+temp_sensor_adc_model: 57 warnings
+exttospice finished.
+Warning:  Ports "{"sensor_temp_celsius\[9\]"}" and "{"sensor_temp_celsius\[8\]"}" are electrically shorted.
+Total of 57 warnings.
+Warning:  Ports "{sensor_temp_celsius\[9\]}" and "{sensor_temp_celsius\[8\]}" are electrically shorted.

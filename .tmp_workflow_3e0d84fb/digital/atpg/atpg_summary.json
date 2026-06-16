@@ -1,0 +1,53 @@
+{
+  "workflow_id": "3e0d84fb-1bc2-4064-a8dc-9ac94ff7a1fc",
+  "agent": "Digital Scan ATPG Coverage Agent",
+  "status": "patterns_generated",
+  "tool": "atalanta",
+  "tool_executable": "/usr/local/bin/atalanta",
+  "return_code": 0,
+  "input_netlist": "scan_stitched_netlist.v",
+  "pattern_count": 274,
+  "stuck_at_coverage_pct": 98.895,
+  "faults_detected": null,
+  "faults_undetected": null,
+  "faults_aborted": 5,
+  "pattern_count_source": "pattern_file",
+  "coverage_source": "adapter_metrics",
+  "metrics_file": "atpg_metrics.json",
+  "bench_generation": {
+    "status": "generated",
+    "inputs": 108,
+    "outputs": 86,
+    "gates": 440,
+    "scan_state_inputs": 65,
+    "scan_capture_outputs": 65,
+    "floating_inputs_promoted": [
+      "u_digital_adc_code_0",
+      "u_digital_adc_code_1",
+      "u_digital_adc_code_10",
+      "u_digital_adc_code_11",
+      "u_digital_adc_code_2",
+      "u_digital_adc_code_3",
+      "u_digital_adc_code_4",
+      "u_digital_adc_code_5",
+      "u_digital_adc_code_6",
+      "u_digital_adc_code_7",
+      "u_digital_adc_code_8",
+      "u_digital_adc_code_9",
+      "u_digital_adc_valid"
+    ],
+    "unsupported_cells": []
+  },
+  "tool_diagnostics": [],
+  "generated_at": "2026-06-16T01:41:02.603300Z",
+  "artifacts": {
+    "summary": "digital/atpg/atpg_summary.json",
+    "report": "digital/atpg/atpg_report.md",
+    "log": "digital/atpg/logs/scan_atpg.log",
+    "input_netlist": "digital/atpg/input/scan_or_gate_netlist.v",
+    "bench": "digital/atpg/input/full_scan_atpg.bench",
+    "metrics": "digital/atpg/atpg_metrics.json",
+    "patterns": "digital/atpg/patterns/atalanta.test",
+    "tool_output": "digital/atpg/atalanta.out"
+  }
+}
