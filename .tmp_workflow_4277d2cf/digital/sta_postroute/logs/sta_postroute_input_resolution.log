@@ -1,0 +1,21 @@
+[2026-06-16T03:10:07.740762Z] Digital STA PostRoute Agent
+workflow_id=4277d2cf-725a-4295-96ed-62c59855efb8
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/route/constraints/top.sdc
+sdc_basename=top.sdc
+stage_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/run_work/inputs/constraints/top.sdc
+base_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/run_work/route/config.json
+run_work_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/run_work
+run_tag=System_PD_4277d2cf-725a-4295-96ed-62c59855efb8
+top_module=temp_monitor_soc_phys
+verilog_files_mode=inherited_from_base_config
+verilog_files=inputs/netlist/temp_monitor_soc_phys_synth.v
+resolved_postroute_netlist=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/route/netlist/temp_monitor_soc_phys.nl.v
+staged_postroute_netlist=None
+resolved_postroute_spef=None
+staged_postroute_spef=None
+macro_lef_count=1
+macro_lib_count=1
+macro_gds_count=1
+macro_placement_cfg=dir::inputs/macros/macro_placement.cfg
+macro_placement_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/run_work/sta_postroute/inputs/macros/macro_placement.cfg

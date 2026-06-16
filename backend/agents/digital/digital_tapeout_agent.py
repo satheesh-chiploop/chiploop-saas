@@ -203,6 +203,15 @@ def _stage_is_clean(stage: str, status: str | None) -> bool:
     return status == "ok"
 
 
+def _signoff_blocking_reasons(drc_status: str | None, lvs_status: str | None) -> list[str]:
+    reasons: list[str] = []
+    if drc_status == "blackbox_deferred":
+        reasons.append("analog_macro_gds_missing")
+    if lvs_status == "blackbox_deferred" and "analog_macro_gds_missing" not in reasons:
+        reasons.append("analog_macro_gds_missing")
+    return reasons
+
+
 def _xor_difference_count(log: str) -> int | None:
     counts = [int(match.group(1)) for match in re.finditer(r"Total XOR differences:\s*(\d+)", log or "", flags=re.IGNORECASE)]
     if counts:
@@ -228,6 +237,7 @@ def _tapeout_failure_reasons(
         reasons.append("drc_not_clean")
     if not _stage_is_clean("lvs", lvs_status):
         reasons.append("lvs_not_clean")
+    reasons.extend(reason for reason in _signoff_blocking_reasons(drc_status, lvs_status) if reason not in reasons)
     xor_count = blocking_xor_count if blocking_xor_count is not None else _xor_difference_count(log)
     if _xor_signoff_status() == "enabled" and xor_count is not None and xor_count > 0:
         reasons.append("xor_differences_found")
@@ -343,7 +353,7 @@ def _resolve_macro_files_from_workflow(workflow_dir: str, exts: tuple[str, ...])
         if base.endswith("_llm_lef_raw.lef") or base.endswith("_raw.lef") or "debug" in base:
             continue
         ap = os.path.abspath(p)
-        if ap in seen:
+        if ap in seen or not os.path.isfile(ap):
             continue
         seen.add(ap)
         out.append(ap)
@@ -363,7 +373,7 @@ def _resolve_stdcell_spice_models(state: dict, workflow_dir: str) -> list[str]:
         for item in values:
             if isinstance(item, str):
                 cand = item if os.path.isabs(item) else os.path.join(workflow_dir, item)
-                if os.path.exists(cand):
+                if os.path.isfile(cand):
                     explicit.append(os.path.abspath(cand))
 
     pdk_variant = state.get("pdk_variant") or state.get("pdk") or DEFAULT_PDK_VARIANT
@@ -386,7 +396,7 @@ def _resolve_stdcell_spice_models(state: dict, workflow_dir: str) -> list[str]:
     seen: set[str] = set()
     for path in explicit + discovered:
         ap = os.path.abspath(path)
-        if ap in seen or not os.path.exists(ap):
+        if ap in seen or not os.path.isfile(ap):
             continue
         seen.add(ap)
         out.append(ap)
@@ -407,7 +417,7 @@ def _resolve_macro_spice_models(state: dict, workflow_dir: str) -> list[str]:
         ):
             if isinstance(value, str):
                 cand = value if os.path.isabs(value) else os.path.join(workflow_dir, value)
-                if os.path.exists(cand):
+                if os.path.isfile(cand):
                     candidates.append(os.path.abspath(cand))
     for value in (
         state.get("analog_spice_path"),
@@ -420,7 +430,7 @@ def _resolve_macro_spice_models(state: dict, workflow_dir: str) -> list[str]:
         for item in values:
             if isinstance(item, str):
                 cand = item if os.path.isabs(item) else os.path.join(workflow_dir, item)
-                if os.path.exists(cand):
+                if os.path.isfile(cand):
                     candidates.append(os.path.abspath(cand))
     candidates.extend(_resolve_macro_files_from_workflow(workflow_dir, (".spice", ".sp", ".cdl")))
     out: list[str] = []
@@ -438,7 +448,7 @@ def _resolve_macro_spice_models(state: dict, workflow_dir: str) -> list[str]:
         ):
             continue
         ap = os.path.abspath(path)
-        if ap in seen or not os.path.exists(ap):
+        if ap in seen or not os.path.isfile(ap):
             continue
         seen.add(ap)
         out.append(ap)
@@ -453,6 +463,8 @@ def _stage_spice_models(work_stage_dir: str, stdcell_spice: list[str], macro_spi
     seen: set[str] = set()
     for bucket, srcs in ((staged_stdcell, stdcell_spice), (staged_extra, macro_spice)):
         for src in srcs:
+            if not isinstance(src, str) or not os.path.isfile(src):
+                continue
             basename = os.path.basename(src)
             dst = os.path.join(spice_dir, basename)
             if os.path.abspath(src) != os.path.abspath(dst):
@@ -467,9 +479,9 @@ def _stage_spice_models(work_stage_dir: str, stdcell_spice: list[str], macro_spi
 def _stage_macro_inputs(state: dict, workflow_dir: str, work_stage_dir: str):
     digital = state.get("digital") or {}
 
-    macro_lefs = list(dict.fromkeys(p for p in (digital.get("macro_lefs") or []) if p and os.path.exists(p)))
-    macro_libs = list(dict.fromkeys(p for p in (digital.get("macro_libs") or []) if p and os.path.exists(p)))
-    macro_gds  = list(dict.fromkeys(p for p in (digital.get("macro_gds") or []) if p and os.path.exists(p)))
+    macro_lefs = list(dict.fromkeys(p for p in (digital.get("macro_lefs") or []) if isinstance(p, str) and os.path.isfile(p)))
+    macro_libs = list(dict.fromkeys(p for p in (digital.get("macro_libs") or []) if isinstance(p, str) and os.path.isfile(p)))
+    macro_gds  = list(dict.fromkeys(p for p in (digital.get("macro_gds") or []) if isinstance(p, str) and os.path.isfile(p)))
 
     inputs_dir = os.path.join(work_stage_dir, "inputs", "macros")
     lef_dir = os.path.join(inputs_dir, "lef")
@@ -525,7 +537,7 @@ def _stage_macro_placement_cfg_if_needed(cfg: dict, state: dict, workflow_dir: s
         place_state.get("macro_placement_cfg"),
         os.path.join(workflow_dir, "digital", "place", "macro_placement.cfg"),
     ]
-    src = next((p for p in candidates if isinstance(p, str) and os.path.exists(p)), None)
+    src = next((p for p in candidates if isinstance(p, str) and os.path.isfile(p)), None)
     if not src:
         cfg.pop("MACRO_PLACEMENT_CFG", None)
         return None
@@ -685,6 +697,65 @@ def run_agent(state: dict) -> dict:
     input_log_path = os.path.join(logs_dir, "tapeout_input_resolution.log")
     _write_text(input_log_path, input_log)
 
+    drc_status = _stage_status(state, "drc")
+    lvs_status = _stage_status(state, "lvs")
+    signoff_blockers = _signoff_blocking_reasons(drc_status, lvs_status)
+    if signoff_blockers:
+        out = "Tapeout blocked before streamout because required physical signoff is deferred: " + ", ".join(signoff_blockers) + "\n"
+        log_path = os.path.join(logs_dir, "openlane_tapeout.log")
+        _write_text(log_path, out)
+        summary = {
+            "workflow_id": workflow_id,
+            "agent": AGENT_NAME,
+            "status": "blocked",
+            "return_code": 0,
+            "failure_reasons": signoff_blockers + ["drc_not_clean", "lvs_not_clean"],
+            "signoff_inputs": {
+                "drc_status": drc_status,
+                "lvs_status": lvs_status,
+                "xor_status": _xor_signoff_status(),
+                "xor_differences": None,
+                "xor_differences_observed": None,
+                "xor_differences_total": None,
+                "xor_layer_counts": {},
+                "xor_nonblocking_layers": sorted(DEFAULT_NONBLOCKING_XOR_LAYERS),
+                "gds_produced": False,
+            },
+            "outputs": {
+                "sdc": f"digital/tapeout/constraints/{sdc_basename}",
+                "metrics_json": None,
+                "xor_report_xml": None,
+                "klayout_gds": None,
+                "magic_gds": None,
+                "log": "digital/tapeout/logs/openlane_tapeout.log",
+                "input_resolution_log": "digital/tapeout/logs/tapeout_input_resolution.log",
+                "openlane_run_dir": None,
+            },
+        }
+        _write_text(os.path.join(stage_dir, "tapeout_summary.json"), json.dumps(summary, indent=2))
+        _write_text(os.path.join(stage_dir, "tapeout_summary.md"), "# Tapeout\n\n- status: `blocked`\n- reason: `analog_macro_gds_missing`\n")
+        try:
+            save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", "tapeout/config.json", json.dumps(cfg, indent=2))
+            save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", f"tapeout/constraints/{sdc_basename}", sdc_text)
+            save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", "tapeout/logs/openlane_tapeout.log", out)
+            save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", "tapeout/logs/tapeout_input_resolution.log", input_log)
+            save_text_artifact_and_record(workflow_id, AGENT_NAME, "digital", "tapeout/tapeout_summary.json", json.dumps(summary, indent=2))
+        except Exception as e:
+            print(f"âš ï¸ {AGENT_NAME} upload failed: {e}")
+        state.setdefault("digital", {})["tapeout"] = {
+            "status": summary["status"],
+            "stage_dir": stage_dir,
+            "metrics_json": None,
+            "constraints_sdc": stage_sdc,
+            "openlane_config": config_path,
+            "input_resolution_log": input_log_path,
+            "gds_klayout": None,
+            "gds_magic": None,
+            "openlane_run_dir": None,
+            "failure_reasons": summary["failure_reasons"],
+        }
+        return state
+
     run_sh = f"""#!/usr/bin/env bash
 set -euo pipefail
 
@@ -746,8 +817,6 @@ docker run --rm \\
     if mg_src and mg_dst:
         shutil.copy2(mg_src, mg_dst)
 
-    drc_status = _stage_status(state, "drc")
-    lvs_status = _stage_status(state, "lvs")
     failure_reasons = _tapeout_failure_reasons(
         rc=rc,
         log=out,

@@ -1,0 +1,52 @@
+{
+  "type": "pd_signoff_closure_chart",
+  "metric_scope": "postfill_signoff",
+  "series": [
+    {
+      "iteration": 0,
+      "label": "baseline",
+      "postfill_wns": 0.03181988096410438,
+      "postfill_tns": 0,
+      "postfill_setup_wns": 0,
+      "postfill_setup_tns": 0,
+      "postfill_hold_wns": 0,
+      "postfill_hold_tns": 0,
+      "postfill_setup_violations": 0,
+      "postfill_hold_violations": 0,
+      "drc_violations": null,
+      "drc_status": "blackbox_deferred",
+      "lvs_status": "blackbox_deferred",
+      "tapeout_lec_status": "blocked",
+      "tapeout_lec_unproven_points": null,
+      "analog_drc_status": null,
+      "analog_drc_issues": null,
+      "analog_lvs_status": null,
+      "dominant_issue": "digital_lvs",
+      "selected_restart_stage": "Digital LVS Agent"
+    },
+    {
+      "iteration": 1,
+      "label": "iteration 1",
+      "postfill_wns": 0.03181988096410438,
+      "postfill_tns": 0,
+      "postfill_setup_wns": 0,
+      "postfill_setup_tns": 0,
+      "postfill_hold_wns": 0,
+      "postfill_hold_tns": 0,
+      "postfill_setup_violations": 0,
+      "postfill_hold_violations": 0,
+      "drc_violations": null,
+      "drc_status": "blackbox_deferred",
+      "lvs_status": "blackbox_deferred",
+      "tapeout_lec_status": "blocked",
+      "tapeout_lec_unproven_points": null,
+      "analog_drc_status": null,
+      "analog_drc_issues": null,
+      "analog_lvs_status": null,
+      "dominant_issue": "digital_lvs",
+      "selected_restart_stage": "Digital LVS Agent"
+    }
+  ],
+  "baseline_only": false,
+  "no_fake_iterations": true
+}

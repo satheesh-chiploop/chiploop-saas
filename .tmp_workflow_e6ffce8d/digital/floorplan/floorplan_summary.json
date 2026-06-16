@@ -1,0 +1,13 @@
+{
+  "workflow_id": "e6ffce8d-17d7-4511-aae3-34c953406829",
+  "agent": "Digital Floorplan Agent",
+  "status": "ok",
+  "return_code": 0,
+  "outputs": {
+    "sdc": "digital/floorplan/constraints/top.sdc",
+    "metrics_json": "digital/floorplan/metrics.json",
+    "primary_def": "digital/floorplan/primary.def",
+    "log": "digital/floorplan/logs/openlane_floorplan.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/e6ffce8d-17d7-4511-aae3-34c953406829/aea4e7a4-8d37-486d-86c2-cd3dcc00ee22/digital/digital/run_work/floorplan/runs/System_PD_e6ffce8d-17d7-4511-aae3-34c953406829"
+  }
+}

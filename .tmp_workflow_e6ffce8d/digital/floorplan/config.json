@@ -1,0 +1,23 @@
+{
+  "DESIGN_NAME": "temp_monitor_soc_phys",
+  "PDK": "sky130A",
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 5.0,
+  "VERILOG_FILES": [
+    "inputs/netlist/temp_monitor_soc_phys_synth.v"
+  ],
+  "PNR_SDC_FILE": "inputs/constraints/top.sdc",
+  "CHIPLOOP_SOURCE_SPEC_JSON": null,
+  "CHIPLOOP_FILELIST": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/e6ffce8d-17d7-4511-aae3-34c953406829/aea4e7a4-8d37-486d-86c2-cd3dcc00ee22/digital/digital/impl_setup/filelist.f",
+  "CHIPLOOP_UPSTREAM_SDC_SOURCE": "request_clock_constraints",
+  "FP_CORE_UTIL": 20,
+  "PL_TARGET_DENSITY": 0.25,
+  "DIE_AREA": "0 0 120 120",
+  "RUN_LINTER": false,
+  "EXTRA_LEFS": [
+    "dir::inputs/macros/lef/temp_sensor_adc_model.lef"
+  ],
+  "EXTRA_LIBS": [
+    "dir::inputs/macros/lib/temp_sensor_adc_model.lib"
+  ]
+}

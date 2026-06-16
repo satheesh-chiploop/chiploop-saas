@@ -1,0 +1,19 @@
+{
+  "workflow_id": "e6ffce8d-17d7-4511-aae3-34c953406829",
+  "agent": "Digital LVS Agent",
+  "status": "blackbox_deferred",
+  "lvs_status": "blackbox_deferred",
+  "xor_differences": null,
+  "return_code": 0,
+  "blackbox_macros": [
+    "temp_sensor_adc_model"
+  ],
+  "reason": "analog_macro_gds_missing",
+  "outputs": {
+    "sdc": "digital/lvs/constraints/top.sdc",
+    "metrics_json": null,
+    "lvs_report": null,
+    "log": "digital/lvs/logs/openlane_lvs.log",
+    "openlane_run_dir": null
+  }
+}

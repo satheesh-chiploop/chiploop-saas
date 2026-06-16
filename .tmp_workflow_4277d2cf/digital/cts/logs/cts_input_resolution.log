@@ -1,0 +1,16 @@
+[2026-06-16T03:08:38.481238Z] Digital CTS Agent
+workflow_id=4277d2cf-725a-4295-96ed-62c59855efb8
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/impl_setup/constraints/top.sdc
+sdc_basename=top.sdc
+stage_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/cts/constraints/top.sdc
+base_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/place/config.json
+run_work_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/run_work
+run_tag=System_PD_4277d2cf-725a-4295-96ed-62c59855efb8
+top_module=temp_monitor_soc_phys
+netlist_count=1
+macro_lef_count=1
+macro_lib_count=1
+macro_gds_count=1
+macro_placement_cfg=dir::inputs/macros/macro_placement.cfg
+macro_placement_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/4277d2cf-725a-4295-96ed-62c59855efb8/f4c7b80f-2041-4bb7-bc2d-6985967fe443/digital/digital/run_work/cts/inputs/macros/macro_placement.cfg

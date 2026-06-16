@@ -376,6 +376,21 @@ def test_tapeout_requires_gds_output():
     assert reasons == ["gds_not_produced"]
 
 
+def test_tapeout_reports_analog_macro_gds_missing_when_signoff_deferred():
+    reasons = _tapeout_failure_reasons(
+        rc=0,
+        log="",
+        drc_status="blackbox_deferred",
+        lvs_status="blackbox_deferred",
+        klayout_gds=None,
+        magic_gds=None,
+    )
+
+    assert "analog_macro_gds_missing" in reasons
+    assert "drc_not_clean" in reasons
+    assert "lvs_not_clean" in reasons
+
+
 def test_tapeout_xor_difference_parser():
     assert _xor_difference_count("Total XOR differences: 0") == 0
     assert _xor_difference_count("One or more deferred errors encountered: 1 XOR differences found.") == 1
@@ -557,6 +572,46 @@ def test_drc_lvs_blackbox_deferred_when_macro_gds_missing():
     assert _drc_macro_blackbox_deferred(["dir::inputs/macros/lef/ana.lef"], ["dir::inputs/macros/lib/ana.lib"], [])
     assert _lvs_macro_blackbox_deferred(["dir::inputs/macros/lef/ana.lef"], ["dir::inputs/macros/lib/ana.lib"], [])
     assert not _drc_macro_blackbox_deferred(["dir::inputs/macros/lef/ana.lef"], [], ["dir::inputs/macros/gds/ana.gds"])
+
+
+def test_signoff_macro_staging_ignores_directory_collateral(tmp_path):
+    bad_dir = tmp_path / "digital"
+    bad_dir.mkdir()
+    lef = tmp_path / "ana.lef"
+    lef.write_text("MACRO ana\nEND ana\n", encoding="utf-8")
+    state = {
+        "digital": {
+            "macro_lefs": [str(bad_dir), str(lef)],
+            "macro_libs": [str(bad_dir)],
+            "macro_gds": [str(bad_dir)],
+        }
+    }
+
+    for module in (digital_drc_agent, digital_lvs_agent, digital_tapeout_agent):
+        staged_lefs, staged_libs, staged_gds = module._stage_macro_inputs(
+            state,
+            str(tmp_path),
+            str(tmp_path / module.AGENT_NAME.replace(" ", "_")),
+        )
+        assert staged_lefs == ["dir::inputs/macros/lef/ana.lef"]
+        assert staged_libs == []
+        assert staged_gds == []
+
+
+def test_lvs_and_tapeout_spice_staging_ignore_directories(tmp_path):
+    bad_dir = tmp_path / "digital"
+    bad_dir.mkdir()
+    spice = tmp_path / "ana.spice"
+    spice.write_text(".subckt ana A B\n.ends ana\n", encoding="utf-8")
+
+    for module in (digital_lvs_agent, digital_tapeout_agent):
+        staged_stdcell, staged_extra = module._stage_spice_models(
+            str(tmp_path / module.AGENT_NAME.replace(" ", "_")),
+            [str(bad_dir)],
+            [str(bad_dir), str(spice)],
+        )
+        assert staged_stdcell == []
+        assert staged_extra == ["dir::inputs/spice/ana.spice"]
 
 
 def test_atpg_pattern_count_can_be_inferred_from_adapter_pattern_file(tmp_path):

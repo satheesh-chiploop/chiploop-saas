@@ -1,0 +1,20 @@
+{
+  "workflow_id": "e6ffce8d-17d7-4511-aae3-34c953406829",
+  "agent": "Digital DRC Agent",
+  "status": "blackbox_deferred",
+  "drc_status": "blackbox_deferred",
+  "drc_violations": null,
+  "xor_differences": null,
+  "return_code": 0,
+  "blackbox_macros": [
+    "temp_sensor_adc_model"
+  ],
+  "reason": "analog_macro_gds_missing",
+  "outputs": {
+    "sdc": "digital/drc/constraints/top.sdc",
+    "metrics_json": null,
+    "drc_report_xml": null,
+    "log": "digital/drc/logs/openlane_drc.log",
+    "openlane_run_dir": null
+  }
+}

@@ -1,0 +1,129 @@
+Netgen 1.5.278 compiled on Sun Sep 29 13:29:03 UTC 2024
+Warning: netgen command 'format' use fully-qualified name '::netgen::format'
+Warning: netgen command 'global' use fully-qualified name '::netgen::global'
+Reading netlist file temp_sensor_adc_model_extracted.spice
+Call to undefined subcircuit sky130_fd_pr__nfet_01v8
+Creating placeholder cell definition.
+Call to undefined subcircuit sky130_fd_pr__pfet_01v8
+Creating placeholder cell definition.
+Reading netlist file temp_sensor_adc_model_lvs_source.spice
+
+Reading setup file /pdk/sky130A/libs.tech/netgen/sky130A_setup.tcl
+
+No property as found for device sky130_fd_pr__nfet_01v8
+No property ad found for device sky130_fd_pr__nfet_01v8
+No property ps found for device sky130_fd_pr__nfet_01v8
+No property pd found for device sky130_fd_pr__nfet_01v8
+No property as found for device sky130_fd_pr__pfet_01v8
+No property ad found for device sky130_fd_pr__pfet_01v8
+No property ps found for device sky130_fd_pr__pfet_01v8
+No property pd found for device sky130_fd_pr__pfet_01v8
+Model sky130_fd_pr__nfet_01v8 pin 1 == 3
+No property mult found for device sky130_fd_pr__nfet_01v8
+No property sa found for device sky130_fd_pr__nfet_01v8
+No property sb found for device sky130_fd_pr__nfet_01v8
+No property sd found for device sky130_fd_pr__nfet_01v8
+No property nf found for device sky130_fd_pr__nfet_01v8
+No property nrd found for device sky130_fd_pr__nfet_01v8
+No property nrs found for device sky130_fd_pr__nfet_01v8
+No property area found for device sky130_fd_pr__nfet_01v8
+No property perim found for device sky130_fd_pr__nfet_01v8
+No property topography found for device sky130_fd_pr__nfet_01v8
+No such pin 1 in model sky130_fd_pr__nfet_01v8
+No property as found for device sky130_fd_pr__nfet_01v8
+No property ad found for device sky130_fd_pr__nfet_01v8
+No property ps found for device sky130_fd_pr__nfet_01v8
+No property pd found for device sky130_fd_pr__nfet_01v8
+No property mult found for device sky130_fd_pr__nfet_01v8
+No property sa found for device sky130_fd_pr__nfet_01v8
+No property sb found for device sky130_fd_pr__nfet_01v8
+No property sd found for device sky130_fd_pr__nfet_01v8
+No property nf found for device sky130_fd_pr__nfet_01v8
+No property nrd found for device sky130_fd_pr__nfet_01v8
+No property nrs found for device sky130_fd_pr__nfet_01v8
+No property area found for device sky130_fd_pr__nfet_01v8
+No property perim found for device sky130_fd_pr__nfet_01v8
+No property topography found for device sky130_fd_pr__nfet_01v8
+Model sky130_fd_pr__pfet_01v8 pin 1 == 3
+No property mult found for device sky130_fd_pr__pfet_01v8
+No property sa found for device sky130_fd_pr__pfet_01v8
+No property sb found for device sky130_fd_pr__pfet_01v8
+No property sd found for device sky130_fd_pr__pfet_01v8
+No property nf found for device sky130_fd_pr__pfet_01v8
+No property nrd found for device sky130_fd_pr__pfet_01v8
+No property nrs found for device sky130_fd_pr__pfet_01v8
+No property area found for device sky130_fd_pr__pfet_01v8
+No property perim found for device sky130_fd_pr__pfet_01v8
+No property topography found for device sky130_fd_pr__pfet_01v8
+No such pin 1 in model sky130_fd_pr__pfet_01v8
+No property as found for device sky130_fd_pr__pfet_01v8
+No property ad found for device sky130_fd_pr__pfet_01v8
+No property ps found for device sky130_fd_pr__pfet_01v8
+No property pd found for device sky130_fd_pr__pfet_01v8
+No property mult found for device sky130_fd_pr__pfet_01v8
+No property sa found for device sky130_fd_pr__pfet_01v8
+No property sb found for device sky130_fd_pr__pfet_01v8
+No property sd found for device sky130_fd_pr__pfet_01v8
+No property nf found for device sky130_fd_pr__pfet_01v8
+No property nrd found for device sky130_fd_pr__pfet_01v8
+No property nrs found for device sky130_fd_pr__pfet_01v8
+No property area found for device sky130_fd_pr__pfet_01v8
+No property perim found for device sky130_fd_pr__pfet_01v8
+No property topography found for device sky130_fd_pr__pfet_01v8
+Comparison output logged to file analog_lvs_netgen.out
+Logging to file "analog_lvs_netgen.out" enabled
+
+Contents of circuit 1:  Circuit: 'sky130_fd_pr__nfet_01v8'
+Circuit sky130_fd_pr__nfet_01v8 contains 0 device instances.
+Circuit contains 0 nets.
+Contents of circuit 2:  Circuit: 'sky130_fd_pr__nfet_01v8'
+Circuit sky130_fd_pr__nfet_01v8 contains 0 device instances.
+Circuit contains 0 nets, and 4 disconnected pins.
+
+Circuit sky130_fd_pr__nfet_01v8 contains no devices.
+
+Contents of circuit 1:  Circuit: 'sky130_fd_pr__pfet_01v8'
+Circuit sky130_fd_pr__pfet_01v8 contains 0 device instances.
+Circuit contains 0 nets.
+Contents of circuit 2:  Circuit: 'sky130_fd_pr__pfet_01v8'
+Circuit sky130_fd_pr__pfet_01v8 contains 0 device instances.
+Circuit contains 0 nets, and 4 disconnected pins.
+
+Circuit sky130_fd_pr__pfet_01v8 contains no devices.
+
+Contents of circuit 1:  Circuit: 'temp_sensor_adc_model'
+Circuit temp_sensor_adc_model contains 36 device instances.
+  Class: sky130_fd_pr__nfet_01v8 instances:  18
+  Class: sky130_fd_pr__pfet_01v8 instances:  18
+Circuit contains 258 nets, and 32 disconnected pins.
+Contents of circuit 2:  Circuit: 'temp_sensor_adc_model'
+Circuit temp_sensor_adc_model contains 36 device instances.
+  Class: sky130_fd_pr__nfet_01v8 instances:  18
+  Class: sky130_fd_pr__pfet_01v8 instances:  18
+Circuit contains 178 nets.
+
+Circuit was modified by parallel/series device merging.
+New circuit summary:
+
+Contents of circuit 1:  Circuit: 'temp_sensor_adc_model'
+Circuit temp_sensor_adc_model contains 4 device instances.
+  Class: sky130_fd_pr__nfet_01v8 instances:   1
+  Class: sky130_fd_pr__pfet_01v8 instances:   3
+Circuit contains 258 nets, and 32 disconnected pins.
+Contents of circuit 2:  Circuit: 'temp_sensor_adc_model'
+Circuit temp_sensor_adc_model contains 36 device instances.
+  Class: sky130_fd_pr__nfet_01v8 instances:  18
+  Class: sky130_fd_pr__pfet_01v8 instances:  18
+Circuit contains 178 nets.
+
+Circuit 1 contains 4 devices, Circuit 2 contains 36 devices. *** MISMATCH ***
+Circuit 1 contains 30 nets,    Circuit 2 contains 178 nets. *** MISMATCH ***
+
+
+Final result: 
+Top level cell failed pin matching.
+
+Logging to file "analog_lvs_netgen.out" disabled
+LVS Done.
+Unable to permute model sky130_fd_pr__nfet_01v8 pins 1, 3.
+Unable to permute model sky130_fd_pr__pfet_01v8 pins 1, 3.
