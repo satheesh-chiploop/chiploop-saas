@@ -1,0 +1,9 @@
+Created starter MBIST config: /root/chiploop-backend/backend/workflows/84c6026a-ffad-4c75-8970-01a822f8f18c/digital/mbist_rtl_insertion/autombist_project/config.yml
+Created starter OpenRAM config: /root/chiploop-backend/backend/workflows/84c6026a-ffad-4c75-8970-01a822f8f18c/digital/mbist_rtl_insertion/autombist_project/openram.yml
+Created starter Makefile: /root/chiploop-backend/backend/workflows/84c6026a-ffad-4c75-8970-01a822f8f18c/digital/mbist_rtl_insertion/autombist_project/Makefile
+Created sample SRAM model: /root/chiploop-backend/backend/workflows/84c6026a-ffad-4c75-8970-01a822f8f18c/digital/mbist_rtl_insertion/autombist_project/sram_1rw.v
+
+Next steps:
+  1. Edit config.yml to match your SRAM macro
+  2. Replace sram_1rw.v with your OpenRAM-generated SRAM
+  3. Run: autombist generate --config config.yml

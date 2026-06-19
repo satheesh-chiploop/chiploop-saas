@@ -1,3 +1,0 @@
-.subckt temp_sensor_adc_model adc_code[0] adc_code[1] adc_code[2] adc_code[3] adc_code[4] adc_code[5] adc_code[6] adc_code[7] adc_code[8] adc_code[9] adc_code[10] adc_code[11] sensor_temp_celsius[0] sensor_temp_celsius[1] sensor_temp_celsius[2] sensor_temp_celsius[3] sensor_temp_celsius[4] sensor_temp_celsius[5] sensor_temp_celsius[6] sensor_temp_celsius[7] sensor_temp_celsius[8] sensor_temp_celsius[9] sensor_temp_celsius[10] sensor_temp_celsius[11] sensor_temp_celsius[12] sensor_temp_celsius[13] sensor_temp_celsius[14] sensor_temp_celsius[15] VGND VPWR adc_valid avdd avss sample_req
-.ends temp_sensor_adc_model
-.end

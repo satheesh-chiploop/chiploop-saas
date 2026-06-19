@@ -1,0 +1,88 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.083 MB sources in 4 modules, into 0.045 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.015 s (elab=0.001, cvt=0.007, bld=0.000); cpu 0.015 s on 1 threads; allocated 31.355 MB
+
+=== STDERR ===
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:255:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  255 |                     8'h00: read_mux = {29'b00000000000000000000000000000, control_reg};
+      |                                     ^
+                 ... For warning description see https://verilator.org/warn/BLKSEQ?v=5.047
+                 ... Use "/* verilator lint_off BLKSEQ */" and lint_on around source to disable this message.
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:256:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  256 |                     8'h04: read_mux = {28'b0000000000000000000000000000, bist_busy_r, bist_fail_r, bist_done_r, ready_r};
+      |                                     ^
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:257:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  257 |                     8'h08: read_mux = {26'b00000000000000000000000000, mem_addr_reg};
+      |                                     ^
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:258:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  258 |                     8'h0C: read_mux = mem_wdata_reg;
+      |                                     ^
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:259:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  259 |                     8'h10: read_mux = mem_rdata_reg;
+      |                                     ^
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:260:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  260 |                     8'h14: read_mux = {30'b000000000000000000000000000000, mem_control_reg};
+      |                                     ^
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:261:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  261 |                     8'h18: read_mux = {30'b000000000000000000000000000000, bist_control_reg};
+      |                                     ^
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:262:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  262 |                     8'h1C: read_mux = {23'b00000000000000000000000, bist_last_fail_addr_reg, bist_busy_r, bist_fail_r, bist_done_r};
+      |                                     ^
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:263:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  263 |                     8'h20: read_mux = {30'b000000000000000000000000000000, irq_status_reg};
+      |                                     ^
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:264:37: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  264 |                     8'h24: read_mux = {30'b000000000000000000000000000000, 2'b00};
+      |                                     ^
+%Warning-BLKSEQ: sram_mbist_demo_controller.v:265:39: Blocking assignment '=' in sequential logic process
+                                                    : ... note: In instance 'sram_mbist_demo_controller'
+                                                    : ... Suggest using delayed assignment '<='
+  265 |                     default: read_mux = 32'h00000000;
+      |                                       ^
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:65:5: Signal is not used: 'bist_running_r'
+                                                        : ... note: In instance 'sram_mbist_demo_controller'
+   65 | reg bist_running_r;
+      |     ^~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:83:6: Signal is not used: 'control_enable'
+                                                        : ... note: In instance 'sram_mbist_demo_controller'
+   83 | wire control_enable;
+      |      ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:84:6: Signal is not used: 'control_irq_enable'
+                                                        : ... note: In instance 'sram_mbist_demo_controller'
+   84 | wire control_irq_enable;
+      |      ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:91:6: Signal is not used: 'irq_latched_done'
+                                                        : ... note: In instance 'sram_mbist_demo_controller'
+   91 | wire irq_latched_done;
+      |      ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:92:6: Signal is not used: 'irq_latched_fail'
+                                                        : ... note: In instance 'sram_mbist_demo_controller'
+   92 | wire irq_latched_fail;
+      |      ^~~~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

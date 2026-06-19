@@ -1,0 +1,82 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "sram_mbist_demo_controller",
+  "module_microarchitecture": [
+    {
+      "name": "sram_mbist_demo_controller",
+      "implementation_style": "Simple synchronous MMIO-controlled scratchpad controller with explicit single-port SRAM intent and lightweight BIST/IRQ collateral. The implementation should use straightforward register flops, combinational decode for register reads, and a single memory-access path that can target either demo_sram_32x64 or demo_sram_32x64_model without changing the controller interface.",
+      "control_strategy": "Use direct decode of wr_en/wr_addr/wr_data for register writes and rd_en/rd_addr for register reads. CONTROL holds enable, soft reset request, and IRQ enable. MEM_ADDR and MEM_WDATA retain the programmed memory transaction operands. MEM_CONTROL triggers a single write or read operation. BIST_CONTROL.START and external bist_start are ORed into a common internal bist_request pulse/level, and BIST_CONTROL.CLEAR_RESULT clears latched result state. IRQ_CLEAR uses write-one-to-clear behavior on the latched IRQ status bits.",
+      "state_strategy": "Keep state minimal and register-based: control register bits, MEM_ADDR, MEM_WDATA, MEM_RDATA, BIST status bits, IRQ status bits, ready/busy indication, and last_fail_addr. Ready can be derived as the inverse of an active operation after enable/reset release. The design should not add an FSM unless needed; a small operation-in-progress indication and result latches are sufficient. Reset synchronously clears all software-visible state and does not issue spurious memory writes or BIST starts.",
+      "output_strategy": "Drive rd_data from the addressed register readback path with MEM_RDATA reflecting the last completed memory read. Drive ready, bist_done, bist_fail, and irq directly from the internal status/enable state. Expose mem_csb, mem_web, mem_addr, and mem_din as the explicit memory intent signals. bist_request and irq_enable are driven as internal collateral outputs for downstream MBIST-aware integration.",
+      "ownership_notes": [
+        "Controller owns rd_data, ready, bist_done, bist_fail, irq, mem_csb, mem_web, mem_addr, mem_din, bist_request, and irq_enable.",
+        "Controller consumes clk, reset_n, wr_en, wr_addr, wr_data, rd_en, rd_addr, bist_start, and mem_dout.",
+        "Software-visible reset behavior must clear control/status registers, ready state, BIST state, IRQ state, and MEM_RDATA."
+      ]
+    },
+    {
+      "name": "demo_sram_32x64",
+      "implementation_style": "Macro-like OpenRAM-compatible single-port SRAM abstraction with explicit memory semantics and no auxiliary control ports. The abstraction should remain intentionally memory-specific so downstream flows can recognize it as a replacement point for SRAM collateral.",
+      "control_strategy": "Treat csb as active-low chip select and web as active-low write enable. The controller is expected to provide address, data-in, and access qualification in a single-port style consistent with the abstraction contract.",
+      "state_strategy": "Internal storage is implementation-defined by the eventual macro collateral. No architectural state is exposed beyond the synchronous memory behavior implied by the interface.",
+      "output_strategy": "dout returns the selected word according to the memory timing model provided by the eventual macro or compatible implementation. The abstraction should preserve a clean read-data return path for MBIST-aware tools.",
+      "ownership_notes": [
+        "Memory abstraction owns dout.",
+        "clk, csb, web, addr, and din are inputs to the abstraction.",
+        "No extra sideband signals or hidden interfaces should be added."
+      ]
+    },
+    {
+      "name": "demo_sram_32x64_model",
+      "implementation_style": "Synthesizable fallback single-port memory wrapper with the same interface shape as the SRAM abstraction. The model should infer as a simple 64x32 memory array with synchronous access behavior and portable RTL constructs only.",
+      "control_strategy": "Use csb low to qualify access and web low for write, web high for read. Keep the control behavior simple and consistent with the abstraction so the top controller does not need conditional protocol handling beyond choosing the implementation.",
+      "state_strategy": "Implement 64 words of 32-bit storage. Initialization may be tool-dependent, but the controller must not rely on contents being known after reset unless firmware writes them. The model should remain deterministic for simulation and synthesis-friendly for memory inference.",
+      "output_strategy": "Drive dout with the selected read data according to the chosen synchronous memory style, while keeping the interface compatible with OpenRAM-style replacement.",
+      "ownership_notes": [
+        "Fallback model owns dout.",
+        "clk, csb, web, addr, and din are inputs to the fallback model.",
+        "No vendor-specific primitives or hidden test hooks should be introduced."
+      ]
+    }
+  ],
+  "fsm_intent": [],
+  "datapath_intent": [
+    {
+      "name": "register_file_and_mmio_decode",
+      "description": "A small set of control/status registers implemented as flops with address decode for write and read access. Reads return the selected register contents combinationally or with a minimal registered readback path if needed for timing, while preserving the simple firmware-visible semantics in the spec."
+    },
+    {
+      "name": "memory_transaction_path",
+      "description": "MEM_ADDR and MEM_WDATA feed the explicit memory interface. MEM_CONTROL.MEM_WRITE produces a write transaction to the selected SRAM using mem_csb, mem_web, mem_addr, and mem_din. MEM_CONTROL.MEM_READ produces a read transaction and captures mem_dout into MEM_RDATA."
+    },
+    {
+      "name": "bist_request_and_status_path",
+      "description": "External bist_start and BIST_CONTROL.START are combined into bist_request. BIST done/fail/running and last_fail_addr are represented by simple latches/registers, with CLEAR_RESULT and reset clearing the latched result state. The BIST status registers remain present even if downstream MBIST logic later replaces or wraps the memory path."
+    },
+    {
+      "name": "irq_generation_path",
+      "description": "IRQ_STATUS latches bist_done and bist_fail indications. irq is asserted when IRQ_ENABLE is set and at least one IRQ_STATUS bit is latched. IRQ_CLEAR uses write-one-to-clear behavior to remove the selected interrupt status bits."
+    }
+  ],
+  "sequencing_notes": [
+    "Reset is synchronous active-low and clears all control/status state without generating a memory write or BIST request.",
+    "Controller enable gates normal operation; ready reflects availability for firmware-visible transactions.",
+    "A memory write captures MEM_ADDR and MEM_WDATA and drives the memory port with a single write-access sequence.",
+    "A memory read captures the addressed word from mem_dout into MEM_RDATA and makes it visible through the register map.",
+    "BIST request is generated by either the external bist_start input or BIST_CONTROL.START, with status latched separately from request generation.",
+    "IRQ status is level-latched until cleared by either BIST_CONTROL.CLEAR_RESULT or IRQ_CLEAR write-one-to-clear behavior.",
+    "The implementation should remain simple and avoid unnecessary pipeline stages unless required for clean synthesis of the chosen memory macro or fallback model."
+  ],
+  "timing_notes": [
+    "Single clock domain on clk at 50 MHz nominal, with synchronous active-low reset_n.",
+    "The controller should preserve simple single-cycle firmware semantics at the register-interface level even if the memory implementation itself has synchronous read timing.",
+    "mem_csb and mem_web are expected to be stable around the active clock edge that performs the memory access.",
+    "rd_data should reflect the selected register read without introducing a complicated bus handshake.",
+    "BIST and IRQ latching should update synchronously on clk and remain deterministic across reset."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}
