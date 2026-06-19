@@ -1,0 +1,12 @@
+memory_name: demo_sram_32
+wrapper_module_name: demo_sram_32
+addr_width: 8
+data_width: 32
+we_active_low: true
+ports:
+  clk: clk0
+  addr: addr0
+  din: din0
+  dout: dout0
+  we: we0
+  csb: csb0

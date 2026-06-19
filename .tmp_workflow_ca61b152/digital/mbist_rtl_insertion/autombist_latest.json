@@ -1,0 +1,67 @@
+{
+  "command": [
+    "make",
+    "-C",
+    "/opt/chiploop-dft/lib/python3.13/site-packages/autombist/tests/hardware",
+    "PROJECT_ROOT=/root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion",
+    "SIM=icarus",
+    "OUTDIR=/root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out",
+    "MEMORY_NAME=demo_sram_32",
+    "WRAPPER_MODULE=demo_sram_32",
+    "USE_SABOTEUR=1",
+    "FAULT_MODE=faults",
+    "FAULTS=50",
+    "FAULT_TYPE=stuck-at",
+    "PULSE_WIDTH_NS=2",
+    "ADDR_WIDTH=8",
+    "DATA_WIDTH=32",
+    "ALGO=march-c",
+    "PYTHON_BIN=/opt/chiploop-dft/bin/python3.13",
+    "sim"
+  ],
+  "config": {
+    "addr_width": 8,
+    "data_width": 32,
+    "memory_name": "demo_sram_32",
+    "we_active_low": true,
+    "wrapper_module_name": "demo_sram_32"
+  },
+  "cwd": "/root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion",
+  "fault_metrics": {
+    "coverage_percent": null,
+    "detected_faults": null,
+    "injected_faults": 50,
+    "total_fault_sites": null
+  },
+  "generated_at": "2026-06-19T03:55:26.290101+00:00",
+  "junit": {
+    "exists": false,
+    "path": "/root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/results.xml",
+    "summary": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 0,
+      "time_seconds": 0.0
+    },
+    "system_out": [],
+    "tests": []
+  },
+  "log_path": "/root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/simulate.log",
+  "report_path": "/root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/reports/latest.json",
+  "results_path": "/root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/reports/results.json",
+  "returncode": 2,
+  "runtime_seconds": 0.711336,
+  "schema_version": "1.0.0",
+  "simulation": {
+    "algo": "march-c",
+    "fault_seed": null,
+    "fault_type": "stuck-at",
+    "faults_requested": 50,
+    "pulse_width_ns": 2,
+    "use_saboteur": true
+  },
+  "status": "fail",
+  "summary": "autombist: simulation FAIL\n  memory: demo_sram_32\n  algo: march-c\n  fault type: stuck-at\n  runtime: 0.711s\n  log: /root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/simulate.log\n  report: /root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/reports/latest.json\n  coverage: not reported by the simulator\n  injected faults: 50\n  junit: 0 tests, 0 failures, 0 errors",
+  "tool_version": "1.1.0"
+}

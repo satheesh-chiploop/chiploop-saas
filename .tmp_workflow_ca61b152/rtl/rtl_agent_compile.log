@@ -1,0 +1,20 @@
+
+
+Issues:
+❌ Inter-module signal 'sram_clk_intent' not found in RTL.
+❌ Inter-module signal 'sram_csb_intent' not found in RTL.
+❌ Inter-module signal 'sram_web_intent' not found in RTL.
+❌ Inter-module signal 'sram_addr_intent' not found in RTL.
+❌ Inter-module signal 'sram_din_intent' not found in RTL.
+❌ Inter-module signal 'sram_dout_observation' not found in RTL.
+❌ Inter-module signal 'sram_model_dout_observation' not found in RTL.
+⚠ Owned signal 'sram_clk_intent' from 'sram_mbist_demo_controller.sram_clk' not found in RTL.
+⚠ Owned signal 'sram_csb_intent' from 'sram_mbist_demo_controller.sram_csb' not found in RTL.
+⚠ Owned signal 'sram_web_intent' from 'sram_mbist_demo_controller.sram_web' not found in RTL.
+⚠ Owned signal 'sram_addr_intent' from 'sram_mbist_demo_controller.sram_addr' not found in RTL.
+⚠ Owned signal 'sram_din_intent' from 'sram_mbist_demo_controller.sram_din' not found in RTL.
+⚠ Owned signal 'sram_dout_observation' from 'demo_sram_32x64.dout' not found in RTL.
+⚠ Owned signal 'sram_model_dout_observation' from 'demo_sram_32x64_model.dout' not found in RTL.
+
+=== VERILATOR LINT ===
+PASS: Verilator lint completed successfully.

@@ -1,0 +1,4 @@
+Generated MBIST wrapper: /root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/demo_sram_32_mbist.v
+Generated fault masks in: /root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/faults
+Generated fault-sim Makefile: /root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/Makefile
+autombist: Simulation failed with exit code 2. See /root/chiploop-backend/backend/workflows/ca61b152-c66a-4472-9d07-124ddfe2ee10/digital/mbist_rtl_insertion/autombist_out/demo_sram_32/simulate.log.
