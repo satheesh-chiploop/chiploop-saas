@@ -11,7 +11,7 @@ from agents.digital.digital_failure_debug_agent import run_agent as failure_debu
 from agents.digital import digital_spec2rtl_conformance_agent as spec2rtl_agent
 from agents.digital import digital_fill_agent, digital_sta_postfill_agent
 from agents.digital.digital_logic_equivalence_agent import _generated_stdcell_model, _missing_stdcell_models, _prepare_golden_rtl_for_yosys, _yosys_script
-from agents.digital.digital_lvs_agent import _lvs_status, _macro_blackbox_deferred as _lvs_macro_blackbox_deferred
+from agents.digital.digital_lvs_agent import _lvs_failure_details, _lvs_status, _macro_blackbox_deferred as _lvs_macro_blackbox_deferred
 from agents.digital.digital_scan_atpg_agent import _adapter_log_has_execution_error, _generate_full_scan_bench, _metrics_show_real_atpg_result, _pattern_count_from_file
 from agents.digital import digital_tapeout_lec_agent as tapeout_lec_agent
 from agents.digital.digital_tapeout_lec_agent import PHYSICAL_ONLY_TOP_PORTS, _top_ports
@@ -25,6 +25,37 @@ def test_physical_stage_selects_one_physical_top_netlist():
     ])
 
     assert chosen == ["/work/inputs/netlist/temp_monitor_soc_phys_synth.v"]
+
+
+def test_lvs_and_tapeout_prefer_physical_netlist_as_openlane_input():
+    candidates = [
+        "/work/inputs/netlist/top_synth.v",
+        "/work/inputs/netlist/top.nl.v",
+    ]
+
+    assert digital_lvs_agent._select_single_top_netlist(candidates) == ["/work/inputs/netlist/top.nl.v"]
+    assert digital_tapeout_agent._select_single_top_netlist(candidates) == ["/work/inputs/netlist/top.nl.v"]
+
+
+def test_lvs_and_tapeout_prefer_pnl_over_nl_netlist():
+    candidates = [
+        "/work/inputs/netlist/top_synth.v",
+        "/work/inputs/netlist/top.nl.v",
+        "/work/inputs/netlist/top.pnl.v",
+    ]
+
+    assert digital_lvs_agent._select_single_top_netlist(candidates) == ["/work/inputs/netlist/top.pnl.v"]
+    assert digital_tapeout_agent._select_single_top_netlist(candidates) == ["/work/inputs/netlist/top.pnl.v"]
+
+
+def test_lvs_and_tapeout_resolve_postfill_physical_netlist(tmp_path):
+    netlist_dir = tmp_path / "digital" / "sta_postfill" / "netlist"
+    netlist_dir.mkdir(parents=True)
+    physical = netlist_dir / "top.nl.v"
+    physical.write_text("module top; endmodule\n", encoding="utf-8")
+
+    assert digital_lvs_agent._resolve_physical_netlist({}, str(tmp_path)) == str(physical.resolve())
+    assert digital_tapeout_agent._resolve_physical_netlist({}, str(tmp_path)) == str(physical.resolve())
 
 
 def test_physical_stage_clears_stale_local_netlists(tmp_path):
@@ -557,8 +588,8 @@ endmodule
     text = open(stubs[0], "r", encoding="utf-8").read()
 
     assert "module temp_sensor_adc_model(sample_req, sensor_temp_celsius, adc_code, avdd, avss, adc_valid);" in text
-    assert "input sensor_temp_celsius;" in text
-    assert "output adc_code;" in text
+    assert "input [15:0] sensor_temp_celsius;" in text
+    assert "output [11:0] adc_code;" in text
     assert "input adc_valid;" in text
 
 
@@ -572,6 +603,289 @@ def test_drc_lvs_blackbox_deferred_when_macro_gds_missing():
     assert _drc_macro_blackbox_deferred(["dir::inputs/macros/lef/ana.lef"], ["dir::inputs/macros/lib/ana.lib"], [])
     assert _lvs_macro_blackbox_deferred(["dir::inputs/macros/lef/ana.lef"], ["dir::inputs/macros/lib/ana.lib"], [])
     assert not _drc_macro_blackbox_deferred(["dir::inputs/macros/lef/ana.lef"], [], ["dir::inputs/macros/gds/ana.gds"])
+
+
+def test_lvs_failure_details_classifies_macro_bus_width_mismatch():
+    details = _lvs_failure_details(
+        "Warning: Net {a[1],a[0]} bus width (2) does not match port a bus width (1).\n"
+        "Note:  Implicit pin a[1] in instance u_ana of ana in cell top\n"
+    )
+
+    assert details["failure_reason"] == "macro_bus_width_mismatch"
+    assert details["implicit_pins"] == ["a[1]"]
+
+
+def test_lvs_failure_details_classifies_stdcell_implicit_outputs_separately():
+    details = _lvs_failure_details(
+        "Note:  Implicit pin X in instance clkload0 of sky130_fd_sc_hd__clkbuf_4 in cell top\n"
+    )
+
+    assert details["failure_reason"] == "physical_netlist_missing_stdcell_outputs"
+    assert details["implicit_pins"] == ["X"]
+    assert details["implicit_pin_records"][0]["model"] == "sky130_fd_sc_hd__clkbuf_4"
+
+
+def test_lvs_failure_details_reports_top_level_disconnected_pin_mismatch():
+    details = _lvs_failure_details(
+        "Circuit contains 422 nets, and 7 disconnected pins.\n"
+        "Contents of circuit 2:  Circuit: 'top'\n"
+        "Circuit contains 422 nets, and 5 disconnected pins.\n"
+        "Final result:\nTop level cell failed pin matching.\n"
+    )
+
+    assert details["failure_reason"] == "top_level_disconnected_pin_mismatch"
+    assert details["source_disconnected_pins"] == 7
+    assert details["layout_disconnected_pins"] == 5
+
+
+def test_lvs_sanitizes_unconnected_stdcell_load_outputs(tmp_path):
+    src = tmp_path / "top.nl.v"
+    dst = tmp_path / "top_lvs.v"
+    src.write_text(
+        """
+module top(input clk);
+  sky130_fd_sc_hd__clkbuf_4 clkload0 (.A(clk));
+  sky130_fd_sc_hd__clkinv_2 clkload1 (.A(clk));
+  sky130_fd_sc_hd__clkinvlp_4 clkload2 (.A(clk));
+  sky130_fd_sc_hd__buf_1 kept (.A(clk), .X(net1));
+endmodule
+""",
+        encoding="utf-8",
+    )
+
+    repaired, count = digital_lvs_agent._sanitize_lvs_netlist_unconnected_stdcell_outputs(str(src), str(dst))
+    text = open(repaired, "r", encoding="utf-8").read()
+
+    assert count == 3
+    assert ".X()" in text
+    assert text.count(".Y()") == 2
+    assert text.count("_chiploop_lvs_nc_kept") == 0
+
+
+def test_lvs_sanitizer_replaces_prior_fake_nc_outputs_with_unconnected_ports(tmp_path):
+    src = tmp_path / "top.nl.v"
+    src.write_text(
+        "module top(input clk); sky130_fd_sc_hd__clkbuf_4 clkload0 (.A(clk), .X(_chiploop_lvs_nc_clkload0_X)); endmodule\n",
+        encoding="utf-8",
+    )
+
+    repaired, count = digital_lvs_agent._sanitize_lvs_netlist_unconnected_stdcell_outputs(str(src))
+    text = open(repaired, "r", encoding="utf-8").read()
+
+    assert count == 1
+    assert ".X()" in text
+    assert "_chiploop_lvs_nc_" not in text
+
+
+def test_lvs_sanitizer_connects_missing_macro_supply_ports(tmp_path):
+    src = tmp_path / "top.nl.v"
+    spice = tmp_path / "ana_lvs_source.spice"
+    src.write_text(
+        """
+module top(avdd, avss, sig);
+  input avdd;
+  input avss;
+  input sig;
+  ana u_ana(.sig(sig));
+endmodule
+""",
+        encoding="utf-8",
+    )
+    spice.write_text(".subckt ana sig VGND VPWR avdd avss\n.ends ana\n", encoding="utf-8")
+
+    repaired, count = digital_lvs_agent._sanitize_lvs_netlist_unconnected_stdcell_outputs(str(src), None, [str(spice)])
+    text = open(repaired, "r", encoding="utf-8").read()
+
+    assert count == 4
+    assert ".VPWR(avdd)" in text
+    assert ".VGND(avss)" in text
+    assert ".avdd(avdd)" in text
+    assert ".avss(avss)" in text
+    assert ".VGND(avss),\n    .VPWR(avdd),\n    .avdd(avdd),\n    .avss(avss)" in text
+
+
+def test_lvs_sanitizer_connects_macro_supply_ports_from_ansi_header(tmp_path):
+    src = tmp_path / "top.nl.v"
+    spice = tmp_path / "ana_lvs_source.spice"
+    src.write_text(
+        "module top(input wire avdd, input wire avss, input sig); ana u_ana(.sig(sig)); endmodule\n",
+        encoding="utf-8",
+    )
+    spice.write_text(".subckt ana sig VPWR VGND\n.ends ana\n", encoding="utf-8")
+
+    repaired, count = digital_lvs_agent._sanitize_lvs_netlist_unconnected_stdcell_outputs(str(src), None, [str(spice)])
+    text = open(repaired, "r", encoding="utf-8").read()
+
+    assert count == 2
+    assert ".VPWR(avdd)" in text
+    assert ".VGND(avss)" in text
+
+
+def test_lvs_sanitizer_never_adds_macro_supply_ports_to_stdcells(tmp_path):
+    src = tmp_path / "top.nl.v"
+    polluted_spice = tmp_path / "mixed.spice"
+    src.write_text(
+        """
+module top(input wire avdd, input wire avss, input sig);
+  sky130_fd_sc_hd__decap_3 FILLER_94_557 ();
+  ana u_ana(.sig(sig));
+endmodule
+""",
+        encoding="utf-8",
+    )
+    polluted_spice.write_text(
+        ".subckt sky130_fd_sc_hd__decap_3 VPWR VGND\n.ends sky130_fd_sc_hd__decap_3\n"
+        ".subckt ana sig VPWR VGND\n.ends ana\n",
+        encoding="utf-8",
+    )
+
+    repaired, count = digital_lvs_agent._sanitize_lvs_netlist_unconnected_stdcell_outputs(str(src), None, [str(polluted_spice)])
+    text = open(repaired, "r", encoding="utf-8").read()
+
+    assert count == 2
+    assert "sky130_fd_sc_hd__decap_3 FILLER_94_557 ();" in text
+    assert ".VPWR(avdd)" in text
+    assert ".VGND(avss)" in text
+
+
+def test_lvs_and_tapeout_generate_physical_only_ef_stdcell_blackboxes(tmp_path):
+    netlist = tmp_path / "top.nl.v"
+    netlist.write_text(
+        """
+module top(input avdd, input avss);
+  sky130_fd_sc_hd__fill_1 FILLER_94_27 ();
+  sky130_ef_sc_hd__decap_12 FILLER_94_545 ();
+  sky130_ef_sc_hd__fakediode_2 ANTENNA_1 (.A(avdd), .B(avss));
+  sky130_fd_sc_hd__and2_1 U1 (.A(avdd), .B(avss), .X());
+endmodule
+""",
+        encoding="utf-8",
+    )
+
+    lvs_stubs = digital_lvs_agent._write_physical_stdcell_blackbox_stubs([str(netlist)], str(tmp_path))
+    lvs_text = open(lvs_stubs[0], "r", encoding="utf-8").read()
+
+    assert "module sky130_fd_sc_hd__fill_1();" in lvs_text
+    assert "module sky130_ef_sc_hd__decap_12();" in lvs_text
+    assert "module sky130_ef_sc_hd__fakediode_2(A, B);" in lvs_text
+    assert "sky130_fd_sc_hd__and2_1" not in lvs_text
+    assert "inout A;" in lvs_text
+    assert "inout B;" in lvs_text
+
+    tapeout_dir = tmp_path / "tapeout"
+    tapeout_dir.mkdir()
+    tapeout_stubs = digital_tapeout_agent._write_physical_stdcell_blackbox_stubs([str(netlist)], str(tapeout_dir))
+    tapeout_text = open(tapeout_stubs[0], "r", encoding="utf-8").read()
+
+    assert tapeout_text == lvs_text
+
+
+def test_lvs_sanitizes_generated_openlane_run_netlists(tmp_path):
+    run = tmp_path / "runs" / "run1"
+    step = run / "111-openroad-fillinsertion"
+    step.mkdir(parents=True)
+    netlist = step / "top.nl.v"
+    netlist.write_text(
+        "module top(input clk); sky130_fd_sc_hd__clkbuf_4 clkload0 (.A(clk)); endmodule\n",
+        encoding="utf-8",
+    )
+
+    result = digital_lvs_agent._sanitize_openlane_lvs_run_netlists(str(run))
+    text = netlist.read_text(encoding="utf-8")
+
+    assert result["repairs"] == 1
+    assert result["files"] == [str(netlist)]
+    assert ".X()" in text
+
+
+def test_lvs_and_tapeout_stdcell_spice_models_include_full_libraries_first(tmp_path):
+    pdk = tmp_path / "pdk" / "sky130A" / "libs.ref"
+    fd_spice = pdk / "sky130_fd_sc_hd" / "spice"
+    ef_spice = pdk / "sky130_ef_sc_hd" / "spice"
+    fd_spice.mkdir(parents=True)
+    ef_spice.mkdir(parents=True)
+    for path in [
+        fd_spice / "sky130_fd_sc_hd__fill_1.spice",
+        fd_spice / "sky130_fd_sc_hd.spice",
+        ef_spice / "sky130_ef_sc_hd__decap_12.spice",
+        ef_spice / "sky130_ef_sc_hd.spice",
+    ]:
+        path.write_text(f".subckt {path.stem} VPWR VGND\n.ends {path.stem}\n", encoding="utf-8")
+
+    state = {"pdk_root_host": str(tmp_path / "pdk")}
+
+    lvs_models = [os.path.basename(p) for p in digital_lvs_agent._resolve_stdcell_spice_models(state, str(tmp_path))]
+    tapeout_models = [os.path.basename(p) for p in digital_tapeout_agent._resolve_stdcell_spice_models(state, str(tmp_path))]
+
+    assert lvs_models[:2] == ["sky130_ef_sc_hd.spice", "sky130_fd_sc_hd.spice"] or lvs_models[:2] == ["sky130_fd_sc_hd.spice", "sky130_ef_sc_hd.spice"]
+    assert "sky130_fd_sc_hd__fill_1.spice" in lvs_models
+    assert "sky130_ef_sc_hd__decap_12.spice" in lvs_models
+    assert tapeout_models == lvs_models
+
+
+def test_lvs_and_tapeout_prefer_analog_signoff_lvs_spice_over_raw_macro_spice(tmp_path):
+    raw_dir = tmp_path / "analog" / "sky130"
+    signoff_dir = tmp_path / "analog" / "signoff"
+    raw_dir.mkdir(parents=True)
+    signoff_dir.mkdir(parents=True)
+    raw = raw_dir / "ana.spice"
+    raw.write_text(".subckt ana bus[0] bus[10] bus[1] vdd vss\n.ends ana\n", encoding="utf-8")
+    signoff = signoff_dir / "ana_lvs_source.spice"
+    signoff.write_text(".subckt ana bus[0] bus[1] bus[10] vdd vss\n.ends ana\n", encoding="utf-8")
+    _summary = raw_dir / "sky130_spice_summary.json"
+    _summary.write_text(json.dumps({"spice": str(raw)}), encoding="utf-8")
+
+    lvs_models = digital_lvs_agent._resolve_macro_spice_models({}, str(tmp_path))
+    tapeout_models = digital_tapeout_agent._resolve_macro_spice_models({}, str(tmp_path))
+
+    assert lvs_models == [str(signoff.resolve())]
+    assert tapeout_models == [str(signoff.resolve())]
+
+
+def test_lvs_and_tapeout_prefer_state_lvs_spice_over_raw_macro_spice(tmp_path):
+    raw_dir = tmp_path / "analog" / "sky130"
+    runtime_dir = tmp_path / "runtime"
+    raw_dir.mkdir(parents=True)
+    runtime_dir.mkdir(parents=True)
+    raw = raw_dir / "ana.spice"
+    raw.write_text(".subckt ana bus[0] bus[10] bus[1] vdd vss\n.ends ana\n", encoding="utf-8")
+    signoff = runtime_dir / "ana_lvs_source.spice"
+    signoff.write_text(".subckt ana bus[0] bus[1] bus[10] vdd vss\n.ends ana\n", encoding="utf-8")
+    (raw_dir / "sky130_spice_summary.json").write_text(json.dumps({"spice": str(raw)}), encoding="utf-8")
+    state = {
+        "analog_lvs_source_spice": str(signoff),
+        "analog_signoff": {"lvs": {"source_spice": str(signoff)}},
+        "digital": {"macro_spice": [str(raw)]},
+    }
+
+    lvs_models = digital_lvs_agent._resolve_macro_spice_models(state, str(tmp_path))
+    tapeout_models = digital_tapeout_agent._resolve_macro_spice_models(state, str(tmp_path))
+
+    assert lvs_models == [str(signoff.resolve())]
+    assert tapeout_models == [str(signoff.resolve())]
+
+
+def test_lvs_and_tapeout_keep_lvs_source_from_analog_gds_dir(tmp_path):
+    gds_dir = tmp_path / "analog" / "gds"
+    raw_dir = tmp_path / "analog" / "sky130"
+    pkg_dir = tmp_path / "analog" / "physical_package"
+    gds_dir.mkdir(parents=True)
+    raw_dir.mkdir(parents=True)
+    pkg_dir.mkdir(parents=True)
+    signoff = gds_dir / "ana_lvs_source.spice"
+    raw = raw_dir / "ana.spice"
+    signoff.write_text(".subckt ana bus[0] bus[1] bus[10] vdd vss\n.ends ana\n", encoding="utf-8")
+    raw.write_text(".subckt ana bus[0] bus[10] bus[1] vdd vss\n.ends ana\n", encoding="utf-8")
+    (pkg_dir / "analog_physical_collateral_package.json").write_text(
+        json.dumps({"spice": str(signoff), "raw_spice": str(raw), "lvs_spice": str(signoff)}),
+        encoding="utf-8",
+    )
+
+    lvs_models = digital_lvs_agent._resolve_macro_spice_models({}, str(tmp_path))
+    tapeout_models = digital_tapeout_agent._resolve_macro_spice_models({}, str(tmp_path))
+
+    assert lvs_models == [str(signoff.resolve())]
+    assert tapeout_models == [str(signoff.resolve())]
 
 
 def test_signoff_macro_staging_ignores_directory_collateral(tmp_path):

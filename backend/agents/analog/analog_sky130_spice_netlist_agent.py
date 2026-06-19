@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import shlex
 from typing import Any, Dict, List
 
 from model_gateway import complete_text
@@ -69,15 +70,24 @@ def _port_specs(state: dict) -> Dict[str, Dict[str, Any]]:
 
 
 def _base_bus_name(name: str) -> str:
-    match = re.match(r"^(.+)\[\d+\]$", name or "")
-    return match.group(1) if match else name
+    pin = _pin_name(name)
+    match = re.match(r"^(.+)\[\d+\]$", pin)
+    return match.group(1) if match else pin
+
+
+def _pin_name(token: str) -> str:
+    return str(token or "").strip().strip('"').strip("'").strip("{}")
 
 
 def _subckt_parts(text: str) -> tuple[str, List[str]]:
     match = re.search(r"^\s*\.subckt\s+(\S+)\s+(.+)$", text or "", flags=re.IGNORECASE | re.MULTILINE)
     if not match:
         return "", []
-    return match.group(1), match.group(2).split()
+    try:
+        pins = shlex.split(match.group(2))
+    except Exception:
+        pins = match.group(2).split()
+    return _pin_name(match.group(1)), [_pin_name(pin) for pin in pins if _pin_name(pin)]
 
 
 def _normalize_subckt_bus_pins(text: str) -> str:
@@ -85,10 +95,16 @@ def _normalize_subckt_bus_pins(text: str) -> str:
     if not name or not pins:
         return text
     bit_bases = {_base_bus_name(pin) for pin in pins if re.match(r"^.+\[\d+\]$", pin)}
-    if not bit_bases:
-        return text
-    normalized = [pin for pin in pins if not (pin in bit_bases and any(p.startswith(f"{pin}[") for p in pins))]
-    if normalized == pins:
+    normalized: List[str] = []
+    seen: set[str] = set()
+    for pin in pins:
+        if pin in bit_bases and any(p.startswith(f"{pin}[") for p in pins):
+            continue
+        if pin in seen:
+            continue
+        seen.add(pin)
+        normalized.append(pin)
+    if normalized == pins and '"' not in text and "'" not in text:
         return text
     return re.sub(
         r"^\s*\.subckt\s+\S+\s+.+$",
@@ -117,7 +133,7 @@ def _legalize_scalar_bus_mos_terminals(text: str) -> str:
 
     def repl(match: re.Match) -> str:
         prefix, drain, gate, source, bulk, suffix = match.groups()
-        terminals = [replacements.get(term, term) for term in (drain, gate, source, bulk)]
+        terminals = [replacements.get(_pin_name(term), _pin_name(term)) for term in (drain, gate, source, bulk)]
         return f"{prefix}{terminals[0]} {terminals[1]} {terminals[2]} {terminals[3]}{suffix}"
 
     return re.sub(
@@ -143,6 +159,17 @@ def _is_supply_pin(pin: str, port_specs: Dict[str, Dict[str, Any]]) -> bool:
     return lowered in {"vdd", "vss", "vcc", "gnd", "avdd", "avss", "dvdd", "dvss", "vpwr", "vgnd"}
 
 
+def _supply_kind(pin: str, port_specs: Dict[str, Dict[str, Any]]) -> str:
+    spec = port_specs.get(pin) or port_specs.get(_base_bus_name(pin)) or {}
+    role = str(spec.get("role") or "").strip().lower()
+    lowered = (pin or "").lower()
+    if role == "power" or lowered in {"vdd", "vcc", "avdd", "dvdd", "vpwr"} or lowered.endswith("vdd"):
+        return "power"
+    if role == "ground" or lowered in {"vss", "gnd", "avss", "dvss", "vgnd"} or lowered.endswith("vss"):
+        return "ground"
+    return ""
+
+
 def _interface_safety_context(ports: List[str], port_specs: Dict[str, Dict[str, Any]]) -> Dict[str, List[str]]:
     bit_bases = sorted(dict.fromkeys(_base_bus_name(pin) for pin in ports if re.match(r"^.+\[\d+\]$", pin)))
     input_pins = sorted(dict.fromkeys(
@@ -157,6 +184,161 @@ def _interface_safety_context(ports: List[str], port_specs: Dict[str, Dict[str, 
         "output_pins_may_be_driven": output_pins,
         "forbidden_scalar_bus_terminals": bit_bases,
     }
+
+
+def _canonicalize_generated_supply_usage(text: str, port_specs: Dict[str, Dict[str, Any]]) -> str:
+    _subckt_name, pins = _subckt_parts(text)
+    if not pins:
+        return text
+    supplies = {pin for pin in pins if _is_supply_pin(pin, port_specs)}
+    outputs = {
+        pin for pin in pins
+        if _direction_for_pin(pin, port_specs).startswith("output")
+        or _direction_for_pin(_base_bus_name(pin), port_specs).startswith("output")
+    }
+    if not supplies or not outputs:
+        return text
+
+    source_counts: Dict[str, int] = {pin: 0 for pin in supplies}
+    mos_line_re = re.compile(r"^(\s*M\S*\s+)(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(\s+(\S+).*)$", re.IGNORECASE)
+    lines: List[str] = []
+    mos_indexes_by_kind = {"power": [], "ground": []}
+    for line in (text or "").splitlines():
+        match = mos_line_re.match(line)
+        if not match:
+            lines.append(line)
+            continue
+        prefix, drain, gate, source, bulk, suffix, model = match.groups()
+        drain = _pin_name(drain)
+        gate = _pin_name(gate)
+        source = _pin_name(source)
+        bulk = _pin_name(bulk)
+        model_lower = model.lower()
+        if drain in supplies:
+            continue
+        line_index = len(lines)
+        if source in source_counts:
+            source_counts[source] += 1
+        if drain in outputs:
+            if "pfet" in model_lower:
+                mos_indexes_by_kind["power"].append(line_index)
+            elif "nfet" in model_lower:
+                mos_indexes_by_kind["ground"].append(line_index)
+        lines.append(f"{prefix}{drain} {gate} {source} {bulk}{suffix}")
+
+    unused_by_kind = {"power": [], "ground": []}
+    for supply, count in source_counts.items():
+        kind = _supply_kind(supply, port_specs)
+        if count == 0 and kind in unused_by_kind:
+            unused_by_kind[kind].append(supply)
+
+    used_line_indexes: set[int] = set()
+    for kind, unused_supplies in unused_by_kind.items():
+        candidate_indexes = mos_indexes_by_kind[kind]
+        for supply in unused_supplies:
+            target_index = next((idx for idx in candidate_indexes if idx not in used_line_indexes), None)
+            if target_index is None:
+                continue
+            used_line_indexes.add(target_index)
+            match = mos_line_re.match(lines[target_index])
+            if not match:
+                continue
+            prefix, drain, gate, _source, _bulk, suffix, _model = match.groups()
+            lines[target_index] = f"{prefix}{_pin_name(drain)} {_pin_name(gate)} {supply} {supply}{suffix}"
+
+    return "\n".join(lines).rstrip() + ("\n" if text.endswith("\n") else "")
+
+
+def _gate_counts_for_external_inputs(text: str, port_specs: Dict[str, Dict[str, Any]]) -> Dict[str, int]:
+    _subckt_name, pins = _subckt_parts(text)
+    external_inputs = {
+        pin for pin in pins
+        if _direction_for_pin(pin, port_specs).startswith("input") and not _is_supply_pin(pin, port_specs)
+    }
+    external_inputs.update(
+        pin for pin in pins
+        if _direction_for_pin(_base_bus_name(pin), port_specs).startswith("input") and not _is_supply_pin(pin, port_specs)
+    )
+    counts: Dict[str, int] = {pin: 0 for pin in external_inputs}
+    for match in re.finditer(r"^\s*M\S*\s+\S+\s+(\S+)\s+\S+\s+\S+\s+\S+", text or "", flags=re.IGNORECASE | re.MULTILINE):
+        gate = _pin_name(match.group(1))
+        if gate in counts:
+            counts[gate] += 1
+    return counts
+
+
+def _bus_index(pin: str) -> int | None:
+    match = re.match(r"^.+\[(\d+)\]$", _pin_name(pin))
+    return int(match.group(1)) if match else None
+
+
+def _canonicalize_generated_input_gate_fanout(text: str, port_specs: Dict[str, Dict[str, Any]], max_gate_fanout: int = 6) -> str:
+    _subckt_name, pins = _subckt_parts(text)
+    if not pins:
+        return text
+    external_inputs = [
+        pin for pin in pins
+        if _direction_for_pin(pin, port_specs).startswith("input") and not _is_supply_pin(pin, port_specs)
+    ]
+    external_inputs.extend(
+        pin for pin in pins
+        if _direction_for_pin(_base_bus_name(pin), port_specs).startswith("input") and not _is_supply_pin(pin, port_specs)
+    )
+    external_inputs = sorted(dict.fromkeys(external_inputs), key=lambda pin: (_base_bus_name(pin), _bus_index(pin) if _bus_index(pin) is not None else -1, pin))
+    if len(external_inputs) < 2:
+        return text
+    output_pins = {
+        pin for pin in pins
+        if _direction_for_pin(pin, port_specs).startswith("output")
+        or _direction_for_pin(_base_bus_name(pin), port_specs).startswith("output")
+    }
+    input_bus_by_index: Dict[int, str] = {
+        idx: pin
+        for pin in external_inputs
+        for idx in [_bus_index(pin)]
+        if idx is not None
+    }
+    input_scalars = [pin for pin in external_inputs if _bus_index(pin) is None]
+
+    mos_line_re = re.compile(r"^(\s*M\S*\s+)(\S+)\s+(\S+)\s+(\S+)\s+(\S+)(\s+\S+.*)$", re.IGNORECASE)
+    parsed: list[tuple[int, re.Match[str], str, str]] = []
+    gate_counts: Dict[str, int] = {}
+    for idx, line in enumerate((text or "").splitlines()):
+        match = mos_line_re.match(line)
+        if not match:
+            continue
+        _prefix, drain, gate, _source, _bulk, _suffix = match.groups()
+        drain = _pin_name(drain)
+        gate = _pin_name(gate)
+        if drain not in output_pins or gate not in external_inputs:
+            continue
+        parsed.append((idx, match, drain, gate))
+        gate_counts[gate] = gate_counts.get(gate, 0) + 1
+    if not any(count > max_gate_fanout for count in gate_counts.values()):
+        return text
+
+    lines = (text or "").splitlines()
+    round_robin_inputs = [*input_bus_by_index.values(), *input_scalars]
+    rr = 0
+    retained_scalar: set[str] = set()
+    for idx, match, drain, gate in parsed:
+        if gate_counts.get(gate, 0) <= max_gate_fanout:
+            continue
+        if _bus_index(gate) is None and _bus_index(drain) is None and gate not in retained_scalar:
+            retained_scalar.add(gate)
+            continue
+        replacement = None
+        out_idx = _bus_index(drain)
+        if out_idx is not None:
+            replacement = input_bus_by_index.get(out_idx)
+        if not replacement and round_robin_inputs:
+            replacement = round_robin_inputs[rr % len(round_robin_inputs)]
+            rr += 1
+        if not replacement:
+            continue
+        prefix, drain_raw, _gate_raw, source, bulk, suffix = match.groups()
+        lines[idx] = f"{prefix}{_pin_name(drain_raw)} {replacement} {_pin_name(source)} {_pin_name(bulk)}{suffix}"
+    return "\n".join(lines).rstrip() + ("\n" if text.endswith("\n") else "")
 
 
 def _generated_spice_layout_issues(text: str, port_specs: Dict[str, Dict[str, Any]]) -> List[str]:
@@ -176,8 +358,20 @@ def _generated_spice_layout_issues(text: str, port_specs: Dict[str, Dict[str, An
         if _direction_for_pin(_base_bus_name(pin), port_specs).startswith("input") and not _is_supply_pin(pin, port_specs)
     )
     external_supplies = {pin for pin in pins if _is_supply_pin(pin, port_specs)}
+    external_outputs = {pin for pin in pins if _direction_for_pin(pin, port_specs).startswith("output")}
+    external_outputs.update(
+        pin
+        for pin in pins
+        if _direction_for_pin(_base_bus_name(pin), port_specs).startswith("output")
+    )
+    supply_sources: Dict[str, int] = {pin: 0 for pin in external_supplies}
+    output_drive_classes: Dict[str, set[str]] = {pin: set() for pin in external_outputs}
     for match in re.finditer(r"^\s*M\S*\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)", text or "", flags=re.IGNORECASE | re.MULTILINE):
-        drain, _gate, source, bulk, _model = match.groups()
+        drain, _gate, source, bulk, model = match.groups()
+        drain = _pin_name(drain)
+        source = _pin_name(source)
+        bulk = _pin_name(bulk)
+        model_kind = "pfet" if "pfet" in model.lower() else "nfet" if "nfet" in model.lower() else ""
         for terminal in (drain, source, bulk):
             if terminal not in pin_set and terminal in bit_bases:
                 issues.append(f"undeclared_external_scalar_bus:{terminal}")
@@ -187,6 +381,21 @@ def _generated_spice_layout_issues(text: str, port_specs: Dict[str, Dict[str, An
                 issues.append(f"input_pin_used_as_device_terminal:{terminal}")
         if drain in external_supplies:
             issues.append(f"supply_pin_used_as_device_drain:{drain}")
+        if source in supply_sources:
+            supply_sources[source] += 1
+        for terminal in (drain, source):
+            if terminal in output_drive_classes and model_kind:
+                output_drive_classes[terminal].add(model_kind)
+    for supply, count in sorted(supply_sources.items()):
+        if count == 0:
+            issues.append(f"supply_pin_not_used_as_device_source:{supply}")
+    for output, classes in sorted(output_drive_classes.items()):
+        if not classes:
+            issues.append(f"output_pin_not_driven:{output}")
+        if "pfet" in classes and "nfet" not in classes:
+            issues.append(f"output_pin_missing_nfet_pull:{output}")
+        if "nfet" in classes and "pfet" not in classes:
+            issues.append(f"output_pin_missing_pfet_pull:{output}")
     return sorted(dict.fromkeys(issues))
 
 
@@ -300,6 +509,68 @@ Good bus example, because every bus terminal uses a declared bit pin:
 Mgood3 data_bus[0] enable vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u
 Mgood4 data_bus[0] enable vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u
 .ends example
+
+Bad input-bus example, because sensor_bus[0] is an input bit but is used as a MOS drain:
+.subckt example sensor_bus[0] sensor_bus[1] output_code[0] sample_req vdd vss
+Mbad4 sensor_bus[0] sample_req vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+Mbad5 sensor_bus[0] sample_req vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+.ends example
+
+Good input-bus example, because sensor_bus bits are used only as gates and only output_code[0] is driven:
+.subckt example sensor_bus[0] sensor_bus[1] output_code[0] sample_req vdd vss
+Mgood5 output_code[0] sensor_bus[0] vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+Mgood6 output_code[0] sample_req vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+.ends example
+
+Bad supply-alias example, because avdd and avss are .subckt pins but are never used as MOS source terminals:
+.subckt example out in VPWR VGND avdd avss
+Mbad6 out in VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+Mbad7 out in VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+.ends example
+
+Bad supply-drain example, because avdd and avss are supplies but are illegally used as driven MOS drains:
+.subckt example out in VPWR VGND avdd avss
+Mbad8 avdd in avdd avdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+Mbad9 avss in avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+.ends example
+
+Good supply-alias example, because every supply pin is used as a source terminal at least once:
+.subckt example out0 out1 in0 in1 VPWR VGND avdd avss
+Mgood7 out0 in0 VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+Mgood8 out0 in0 VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+Mgood9 out1 in1 avdd avdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+Mgood10 out1 in1 avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+.ends example
+""".strip()
+
+
+def _layout_safe_self_check() -> str:
+    return """
+Before returning SPICE, perform this exact self-check and fix failures:
+1. .subckt interface:
+   - It must contain exactly the required external pins.
+   - If bit pins like bus[0] exist, the scalar bus name bus must not appear as a .subckt pin or MOS terminal.
+2. Inputs:
+   - Any pin listed in input_pins_gate_only may appear only as the MOS gate terminal.
+   - If an input appears as drain/source/bulk, rewrite that device so the input is the gate and an output/internal node is the drain.
+   - Never create output drivers for input bus pins. If an illegal device drives an input bit, delete that device or move its drain to a real output_pins_may_be_driven pin.
+3. Outputs:
+   - Every pin listed in output_pins_may_be_driven must be driven by at least one legal MOS device.
+   - For every output pin driven by a PFET, there must also be at least one NFET connected to that same output pin.
+   - For every output pin driven by an NFET, there must also be at least one PFET connected to that same output pin.
+4. Supplies:
+   - Every supply pin in the .subckt, including aliases such as VPWR, VGND, avdd, and avss, must be used as a MOS source terminal at least once.
+   - Supply pins may be source/bulk terminals, never drain terminals.
+   - If a supply alias is unused, choose a real output device and use that alias as both source and bulk for one complementary driver.
+5. Issue-to-repair mapping:
+   - supply_pin_not_used_as_device_source:X => add or rewrite at least one legal MOS with source X and bulk X.
+   - supply_pin_used_as_device_drain:X => never drive X; remove that device or move the drain to a real output pin and keep X only as source/bulk.
+   - output_pin_not_driven:Y => add complementary PFET/NFET drivers for output Y.
+   - output_pin_missing_nfet_pull:Y => add an NFET for output Y with source/bulk on a ground supply.
+   - output_pin_missing_pfet_pull:Y => add a PFET for output Y with source/bulk on a power supply.
+   - input_pin_used_as_device_terminal:Z => move Z to gate only; do not use Z as drain/source/bulk.
+   - undeclared_external_scalar_bus:B => replace B with a declared bit pin such as B[0].
+6. Return only the repaired SPICE. Do not explain the self-check.
 """.strip()
 
 
@@ -324,6 +595,9 @@ Layout-safe external terminal rules derived from the interface:
 Layout-safe topology examples:
 {_layout_safe_spice_examples()}
 
+Mandatory self-check and self-repair strategy:
+{_layout_safe_self_check()}
+
 Available analog spec JSON:
 {json.dumps(ctx["analog_spec"], indent=2)}
 
@@ -342,8 +616,13 @@ Strict requirements:
 - If a port is a bus, use either the bus bit pins or the scalar bus port, not both.
 - Input pins listed in input_pins_gate_only may appear only as MOS gates. They must never appear as MOS drain, source, or bulk terminals.
 - Do not create internal helper devices that modify external input pins.
+- Do not generate output drivers for pins listed in input_pins_gate_only. Bus inputs must stay read-only external stimulus pins.
 - Supply pins listed in supply_pins_source_or_bulk_only may be MOS source/bulk terminals, not MOS drain terminals.
+- Do not create dummy self-driven supply devices such as drain=avdd source=avdd or drain=avss source=avss. Supply pins are not outputs.
+- Every supply pin listed in the .subckt must be used as a MOS source terminal on at least one real MOS device; using it only as a bulk terminal is not enough for Magic LVS port extraction.
 - Output pins listed in output_pins_may_be_driven may be MOS drain/source terminals.
+- Every output pin listed in output_pins_may_be_driven must be represented by at least one legal MOS driver.
+- Every driven output pin must have a complementary CMOS pull structure: at least one PFET path to a power source and at least one NFET path to a ground source. Do not emit PFET-only or NFET-only output drivers.
 - Names listed in forbidden_scalar_bus_terminals must not appear as MOS terminals or .subckt pins when the required port order uses bit pins. Use the declared bit pins exactly.
 - Include explicit W and L parameters on MOS devices.
 - Use Sky130 Magic-compatible dimensions: W >= 0.42u and L >= 0.15u for every MOS device.
@@ -383,6 +662,9 @@ Layout-safe external terminal rules derived from the interface:
 Layout-safe topology examples:
 {_layout_safe_spice_examples()}
 
+Mandatory self-check and self-repair strategy:
+{_layout_safe_self_check()}
+
 Detected layout-safety issues to fix:
 {json.dumps(layout_issues, indent=2)}
 
@@ -401,8 +683,14 @@ Strict requirements:
 - Preserve the required external interface. For bus ports, use either scalar bus pins or bit pins, not both.
 - Input pins listed in input_pins_gate_only may connect only to MOS gates or passive loads. They must never appear as MOS drain/source/bulk terminals.
 - Do not create internal devices that drive, tie, or overwrite external input pins.
+- Do not repair by moving an illegal device onto another input bit. If an illegal device drives an input, either delete it or move its driven terminal to a real output_pins_may_be_driven pin.
+- If the original SPICE already violates input_pin_used_as_device_terminal, the repaired SPICE must not contain that same device topology again.
 - Output pins may be MOS drain/source terminals.
 - Supply pins listed in supply_pins_source_or_bulk_only may be MOS source/bulk terminals, not MOS drain terminals.
+- Do not create dummy self-driven supply devices such as drain=avdd source=avdd or drain=avss source=avss. Supply pins are not outputs.
+- Every supply pin listed in the .subckt must be used as a MOS source terminal on at least one real MOS device; using it only as a bulk terminal is not enough for Magic LVS port extraction.
+- Every output pin listed in output_pins_may_be_driven must be represented by at least one legal MOS driver.
+- Every driven output pin must have a complementary CMOS pull structure: at least one PFET path to a power source and at least one NFET path to a ground source. Do not emit PFET-only or NFET-only output drivers.
 - Names listed in forbidden_scalar_bus_terminals must not appear as MOS terminals or .subckt pins when the required port order uses bit pins. Replace scalar bus terminals with declared bit pins or remove those devices.
 - Use only sky130_fd_pr__nfet_01v8 and sky130_fd_pr__pfet_01v8 MOS devices with M lines.
 - Do not use X lines for MOS devices.
@@ -418,8 +706,7 @@ Strict requirements:
 
 
 def _blocking_layout_issues(spice: str, port_specs: Dict[str, Dict[str, Any]]) -> List[str]:
-    layout_issues = _generated_spice_layout_issues(spice, port_specs)
-    return [issue for issue in layout_issues if not issue.startswith("duplicate_scalar_bus_pins:")]
+    return _generated_spice_layout_issues(spice, port_specs)
 
 
 def run_agent(state: dict) -> dict:
@@ -457,6 +744,7 @@ def run_agent(state: dict) -> dict:
         "module": module_name,
         "source": selected_source,
     }
+    repair_no_progress = False
 
     if not selected_text:
         summary.update({
@@ -470,12 +758,17 @@ def run_agent(state: dict) -> dict:
         raise RuntimeError("Analog GDS generation requires real transistor-level SPICE; no valid device-level SPICE was provided.")
 
     spice = _normalise_for_source(selected_text, module_name, ports, selected_source)
+    if selected_source.startswith("generated_by_sky130_spice_agent"):
+        spice = _canonicalize_generated_supply_usage(spice, port_specs)
+        spice = _canonicalize_generated_input_gate_fanout(spice, port_specs)
     layout_blocking_issues = _blocking_layout_issues(spice, port_specs)
     if layout_blocking_issues and selected_source == "generated_by_sky130_spice_agent":
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "analog/sky130", f"{module_name}_rejected_pass1.spice", spice)
         repaired_text = _repair_generated_spice_with_llm(state, module_name, ports, spice, layout_blocking_issues)
         if repaired_text and _has_real_devices(repaired_text):
             repaired_spice = _normalise_for_source(repaired_text, module_name, ports, "generated_by_sky130_spice_agent_repaired")
+            repaired_spice = _canonicalize_generated_supply_usage(repaired_spice, port_specs)
+            repaired_spice = _canonicalize_generated_input_gate_fanout(repaired_spice, port_specs)
             repaired_issues = _blocking_layout_issues(repaired_spice, port_specs)
             if not repaired_issues:
                 spice = repaired_spice
@@ -483,6 +776,7 @@ def run_agent(state: dict) -> dict:
                 selected_source = "generated_by_sky130_spice_agent_repaired"
             else:
                 save_text_artifact_and_record(workflow_id, AGENT_NAME, "analog/sky130", f"{module_name}_rejected_pass2.spice", repaired_spice)
+                repair_no_progress = repaired_spice.strip() == spice.strip() or repaired_issues == layout_blocking_issues
                 layout_blocking_issues = repaired_issues
         else:
             layout_blocking_issues = [*layout_blocking_issues, "repair_pass_no_valid_mos_devices"]
@@ -493,6 +787,7 @@ def run_agent(state: dict) -> dict:
             "reason": "generated_spice_not_layout_safe",
             "layout_issues": layout_blocking_issues,
             "repair_attempted": True,
+            "repair_no_progress": repair_no_progress,
             "note": "Generated transistor SPICE would create invalid Magic layout. Provide a real layout-safe transistor netlist or improve the analog SPICE generator.",
         })
         save_text_artifact_and_record(workflow_id, AGENT_NAME, "analog/sky130", "sky130_spice_summary.json", json.dumps(summary, indent=2))

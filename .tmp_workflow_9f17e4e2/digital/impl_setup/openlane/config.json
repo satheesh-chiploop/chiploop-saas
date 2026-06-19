@@ -1,0 +1,17 @@
+{
+  "DESIGN_NAME": "top",
+  "PDK": "sky130A",
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 5.0,
+  "VERILOG_FILES": [
+    "dir::../filelist.f"
+  ],
+  "SYNTH_SDC_FILE": "dir::../constraints/top.sdc",
+  "PNR_SDC_FILE": "dir::../constraints/top.sdc",
+  "CHIPLOOP_SOURCE_SPEC_JSON": null,
+  "CHIPLOOP_FILELIST": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169/fb1e0dee-ceb5-417a-900a-47409d974a5c/digital/digital/impl_setup/filelist.f",
+  "CHIPLOOP_UPSTREAM_SDC_SOURCE": "request_clock_constraints",
+  "FP_CORE_UTIL": 20,
+  "PL_TARGET_DENSITY": 0.25,
+  "DIE_AREA": "0 0 120 120"
+}

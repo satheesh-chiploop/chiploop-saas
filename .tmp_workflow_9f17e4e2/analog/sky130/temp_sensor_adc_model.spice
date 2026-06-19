@@ -1,0 +1,34 @@
+.lib "$PDK_ROOT/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
+.subckt temp_sensor_adc_model adc_code[0] adc_code[10] adc_code[11] adc_code[1] adc_code[2] adc_code[3] adc_code[4] adc_code[5] adc_code[6] adc_code[7] adc_code[8] adc_code[9] sensor_temp_celsius[0] sensor_temp_celsius[10] sensor_temp_celsius[11] sensor_temp_celsius[12] sensor_temp_celsius[13] sensor_temp_celsius[14] sensor_temp_celsius[15] sensor_temp_celsius[1] sensor_temp_celsius[2] sensor_temp_celsius[3] sensor_temp_celsius[4] sensor_temp_celsius[5] sensor_temp_celsius[6] sensor_temp_celsius[7] sensor_temp_celsius[8] sensor_temp_celsius[9] VGND VPWR adc_valid avdd avss sample_req
+MADCV0 adc_code[0] sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV1 adc_code[0] sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV2 adc_code[1] sensor_temp_celsius[0] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV3 adc_code[1] sensor_temp_celsius[0] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV4 adc_code[2] sensor_temp_celsius[1] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV5 adc_code[2] sensor_temp_celsius[1] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV6 adc_code[3] sensor_temp_celsius[2] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV7 adc_code[3] sensor_temp_celsius[2] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV8 adc_code[4] sensor_temp_celsius[3] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV9 adc_code[4] sensor_temp_celsius[3] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV10 adc_code[5] sensor_temp_celsius[4] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV11 adc_code[5] sensor_temp_celsius[4] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV12 adc_code[6] sensor_temp_celsius[5] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV13 adc_code[6] sensor_temp_celsius[5] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV14 adc_code[7] sensor_temp_celsius[6] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV15 adc_code[7] sensor_temp_celsius[6] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV16 adc_code[8] sensor_temp_celsius[7] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV17 adc_code[8] sensor_temp_celsius[7] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV18 adc_code[9] sensor_temp_celsius[8] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV19 adc_code[9] sensor_temp_celsius[8] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV20 adc_code[10] sensor_temp_celsius[9] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV21 adc_code[10] sensor_temp_celsius[9] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MADCV22 adc_code[11] sensor_temp_celsius[10] VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MADCV23 adc_code[11] sensor_temp_celsius[10] VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MVAL0 adc_valid sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MVAL1 adc_valid sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MAVDD0 adc_valid sensor_temp_celsius[11] avdd avdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MAVSS0 adc_valid sensor_temp_celsius[12] avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+MAVDD1 adc_code[0] avdd VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u
+MAVSS1 adc_code[0] avss VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u
+.ends temp_sensor_adc_model
+.end

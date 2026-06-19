@@ -42,6 +42,36 @@ def _module_name(state: dict) -> str:
     return str(state.get("analog_macro_module") or contract.get("macro_name") or "analog_macro").strip()
 
 
+def _lvs_source_spice(workflow_dir: str, module: str) -> str:
+    candidates = [
+        os.path.join(workflow_dir, "analog", "signoff", f"{module}_lvs_source.spice"),
+    ]
+    signoff_dir = os.path.join(workflow_dir, "analog", "signoff")
+    if os.path.isdir(signoff_dir):
+        candidates.extend(
+            os.path.join(signoff_dir, name)
+            for name in sorted(os.listdir(signoff_dir))
+            if name.endswith("_lvs_source.spice")
+        )
+    return next((_exists(path) for path in candidates if _exists(path)), "")
+
+
+def _state_lvs_source_spice(state: dict) -> str:
+    gds_summary = state.get("analog_gds_generation") if isinstance(state.get("analog_gds_generation"), dict) else {}
+    gds_lvs = gds_summary.get("analog_lvs") if isinstance(gds_summary.get("analog_lvs"), dict) else {}
+    signoff = state.get("analog_signoff") if isinstance(state.get("analog_signoff"), dict) else {}
+    signoff_lvs = signoff.get("lvs") if isinstance(signoff.get("lvs"), dict) else {}
+    for value in (
+        state.get("analog_lvs_source_spice"),
+        signoff_lvs.get("source_spice"),
+        gds_lvs.get("source_spice"),
+    ):
+        found = _exists(value)
+        if found:
+            return found
+    return ""
+
+
 def run_agent(state: dict) -> dict:
     print(f"\nRunning {AGENT_NAME}...")
     workflow_id = state.get("workflow_id", "default")
@@ -55,10 +85,12 @@ def run_agent(state: dict) -> dict:
     spice = _exists(state.get("analog_spice_path") or state.get("analog_netlist_path"))
     mode = str(state.get("analog_physical_mode") or "blackbox").strip().lower()
     module = _module_name(state)
+    lvs_spice = _state_lvs_source_spice(state) or _lvs_source_spice(workflow_dir, module)
     generate_mode = _generate_mode(state)
     analog_lvs_status = _analog_lvs_status(state)
     analog_drc_status = _analog_drc_status(state)
 
+    package_spice = lvs_spice or spice
     package: Dict[str, Any] = {
         "workflow_id": workflow_id,
         "agent": AGENT_NAME,
@@ -69,7 +101,9 @@ def run_agent(state: dict) -> dict:
         "lef": lef,
         "lib": lib,
         "gds": gds,
-        "spice": spice,
+        "spice": package_spice,
+        "raw_spice": spice,
+        "lvs_spice": lvs_spice,
         "blackbox_for_drc_lvs": bool((lef or lib) and not gds and not generate_mode),
         "blackbox_reason": "analog_macro_gds_missing" if (lef or lib) and not gds and not generate_mode else "",
         "gds_generation": state.get("analog_gds_generation") or {},
@@ -119,8 +153,11 @@ def run_agent(state: dict) -> dict:
         if gds and package["status"] == "ready":
             digital["macro_gds"] = list(dict.fromkeys((digital.get("macro_gds") or []) + [gds]))
             digital.pop("macro_blackbox_mode", None)
-        if spice:
-            digital["macro_spice"] = list(dict.fromkeys((digital.get("macro_spice") or []) + [spice]))
+        signoff_spice = lvs_spice or spice
+        if signoff_spice:
+            digital["macro_spice"] = list(dict.fromkeys((digital.get("macro_spice") or []) + [signoff_spice]))
+            if lvs_spice:
+                digital["macro_lvs_spice"] = list(dict.fromkeys((digital.get("macro_lvs_spice") or []) + [lvs_spice]))
         elif (lef or lib) and not generate_mode:
             digital["macro_blackbox_mode"] = "lef_lib_no_gds"
             digital["macro_blackboxes"] = [os.path.splitext(os.path.basename(lef))[0]] if lef else []

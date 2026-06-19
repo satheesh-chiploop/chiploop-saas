@@ -1,0 +1,20 @@
+[2026-06-19T02:04:46.680224Z] Digital Tapeout Agent
+workflow_id=9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169/fb1e0dee-ceb5-417a-900a-47409d974a5c/digital
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169/fb1e0dee-ceb5-417a-900a-47409d974a5c/digital/digital/lvs/constraints/top.sdc
+sdc_basename=top.sdc
+stage_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169/fb1e0dee-ceb5-417a-900a-47409d974a5c/digital/digital/tapeout/constraints/top.sdc
+base_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169/fb1e0dee-ceb5-417a-900a-47409d974a5c/digital/digital/fill/config.json
+run_work_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169/fb1e0dee-ceb5-417a-900a-47409d974a5c/digital/digital/run_work
+run_tag=System_PD_9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169
+top_module=temp_monitor_soc_phys
+resolved_physical_netlist=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169/fb1e0dee-ceb5-417a-900a-47409d974a5c/digital/digital/sta_postfill/netlist/temp_monitor_soc_phys.nl.v
+selected_verilog_files=['inputs/netlist/chiploop_physical_stdcell_blackboxes.v', 'inputs/netlist/temp_monitor_soc_phys.nl_lvs.v']
+netlist_count=1
+tapeout_netlist_repairs=11
+physical_stdcell_stub_count=1
+macro_placement_cfg=dir::inputs/macros/macro_placement.cfg
+macro_placement_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f17e4e2-4c7c-47d3-a9ba-4d09c2f00169/fb1e0dee-ceb5-417a-900a-47409d974a5c/digital/digital/run_work/tapeout/inputs/macros/macro_placement.cfg
+cell_spice_count=7
+extra_spice_count=1
+closure_overrides={}

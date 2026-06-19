@@ -224,6 +224,7 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital Microarchitecture Agent",
     "Digital Register Map Agent",
     "Digital RTL Agent",
+    "Digital MBIST RTL Insertion Agent",
     "Digital Power Intent (UPF-lite) Agent",
     "Digital UPF Static Check Agent",
     "Digital IP Packaging & Handoff Agent",
@@ -748,6 +749,11 @@ const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
       uiLabel: "Digital Scan ATPG Coverage Agent",
       backendLabel: "Digital Scan ATPG Coverage Agent",
       desc: "Stages scan/gate netlists for open-source ATPG and reports pattern/coverage evidence when a configured adapter command is available."
+    },
+    {
+      uiLabel: "Digital MBIST RTL Insertion Agent",
+      backendLabel: "Digital MBIST RTL Insertion Agent",
+      desc: "Optional Arch2RTL-stage MBIST wrapper generation using AutoMBIST. Runs only when enabled and OpenRAM/SRAM is detected; standalone simulation must pass before RTL handoff is updated."
     },
     {
       uiLabel: "Digital MBIST Collateral Agent",

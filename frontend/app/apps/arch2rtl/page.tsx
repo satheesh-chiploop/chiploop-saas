@@ -117,6 +117,7 @@ export default function Arch2RTLAppPage() {
   const [genUpfLite, setGenUpfLite] = useState(false);
   const [genPackaging, setGenPackaging] = useState(true);
   const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
+  const [insertMbist, setInsertMbist] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const arch2rtlReady = useMemo(() => {
@@ -331,6 +332,7 @@ export default function Arch2RTLAppPage() {
             gen_upf_lite: genUpfLite,
             gen_packaging: genPackaging,
             run_spec2rtl_check: runSpec2RtlCheck,
+            insert_mbist: insertMbist,
           },
         }
       );
@@ -512,6 +514,15 @@ export default function Arch2RTLAppPage() {
                     Run Spec-to-RTL conformance check
                     <span className="block text-xs text-slate-500">
                       Optional: checks generated RTL against spec, interfaces, reset behavior, register intent, and requirement trace.
+                    </span>
+                  </span>
+                </label>
+                <label className="flex items-start gap-2 text-sm text-slate-300">
+                  <input className="mt-1" type="checkbox" checked={insertMbist} onChange={e => setInsertMbist(e.target.checked)} />
+                  <span>
+                    Insert MBIST
+                    <span className="block text-xs text-slate-500">
+                      Optional: only runs when OpenRAM/SRAM is detected. AutoMBIST wrapper simulation must pass before RTL handoff is updated.
                     </span>
                   </span>
                 </label>

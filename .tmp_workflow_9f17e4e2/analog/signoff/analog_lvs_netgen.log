@@ -1,0 +1,24 @@
+Netgen 1.5.278 compiled on Sun Sep 29 13:29:03 UTC 2024
+Warning: netgen command 'format' use fully-qualified name '::netgen::format'
+Warning: netgen command 'global' use fully-qualified name '::netgen::global'
+Reading netlist file temp_sensor_adc_model_extracted.spice
+Reading netlist file temp_sensor_adc_model_lvs_source.spice
+
+Reading setup file /pdk/sky130A/libs.tech/netgen/sky130A_setup.tcl
+
+Comparison output logged to file analog_lvs_netgen.out
+Logging to file "analog_lvs_netgen.out" enabled
+
+Contents of circuit 1:  Circuit: 'temp_sensor_adc_model'
+Circuit temp_sensor_adc_model contains 0 device instances.
+Circuit contains 0 nets, and 34 disconnected pins.
+Contents of circuit 2:  Circuit: 'temp_sensor_adc_model'
+Circuit temp_sensor_adc_model contains 0 device instances.
+Circuit contains 0 nets, and 34 disconnected pins.
+
+Circuit temp_sensor_adc_model contains no devices.
+
+Final result: 
+Verify:  cell temp_sensor_adc_model_lvs_source.spice has no elements and/or nodes.  Not checked.
+Logging to file "analog_lvs_netgen.out" disabled
+LVS Done.

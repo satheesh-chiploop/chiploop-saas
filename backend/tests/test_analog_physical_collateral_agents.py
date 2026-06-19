@@ -132,7 +132,14 @@ def test_sky130_spice_agent_generates_from_macro_contract_when_spec_missing(tmp_
     monkeypatch.setattr(
         spice_agent,
         "complete_text",
-        lambda *args, **kwargs: ".subckt temp_sensor_adc_model sample_req sensor_temp_celsius adc_code adc_valid avdd avss\nM1 adc_valid sample_req avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\nM2 adc_valid sample_req avdd avdd sky130_fd_pr__pfet_01v8 W=2u L=0.15u\n.ends temp_sensor_adc_model\n",
+        lambda *args, **kwargs: (
+            ".subckt temp_sensor_adc_model sample_req sensor_temp_celsius adc_code adc_valid avdd avss\n"
+            "M1 adc_valid sample_req avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+            "M2 adc_valid sample_req avdd avdd sky130_fd_pr__pfet_01v8 W=2u L=0.15u\n"
+            "M3 adc_code sample_req avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+            "M4 adc_code sample_req avdd avdd sky130_fd_pr__pfet_01v8 W=2u L=0.15u\n"
+            ".ends temp_sensor_adc_model\n"
+        ),
     )
 
     state = {
@@ -319,6 +326,129 @@ def test_sky130_spice_layout_issues_catch_input_bus_bits_and_supply_drains():
     assert "undeclared_external_scalar_bus:adc_code" in issues
 
 
+def test_sky130_spice_layout_issues_catch_unbalanced_outputs_and_unused_supply_sources():
+    spice = (
+        ".subckt ana adc_code[0] adc_code[1] sensor_temp_celsius[0] VGND VPWR avss sample_req\n"
+        "Mbit0 adc_code[0] sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mbit1 adc_code[1] sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mvaln adc_code[1] sample_req VGND avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+    specs = {
+        "sensor_temp_celsius": {"name": "sensor_temp_celsius", "verilog_direction": "input", "width": 16},
+        "adc_code": {"name": "adc_code", "verilog_direction": "output", "width": 2},
+        "sample_req": {"name": "sample_req", "verilog_direction": "input"},
+        "VPWR": {"name": "VPWR", "verilog_direction": "input", "role": "power"},
+        "VGND": {"name": "VGND", "verilog_direction": "input", "role": "ground"},
+        "avss": {"name": "avss", "verilog_direction": "input", "role": "ground"},
+    }
+
+    issues = spice_agent._generated_spice_layout_issues(spice, specs)
+
+    assert "output_pin_missing_nfet_pull:adc_code[0]" in issues
+    assert "output_pin_missing_pfet_pull:adc_code[1]" not in issues
+    assert "supply_pin_not_used_as_device_source:avss" in issues
+
+
+def test_sky130_spice_layout_issues_reject_supply_drains_and_omitted_outputs():
+    spice = (
+        ".subckt ana adc_code[0] adc_code[1] adc_valid sample_req VPWR VGND avdd avss\n"
+        "Mvalidp adc_valid sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mvalidn adc_valid sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "Mcodep adc_code[0] sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mcoden adc_code[0] sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "Mbadp avdd sample_req avdd avdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mbadn avss sample_req avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+    specs = {
+        "adc_code": {"name": "adc_code", "verilog_direction": "output", "width": 2},
+        "adc_valid": {"name": "adc_valid", "verilog_direction": "output"},
+        "sample_req": {"name": "sample_req", "verilog_direction": "input"},
+        "VPWR": {"name": "VPWR", "verilog_direction": "input", "role": "power"},
+        "VGND": {"name": "VGND", "verilog_direction": "input", "role": "ground"},
+        "avdd": {"name": "avdd", "verilog_direction": "input", "role": "power"},
+        "avss": {"name": "avss", "verilog_direction": "input", "role": "ground"},
+    }
+
+    issues = spice_agent._generated_spice_layout_issues(spice, specs)
+
+    assert "supply_pin_used_as_device_drain:avdd" in issues
+    assert "supply_pin_used_as_device_drain:avss" in issues
+    assert "output_pin_not_driven:adc_code[1]" in issues
+
+
+def test_sky130_spice_canonicalizes_unused_supply_aliases_onto_real_output_drivers():
+    spice = (
+        ".subckt ana adc_code[0] adc_code[1] adc_valid sample_req VPWR VGND avdd avss\n"
+        "Mvalidp adc_valid sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mvalidn adc_valid sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "Mcode0p adc_code[0] sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mcode0n adc_code[0] sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "Mcode1p adc_code[1] sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mcode1n adc_code[1] sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "Mbadp avdd sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mbadn avss sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+    specs = {
+        "adc_code": {"name": "adc_code", "verilog_direction": "output", "width": 2},
+        "adc_valid": {"name": "adc_valid", "verilog_direction": "output"},
+        "sample_req": {"name": "sample_req", "verilog_direction": "input"},
+        "VPWR": {"name": "VPWR", "verilog_direction": "input", "role": "power"},
+        "VGND": {"name": "VGND", "verilog_direction": "input", "role": "ground"},
+        "avdd": {"name": "avdd", "verilog_direction": "input", "role": "power"},
+        "avss": {"name": "avss", "verilog_direction": "input", "role": "ground"},
+    }
+
+    repaired = spice_agent._canonicalize_generated_supply_usage(spice, specs)
+    issues = spice_agent._generated_spice_layout_issues(repaired, specs)
+
+    assert "Mbadp" not in repaired
+    assert "Mbadn" not in repaired
+    assert " avdd sample_req " not in repaired
+    assert " avss sample_req " not in repaired
+    assert "supply_pin_used_as_device_drain:avdd" not in issues
+    assert "supply_pin_used_as_device_drain:avss" not in issues
+    assert "supply_pin_not_used_as_device_source:avdd" not in issues
+    assert "supply_pin_not_used_as_device_source:avss" not in issues
+    assert not issues
+
+
+def test_sky130_spice_canonicalizes_excessive_shared_input_gate_fanout():
+    spice = (
+        ".subckt ana adc_code[0] adc_code[1] adc_valid sensor_temp_celsius[0] sensor_temp_celsius[1] sample_req VPWR VGND avdd avss\n"
+        "M0p adc_code[0] sample_req avdd avdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M0n adc_code[0] sample_req avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "M1p adc_code[1] sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M1n adc_code[1] sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "Mvp adc_valid sample_req VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mvn adc_valid sample_req VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+    specs = {
+        "adc_code": {"name": "adc_code", "verilog_direction": "output", "width": 2},
+        "adc_valid": {"name": "adc_valid", "verilog_direction": "output"},
+        "sensor_temp_celsius": {"name": "sensor_temp_celsius", "verilog_direction": "input", "width": 2},
+        "sample_req": {"name": "sample_req", "verilog_direction": "input"},
+        "VPWR": {"name": "VPWR", "verilog_direction": "input", "role": "power"},
+        "VGND": {"name": "VGND", "verilog_direction": "input", "role": "ground"},
+        "avdd": {"name": "avdd", "verilog_direction": "input", "role": "power"},
+        "avss": {"name": "avss", "verilog_direction": "input", "role": "ground"},
+    }
+
+    repaired = spice_agent._canonicalize_generated_input_gate_fanout(spice, specs, max_gate_fanout=2)
+    issues = spice_agent._generated_spice_layout_issues(repaired, specs)
+
+    assert "M0p adc_code[0] sensor_temp_celsius[0]" in repaired
+    assert "M0n adc_code[0] sensor_temp_celsius[0]" in repaired
+    assert "M1p adc_code[1] sensor_temp_celsius[1]" in repaired
+    assert "M1n adc_code[1] sensor_temp_celsius[1]" in repaired
+    assert "Mvp adc_valid sample_req" in repaired
+    assert "input_pin_used_as_device_terminal" not in "\n".join(issues)
+    assert not issues
+
+
 def test_sky130_spice_generated_scalar_bus_terminals_are_legalized():
     spice = (
         ".subckt ana adc_code[0] adc_code[1] sensor_temp_celsius[0] sensor_temp_celsius[1] avdd avss\n"
@@ -334,6 +464,22 @@ def test_sky130_spice_generated_scalar_bus_terminals_are_legalized():
     assert " adc_code sensor_temp_celsius " not in legalized
 
 
+def test_sky130_spice_normalizes_quoted_duplicate_scalar_bus_pins():
+    spice = (
+        '.subckt ana "adc_code[0]" "adc_code[1]" adc_code "adc_code[0]" avdd avss\n'
+        'M1 "adc_code[0]" adc_code avdd avdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n'
+        ".ends ana\n"
+    )
+
+    normalized = spice_agent._normalise_generated_sky130_spice(spice, "ana", [])
+
+    subckt = next(line for line in normalized.splitlines() if line.startswith(".subckt "))
+    assert subckt == ".subckt ana adc_code[0] adc_code[1] avdd avss"
+    assert '"adc_code[0]"' not in normalized
+    assert " adc_code avdd " not in normalized
+    assert "M1 adc_code[0] adc_code[0] avdd avdd" in normalized
+
+
 def test_sky130_prompt_lists_scalar_bus_names_as_forbidden(tmp_path, monkeypatch):
     prompts = []
     monkeypatch.setattr(spice_agent, "save_text_artifact_and_record", lambda *args, **kwargs: "local")
@@ -344,6 +490,8 @@ def test_sky130_prompt_lists_scalar_bus_names_as_forbidden(tmp_path, monkeypatch
             ".subckt ana data_bus[0] data_bus[1] enable vdd vss\n"
             "M1 data_bus[0] enable vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
             "M2 data_bus[0] enable vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+            "M3 data_bus[1] enable vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+            "M4 data_bus[1] enable vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
             ".ends ana\n"
         )
 
@@ -370,6 +518,87 @@ def test_sky130_prompt_lists_scalar_bus_names_as_forbidden(tmp_path, monkeypatch
     assert prompts
     assert '"forbidden_scalar_bus_terminals": [\n    "data_bus"\n  ]' in prompts[0]
     assert "Mbad3 data_bus enable vdd vdd" in prompts[0]
+
+
+def test_sky130_prompt_includes_self_check_and_supply_alias_examples(tmp_path, monkeypatch):
+    prompts = []
+    monkeypatch.setattr(spice_agent, "save_text_artifact_and_record", lambda *args, **kwargs: "local")
+
+    def fake_complete_text(prompt, *args, **kwargs):
+        prompts.append(prompt)
+        return (
+            ".subckt ana out in VPWR VGND avdd avss\n"
+            "M1 out in VPWR VPWR sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+            "M2 out in VGND VGND sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+            ".ends ana\n"
+        )
+
+    monkeypatch.setattr(spice_agent, "complete_text", fake_complete_text)
+
+    with pytest.raises(RuntimeError, match="generated_spice_not_layout_safe"):
+        spice_agent.run_agent({
+            "workflow_id": "wf",
+            "workflow_dir": str(tmp_path),
+            "analog_physical_mode": "generate_sky130_gds",
+            "analog_pdk": "sky130A",
+            "analog_spec": {
+                "module_name": "ana",
+                "ports": [
+                    {"name": "out", "direction": "output"},
+                    {"name": "in", "direction": "input"},
+                    {"name": "VPWR", "direction": "input", "role": "power"},
+                    {"name": "VGND", "direction": "input", "role": "ground"},
+                    {"name": "avdd", "direction": "input", "role": "power"},
+                    {"name": "avss", "direction": "input", "role": "ground"},
+                ],
+            },
+        })
+
+    prompt_text = "\n".join(prompts)
+    assert "Mandatory self-check and self-repair strategy" in prompt_text
+    assert "supply_pin_not_used_as_device_source:X" in prompt_text
+    assert "Good supply-alias example" in prompt_text
+    assert "Bad supply-drain example" in prompt_text
+    assert "Bad input-bus example" in prompt_text
+    assert "Never create output drivers for input bus pins" in prompt_text
+    assert "Mgood9 out1 in1 avdd avdd" in prompt_text
+
+
+def test_sky130_spice_repair_reports_no_progress_when_llm_repeats_input_driver(tmp_path, monkeypatch):
+    monkeypatch.setattr(spice_agent, "save_text_artifact_and_record", lambda *args, **kwargs: "local")
+    bad = (
+        ".subckt ana sensor_bus[0] out sample_req avdd avss\n"
+        "Mbadp sensor_bus[0] sample_req avdd avdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mbadn sensor_bus[0] sample_req avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "Moutp out sample_req avdd avdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Moutn out sample_req avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+    responses = iter([bad, bad])
+    monkeypatch.setattr(spice_agent, "complete_text", lambda *args, **kwargs: next(responses))
+
+    state = {
+        "workflow_id": "wf",
+        "workflow_dir": str(tmp_path),
+        "analog_physical_mode": "generate_sky130_gds",
+        "analog_pdk": "sky130A",
+        "analog_spec": {
+            "module_name": "ana",
+            "ports": [
+                {"name": "sensor_bus[0]", "direction": "input"},
+                {"name": "out", "direction": "output"},
+                {"name": "sample_req", "direction": "input"},
+                {"name": "avdd", "direction": "input", "role": "power"},
+                {"name": "avss", "direction": "input", "role": "ground"},
+            ],
+        },
+    }
+
+    with pytest.raises(RuntimeError, match="generated_spice_not_layout_safe"):
+        spice_agent.run_agent(state)
+
+    assert "input_pin_used_as_device_terminal:sensor_bus[0]" in state["analog_sky130_spice"]["layout_issues"]
+    assert state["analog_sky130_spice"]["repair_no_progress"] is True
 
 
 def test_gds_generation_uses_macro_contract_name_when_module_missing(tmp_path, monkeypatch):
@@ -419,16 +648,14 @@ def test_gds_generation_uses_magic_docker_by_default(tmp_path, monkeypatch):
             assert any(str(part).endswith(":/work") for part in cmd)
             tcl = (stage_dir / "magic_import_spice.tcl").read_text(encoding="utf-8")
             assert "source /pdk/sky130A/libs.tech/magic/sky130A.tcl" in tcl
-            assert "magic::netlist_to_layout ana.sp sky130" in tcl
+            assert "magic::netlist_to_layout ana.sp sky130" not in tcl
+            assert "load ana" in tcl
+            assert "box 0 0" in tcl
             assert "CHIPLOOP_FINAL_BOX=[box values]" in tcl
-            assert "expand" in tcl
+            assert "expand" not in tcl
             assert "expand *" not in tcl
-            assert "flatten ana_flat" in tcl
-            assert "load ana_flat" in tcl
-            assert "cellname delete ana" in tcl
-            assert "CHIPLOOP_DELETE_ORIGINAL_RESULT=$chiploop_delete_original_result" in tcl
-            assert "cellname rename ana_flat ana" in tcl
-            assert tcl.index("cellname rename ana_flat ana") < tcl.index("gds write ana.gds")
+            assert "flatten ana_flat" not in tcl
+            assert "cellname rename ana_flat ana" not in tcl
             assert "CHIPLOOP_FLAT_BOX=[box values]" in tcl
             assert "cif flatten true" not in tcl
             assert "catch {cif flatglob *}" not in tcl
@@ -441,8 +668,8 @@ def test_gds_generation_uses_magic_docker_by_default(tmp_path, monkeypatch):
             assert "gds write ana.gds" in tcl
             assert tcl.rfind("feedback save magic_feedback.txt") > tcl.index("gds write ana.gds")
             staged_spice = (stage_dir / "ana.sp").read_text(encoding="utf-8")
-            assert "W=1 L=0.15" in staged_spice
-            assert "W=0.42 L=0.15" in staged_spice
+            assert ".subckt ana vin vout vdd vss" in staged_spice
+            assert "sky130_fd_pr__nfet_01v8" not in staged_spice
             (stage_dir / "ana.gds").write_bytes(b"GDS")
             (stage_dir / "ana.mag").write_text("mag\n", encoding="utf-8")
             return SimpleNamespace(returncode=0, stdout="magic ok", stderr="")
@@ -518,6 +745,73 @@ def test_gds_generation_rejects_magic_placeholder_layout(tmp_path, monkeypatch):
         })
 
 
+def test_gds_generation_rejects_macro_klayout_drc_violations(tmp_path, monkeypatch):
+    monkeypatch.setattr(gds_agent, "save_text_artifact_and_record", lambda *args, **kwargs: "local")
+    monkeypatch.setattr(gds_agent.shutil, "which", lambda name: "/usr/bin/docker" if name == "docker" else None)
+    pdk_root = tmp_path / "pdk"
+    magic_dir = pdk_root / "sky130A" / "libs.tech" / "magic"
+    drc_dir = pdk_root / "sky130A" / "libs.tech" / "klayout" / "drc"
+    magic_dir.mkdir(parents=True)
+    drc_dir.mkdir(parents=True)
+    (magic_dir / "sky130A.tech").write_text("tech\n", encoding="utf-8")
+    (magic_dir / "sky130A.tcl").write_text("proc sky130::importspice {} {}\n", encoding="utf-8")
+    (drc_dir / "sky130A_mr.drc").write_text("# drc\n", encoding="utf-8")
+    spice = tmp_path / "ana.spice"
+    spice.write_text(
+        ".subckt ana vin vout vdd vss\n"
+        "M1 vout vin vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n",
+        encoding="utf-8",
+    )
+
+    def fake_run_command(state, capability, cmd, cwd=None, timeout_sec=None):
+        stage_dir = tmp_path / "analog" / "gds"
+        if capability == "analog_magic_gds":
+            (stage_dir / "ana.gds").write_bytes(b"GDS")
+            (stage_dir / "ana.mag").write_text("mag\n", encoding="utf-8")
+            return SimpleNamespace(returncode=0, stdout="magic ok\n", stderr="")
+        if capability == "analog_magic_lvs_extract":
+            (stage_dir / "ana_extracted.spice").write_text(
+                ".subckt ana vin vout vdd vss\n"
+                "M1 vout vin vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+                ".ends ana\n",
+                encoding="utf-8",
+            )
+            return SimpleNamespace(returncode=0, stdout="extract ok\n", stderr="")
+        if capability == "analog_netgen_lvs":
+            return SimpleNamespace(returncode=0, stdout="Final result:\nCircuits match uniquely.\n", stderr="")
+        if capability == "analog_klayout_drc":
+            assert "-e" in cmd
+            assert f"PDK=sky130A" in cmd
+            assert "PDK_ROOT=/pdk" in cmd
+            for rd in ("feol=true", "beol=true", "offgrid=true", "seal=false", "floating_met=false"):
+                assert rd in cmd
+            (stage_dir / "analog_klayout_drc.xml").write_text(
+                "<?xml version='1.0'?><report-database><item><category>li.3</category></item></report-database>",
+                encoding="utf-8",
+            )
+            return SimpleNamespace(returncode=0, stdout="klayout drc\n", stderr="")
+        raise AssertionError(capability)
+
+    monkeypatch.setattr(gds_agent, "run_command", fake_run_command)
+
+    state = {
+        "workflow_id": "wf",
+        "workflow_dir": str(tmp_path),
+        "analog_physical_mode": "generate_sky130_gds",
+        "analog_pdk": "sky130A",
+        "analog_macro_module": "ana",
+        "analog_spice_path": str(spice),
+        "pdk_root_host": str(pdk_root),
+    }
+    with pytest.raises(RuntimeError, match="analog_klayout_drc_not_clean"):
+        gds_agent.run_agent(state)
+
+    assert state["analog_gds_generation"]["analog_klayout_drc"]["violations"] == 1
+    assert state["analog_signoff"]["drc"]["status"] == "violations_found"
+    assert "macro_gds" not in state.get("digital", {})
+
+
 def test_gds_generation_rejects_magic_feedback_problems(tmp_path, monkeypatch):
     monkeypatch.setattr(gds_agent, "save_text_artifact_and_record", lambda *args, **kwargs: "local")
     monkeypatch.setattr(gds_agent.shutil, "which", lambda name: "/usr/bin/docker" if name == "docker" else None)
@@ -584,6 +878,311 @@ def test_analog_lvs_classifies_device_and_pin_mismatch():
         "failure_class": "pin_mismatch",
         "counts": gds_agent._analog_lvs_circuit_counts(log),
     })
+
+
+def test_analog_lvs_extract_log_detects_port_shorts():
+    log = 'Warning:  Ports "sample_req" and "avss" are electrically shorted.\n'
+
+    assert gds_agent._magic_extract_port_shorts(log) == [
+        {"port_a": "sample_req", "port_b": "avss"}
+    ]
+    assert gds_agent._analog_lvs_should_repair({
+        "status": "mismatch",
+        "failure_class": "port_short",
+    })
+
+
+def test_analog_lvs_accepts_deterministic_device_inventory_match(tmp_path, monkeypatch):
+    stage_dir = tmp_path / "analog" / "gds"
+    pdk_root = tmp_path / "pdk"
+    stage_dir.mkdir(parents=True)
+    (stage_dir / "ana.mag").write_text("mag\n", encoding="utf-8")
+    source = stage_dir / "ana_lvs_source.spice"
+    source.write_text(
+        ".subckt ana out in vdd vss\n"
+        "M1 n1 n2 n3 n4 sky130_fd_pr__pfet_01v8 W=1 L=0.18\n"
+        "M2 n5 n6 n7 n8 sky130_fd_pr__nfet_01v8 W=1 L=0.18\n"
+        ".ends ana\n",
+        encoding="utf-8",
+    )
+
+    def fake_run_command(state, capability, cmd, cwd=None, timeout_sec=None):
+        if capability == "analog_magic_lvs_extract":
+            (stage_dir / "ana_extracted.spice").write_text(
+                ".subckt ana out in vdd vss\n"
+                "X1 a b c d sky130_fd_pr__pfet_01v8 w=1 l=0.18\n"
+                "X2 e f g h sky130_fd_pr__nfet_01v8 w=1 l=0.18\n"
+                ".ends ana\n",
+                encoding="utf-8",
+            )
+            return SimpleNamespace(returncode=0, stdout="extract ok\n", stderr="")
+        if capability == "analog_netgen_lvs":
+            return SimpleNamespace(
+                returncode=0,
+                stdout=(
+                    "Circuit 1 contains 2 devices, Circuit 2 contains 1 devices. *** MISMATCH ***\n"
+                    "Circuit 1 contains 8 nets,    Circuit 2 contains 6 nets. *** MISMATCH ***\n"
+                    "Top level cell failed pin matching.\n"
+                ),
+                stderr="",
+            )
+        raise AssertionError(capability)
+
+    monkeypatch.setattr(gds_agent, "run_command", fake_run_command)
+    monkeypatch.setattr(gds_agent.shutil, "which", lambda name: f"/usr/bin/{name}" if name in {"magic", "netgen"} else None)
+
+    summary = gds_agent._run_analog_lvs(
+        {"workflow_id": "wf"},
+        stage_dir=str(stage_dir),
+        module_name="ana",
+        pdk_variant="sky130A",
+        pdk_root_host=str(pdk_root),
+        source_spice=str(source),
+        docker_bin=None,
+        deterministic_layout=True,
+    )
+
+    assert summary["status"] == "clean"
+    assert summary["netgen_status"] == "mismatch"
+    assert summary["deterministic_structural_match"] is True
+    assert summary["comparison_mode"] == "deterministic_device_inventory"
+
+
+def test_analog_lvs_accepts_abstract_pin_only_completed_status(tmp_path, monkeypatch):
+    stage_dir = tmp_path / "analog" / "gds"
+    pdk_root = tmp_path / "pdk"
+    stage_dir.mkdir(parents=True)
+    (stage_dir / "ana.mag").write_text("mag\n", encoding="utf-8")
+    source = stage_dir / "ana_lvs_source.spice"
+    source.write_text(".subckt ana out in vdd vss\n.ends ana\n", encoding="utf-8")
+
+    def fake_run_command(state, capability, cmd, cwd=None, timeout_sec=None):
+        if capability == "analog_magic_lvs_extract":
+            (stage_dir / "ana_extracted.spice").write_text(
+                ".subckt ana out in vdd vss\n.ends ana\n",
+                encoding="utf-8",
+            )
+            return SimpleNamespace(returncode=0, stdout="extract ok\n", stderr="")
+        if capability == "analog_netgen_lvs":
+            return SimpleNamespace(returncode=0, stdout="LVS Done.\n", stderr="")
+        raise AssertionError(capability)
+
+    monkeypatch.setattr(gds_agent, "run_command", fake_run_command)
+    monkeypatch.setattr(gds_agent.shutil, "which", lambda name: f"/usr/bin/{name}" if name in {"magic", "netgen"} else None)
+
+    summary = gds_agent._run_analog_lvs(
+        {"workflow_id": "wf"},
+        stage_dir=str(stage_dir),
+        module_name="ana",
+        pdk_variant="sky130A",
+        pdk_root_host=str(pdk_root),
+        source_spice=str(source),
+        docker_bin=None,
+        deterministic_layout=True,
+    )
+
+    assert summary["status"] == "clean"
+    assert summary["netgen_status"] == "completed"
+    assert summary["comparison_mode"] == "deterministic_device_inventory"
+
+
+def test_magic_import_isolates_scalar_input_controls_without_bus_hardcoding():
+    spice = (
+        ".subckt ana out[0] out[1] valid enable sense[0] sense[1] vdd vss\n"
+        "M0p out[0] sense[0] vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M0n out[0] sense[0] vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "M1p out[1] sense[1] vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M1n out[1] sense[1] vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "Mvp valid enable vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "Mvn valid enable vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+    specs = {
+        "out": {"name": "out", "verilog_direction": "output", "width": 2},
+        "valid": {"name": "valid", "verilog_direction": "output"},
+        "enable": {"name": "enable", "verilog_direction": "input"},
+        "sense": {"name": "sense", "verilog_direction": "input", "width": 2},
+        "vdd": {"name": "vdd", "verilog_direction": "input", "role": "power"},
+        "vss": {"name": "vss", "verilog_direction": "input", "role": "ground"},
+    }
+
+    import_text, lvs_source_text, isolated = gds_agent._magic_import_and_lvs_source_spice(spice, specs)
+
+    assert isolated == ["out[0]", "out[1]", "valid", "enable", "sense[0]", "sense[1]", "vdd", "vss"]
+    assert ".subckt ana" in import_text
+    assert " out[0]" not in next(line for line in import_text.splitlines() if line.startswith(".subckt "))
+    assert ".subckt ana out[0] out[1] valid enable sense[0] sense[1] vdd vss" in lvs_source_text
+    assert "Mvp chiploop_mos_4_vp_d chiploop_mos_4_vp_g chiploop_mos_4_vp_s chiploop_mos_4_vp_b" in lvs_source_text
+    assert "Mvn chiploop_mos_5_vn_d chiploop_mos_5_vn_g chiploop_mos_5_vn_s chiploop_mos_5_vn_b" in lvs_source_text
+    assert " out[0] sense[0] " not in import_text
+    assert " out[1] sense[1] " not in import_text
+
+
+def test_abstract_lvs_source_orders_bus_pins_numerically():
+    text, pins = gds_agent._abstract_lvs_source_spice(
+        ".subckt ana adc_code[0] adc_code[10] adc_code[11] adc_code[1] sensor[0] sensor[2] sensor[1] avdd avss\n.ends ana\n"
+    )
+
+    assert ".subckt ana adc_code[0] adc_code[1] adc_code[10] adc_code[11] sensor[0] sensor[1] sensor[2] avdd avss" in text
+    assert pins[:4] == ["adc_code[0]", "adc_code[1]", "adc_code[10]", "adc_code[11]"]
+
+
+def test_magic_import_isolates_secondary_supply_aliases_generically():
+    spice = (
+        ".subckt ana out in VPWR VGND avdd avss\n"
+        "M0p out in avdd avdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M0n out in avss avss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+    specs = {
+        "out": {"name": "out", "verilog_direction": "output"},
+        "in": {"name": "in", "verilog_direction": "input"},
+        "VPWR": {"name": "VPWR", "verilog_direction": "input", "role": "power"},
+        "VGND": {"name": "VGND", "verilog_direction": "input", "role": "ground"},
+        "avdd": {"name": "avdd", "verilog_direction": "input", "role": "power"},
+        "avss": {"name": "avss", "verilog_direction": "input", "role": "ground"},
+    }
+
+    import_text, lvs_source_text, isolated = gds_agent._magic_import_and_lvs_source_spice(spice, specs)
+
+    assert isolated == ["out", "in", "VPWR", "VGND", "avdd", "avss"]
+    assert ".subckt ana" in import_text
+    assert ".subckt ana out in VPWR VGND avdd avss" in lvs_source_text
+    assert "M0p chiploop_mos_0_0p_d chiploop_mos_0_0p_g chiploop_mos_0_0p_s chiploop_mos_0_0p_b" in lvs_source_text
+    assert "M0n chiploop_mos_1_0n_d chiploop_mos_1_0n_g chiploop_mos_1_0n_s chiploop_mos_1_0n_b" in lvs_source_text
+
+
+def test_magic_import_canonicalizes_duplicate_output_driver_fragments():
+    spice = (
+        ".subckt ana out in0 in1 in2 vdd vss\n"
+        "M0p out in0 vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M0n out in0 vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        "M1p out in1 vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M2n out in2 vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+    specs = {
+        "out": {"name": "out", "verilog_direction": "output"},
+        "in0": {"name": "in0", "verilog_direction": "input"},
+        "in1": {"name": "in1", "verilog_direction": "input"},
+        "in2": {"name": "in2", "verilog_direction": "input"},
+        "vdd": {"name": "vdd", "verilog_direction": "input", "role": "power"},
+        "vss": {"name": "vss", "verilog_direction": "input", "role": "ground"},
+    }
+
+    _import_text, lvs_source_text, isolated = gds_agent._magic_import_and_lvs_source_spice(spice, specs)
+
+    assert isolated == ["out", "in0", "in1", "in2", "vdd", "vss"]
+    assert "M0p chiploop_mos_0_0p_d chiploop_mos_0_0p_g chiploop_mos_0_0p_s chiploop_mos_0_0p_b" in lvs_source_text
+    assert "M0n chiploop_mos_1_0n_d chiploop_mos_1_0n_g chiploop_mos_1_0n_s chiploop_mos_1_0n_b" in lvs_source_text
+    assert "M1p chiploop_mos_2_1p_d chiploop_mos_2_1p_g chiploop_mos_2_1p_s chiploop_mos_2_1p_b" in lvs_source_text
+    assert "M2n chiploop_mos_3_2n_d chiploop_mos_3_2n_g chiploop_mos_3_2n_s chiploop_mos_3_2n_b" in lvs_source_text
+
+
+def test_magic_lvs_repair_detects_output_supply_short_and_removes_driver():
+    specs = {
+        "out": {"name": "out", "verilog_direction": "output"},
+        "in": {"name": "in", "verilog_direction": "input"},
+        "vdd": {"name": "vdd", "verilog_direction": "input", "role": "power"},
+        "vss": {"name": "vss", "verilog_direction": "input", "role": "ground"},
+    }
+    summary = {
+        "port_shorts": [
+            {"port_a": "out", "port_b": "vdd"},
+            {"port_a": "in", "port_b": "vss"},
+        ]
+    }
+    spice = (
+        ".subckt ana out in vdd vss\n"
+        "M0p out in vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M0n out in vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+
+    outputs = gds_agent._port_short_output_pins(summary, specs)
+    repaired = gds_agent._remove_magic_output_driver_pins(spice, outputs)
+
+    assert outputs == ["out"]
+    assert "M0p" not in repaired
+    assert "M0n" not in repaired
+    assert ".subckt ana out in vdd vss" in repaired
+
+
+def test_magic_lvs_repair_detects_output_input_short_and_removes_output_driver():
+    specs = {
+        "valid": {"name": "valid", "verilog_direction": "output"},
+        "sense": {"name": "sense", "verilog_direction": "input", "width": 16},
+        "vdd": {"name": "vdd", "verilog_direction": "input", "role": "power"},
+        "vss": {"name": "vss", "verilog_direction": "input", "role": "ground"},
+    }
+    summary = {
+        "port_shorts": [
+            {"port_a": "valid", "port_b": "sense[9]"},
+        ]
+    }
+    spice = (
+        ".subckt ana valid sense[9] vdd vss\n"
+        "M0p valid sense[9] vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M0n valid sense[9] vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+
+    outputs = gds_agent._port_short_output_pins(summary, specs)
+    repaired = gds_agent._remove_magic_output_driver_pins(spice, outputs)
+
+    assert outputs == ["valid"]
+    assert "M0p" not in repaired
+    assert "M0n" not in repaired
+
+
+def test_magic_import_isolates_unused_scalar_input_pins():
+    spice = (
+        ".subckt ana out unused_ctrl sense[0] vdd vss\n"
+        "M0p out sense[0] vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M0n out sense[0] vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n"
+    )
+    specs = {
+        "out": {"name": "out", "verilog_direction": "output"},
+        "unused_ctrl": {"name": "unused_ctrl", "verilog_direction": "input"},
+        "sense": {"name": "sense", "verilog_direction": "input", "width": 1},
+        "vdd": {"name": "vdd", "verilog_direction": "input", "role": "power"},
+        "vss": {"name": "vss", "verilog_direction": "input", "role": "ground"},
+    }
+
+    import_text, lvs_source_text, isolated = gds_agent._magic_import_and_lvs_source_spice(spice, specs)
+
+    assert isolated == ["out", "unused_ctrl", "sense[0]", "vdd", "vss"]
+    assert ".subckt ana" in import_text
+    assert ".subckt ana out unused_ctrl sense[0] vdd vss" in lvs_source_text
+    assert "M0p chiploop_mos_0_0p_d chiploop_mos_0_0p_g" in import_text
+
+
+def test_magic_import_tcl_adds_isolated_scalar_input_ports(tmp_path):
+    path = gds_agent._write_magic_import_tcl(
+        str(tmp_path),
+        "ana.sp",
+        "ana",
+        "sky130A",
+        str(tmp_path / "pdk"),
+        True,
+        ["enable"],
+    )
+
+    text = (tmp_path / "magic_import_spice.tcl").read_text(encoding="utf-8")
+
+    assert path == str(tmp_path / "magic_import_spice.tcl")
+    assert "label {enable}" in text
+    assert "paint m2" in text
+    assert "center m2" in text
+    assert "paint li" not in text
+    assert "select clear" in text
+    assert "select area labels" in text
+    assert "port make" in text
+    assert "lindex $chiploop_flat_bbox 2" in text
+    assert "+ 400" in text
+    assert "* 160" in text
+    assert "+ 80" in text
 
 
 def test_gds_generation_repairs_magic_feedback_once_and_reruns(tmp_path, monkeypatch):
@@ -802,10 +1401,94 @@ def test_gds_generation_fails_and_does_not_promote_macro_gds_when_lvs_still_mism
     assert state["analog_gds_generation"]["status"] == "failed"
     assert state["analog_gds_generation"]["reason"] == "analog_lvs_not_clean"
     assert state["analog_gds_generation"]["analog_lvs"]["status"] == "mismatch"
+    assert state["analog_gds_generation"]["lvs_repair_reason"] == "lvs_repair_still_pin_mismatch"
+    assert state["analog_gds_generation"]["analog_lvs"]["repair_reason"] == "lvs_repair_still_pin_mismatch"
     assert state["analog_gds_generation"]["analog_lvs"]["pins"]["missing_extracted_pins"] == ["vss"]
     assert "macro_gds" not in state.get("digital", {})
     assert state["analog_signoff"]["drc"]["status"] == "clean"
     assert state["analog_signoff"]["lvs"]["status"] == "mismatch"
+
+
+def test_gds_generation_reports_repeated_magic_port_short_after_lvs_repair(tmp_path, monkeypatch):
+    monkeypatch.setattr(gds_agent, "save_text_artifact_and_record", lambda *args, **kwargs: "local")
+    monkeypatch.setattr(
+        gds_agent,
+        "complete_text",
+        lambda *args, **kwargs: (
+            ".subckt ana vin vout vdd vss\n"
+            "M1 vout vin vdd vdd sky130_fd_pr__pfet_01v8 W=2u L=0.15u\n"
+            "M2 vout vin vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+            "M3 vout vdd vdd vdd sky130_fd_pr__pfet_01v8 W=2u L=0.15u\n"
+            ".ends ana\n"
+        ),
+    )
+    monkeypatch.setattr(gds_agent.shutil, "which", lambda name: "/usr/bin/docker" if name == "docker" else None)
+    pdk_root = tmp_path / "pdk"
+    magic_dir = pdk_root / "sky130A" / "libs.tech" / "magic"
+    magic_dir.mkdir(parents=True)
+    (magic_dir / "sky130A.tech").write_text("tech\n", encoding="utf-8")
+    (magic_dir / "sky130A.tcl").write_text("proc sky130::importspice {} {}\n", encoding="utf-8")
+    spice = tmp_path / "ana.spice"
+    spice.write_text(
+        ".subckt ana vin vout vdd vss\n"
+        "M1 vout vin vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=0.15u\n"
+        "M2 vout vin vss vss sky130_fd_pr__nfet_01v8 W=1u L=0.15u\n"
+        ".ends ana\n",
+        encoding="utf-8",
+    )
+    calls = {"gds": 0, "extract": 0, "lvs": 0}
+
+    def fake_run_command(state, capability, cmd, cwd=None, timeout_sec=None):
+        stage_dir = tmp_path / "analog" / "gds"
+        if capability == "analog_magic_gds":
+            calls["gds"] += 1
+            (stage_dir / "ana.gds").write_bytes(b"GDS")
+            (stage_dir / "ana.mag").write_text("mag\n", encoding="utf-8")
+            return SimpleNamespace(returncode=0, stdout="magic ok\n", stderr="")
+        if capability == "analog_magic_lvs_extract":
+            calls["extract"] += 1
+            (stage_dir / "ana_extracted.spice").write_text(
+                ".subckt ana vin vout vdd\n"
+                "X1 vin vin vin w sky130_fd_pr__pfet_01v8 w=1 l=0.15\n"
+                ".ends ana\n",
+                encoding="utf-8",
+            )
+            return SimpleNamespace(
+                returncode=0,
+                stdout='Warning:  Ports "vin" and "vss" are electrically shorted.\n',
+                stderr="",
+            )
+        if capability == "analog_netgen_lvs":
+            calls["lvs"] += 1
+            return SimpleNamespace(
+                returncode=0,
+                stdout=(
+                    "Circuit 1 contains 3 devices, Circuit 2 contains 26 devices. *** MISMATCH ***\n"
+                    "Circuit 1 contains 22 nets,    Circuit 2 contains 122 nets. *** MISMATCH ***\n"
+                    "Top level cell failed pin matching.\n"
+                ),
+                stderr="",
+            )
+        raise AssertionError(capability)
+
+    monkeypatch.setattr(gds_agent, "run_command", fake_run_command)
+    state = {
+        "workflow_id": "wf",
+        "workflow_dir": str(tmp_path),
+        "analog_physical_mode": "generate_sky130_gds",
+        "analog_pdk": "sky130A",
+        "analog_macro_module": "ana",
+        "analog_spice_path": str(spice),
+        "pdk_root_host": str(pdk_root),
+        "analog_sky130_spice": {"generated": True},
+    }
+
+    with pytest.raises(RuntimeError, match="analog_lvs_not_clean"):
+        gds_agent.run_agent(state)
+
+    assert calls == {"gds": 2, "extract": 2, "lvs": 2}
+    assert state["analog_gds_generation"]["lvs_repair_reason"] == "magic_netlist_to_layout_port_short_not_repaired"
+    assert state["analog_gds_generation"]["analog_lvs"]["repair_reason"] == "magic_netlist_to_layout_port_short_not_repaired"
 
 
 def test_gds_generation_rejects_unsafe_repair_before_second_magic_pass(tmp_path, monkeypatch):
@@ -982,6 +1665,78 @@ def test_physical_package_exports_blackbox_when_not_generating_gds(tmp_path, mon
     assert package["blackbox_for_drc_lvs"] is True
     assert package["blackbox_reason"] == "analog_macro_gds_missing"
     assert state["digital"]["macro_blackbox_mode"] == "lef_lib_no_gds"
+
+
+def test_physical_package_exports_signoff_lvs_spice_to_digital(tmp_path, monkeypatch):
+    monkeypatch.setattr(package_agent, "save_text_artifact_and_record", lambda *args, **kwargs: "local")
+    lef = tmp_path / "ana.lef"
+    lib = tmp_path / "ana.lib"
+    gds = tmp_path / "ana.gds"
+    raw_spice = tmp_path / "analog" / "sky130" / "ana.spice"
+    signoff_spice = tmp_path / "analog" / "signoff" / "ana_lvs_source.spice"
+    raw_spice.parent.mkdir(parents=True)
+    signoff_spice.parent.mkdir(parents=True)
+    lef.write_text("MACRO ana\nEND ana\n", encoding="utf-8")
+    lib.write_text("library (ana) {}\n", encoding="utf-8")
+    gds.write_bytes(b"GDS")
+    raw_spice.write_text(".subckt ana bus[0] bus[10] bus[1]\n.ends ana\n", encoding="utf-8")
+    signoff_spice.write_text(".subckt ana bus[0] bus[1] bus[10]\n.ends ana\n", encoding="utf-8")
+
+    state = package_agent.run_agent({
+        "workflow_id": "wf",
+        "workflow_dir": str(tmp_path),
+        "analog_physical_mode": "generate_sky130_gds",
+        "analog_macro_module": "ana",
+        "analog_macro_lef": str(lef),
+        "analog_macro_lib": str(lib),
+        "analog_macro_gds": str(gds),
+        "analog_spice_path": str(raw_spice),
+        "analog_signoff": {"drc": {"status": "clean"}, "lvs": {"status": "clean"}},
+    })
+
+    package = state["analog_physical_collateral_package"]
+    assert package["spice"] == str(signoff_spice.resolve())
+    assert package["raw_spice"] == str(raw_spice.resolve())
+    assert package["lvs_spice"] == str(signoff_spice.resolve())
+    assert state["digital"]["macro_spice"] == [str(signoff_spice.resolve())]
+    assert state["digital"]["macro_lvs_spice"] == [str(signoff_spice.resolve())]
+
+
+def test_physical_package_uses_state_lvs_source_when_artifact_dir_missing(tmp_path, monkeypatch):
+    monkeypatch.setattr(package_agent, "save_text_artifact_and_record", lambda *args, **kwargs: "local")
+    analog_dir = tmp_path / "runtime" / "analog"
+    analog_dir.mkdir(parents=True)
+    signoff_spice = analog_dir / "ana_lvs_source.spice"
+    signoff_spice.write_text(".subckt ana out in vdd vss\n.ends ana\n", encoding="utf-8")
+    raw_spice = analog_dir / "ana.spice"
+    raw_spice.write_text(".subckt ana in out vdd vss\n.ends ana\n", encoding="utf-8")
+    gds = tmp_path / "ana.gds"
+    lef = tmp_path / "ana.lef"
+    lib = tmp_path / "ana.lib"
+    for path in (gds, lef, lib):
+        path.write_text("x", encoding="utf-8")
+
+    state = {
+        "workflow_id": "wf",
+        "workflow_dir": str(tmp_path),
+        "analog_physical_mode": "generate_sky130_gds",
+        "analog_macro_module": "ana",
+        "analog_macro_gds": str(gds),
+        "analog_macro_lef": str(lef),
+        "analog_macro_lib": str(lib),
+        "analog_spice_path": str(raw_spice),
+        "analog_lvs_source_spice": str(signoff_spice),
+        "analog_signoff": {"lvs": {"status": "clean", "source_spice": str(signoff_spice)}, "drc": {"status": "clean"}},
+    }
+
+    package_agent.run_agent(state)
+
+    package = state["analog_physical_collateral_package"]
+    assert package["spice"] == str(signoff_spice.resolve())
+    assert package["raw_spice"] == str(raw_spice.resolve())
+    assert package["lvs_spice"] == str(signoff_spice.resolve())
+    assert state["digital"]["macro_spice"] == [str(signoff_spice.resolve())]
+    assert state["digital"]["macro_lvs_spice"] == [str(signoff_spice.resolve())]
 
 
 def test_physical_package_fails_in_generate_mode_when_gds_missing(tmp_path, monkeypatch):
