@@ -433,6 +433,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "arch2rtl_dashboard.json",
         "digital_regmap.json",
         "upf_static_check.json",
+        "digital/mbist_rtl_insertion/mbist_rtl_insertion_summary.json",
+        "digital/mbist_rtl_insertion/mbist_integrated_rtl_lint.json",
         "digital/spec2rtl/spec2rtl_conformance.json",
         "system_rtl_dashboard.json",
         "system_rtl_package.json",
@@ -566,6 +568,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const upf = record(evidence["upf_static_check.json"]);
         const spec2rtl = record(evidence["spec2rtl_conformance.json"]);
         const spec2rtlSummary = record(spec2rtl.summary);
+        const mbistInsertion = record(evidence["mbist_rtl_insertion_summary.json"] || evidence["digital/mbist_rtl_insertion/mbist_rtl_insertion_summary.json"]);
+        const mbistLint = record(evidence["mbist_integrated_rtl_lint.json"] || evidence["digital/mbist_rtl_insertion/mbist_integrated_rtl_lint.json"] || mbistInsertion.integrated_rtl_lint);
+        const mbistIverilog = record(mbistLint.iverilog);
+        const mbistVerilator = record(mbistLint.verilator);
+        const hasMbistInsertion = Object.keys(mbistInsertion).length > 0;
+        const hasMbistLint = Object.keys(mbistLint).length > 0;
+        const mbistLintPass = firstString(mbistIverilog.status) === "pass" && firstString(mbistVerilator.status) === "pass";
         const hasSpec2Rtl = Object.keys(spec2rtl).length > 0;
         const hasUpf = Object.keys(upf).length > 0;
         const lintStatus = firstString(lint.status, "unavailable");
@@ -591,6 +600,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
               {hasUpf ? <Stat title="UPF Static" value={statusLabel(upf.status)} /> : null}
               {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
+              {hasMbistInsertion ? <Stat title="MBIST RTL" value={statusLabel(mbistInsertion.status)} /> : null}
+              {hasMbistLint ? <Stat title="MBIST RTL Lint" value={mbistLintPass ? "pass" : "fail"} /> : null}
               <Stat title="Modules" value={number(dashboard.module_count)} />
               <Stat title="RTL Files" value={number(dashboard.rtl_file_count)} />
               {hasSpec2Rtl ? <Stat title="Spec2RTL" value={statusLabel(spec2rtl.status)} /> : null}

@@ -1,0 +1,167 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "sram_mbist_demo_controller",
+  "design_summary": {
+    "purpose": "A small SRAM scratchpad controller that demonstrates OpenRAM-style memory integration, explicit MBIST collateral hooks, and a firmware-visible MMIO register map while remaining synthesizable and simple to integrate.",
+    "operating_model": "Single synchronous clock-domain controller with active-low synchronous reset. Firmware-style accesses are represented by the top-level control/data ports and are decoded internally into register semantics, SRAM single-port commands, BIST request/status tracking, and IRQ generation. The memory path remains intentionally SRAM-like so synthesis and DFT/MBIST tooling can recognize the structure.",
+    "external_interfaces": [
+      "clk",
+      "reset_n",
+      "wr_en",
+      "wr_addr[7:0]",
+      "wr_data[31:0]",
+      "rd_en",
+      "rd_addr[7:0]",
+      "bist_start",
+      "rd_data[31:0]",
+      "ready",
+      "bist_done",
+      "bist_fail",
+      "irq"
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "sram_mbist_demo_controller",
+      "role": "Top-level controller that exposes firmware-visible SRAM access controls, BIST request/status, IRQ generation, and a direct single-port SRAM interface to the OpenRAM-compatible 64x32 memory.",
+      "responsibilities": [
+        "Gate and sequence single-port SRAM accesses from write/read control inputs.",
+        "Expose a recognizable SRAM macro interface for OpenRAM collateral or synthesizable fallback memory.",
+        "Latch and present BIST completion and failure state.",
+        "Generate irq when IRQ enable is set and a BIST result is latched.",
+        "Provide explicit reset semantics for control, status, IRQ, and read data.",
+        "Keep the design synthesizable and free of vendor-only primitives."
+      ],
+      "interface_notes": [
+        "Consumes clk and reset_n plus firmware-style write/read controls and bist_start.",
+        "Drives rd_data, ready, bist_done, bist_fail, and irq as top-level status outputs.",
+        "Does not introduce additional ports beyond the fixed top-level contract.",
+        "Maintains a single-port SRAM-like memory path internally, with only the lower 6 address bits used for the 64-word array."
+      ],
+      "ownership_notes": [
+        "Owns the top-level visible status outputs through the internal register/control block.",
+        "Relies on the register/control block to generate memory command and BIST semantics.",
+        "The top-level memory instance is either demo_sram_32x64 or demo_sram_32x64_model depending on collateral availability, but the controller contract remains unchanged."
+      ]
+    },
+    {
+      "name": "sram_mbist_demo_controller_regs",
+      "role": "Internal MMIO/register and control sequencer block that decodes firmware-style accesses, generates explicit semantic control signals, tracks status, and routes SRAM read/write operations and BIST control.",
+      "responsibilities": [
+        "Decode CONTROL, STATUS, MEM_ADDR, MEM_WDATA, MEM_RDATA, MEM_CONTROL, BIST_CONTROL, BIST_STATUS, IRQ_STATUS, and IRQ_CLEAR semantics.",
+        "Generate explicit SRAM control outputs csb, web, addr, din semantics for the top-level controller.",
+        "Generate explicit BIST request and clear-result pulses.",
+        "Track ready, BIST running, done, fail, IRQ enable, and last failure address semantics.",
+        "Provide the software-visible read data path and readback muxing for register space.",
+        "Ensure clear and reset actions restore all status to defaults."
+      ],
+      "interface_notes": [
+        "Consumes all top-level firmware-style inputs and the raw sram_dout feedback from the memory.",
+        "Drives ready, rd_data, bist_done, bist_fail, irq, and the explicit memory command/status ports.",
+        "Exposes semantic control outputs mem_write_req, mem_read_req, bist_req, bist_clear_result, irq_enable, and memory address/data latch outputs for downstream MBIST visibility.",
+        "Produces an explicit single-port SRAM control view via sram_csb, sram_web, sram_addr, and sram_din rather than hiding memory intent inside an abstract bus."
+      ],
+      "ownership_notes": [
+        "Owns the internal register contract and readback muxing.",
+        "Owns the generation of irq from irq_enable and latched BIST status.",
+        "Owns the software-visible read data presentation and latched failure address semantics.",
+        "Serves as the main source of explicit MBIST collateral signals for downstream tools."
+      ]
+    },
+    {
+      "name": "demo_sram_32x64_model",
+      "role": "Synthesizable single-port SRAM fallback wrapper with the same memory interface expected by OpenRAM collateral, preserving memory-like structure for integration and MBIST collateral generation.",
+      "responsibilities": [
+        "Provide a synthesizable fallback when OpenRAM collateral is unavailable.",
+        "Maintain the same interface contract as the OpenRAM-compatible macro.",
+        "Preserve memory-like inference for synthesis and DFT flows.",
+        "Support deterministic simulation behavior for reads and writes."
+      ],
+      "interface_notes": [
+        "Receives clk, csb, web, addr, and din and drives dout.",
+        "Uses the exact 64x32 single-port interface contract expected by the macro path.",
+        "No vendor-specific primitives are used in the fallback implementation.",
+        "The wrapper name and port contract are intentionally kept aligned with the macro replacement flow."
+      ],
+      "ownership_notes": [
+        "Owns only the memory array behavior in fallback mode and does not own register semantics.",
+        "Acts as the synthesizable stand-in for demo_sram_32x64 when hard macro collateral is absent.",
+        "Designed so downstream replacement with the OpenRAM macro does not require controller interface changes."
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "sram_mbist_demo_controller",
+      "to": "sram_mbist_demo_controller_regs",
+      "signals": [
+        "clk",
+        "reset_n",
+        "wr_en",
+        "wr_addr[7:0]",
+        "wr_data[31:0]",
+        "rd_en",
+        "rd_addr[7:0]",
+        "bist_start",
+        "sram_dout[31:0]"
+      ],
+      "intent": "The top-level controller forwards firmware-style access controls and SRAM readback into the register/control block, which performs decode, sequencing, and status generation."
+    },
+    {
+      "from": "sram_mbist_demo_controller_regs",
+      "to": "demo_sram_32x64_model",
+      "signals": [
+        "sram_csb",
+        "sram_web",
+        "sram_addr[5:0]",
+        "sram_din[31:0]"
+      ],
+      "intent": "The register/control block emits explicit single-port SRAM command and data signals that preserve recognizable SRAM structure for synthesis and MBIST collateral generation."
+    },
+    {
+      "from": "demo_sram_32x64_model",
+      "to": "sram_mbist_demo_controller_regs",
+      "signals": [
+        "sram_dout[31:0]"
+      ],
+      "intent": "The memory model returns raw read data into the register/control block for MEM_RDATA presentation and status-aligned readback behavior."
+    },
+    {
+      "from": "sram_mbist_demo_controller_regs",
+      "to": "sram_mbist_demo_controller",
+      "signals": [
+        "rd_data[31:0]",
+        "ready",
+        "bist_done",
+        "bist_fail",
+        "irq"
+      ],
+      "intent": "The register/control block drives the externally visible read data, readiness, BIST status, and interrupt indication exposed by the top-level controller."
+    }
+  ],
+  "data_flow_summary": [
+    "Firmware writes to CONTROL, MEM_ADDR, MEM_WDATA, MEM_CONTROL, BIST_CONTROL, and IRQ_CLEAR are decoded by the register/control block into internal control state and explicit command pulses.",
+    "SRAM accesses use a single-port model with a 6-bit address view; the upper 2 bits of the top-level address are ignored for memory addressing and do not alter SRAM behavior.",
+    "MEM_WRITE and MEM_READ semantics are exposed explicitly through mem_write_req and mem_read_req while the actual memory command is translated into active-low csb and web control.",
+    "BIST is requested through bist_start or BIST_CONTROL.START, then reflected in bist_running and latched done/fail status, with the last failing address retained in last_fail_addr.",
+    "IRQ asserts only when irq_enable is set and one of the latched BIST interrupt status bits is present; IRQ_CLEAR clears those latched interrupt bits when written.",
+    "Read data presented on rd_data is sourced from the internal register readback path, including MEM_RDATA behavior derived from SRAM readback or the current read pipeline value."
+  ],
+  "clock_reset_summary": {
+    "clocking": "Single synchronous clk domain at 50.0 MHz nominal, with a 20 ns period target. All sequential logic is in one domain and no additional clocks are introduced.",
+    "reset_behavior": "reset_n is active-low and synchronous to clk. Reset clears control/status registers, ready state, BIST status, IRQ, memory request outputs, BIST request outputs, last_fail_addr, and software-visible read data to zero or idle defaults. The SRAM contents are not architecturally required to be cleared by reset unless the chosen memory implementation explicitly models it."
+  },
+  "integration_notes": [
+    "Use demo_sram_32x64 when OpenRAM macro collateral is available; otherwise use the synthesizable demo_sram_32x64_model with the same port contract.",
+    "The design intentionally preserves memory-like structure visibility to support downstream synthesis, DFT, and MBIST collateral generation.",
+    "The controller is intentionally small and fast to run, with explicit status and request hooks rather than a broad system bus wrapper.",
+    "The register map is part of the architecture contract and should remain aligned with the specified offsets and field meanings.",
+    "No additional external bus interface is implied; firmware access is represented by the provided top-level control and data ports.",
+    "Any implementation choice for arbitration between simultaneous read and write requests must remain deterministic and consistent with the RTL comments and testbench expectations."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

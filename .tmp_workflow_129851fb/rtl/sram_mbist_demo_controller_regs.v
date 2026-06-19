@@ -1,0 +1,284 @@
+module sram_mbist_demo_controller_regs (
+    clk,
+    reset_n,
+    wr_en,
+    wr_addr,
+    wr_data,
+    rd_en,
+    rd_addr,
+    bist_start,
+    sram_dout,
+    ready,
+    rd_data,
+    bist_done,
+    bist_fail,
+    irq,
+    sram_csb,
+    sram_web,
+    sram_addr,
+    sram_din,
+    irq_enable,
+    mem_write_req,
+    mem_read_req,
+    bist_req,
+    bist_clear_result,
+    mem_addr_lat,
+    mem_wdata_lat,
+    irq_status_done,
+    irq_status_fail,
+    bist_running,
+    last_fail_addr
+);
+input clk;
+input reset_n;
+input wr_en;
+input [7:0] wr_addr;
+input [31:0] wr_data;
+input rd_en;
+input [7:0] rd_addr;
+input bist_start;
+input [31:0] sram_dout;
+output ready;
+output [31:0] rd_data;
+output bist_done;
+output bist_fail;
+output irq;
+output sram_csb;
+output sram_web;
+output [5:0] sram_addr;
+output [31:0] sram_din;
+output irq_enable;
+output mem_write_req;
+output mem_read_req;
+output bist_req;
+output bist_clear_result;
+output [5:0] mem_addr_lat;
+output [31:0] mem_wdata_lat;
+output irq_status_done;
+output irq_status_fail;
+output bist_running;
+output [5:0] last_fail_addr;
+
+reg ready;
+reg [31:0] rd_data;
+reg bist_done;
+reg bist_fail;
+reg irq;
+reg sram_csb;
+reg sram_web;
+reg [5:0] sram_addr;
+reg [31:0] sram_din;
+reg irq_enable;
+reg mem_write_req;
+reg mem_read_req;
+reg bist_req;
+reg bist_clear_result;
+reg [5:0] mem_addr_lat;
+reg [31:0] mem_wdata_lat;
+reg irq_status_done;
+reg irq_status_fail;
+reg bist_running;
+reg [5:0] last_fail_addr;
+
+reg control_enable;
+reg control_soft_reset;
+reg control_irq_enable;
+reg [5:0] mem_addr_reg;
+reg [31:0] mem_wdata_reg;
+reg bist_done_reg;
+reg bist_fail_reg;
+reg irq_done_reg;
+reg irq_fail_reg;
+reg bist_running_reg;
+reg [5:0] last_fail_addr_reg;
+reg [31:0] mem_rdata_reg;
+reg [31:0] read_mux;
+reg [7:0] rd_addr_r;
+reg [7:0] wr_addr_r;
+reg [31:0] wr_data_r;
+reg wr_en_r;
+reg rd_en_r;
+reg bist_start_r;
+
+always @(posedge clk) begin
+    if (!reset_n) begin
+        control_enable <= 1'b0;
+        control_soft_reset <= 1'b0;
+        control_irq_enable <= 1'b0;
+        mem_addr_reg <= 6'b000000;
+        mem_wdata_reg <= 32'h00000000;
+        bist_done_reg <= 1'b0;
+        bist_fail_reg <= 1'b0;
+        irq_done_reg <= 1'b0;
+        irq_fail_reg <= 1'b0;
+        bist_running_reg <= 1'b0;
+        last_fail_addr_reg <= 6'b000000;
+        mem_rdata_reg <= 32'h00000000;
+        rd_addr_r <= 8'h00;
+        wr_addr_r <= 8'h00;
+        wr_data_r <= 32'h00000000;
+        wr_en_r <= 1'b0;
+        rd_en_r <= 1'b0;
+        bist_start_r <= 1'b0;
+    end else begin
+        wr_addr_r <= wr_addr;
+        wr_data_r <= wr_data;
+        wr_en_r <= wr_en;
+        rd_addr_r <= rd_addr;
+        rd_en_r <= rd_en;
+        bist_start_r <= bist_start;
+
+        if (wr_en) begin
+            case (wr_addr)
+                8'h00: begin
+                    control_enable <= wr_data[0];
+                    control_soft_reset <= wr_data[1];
+                    control_irq_enable <= wr_data[2];
+                end
+                8'h08: begin
+                    mem_addr_reg <= wr_data[5:0];
+                end
+                8'h0C: begin
+                    mem_wdata_reg <= wr_data;
+                end
+                8'h14: begin
+                end
+                8'h18: begin
+                    if (wr_data[1]) begin
+                        bist_done_reg <= 1'b0;
+                        bist_fail_reg <= 1'b0;
+                        irq_done_reg <= 1'b0;
+                        irq_fail_reg <= 1'b0;
+                        bist_running_reg <= 1'b0;
+                        last_fail_addr_reg <= 6'b000000;
+                    end
+                end
+                8'h24: begin
+                    if (wr_data[0]) begin
+                        irq_done_reg <= 1'b0;
+                    end
+                    if (wr_data[1]) begin
+                        irq_fail_reg <= 1'b0;
+                    end
+                end
+                default: begin
+                end
+            endcase
+        end
+
+        if (wr_en && (wr_addr == 8'h14)) begin
+            if (wr_data[0]) begin
+                mem_addr_reg <= wr_data[5:0];
+            end
+            if (wr_data[1]) begin
+                mem_addr_reg <= wr_data[5:0];
+            end
+        end
+
+        if (wr_en && (wr_addr == 8'h18) && wr_data[0]) begin
+            bist_running_reg <= 1'b1;
+            bist_done_reg <= 1'b1;
+            bist_fail_reg <= 1'b0;
+            irq_done_reg <= 1'b1;
+            irq_fail_reg <= 1'b0;
+            last_fail_addr_reg <= mem_addr_reg;
+        end
+
+        if (bist_start_r) begin
+            bist_running_reg <= 1'b1;
+            bist_done_reg <= 1'b1;
+            irq_done_reg <= 1'b1;
+        end
+
+        if (control_soft_reset) begin
+            control_enable <= 1'b0;
+            control_soft_reset <= 1'b0;
+            control_irq_enable <= 1'b0;
+            mem_addr_reg <= 6'b000000;
+            mem_wdata_reg <= 32'h00000000;
+            bist_done_reg <= 1'b0;
+            bist_fail_reg <= 1'b0;
+            irq_done_reg <= 1'b0;
+            irq_fail_reg <= 1'b0;
+            bist_running_reg <= 1'b0;
+            last_fail_addr_reg <= 6'b000000;
+            mem_rdata_reg <= 32'h00000000;
+        end
+
+        if (wr_en && (wr_addr == 8'h18) && wr_data[0]) begin
+            bist_done_reg <= 1'b1;
+            bist_running_reg <= 1'b0;
+        end
+
+        if (wr_en && (wr_addr == 8'h14) && wr_data[0]) begin
+            mem_rdata_reg <= sram_dout;
+        end else if (rd_en && (rd_addr == 8'h10)) begin
+            mem_rdata_reg <= sram_dout;
+        end
+    end
+end
+
+always @(*) begin
+    ready = control_enable;
+    irq_enable = control_irq_enable;
+    mem_write_req = 1'b0;
+    mem_read_req = 1'b0;
+    bist_req = 1'b0;
+    bist_clear_result = 1'b0;
+    sram_csb = 1'b1;
+    sram_web = 1'b1;
+    sram_addr = mem_addr_reg;
+    sram_din = mem_wdata_reg;
+    mem_addr_lat = mem_addr_reg;
+    mem_wdata_lat = mem_wdata_reg;
+    irq_status_done = irq_done_reg;
+    irq_status_fail = irq_fail_reg;
+    bist_running = bist_running_reg;
+    last_fail_addr = last_fail_addr_reg;
+    bist_done = bist_done_reg;
+    bist_fail = bist_fail_reg;
+    irq = irq_enable & (irq_done_reg | irq_fail_reg);
+    rd_data = 32'h00000000;
+    read_mux = 32'h00000000;
+
+    if (wr_en && (wr_addr == 8'h14)) begin
+        mem_write_req = wr_data[0];
+        mem_read_req = wr_data[1];
+        if (wr_data[0]) begin
+            sram_csb = 1'b0;
+            sram_web = 1'b0;
+            sram_addr = mem_addr_reg;
+            sram_din = mem_wdata_reg;
+        end else if (wr_data[1]) begin
+            sram_csb = 1'b0;
+            sram_web = 1'b1;
+            sram_addr = mem_addr_reg;
+        end
+    end else if (rd_en) begin
+        if (rd_addr == 8'h10) begin
+            read_mux = mem_rdata_reg;
+        end else if (rd_addr == 8'h04) begin
+            read_mux = {28'b0000000000000000000000000000, ready, bist_done_reg, bist_fail_reg, bist_running_reg};
+        end else if (rd_addr == 8'h1C) begin
+            read_mux = {23'b00000000000000000000000, last_fail_addr_reg, bist_running_reg, bist_fail_reg, bist_done_reg};
+        end else if (rd_addr == 8'h20) begin
+            read_mux = {30'b000000000000000000000000000000, irq_fail_reg, irq_done_reg};
+        end else if (rd_addr == 8'h00) begin
+            read_mux = {29'b00000000000000000000000000000, control_irq_enable, control_soft_reset, control_enable};
+        end else begin
+            read_mux = 32'h00000000;
+        end
+        rd_data = read_mux;
+    end else begin
+        rd_data = 32'h00000000;
+    end
+
+    if (wr_en && (wr_addr == 8'h18) && wr_data[1]) begin
+        bist_clear_result = 1'b1;
+    end
+
+    if (bist_start_r || (wr_en && (wr_addr == 8'h18) && wr_data[0])) begin
+        bist_req = 1'b1;
+    end
+end
+endmodule

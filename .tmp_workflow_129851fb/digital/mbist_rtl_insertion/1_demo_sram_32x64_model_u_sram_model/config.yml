@@ -1,0 +1,12 @@
+memory_name: demo_sram_32x64_model
+wrapper_module_name: demo_sram_32x64_model_mbist
+addr_width: 6
+data_width: 32
+we_active_low: true
+ports:
+  clk: clk
+  addr: addr
+  din: din
+  dout: dout
+  we: web
+  csb: csb

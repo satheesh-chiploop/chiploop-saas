@@ -1,0 +1,353 @@
+{
+  "workflow_id": "129851fb-156a-4c75-8b9b-d4bd132f2a93",
+  "agent": "Digital MBIST RTL Insertion Agent",
+  "enabled": true,
+  "status": "failed",
+  "detected_memory": {
+    "kind": "spec_memory_macro",
+    "cell": "demo_sram_32x64",
+    "instance": "u_sram",
+    "source_file": null,
+    "connections": {},
+    "ports": {
+      "clk": "clk",
+      "csb": "csb",
+      "we": "web",
+      "addr": "addr",
+      "din": "din",
+      "dout": "dout"
+    },
+    "addr_width": 6,
+    "data_width": 32,
+    "depth": 64,
+    "requires_mbist": true
+  },
+  "detected_memories": [
+    {
+      "kind": "spec_memory_macro",
+      "cell": "demo_sram_32x64",
+      "instance": "u_sram",
+      "source_file": null,
+      "connections": {},
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "addr_width": 6,
+      "data_width": 32,
+      "depth": 64,
+      "requires_mbist": true
+    },
+    {
+      "kind": "memory_instance",
+      "cell": "demo_sram_32x64_model",
+      "instance": "u_sram_model",
+      "source_file": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/rtl/sram_mbist_demo_controller.v",
+      "connections": {
+        "clk": "clk",
+        "csb": "sram_csb",
+        "web": "sram_web",
+        "addr": "sram_addr",
+        "din": "sram_din",
+        "dout": "sram_dout"
+      },
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "addr_width": 6,
+      "data_width": 32,
+      "depth": 64,
+      "requires_mbist": true,
+      "spec_memory_macro": {
+        "kind": "spec_memory_macro",
+        "cell": "demo_sram_32x64_model",
+        "instance": "u_sram_model",
+        "source_file": null,
+        "connections": {},
+        "ports": {
+          "clk": "clk",
+          "csb": "csb",
+          "we": "web",
+          "addr": "addr",
+          "din": "din",
+          "dout": "dout"
+        },
+        "addr_width": 6,
+        "data_width": 32,
+        "depth": 64,
+        "requires_mbist": true
+      }
+    }
+  ],
+  "detected_rtl_memories": [
+    {
+      "kind": "memory_instance",
+      "cell": "demo_sram_32x64_model",
+      "instance": "u_sram_model",
+      "source_file": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/rtl/sram_mbist_demo_controller.v",
+      "connections": {
+        "clk": "clk",
+        "csb": "sram_csb",
+        "web": "sram_web",
+        "addr": "sram_addr",
+        "din": "sram_din",
+        "dout": "sram_dout"
+      },
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "addr_width": 1,
+      "data_width": 1,
+      "depth": 2
+    }
+  ],
+  "spec_memory_macros": [
+    {
+      "kind": "spec_memory_macro",
+      "cell": "demo_sram_32x64",
+      "instance": "u_sram",
+      "source_file": null,
+      "connections": {},
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "addr_width": 6,
+      "data_width": 32,
+      "depth": 64,
+      "requires_mbist": true
+    },
+    {
+      "kind": "spec_memory_macro",
+      "cell": "demo_sram_32x64_model",
+      "instance": "u_sram_model",
+      "source_file": null,
+      "connections": {},
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "addr_width": 6,
+      "data_width": 32,
+      "depth": 64,
+      "requires_mbist": true
+    }
+  ],
+  "autombist_executable": "/usr/local/bin/autombist",
+  "generated_at": "2026-06-19T16:52:09.878071Z",
+  "rtl_files_scanned": [
+    "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/rtl/demo_sram_32x64_model.v",
+    "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/rtl/sram_mbist_demo_controller.v",
+    "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/rtl/sram_mbist_demo_controller_regs.v"
+  ],
+  "allow_generated_sim_model": false,
+  "memory_results": [
+    {
+      "memory": {
+        "kind": "spec_memory_macro",
+        "cell": "demo_sram_32x64",
+        "instance": "u_sram",
+        "source_file": null,
+        "connections": {},
+        "ports": {
+          "clk": "clk",
+          "csb": "csb",
+          "we": "web",
+          "addr": "addr",
+          "din": "din",
+          "dout": "dout"
+        },
+        "addr_width": 6,
+        "data_width": 32,
+        "depth": 64,
+        "requires_mbist": true
+      },
+      "stage_dir": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/0_demo_sram_32x64_u_sram",
+      "openram_collateral_generation": {
+        "status": "failed",
+        "config": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/0_demo_sram_32x64_u_sram/autombist_project/openram.yml",
+        "output_dir": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/0_demo_sram_32x64_u_sram/openram_out",
+        "attempts": [
+          {
+            "cmd": [
+              "/usr/local/bin/autombist",
+              "ram-synth",
+              "--config",
+              "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/0_demo_sram_32x64_u_sram/autombist_project/openram.yml",
+              "--out",
+              "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/0_demo_sram_32x64_u_sram/openram_out"
+            ],
+            "rc": 2,
+            "log": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/0_demo_sram_32x64_u_sram/openram_ram_synth_attempt1.log"
+          },
+          {
+            "cmd": [
+              "/usr/local/bin/autombist",
+              "ram-synth",
+              "--config",
+              "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/0_demo_sram_32x64_u_sram/autombist_project/openram.yml"
+            ],
+            "rc": 2,
+            "log": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/0_demo_sram_32x64_u_sram/openram_ram_synth_attempt2.log"
+          }
+        ],
+        "collateral": {
+          "behavioral_model": null,
+          "lib": [],
+          "lef": [],
+          "gds": [],
+          "spice": [],
+          "verilog": [
+            "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/0_demo_sram_32x64_u_sram/autombist_project/sram_1rw.v"
+          ]
+        },
+        "validation": {
+          "status": "issues",
+          "missing": [
+            "behavioral_model",
+            "lib",
+            "lef",
+            "gds"
+          ],
+          "issues": [],
+          "required": [
+            "behavioral_model",
+            "lib",
+            "lef",
+            "gds"
+          ]
+        }
+      },
+      "status": "failed",
+      "reason": "openram_collateral_validation_failed"
+    },
+    {
+      "memory": {
+        "kind": "memory_instance",
+        "cell": "demo_sram_32x64_model",
+        "instance": "u_sram_model",
+        "source_file": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/rtl/sram_mbist_demo_controller.v",
+        "connections": {
+          "clk": "clk",
+          "csb": "sram_csb",
+          "web": "sram_web",
+          "addr": "sram_addr",
+          "din": "sram_din",
+          "dout": "sram_dout"
+        },
+        "ports": {
+          "clk": "clk",
+          "csb": "csb",
+          "we": "web",
+          "addr": "addr",
+          "din": "din",
+          "dout": "dout"
+        },
+        "addr_width": 6,
+        "data_width": 32,
+        "depth": 64,
+        "requires_mbist": true,
+        "spec_memory_macro": {
+          "kind": "spec_memory_macro",
+          "cell": "demo_sram_32x64_model",
+          "instance": "u_sram_model",
+          "source_file": null,
+          "connections": {},
+          "ports": {
+            "clk": "clk",
+            "csb": "csb",
+            "we": "web",
+            "addr": "addr",
+            "din": "din",
+            "dout": "dout"
+          },
+          "addr_width": 6,
+          "data_width": 32,
+          "depth": 64,
+          "requires_mbist": true
+        }
+      },
+      "stage_dir": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model",
+      "openram_collateral_generation": {
+        "status": "failed",
+        "config": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/autombist_project/openram.yml",
+        "output_dir": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/openram_out",
+        "attempts": [
+          {
+            "cmd": [
+              "/usr/local/bin/autombist",
+              "ram-synth",
+              "--config",
+              "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/autombist_project/openram.yml",
+              "--out",
+              "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/openram_out"
+            ],
+            "rc": 2,
+            "log": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/openram_ram_synth_attempt1.log"
+          },
+          {
+            "cmd": [
+              "/usr/local/bin/autombist",
+              "ram-synth",
+              "--config",
+              "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/autombist_project/openram.yml"
+            ],
+            "rc": 2,
+            "log": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/openram_ram_synth_attempt2.log"
+          }
+        ],
+        "collateral": {
+          "behavioral_model": null,
+          "lib": [],
+          "lef": [],
+          "gds": [],
+          "spice": [],
+          "verilog": [
+            "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/autombist_project/sram_1rw.v"
+          ]
+        },
+        "validation": {
+          "status": "issues",
+          "missing": [
+            "behavioral_model",
+            "lib",
+            "lef",
+            "gds"
+          ],
+          "issues": [],
+          "required": [
+            "behavioral_model",
+            "lib",
+            "lef",
+            "gds"
+          ]
+        }
+      },
+      "status": "failed",
+      "reason": "openram_collateral_validation_failed"
+    }
+  ],
+  "reason": "openram_collateral_validation_failed"
+}

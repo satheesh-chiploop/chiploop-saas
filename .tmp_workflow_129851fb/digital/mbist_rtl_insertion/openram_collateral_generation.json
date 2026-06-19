@@ -1,0 +1,55 @@
+{
+  "status": "failed",
+  "config": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/autombist_project/openram.yml",
+  "output_dir": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/openram_out",
+  "attempts": [
+    {
+      "cmd": [
+        "/usr/local/bin/autombist",
+        "ram-synth",
+        "--config",
+        "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/autombist_project/openram.yml",
+        "--out",
+        "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/openram_out"
+      ],
+      "rc": 2,
+      "log": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/openram_ram_synth_attempt1.log"
+    },
+    {
+      "cmd": [
+        "/usr/local/bin/autombist",
+        "ram-synth",
+        "--config",
+        "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/autombist_project/openram.yml"
+      ],
+      "rc": 2,
+      "log": "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/openram_ram_synth_attempt2.log"
+    }
+  ],
+  "collateral": {
+    "behavioral_model": null,
+    "lib": [],
+    "lef": [],
+    "gds": [],
+    "spice": [],
+    "verilog": [
+      "/root/chiploop-backend/backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/digital/mbist_rtl_insertion/1_demo_sram_32x64_model_u_sram_model/autombist_project/sram_1rw.v"
+    ]
+  },
+  "validation": {
+    "status": "issues",
+    "missing": [
+      "behavioral_model",
+      "lib",
+      "lef",
+      "gds"
+    ],
+    "issues": [],
+    "required": [
+      "behavioral_model",
+      "lib",
+      "lef",
+      "gds"
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "sram_mbist_demo_controller",
+  "module_microarchitecture": [
+    {
+      "name": "sram_mbist_demo_controller",
+      "implementation_style": "Single-clock top-level wrapper that connects the firmware-visible control/status path to the internal register/control sequencer and the single-port SRAM instance or fallback model. The top module itself stays thin and preserves the memory-like structure for downstream recognition.",
+      "control_strategy": "Instantiate the register/control block, pass through the fixed top-level ports, and connect its explicit SRAM command/status signals to the memory macro/model. The top module does not add extra protocol layers or hidden arbitration beyond the described single-port behavior.",
+      "state_strategy": "No independent top-level architectural state beyond the internal block and memory instance. Visible outputs are driven from the internal register/control state and memory readback path.",
+      "output_strategy": "Forward rd_data, ready, bist_done, bist_fail, and irq from the internal register/control block. Keep the top-level outputs synchronous and consistent with the internal status latches.",
+      "ownership_notes": [
+        "Owns only the top-level structural integration.",
+        "Relies on the internal register/control block for all semantic behavior.",
+        "Preserves a direct single-port SRAM-like integration point for OpenRAM or fallback use."
+      ]
+    },
+    {
+      "name": "sram_mbist_demo_controller_regs",
+      "implementation_style": "Synchronous MMIO-style register decoder and sequencer with explicit semantic outputs for memory control, BIST request/status, IRQ latching, and software readback.",
+      "control_strategy": "Decode the fixed offsets CONTROL, STATUS, MEM_ADDR, MEM_WDATA, MEM_RDATA, MEM_CONTROL, BIST_CONTROL, BIST_STATUS, IRQ_STATUS, and IRQ_CLEAR from the write/read strobes. Use simple priority handling for simultaneous memory requests, with a deterministic choice consistent with RTL comments and testbench expectations. Generate explicit pulses or level signals for memory write/read requests, BIST start, and BIST clear-result handling.",
+      "state_strategy": "Maintain a small set of synchronous registers for CONTROL bits, MEM_ADDR, MEM_WDATA, BIST result latches, IRQ status latches, ready/busy indication, last_fail_addr, and software-visible read data. reset_n synchronously clears control and status state to idle defaults, including rd_data, ready, bist_done, bist_fail, and irq.",
+      "output_strategy": "Drive sram_csb, sram_web, sram_addr, and sram_din explicitly so the memory intent remains visible. Drive rd_data from the register readback mux, including MEM_RDATA behavior sourced from sram_dout or the current read pipeline value. Drive ready, bist_done, bist_fail, and irq directly from the internal status/state registers.",
+      "ownership_notes": [
+        "Owns the register contract and readback muxing.",
+        "Owns irq_enable, IRQ_STATUS, and BIST_STATUS semantics.",
+        "Owns the explicit memory command signals that downstream synthesis/DFT tools should recognize.",
+        "Owns the visible BIST request and clear-result sequencing hooks."
+      ]
+    },
+    {
+      "name": "demo_sram_32x64_model",
+      "implementation_style": "Synthesizable vendor-neutral single-port memory wrapper that mirrors the OpenRAM-compatible port contract and is suitable as a fallback when hard macro collateral is unavailable.",
+      "control_strategy": "Treat csb as active-low chip select and web as the active-low write control as mapped by the controller. Use a synchronous single-port access model with deterministic read/write behavior suitable for synthesis and simulation.",
+      "state_strategy": "Implement a 64x32 memory array with a 6-bit address. The stored contents may remain unchanged by reset; only dout may be driven to a known value on reset if desired for simulation determinism.",
+      "output_strategy": "Return synchronous dout from the selected address in a memory-like manner that remains recognizable to synthesis and MBIST collateral generators. Avoid vendor-specific primitives and black-box-only constructs.",
+      "ownership_notes": [
+        "Owns only the fallback memory array behavior.",
+        "Does not own register, BIST, or IRQ semantics.",
+        "Must remain drop-in replaceable by demo_sram_32x64 without changing the controller contract."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    "No complex FSM is required or implied. The intent is a small synchronous register/control sequencer with a few clearly defined states/conditions: idle/ready, memory access handling, BIST running, and latched result/IRQ indication.",
+    "BIST running is represented as a simple asserted status condition until completion or failure is latched. The implementation should avoid over-engineering and keep the control flow straightforward."
+  ],
+  "datapath_intent": [
+    "Inputs: clk, reset_n, wr_en, wr_addr[7:0], wr_data[31:0], rd_en, rd_addr[7:0], bist_start, and sram_dout[31:0] into the register/control block; clk, csb, web, addr[5:0], and din[31:0] into the memory model.",
+    "Internal storage: CONTROL bits for ENABLE, SOFT_RESET, IRQ_ENABLE; MEM_ADDR[5:0]; MEM_WDATA[31:0]; MEM_RDATA readback value; STATUS/ready/busy bits; BIST done/fail/running latches; IRQ_STATUS done/fail latches; last_fail_addr[5:0]; and any minimal read-capture staging needed for synchronous SRAM behavior.",
+    "Output mapping: rd_data reflects the selected register readback value, including MEM_RDATA for memory reads. ready/bist_done/bist_fail/irq reflect the latched control/status conditions. sram_csb/sram_web/sram_addr/sram_din directly express the SRAM transaction intent."
+  ],
+  "sequencing_notes": [
+    "Reset is synchronous and clears visible control/status state to idle defaults.",
+    "Firmware writes to MEM_ADDR and MEM_WDATA should update the address/data latches before a MEM_CONTROL request is issued.",
+    "A MEM_WRITE or MEM_READ request should translate into a single-port SRAM transaction through the explicit csb/web/address/data signals.",
+    "bist_start and BIST_CONTROL.START both feed the same simple BIST request path, with BIST status latching done/fail and last_fail_addr.",
+    "IRQ asserts only when IRQ_ENABLE is set and a BIST result bit is latched; IRQ_CLEAR clears the corresponding latched IRQ_STATUS bits.",
+    "If wr_en and rd_en are asserted together, behavior must remain deterministic and consistent with the RTL/testbench documentation; do not introduce hidden ambiguity."
+  ],
+  "timing_notes": [
+    "Single synchronous clock domain only; no derived clocks or asynchronous control trees.",
+    "Target clock is 50 MHz with a 20 ns period constraint.",
+    "Reset is synchronous to clk and should be sampled on the clock edge.",
+    "Keep the controller shallow and memory-centric so it runs quickly in synthesis and simulation.",
+    "Preserve simple single-port memory timing expectations for the fallback model and hard macro replacement flow."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

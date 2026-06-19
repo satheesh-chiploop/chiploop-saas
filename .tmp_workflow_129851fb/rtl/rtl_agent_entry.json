@@ -1,0 +1,8 @@
+{
+  "workflow_id": "129851fb-156a-4c75-8b9b-d4bd132f2a93",
+  "workflow_dir": "backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93",
+  "digital_spec_json": "backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/spec/sram_mbist_demo_controller_spec.json",
+  "spec_json": "backend/workflows/129851fb-156a-4c75-8b9b-d4bd132f2a93/spec/sram_mbist_demo_controller_spec.json",
+  "digital_spec_json_exists": true,
+  "spec_json_exists": true
+}
