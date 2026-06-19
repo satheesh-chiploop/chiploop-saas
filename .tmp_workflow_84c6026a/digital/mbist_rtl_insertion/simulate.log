@@ -1,8 +1,0 @@
-make: Entering directory '/opt/chiploop-dft/lib/python3.13/site-packages/autombist/tests/hardware'
-rm -f /root/chiploop-backend/backend/workflows/84c6026a-ffad-4c75-8970-01a822f8f18c/digital/mbist_rtl_insertion/autombist_out/demo_sram_32x64/results.xml
-"make" -f Makefile /root/chiploop-backend/backend/workflows/84c6026a-ffad-4c75-8970-01a822f8f18c/digital/mbist_rtl_insertion/autombist_out/demo_sram_32x64/results.xml
-make[1]: Entering directory '/opt/chiploop-dft/lib/python3.13/site-packages/autombist/tests/hardware'
-make[1]: Leaving directory '/opt/chiploop-dft/lib/python3.13/site-packages/autombist/tests/hardware'
-make: Leaving directory '/opt/chiploop-dft/lib/python3.13/site-packages/autombist/tests/hardware'
-make[1]: *** No rule to make target '/opt/chiploop-dft/lib/python3.13/site-packages/autombist/tests/hardware/demo_sram_32x64.v', needed by 'sim_build/march_c_t0_s1/sim.vvp'.  Stop.
-make: *** [/opt/chiploop-dft/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2
