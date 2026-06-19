@@ -1,0 +1,16 @@
+{
+  "domains": [
+    {
+      "name": "PD_TOP",
+      "elements": [
+        "pwm_controller"
+      ],
+      "primary_power_net": "VDD",
+      "primary_ground_net": "VSS"
+    }
+  ],
+  "isolation": [],
+  "retention": [],
+  "spec_mode": "flat",
+  "top_module": "pwm_controller"
+}

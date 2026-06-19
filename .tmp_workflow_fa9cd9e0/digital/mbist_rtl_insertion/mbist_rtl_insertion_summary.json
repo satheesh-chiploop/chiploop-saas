@@ -1,0 +1,15 @@
+{
+  "workflow_id": "fa9cd9e0-7e45-4865-b3b0-ed5c707e8f40",
+  "agent": "Digital MBIST RTL Insertion Agent",
+  "enabled": true,
+  "status": "skipped_no_openram_sram_detected",
+  "detected_memory": null,
+  "detected_memories": [],
+  "detected_rtl_memories": [],
+  "spec_memory_macros": [],
+  "autombist_executable": "/usr/local/bin/autombist",
+  "generated_at": "2026-06-19T18:42:42.657284Z",
+  "rtl_files_scanned": [
+    "/root/chiploop-backend/backend/workflows/fa9cd9e0-7e45-4865-b3b0-ed5c707e8f40/rtl/pwm_controller.v"
+  ]
+}

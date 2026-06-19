@@ -1,5 +1,0 @@
-Usage: autombist ram-synth [OPTIONS]
-Try 'autombist ram-synth --help' for help.
-╭─ Error ──────────────────────────────────────────────────────────────────────╮
-│ No such option: --out                                                        │
-╰──────────────────────────────────────────────────────────────────────────────╯

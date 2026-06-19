@@ -1,0 +1,85 @@
+{
+  "agent": "Digital Arch2RTL Dashboard Agent",
+  "tool_profile": {
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "artifact_policy": "full_sync",
+    "strict_tool_profile": false,
+    "tools": [
+      "atalanta",
+      "autombist",
+      "bash",
+      "boolector",
+      "cadence_genus",
+      "cargo",
+      "docker",
+      "fault",
+      "gcc",
+      "gcov",
+      "gem5_riscv",
+      "gem5_x86",
+      "git",
+      "iverilog",
+      "jasper",
+      "llvm_cov",
+      "llvm_profdata",
+      "make",
+      "ngspice",
+      "openram",
+      "openroad",
+      "podem",
+      "questa",
+      "riscv64_linux_gnu_gcc",
+      "riscv64_unknown_elf_gcc",
+      "rustc",
+      "sby",
+      "scons",
+      "synopsys_dc",
+      "vc_lp",
+      "vcs",
+      "verilator",
+      "verilator_coverage",
+      "vvp",
+      "x86_64_linux_gnu_gcc",
+      "xcelium",
+      "yosys",
+      "z3"
+    ],
+    "runtime": [
+      "cocotb_config",
+      "pip",
+      "pytest",
+      "python",
+      "python3"
+    ],
+    "commands": [
+      "upf_power_aware_sim",
+      "upf_static_check"
+    ]
+  },
+  "executions": [
+    {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "backend/workflows/fa9cd9e0-7e45-4865-b3b0-ed5c707e8f40/handoff/pwm_controller_ip_package/rtl/pwm_controller.v"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stdout": "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b\n- Verilator: Built from 0.031 MB sources in 2 modules, into 0.014 MB in 3 C++ files needing 0.000 MB\n- Verilator: Walltime 0.008 s (elab=0.000, cvt=0.003, bld=0.000); cpu 0.008 s on 1 threads; allocated 31.352 MB\n",
+      "stderr": "",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-06-19T18:42:44.771331+00:00",
+      "ended_at": "2026-06-19T18:42:44.874626+00:00",
+      "elapsed_ms": 103
+    }
+  ]
+}

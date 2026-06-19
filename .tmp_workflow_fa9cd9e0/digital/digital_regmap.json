@@ -1,0 +1,26 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "flat",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": []
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [],
+    "polling_sequence": [
+      "Read counter_value and/or observe pwm_out through the module's direct output interface; no firmware-visible register interface is implied by the spec."
+    ],
+    "irq_sequence": []
+  },
+  "consistency_notes": [
+    "DIGITAL_SPEC_JSON defines only direct top-level RTL ports and does not imply a memory-mapped or byte-register software interface.",
+    "No additional hierarchy, bus wrapper, or software-controlled register block is introduced.",
+    "The PWM controller is intended for direct RTL integration; firmware-visible register mapping is therefore omitted as incompatible with the source spec."
+  ]
+}

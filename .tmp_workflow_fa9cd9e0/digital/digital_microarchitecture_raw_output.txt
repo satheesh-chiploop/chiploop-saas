@@ -1,0 +1,56 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "module_name": "pwm_controller",
+  "microarchitecture_summary": {
+    "implementation_style": "Single-module synthesizable RTL with one 8-bit synchronous counter and one combinational compare for PWM generation.",
+    "control_strategy": "On each rising edge of clk, synchronous active-low reset_n clears state to zero; when reset_n is high and enable is asserted, the counter either increments by 1 or wraps to 0 when the programmed period boundary is reached.",
+    "state_strategy": "An internal 8-bit counter register holds the current count and is the sole sequential state; counter_value mirrors this state to the output port.",
+    "output_strategy": "pwm_out is generated from the current counter state using a strict less-than comparison against duty_cycle, with no hidden shadow register behavior."
+  },
+  "fsm_intent": {
+    "present": false,
+    "description": "No explicit FSM is required. The design is a simple counter-based sequential datapath with enable gating and wrap logic.",
+    "states": []
+  },
+  "datapath_intent": {
+    "inputs": [
+      "clk",
+      "reset_n",
+      "enable",
+      "duty_cycle[7:0]",
+      "period[7:0]"
+    ],
+    "internal_storage": [
+      "8-bit counter register initialized to zero on synchronous active-low reset",
+      "No additional registers, memories, or shadow copies of duty_cycle or period"
+    ],
+    "output_mapping": [
+      "counter_value[7:0] is driven directly from the internal counter state",
+      "pwm_out is driven from a combinational comparison of counter_value < duty_cycle"
+    ]
+  },
+  "sequencing_notes": [
+    "State updates occur only on the rising edge of clk.",
+    "When reset_n is low, all sequential state is synchronously cleared to zero.",
+    "When reset_n is high and enable is low, the counter holds its current value.",
+    "When reset_n is high and enable is high, the counter increments by one unless the current count has reached period, in which case the next state returns to zero.",
+    "period and duty_cycle are treated as live 8-bit unsigned inputs and are not captured into shadow registers."
+  ],
+  "timing_notes": [
+    "Single clock domain on clk with a 20.0 ns period corresponding to 50.0 MHz.",
+    "reset_n is synchronous active-low and should be constrained accordingly in STA.",
+    "counter_value and pwm_out are derived from registered state; pwm_out is a simple compare path from counter_value to duty_cycle.",
+    "No multi-cycle, generated-clock, or asynchronous-reset timing intent is implied by the spec."
+  ],
+  "ownership_notes": [
+    "Counter state ownership remains internal to pwm_controller and is exposed through counter_value.",
+    "Output generation ownership remains internal to pwm_controller and is derived from the live comparison of counter_value and duty_cycle.",
+    "No additional modules, submodules, or hidden interfaces are implied.",
+    "The RTL output filename remains pwm_controller.v."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "Interfaces remain exactly as defined in digital_spec_json."
+  ]
+}
