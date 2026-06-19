@@ -50,7 +50,7 @@ const ARCH2RTL_ONBOARDING_DEFAULTS = {
   topModule: "pwm_controller",
   designLanguage: "systemverilog" as const,
   specText: ARCH2RTL_ONBOARDING_SPEC,
-  toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+  toggles: { genRegmap: true, genUpfLite: true, genPackaging: true, insertMbist: false },
 };
 
 type WorkflowRow = {
@@ -253,6 +253,7 @@ export default function Arch2RTLAppPage() {
     setGenRegmap(demo.toggles.genRegmap);
     setGenUpfLite(demo.toggles.genUpfLite);
     setGenPackaging(demo.toggles.genPackaging);
+    setInsertMbist(demo.toggles.insertMbist ?? false);
   }, [loading]);
 
   // Live workflow updates

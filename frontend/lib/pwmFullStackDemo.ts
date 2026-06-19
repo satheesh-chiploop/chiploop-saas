@@ -479,6 +479,23 @@ Memory intent:
 - Memory is 64 words by 32 bits.
 - The memory wrapper interface should include clk, csb, web, addr[5:0], din[31:0], and dout[31:0].
 
+Structured memory macro contract:
+- memory_macros[0].name = demo_sram_32x64
+- memory_macros[0].kind = openram_sram
+- memory_macros[0].depth = 64
+- memory_macros[0].data_width = 32
+- memory_macros[0].addr_width = 6
+- memory_macros[0].instance_name = u_sram
+- memory_macros[0].requires_mbist = true
+- memory_macros[0].ports.clk = clk
+- memory_macros[0].ports.csb = csb
+- memory_macros[0].ports.we = web
+- memory_macros[0].ports.addr = addr
+- memory_macros[0].ports.din = din
+- memory_macros[0].ports.dout = dout
+- The controller RTL must instantiate demo_sram_32x64 as a macro cell when OpenRAM collateral is available.
+- The fallback demo_sram_32x64_model is simulation/synthesis fallback only; it must keep the same clk/csb/web/addr/din/dout interface so OpenRAM/AutoMBIST can replace or wrap the path.
+
 Register map:
 - 0x00 CONTROL: bit 0 ENABLE, bit 1 SOFT_RESET, bit 2 IRQ_ENABLE
 - 0x04 STATUS: ready, bist_done, bist_fail, busy

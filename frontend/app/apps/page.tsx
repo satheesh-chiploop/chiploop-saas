@@ -686,7 +686,7 @@ export default function AppsHomePage() {
       topModule: "sram_mbist_demo_controller",
       designLanguage: "systemverilog",
       specText: MBIST_SRAM_ARCH2RTL_SPEC,
-      toggles: { genRegmap: true, genUpfLite: true, genPackaging: true },
+      toggles: { genRegmap: true, genUpfLite: true, genPackaging: true, insertMbist: true },
     }));
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "mbist_sram" }));
     go("/apps/arch2rtl?guided=1&mbist_chain=1");
