@@ -1,0 +1,19 @@
+{
+  "type": "ip_packaging_handoff",
+  "version": "1.0",
+  "top_module": "sram_mbist_demo_controller",
+  "package_dir": "backend/workflows/d2c04f26-a13c-4189-ac5d-8715f90b4311/handoff/sram_mbist_demo_controller_ip_package",
+  "zip_path": "backend/workflows/d2c04f26-a13c-4189-ac5d-8715f90b4311/handoff/sram_mbist_demo_controller_ip_package.zip",
+  "bucket_counts": {
+    "rtl": 14,
+    "spec": 3,
+    "arch": 1,
+    "microarch": 1,
+    "regmap": 2,
+    "constraints": 0,
+    "power_intent": 1,
+    "verification": 0,
+    "reports": 0,
+    "other": 10
+  }
+}

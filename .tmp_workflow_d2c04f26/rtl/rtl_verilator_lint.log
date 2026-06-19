@@ -1,0 +1,39 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.080 MB sources in 4 modules, into 0.035 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.013 s (elab=0.001, cvt=0.006, bld=0.000); cpu 0.013 s on 1 threads; allocated 31.352 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:67:12: Bits of signal are not used: 'control_reg'[31:2]
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   67 | reg [31:0] control_reg;
+      |            ^~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:68:12: Bits of signal are not used: 'mem_addr_reg'[31:6]
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   68 | reg [31:0] mem_addr_reg;
+      |            ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:70:12: Signal is not used: 'mem_rdata_reg'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   70 | reg [31:0] mem_rdata_reg;
+      |            ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:71:12: Bits of signal are not used: 'mem_control_reg'[31:2,0]
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   71 | reg [31:0] mem_control_reg;
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:72:12: Bits of signal are not used: 'bist_control_reg'[31:2]
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   72 | reg [31:0] bist_control_reg;
+      |            ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:73:12: Signal is not used: 'bist_status_reg'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   73 | reg [31:0] bist_status_reg;
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:74:12: Signal is not used: 'irq_status_reg'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   74 | reg [31:0] irq_status_reg;
+      |            ^~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

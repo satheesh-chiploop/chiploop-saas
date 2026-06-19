@@ -1,0 +1,262 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "sram_mbist_demo_controller",
+  "design_summary": {
+    "purpose": "Small SRAM scratchpad controller with explicit OpenRAM-style memory integration, firmware-visible MMIO register map, and MBIST status/IRQ collateral for downstream DFT and memory-test agents.",
+    "operating_model": "Single synchronous clk domain with synchronous active-low reset_n. Firmware accesses a 64x32 single-port SRAM through embedded register semantics, while BIST request and status are exposed both from a direct input path and from software control bits so the memory path can later be wrapped or replaced by external MBIST logic without changing the software contract.",
+    "external_interfaces": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": 1
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": 1,
+        "active_low": true
+      },
+      {
+        "name": "wr_en",
+        "direction": "input",
+        "width": 1
+      },
+      {
+        "name": "wr_addr",
+        "direction": "input",
+        "width": 8
+      },
+      {
+        "name": "wr_data",
+        "direction": "input",
+        "width": 32
+      },
+      {
+        "name": "rd_en",
+        "direction": "input",
+        "width": 1
+      },
+      {
+        "name": "rd_addr",
+        "direction": "input",
+        "width": 8
+      },
+      {
+        "name": "bist_start",
+        "direction": "input",
+        "width": 1
+      },
+      {
+        "name": "rd_data",
+        "direction": "output",
+        "width": 32
+      },
+      {
+        "name": "ready",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "bist_done",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "bist_fail",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "irq",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "mem_csb",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "mem_web",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "mem_addr",
+        "direction": "output",
+        "width": 6
+      },
+      {
+        "name": "mem_din",
+        "direction": "output",
+        "width": 32
+      },
+      {
+        "name": "mem_dout",
+        "direction": "input",
+        "width": 32
+      },
+      {
+        "name": "bist_req",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "irq_enable",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "bist_done_latched",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "bist_fail_latched",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "last_fail_addr",
+        "direction": "output",
+        "width": 6
+      }
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "sram_mbist_demo_controller",
+      "role": "Top-level SRAM scratchpad controller and MMIO-visible MBIST collateral integration point.",
+      "responsibilities": [
+        "Accept synchronous write and read requests on the user-facing SRAM access ports.",
+        "Decode and hold register-visible control and status state for firmware visibility.",
+        "Expose explicit memory intent for a 64x32 single-port SRAM suitable for OpenRAM macro binding.",
+        "Propagate BIST request, done, fail, and last-fail-address status to software-visible state.",
+        "Assert irq only when interrupt enable is set and a BIST completion or failure status is latched.",
+        "Clear state cleanly on reset and on software clear paths.",
+        "Provide a stable top-level MBIST collateral contract regardless of the underlying memory implementation."
+      ],
+      "interface_notes": [
+        "Primary software-visible register map includes CONTROL at 0x00, STATUS at 0x04, MEM_ADDR at 0x08, MEM_WDATA at 0x0C, MEM_RDATA at 0x10, MEM_CONTROL at 0x14, BIST_CONTROL at 0x18, BIST_STATUS at 0x1C, IRQ_STATUS at 0x20, and IRQ_CLEAR at 0x24.",
+        "Memory addressing uses only wr_addr[5:0] and rd_addr[5:0]; upper address bits are ignored or reserved.",
+        "The controller must drive the explicit memory intent signals mem_csb, mem_web, mem_addr, and mem_din, while receiving mem_dout from the selected SRAM implementation.",
+        "BIST request may originate from either bist_start or BIST_CONTROL.START, and the design preserves explicit BIST status outputs even if an external MBIST agent later replaces the direct memory path."
+      ],
+      "ownership_notes": [
+        "Controller-owned signals include mem_csb, mem_web, mem_addr, mem_din, bist_req, irq_enable, bist_done_latched, bist_fail_latched, last_fail_addr, rd_data, ready, bist_done, bist_fail, and irq.",
+        "The controller receives clk, reset_n, wr_en, wr_addr, wr_data, rd_en, rd_addr, bist_start, and mem_dout.",
+        "The controller must not drive the input ports from its own domain."
+      ]
+    },
+    {
+      "name": "demo_sram_32x64",
+      "role": "OpenRAM-compatible single-port SRAM abstraction used when macro collateral is available.",
+      "responsibilities": [
+        "Provide a memory-like synthesis target with explicit single-port SRAM semantics.",
+        "Preserve the exact interface expected by downstream memory integration and MBIST tools.",
+        "Expose a standard macro-compatible port naming scheme suitable for OpenRAM binding."
+      ],
+      "interface_notes": [
+        "Ports are clk, csb, web, addr[5:0], din[31:0], and dout[31:0].",
+        "The interface is intentionally macro-like and synchronous.",
+        "When csb is inactive, the memory must not be accessed.",
+        "When web indicates write, din is written to the addressed word on the active clock edge.",
+        "When web indicates read, dout reflects the addressed word according to the chosen single-port SRAM latency model."
+      ],
+      "ownership_notes": [
+        "This module drives dout and receives clk, csb, web, addr, and din.",
+        "No explicit reset port exists; memory contents are implementation-defined on power-up unless initialized by the environment.",
+        "The module name remains demo_sram_32x64 so OpenRAM collateral and memory-intent detection can bind to it."
+      ]
+    },
+    {
+      "name": "demo_sram_32x64_model",
+      "role": "Synthesizable fallback single-port memory wrapper with the same macro-facing interface used when OpenRAM collateral is unavailable.",
+      "responsibilities": [
+        "Provide a portable synthesizable stand-in for the SRAM macro.",
+        "Maintain the exact macro-compatible interface so the top-level controller does not change when switching between macro and model.",
+        "Keep the memory intent explicit for downstream tools.",
+        "Avoid vendor-only primitives and non-synthesizable constructs."
+      ],
+      "interface_notes": [
+        "Ports are clk, csb, web, addr[5:0], din[31:0], and dout[31:0].",
+        "The model preserves the same interface as demo_sram_32x64 so the controller contract remains stable across macro and fallback builds.",
+        "The model is intended to be synthesizable and simulation-friendly without introducing hidden protocol complexity."
+      ],
+      "ownership_notes": [
+        "The fallback model drives dout and receives clk, csb, web, addr, and din.",
+        "No reset port is present; the wrapper must not infer asynchronous reset behavior inside the memory.",
+        "The model exists only as a fallback and must not obscure memory-like structure from synthesis and DFT agents."
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "sram_mbist_demo_controller",
+      "to": "demo_sram_32x64 / demo_sram_32x64_model",
+      "signals": [
+        "mem_csb",
+        "mem_web",
+        "mem_addr",
+        "mem_din",
+        "clk"
+      ],
+      "intent": "Controller-generated single-port SRAM command path using explicit chip-select-bar, write-enable-bar, address, and write data signals with common clocking."
+    },
+    {
+      "from": "demo_sram_32x64 / demo_sram_32x64_model",
+      "to": "sram_mbist_demo_controller",
+      "signals": [
+        "mem_dout"
+      ],
+      "intent": "Selected memory implementation returns synchronous read data to the controller for firmware-visible MEM_RDATA behavior and any memory-test collateral flow."
+    },
+    {
+      "from": "firmware MMIO contract",
+      "to": "sram_mbist_demo_controller",
+      "signals": [
+        "wr_en",
+        "wr_addr",
+        "wr_data",
+        "rd_en",
+        "rd_addr"
+      ],
+      "intent": "Software uses the embedded register map to access control, address, data, memory control, BIST control, and IRQ clear behavior through the controller."
+    },
+    {
+      "from": "bist_start input and BIST_CONTROL.START",
+      "to": "sram_mbist_demo_controller",
+      "signals": [
+        "bist_start",
+        "bist_req"
+      ],
+      "intent": "Either direct external request or software-requested start can initiate a BIST request path without changing the top-level contract."
+    }
+  ],
+  "data_flow_summary": [
+    "Firmware writes CONTROL, MEM_ADDR, MEM_WDATA, MEM_CONTROL, BIST_CONTROL, IRQ_STATUS, and IRQ_CLEAR through the embedded MMIO-style contract.",
+    "The controller decodes MEM_ADDR[5:0] into the 64-word SRAM address space and presents the selected address on mem_addr.",
+    "On memory write operations, mem_din is driven from the programmed write data and mem_web indicates write-active behavior to the selected SRAM.",
+    "On memory read operations, the selected SRAM returns mem_dout, which is captured into software-visible MEM_RDATA behavior and reflected on rd_data.",
+    "BIST status is tracked independently of the memory access path so a future MBIST engine can wrap or replace the memory without changing software-visible status registers.",
+    "irq is derived from latched BIST done/fail conditions gated by IRQ_ENABLE, and is cleared through reset, software clear, or IRQ_CLEAR write-one-to-clear behavior."
+  ],
+  "clock_reset_summary": {
+    "clocking": "Single synchronous clock domain on clk at 50.0 MHz nominal with 20.0 ns period. The design is intended to remain simple and fast to run, with no additional clock domains or hidden timing protocols.",
+    "reset_behavior": "reset_n is synchronous and active-low. On reset, the controller clears all control and status registers, deasserts ready, bist_done, bist_fail, and irq, clears software-visible read data to zero, and returns the memory access path to an idle-safe state with no pending BIST request latched from software-visible sources. The memory wrapper itself has no explicit reset port and remains macro-like."
+  },
+  "integration_notes": [
+    "The controller must preserve memory intent by instantiating a named 64x32 single-port SRAM abstraction or fallback model with ports clk, csb, web, addr[5:0], din[31:0], and dout[31:0].",
+    "If OpenRAM collateral is present, the memory instance name shall be demo_sram_32x64; otherwise the synthesizable wrapper instance name shall be demo_sram_32x64_model.",
+    "The RTL output filenames are fixed by the spec and must remain sram_mbist_demo_controller.v, demo_sram_32x64.v, and demo_sram_32x64_model.v.",
+    "BIST status registers must remain present and meaningful even if an external MBIST agent later replaces the direct memory path.",
+    "The fallback memory wrapper must remain synthesizable without vendor-only primitives and must not introduce asynchronous reset behavior inside the memory block.",
+    "The packaging collateral, assertions, simulation testbench, UPF-lite collateral, and timing constraints are all derived from the same design contract and should not introduce new hierarchy or ports.",
+    "Upper address bits on wr_addr and rd_addr are reserved/ignored for SRAM access, preserving the fixed 64-word memory depth."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}
