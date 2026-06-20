@@ -462,10 +462,10 @@ export const helpTopics: HelpTopic[] = [
     slug: "apps-sram-mbist-reference-journey",
     title: "SRAM MBIST Reference Journey",
     category: "Apps",
-    summary: "Run a focused memory/DFT demo with an OpenRAM-style SRAM controller, scan DFT, ATPG readiness, and MBIST applicability evidence.",
+    summary: "Run a focused memory/DFT demo with a prebuilt Sky130 SRAM macro controller, scan DFT, ATPG readiness, and MBIST applicability evidence.",
     body: [
       "SRAM MBIST Reference Journey is a compact Memory / DFT demo. It starts from a small memory-mapped SRAM scratchpad controller instead of a large image pipeline.",
-      "The Arch2RTL spec asks for an OpenRAM-compatible SRAM abstraction with a synthesizable fallback wrapper, so downstream synthesis and DFT agents can detect memory intent.",
+      "The Arch2RTL spec asks for a 32x256 Sky130 SRAM macro contract with a synthesizable model wrapper, so downstream synthesis and DFT agents can detect memory intent.",
       "After Arch2RTL, open Synthesis to inspect synthesis metrics, logic-equivalence evidence, scan DFT evidence, open-source ATPG tool readiness, and MBIST applicability.",
       "Scan DFT is backed by OpenROAD/OpenLane2 where supported. ATPG and MBIST report real coverage or insertion only when the corresponding open-source/customer tool adapter is configured.",
       "Segment: Memory / DFT.",
@@ -481,7 +481,7 @@ export const helpTopics: HelpTopic[] = [
       { label: "Arch2RTL", href: "/apps/arch2rtl?guided=1&mbist_chain=1" },
       { label: "Arch2Synthesis", href: "/apps/arch2synthesis" },
     ],
-    keywords: ["sram", "mbist", "openram", "autombist", "scan", "atpg", "dft", "reference journey", "arch2rtl", "synthesis"],
+    keywords: ["sram", "mbist", "sky130", "prebuilt macro", "autombist", "scan", "atpg", "dft", "reference journey", "arch2rtl", "synthesis"],
   },
   {
     slug: "apps-smart-sensor-hub-reference-journey",

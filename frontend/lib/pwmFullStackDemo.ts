@@ -449,9 +449,9 @@ export const IMAGE_PRODUCT_INTENT = `Build a simulator-backed image processing p
 
 The dashboard should let a user select a filter mode, adjust threshold and brightness, start a frame, visualize DMA progress, show input/output frame previews, display a histogram, show irq/status/error fields, and preserve lineage back to the generated workflows.`;
 
-export const MBIST_SRAM_ARCH2RTL_SPEC = `Design a small SRAM scratchpad controller for demonstrating OpenRAM-style memory integration and MBIST collateral.
+export const MBIST_SRAM_ARCH2RTL_SPEC = `Design a small SRAM scratchpad controller for demonstrating prebuilt Sky130 SRAM macro integration and MBIST collateral.
 
-This is a focused memory-test reference journey. Keep the design simple and fast to run, but make the memory intent explicit so downstream synthesis/DFT agents can detect memory-like structures and generate MBIST collateral.
+This is a focused memory-test reference journey. Keep the design simple and fast to run, but make the memory intent explicit so downstream synthesis/DFT agents can detect SRAM macro usage and generate MBIST collateral.
 
 Top module:
 - sram_mbist_demo_controller
@@ -474,17 +474,19 @@ Outputs:
 - irq
 
 Memory intent:
-- Use an OpenRAM-compatible single-port SRAM abstraction named demo_sram_32x64 when OpenRAM SRAM collateral is available.
-- If OpenRAM macro collateral is not available during RTL generation, instantiate a synthesizable single-port memory wrapper with the same interface and name it demo_sram_32x64_model.
-- Memory is 64 words by 32 bits.
-- The memory wrapper interface should include clk, csb, web, addr[5:0], din[31:0], and dout[31:0].
+- Use the prebuilt Sky130 SRAM macro collateral named sky130_sram_1kbyte_1rw1r_32x256_8 when macro collateral is available.
+- Expose the memory through a simple functional scratchpad wrapper named demo_sram_32x256_wrapper.
+- If macro collateral is not available during RTL generation, instantiate a synthesizable memory model named demo_sram_32x256_model with the same functional wrapper interface.
+- Memory is 256 words by 32 bits.
+- The functional wrapper interface should include clk, csb, web, addr[7:0], din[31:0], and dout[31:0].
+- If the underlying macro has a second read port, tie it off safely or leave it reserved for MBIST wrapper integration; the controller should use one functional access path.
 
 Structured memory macro contract:
-- memory_macros[0].name = demo_sram_32x64
-- memory_macros[0].kind = openram_sram
-- memory_macros[0].depth = 64
+- memory_macros[0].name = sky130_sram_1kbyte_1rw1r_32x256_8
+- memory_macros[0].kind = prebuilt_sky130_sram
+- memory_macros[0].depth = 256
 - memory_macros[0].data_width = 32
-- memory_macros[0].addr_width = 6
+- memory_macros[0].addr_width = 8
 - memory_macros[0].instance_name = u_sram
 - memory_macros[0].requires_mbist = true
 - memory_macros[0].ports.clk = clk
@@ -493,18 +495,18 @@ Structured memory macro contract:
 - memory_macros[0].ports.addr = addr
 - memory_macros[0].ports.din = din
 - memory_macros[0].ports.dout = dout
-- The controller RTL must instantiate demo_sram_32x64 as a macro cell when OpenRAM collateral is available.
-- The fallback demo_sram_32x64_model is simulation/synthesis fallback only; it must keep the same clk/csb/web/addr/din/dout interface so OpenRAM/AutoMBIST can replace or wrap the path.
+- The controller RTL should instantiate demo_sram_32x256_wrapper, which may bind to the prebuilt SRAM macro or to demo_sram_32x256_model depending on available collateral.
+- The fallback demo_sram_32x256_model is simulation/synthesis fallback only; it must keep the same clk/csb/web/addr/din/dout interface so AutoMBIST can replace or wrap the path.
 
 Register map:
 - 0x00 CONTROL: bit 0 ENABLE, bit 1 SOFT_RESET, bit 2 IRQ_ENABLE
 - 0x04 STATUS: ready, bist_done, bist_fail, busy
-- 0x08 MEM_ADDR: memory address[5:0]
+- 0x08 MEM_ADDR: memory address[7:0]
 - 0x0C MEM_WDATA: memory write data[31:0]
 - 0x10 MEM_RDATA: memory read data[31:0], read-only
 - 0x14 MEM_CONTROL: bit 0 MEM_WRITE, bit 1 MEM_READ
 - 0x18 BIST_CONTROL: bit 0 START, bit 1 CLEAR_RESULT
-- 0x1C BIST_STATUS: done, fail, running, last_fail_addr[5:0]
+- 0x1C BIST_STATUS: done, fail, running, last_fail_addr[7:0]
 - 0x20 IRQ_STATUS: bist_done, bist_fail
 - 0x24 IRQ_CLEAR: write one to clear IRQ_STATUS
 

@@ -1092,8 +1092,8 @@ export default function AppsHomePage() {
               },
               {
                 segment: "Memory / DFT",
-                title: "SRAM MBIST Demo: OpenRAM-style memory, scan, ATPG, and MBIST evidence",
-                copy: "A focused memory-test journey using a small SRAM scratchpad controller. Run Arch2RTL, then Arch2Synthesis to see scan DFT, ATPG readiness, and MBIST applicability evidence.",
+                title: "SRAM MBIST Demo: Sky130 SRAM macro, scan, ATPG, and MBIST evidence",
+                copy: "A focused memory-test journey using a 32x256 Sky130 SRAM scratchpad controller. Run Arch2RTL, then Arch2Synthesis to see scan DFT, ATPG readiness, and MBIST applicability evidence.",
                 button: "Start MBIST SRAM Journey",
                 onClick: startMbistSramDemo,
               },

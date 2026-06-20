@@ -208,6 +208,31 @@ endmodule
     assert detected["depth"] == 64
 
 
+def test_sram_named_controller_is_not_detected_as_memory_definition(tmp_path):
+    rtl = tmp_path / "sram_mbist_demo_controller.v"
+    rtl.write_text(
+        """
+module sram_mbist_demo_controller (
+    input clk,
+    input reset_n,
+    output sram_csb,
+    output sram_web,
+    output [5:0] sram_addr,
+    output [31:0] sram_din,
+    input [31:0] sram_dout
+);
+assign sram_csb = 1'b1;
+assign sram_web = 1'b1;
+assign sram_addr = 6'h0;
+assign sram_din = 32'h0;
+endmodule
+""",
+        encoding="utf-8",
+    )
+
+    assert agent._detect_openram_memory([str(rtl)]) is None
+
+
 def test_autombist_config_uses_detected_sram_ports():
     memory = {
         "cell": "demo_sram_32x64",
@@ -378,7 +403,7 @@ def test_openram_generation_discovers_behavioral_model_and_macro_collateral(tmp_
     rtl_src.write_text("module top; endmodule\n", encoding="utf-8")
     memory = {"cell": "demo_sram_32x64", "addr_width": 6, "data_width": 32, "depth": 64, "source_file": str(rtl_src)}
 
-    def fake_run(cmd, cwd, timeout=600):
+    def fake_run(cmd, cwd, timeout=600, env=None):
         assert "sram_compiler.py" in cmd[1]
         out_dir = stage_dir / "openram_out"
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -431,7 +456,7 @@ def test_openram_generation_reports_disk_full_root_cause(tmp_path, monkeypatch):
     memory = {"cell": "demo_sram_32x64", "addr_width": 6, "data_width": 32, "depth": 64}
 
     monkeypatch.setattr(agent, "_find_openram_compiler", lambda state: "/tools/sram_compiler.py")
-    monkeypatch.setattr(agent, "_run", lambda cmd, cwd, timeout=600: (1, "error: No space left on device\n"))
+    monkeypatch.setattr(agent, "_run", lambda cmd, cwd, timeout=600, env=None: (1, "error: No space left on device\n"))
 
     result = agent._generate_openram_collateral(memory, "autombist", str(project_dir), str(stage_dir), "wf1")
 
@@ -439,6 +464,110 @@ def test_openram_generation_reports_disk_full_root_cause(tmp_path, monkeypatch):
     assert result["reason"] == "openram_no_space_left_on_device"
     assert result["collateral"]["verilog"] == []
     assert result["validation"]["missing"] == ["behavioral_model", "lib", "lef", "gds"]
+
+
+def test_openram_generation_reports_missing_pdk_root_root_cause(tmp_path, monkeypatch):
+    project_dir = tmp_path / "project"
+    stage_dir = tmp_path / "stage"
+    project_dir.mkdir()
+    stage_dir.mkdir()
+    memory = {"cell": "demo_sram_32x64", "addr_width": 6, "data_width": 32, "depth": 64}
+
+    monkeypatch.setattr(agent, "_find_openram_compiler", lambda state: "/tools/sram_compiler.py")
+    monkeypatch.setattr(agent, "_run", lambda cmd, cwd, timeout=600, env=None: (1, "SystemError: Unable to find open_pdks tech file. Set PDK_ROOT.\n"))
+
+    result = agent._generate_openram_collateral(memory, "autombist", str(project_dir), str(stage_dir), "wf1")
+
+    assert result["status"] == "failed"
+    assert result["reason"] == "openram_pdk_root_not_set"
+
+
+def test_openram_generation_reports_missing_custom_cell_spice(tmp_path, monkeypatch):
+    project_dir = tmp_path / "project"
+    stage_dir = tmp_path / "stage"
+    project_dir.mkdir()
+    stage_dir.mkdir()
+    memory = {"cell": "demo_sram_32x64", "addr_width": 6, "data_width": 32, "depth": 64}
+    log = "Custom cell pin names do not match spice file:\n['BL', 'BR', 'VGND', 'VPWR', 'VPB', 'VNB', 'WL'] vs []\n"
+
+    monkeypatch.setattr(agent, "_find_openram_compiler", lambda state: "/tools/sram_compiler.py")
+    monkeypatch.setattr(agent, "_run", lambda cmd, cwd, timeout=600, env=None: (1, log))
+
+    result = agent._generate_openram_collateral(memory, "autombist", str(project_dir), str(stage_dir), "wf1")
+
+    assert result["status"] == "failed"
+    assert result["reason"] == "openram_custom_cell_spice_missing"
+
+
+def _write_precompiled_macro(root: Path, cell: str):
+    for subdir in ("verilog", "lef", "gds", "spice", "lib"):
+        (root / subdir).mkdir(parents=True, exist_ok=True)
+    (root / "verilog" / f"{cell}.v").write_text(
+        f"module {cell}(input clk,input [7:0] addr,input [31:0] din,output reg [31:0] dout);"
+        "reg [31:0] mem [0:255]; always @(posedge clk) dout <= mem[addr]; endmodule\n",
+        encoding="utf-8",
+    )
+    (root / "lef" / f"{cell}.lef").write_text(f"MACRO {cell}\nEND {cell}\n", encoding="utf-8")
+    (root / "gds" / f"{cell}.gds").write_text("gds\n", encoding="utf-8")
+    (root / "spice" / f"{cell}.spice").write_text(f".subckt {cell} clk addr din dout\n.ends\n", encoding="utf-8")
+    (root / "lib" / f"{cell}_TT_1p8V_25C.lib").write_text(f"library({cell}) {{ cell({cell}) {{}} }}\n", encoding="utf-8")
+
+
+def test_selects_precompiled_sram_macro_with_larger_depth(tmp_path, monkeypatch):
+    root = tmp_path / "sky130_sram_macros"
+    cell = "sky130_sram_1kbyte_1rw1r_32x256_8"
+    _write_precompiled_macro(root, cell)
+    monkeypatch.setattr(agent, "_precompiled_sram_roots", lambda stage_dir: [str(root)])
+
+    selected = agent._select_precompiled_sram_macro(
+        {"cell": "demo_sram_32x64", "data_width": 32, "depth": 64, "addr_width": 6},
+        str(tmp_path / "stage"),
+    )
+
+    assert selected["cell"] == cell
+    assert selected["data_width"] == 32
+    assert selected["depth"] == 256
+
+
+def test_openram_custom_cell_failure_uses_precompiled_sram_macro(tmp_path, monkeypatch):
+    project_dir = tmp_path / "project"
+    stage_dir = tmp_path / "stage"
+    project_dir.mkdir()
+    stage_dir.mkdir()
+    root = tmp_path / "sky130_sram_macros"
+    cell = "sky130_sram_1kbyte_1rw1r_32x256_8"
+    _write_precompiled_macro(root, cell)
+    memory = {"cell": "demo_sram_32x64", "addr_width": 6, "data_width": 32, "depth": 64}
+    log = "Custom cell pin names do not match spice file:\n['BL', 'BR'] vs []\n"
+
+    monkeypatch.setattr(agent, "_precompiled_sram_roots", lambda stage_dir_arg: [str(root)])
+    monkeypatch.setattr(agent, "_find_openram_compiler", lambda state: "/tools/sram_compiler.py")
+    monkeypatch.setattr(agent, "_run", lambda cmd, cwd, timeout=600, env=None: (1, log))
+
+    result = agent._generate_openram_collateral(memory, "autombist", str(project_dir), str(stage_dir), "wf1")
+
+    assert result["status"] == "validated"
+    assert result["generator"] == "precompiled_sram_macro"
+    assert result["selected"]["cell"] == cell
+    assert result["depth_match"] is False
+    assert memory["openram_behavioral_model"].endswith(f"{cell}.v")
+    assert memory["logical_depth"] == 64
+    assert memory["depth"] == 256
+
+
+def test_openram_env_infers_backend_pdk_root(tmp_path, monkeypatch):
+    root = tmp_path / "repo"
+    pdk = root / "backend" / "pdk"
+    stage_dir = root / "backend" / "workflows" / "wf1" / "digital" / "mbist_rtl_insertion"
+    pdk.mkdir(parents=True)
+    stage_dir.mkdir(parents=True)
+    monkeypatch.delenv("PDK_ROOT", raising=False)
+    monkeypatch.delenv("CHIPLOOP_PDK_ROOT", raising=False)
+    monkeypatch.delenv("OPEN_PDKS_ROOT", raising=False)
+
+    env = agent._openram_env(str(stage_dir))
+
+    assert env["PDK_ROOT"] == str(pdk.resolve())
 
 
 def test_openram_validation_rejects_partial_collateral(tmp_path):
