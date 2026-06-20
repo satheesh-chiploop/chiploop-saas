@@ -453,6 +453,8 @@ export const MBIST_SRAM_ARCH2RTL_SPEC = `Design a small SRAM scratchpad controll
 
 This is a focused memory-test reference journey. Keep the design simple and fast to run, but make the memory intent explicit so downstream synthesis/DFT agents can detect SRAM macro usage and generate MBIST collateral.
 
+The top module must remain a controller with the external ports listed below. Do not make the top module a raw SRAM model. Generate any SRAM wrapper/model as a child module or separate module, not as a replacement for sram_mbist_demo_controller.
+
 Top module:
 - sram_mbist_demo_controller
 
@@ -495,7 +497,8 @@ Structured memory macro contract:
 - memory_macros[0].ports.addr = addr
 - memory_macros[0].ports.din = din
 - memory_macros[0].ports.dout = dout
-- The controller RTL should instantiate demo_sram_32x256_wrapper, which may bind to the prebuilt SRAM macro or to demo_sram_32x256_model depending on available collateral.
+- The controller RTL must instantiate demo_sram_32x256_wrapper as child memory wrapper instance u_sram.
+- The wrapper may bind to the prebuilt SRAM macro or to demo_sram_32x256_model depending on available collateral.
 - The fallback demo_sram_32x256_model is simulation/synthesis fallback only; it must keep the same clk/csb/web/addr/din/dout interface so AutoMBIST can replace or wrap the path.
 
 Register map:
