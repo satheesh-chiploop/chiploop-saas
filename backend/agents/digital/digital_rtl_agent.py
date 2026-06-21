@@ -251,20 +251,21 @@ def _module_code_for_name(code: str, module_name: str) -> str:
     return modules.get(module_name, code or "")
 
 
-def _module_code_with_local_dependencies(code: str, module_name: str) -> str:
+def _module_code_with_local_dependencies(code: str, module_name: str, excluded_modules: Optional[set[str]] = None) -> str:
     modules = _extract_verilog_modules(code)
     if module_name not in modules:
         return code or ""
     selected: List[str] = []
     seen: set[str] = set()
+    excluded = set(excluded_modules or set()) - {module_name}
 
     def visit(name: str) -> None:
-        if name in seen or name not in modules:
+        if name in seen or name not in modules or name in excluded:
             return
         seen.add(name)
         body = modules[name]
         for candidate in modules:
-            if candidate == name:
+            if candidate == name or candidate in excluded:
                 continue
             if re.search(rf"\b{re.escape(candidate)}\s*(?:#\s*\([^;]*?\)\s*)?[A-Za-z_][A-Za-z0-9_$]*\s*\(", body):
                 visit(candidate)
@@ -272,6 +273,163 @@ def _module_code_with_local_dependencies(code: str, module_name: str) -> str:
 
     visit(module_name)
     return "\n\n".join(selected)
+
+
+def _canonical_memory_port_roles(port_names: List[str]) -> Dict[str, str]:
+    available = {name.lower(): name for name in port_names}
+    roles: Dict[str, str] = {}
+
+    def pick(role: str, candidates: tuple[str, ...]) -> None:
+        for candidate in candidates:
+            if candidate.lower() in available:
+                roles[role] = available[candidate.lower()]
+                return
+
+    pick("clk", ("clk", "clock"))
+    pick("csb", ("csb", "ceb", "cs_n", "cen"))
+    pick("we", ("web", "we", "wen", "write_enable"))
+    pick("addr", ("addr", "address"))
+    pick("din", ("din", "data_in", "wdata", "d"))
+    pick("dout", ("dout", "data_out", "rdata", "q"))
+    return roles
+
+
+def _ports_from_module_spec(module: dict) -> Dict[str, dict]:
+    ports: Dict[str, dict] = {}
+    for port in module.get("ports", []) or []:
+        if not isinstance(port, dict) or not port.get("name"):
+            continue
+        ports[str(port["name"])] = {
+            "direction": str(port.get("direction") or "input").lower(),
+            "width": int(port.get("width") or 1),
+        }
+    return ports
+
+
+def _module_decl_from_spec(module_name: str, ports: Dict[str, dict]) -> str:
+    names = list(ports)
+    lines = [f"module {module_name} (", "    " + ",\n    ".join(names), ");"]
+    for name, info in ports.items():
+        direction = info.get("direction") or "input"
+        width = int(info.get("width") or 1)
+        rng = f" [{width - 1}:0]" if width > 1 else ""
+        lines.append(f"{direction}{rng} {name};")
+    return "\n".join(lines)
+
+
+def _build_memory_adapter_module(module: dict, helper_name: str, helper_code: str) -> str | None:
+    module_name = str(module.get("name") or "").strip()
+    ports = _ports_from_module_spec(module)
+    if not module_name or not ports:
+        return None
+    target_roles = _canonical_memory_port_roles(list(ports))
+    helper_ports = _declared_ports(helper_code)
+    helper_roles = _canonical_memory_port_roles(list(helper_ports))
+    required = {"clk", "addr", "din", "dout"}
+    if not required.issubset(target_roles) or not required.issubset(helper_roles):
+        return None
+
+    lines = [_module_decl_from_spec(module_name, ports), ""]
+    conns: List[str] = []
+    for helper_role, helper_port in helper_roles.items():
+        target_port = target_roles.get(helper_role)
+        if not target_port and helper_role == "we":
+            target_port = target_roles.get("we")
+        if not target_port and helper_role == "csb":
+            target_port = target_roles.get("csb")
+        if target_port:
+            conns.append(f"    .{helper_port}({target_port})")
+    if not conns:
+        return None
+    lines.append(f"{helper_name} u_backing_macro (")
+    lines.append(",\n".join(conns))
+    lines.append(");")
+    lines.append("")
+    lines.append("endmodule")
+    return "\n".join(lines)
+
+
+def _fill_missing_expected_memory_modules(
+    verilog_map: Dict[str, str],
+    spec_json: dict,
+    mode: str,
+    helper_source_map: Optional[Dict[str, str]] = None,
+) -> Dict[str, str]:
+    expected_modules = _collect_expected_modules(spec_json, mode)
+    expected_names = {str(module.get("name") or "").strip() for module in expected_modules}
+    helper_modules: Dict[str, str] = {}
+    for code in (helper_source_map or verilog_map).values():
+        for name, body in _extract_verilog_modules(code).items():
+            if name not in expected_names:
+                helper_modules[name] = body
+    if not helper_modules:
+        return verilog_map
+
+    out = dict(verilog_map)
+    for module in expected_modules:
+        rtl_file = str(module.get("rtl_output_file") or "").strip()
+        module_name = str(module.get("name") or "").strip()
+        if not rtl_file or rtl_file in out:
+            continue
+        name_hint = module_name.lower()
+        if not any(token in name_hint for token in ("sram", "memory", "mem", "openram", "wrapper", "model")):
+            continue
+        for helper_name, helper_code in helper_modules.items():
+            adapter = _build_memory_adapter_module(module, helper_name, helper_code)
+            if adapter:
+                out[rtl_file] = adapter
+                break
+    return out
+
+
+def _range_decl(width: int) -> str:
+    return f"[{width - 1}:0] " if int(width or 1) > 1 else ""
+
+
+def _repair_decl_width(code: str, kind_pattern: str, name: str, width: int) -> str:
+    if int(width or 1) <= 1:
+        return code
+    rng = _range_decl(width)
+    name_re = re.escape(name)
+
+    def repl(match: re.Match) -> str:
+        prefix = match.group("prefix")
+        sep = match.group("sep")
+        return f"{prefix}{rng}{name}{sep}"
+
+    pattern = re.compile(
+        rf"(?P<prefix>\b(?:{kind_pattern})\b\s+(?:(?:wire|reg|logic|signed)\s+)*)(?:\[[^\]]+\]\s*)?{name_re}(?P<sep>\s*[,);])",
+        flags=re.IGNORECASE,
+    )
+    code = pattern.sub(repl, code)
+
+    line_pattern = re.compile(
+        rf"^(?P<prefix>\s*(?:{kind_pattern})\b\s+(?:(?:wire|reg|logic|signed)\s+)*)(?:\[[^\]]+\]\s*)?{name_re}(?P<sep>\s*;)\s*$",
+        flags=re.IGNORECASE | re.MULTILINE,
+    )
+    return line_pattern.sub(repl, code)
+
+
+def _repair_module_port_widths_from_spec(verilog_map: Dict[str, str], spec_json: dict, mode: str) -> Dict[str, str]:
+    out = dict(verilog_map)
+    for module in _collect_expected_modules(spec_json, mode):
+        rtl_file = str(module.get("rtl_output_file") or "").strip()
+        if not rtl_file or rtl_file not in out:
+            continue
+        code = out[rtl_file]
+        for pname, info in _ports_from_module_spec(module).items():
+            width = int(info.get("width") or 1)
+            if width <= 1:
+                continue
+            direction = str(info.get("direction") or "input").lower()
+            code = _repair_decl_width(code, direction, pname, width)
+
+            for alias in re.findall(rf"\bassign\s+{re.escape(pname)}\s*=\s*([A-Za-z_][A-Za-z0-9_$]*)\s*;", code):
+                code = _repair_decl_width(code, r"wire|reg|logic", alias, width)
+            for alias in re.findall(rf"\bassign\s+([A-Za-z_][A-Za-z0-9_$]*)\s*=\s*{re.escape(pname)}\s*;", code):
+                code = _repair_decl_width(code, r"wire|reg|logic", alias, width)
+        out[rtl_file] = code
+    return out
 
 
 def _has_structural_width_warnings(tool_output: str) -> bool:
@@ -310,6 +468,7 @@ def _align_verilog_map_to_expected_modules(verilog_map: Dict[str, str], spec_jso
     expected_files = set(module_to_file.values())
     aligned = dict(verilog_map)
     extracted_by_module: Dict[str, str] = {}
+    expected_module_names = set(module_to_file)
     for code in verilog_map.values():
         extracted_by_module.update(_extract_verilog_modules(code))
 
@@ -317,12 +476,18 @@ def _align_verilog_map_to_expected_modules(verilog_map: Dict[str, str], spec_jso
         module_code = None
         for code in verilog_map.values():
             if module_name in _extract_verilog_modules(code):
-                module_code = _module_code_with_local_dependencies(code, module_name)
+                module_code = _module_code_with_local_dependencies(
+                    code,
+                    module_name,
+                    excluded_modules=expected_module_names,
+                )
                 break
         if module_code:
             aligned[rtl_file] = module_code
 
-    return {fname: code for fname, code in aligned.items() if fname in expected_files}
+    aligned = {fname: code for fname, code in aligned.items() if fname in expected_files}
+    aligned = _fill_missing_expected_memory_modules(aligned, spec_json, mode, helper_source_map=verilog_map)
+    return _repair_module_port_widths_from_spec(aligned, spec_json, mode)
 
 
 def _remove_comb_blocking_assigns_to_sequential_regs(code: str) -> str:
@@ -418,10 +583,38 @@ def _remove_reset_only_seq_assigns_for_comb_targets(code: str) -> str:
     return "\n".join(out).rstrip()
 
 
+def _convert_procedural_wire_declarations(code: str) -> str:
+    text = code or ""
+    for _module_name, module_code in _extract_verilog_modules(text).items():
+        replacements: Dict[str, str] = {}
+        for decl in re.finditer(
+            r"^(?P<indent>\s*)wire\b(?P<body>\s*(?:signed\s*)?(?:\[[^\]]+\]\s*)?)(?P<names>[^;]+);",
+            module_code,
+            flags=re.MULTILINE,
+        ):
+            raw_items = [re.sub(r"=.*", "", item).strip() for item in decl.group("names").split(",")]
+            names = [
+                re.sub(r"\[[^\]]+\]", "", item).strip()
+                for item in raw_items
+                if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_$]*(?:\[[^\]]+\])?", item or "")
+            ]
+            if names and all(_module_procedurally_assigns_signal(module_code, name) for name in names):
+                replacements[decl.group(0)] = f"{decl.group('indent')}reg{decl.group('body')}{decl.group('names')};"
+        if not replacements:
+            continue
+        updated_module = module_code
+        for old, new in replacements.items():
+            updated_module = updated_module.replace(old, new, 1)
+        text = text.replace(module_code, updated_module, 1)
+    return text
+
+
 def _sanitize_single_driver_rtl(verilog_map: Dict[str, str]) -> Dict[str, str]:
     return {
-        fname: _remove_reset_only_seq_assigns_for_comb_targets(
-            _remove_comb_blocking_assigns_to_sequential_regs(code)
+        fname: _convert_procedural_wire_declarations(
+            _remove_reset_only_seq_assigns_for_comb_targets(
+                _remove_comb_blocking_assigns_to_sequential_regs(code)
+            )
         )
         for fname, code in verilog_map.items()
     }
@@ -475,13 +668,15 @@ def _declared_ports(code: str) -> Dict[str, dict]:
             range_match = re.search(r"\[[^\]]+\]", item)
             if range_match:
                 current_range = range_match.group(0)
-            item = re.sub(r"\b(input|output|inout|wire|reg|signed)\b", " ", item, flags=re.IGNORECASE)
+            elif direction:
+                current_range = ""
+            item = re.sub(r"\b(input|output|inout|wire|reg|logic|signed)\b", " ", item, flags=re.IGNORECASE)
             item = re.sub(r"\[[^\]]+\]", " ", item)
             names = re.findall(r"\b[A-Za-z_][A-Za-z0-9_$]*\b", item)
             if names and current_direction:
                 ports[names[-1]] = {"direction": current_direction, "width": _range_width(current_range)}
     for decl in re.finditer(
-        r"^\s*(input|output|inout)\b\s*(?:wire\s*|reg\s*)?(?:signed\s*)?(?P<range>\[[^\]]+\]\s*)?(?P<names>[^;]+);",
+        r"^\s*(input|output|inout)\b\s*(?:wire\s*|reg\s*|logic\s*)?(?:signed\s*)?(?P<range>\[[^\]]+\]\s*)?(?P<names>[^;]+);",
         code or "",
         flags=re.MULTILINE,
     ):
@@ -498,7 +693,7 @@ def _declared_ports(code: str) -> Dict[str, dict]:
 def _declared_signal_widths(code: str) -> Dict[str, int]:
     widths: Dict[str, int] = {name: int(info.get("width") or 1) for name, info in _declared_ports(code).items()}
     for decl in re.finditer(
-        r"^\s*(?:input|output|inout|wire|reg)\b\s*(?:wire\s*|reg\s*)?(?:signed\s*)?(?P<range>\[[^\]]+\]\s*)?(?P<names>[^;]+);",
+        r"^\s*(?:input|output|inout|wire|reg|logic)\b\s*(?:wire\s*|reg\s*|logic\s*)?(?:signed\s*)?(?P<range>\[[^\]]+\]\s*)?(?P<names>[^;]+);",
         code or "",
         flags=re.MULTILINE,
     ):
@@ -524,7 +719,7 @@ def _replace_or_insert_wire_decl(code: str, name: str, width: int) -> str:
     if wire_pat.search(code):
         return wire_pat.sub(decl, code, count=1)
     declared_pat = re.compile(
-        rf"^\s*(?:input|output|inout|reg)\b[^;]*\b{re.escape(name)}\b[^;]*;\s*$",
+        rf"^\s*(?:input|output|inout|reg|logic)\b[^;]*\b{re.escape(name)}\b[^;]*;\s*$",
         flags=re.MULTILINE,
     )
     if declared_pat.search(code):
@@ -534,7 +729,7 @@ def _replace_or_insert_wire_decl(code: str, name: str, width: int) -> str:
     if header:
         insert_at = header.end()
         for match in re.finditer(
-            r"^\s*(?:input|output|inout|wire|reg)\b[^;]*;\s*$",
+            r"^\s*(?:input|output|inout|wire|reg|logic)\b[^;]*;\s*$",
             code,
             flags=re.MULTILINE,
         ):
@@ -1014,6 +1209,24 @@ def _validate_spec_vs_rtl(spec_json: dict, mode: str, verilog_map: Dict[str, str
             issues.append(f"❌ Module '{mod_name}' missing ports vs spec: {missing_ports}")
         if extra_ports2:
             issues.append(f"❌ Module '{mod_name}' has extra ports vs spec: {extra_ports2}")
+
+        declared = _declared_ports(_extract_verilog_modules(code).get(mod_name, code))
+        for p in mod.get("ports", []) or []:
+            pname = str(p.get("name") or "")
+            if not pname or pname not in declared:
+                continue
+            expected_dir = str(p.get("direction") or "input").lower()
+            expected_width = int(p.get("width") or 1)
+            actual_dir = str(declared[pname].get("direction") or "").lower()
+            actual_width = int(declared[pname].get("width") or 1)
+            if actual_dir and actual_dir != expected_dir:
+                issues.append(
+                    f"Module '{mod_name}' port '{pname}' direction mismatch: spec={expected_dir}, rtl={actual_dir}"
+                )
+            if actual_width != expected_width:
+                issues.append(
+                    f"Module '{mod_name}' port '{pname}' width mismatch: spec={expected_width}, rtl={actual_width}"
+                )
 
         for p in mod.get("ports", []):
             pname = p["name"]

@@ -103,6 +103,116 @@ def _extract_memory_macros_from_prompt(prompt_text: str) -> list[dict]:
     return [macros[idx] for idx in sorted(macros) if macros[idx].get("name")]
 
 
+def _parse_prompt_port_line(line: str, direction: str) -> dict | None:
+    item = re.sub(r"^\s*[-*]\s*", "", line or "").strip()
+    if not item:
+        return None
+    match = re.match(r"(?P<name>[A-Za-z_][A-Za-z0-9_$]*)(?:\s*\[\s*(?P<msb>\d+)\s*:\s*(?P<lsb>\d+)\s*\])?\s*$", item)
+    if not match:
+        return None
+    width = 1
+    if match.group("msb") is not None and match.group("lsb") is not None:
+        width = abs(int(match.group("msb")) - int(match.group("lsb"))) + 1
+    port = {"name": match.group("name"), "direction": direction, "width": width}
+    if port["name"].lower() in {"reset_n", "rst_n"}:
+        port["active_low"] = True
+    return port
+
+
+def _extract_top_ports_from_prompt(prompt_text: str) -> list[dict]:
+    ports: list[dict] = []
+    seen: set[str] = set()
+    current_direction: str | None = None
+    for raw in (prompt_text or "").splitlines():
+        line = raw.strip()
+        lower = line.lower()
+        if re.fullmatch(r"inputs?\s*:", lower):
+            current_direction = "input"
+            continue
+        if re.fullmatch(r"outputs?\s*:", lower):
+            current_direction = "output"
+            continue
+        if current_direction and re.match(r"^[A-Za-z][A-Za-z0-9 _/-]*:\s*$", line):
+            current_direction = None
+            continue
+        if not current_direction:
+            continue
+        port = _parse_prompt_port_line(line, current_direction)
+        if port and port["name"] not in seen:
+            ports.append(port)
+            seen.add(port["name"])
+    return ports
+
+
+def _repair_top_ports_from_prompt(spec_json: dict, mode: str, source_prompt: str) -> dict:
+    prompt_ports = _extract_top_ports_from_prompt(source_prompt)
+    if not prompt_ports:
+        return spec_json
+    prompt_names = {p["name"] for p in prompt_ports}
+    if mode == "flat":
+        if not spec_json.get("ports"):
+            spec_json["ports"] = prompt_ports
+        else:
+            spec_json["ports"] = [
+                {**next((p for p in spec_json.get("ports", []) if isinstance(p, dict) and p.get("name") == prompt_port["name"]), {}), **prompt_port}
+                for prompt_port in prompt_ports
+            ]
+        spec_json["must_receive"] = [p["name"] for p in prompt_ports if p.get("direction") == "input"]
+        spec_json["must_drive"] = [p["name"] for p in prompt_ports if p.get("direction") == "output"]
+        spec_json["must_not_drive"] = list(spec_json["must_receive"])
+    else:
+        hierarchy = spec_json.get("hierarchy") if isinstance(spec_json.get("hierarchy"), dict) else {}
+        top = hierarchy.get("top_module") if isinstance(hierarchy, dict) else None
+        if isinstance(top, dict):
+            if not top.get("ports"):
+                top["ports"] = prompt_ports
+            else:
+                top["ports"] = [
+                    {**next((p for p in top.get("ports", []) if isinstance(p, dict) and p.get("name") == prompt_port["name"]), {}), **prompt_port}
+                    for prompt_port in prompt_ports
+                ]
+            top["must_receive"] = [p["name"] for p in prompt_ports if p.get("direction") == "input"]
+            top["must_drive"] = [p["name"] for p in prompt_ports if p.get("direction") == "output"]
+            top["must_not_drive"] = list(top["must_receive"])
+            top["ports_documentation"] = [
+                p for p in top.get("ports_documentation", []) or []
+                if isinstance(p, dict) and p.get("name") in prompt_names
+            ]
+    return spec_json
+
+
+def _repair_empty_top_ports_from_prompt(spec_json: dict, mode: str, source_prompt: str) -> dict:
+    return _repair_top_ports_from_prompt(spec_json, mode, source_prompt)
+
+
+def _enforce_prompt_top_ports_after_hierarchy_repair(spec_json: dict, mode: str, source_prompt: str) -> dict:
+    prompt_ports = _extract_top_ports_from_prompt(source_prompt)
+    if mode != "hierarchical" or not prompt_ports:
+        return spec_json
+    hier = spec_json.get("hierarchy") if isinstance(spec_json.get("hierarchy"), dict) else {}
+    top = hier.get("top_module") if isinstance(hier, dict) else None
+    if not isinstance(top, dict):
+        return spec_json
+    prompt_names = {p["name"] for p in prompt_ports}
+    existing_ports = {
+        str(p.get("name") or ""): p
+        for p in (top.get("ports") or [])
+        if isinstance(p, dict) and p.get("name")
+    }
+    top["ports"] = [
+        {**existing_ports.get(prompt_port["name"], {}), **prompt_port}
+        for prompt_port in prompt_ports
+    ]
+    top["must_receive"] = [p["name"] for p in prompt_ports if p.get("direction") == "input"]
+    top["must_drive"] = [p["name"] for p in prompt_ports if p.get("direction") == "output"]
+    top["must_not_drive"] = list(top["must_receive"])
+    spec_json["top_level_connections"] = [
+        conn for conn in (spec_json.get("top_level_connections") or [])
+        if isinstance(conn, dict) and conn.get("top_port") in prompt_names
+    ]
+    return spec_json
+
+
 def _merge_prompt_memory_macros(spec_json: dict, prompt_text: str) -> dict:
     if not isinstance(spec_json, dict) or spec_json.get("memory_macros"):
         return spec_json
@@ -268,6 +378,10 @@ def _normalize_spec_json(spec_json: dict):
         hier = spec_json["hierarchy"]
         top = hier.get("top_module")
         modules = hier.get("modules", [])
+        if not modules and isinstance(hier.get("submodules"), list):
+            modules = hier.get("submodules", [])
+        if not modules and isinstance(spec_json.get("modules"), list):
+            modules = spec_json.get("modules", [])
         if not modules and isinstance(spec_json.get("hierarchical_modules"), list):
             modules = spec_json.get("hierarchical_modules", [])
 
@@ -745,13 +859,51 @@ def _parse_llm_json_object(llm_output: str) -> dict:
     try:
         parsed = json.loads(candidate)
     except JSONDecodeError as exc:
-        repaired = _repair_json_if_truncated_at_eof(candidate, exc)
+        repaired = _repair_json_syntax_near_error(candidate, exc)
+        if repaired == candidate:
+            repaired = _repair_json_if_truncated_at_eof(candidate, exc)
         if repaired == candidate:
             raise
         parsed = json.loads(repaired)
     if not isinstance(parsed, dict):
         raise ValueError("Spec JSON root must be an object.")
     return parsed
+
+
+def _try_parse_after_eof_repair(candidate: str) -> str | None:
+    try:
+        json.loads(candidate)
+        return candidate
+    except JSONDecodeError as exc:
+        repaired = _repair_json_if_truncated_at_eof(candidate, exc)
+        if repaired == candidate:
+            return None
+        try:
+            json.loads(repaired)
+            return repaired
+        except JSONDecodeError:
+            return None
+
+
+def _repair_json_syntax_near_error(candidate: str, exc: JSONDecodeError) -> str:
+    text = (candidate or "").strip()
+    if not text:
+        return candidate
+
+    positions = [exc.pos, exc.pos - 1, exc.pos + 1]
+    replacements = {"]": "}", "}": "]"}
+    for pos in positions:
+        if pos < 0 or pos >= len(text):
+            continue
+        ch = text[pos]
+        replacement = replacements.get(ch)
+        if not replacement:
+            continue
+        probe = text[:pos] + replacement + text[pos + 1:]
+        parsed = _try_parse_after_eof_repair(probe)
+        if parsed is not None:
+            return parsed
+    return candidate
 
 
 def _repair_json_if_truncated_at_eof(candidate: str, exc: JSONDecodeError) -> str:
@@ -1260,6 +1412,7 @@ def _compile_spec_contract(
     spec_json, mode = _normalize_spec_json(parsed_json)
     logger.info(f"🔍 Digital Spec Agent normalized mode={mode} suffix='{suffix or 'pass1'}'")
     spec_json = _apply_requested_top_module(spec_json, mode, requested_top)
+    spec_json = _repair_empty_top_ports_from_prompt(spec_json, mode, source_prompt)
     if requested_top:
         logger.info(
             "Digital Spec Agent enforced requested top_module=%s suffix='%s'",
@@ -1273,6 +1426,7 @@ def _compile_spec_contract(
         spec_json = _ensure_hierarchical_port_closure(spec_json)
         spec_json = _reconcile_hierarchical_signal_directions(spec_json, mode)
         spec_json = _sanitize_hierarchical_connectivity(spec_json)
+        spec_json = _enforce_prompt_top_ports_after_hierarchy_repair(spec_json, mode, source_prompt)
         logger.info(f"🔍 Digital Spec Agent hierarchical port closure done suffix='{suffix or 'pass1'}'")
 
    
