@@ -3,6 +3,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 os.environ.setdefault("SUPABASE_URL", "https://example.supabase.co")
 os.environ.setdefault("SUPABASE_SERVICE_ROLE_KEY", "test-service-role-key")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -355,3 +357,143 @@ def test_requested_top_module_overrides_mmio_suffix_in_hierarchical_spec():
     assert out["top_level_connections"][0]["connected_to"] == ["pwm_controller.clk"]
     assert out["inter_module_signals"][0]["source"] == "pwm_controller.tick"
     assert out["signal_ownership"][0]["owner"] == "pwm_controller.tick"
+
+
+def test_parse_prefers_nested_hierarchy_object_over_flat_child_module():
+    raw = """
+prefix text
+{
+  "top_module": {
+    "name": "sram_mbist_demo_controller",
+    "ports": [{"name": "clk", "direction": "input", "width": 1}],
+    "rtl_output_file": "sram_mbist_demo_controller.v"
+  },
+  "modules": [
+    {
+      "name": "demo_sram_32x256_model",
+      "ports": [{"name": "dout", "direction": "output", "width": 32}],
+      "rtl_output_file": "demo_sram_32x256_model.v"
+    }
+  ],
+  "top_level_connections": [{"top_port": "clk", "connected_to": ["sram_mbist_demo_controller.clk"]}],
+  "inter_module_signals": [],
+  "signal_ownership": []
+}
+{
+  "name": "demo_sram_32x256_model",
+  "ports": [{"name": "dout", "direction": "output", "width": 32}],
+  "rtl_output_file": "demo_sram_32x256_model.v"
+}
+"""
+
+    parsed = spec_agent._parse_llm_json_object(raw)
+
+    assert "hierarchy" in parsed
+    assert parsed["hierarchy"]["top_module"]["name"] == "sram_mbist_demo_controller"
+    assert parsed["hierarchy"]["modules"][0]["name"] == "demo_sram_32x256_model"
+
+
+def test_requested_top_rejects_flat_memory_interface_contract(tmp_path):
+    llm_output = json.dumps(
+        {
+            "name": "demo_sram_32x256_wrapper",
+            "description": "Synthesizable fallback memory model with macro-facing wrapper interface.",
+            "memory_macros": [
+                {
+                    "name": "sky130_sram_1kbyte_1rw1r_32x256_8",
+                    "depth": 256,
+                    "data_width": 32,
+                    "addr_width": 8,
+                    "requires_mbist": True,
+                    "ports": {
+                        "clk": "clk",
+                        "csb": "csb",
+                        "we": "web",
+                        "addr": "addr",
+                        "din": "din",
+                        "dout": "dout",
+                    },
+                }
+            ],
+            "ports": [
+                _port("clk", "input"),
+                _port("csb", "input"),
+                _port("web", "input"),
+                _port("addr", "input", 8),
+                _port("din", "input", 32),
+                _port("dout", "output", 32),
+            ],
+            "functionality": "SRAM wrapper fallback model.",
+            "responsibilities": [],
+            "must_drive": ["dout"],
+            "must_receive": ["clk", "csb", "web", "addr", "din"],
+            "must_not_drive": ["clk", "csb", "web", "addr", "din"],
+            "reset_behavior": "",
+            "behavior_rules": [],
+            "rtl_output_file": "demo_sram_32x256_wrapper.v",
+        }
+    )
+
+    with pytest.raises(ValueError, match="memory macro interface contract"):
+        spec_agent._compile_spec_contract(
+            llm_output,
+            str(tmp_path),
+            requested_top="sram_mbist_demo_controller",
+        )
+
+
+def test_normalize_accepts_hierarchical_modules_alias_and_preserves_top_dirs():
+    spec = {
+        "design_name": "sram_mbist_demo_controller",
+        "hierarchy": {
+            "top_module": {
+                "name": "sram_mbist_demo_controller",
+                "rtl_output_file": "sram_mbist_demo_controller.v",
+                "ports": [
+                    {"name": "clk", "direction": "input", "width": 1},
+                    {"name": "rd_data", "direction": "output", "width": 32},
+                ],
+            }
+        },
+        "hierarchical_modules": [
+            {
+                "name": "demo_sram_32x256_wrapper",
+                "rtl_output_file": "demo_sram_32x256_wrapper.v",
+                "ports": [
+                    {"name": "clk", "direction": "input", "width": 1},
+                    {"name": "dout", "direction": "output", "width": 32},
+                ],
+            }
+        ],
+        "inter_module_signals": [
+            {
+                "name": "sram_clk",
+                "width": 1,
+                "source": "sram_mbist_demo_controller.clk",
+                "destinations": ["demo_sram_32x256_wrapper.clk"],
+            },
+            {
+                "name": "sram_dout",
+                "width": 32,
+                "source": "demo_sram_32x256_wrapper.dout",
+                "destinations": ["sram_mbist_demo_controller.rd_data"],
+            },
+        ],
+        "signal_ownership": [
+            {"signal": "sram_clk", "owner": "sram_mbist_demo_controller.clk"},
+            {"signal": "sram_dout", "owner": "demo_sram_32x256_wrapper.dout"},
+        ],
+        "top_level_connections": [
+            {"top_port": "clk", "connected_to": ["sram_mbist_demo_controller.clk"]},
+            {"top_port": "rd_data", "connected_to": ["sram_mbist_demo_controller.rd_data"]},
+        ],
+    }
+
+    norm, mode = spec_agent._normalize_spec_json(spec)
+    norm = spec_agent._reconcile_hierarchical_signal_directions(norm, mode)
+
+    assert [m["name"] for m in norm["hierarchy"]["modules"]] == ["demo_sram_32x256_wrapper"]
+    top_ports = {p["name"]: p["direction"] for p in norm["hierarchy"]["top_module"]["ports"]}
+    assert top_ports["clk"] == "input"
+    assert top_ports["rd_data"] == "output"
+    spec_agent._validate_spec_contract(norm, mode)

@@ -32,6 +32,47 @@ endmodule
     assert "rd_data = 8'h00" not in top_code
 
 
+def test_align_preserves_same_file_helper_modules_needed_by_top():
+    code = """
+module sky130_sram_1kbyte_1rw1r_32x256_8(
+  input clk,
+  input csb,
+  input web,
+  input [7:0] addr,
+  input [31:0] din,
+  output reg [31:0] dout
+);
+endmodule
+
+module sram_mbist_demo_controller(input clk);
+  wire [31:0] dout;
+  sky130_sram_1kbyte_1rw1r_32x256_8 u_sram(
+    .clk(clk),
+    .csb(1'b0),
+    .web(1'b1),
+    .addr(8'h00),
+    .din(32'h0),
+    .dout(dout)
+  );
+endmodule
+"""
+    spec = {
+        "hierarchy": {
+            "top_module": {
+                "name": "sram_mbist_demo_controller",
+                "rtl_output_file": "sram_mbist_demo_controller.v",
+            },
+            "modules": [],
+        }
+    }
+
+    out = agent._align_verilog_map_to_expected_modules({"sram_mbist_demo_controller.v": code}, spec, "hierarchical")
+    text = out["sram_mbist_demo_controller.v"]
+
+    assert "module sky130_sram_1kbyte_1rw1r_32x256_8" in text
+    assert "module sram_mbist_demo_controller" in text
+
+
 def test_module_procedural_assignment_check_ignores_continuous_wiring():
     continuous_top = """
 module temp_monitor_digital(output [7:0] rd_data);
@@ -100,3 +141,76 @@ def test_verilator_lint_preserves_pass2_relative_subdir(tmp_path, monkeypatch):
     assert captured["cwd"] == str(rtl_dir)
     assert "pass2/temp_monitor_digital.v" in captured["args"]
     assert "temp_monitor_digital.v" not in captured["args"][-1:]
+
+
+def test_sanitize_child_output_does_not_drive_parent_input():
+    code = """
+module top(
+  input [31:0] mem_dout,
+  input clk
+);
+  wire csb;
+  wire web;
+  wire [7:0] addr;
+  wire [31:0] din;
+  demo_sram_32x256_wrapper u_sram (
+    .clk(clk),
+    .csb(csb),
+    .web(web),
+    .addr(addr),
+    .din(din),
+    .dout(mem_dout)
+  );
+endmodule
+
+module demo_sram_32x256_wrapper(
+  input clk,
+  input csb,
+  input web,
+  input [7:0] addr,
+  input [31:0] din,
+  output [31:0] dout
+);
+endmodule
+"""
+
+    out = agent._sanitize_child_output_instance_connections({"top.v": code})["top.v"]
+
+    assert "wire [31:0] mem_dout_from_u_sram;" in out
+    assert ".dout(mem_dout_from_u_sram)" in out
+    assert ".dout(mem_dout)" not in out
+
+
+def test_sanitize_child_output_resizes_unused_placeholder_wire():
+    code = """
+module top(input clk);
+  wire csb;
+  wire web;
+  wire [7:0] addr;
+  wire [31:0] din;
+  wire mem_dout_unused;
+  demo_sram_32x256_wrapper u_sram (
+    .clk(clk),
+    .csb(csb),
+    .web(web),
+    .addr(addr),
+    .din(din),
+    .dout(mem_dout_unused)
+  );
+endmodule
+
+module demo_sram_32x256_wrapper(
+  input clk,
+  input csb,
+  input web,
+  input [7:0] addr,
+  input [31:0] din,
+  output [31:0] dout
+);
+endmodule
+"""
+
+    out = agent._sanitize_child_output_instance_connections({"top.v": code})["top.v"]
+
+    assert "wire [31:0] mem_dout_unused;" in out
+    assert ".dout(mem_dout_unused)" in out

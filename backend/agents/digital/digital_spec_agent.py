@@ -187,6 +187,34 @@ def _apply_requested_top_module(spec_json: dict, mode: str, requested_top: str) 
     return spec_json
 
 
+def _flat_spec_is_memory_macro_interface(spec_json: dict) -> bool:
+    macros = spec_json.get("memory_macros") if isinstance(spec_json.get("memory_macros"), list) else []
+    ports = spec_json.get("ports") if isinstance(spec_json.get("ports"), list) else []
+    if len(macros) != 1 or not ports:
+        return False
+    macro_ports = macros[0].get("ports") if isinstance(macros[0], dict) and isinstance(macros[0].get("ports"), dict) else {}
+    if not macro_ports:
+        return False
+    spec_port_names = {str(port.get("name") or "").strip() for port in ports if isinstance(port, dict)}
+    macro_port_names = {str(name or "").strip() for name in macro_ports.values()}
+    if not spec_port_names or spec_port_names != macro_port_names:
+        return False
+    text = " ".join(str(spec_json.get(key) or "").lower() for key in ("description", "functionality"))
+    return bool(re.search(r"\b(memory|sram|macro|fallback|wrapper)\b", text))
+
+
+def _reject_requested_top_memory_interface(spec_json: dict, mode: str, requested_top: str) -> None:
+    if not requested_top or mode != "flat":
+        return
+    if str(spec_json.get("name") or "").strip() != requested_top:
+        return
+    if _flat_spec_is_memory_macro_interface(spec_json):
+        raise ValueError(
+            f"Requested top_module '{requested_top}' resolved to a memory macro interface contract. "
+            "Generate the requested controller/top-level module as the top spec and keep SRAM macros as child instances."
+        )
+
+
 def _is_truncated_model_response(exc: Exception) -> bool:
     msg = str(exc).lower()
     return "truncated" in msg and "max_completion_tokens" in msg
@@ -240,6 +268,8 @@ def _normalize_spec_json(spec_json: dict):
         hier = spec_json["hierarchy"]
         top = hier.get("top_module")
         modules = hier.get("modules", [])
+        if not modules and isinstance(spec_json.get("hierarchical_modules"), list):
+            modules = spec_json.get("hierarchical_modules", [])
 
         if not isinstance(top, dict):
             raise ValueError("hierarchy.top_module must be an object.")
@@ -498,7 +528,7 @@ def _validate_hierarchical_endpoint_coverage(spec_json: dict) -> None:
         if smod != top_name and sport not in module_ports[smod]:
             raise ValueError(f"inter_module_signals[{i}] source port '{smod}.{sport}' is not present in module ports.")
         src_dir = (module_dirs.get(smod) or {}).get(sport)
-        if src_dir and src_dir not in {"output", "inout"}:
+        if smod != top_name and src_dir and src_dir not in {"output", "inout"}:
             raise ValueError(
                 f"inter_module_signals[{i}] source port '{smod}.{sport}' must be output/inout, got '{src_dir}'."
             )
@@ -512,7 +542,7 @@ def _validate_hierarchical_endpoint_coverage(spec_json: dict) -> None:
             if dmod != top_name and dport not in module_ports[dmod]:
                 raise ValueError(f"inter_module_signals[{i}] destination port '{dmod}.{dport}' is not present in module ports.")
             dst_dir = (module_dirs.get(dmod) or {}).get(dport)
-            if dst_dir and dst_dir not in {"input", "inout"}:
+            if dmod != top_name and dst_dir and dst_dir not in {"input", "inout"}:
                 raise ValueError(
                     f"inter_module_signals[{i}] destination port '{dmod}.{dport}' must be input/inout, got '{dst_dir}'."
                 )
@@ -527,7 +557,7 @@ def _validate_hierarchical_endpoint_coverage(spec_json: dict) -> None:
         if omod != top_name and oport not in module_ports[omod]:
             raise ValueError(f"signal_ownership[{i}] owner port '{omod}.{oport}' is not present in module ports.")
         owner_dir = (module_dirs.get(omod) or {}).get(oport)
-        if owner_dir and owner_dir not in {"output", "inout"}:
+        if omod != top_name and owner_dir and owner_dir not in {"output", "inout"}:
             raise ValueError(
                 f"signal_ownership[{i}] owner port '{omod}.{oport}' must be output/inout, got '{owner_dir}'."
             )
@@ -678,6 +708,26 @@ def _parse_llm_json_object(llm_output: str) -> dict:
             continue
         if isinstance(parsed_item, dict) and parsed_item.get("hierarchy"):
             hierarchical_candidates.append(parsed_item)
+            continue
+        if isinstance(parsed_item, dict) and isinstance(parsed_item.get("top_module"), dict) and isinstance(parsed_item.get("modules"), list):
+            hierarchical_candidates.append({
+                "design_name": parsed_item.get("design_name") or parsed_item["top_module"].get("name"),
+                "design_summary": parsed_item.get("design_summary", ""),
+                "operating_constraints": parsed_item.get("operating_constraints", {}),
+                "implementation_requirements": parsed_item.get("implementation_requirements", []),
+                "verification_requirements": parsed_item.get("verification_requirements", []),
+                "memory_macros": parsed_item.get("memory_macros", []),
+                "hierarchy": {
+                    "top_module": parsed_item["top_module"],
+                    "modules": parsed_item.get("modules", []),
+                },
+                "top_level_connections": parsed_item.get("top_level_connections", []),
+                "inter_module_signals": parsed_item.get("inter_module_signals", []),
+                "signal_ownership": parsed_item.get("signal_ownership", []),
+                "register_contract": parsed_item.get("register_contract", {}),
+                "verification": parsed_item.get("verification", {}),
+                "implementation_notes": parsed_item.get("implementation_notes", {}),
+            })
             continue
         is_flat_spec = parsed_item.get("name") and (
             "functionality" in parsed_item
@@ -950,7 +1000,14 @@ def _reconcile_hierarchical_signal_directions(spec_json: dict, mode: str) -> dic
     if mode != "hierarchical":
         return spec_json
     hier = spec_json.get("hierarchy") or {}
-    modules = [hier.get("top_module") or {}] + list(hier.get("modules") or [])
+    top_module = hier.get("top_module") or {}
+    top_name = str(top_module.get("name") or "").strip()
+    top_port_dirs = {
+        str(port.get("name") or "").strip(): str(port.get("direction") or "").strip().lower()
+        for port in (top_module.get("ports") or [])
+        if isinstance(port, dict) and str(port.get("name") or "").strip()
+    }
+    modules = [top_module] + list(hier.get("modules") or [])
     module_map = {
         str(module.get("name") or "").strip(): module
         for module in modules
@@ -961,6 +1018,8 @@ def _reconcile_hierarchical_signal_directions(spec_json: dict, mode: str) -> dic
     def mark(endpoint: str, direction: str) -> None:
         module_name, port_name = _normalize_endpoint_port(endpoint)
         if module_name in module_map and port_name:
+            if module_name == top_name and top_port_dirs.get(port_name) in {"input", "output", "inout"}:
+                return
             key = (module_name, port_name)
             if direction == "output" or key not in desired:
                 desired[key] = direction
@@ -1207,6 +1266,7 @@ def _compile_spec_contract(
             requested_top,
             suffix or "pass1",
         )
+    _reject_requested_top_memory_interface(spec_json, mode, requested_top)
 
     if mode == "hierarchical":
         spec_json = _ensure_hierarchical_top_level_connections(spec_json)
@@ -1513,8 +1573,9 @@ RULES
 - Preserve exact signal ownership.
 - Preserve exact internal interface contracts.
 - Preserve exact fixed clock frequency if the user specifies it.
-- If the user asks for SRAM/OpenRAM/MBIST/memory macro behavior, include memory_macros[] with exact OpenRAM SRAM requirements.
+- If the user asks for SRAM/OpenRAM/prebuilt SRAM/MBIST/memory macro behavior, include memory_macros[] with exact SRAM macro requirements.
 - memory_macros[].name must be the SRAM macro module/cell name the RTL should instantiate.
+- memory_macros[].kind must distinguish intent, for example openram_sram for generated OpenRAM or prebuilt_sky130_sram/prebuilt_sram for explicit existing macro collateral.
 - memory_macros[].depth, data_width, and addr_width must match the requested memory capacity.
 - memory_macros[].ports must map canonical roles clk, csb, we, addr, din, dout to real RTL port names.
 - If MBIST is requested or likely required, set memory_macros[].requires_mbist true; otherwise false.

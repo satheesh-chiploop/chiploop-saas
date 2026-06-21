@@ -251,6 +251,29 @@ def _module_code_for_name(code: str, module_name: str) -> str:
     return modules.get(module_name, code or "")
 
 
+def _module_code_with_local_dependencies(code: str, module_name: str) -> str:
+    modules = _extract_verilog_modules(code)
+    if module_name not in modules:
+        return code or ""
+    selected: List[str] = []
+    seen: set[str] = set()
+
+    def visit(name: str) -> None:
+        if name in seen or name not in modules:
+            return
+        seen.add(name)
+        body = modules[name]
+        for candidate in modules:
+            if candidate == name:
+                continue
+            if re.search(rf"\b{re.escape(candidate)}\s*(?:#\s*\([^;]*?\)\s*)?[A-Za-z_][A-Za-z0-9_$]*\s*\(", body):
+                visit(candidate)
+        selected.append(body)
+
+    visit(module_name)
+    return "\n\n".join(selected)
+
+
 def _has_structural_width_warnings(tool_output: str) -> bool:
     text = tool_output or ""
     patterns = (
@@ -291,7 +314,11 @@ def _align_verilog_map_to_expected_modules(verilog_map: Dict[str, str], spec_jso
         extracted_by_module.update(_extract_verilog_modules(code))
 
     for module_name, rtl_file in module_to_file.items():
-        module_code = extracted_by_module.get(module_name)
+        module_code = None
+        for code in verilog_map.values():
+            if module_name in _extract_verilog_modules(code):
+                module_code = _module_code_with_local_dependencies(code, module_name)
+                break
         if module_code:
             aligned[rtl_file] = module_code
 
@@ -428,6 +455,173 @@ def _declared_input_ports(code: str) -> List[str]:
             if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_$]*", name or ""):
                 ports.append(name)
     return list(dict.fromkeys(ports))
+
+
+def _declared_ports(code: str) -> Dict[str, dict]:
+    ports: Dict[str, dict] = {}
+    header = re.search(
+        r"\bmodule\s+[A-Za-z_][A-Za-z0-9_$]*\s*(?:#\s*\([^;]*?\)\s*)?\((?P<ports>.*?)\)\s*;",
+        code or "",
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+    if header:
+        current_direction = ""
+        current_range = ""
+        for raw in header.group("ports").split(","):
+            item = raw.strip()
+            direction = re.search(r"\b(input|output|inout)\b", item, flags=re.IGNORECASE)
+            if direction:
+                current_direction = direction.group(1).lower()
+            range_match = re.search(r"\[[^\]]+\]", item)
+            if range_match:
+                current_range = range_match.group(0)
+            item = re.sub(r"\b(input|output|inout|wire|reg|signed)\b", " ", item, flags=re.IGNORECASE)
+            item = re.sub(r"\[[^\]]+\]", " ", item)
+            names = re.findall(r"\b[A-Za-z_][A-Za-z0-9_$]*\b", item)
+            if names and current_direction:
+                ports[names[-1]] = {"direction": current_direction, "width": _range_width(current_range)}
+    for decl in re.finditer(
+        r"^\s*(input|output|inout)\b\s*(?:wire\s*|reg\s*)?(?:signed\s*)?(?P<range>\[[^\]]+\]\s*)?(?P<names>[^;]+);",
+        code or "",
+        flags=re.MULTILINE,
+    ):
+        direction = decl.group(1)
+        width = _range_width(decl.group("range"))
+        for raw in decl.group("names").split(","):
+            name = re.sub(r"=.*", "", raw)
+            name = re.sub(r"\[[^\]]+\]", "", name).strip()
+            if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_$]*", name or ""):
+                ports[name] = {"direction": direction, "width": width}
+    return ports
+
+
+def _declared_signal_widths(code: str) -> Dict[str, int]:
+    widths: Dict[str, int] = {name: int(info.get("width") or 1) for name, info in _declared_ports(code).items()}
+    for decl in re.finditer(
+        r"^\s*(?:input|output|inout|wire|reg)\b\s*(?:wire\s*|reg\s*)?(?:signed\s*)?(?P<range>\[[^\]]+\]\s*)?(?P<names>[^;]+);",
+        code or "",
+        flags=re.MULTILINE,
+    ):
+        width = _range_width(decl.group("range"))
+        for raw in decl.group("names").split(","):
+            name = re.sub(r"=.*", "", raw)
+            name = re.sub(r"\[[^\]]+\]", "", name).strip()
+            if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_$]*", name or ""):
+                widths[name] = width
+    return widths
+
+
+def _wire_decl(name: str, width: int) -> str:
+    return f"wire [{width - 1}:0] {name};" if width > 1 else f"wire {name};"
+
+
+def _replace_or_insert_wire_decl(code: str, name: str, width: int) -> str:
+    decl = _wire_decl(name, width)
+    wire_pat = re.compile(
+        rf"^\s*wire\b\s*(?:signed\s*)?(?:\[[^\]]+\]\s*)?{re.escape(name)}\s*;\s*$",
+        flags=re.MULTILINE,
+    )
+    if wire_pat.search(code):
+        return wire_pat.sub(decl, code, count=1)
+    declared_pat = re.compile(
+        rf"^\s*(?:input|output|inout|reg)\b[^;]*\b{re.escape(name)}\b[^;]*;\s*$",
+        flags=re.MULTILINE,
+    )
+    if declared_pat.search(code):
+        return code
+    insert_at = 0
+    header = re.search(r"\)\s*;", code)
+    if header:
+        insert_at = header.end()
+        for match in re.finditer(
+            r"^\s*(?:input|output|inout|wire|reg)\b[^;]*;\s*$",
+            code,
+            flags=re.MULTILINE,
+        ):
+            if match.start() >= header.end():
+                insert_at = match.end()
+    return code[:insert_at] + "\n" + decl + code[insert_at:]
+
+
+def _named_instance_connections(conn_text: str) -> Dict[str, str]:
+    conns: Dict[str, str] = {}
+    for match in re.finditer(r"\.(?P<port>[A-Za-z_][A-Za-z0-9_$]*)\s*\(\s*(?P<sig>[^()]+?)\s*\)", conn_text):
+        sig = match.group("sig").strip()
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_$]*(?:\[[^\]]+\])?", sig):
+            conns[match.group("port")] = sig
+    return conns
+
+
+def _sanitize_child_output_instance_connections(verilog_map: Dict[str, str]) -> Dict[str, str]:
+    module_defs: Dict[str, dict] = {}
+    for code in verilog_map.values():
+        for match in re.finditer(
+            r"\bmodule\s+(?P<name>[A-Za-z_][A-Za-z0-9_$]*)\b(?P<body>.*?)(?=\bendmodule\b)",
+            code or "",
+            flags=re.DOTALL,
+        ):
+            module_defs[match.group("name")] = {
+                "ports": _declared_ports(match.group(0)),
+            }
+
+    if not module_defs:
+        return verilog_map
+
+    out: Dict[str, str] = {}
+    child_names = sorted((re.escape(name) for name in module_defs), key=len, reverse=True)
+    inst_re = re.compile(
+        rf"\b(?P<cell>{'|'.join(child_names)})\s*(?:#\s*\([^;]*?\)\s*)?"
+        r"(?P<inst>[A-Za-z_][A-Za-z0-9_$]*)\s*\((?P<conns>.*?)\)\s*;",
+        flags=re.DOTALL,
+    )
+
+    for fname, code in verilog_map.items():
+        text = code or ""
+        parent_ports = _declared_ports(text)
+        signal_widths = _declared_signal_widths(text)
+        wire_updates: Dict[str, int] = {}
+
+        def repl(match: re.Match) -> str:
+            cell = match.group("cell")
+            inst = match.group("inst")
+            child_ports = module_defs.get(cell, {}).get("ports", {})
+            conns = _named_instance_connections(match.group("conns"))
+            if not conns:
+                return match.group(0)
+            conn_text = match.group("conns")
+            changed = False
+            for port, sig_expr in conns.items():
+                sig = re.sub(r"\[[^\]]+\]", "", sig_expr).strip()
+                child = child_ports.get(port)
+                if not child or child.get("direction") not in {"output", "inout"}:
+                    continue
+                child_width = int(child.get("width") or 1)
+                parent_info = parent_ports.get(sig)
+                sig_width = int(signal_widths.get(sig, 1))
+                if parent_info and parent_info.get("direction") == "input":
+                    new_sig = f"{sig}_from_{inst}"
+                    wire_updates[new_sig] = child_width
+                elif sig_width != child_width and sig.endswith("_unused"):
+                    new_sig = sig
+                    wire_updates[new_sig] = child_width
+                else:
+                    continue
+                conn_text = re.sub(
+                    rf"(\.{re.escape(port)}\s*\(\s*){re.escape(sig_expr)}(\s*\))",
+                    rf"\1{new_sig}\2",
+                    conn_text,
+                    count=1,
+                )
+                changed = True
+            if not changed:
+                return match.group(0)
+            return f"{cell} {inst} ({conn_text});"
+
+        text = inst_re.sub(repl, text)
+        for wire, width in sorted(wire_updates.items()):
+            text = _replace_or_insert_wire_decl(text, wire, width)
+        out[fname] = text
+    return out
 
 
 def _expected_top_port_names(spec_json: dict, mode: str) -> set:
@@ -1107,7 +1301,7 @@ Every combinational always @(*) block must:
 SCALE AND COMPLETENESS RULES
 - If the spec requests a rough flip-flop/register-bit target, FIFO depth, line-buffer storage, histogram counters, DMA buffers, packet buffers, shifters, or multiple pipeline stages, implement those as real Verilog storage and real sequential logic.
 - Do not satisfy a complex design by registering only outputs or by emitting a shell with comments.
-- If DIGITAL_SPEC_JSON contains memory_macros[] with kind openram_sram, instantiate the named SRAM macro cell exactly once per required instance. Do not implement that OpenRAM SRAM as a local reg array.
+- If DIGITAL_SPEC_JSON contains memory_macros[] with kind openram_sram, prebuilt_sky130_sram, prebuilt_sram, or precompiled_sram_macro, instantiate the named SRAM macro cell exactly once per required instance. Do not implement that SRAM macro as a local reg array.
 - The SRAM instance module name must match memory_macros[].name, and the instance name should match memory_macros[].instance_name when provided.
 - Connect SRAM ports using memory_macros[].ports canonical roles: clk, csb, we/web, addr, din, dout.
 - The address width, data width, and depth implied by the RTL connections must match memory_macros[].addr_width, memory_macros[].data_width, and memory_macros[].depth.
@@ -1887,6 +2081,7 @@ def _validate_and_materialize_rtl(
     verilog_map = _align_verilog_map_to_expected_modules(verilog_map, spec_json, mode)
     verilog_map = _sanitize_single_driver_rtl(verilog_map)
     verilog_map = _remove_spec_invalid_extra_control_inputs(verilog_map, spec_json, mode)
+    verilog_map = _sanitize_child_output_instance_connections(verilog_map)
     artifact_list = []
 
     materialize_dir = rtl_dir if not materialize_subdir else os.path.join(rtl_dir, materialize_subdir)
