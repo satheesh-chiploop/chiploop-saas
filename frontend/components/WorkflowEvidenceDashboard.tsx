@@ -384,6 +384,15 @@ function Bar({ label, value, total, color }: { label: string; value: number; tot
   );
 }
 
+function MiniMetric({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="min-w-0 rounded-md border border-slate-800 bg-slate-950/50 px-3 py-2">
+      <div className="truncate text-[11px] uppercase text-slate-500">{label}</div>
+      <div className="mt-1 text-sm font-semibold text-slate-100">{value}</div>
+    </div>
+  );
+}
+
 function ClosureTrend({ title, chart, metrics }: { title: string; chart: JsonMap; metrics: Array<{ key: string; label: string }> }) {
   const series = array(chart.series).map(record);
   if (!series.length) return null;
@@ -572,44 +581,45 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const spec2rtlSummary = record(spec2rtl.summary);
         const mbistInsertion = record(evidence["mbist_rtl_insertion_summary.json"] || evidence["digital/mbist_rtl_insertion/mbist_rtl_insertion_summary.json"]);
         const mbistLint = record(evidence["mbist_integrated_rtl_lint.json"] || evidence["digital/mbist_rtl_insertion/mbist_integrated_rtl_lint.json"] || mbistInsertion.integrated_rtl_lint);
+        const mbistSimulation = record(mbistInsertion.simulation);
         const mbistIverilog = record(mbistLint.iverilog);
         const mbistVerilator = record(mbistLint.verilator);
         const hasMbistInsertion = Object.keys(mbistInsertion).length > 0;
         const hasMbistLint = Object.keys(mbistLint).length > 0;
         const mbistLintPass = firstString(mbistIverilog.status) === "pass" && firstString(mbistVerilator.status) === "pass";
+        const mbistSimulationPass = firstString(mbistSimulation.status) === "pass";
         const hasSpec2Rtl = Object.keys(spec2rtl).length > 0;
         const hasUpf = Object.keys(upf).length > 0;
         const lintStatus = firstString(lint.status, "unavailable");
         return (
-          <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(280px,0.6fr)_minmax(0,1.4fr)]">
             <div className="space-y-3">
               <Bar label="Input bits" value={number(iface.input_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-cyan-500" />
               <Bar label="Output bits" value={number(iface.output_count)} total={Math.max(number(iface.input_count) + number(iface.output_count), 1)} color="bg-emerald-500" />
               <Bar label="Flip-flops" value={number(storage.flipflop_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-violet-500" />
               <Bar label="Latches" value={number(storage.latch_count)} total={Math.max(number(storage.flipflop_count) + number(storage.latch_count), 1)} color="bg-amber-500" />
+              <div className="grid grid-cols-2 gap-2 pt-2">
+                <MiniMetric label="Input Ports" value={number(iface.input_port_count)} />
+                <MiniMetric label="Output Ports" value={number(iface.output_port_count)} />
+                <MiniMetric label="RTL Files" value={number(dashboard.rtl_file_count)} />
+                <MiniMetric label="Modules" value={number(dashboard.module_count)} />
+                <MiniMetric label="Full-Cycle" value={number(timing.full_cycle_path_count)} />
+                <MiniMetric label="Half-Cycle" value={number(timing.half_cycle_path_count)} />
+              </div>
             </div>
-            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
               <Stat title="Lint" value={lintStatus} />
-              <Stat title="Flip-flops" value={number(storage.flipflop_count)} />
-              <Stat title="Latches" value={number(storage.latch_count)} />
-              <Stat title="Full-cycle Paths" value={number(timing.full_cycle_path_count)} />
-              <Stat title="Half-cycle Paths" value={number(timing.half_cycle_path_count)} />
-              <Stat title="Input Bits" value={number(iface.input_count)} />
-              <Stat title="Output Bits" value={number(iface.output_count)} />
-              <Stat title="Input Ports" value={number(iface.input_port_count)} />
-              <Stat title="Output Ports" value={number(iface.output_port_count)} />
               <Stat title="Clock" value={firstString(clockReset.primary_clock, "not inferred")} />
               <Stat title="Reset" value={firstString(clockReset.primary_reset, "not inferred")} />
               {hasUpf ? <Stat title="UPF Static" value={statusLabel(upf.status)} /> : null}
               {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
               {hasMbistInsertion ? <Stat title="MBIST RTL" value={statusLabel(mbistInsertion.status)} /> : null}
+              {hasMbistInsertion ? <Stat title="MBIST Standalone Sim" value={mbistSimulationPass ? "pass" : statusLabel(mbistSimulation.status)} /> : null}
               {hasMbistInsertion ? <Stat title="MBIST Algorithm" value={metricValue(mbistInsertion.algorithm)} /> : null}
               {hasMbistInsertion ? <Stat title="MBIST RAMs" value={metricValue(mbistInsertion.ram_count, mbistInsertion.memory_count)} /> : null}
               {hasMbistInsertion ? <Stat title="MBIST Controllers" value={metricValue(mbistInsertion.mbist_controller_count)} /> : null}
               {hasMbistInsertion ? <Stat title="MBIST Wrappers" value={metricValue(mbistInsertion.wrapper_module_count)} /> : null}
               {hasMbistLint ? <Stat title="MBIST RTL Lint" value={mbistLintPass ? "pass" : "fail"} /> : null}
-              <Stat title="Modules" value={number(dashboard.module_count)} />
-              <Stat title="RTL Files" value={number(dashboard.rtl_file_count)} />
               {hasSpec2Rtl ? <Stat title="Spec2RTL" value={statusLabel(spec2rtl.status)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Checked" value={metricValue(spec2rtlSummary.checked)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Matched" value={metricValue(spec2rtlSummary.matched)} /> : null}

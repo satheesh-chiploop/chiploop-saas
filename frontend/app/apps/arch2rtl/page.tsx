@@ -410,7 +410,7 @@ export default function Arch2RTLAppPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <div className="mx-auto max-w-[1600px] px-6 py-10">
         <div className="flex items-center justify-between">
           <button onClick={() => router.push("/apps")} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
             Back to Apps
@@ -614,7 +614,7 @@ export default function Arch2RTLAppPage() {
           </div>
 
           {workflowId ? (
-            <div className="mt-6 grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
+            <div className="mt-6 grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
               <div className="rounded-2xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
                 <div className="font-semibold text-slate-100">Run Status</div>
                 <div className="mt-2">
