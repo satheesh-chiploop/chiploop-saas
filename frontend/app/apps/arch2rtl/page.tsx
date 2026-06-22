@@ -50,7 +50,7 @@ const ARCH2RTL_ONBOARDING_DEFAULTS = {
   topModule: "pwm_controller",
   designLanguage: "systemverilog" as const,
   specText: ARCH2RTL_ONBOARDING_SPEC,
-  toggles: { genRegmap: true, genUpfLite: true, genPackaging: true, insertMbist: false },
+  toggles: { genRegmap: true, genUpfLite: true, genPackaging: true, insertMbist: false, mbistAlgorithm: "march-c" },
 };
 
 type WorkflowRow = {
@@ -118,6 +118,7 @@ export default function Arch2RTLAppPage() {
   const [genPackaging, setGenPackaging] = useState(true);
   const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
   const [insertMbist, setInsertMbist] = useState(false);
+  const [mbistAlgorithm, setMbistAlgorithm] = useState<"march-c" | "march-raw">("march-c");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const arch2rtlReady = useMemo(() => {
@@ -211,6 +212,7 @@ export default function Arch2RTLAppPage() {
           setGenRegmap(parsed.toggles?.genRegmap ?? true);
           setGenUpfLite(parsed.toggles?.genUpfLite ?? true);
           setGenPackaging(parsed.toggles?.genPackaging ?? true);
+          setMbistAlgorithm(parsed.toggles?.mbistAlgorithm === "march-raw" ? "march-raw" : "march-c");
           window.localStorage.removeItem(ARCH2RTL_HANDOFF_KEY);
           return;
         } catch {
@@ -254,6 +256,7 @@ export default function Arch2RTLAppPage() {
     setGenUpfLite(demo.toggles.genUpfLite);
     setGenPackaging(demo.toggles.genPackaging);
     setInsertMbist(demo.toggles.insertMbist ?? false);
+    setMbistAlgorithm(demo.toggles.mbistAlgorithm === "march-raw" ? "march-raw" : "march-c");
   }, [loading]);
 
   // Live workflow updates
@@ -334,6 +337,7 @@ export default function Arch2RTLAppPage() {
             gen_packaging: genPackaging,
             run_spec2rtl_check: runSpec2RtlCheck,
             insert_mbist: insertMbist,
+            mbist_algorithm: mbistAlgorithm,
           },
         }
       );
@@ -527,6 +531,22 @@ export default function Arch2RTLAppPage() {
                     </span>
                   </span>
                 </label>
+                {insertMbist ? (
+                  <label className="block text-sm text-slate-300">
+                    MBIST algorithm
+                    <select
+                      value={mbistAlgorithm}
+                      onChange={e => setMbistAlgorithm(e.target.value === "march-raw" ? "march-raw" : "march-c")}
+                      className="mt-1 w-full rounded-xl border border-slate-800 bg-black/30 px-4 py-2 text-slate-100"
+                    >
+                      <option value="march-c">March C</option>
+                      <option value="march-raw">March Raw</option>
+                    </select>
+                    <span className="mt-1 block text-xs text-slate-500">
+                      AutoMBIST default is March C. March Raw is available for raw March algorithm collateral.
+                    </span>
+                  </label>
+                ) : null}
               </div>
 
               <button

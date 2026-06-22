@@ -13,6 +13,14 @@ from tooling.runner import tool_path
 from utils.artifact_utils import save_text_artifact_and_record
 
 AGENT_NAME = "Digital MBIST RTL Insertion Agent"
+AUTOMBIST_ALGORITHMS = {"march-c", "march-raw"}
+
+
+def _mbist_algorithm(state: dict[str, Any]) -> str:
+    toggles = state.get("toggles") if isinstance(state.get("toggles"), dict) else {}
+    raw = toggles.get("mbist_algorithm") or state.get("mbist_algorithm") or "march-c"
+    normalized = str(raw).strip().lower().replace("_", "-")
+    return normalized if normalized in AUTOMBIST_ALGORITHMS else "march-c"
 
 
 def _ensure_dir(path: str) -> None:
@@ -562,7 +570,7 @@ def _merge_spec_memories_with_rtl_detection(spec_macros: list[dict[str, Any]], d
     used: set[int] = set()
     merged: list[dict[str, Any]] = []
     for spec in spec_macros:
-        match_idx: int | None = None
+        scored_matches: list[tuple[int, int]] = []
         for idx, det in enumerate(detected):
             if idx in used:
                 continue
@@ -585,8 +593,21 @@ def _merge_spec_memories_with_rtl_detection(spec_macros: list[dict[str, Any]], d
                 and int(det.get("depth") or 0) == int(spec.get("depth") or 0)
             )
             if same_cell or fallback_cell or same_shape_fallback or same_instance_shape:
-                match_idx = idx
-                break
+                parent = str(det.get("parent_module") or "").lower()
+                helper_parent = any(token in parent for token in ("wrapper", "model", "macro"))
+                score = 0
+                if same_instance_shape:
+                    score += 100
+                if same_inst:
+                    score += 50
+                if same_cell:
+                    score += 30
+                if fallback_cell or same_shape_fallback:
+                    score += 10
+                if parent and not helper_parent:
+                    score += 80
+                scored_matches.append((score, idx))
+        match_idx = max(scored_matches)[1] if scored_matches else None
         if match_idx is None:
             merged.append(dict(spec))
             continue
@@ -1537,8 +1558,55 @@ def _stage_behavioral_models_for_integrated_lint(memory_results: list[dict[str, 
         dst = os.path.join(final_rtl_dir, os.path.basename(model))
         if os.path.abspath(model) != os.path.abspath(dst):
             shutil.copy2(model, dst)
+        _sanitize_integrated_lint_copy(dst)
         staged.append(os.path.abspath(dst))
     return sorted(dict.fromkeys(staged))
+
+
+def _sanitize_integrated_lint_copy(path: str) -> None:
+    text = _read_text(path)
+    if not text:
+        return
+    sanitized = text.replace("%m", "scope")
+    if sanitized != text:
+        _write_text(path, sanitized)
+
+
+def _dedupe_functional_rtl_against_staged_models(
+    functional_rtl_files: list[str],
+    staged_model_files: list[str],
+) -> dict[str, Any]:
+    staged_modules: set[str] = set()
+    for path in staged_model_files:
+        for name, _body in _module_blocks(_read_text(path)):
+            staged_modules.add(name)
+    if not staged_modules:
+        return {"files": sorted(dict.fromkeys(functional_rtl_files)), "removed": []}
+
+    removed: list[dict[str, str]] = []
+    kept_files: list[str] = []
+    module_pattern = re.compile(
+        r"(?ms)^\s*module\s+(?P<name>[A-Za-z_][A-Za-z0-9_$]*)\b.*?\bendmodule\s*",
+        flags=re.IGNORECASE,
+    )
+    for path in sorted(dict.fromkeys(functional_rtl_files)):
+        text = _read_text(path)
+        if not text:
+            continue
+
+        def replace(match: re.Match[str]) -> str:
+            name = match.group("name")
+            if name in staged_modules:
+                removed.append({"file": os.path.abspath(path), "module": name})
+                return "\n"
+            return match.group(0)
+
+        updated = module_pattern.sub(replace, text)
+        if updated != text:
+            _write_text(path, updated)
+        if _module_blocks(updated):
+            kept_files.append(os.path.abspath(path))
+    return {"files": sorted(dict.fromkeys(kept_files)), "removed": removed}
 
 
 def _write_publish_summary(workflow_id: str, stage_dir: str, summary: dict[str, Any]) -> None:
@@ -1566,12 +1634,17 @@ def run_agent(state: dict) -> dict:
     memories = _merge_spec_memories_with_rtl_detection(spec_memory_macros, detected_memories)
     memory = memories[0] if memories else None
     autombist = tool_path("autombist", state)
+    algorithm = _mbist_algorithm(state)
 
     summary: dict[str, Any] = {
         "workflow_id": workflow_id,
         "agent": AGENT_NAME,
         "enabled": enabled,
         "status": "disabled" if not enabled else "not_started",
+        "algorithm": algorithm,
+        "supported_algorithms": sorted(AUTOMBIST_ALGORITHMS),
+        "memory_count": len(memories),
+        "ram_count": len(memories),
         "detected_memory": memory,
         "detected_memories": memories,
         "detected_rtl_memories": detected_memories,
@@ -1691,7 +1764,7 @@ def run_agent(state: dict) -> dict:
 
         out_dir = os.path.join(memory_stage_dir, "autombist_out")
         rc_run, out_run = _run(
-            [autombist, "run", "--config", config_path, "--out", out_dir, "--test"],
+            [autombist, "run", "--config", config_path, "--out", out_dir, "--test", "--algo", algorithm],
             cwd=memory_stage_dir,
             timeout=900,
         )
@@ -1733,6 +1806,7 @@ def run_agent(state: dict) -> dict:
         memory_results.append(result)
 
     summary["memory_results"] = memory_results
+    summary["processed_memory_count"] = len(memory_results)
     failed = [item for item in memory_results if item.get("status") == "failed"]
     if failed:
         summary["status"] = "failed"
@@ -1781,13 +1855,18 @@ def run_agent(state: dict) -> dict:
         dst = os.path.join(final_rtl_dir, os.path.basename(src))
         if os.path.abspath(src) != os.path.abspath(dst):
             shutil.copy2(src, dst)
+        _sanitize_integrated_lint_copy(dst)
         copied_generated_rtl.append(os.path.abspath(dst))
     staged_behavioral_models = _stage_behavioral_models_for_integrated_lint(memory_results, final_rtl_dir)
+    functional_rtl_files = sorted(dict.fromkeys([
+        *glob.glob(os.path.join(original_rtl_dir, "*.v")),
+        *glob.glob(os.path.join(original_rtl_dir, "*.sv")),
+    ]))
+    deduped_functional_rtl = _dedupe_functional_rtl_against_staged_models(functional_rtl_files, staged_behavioral_models)
     final_files = sorted(dict.fromkeys([
         *copied_generated_rtl,
         *staged_behavioral_models,
-        *glob.glob(os.path.join(original_rtl_dir, "*.v")),
-        *glob.glob(os.path.join(original_rtl_dir, "*.sv")),
+        *deduped_functional_rtl.get("files", []),
     ]))
     integrated_lint = _run_integrated_rtl_lint(state, workflow_id, stage_dir, final_files)
     if integrated_lint.get("status") != "pass":
@@ -1797,22 +1876,30 @@ def run_agent(state: dict) -> dict:
             "integrated_rtl_lint": integrated_lint,
             "final_rtl_files": final_files,
             "staged_behavioral_models": staged_behavioral_models,
+            "deduped_functional_rtl": deduped_functional_rtl,
         })
         _write_publish_summary(workflow_id, stage_dir, summary)
         raise RuntimeError(f"MBIST RTL insertion failed: {summary['reason']}.")
     integration_status = "wrapper_replaced_memory_instance"
+    wrapper_modules = [item.get("wrapper_module") for item in integration_wrapper_items if item.get("wrapper_module")]
     summary.update({
         "status": "mbist_rtl_generated_and_simulated",
         "simulation": {"status": "pass", "memory_count": len(memories)},
+        "algorithm": algorithm,
+        "memory_count": len(memories),
+        "ram_count": len(memories),
+        "mbist_controller_count": len(integration_wrapper_items),
+        "wrapper_module_count": len(set(wrapper_modules)),
         "integration_status": integration_status,
         "integrated_rtl_lint": integrated_lint,
-        "wrapper_modules": [item.get("wrapper_module") for item in integration_wrapper_items],
+        "wrapper_modules": wrapper_modules,
         "integration_targets": integration_wrapper_items,
         "skipped_nested_integration_targets": skipped_nested_wrapper_items,
         "patched_sources": patched_sources,
         "integrated_rtl_dir": final_rtl_dir,
         "final_rtl_files": final_files,
         "staged_behavioral_models": staged_behavioral_models,
+        "deduped_functional_rtl": deduped_functional_rtl,
         "integration_note": (
             "AutoMBIST generated and simulated wrapper RTL for each detected OpenRAM/SRAM memory. The agent replaces detected instances when wrapper ports can be mapped; "
             "otherwise it fails later at synthesis rather than claiming a fake insertion."

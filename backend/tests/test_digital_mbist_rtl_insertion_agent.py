@@ -49,6 +49,12 @@ def test_mbist_rtl_insertion_enabled_without_openram_skips(tmp_path):
     assert summary["detected_memory"] is None
 
 
+def test_mbist_algorithm_defaults_and_normalizes():
+    assert agent._mbist_algorithm({"toggles": {}}) == "march-c"
+    assert agent._mbist_algorithm({"toggles": {"mbist_algorithm": "march_raw"}}) == "march-raw"
+    assert agent._mbist_algorithm({"toggles": {"mbist_algorithm": "invalid"}}) == "march-c"
+
+
 def test_detects_openram_instance_and_dimensions(tmp_path):
     rtl = tmp_path / "top.sv"
     rtl.write_text(
@@ -1115,6 +1121,49 @@ def test_selects_outer_functional_memory_instance_for_mbist_integration():
     assert selected == [items[1]]
 
 
+def test_merge_prefers_spec_named_outer_instance_over_same_cell_helper():
+    spec = {
+        "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+        "instance": "u_sram",
+        "addr_width": 8,
+        "data_width": 32,
+        "depth": 256,
+        "ports": {"clk": "clk", "csb": "csb", "we": "web", "addr": "addr", "din": "din", "dout": "dout"},
+    }
+    detected = [
+        {
+            "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+            "instance": "u_model",
+            "parent_module": "sky130_sram_1kbyte_1rw1r_32x256_8",
+            "addr_width": 8,
+            "data_width": 32,
+            "depth": 256,
+        },
+        {
+            "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+            "instance": "u_sram",
+            "parent_module": "demo_sram_32x256_wrapper",
+            "addr_width": 8,
+            "data_width": 32,
+            "depth": 256,
+        },
+        {
+            "cell": "demo_sram_32x256_wrapper",
+            "instance": "u_sram",
+            "parent_module": "sram_mbist_demo_controller",
+            "addr_width": 8,
+            "data_width": 32,
+            "depth": 256,
+        },
+    ]
+
+    merged = agent._merge_spec_memories_with_rtl_detection([spec], detected)
+
+    assert len(merged) == 1
+    assert merged[0]["rtl_cell"] == "demo_sram_32x256_wrapper"
+    assert merged[0]["parent_module"] == "sram_mbist_demo_controller"
+
+
 def test_detected_memory_records_parent_module(tmp_path):
     rtl = tmp_path / "top.sv"
     rtl.write_text(
@@ -1182,7 +1231,7 @@ def test_integrated_rtl_lint_fails_on_iverilog_width_warning(tmp_path, monkeypat
 
 def test_stages_prebuilt_behavioral_model_for_integrated_lint(tmp_path):
     model = tmp_path / "sky130_sram_1kbyte_1rw1r_32x256_8.v"
-    model.write_text("module sky130_sram_1kbyte_1rw1r_32x256_8; endmodule\n", encoding="utf-8")
+    model.write_text('module sky130_sram_1kbyte_1rw1r_32x256_8; initial $display("read %m"); endmodule\n', encoding="utf-8")
     final_rtl = tmp_path / "integrated_rtl"
 
     staged = agent._stage_behavioral_models_for_integrated_lint(
@@ -1191,7 +1240,54 @@ def test_stages_prebuilt_behavioral_model_for_integrated_lint(tmp_path):
     )
 
     assert staged == [str((final_rtl / model.name).resolve())]
-    assert (final_rtl / model.name).read_text(encoding="utf-8") == model.read_text(encoding="utf-8")
+    staged_text = (final_rtl / model.name).read_text(encoding="utf-8")
+    assert "%m" not in staged_text
+    assert "read scope" in staged_text
+    assert "%m" in model.read_text(encoding="utf-8")
+
+
+def test_sanitizes_generated_integrated_lint_copy_without_touching_source(tmp_path):
+    src = tmp_path / "input_demo_8x16_scn4m.v"
+    src.write_text('module input_demo_8x16_scn4m; initial $display("read %m"); endmodule\n', encoding="utf-8")
+    dst = tmp_path / "integrated" / src.name
+    dst.parent.mkdir()
+    dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+
+    agent._sanitize_integrated_lint_copy(str(dst))
+
+    assert "%m" not in dst.read_text(encoding="utf-8")
+    assert "read scope" in dst.read_text(encoding="utf-8")
+    assert "%m" in src.read_text(encoding="utf-8")
+
+
+def test_dedupes_embedded_sram_model_when_real_behavioral_model_is_staged(tmp_path):
+    functional = tmp_path / "functional_rtl"
+    functional.mkdir()
+    wrapper = functional / "demo_sram_32x256_wrapper.v"
+    wrapper.write_text(
+        """
+module sky130_sram_1kbyte_1rw1r_32x256_8(input clk,input csb,input web,input [7:0] addr,input [31:0] din,output [31:0] dout);
+endmodule
+
+module demo_sram_32x256_wrapper(input clk,input csb,input web,input [7:0] addr,input [31:0] din,output [31:0] dout);
+  sky130_sram_1kbyte_1rw1r_32x256_8 u_sram_macro(.clk(clk), .csb(csb), .web(web), .addr(addr), .din(din), .dout(dout));
+endmodule
+""",
+        encoding="utf-8",
+    )
+    model = tmp_path / "sky130_sram_1kbyte_1rw1r_32x256_8.v"
+    model.write_text(
+        "module sky130_sram_1kbyte_1rw1r_32x256_8(input clk0,input csb0,input web0,input [7:0] addr0,input [31:0] din0,output [31:0] dout0); endmodule\n",
+        encoding="utf-8",
+    )
+
+    result = agent._dedupe_functional_rtl_against_staged_models([str(wrapper)], [str(model)])
+    updated = wrapper.read_text(encoding="utf-8")
+
+    assert result["files"] == [str(wrapper.resolve())]
+    assert result["removed"] == [{"file": str(wrapper.resolve()), "module": "sky130_sram_1kbyte_1rw1r_32x256_8"}]
+    assert "module demo_sram_32x256_wrapper" in updated
+    assert updated.count("module sky130_sram_1kbyte_1rw1r_32x256_8") == 0
 
 
 def test_autombist_fault_text_does_not_make_successful_run_fail(tmp_path):

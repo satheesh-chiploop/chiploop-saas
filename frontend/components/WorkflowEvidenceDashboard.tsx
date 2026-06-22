@@ -431,8 +431,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     const files: Record<Stage, string[]> = {
       arch2rtl: [
         "arch2rtl_dashboard.json",
+        "digital/arch2rtl_dashboard.json",
         "digital_regmap.json",
         "upf_static_check.json",
+        "digital/upf/upf_static_check.json",
         "digital/mbist_rtl_insertion/mbist_rtl_insertion_summary.json",
         "digital/mbist_rtl_insertion/mbist_integrated_rtl_lint.json",
         "digital/spec2rtl/spec2rtl_conformance.json",
@@ -601,6 +603,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               {hasUpf ? <Stat title="UPF Static" value={statusLabel(upf.status)} /> : null}
               {hasUpf ? <Stat title="Power Domains" value={metricValue(upf.domain_count)} /> : null}
               {hasMbistInsertion ? <Stat title="MBIST RTL" value={statusLabel(mbistInsertion.status)} /> : null}
+              {hasMbistInsertion ? <Stat title="MBIST Algorithm" value={metricValue(mbistInsertion.algorithm)} /> : null}
+              {hasMbistInsertion ? <Stat title="MBIST RAMs" value={metricValue(mbistInsertion.ram_count, mbistInsertion.memory_count)} /> : null}
+              {hasMbistInsertion ? <Stat title="MBIST Controllers" value={metricValue(mbistInsertion.mbist_controller_count)} /> : null}
+              {hasMbistInsertion ? <Stat title="MBIST Wrappers" value={metricValue(mbistInsertion.wrapper_module_count)} /> : null}
               {hasMbistLint ? <Stat title="MBIST RTL Lint" value={mbistLintPass ? "pass" : "fail"} /> : null}
               <Stat title="Modules" value={number(dashboard.module_count)} />
               <Stat title="RTL Files" value={number(dashboard.rtl_file_count)} />
