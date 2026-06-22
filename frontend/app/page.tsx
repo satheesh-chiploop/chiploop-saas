@@ -143,10 +143,13 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold">Design Intent to Execution</h2>
-        </div>
+        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold">Design Intent to Execution</h2>
+            <p className="mx-auto mt-3 max-w-3xl text-base leading-7 text-slate-300">
+              ChipLoop turns complex multi-dimensional chip design workflows into connected, traceable execution loops.
+            </p>
+          </div>
         <div className="mt-8 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
           {[
             ["01", "Define", "Specs, products, or workflows"],

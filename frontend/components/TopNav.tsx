@@ -107,11 +107,12 @@ export default function TopNav({
           className="group flex self-start items-center gap-2.5 text-xl font-extrabold text-cyan-300 sm:self-auto"
           aria-label="ChipLoop home"
         >
-          <span className="relative h-7 w-7 shrink-0">
-            <span className="absolute left-1 top-1 h-[18px] w-[18px] border-2 border-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.45)] transition group-hover:border-cyan-100" />
-            <span className="absolute bottom-1 right-1 h-[18px] w-[18px] border-2 border-violet-400 transition group-hover:border-violet-200" />
-            <span className="absolute left-[11px] top-[11px] h-1.5 w-1.5 rounded-full bg-white" />
-          </span>
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/5/55/8-cell-simple.gif"
+            alt=""
+            className="h-7 w-7 shrink-0 rounded-sm object-contain"
+            aria-hidden="true"
+          />
           <span>ChipLoop</span>
         </button>
 
