@@ -528,7 +528,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/signoff_closure/signoff_closure_chart.json",
         "executive_summary.json",
       ],
-      verification: ["simulation_summary_coverage.json", "system_sim_dashboard.json"],
+      verification: ["simulation_summary_coverage.json", "formal_report.json", "system_sim_dashboard.json"],
       embedded: ["system_firmware_dashboard.json", "system_firmware_execution.json"],
       software: ["system_software_api_contract.json", "system_software_package.json"],
       validation: [
@@ -1110,6 +1110,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const coverage = record(verifyDashboard?.coverage);
       const codeCoverage = record(coverage.code);
       const assertionCoverage = record(coverage.assertions);
+      const formalReport = record(evidence["formal_report.json"]);
       const formal = record(verifyDashboard?.formal);
       const golden = record(verifyDashboard?.golden_model);
       const toolchain = record(verifyDashboard?.toolchain);
@@ -1117,7 +1118,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const failed = number(simulation.fail);
       const total = number(simulation.total);
       const codeStatus = String(codeCoverage.status || "");
-      const formalStatus = String(formal.status || "not_enabled");
+      const formalStatus = String(formal.status || formalReport.status || "not_enabled");
       const formalValue = formalStatus === "fail" && typeof formal.returncode === "number"
         ? `fail (rc ${formal.returncode})`
         : formalStatus;
@@ -1221,6 +1222,53 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Artifacts" value={artifacts} />
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Package" value={String(pkg.package_status || "unavailable")} />
+          </div>
+        </div>
+      );
+    }
+
+    if (stage === "product") {
+      const model = record(evidence["system_product_capability_model.json"]);
+      const pkg = record(evidence["system_product_package.json"]);
+      const manifest = record(evidence["system_product_dashboard_manifest.json"]);
+      const contract = record(evidence["system_product_collateral_contract.json"]);
+      const lineage = record(model.lineage || contract.lineage);
+      const sourceArtifacts = record(contract.source_artifacts);
+      const capabilities = array(model.capabilities);
+      const registers = array(model.registers);
+      const specific = String(model.device_model || "generic_device_control") !== "generic_device_control";
+      return (
+        <div className="mt-5 space-y-5">
+          <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+            <div>
+              <div className="text-sm font-semibold text-slate-100">{String(model.product_name || "Product Dashboard")}</div>
+              <div className="mt-2 text-sm text-slate-400">
+                {String(record(model.product_experience).summary || "Generated simulator-backed product app.")}
+              </div>
+              {capabilities.length ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {capabilities.slice(0, 8).map((capability, index) => (
+                    <span key={index} className="rounded border border-cyan-900/60 bg-cyan-950/20 px-3 py-2 text-xs text-cyan-200">
+                      {String(record(capability).label || record(capability).id || "capability")}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Stat title="Model" value={String(model.device_model || "unavailable")} />
+              <Stat title="Specific" value={specific ? "yes" : "generic"} />
+              <Stat title="Capabilities" value={capabilities.length} />
+              <Stat title="Registers" value={registers.length} />
+              {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+              <Stat title="Runtime" value={String(pkg.runtime || lineage.target_runtime || "simulated_device")} />
+            </div>
+          </div>
+          <div className="grid min-w-0 grid-cols-2 gap-3 md:grid-cols-4">
+            <Stat title="Dashboard" value={String(manifest.entrypoint || pkg.entrypoint || "not produced")} />
+            <Stat title="Firmware Source" value={record(sourceArtifacts.firmware_dashboard).data ? "loaded" : "missing"} />
+            <Stat title="Software Source" value={record(sourceArtifacts.software_api).data || record(sourceArtifacts.software_package).data ? "loaded" : "missing"} />
+            <Stat title="Validation Source" value={record(sourceArtifacts.validation_summary).data ? "loaded" : "missing"} />
           </div>
         </div>
       );

@@ -104,10 +104,15 @@ export default function TopNav({
       <div className={`mx-auto flex ${maxWidthClass} flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4`}>
         <button
           onClick={() => router.push("/")}
-          className="self-start text-xl font-extrabold text-cyan-300 sm:self-auto"
+          className="group flex self-start items-center gap-2.5 text-xl font-extrabold text-cyan-300 sm:self-auto"
           aria-label="ChipLoop home"
         >
-          ChipLoop
+          <span className="relative h-7 w-7 shrink-0">
+            <span className="absolute left-1 top-1 h-[18px] w-[18px] border-2 border-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.45)] transition group-hover:border-cyan-100" />
+            <span className="absolute bottom-1 right-1 h-[18px] w-[18px] border-2 border-violet-400 transition group-hover:border-violet-200" />
+            <span className="absolute left-[11px] top-[11px] h-1.5 w-1.5 rounded-full bg-white" />
+          </span>
+          <span>ChipLoop</span>
         </button>
 
         <div className="flex w-full items-center gap-4 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:justify-end sm:gap-5 sm:overflow-visible sm:pb-0">
