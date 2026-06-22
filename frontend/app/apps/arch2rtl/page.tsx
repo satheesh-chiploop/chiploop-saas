@@ -614,7 +614,7 @@ export default function Arch2RTLAppPage() {
           </div>
 
           {workflowId ? (
-            <div className="mt-6 grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
+            <div className="mt-6 space-y-4">
               <div className="rounded-2xl border border-slate-800 bg-black/30 p-4 text-sm text-slate-300">
                 <div className="font-semibold text-slate-100">Run Status</div>
                 <div className="mt-2">

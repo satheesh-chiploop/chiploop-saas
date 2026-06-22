@@ -575,6 +575,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const storage = record(dashboard.storage);
         const timing = record(dashboard.timing);
         const iface = record(dashboard.interface);
+        const scopes = record(dashboard.scopes);
+        const completePackage = record(scopes.complete_package);
         const clockReset = record(dashboard.clock_reset);
         const upf = record(evidence["upf_static_check.json"]);
         const spec2rtl = record(evidence["spec2rtl_conformance.json"]);
@@ -601,8 +603,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <MiniMetric label="Input Ports" value={number(iface.input_port_count)} />
                 <MiniMetric label="Output Ports" value={number(iface.output_port_count)} />
-                <MiniMetric label="RTL Files" value={number(dashboard.rtl_file_count)} />
-                <MiniMetric label="Modules" value={number(dashboard.module_count)} />
+                <MiniMetric label="Functional RTL" value={number(dashboard.rtl_file_count)} />
+                <MiniMetric label="Functional Modules" value={number(dashboard.module_count)} />
                 <MiniMetric label="Full-Cycle" value={number(timing.full_cycle_path_count)} />
                 <MiniMetric label="Half-Cycle" value={number(timing.half_cycle_path_count)} />
               </div>
@@ -619,6 +621,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               {hasMbistInsertion ? <Stat title="MBIST RAMs" value={metricValue(mbistInsertion.ram_count, mbistInsertion.memory_count)} /> : null}
               {hasMbistInsertion ? <Stat title="MBIST Controllers" value={metricValue(mbistInsertion.mbist_controller_count)} /> : null}
               {hasMbistInsertion ? <Stat title="MBIST Wrappers" value={metricValue(mbistInsertion.wrapper_module_count)} /> : null}
+              {hasMbistInsertion ? <Stat title="Package RTL Files" value={metricValue(completePackage.rtl_file_count)} /> : null}
+              {hasMbistInsertion ? <Stat title="Package Modules" value={metricValue(completePackage.module_count)} /> : null}
+              {number(storage.memory_bit_count) ? <Stat title="Behavioral Memory Bits" value={metricValue(storage.memory_bit_count)} /> : null}
               {hasMbistLint ? <Stat title="MBIST RTL Lint" value={mbistLintPass ? "pass" : "fail"} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL" value={statusLabel(spec2rtl.status)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Checked" value={metricValue(spec2rtlSummary.checked)} /> : null}
