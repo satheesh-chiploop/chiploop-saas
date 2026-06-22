@@ -467,11 +467,9 @@ export default function SystemSoftwareAppPage() {
                       Open in Full Validation
                     </button>
                   ) : null}
-                  {pwmChainDemo ? (
-                    <div className="mt-4">
-                      <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="software" logs={workflowRow?.logs} />
-                    </div>
-                  ) : null}
+                  <div className="mt-4">
+                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="software" logs={workflowRow?.logs} />
+                  </div>
                 </div>
               ) : null}
             </div>

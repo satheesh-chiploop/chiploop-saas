@@ -82,6 +82,7 @@ export default function SystemProductBuilderPage() {
   const [secureChainDemo, setSecureChainDemo] = useState(false);
   const [safetyChainDemo, setSafetyChainDemo] = useState(false);
   const [tempMonitorChainDemo, setTempMonitorChainDemo] = useState(false);
+  const [sramChainDemo, setSramChainDemo] = useState(false);
 
   const [arch2rtlWorkflowId, setArch2rtlWorkflowId] = useState("");
   const [verifyWorkflowId, setVerifyWorkflowId] = useState("");
@@ -153,12 +154,20 @@ export default function SystemProductBuilderPage() {
     try {
       const prefill = rawPrefill ? JSON.parse(rawPrefill) as any : {};
       const isTempMonitor = params.get("tempmon_chain") === "1";
+      const isSram = params.get("sram_chain") === "1" || String(context.demoKind || "").toLowerCase().includes("sram");
+      setSramChainDemo(isSram);
       setArch2rtlWorkflowId(prefill.arch2rtlWorkflowId || context.systemRtlWorkflowId || context.arch2rtlWorkflowId || "");
       setVerifyWorkflowId(prefill.verifyWorkflowId || context.systemSimWorkflowId || context.verifyWorkflowId || "");
       setSystemFirmwareWorkflowId(prefill.systemFirmwareWorkflowId || context.systemFirmwareWorkflowId || context.embeddedWorkflowId || "");
       setSystemSoftwareWorkflowId(prefill.systemSoftwareWorkflowId || context.softwareWorkflowId || "");
       setSystemValidationWorkflowId(prefill.systemValidationWorkflowId || context.validationWorkflowId || "");
-      setProductIntent(prefill.productIntent || (isTempMonitor ? TEMP_MONITOR_SYSTEM_PRODUCT_INTENT : "Build a simulator-backed product dashboard from the validated system collateral."));
+      setProductIntent(prefill.productIntent || (
+        isTempMonitor
+          ? TEMP_MONITOR_SYSTEM_PRODUCT_INTENT
+          : isSram
+            ? "Build a simulator-backed SRAM scratchpad controller dashboard with memory read/write controls, MBIST start/status, IRQ visibility, and validation lineage."
+            : "Build a simulator-backed product dashboard from the validated system collateral."
+      ));
       setAppType(prefill.appType || "web_dashboard");
       setTargetRuntime(prefill.targetRuntime || "simulated_device");
     } catch {
@@ -213,7 +222,7 @@ export default function SystemProductBuilderPage() {
       try { context = raw ? JSON.parse(raw) as DesignChainContext : {}; } catch { context = {}; }
       context.productWorkflowId = out.workflow_id;
       context.productRunId = out.run_id;
-      context.demoKind = tempMonitorChainDemo ? "temp_monitor_system" : pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : secureChainDemo ? "secure_boot" : safetyChainDemo ? "safety_fault" : context.demoKind;
+      context.demoKind = tempMonitorChainDemo ? "temp_monitor_system" : sramChainDemo ? "sram_mbist" : pwmChainDemo ? "pwm" : uartChainDemo ? "uart_packet" : imageChainDemo ? "image_dma" : sensorChainDemo ? "sensor_hub" : secureChainDemo ? "secure_boot" : safetyChainDemo ? "safety_fault" : context.demoKind;
       window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify(context));
     } catch (e: any) {
       setErr(e?.message || String(e));
@@ -248,6 +257,10 @@ export default function SystemProductBuilderPage() {
           {tempMonitorChainDemo ? (
             <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
               Temperature monitor SoC journey: build a simulator-backed product dashboard from System RTL, System Sim, firmware, software, and validation lineage.
+            </div>
+          ) : sramChainDemo ? (
+            <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">
+              SRAM MBIST demo: build a simulator-backed scratchpad controller dashboard for memory read/write, MBIST start/status, IRQ state, and validation lineage.
             </div>
           ) : pwmChainDemo ? (
             <div className="mt-4 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-4 text-sm text-slate-200">

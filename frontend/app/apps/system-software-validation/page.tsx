@@ -524,11 +524,9 @@ export default function SystemSoftwareValidationAppPage() {
                   >
                     Build Product App
                   </button>
-                  {pwmChainDemo ? (
-                    <div className="mt-4">
-                      <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="validation" logs={workflowRow?.logs} />
-                    </div>
-                  ) : null}
+                  <div className="mt-4">
+                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="validation" logs={workflowRow?.logs} />
+                  </div>
                     <AskThisRunPanel workflowId={workflowId} compact />
                 </div>
               ) : null}

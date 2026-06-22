@@ -1,0 +1,10 @@
+{
+  "type": "simulation_summary_coverage_report",
+  "simulation_execution_summary_json": "backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/vv/tb/reports/simulation_execution_summary.json",
+  "functional_coverage_summary_json": "backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/vv/tb/reports/functional_coverage_summary.json",
+  "code_coverage_summary_json": "backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/vv/tb/reports/code_coverage_summary.json",
+  "artifacts": {
+    "simulation_summary_coverage": "backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/vv/tb/reports/simulation_summary_coverage.json",
+    "simulation_summary_coverage_md": "backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/vv/tb/reports/SIM_SUMMARY_COVERAGE.md"
+  }
+}

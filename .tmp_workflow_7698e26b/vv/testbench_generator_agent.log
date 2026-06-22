@@ -1,0 +1,34 @@
+Digital Testbench Generator Agent Log
+[2026-06-22T15:18:34.005458] [INFO] Starting Digital Testbench Generator Agent...
+[2026-06-22T15:18:34.005859] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/spec/sram_mbist_demo_controller_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 3,
+  "top_module": "sram_mbist_demo_controller",
+  "soc_mode": false
+}
+[2026-06-22T15:18:34.006252] [INFO] resolved_mode=digital
+[2026-06-22T15:18:34.006356] [INFO] spec_path=/root/chiploop-backend/backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/spec/sram_mbist_demo_controller_spec.json
+[2026-06-22T15:18:34.006439] [INFO] top_module=sram_mbist_demo_controller
+[2026-06-22T15:18:34.006518] [INFO] rtl_file_count=3
+[2026-06-22T15:18:34.006641] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-06-22T15:18:34.006742] [INFO] reset_candidates=[
+  {
+    "name": "reset_n",
+    "active_low": true,
+    "async": false
+  }
+]
+[2026-06-22T15:18:34.131308] [INFO] verification_files=[]
+[2026-06-22T15:18:34.132620] [INFO] Generated testbench: vv/tb/test_sram_mbist_demo_controller.py
+[2026-06-22T15:18:34.132752] [INFO] Generated Makefile
+[2026-06-22T15:18:34.132860] [INFO] Generated rtl_sources.mk
+[2026-06-22T15:18:34.132979] [INFO] Generated testcases.json
+[2026-06-22T15:18:34.133104] [INFO] Generated tb_contract.json
+[2026-06-22T15:18:34.133249] [INFO] generated_testcases=[
+  "smoke_test"
+]

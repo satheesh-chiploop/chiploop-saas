@@ -1,0 +1,437 @@
+{
+  "design_name": "sram_mbist_demo_controller",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [
+    {
+      "name": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "kind": "prebuilt_sky130_sram",
+      "depth": 256,
+      "data_width": 32,
+      "addr_width": 8,
+      "instance_name": "u_sram",
+      "requires_mbist": true,
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      }
+    }
+  ],
+  "hierarchy": {
+    "top_module": {
+      "name": "sram_mbist_demo_controller",
+      "description": "Top-level scratchpad controller providing a software-visible register map, simple memory read/write sequencing, BIST request/status signaling, interrupt generation, and a child SRAM wrapper instance named u_sram that binds to either the prebuilt Sky130 SRAM macro or the synthesizable fallback model.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "wr_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wr_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "wr_data",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "rd_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rd_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "bist_start",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rd_data",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "bist_done",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "bist_fail",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "irq",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "Implements a minimal controller with a register-accessible memory scratchpad interface, a single functional SRAM access path, and BIST control/status latches. The module decodes register writes and reads, sequences memory transactions, exposes software-visible read data, and surfaces BIST completion/failure into status and interrupt outputs. The top module instantiates the SRAM wrapper as child instance u_sram and uses it as the only functional memory storage element path in the design contract.",
+      "responsibilities": [
+        "Decode the externally visible register address space and manage control/status registers.",
+        "Accept software-driven scratchpad writes through MEM_ADDR, MEM_WDATA, and MEM_CONTROL semantics.",
+        "Return software-visible memory readback through MEM_RDATA semantics.",
+        "Latch BIST done/fail status and the last failure address.",
+        "Assert irq when IRQ_ENABLE is set and BIST status is latched.",
+        "Drive ready high when the controller is not busy and reset is deasserted.",
+        "Instantiate the memory wrapper child as u_sram and keep memory intent explicit for downstream macro/MBIST tools."
+      ],
+      "must_drive": [
+        "rd_data",
+        "ready",
+        "bist_done",
+        "bist_fail",
+        "irq"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "wr_en",
+        "wr_addr",
+        "wr_data",
+        "rd_en",
+        "rd_addr",
+        "bist_start"
+      ],
+      "must_not_drive": [
+        "clk",
+        "reset_n",
+        "wr_en",
+        "wr_addr",
+        "wr_data",
+        "rd_en",
+        "rd_addr",
+        "bist_start"
+      ],
+      "reset_behavior": "On reset_n low, all control bits, status bits, ready indication, BIST status, IRQ status, latched memory read data, busy indication, and software-visible completion state are cleared to inactive defaults. The controller shall not leave stale read data, stale IRQ state, or stale BIST latched state after reset.",
+      "behavior_rules": [
+        "The controller shall retain explicit register-map semantics even if downstream MBIST collateral later replaces or wraps the memory path.",
+        "The controller shall not be modeled as a raw SRAM array at the top level; the SRAM must remain a child wrapper instance named u_sram.",
+        "The functional wrapper interface to memory shall remain clk, csb, web, addr[7:0], din[31:0], dout[31:0].",
+        "If the prebuilt macro collateral is available, demo_sram_32x256_wrapper shall bind to sky130_sram_1kbyte_1rw1r_32x256_8; otherwise it shall bind to demo_sram_32x256_model.",
+        "The controller shall support simple firmware-controlled memory transactions through MEM_CONTROL bit semantics and keep the BIST request path visible through bist_start and BIST_CONTROL.START.",
+        "BIST status registers shall exist independently of whether the actual MBIST agent is later inserted.",
+        "irq shall assert only when IRQ_ENABLE is set and a BIST done or fail condition has been latched.",
+        "The design shall remain synthesizable and avoid vendor-only primitives in the fallback model."
+      ],
+      "rtl_output_file": "sram_mbist_demo_controller.v",
+      "ports_documentation": []
+    },
+    "modules": [
+      {
+        "name": "demo_sram_32x256_wrapper",
+        "description": "Functional wrapper for the 256x32 SRAM scratchpad. It presents a stable, tool-detectable memory interface and can bind to the prebuilt Sky130 SRAM macro when collateral is present or to the synthesizable fallback model when it is not. The wrapper preserves the memory macro contract and keeps the instance name u_sram for downstream recognition.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "csb",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "web",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "addr",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "din",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "dout",
+            "direction": "output",
+            "width": 32
+          }
+        ],
+        "functionality": "Provides one functional access path to a 256-word x 32-bit scratchpad and preserves the Sky130 SRAM macro intent. The wrapper may elaborate either the prebuilt SRAM macro or the fallback memory model, but the public interface remains identical so AutoMBIST and synthesis/DFT agents can replace or wrap the path without changing the controller contract.",
+        "responsibilities": [
+          "Expose the fixed memory wrapper interface required by the controller.",
+          "Bind to the prebuilt Sky130 SRAM macro when collateral is available.",
+          "Bind to the synthesizable fallback model when collateral is unavailable.",
+          "Keep the child macro/model instance name as u_sram for downstream detection.",
+          "Preserve the single functional access path and leave any second read-port capability reserved or safely tied off for future MBIST wrapper integration."
+        ],
+        "must_drive": [
+          "dout"
+        ],
+        "must_receive": [
+          "clk",
+          "csb",
+          "web",
+          "addr",
+          "din"
+        ],
+        "must_not_drive": [
+          "clk",
+          "csb",
+          "web",
+          "addr",
+          "din"
+        ],
+        "reset_behavior": "The wrapper itself is structurally passive; when the underlying model is used, memory contents are implementation-defined or initialized according to the fallback model rules. No wrapper-local state is retained across reset beyond what the child macro/model defines.",
+        "behavior_rules": [
+          "csb shall be active-low chip select at the wrapper boundary.",
+          "web shall be the write-enable control at the wrapper boundary, consistent with the memory macro contract.",
+          "The wrapper shall not alter address width, data width, or access polarity.",
+          "The wrapper shall not expose vendor-specific primitives in the fallback implementation.",
+          "The wrapper shall keep the memory intent explicit for downstream macro and MBIST tools.",
+          "If a second read port exists in the underlying macro, it shall be reserved for MBIST wrapper integration or safely tied off and not used by the controller's functional path."
+        ],
+        "rtl_output_file": "demo_sram_32x256_wrapper.v"
+      },
+      {
+        "name": "demo_sram_32x256_model",
+        "description": "Synthesizable fallback memory model implementing the same clk/csb/web/addr/din/dout interface as the functional wrapper. It is intended only for simulation and synthesis fallback use when the prebuilt Sky130 macro collateral is unavailable, while keeping the memory contract compatible with replacement or wrapping by AutoMBIST.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "csb",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "web",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "addr",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "din",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "dout",
+            "direction": "output",
+            "width": 32
+          }
+        ],
+        "functionality": "Implements a simple synchronous 256x32 memory with the same public wrapper interface as the prebuilt SRAM bind target. The model must be synthesizable, must not rely on vendor primitives, and must preserve functional compatibility with the wrapper so it can be substituted by the macro during physical or DFT flows.",
+        "responsibilities": [
+          "Provide a synthesizable functional memory fallback.",
+          "Maintain interface compatibility with demo_sram_32x256_wrapper.",
+          "Support 256 addresses and 32-bit data width.",
+          "Support read and write behavior consistent with the functional scratchpad wrapper contract.",
+          "Avoid vendor-only or non-synthesizable primitives."
+        ],
+        "must_drive": [
+          "dout"
+        ],
+        "must_receive": [
+          "clk",
+          "csb",
+          "web",
+          "addr",
+          "din"
+        ],
+        "must_not_drive": [
+          "clk",
+          "csb",
+          "web",
+          "addr",
+          "din"
+        ],
+        "reset_behavior": "The model may initialize memory contents to a known simulation-friendly state if desired, but controller-visible state is reset by the top module. The model itself should not impose asynchronous reset behavior on the interface.",
+        "behavior_rules": [
+          "No vendor-specific memory primitives shall be used.",
+          "The port polarity and width must match the wrapper contract exactly.",
+          "The model shall be compatible with wrapper substitution without changing the controller top-level interface.",
+          "The model shall keep the macro intent explicit rather than replacing the design with an opaque register file."
+        ],
+        "rtl_output_file": "demo_sram_32x256_model.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "demo_sram_32x256_wrapper.clk",
+        "demo_sram_32x256_model.clk"
+      ],
+      "description": "Top-level port clk connected to matching child module port(s)."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "demo_sram_32x256_wrapper_csb",
+      "width": 1,
+      "source": "sram_mbist_demo_controller.demo_sram_32x256_wrapper_csb",
+      "destinations": [
+        "demo_sram_32x256_wrapper.csb"
+      ],
+      "description": "Derived internal top-owned signal driving demo_sram_32x256_wrapper.csb."
+    },
+    {
+      "name": "demo_sram_32x256_wrapper_web",
+      "width": 1,
+      "source": "sram_mbist_demo_controller.demo_sram_32x256_wrapper_web",
+      "destinations": [
+        "demo_sram_32x256_wrapper.web"
+      ],
+      "description": "Derived internal top-owned signal driving demo_sram_32x256_wrapper.web."
+    },
+    {
+      "name": "demo_sram_32x256_wrapper_addr",
+      "width": 8,
+      "source": "sram_mbist_demo_controller.demo_sram_32x256_wrapper_addr",
+      "destinations": [
+        "demo_sram_32x256_wrapper.addr"
+      ],
+      "description": "Derived internal top-owned signal driving demo_sram_32x256_wrapper.addr."
+    },
+    {
+      "name": "demo_sram_32x256_wrapper_din",
+      "width": 32,
+      "source": "sram_mbist_demo_controller.demo_sram_32x256_wrapper_din",
+      "destinations": [
+        "demo_sram_32x256_wrapper.din"
+      ],
+      "description": "Derived internal top-owned signal driving demo_sram_32x256_wrapper.din."
+    },
+    {
+      "name": "demo_sram_32x256_wrapper_dout",
+      "width": 32,
+      "source": "demo_sram_32x256_wrapper.dout",
+      "destinations": [
+        "sram_mbist_demo_controller.demo_sram_32x256_wrapper_dout"
+      ],
+      "description": "Derived internal signal produced by demo_sram_32x256_wrapper.dout."
+    },
+    {
+      "name": "demo_sram_32x256_model_csb",
+      "width": 1,
+      "source": "sram_mbist_demo_controller.demo_sram_32x256_model_csb",
+      "destinations": [
+        "demo_sram_32x256_model.csb"
+      ],
+      "description": "Derived internal top-owned signal driving demo_sram_32x256_model.csb."
+    },
+    {
+      "name": "demo_sram_32x256_model_web",
+      "width": 1,
+      "source": "sram_mbist_demo_controller.demo_sram_32x256_model_web",
+      "destinations": [
+        "demo_sram_32x256_model.web"
+      ],
+      "description": "Derived internal top-owned signal driving demo_sram_32x256_model.web."
+    },
+    {
+      "name": "demo_sram_32x256_model_addr",
+      "width": 8,
+      "source": "sram_mbist_demo_controller.demo_sram_32x256_model_addr",
+      "destinations": [
+        "demo_sram_32x256_model.addr"
+      ],
+      "description": "Derived internal top-owned signal driving demo_sram_32x256_model.addr."
+    },
+    {
+      "name": "demo_sram_32x256_model_din",
+      "width": 32,
+      "source": "sram_mbist_demo_controller.demo_sram_32x256_model_din",
+      "destinations": [
+        "demo_sram_32x256_model.din"
+      ],
+      "description": "Derived internal top-owned signal driving demo_sram_32x256_model.din."
+    },
+    {
+      "name": "demo_sram_32x256_model_dout",
+      "width": 32,
+      "source": "demo_sram_32x256_model.dout",
+      "destinations": [
+        "sram_mbist_demo_controller.demo_sram_32x256_model_dout"
+      ],
+      "description": "Derived internal signal produced by demo_sram_32x256_model.dout."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "demo_sram_32x256_wrapper_csb",
+      "owner": "sram_mbist_demo_controller.demo_sram_32x256_wrapper_csb"
+    },
+    {
+      "signal": "demo_sram_32x256_wrapper_web",
+      "owner": "sram_mbist_demo_controller.demo_sram_32x256_wrapper_web"
+    },
+    {
+      "signal": "demo_sram_32x256_wrapper_addr",
+      "owner": "sram_mbist_demo_controller.demo_sram_32x256_wrapper_addr"
+    },
+    {
+      "signal": "demo_sram_32x256_wrapper_din",
+      "owner": "sram_mbist_demo_controller.demo_sram_32x256_wrapper_din"
+    },
+    {
+      "signal": "demo_sram_32x256_wrapper_dout",
+      "owner": "demo_sram_32x256_wrapper.dout"
+    },
+    {
+      "signal": "demo_sram_32x256_model_csb",
+      "owner": "sram_mbist_demo_controller.demo_sram_32x256_model_csb"
+    },
+    {
+      "signal": "demo_sram_32x256_model_web",
+      "owner": "sram_mbist_demo_controller.demo_sram_32x256_model_web"
+    },
+    {
+      "signal": "demo_sram_32x256_model_addr",
+      "owner": "sram_mbist_demo_controller.demo_sram_32x256_model_addr"
+    },
+    {
+      "signal": "demo_sram_32x256_model_din",
+      "owner": "sram_mbist_demo_controller.demo_sram_32x256_model_din"
+    },
+    {
+      "signal": "demo_sram_32x256_model_dout",
+      "owner": "demo_sram_32x256_model.dout"
+    }
+  ],
+  "register_contract": {}
+}

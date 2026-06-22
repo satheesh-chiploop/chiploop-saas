@@ -529,14 +529,33 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "executive_summary.json",
       ],
       verification: ["simulation_summary_coverage.json", "formal_report.json", "system_sim_dashboard.json"],
-      embedded: ["system_firmware_dashboard.json", "system_firmware_execution.json"],
-      software: ["system_software_api_contract.json", "system_software_package.json"],
+      embedded: [
+        "system_firmware_dashboard.json",
+        "system_firmware_execution.json",
+        "system/firmware/cosim/system_firmware_dashboard.json",
+        "system/firmware/cosim/system_firmware_execution.json",
+        "system_firmware_coverage_dashboard.json",
+        "system_firmware_coverage_summary.json",
+        "system/firmware/coverage/system_firmware_coverage_dashboard.json",
+        "system/firmware/coverage/system_firmware_coverage_summary.json",
+      ],
+      software: [
+        "system_software_api_contract.json",
+        "system/software/sdk/system_software_api_contract.json",
+        "system_software_package.json",
+        "system/software/package/system_software_package.json",
+      ],
       validation: [
         "system_software_validation_summary_l2.json",
+        "system/validation/l2/system_software_validation_summary_l2.json",
         "system_cosim_trace_validation_report.json",
+        "system/validation/l2/system_cosim_trace_validation_report.json",
         "system_cosim_execution_report.json",
+        "system/validation/l2/system_cosim_execution_report.json",
         "system_cosim_harness_manifest.json",
+        "system/validation/l2/system_cosim_harness_manifest.json",
         "system_software_validation_summary.json",
+        "system/software_validation/system_software_validation_summary.json",
         "build_validation_report.json",
         "test_execution_report.json",
         "mock_runtime_validation_report.json",
@@ -545,14 +564,25 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       ],
       product: [
         "system_product_dashboard_manifest.json",
+        "system/product/app/system_product_dashboard_manifest.json",
         "system_product_package.json",
+        "system/product/package/system_product_package.json",
         "system_product_capability_model.json",
+        "system/product/model/system_product_capability_model.json",
         "system_product_collateral_contract.json",
+        "system/product/ingest/system_product_collateral_contract.json",
       ],
     };
     Promise.all((files[stage] || []).map(async (filename) => [filename.split("/").pop() || filename, await artifact(workflowId, filename)] as const))
       .then((entries) => {
-        if (active) setEvidence(Object.fromEntries(entries));
+        if (!active) return;
+        const merged: Record<string, unknown> = {};
+        for (const [key, value] of entries) {
+          if (Object.keys(record(value)).length || !(key in merged)) {
+            merged[key] = value;
+          }
+        }
+        setEvidence(merged);
       })
       .catch((reason: unknown) => {
         if (active) setError(reason instanceof Error ? reason.message : String(reason));
@@ -1158,8 +1188,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     }
 
     if (stage === "embedded") {
-      const dashboard = evidence["system_firmware_dashboard.json"] || {};
-      const execution = evidence["system_firmware_execution.json"] || {};
+      const dashboard = evidence["system_firmware_dashboard.json"] || evidence["system_firmware_coverage_dashboard.json"] || {};
+      const execution = evidence["system_firmware_execution.json"] || evidence["system_firmware_coverage_summary.json"] || {};
       const readiness = record(execution.readiness);
       const inputs = record(execution.inputs);
       const missingInputs = array(dashboard.missing_inputs).length

@@ -1,0 +1,35 @@
+{
+  "type": "vv_formal_verification",
+  "version": "1.0",
+  "top_module": "sram_mbist_demo_controller",
+  "spec_path": "/root/chiploop-backend/backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/spec/sram_mbist_demo_controller_spec.json",
+  "rtl_file_count": 3,
+  "clock": null,
+  "reset": null,
+  "toolchain": {
+    "formal": "symbiyosys",
+    "formal_solver": "z3"
+  },
+  "status": "inconclusive",
+  "reason": "memory_macro_or_mbist_design",
+  "tools_detected": {
+    "sby": true,
+    "yosys": true,
+    "z3": true,
+    "boolector": true
+  },
+  "run": {
+    "tool": "symbiyosys",
+    "solver": "z3",
+    "available": true,
+    "attempted": false,
+    "status": "inconclusive",
+    "reason": "memory_macro_or_mbist_design",
+    "detail": "Full-top BMC is not run by default for SRAM/MBIST macro designs. Use simulation, lint, and dedicated MBIST collateral checks, or enable deep formal explicitly."
+  },
+  "artifacts": {
+    "sby": "backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/vv/formal/sram_mbist_demo_controller.sby",
+    "formal_sv": "backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/vv/formal/sram_mbist_demo_controller_formal.sv",
+    "log": "backend/workflows/7698e26b-0adf-4c65-8a46-05cf4069da28/vv/formal_verification_agent.log"
+  }
+}
