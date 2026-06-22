@@ -1,0 +1,65 @@
+{
+  "package_type": "system_rtl",
+  "package_version": "1.0",
+  "source_workflow_id": "a47f1048-09ef-43e8-aacb-46ecd5e3c66a",
+  "source_verification_workflow_id": "a16d4dc7-7e33-41eb-b929-0d3c54ff2303",
+  "top": {
+    "sim": "pwm_controller",
+    "phys": "pwm_controller"
+  },
+  "filelists": {
+    "sim": [
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_model.v",
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_wrapper.v",
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/sram_mbist_demo_controller.v"
+    ],
+    "phys": [
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_model.v",
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_wrapper.v",
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/sram_mbist_demo_controller.v"
+    ],
+    "libs": []
+  },
+  "register_map_path": "digital/digital_regmap.json",
+  "clock_intent_path": "digital/timing/clock_intent.json",
+  "clock_intent": {
+    "type": "digital_clock_intent",
+    "clocks": [
+      {
+        "name": "clk",
+        "port": "clk",
+        "frequency_mhz": null,
+        "period_ns": null,
+        "source": "rtl_port_inference",
+        "needs_user_frequency": true
+      }
+    ],
+    "resets": [
+      {
+        "name": "reset_n",
+        "port": "reset_n",
+        "active_low": true,
+        "source": "rtl_port_inference"
+      }
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n",
+    "needs_user_review": true,
+    "provenance": {
+      "requested": false,
+      "sdc_clocks": 0,
+      "spec_clocks": 0,
+      "rtl_clocks": 1,
+      "spec_resets": 0,
+      "rtl_resets": 1
+    }
+  },
+  "ready_for_cosim": true,
+  "compile": {
+    "sim": "imported_from_verified_digital_flow"
+  },
+  "notes": [
+    "RTL and register map were imported from the specified Arch2RTL workflow.",
+    "Verification evidence remains associated with source_verification_workflow_id when supplied."
+  ]
+}

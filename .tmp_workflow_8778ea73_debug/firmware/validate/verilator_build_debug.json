@@ -1,0 +1,66 @@
+{
+  "agent": "Embedded Verilator Build Agent",
+  "workflow_dir": "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67",
+  "status": "resolved",
+  "top_module": "pwm_controller",
+  "rtl_top_resolution": {
+    "resolution": "metadata_top_used_without_rtl_match",
+    "candidate_top": "pwm_controller",
+    "selected_top": "pwm_controller",
+    "module_map": {
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_model.v": [
+        "demo_sram_32x256_model"
+      ],
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_wrapper.v": [
+        "demo_sram_32x256_wrapper"
+      ],
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/sram_mbist_demo_controller.v": [
+        "sram_mbist_demo_controller"
+      ]
+    }
+  },
+  "rtl_paths_scanned": [
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_model.v",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_wrapper.v",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/sram_mbist_demo_controller.v"
+  ],
+  "rtl_filelist": "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/validate/verilator_rtl_filelist.f",
+  "rtl_filelist_entries": [
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_model.v",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_wrapper.v",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/sram_mbist_demo_controller.v"
+  ],
+  "harness": "firmware/validate/cocotb_harness.py",
+  "harness_required_for_plan": false,
+  "harness_source": "default_expected_path",
+  "include_dirs": [],
+  "defines": [],
+  "output_path": "firmware/validate/verilator_build.md",
+  "resolved_from_state": {
+    "soc_top_sim_module": "pwm_controller",
+    "system_top_sim_module": "pwm_controller",
+    "rtl_top": "pwm_controller",
+    "top_module": "pwm_controller",
+    "design_name": null,
+    "system_rtl_filelist_sim": null,
+    "rtl_inputs": [
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_model.v",
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_wrapper.v",
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/sram_mbist_demo_controller.v"
+    ],
+    "system_rtl_files": [
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_model.v",
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/demo_sram_32x256_wrapper.v",
+      "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/digital/rtl/sram_mbist_demo_controller.v"
+    ],
+    "system_block": {
+      "soc_top_sim_module": "pwm_controller",
+      "system_top_sim_module": "pwm_controller"
+    },
+    "rtl_filelist_path": null,
+    "system_filelist_sim_path": null,
+    "filelist_path": null,
+    "cocotb_harness_path": null,
+    "sim_harness_path": null
+  }
+}

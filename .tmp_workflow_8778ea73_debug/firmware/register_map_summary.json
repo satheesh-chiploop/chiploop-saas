@@ -1,0 +1,22 @@
+{
+  "agent": "Embedded Firmware Register Extract Agent",
+  "phase": "register_extract",
+  "mode": "artifact_passthrough",
+  "source_path": "state.digital_regmap",
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "register_count": 10,
+  "register_names": [
+    "CONTROL",
+    "STATUS",
+    "MEM_ADDR",
+    "MEM_WDATA",
+    "MEM_RDATA",
+    "MEM_CONTROL",
+    "BIST_CONTROL",
+    "BIST_STATUS",
+    "IRQ_STATUS",
+    "IRQ_CLEAR"
+  ]
+}

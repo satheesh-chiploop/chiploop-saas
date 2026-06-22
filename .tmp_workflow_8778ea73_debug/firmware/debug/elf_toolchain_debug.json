@@ -1,0 +1,66 @@
+{
+  "agent": "Embedded ELF Build Agent",
+  "workflow_dir": "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67",
+  "cargo_workspace_dir": "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build",
+  "cargo_workspace_dir_exists": true,
+  "target_triple": "x86_64-unknown-linux-gnu",
+  "bin_name": "firmware_app",
+  "toolchain": {
+    "fw_language": "rust",
+    "fw_build": "cargo",
+    "rtl_sim": "verilator",
+    "tb_framework": "cocotb",
+    "coverage_fw": "llvm-cov",
+    "coverage_rtl": "verilator_cov"
+  },
+  "cargo_path": "/root/.cargo/bin/cargo",
+  "cwd": "/root/chiploop-backend",
+  "cargo_found": true,
+  "required_relpaths": [
+    "firmware/src/main.rs",
+    "firmware/src/panic.rs",
+    "firmware/src/hal/mod.rs",
+    "firmware/build/Cargo.toml",
+    "firmware/build/.cargo/config.toml"
+  ],
+  "optional_relpaths": [
+    "firmware/hal/registers.rs",
+    "firmware/drivers/driver_scaffold.rs",
+    "firmware/diagnostics/register_dump.rs"
+  ],
+  "generated_relpaths": [
+    "firmware/build/Cargo.toml",
+    "firmware/build/.cargo/config.toml",
+    "firmware/build/memory.x",
+    "firmware/src/main.rs",
+    "firmware/src/panic.rs",
+    "firmware/src/hal/mod.rs",
+    "firmware/build/build_instructions.md"
+  ],
+  "required_srcs_abs": [
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/main.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/panic.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/hal/mod.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build/Cargo.toml",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build/.cargo/config.toml"
+  ],
+  "required_srcs_exists": {
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/main.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/panic.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/hal/mod.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build/Cargo.toml": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build/.cargo/config.toml": true
+  },
+  "optional_srcs_abs": [
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/hal/registers.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/drivers/driver_scaffold.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/diagnostics/register_dump.rs"
+  ],
+  "optional_srcs_exists": {
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/hal/registers.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/drivers/driver_scaffold.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/diagnostics/register_dump.rs": false
+  },
+  "workspace_generated": true,
+  "generation_model": "write_artifact_success_is_source_of_truth"
+}

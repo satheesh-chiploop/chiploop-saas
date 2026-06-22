@@ -1,0 +1,13 @@
+{
+  "type": "vv_golden_model_generation",
+  "version": "1.0",
+  "top_module": "sram_mbist_demo_controller",
+  "spec_path": "/root/chiploop-backend/backend/workflows/a16d4dc7-7e33-41eb-b929-0d3c54ff2303/spec/sram_mbist_demo_controller_spec.json",
+  "rtl_file_count": 3,
+  "clocks": [],
+  "artifacts": {
+    "scoreboard_py": "backend/workflows/a16d4dc7-7e33-41eb-b929-0d3c54ff2303/vv/tb/scoreboard.py",
+    "scoreboard_readme": "backend/workflows/a16d4dc7-7e33-41eb-b929-0d3c54ff2303/vv/tb/SCOREBOARD.md",
+    "log": "backend/workflows/a16d4dc7-7e33-41eb-b929-0d3c54ff2303/vv/golden_model_comparison_agent.log"
+  }
+}

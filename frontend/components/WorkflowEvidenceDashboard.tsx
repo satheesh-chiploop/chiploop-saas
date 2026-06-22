@@ -294,6 +294,15 @@ function countParticipatingAgents(logs: string | null | undefined): number | nul
   return agents.size || null;
 }
 
+function hasTerminalEvidence(status: string | null | undefined, stage: Stage, logs: string | null | undefined): boolean {
+  const normalized = String(status || "").toLowerCase();
+  if (["completed", "complete", "success", "succeeded", "failed"].includes(normalized)) return true;
+  if (stage === "embedded" && logs) {
+    return /system firmware (?:cosim|coverage).*dashboard|system firmware .*complete|system firmware .*generated/i.test(logs);
+  }
+  return false;
+}
+
 async function artifact(workflowId: string, filename: string): Promise<JsonMap | null> {
   try {
     return record(
@@ -433,9 +442,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
   const flow = useMemo(() => displayedFlow(stage), [stage]);
   const stageIndex = flow.findIndex((item) => item.id === stage);
   const agentCount = useMemo(() => countParticipatingAgents(logs), [logs]);
+  const resultsReady = hasTerminalEvidence(status, stage, logs);
 
   useEffect(() => {
-    if (!workflowId || status !== "completed") return;
+    if (!workflowId || !resultsReady) return;
     let active = true;
     const files: Record<Stage, string[]> = {
       arch2rtl: [
@@ -600,10 +610,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     return () => {
       active = false;
     };
-  }, [workflowId, stage, status]);
+  }, [workflowId, stage, resultsReady]);
 
   const content = useMemo(() => {
-    if (!workflowId || status !== "completed") {
+    if (!workflowId || !resultsReady) {
       return <div className="mt-5 text-sm text-slate-400">Results appear after this stage completes.</div>;
     }
     if (error) return <div className="mt-5 text-sm text-amber-300">{error}</div>;
@@ -1441,7 +1451,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ) : null}
       </div>
     );
-  }, [agentCount, evidence, error, stage, status, workflowId]);
+  }, [agentCount, evidence, error, resultsReady, stage, status, workflowId]);
 
   return (
     <section className="w-full rounded-lg border border-slate-800 bg-slate-950/45 p-5">

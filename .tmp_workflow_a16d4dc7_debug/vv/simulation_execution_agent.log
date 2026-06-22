@@ -1,0 +1,36 @@
+Digital Simulation Execution Agent Log
+[2026-06-22T19:02:57.479685] [INFO] Starting Digital Simulation Execution Agent...
+[2026-06-22T19:02:57.479829] [INFO] manifest_path=backend/workflows/a16d4dc7-7e33-41eb-b929-0d3c54ff2303/vv/tb/simulation_manifest.json
+[2026-06-22T19:02:57.480092] [INFO] tests=[
+  "smoke_test",
+  "constrained_random_sanity",
+  "memory_write_read_directed",
+  "bist_start_directed",
+  "register_mapped_memory_bist_directed"
+]
+[2026-06-22T19:02:57.480238] [INFO] seeds=[
+  1,
+  2,
+  3,
+  4
+]
+[2026-06-22T19:02:57.480362] [INFO] Running testcase=smoke_test seed=1
+[2026-06-22T19:03:03.537927] [INFO] Running testcase=smoke_test seed=2
+[2026-06-22T19:03:06.138954] [INFO] Running testcase=smoke_test seed=3
+[2026-06-22T19:03:08.626716] [INFO] Running testcase=smoke_test seed=4
+[2026-06-22T19:03:11.170542] [INFO] Running testcase=constrained_random_sanity seed=1
+[2026-06-22T19:03:13.921857] [INFO] Running testcase=constrained_random_sanity seed=2
+[2026-06-22T19:03:16.590154] [INFO] Running testcase=constrained_random_sanity seed=3
+[2026-06-22T19:03:19.486334] [INFO] Running testcase=constrained_random_sanity seed=4
+[2026-06-22T19:03:22.371889] [INFO] Running testcase=memory_write_read_directed seed=1
+[2026-06-22T19:03:25.071166] [INFO] Running testcase=memory_write_read_directed seed=2
+[2026-06-22T19:03:27.731191] [INFO] Running testcase=memory_write_read_directed seed=3
+[2026-06-22T19:03:30.308137] [INFO] Running testcase=memory_write_read_directed seed=4
+[2026-06-22T19:03:32.992294] [INFO] Running testcase=bist_start_directed seed=1
+[2026-06-22T19:03:35.582130] [INFO] Running testcase=bist_start_directed seed=2
+[2026-06-22T19:03:38.208559] [INFO] Running testcase=bist_start_directed seed=3
+[2026-06-22T19:03:40.860848] [INFO] Running testcase=bist_start_directed seed=4
+[2026-06-22T19:03:43.751871] [INFO] Running testcase=register_mapped_memory_bist_directed seed=1
+[2026-06-22T19:03:46.698927] [INFO] Running testcase=register_mapped_memory_bist_directed seed=2
+[2026-06-22T19:03:49.453069] [INFO] Running testcase=register_mapped_memory_bist_directed seed=3
+[2026-06-22T19:03:52.311345] [INFO] Running testcase=register_mapped_memory_bist_directed seed=4

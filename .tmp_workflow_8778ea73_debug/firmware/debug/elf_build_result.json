@@ -1,0 +1,41 @@
+{
+  "agent": "Embedded ELF Build Agent",
+  "workflow_dir": "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67",
+  "cwd_used_for_build": "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build",
+  "target_triple": "x86_64-unknown-linux-gnu",
+  "bin_name": "firmware_app",
+  "cargo_workspace_dir": "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build",
+  "cargo_workspace_dir_exists": true,
+  "cargo_target_abs": "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build/target/x86_64-unknown-linux-gnu/release/firmware_app",
+  "canonical_elf_relpath": "firmware/build/target/x86_64-unknown-linux-gnu/release/firmware_app.elf",
+  "required_srcs_abs": [
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/main.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/panic.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/hal/mod.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build/Cargo.toml",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build/.cargo/config.toml"
+  ],
+  "required_srcs_exists": {
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/main.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/panic.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/src/hal/mod.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build/Cargo.toml": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build/.cargo/config.toml": true
+  },
+  "optional_srcs_abs": [
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/hal/registers.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/drivers/driver_scaffold.rs",
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/diagnostics/register_dump.rs"
+  ],
+  "optional_srcs_exists": {
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/hal/registers.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/drivers/driver_scaffold.rs": true,
+    "/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/diagnostics/register_dump.rs": false
+  },
+  "workspace_generated": true,
+  "build_attempted": true,
+  "build_succeeded": true,
+  "elf_exists": true,
+  "stdout_tail": "",
+  "stderr_tail": "   Compiling firmware_workspace v0.1.0 (/root/chiploop-backend/backend/workflows/8778ea73-6136-4e5a-873d-f91f99b0be67/firmware/build)\n    Finished `release` profile [optimized] target(s) in 0.18s\n"
+}
