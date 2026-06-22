@@ -1,0 +1,163 @@
+{
+  "type": "code_coverage_summary",
+  "tool": "verilator_coverage",
+  "status": "ok",
+  "coverage_dat_files": [
+    "/root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/coverage.dat"
+  ],
+  "line_coverage_pct": 42.54,
+  "branch_coverage_pct": 0.0,
+  "condition_coverage_pct": 0.0,
+  "toggle_coverage_pct": 1.57,
+  "condition_source": "verilator_lcov_branch_proxy",
+  "toggle_source": "verilator_coverage_annotate_points",
+  "returncode": 0,
+  "stdout_tail": [],
+  "stderr_tail": [],
+  "tool_execution": {
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "capability": "code_coverage_lcov",
+    "tool": "/usr/local/bin/verilator_coverage",
+    "executable": "/usr/local/bin/verilator_coverage",
+    "command": [
+      "/usr/local/bin/verilator_coverage",
+      "--write-info",
+      "/root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/reports/code_coverage.info",
+      "/root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/coverage.dat"
+    ],
+    "cwd": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "",
+    "status": "success",
+    "error": null,
+    "started_at": "2026-06-22T18:00:35.694839+00:00",
+    "ended_at": "2026-06-22T18:00:35.786747+00:00",
+    "elapsed_ms": 91
+  },
+  "lcov_info_path": "/root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/reports/code_coverage.info",
+  "line_found": 134,
+  "line_hit": 57,
+  "branch_found": 1565,
+  "branch_hit": 0,
+  "condition_found": 1565,
+  "condition_hit": 0,
+  "toggle_found": 1530,
+  "toggle_hit": 24,
+  "annotate_returncode": 0,
+  "annotate_stdout_tail": [
+    "Total coverage (35/134) 26.00%",
+    "See lines with '%00' in /root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/reports/verilator_coverage_annotated"
+  ],
+  "annotate_stderr_tail": [],
+  "annotate_tool_execution": {
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "capability": "code_coverage_annotate",
+    "tool": "/usr/local/bin/verilator_coverage",
+    "executable": "/usr/local/bin/verilator_coverage",
+    "command": [
+      "/usr/local/bin/verilator_coverage",
+      "--annotate",
+      "/root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/reports/verilator_coverage_annotated",
+      "--annotate-points",
+      "--annotate-all",
+      "--annotate-min",
+      "1",
+      "/root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/coverage.dat"
+    ],
+    "cwd": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb",
+    "returncode": 0,
+    "stdout": "Total coverage (35/134) 26.00%\nSee lines with '%00' in /root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/reports/verilator_coverage_annotated\n",
+    "stderr": "",
+    "status": "success",
+    "error": null,
+    "started_at": "2026-06-22T18:00:35.792480+00:00",
+    "ended_at": "2026-06-22T18:00:35.879418+00:00",
+    "elapsed_ms": 86
+  },
+  "toggle_annotation_dir": "/root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/reports/verilator_coverage_annotated",
+  "missed_toggle_points": [
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=csb:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=web:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[0]:0->1 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[0]:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[1]:0->1 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[1]:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[2]:0->1 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[2]:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[3]:0->1 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[3]:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[4]:0->1 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[4]:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[5]:0->1 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[5]:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[6]:0->1 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[6]:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[7]:0->1 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=addr[7]:1->0 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=din[0]:0->1 hier=sram_mbist_demo_controller.u_sram"
+    },
+    {
+      "file": "demo_sram_32x256_wrapper.v",
+      "point": "comment=din[0]:1->0 hier=sram_mbist_demo_controller.u_sram"
+    }
+  ]
+}

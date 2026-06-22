@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "flow": "system_firmware",
+  "top_module": "pwm_controller",
+  "digital_block_name": "digital_subsystem",
+  "analog_block_name": "analog_subsystem",
+  "bus_type": "CUSTOM",
+  "register_map_path": "firmware/register_map.json",
+  "register_map_source_path": "state.digital_regmap",
+  "hal_path": "firmware/hal/registers.rs",
+  "driver_path": "firmware/drivers/driver_scaffold.rs",
+  "base_address": "0x00000000",
+  "interrupt_model": {
+    "top_irq_signal": "irq",
+    "sources": [
+      "IRQ_ENABLE",
+      "ready",
+      "bist_done",
+      "done",
+      "IRQ_STATUS",
+      "IRQ_CLEAR"
+    ]
+  },
+  "hardware_features": {
+    "has_dma": false,
+    "has_programmable_pll": false,
+    "has_reset_cause_registers": false,
+    "has_programmable_power_modes": false
+  },
+  "bringup_model": {
+    "type": "register_driven_mixed_signal_bringup",
+    "requires_os_handoff": false
+  },
+  "build": {
+    "target_triple": "x86_64-unknown-linux-gnu",
+    "build_root": "firmware/build",
+    "src_root": "firmware/src",
+    "hal_root": "firmware/hal",
+    "driver_root": "firmware/drivers",
+    "crate_root": "firmware/src",
+    "hal_mod_path": "firmware/src/hal/mod.rs"
+  },
+  "provenance": {
+    "agent": "Embedded Firmware Register Extract Agent",
+    "phase": "register_extract",
+    "regmap_mode": "artifact_passthrough"
+  },
+  "driver_name": "DigitalSubsystemDriver",
+  "interrupt_map_path": "firmware/isr/interrupt_map.json",
+  "elf_path": "firmware/build/target/x86_64-unknown-linux-gnu/release/firmware_app.elf",
+  "register_dump_path": "firmware/diagnostics/register_dump.rs"
+}

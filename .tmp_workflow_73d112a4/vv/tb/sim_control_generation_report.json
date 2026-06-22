@@ -1,0 +1,24 @@
+{
+  "type": "vv_simulation_control_generation",
+  "version": "1.1",
+  "top_module": "sram_mbist_demo_controller",
+  "spec_path": "/root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/spec/sram_mbist_demo_controller_spec.json",
+  "rtl_file_count": 3,
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity",
+    "memory_write_read_directed",
+    "bist_start_directed"
+  ],
+  "simulation_manifest_json": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/simulation_manifest.json",
+  "tools_detected": {
+    "verilator": true,
+    "make": true
+  },
+  "artifacts": {
+    "simulation_manifest": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/simulation_manifest.json",
+    "runner_py": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/run_regression.py",
+    "sim_readme": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/SIM_CONTROL.md",
+    "log": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/simulation_control_agent.log"
+  }
+}

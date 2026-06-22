@@ -1,0 +1,26 @@
+{
+  "agent": "Embedded Rust Register Layer Generator Agent",
+  "phase": "hal_generate",
+  "hal_path": "firmware/hal/registers.rs",
+  "register_count": 17,
+  "register_names": [
+    "CONTROL",
+    "STATUS",
+    "MEM_ADDR",
+    "MEM_WDATA",
+    "MEM_WDATA1",
+    "MEM_WDATA2",
+    "MEM_WDATA3",
+    "MEM_RDATA",
+    "MEM_RDATA1",
+    "MEM_RDATA2",
+    "MEM_RDATA3",
+    "MEM_CONTROL",
+    "BIST_CONTROL",
+    "BIST_STATUS",
+    "BIST_LAST_FAIL_ADDR",
+    "IRQ_STATUS",
+    "IRQ_CLEAR"
+  ],
+  "base_address": "0x00000000"
+}

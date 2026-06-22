@@ -1,0 +1,31 @@
+Digital Simulation Execution Agent Log
+[2026-06-22T17:59:48.568981] [INFO] Starting Digital Simulation Execution Agent...
+[2026-06-22T17:59:48.569254] [INFO] manifest_path=backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/tb/simulation_manifest.json
+[2026-06-22T17:59:48.569528] [INFO] tests=[
+  "smoke_test",
+  "constrained_random_sanity",
+  "memory_write_read_directed",
+  "bist_start_directed"
+]
+[2026-06-22T17:59:48.570060] [INFO] seeds=[
+  1,
+  2,
+  3,
+  4
+]
+[2026-06-22T17:59:48.570279] [INFO] Running testcase=smoke_test seed=1
+[2026-06-22T17:59:53.777775] [INFO] Running testcase=smoke_test seed=2
+[2026-06-22T17:59:56.248646] [INFO] Running testcase=smoke_test seed=3
+[2026-06-22T17:59:58.767960] [INFO] Running testcase=smoke_test seed=4
+[2026-06-22T18:00:01.581298] [INFO] Running testcase=constrained_random_sanity seed=1
+[2026-06-22T18:00:04.935286] [INFO] Running testcase=constrained_random_sanity seed=2
+[2026-06-22T18:00:08.134391] [INFO] Running testcase=constrained_random_sanity seed=3
+[2026-06-22T18:00:11.044477] [INFO] Running testcase=constrained_random_sanity seed=4
+[2026-06-22T18:00:13.819145] [INFO] Running testcase=memory_write_read_directed seed=1
+[2026-06-22T18:00:16.519078] [INFO] Running testcase=memory_write_read_directed seed=2
+[2026-06-22T18:00:19.099681] [INFO] Running testcase=memory_write_read_directed seed=3
+[2026-06-22T18:00:21.904076] [INFO] Running testcase=memory_write_read_directed seed=4
+[2026-06-22T18:00:24.615753] [INFO] Running testcase=bist_start_directed seed=1
+[2026-06-22T18:00:27.261760] [INFO] Running testcase=bist_start_directed seed=2
+[2026-06-22T18:00:29.918898] [INFO] Running testcase=bist_start_directed seed=3
+[2026-06-22T18:00:32.507022] [INFO] Running testcase=bist_start_directed seed=4

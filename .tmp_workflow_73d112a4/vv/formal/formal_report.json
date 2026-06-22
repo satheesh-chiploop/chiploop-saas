@@ -1,0 +1,61 @@
+{
+  "type": "vv_formal_verification",
+  "version": "1.0",
+  "top_module": "sram_mbist_demo_controller",
+  "spec_path": "/root/chiploop-backend/backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/spec/sram_mbist_demo_controller_spec.json",
+  "rtl_file_count": 3,
+  "clock": "clk",
+  "reset": {
+    "name": "reset_n",
+    "active_low": true,
+    "async": false
+  },
+  "toolchain": {
+    "formal": "symbiyosys",
+    "formal_solver": "z3"
+  },
+  "deep_formal_default": false,
+  "status": "fail",
+  "reason": null,
+  "tools_detected": {
+    "sby": true,
+    "yosys": true,
+    "z3": true,
+    "boolector": true
+  },
+  "run": {
+    "tool": "symbiyosys",
+    "solver": "z3",
+    "available": true,
+    "attempted": true,
+    "returncode": null,
+    "stdout_tail": [],
+    "stderr_tail": [],
+    "tool_execution": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "formal_verification",
+      "tool": "sby",
+      "executable": "/usr/local/bin/sby",
+      "command": [
+        "/usr/local/bin/sby",
+        "-f",
+        "sram_mbist_demo_controller.sby"
+      ],
+      "cwd": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/formal",
+      "returncode": null,
+      "stdout": "",
+      "stderr": "",
+      "status": "exception",
+      "error": "Command '['/usr/local/bin/sby', '-f', 'sram_mbist_demo_controller.sby']' timed out after 600 seconds",
+      "started_at": "2026-06-22T17:49:46.411343+00:00",
+      "ended_at": "2026-06-22T17:59:46.490012+00:00",
+      "elapsed_ms": 600078
+    }
+  },
+  "artifacts": {
+    "sby": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/formal/sram_mbist_demo_controller.sby",
+    "formal_sv": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/formal/sram_mbist_demo_controller_formal.sv",
+    "log": "backend/workflows/73d112a4-5b95-4410-b41b-0d33ea860c58/vv/formal_verification_agent.log"
+  }
+}
