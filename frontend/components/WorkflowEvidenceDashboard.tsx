@@ -586,6 +586,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const mbistSimulation = record(mbistInsertion.simulation);
         const mbistIverilog = record(mbistLint.iverilog);
         const mbistVerilator = record(mbistLint.verilator);
+        const mbistLintFileCount = array(mbistLint.rtl_files).length;
         const hasMbistInsertion = Object.keys(mbistInsertion).length > 0;
         const hasMbistLint = Object.keys(mbistLint).length > 0;
         const mbistLintPass = firstString(mbistIverilog.status) === "pass" && firstString(mbistVerilator.status) === "pass";
@@ -624,7 +625,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               {hasMbistInsertion ? <Stat title="Package RTL Files" value={metricValue(completePackage.rtl_file_count)} /> : null}
               {hasMbistInsertion ? <Stat title="Package Modules" value={metricValue(completePackage.module_count)} /> : null}
               {number(storage.memory_bit_count) ? <Stat title="Behavioral Memory Bits" value={metricValue(storage.memory_bit_count)} /> : null}
-              {hasMbistLint ? <Stat title="MBIST RTL Lint" value={mbistLintPass ? "pass" : "fail"} /> : null}
+              {hasMbistLint ? <Stat title="Integrated MBIST RTL Lint" value={mbistLintPass ? "pass" : "fail"} /> : null}
+              {hasMbistLint ? <Stat title="Integrated RTL Files Linted" value={metricValue(mbistLintFileCount)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL" value={statusLabel(spec2rtl.status)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Checked" value={metricValue(spec2rtlSummary.checked)} /> : null}
               {hasSpec2Rtl ? <Stat title="Spec2RTL Matched" value={metricValue(spec2rtlSummary.matched)} /> : null}
