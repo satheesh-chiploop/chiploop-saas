@@ -296,9 +296,23 @@ function countParticipatingAgents(logs: string | null | undefined): number | nul
 
 function hasTerminalEvidence(status: string | null | undefined, stage: Stage, logs: string | null | undefined): boolean {
   const normalized = String(status || "").toLowerCase();
-  if (["completed", "complete", "success", "succeeded", "failed"].includes(normalized)) return true;
-  if (stage === "embedded" && logs) {
-    return /system firmware (?:cosim|coverage).*dashboard|system firmware .*complete|system firmware .*generated/i.test(logs);
+  if (["completed", "complete", "success", "succeeded", "failed", "done"].includes(normalized)) return true;
+  if (!logs) return false;
+  if (/(?:system|digital|embedded|analog|validation)\s+(?:run\s+)?app\s+complete/i.test(logs)) return true;
+  if (/system\s+app\s+complete:\s*system[_\s-]*(?:firmware|software|software[_\s-]*validation|product[_\s-]*app[_\s-]*builder|rtl|sim)/i.test(logs)) {
+    return true;
+  }
+  if (stage === "embedded") {
+    return /system[_\s-]*firmware.*(?:cosim|coverage|dashboard|complete|generated)|system_software_handoff/i.test(logs);
+  }
+  if (stage === "software") {
+    return /system\s+software\s+(?:packaging|executive\s+summary).*done|system_software_(?:package|executive_summary|api_contract)\.json/i.test(logs);
+  }
+  if (stage === "validation") {
+    return /system\s+software\s+validation\s+summary.*done|(?:l2_)?validation_summary\.json|system_software_validation_summary(?:_l2)?\.json|system_cosim_trace_validation_report\.json/i.test(logs);
+  }
+  if (stage === "product") {
+    return /system\s+product\s+(?:package|dashboard|capability|collateral).*done|system_product_(?:package|dashboard_manifest|capability_model|collateral_contract)\.json|system\/product\/app\/index\.html/i.test(logs);
   }
   return false;
 }
@@ -552,11 +566,25 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       software: [
         "system_software_api_contract.json",
         "system/software/sdk/system_software_api_contract.json",
+        "system_software_sdk_manifest.json",
+        "system/software/sdk/system_software_sdk_manifest.json",
+        "system_software_application_manifest.json",
+        "system/software/apps/system_software_application_manifest.json",
+        "system_software_build_manifest.json",
+        "system/software/build/system_software_build_manifest.json",
+        "system_software_test_manifest.json",
+        "system/software/tests/system_software_test_manifest.json",
+        "system_software_mock_manifest.json",
+        "system/software/mock/system_software_mock_manifest.json",
+        "system_software_executive_summary.json",
+        "system/software/executive/system_software_executive_summary.json",
         "system_software_package.json",
         "system/software/package/system_software_package.json",
       ],
       validation: [
         "system_software_validation_summary_l2.json",
+        "l2_validation_summary.json",
+        "system/cosim/l2_validation_summary.json",
         "system/validation/l2/system_software_validation_summary_l2.json",
         "system/software_validation/cosim/summary/system_software_validation_summary_l2.json",
         "system_cosim_trace_validation_report.json",
@@ -586,10 +614,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "system_product_dashboard_manifest.json",
         "system/product/app/system_product_dashboard_manifest.json",
         "system_product_package.json",
+        "system/product/system_product_package.json",
         "system/product/package/system_product_package.json",
         "system_product_capability_model.json",
         "system/product/model/system_product_capability_model.json",
         "system_product_collateral_contract.json",
+        "system/product/input/system_product_collateral_contract.json",
         "system/product/ingest/system_product_collateral_contract.json",
       ],
     };
@@ -1284,6 +1314,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const contract = record(evidence["system_product_collateral_contract.json"]);
       const lineage = record(model.lineage || contract.lineage);
       const sourceArtifacts = record(contract.source_artifacts);
+      const firmwareSourceLoaded = Boolean(
+        record(sourceArtifacts.firmware_dashboard).data ||
+        record(sourceArtifacts.firmware_register_map).data ||
+        record(sourceArtifacts.software_handoff).data
+      );
       const capabilities = array(model.capabilities);
       const registers = array(model.registers);
       const specific = String(model.device_model || "generic_device_control") !== "generic_device_control";
@@ -1316,7 +1351,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           </div>
           <div className="grid min-w-0 grid-cols-2 gap-3 md:grid-cols-4">
             <Stat title="Dashboard" value={String(manifest.entrypoint || pkg.entrypoint || "not produced")} />
-            <Stat title="Firmware Source" value={record(sourceArtifacts.firmware_dashboard).data ? "loaded" : "missing"} />
+            <Stat title="Firmware Source" value={firmwareSourceLoaded ? "loaded" : "missing"} />
             <Stat title="Software Source" value={record(sourceArtifacts.software_api).data || record(sourceArtifacts.software_package).data ? "loaded" : "missing"} />
             <Stat title="Validation Source" value={record(sourceArtifacts.validation_summary).data ? "loaded" : "missing"} />
           </div>

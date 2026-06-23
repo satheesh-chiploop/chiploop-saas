@@ -6,9 +6,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import {
+  IMAGE_PRODUCT_INTENT,
   PRODUCT_BUILDER_PREFILL_KEY,
+  PWM_PRODUCT_INTENT,
+  SAFETY_PRODUCT_INTENT,
+  SECURE_BOOT_PRODUCT_INTENT,
+  SENSOR_PRODUCT_INTENT,
   TEMP_MONITOR_SYSTEM_PRODUCT_INTENT,
+  UART_PRODUCT_INTENT,
   type DesignChainContext,
   DESIGN_CHAIN_CONTEXT_KEY,
 } from "@/lib/pwmFullStackDemo";
@@ -34,6 +41,21 @@ function countParticipatingAgents(logs: string | null | undefined): number | nul
     if (name) agents.add(name.trim());
   }
   return agents.size || null;
+}
+
+function productIntentForContext(demoKind: unknown): string {
+  const kind = String(demoKind || "").toLowerCase();
+  if (kind.includes("temp_monitor")) return TEMP_MONITOR_SYSTEM_PRODUCT_INTENT;
+  if (kind.includes("sram") || kind.includes("mbist")) {
+    return "Build a simulator-backed SRAM scratchpad controller dashboard with memory read/write controls, MBIST start/status, IRQ visibility, and validation lineage.";
+  }
+  if (kind.includes("pwm")) return PWM_PRODUCT_INTENT;
+  if (kind.includes("uart")) return UART_PRODUCT_INTENT;
+  if (kind.includes("image")) return IMAGE_PRODUCT_INTENT;
+  if (kind.includes("sensor")) return SENSOR_PRODUCT_INTENT;
+  if (kind.includes("secure")) return SECURE_BOOT_PRODUCT_INTENT;
+  if (kind.includes("safety")) return SAFETY_PRODUCT_INTENT;
+  return "Build a simulator-backed product dashboard from the validated system collateral.";
 }
 
 function WorkflowIdField({
@@ -161,13 +183,7 @@ export default function SystemProductBuilderPage() {
       setSystemFirmwareWorkflowId(prefill.systemFirmwareWorkflowId || context.systemFirmwareWorkflowId || context.embeddedWorkflowId || "");
       setSystemSoftwareWorkflowId(prefill.systemSoftwareWorkflowId || context.softwareWorkflowId || "");
       setSystemValidationWorkflowId(prefill.systemValidationWorkflowId || context.validationWorkflowId || "");
-      setProductIntent(prefill.productIntent || (
-        isTempMonitor
-          ? TEMP_MONITOR_SYSTEM_PRODUCT_INTENT
-          : isSram
-            ? "Build a simulator-backed SRAM scratchpad controller dashboard with memory read/write controls, MBIST start/status, IRQ visibility, and validation lineage."
-            : "Build a simulator-backed product dashboard from the validated system collateral."
-      ));
+      setProductIntent(prefill.productIntent || productIntentForContext(isTempMonitor ? "temp_monitor_system" : isSram ? "mbist_sram" : context.demoKind));
       setAppType(prefill.appType || "web_dashboard");
       setTargetRuntime(prefill.targetRuntime || "simulated_device");
     } catch {
@@ -361,6 +377,11 @@ export default function SystemProductBuilderPage() {
               {workflowId ? <AskThisRunPanel workflowId={workflowId} compact /> : null}
             </div>
           </div>
+          {workflowId ? (
+            <div className="mt-6">
+              <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="product" logs={workflowRow?.logs} />
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-2xl border border-slate-800 bg-black/20 p-4">
             <div className="text-sm font-semibold">Live logs</div>
