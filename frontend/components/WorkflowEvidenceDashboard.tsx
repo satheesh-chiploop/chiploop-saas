@@ -453,12 +453,16 @@ function ClosureTrend({ title, chart, metrics }: { title: string; chart: JsonMap
 export default function WorkflowEvidenceDashboard({ workflowId, status, stage, logs }: Props) {
   const [evidence, setEvidence] = useState<Record<string, JsonMap | null>>({});
   const [error, setError] = useState<string | null>(null);
+  const [artifactsLoaded, setArtifactsLoaded] = useState(false);
   const flow = useMemo(() => displayedFlow(stage), [stage]);
   const stageIndex = flow.findIndex((item) => item.id === stage);
   const agentCount = useMemo(() => countParticipatingAgents(logs), [logs]);
   const resultsReady = hasTerminalEvidence(status, stage, logs);
 
   useEffect(() => {
+    setArtifactsLoaded(false);
+    setEvidence({});
+    setError(null);
     if (!workflowId || !resultsReady) return;
     let active = true;
     const files: Record<Stage, string[]> = {
@@ -623,8 +627,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "system/product/ingest/system_product_collateral_contract.json",
       ],
     };
-    Promise.all((files[stage] || []).map(async (filename) => [filename.split("/").pop() || filename, await artifact(workflowId, filename)] as const))
-      .then((entries) => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const loadArtifacts = (attempt: number) => {
+      Promise.all((files[stage] || []).map(async (filename) => [filename.split("/").pop() || filename, await artifact(workflowId, filename)] as const))
+        .then((entries) => {
         if (!active) return;
         const merged: Record<string, unknown> = {};
         for (const [key, value] of entries) {
@@ -632,13 +638,21 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             merged[key] = value;
           }
         }
+        const hasEvidence = entries.some(([, value]) => Object.keys(record(value)).length > 0);
         setEvidence(merged);
-      })
-      .catch((reason: unknown) => {
-        if (active) setError(reason instanceof Error ? reason.message : String(reason));
-      });
+        setArtifactsLoaded(hasEvidence);
+        if (!hasEvidence && attempt < 12) {
+          timer = setTimeout(() => loadArtifacts(attempt + 1), 2500);
+        }
+        })
+        .catch((reason: unknown) => {
+          if (active) setError(reason instanceof Error ? reason.message : String(reason));
+        });
+    };
+    loadArtifacts(0);
     return () => {
       active = false;
+      if (timer) clearTimeout(timer);
     };
   }, [workflowId, stage, resultsReady]);
 
@@ -647,6 +661,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       return <div className="mt-5 text-sm text-slate-400">Results appear after this stage completes.</div>;
     }
     if (error) return <div className="mt-5 text-sm text-amber-300">{error}</div>;
+    if (!artifactsLoaded) {
+      return (
+        <div className="mt-5 rounded-lg border border-slate-800 bg-black/20 p-4 text-sm text-slate-400">
+          Result artifacts are syncing. The dashboard will populate when the generated stage artifact is available.
+        </div>
+      );
+    }
 
     if (stage === "arch2rtl") {
       const dashboard = record(evidence["arch2rtl_dashboard.json"]);
@@ -1486,7 +1507,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ) : null}
       </div>
     );
-  }, [agentCount, evidence, error, resultsReady, stage, status, workflowId]);
+  }, [agentCount, artifactsLoaded, evidence, error, resultsReady, stage, status, workflowId]);
 
   return (
     <section className="w-full rounded-lg border border-slate-800 bg-slate-950/45 p-5">

@@ -1,0 +1,82 @@
+{
+  "workflow_dir": "backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d",
+  "candidate_paths": [
+    "digital/digital_regmap.json",
+    "digital_regmap.json",
+    "digital/regmap.json",
+    "digital/register_map.json",
+    "regmap.json"
+  ],
+  "candidate_roots": [
+    "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d",
+    "/root/chiploop-backend/backend/workflows",
+    "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital",
+    "/root/chiploop-backend/backend/workflows/28468353-d226-4215-b923-459a32c1f88f",
+    "/root/chiploop-backend/backend/workflows/28468353-d226-4215-b923-459a32c1f88f/digital"
+  ],
+  "candidate_probe": [
+    {
+      "rel": "digital/digital_regmap.json",
+      "abs": "backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/digital_regmap.json",
+      "exists": true
+    },
+    {
+      "rel": "digital_regmap.json",
+      "abs": "backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital_regmap.json",
+      "exists": false
+    },
+    {
+      "rel": "digital/regmap.json",
+      "abs": "backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/regmap.json",
+      "exists": false
+    },
+    {
+      "rel": "digital/register_map.json",
+      "abs": "backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/register_map.json",
+      "exists": false
+    },
+    {
+      "rel": "regmap.json",
+      "abs": "backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/regmap.json",
+      "exists": false
+    }
+  ],
+  "state_digital_regmap_present": true,
+  "state_digital_regmap_path": "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/digital_regmap.json",
+  "state_digital_register_map_path": "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/digital_regmap.json",
+  "state_digital_block_keys": [
+    "regmap",
+    "digital_regmap",
+    "digital_regmap_path",
+    "rtl_files",
+    "clock_intent"
+  ],
+  "selected_regmap_path": "state.digital_regmap",
+  "source_workflow_ids": [
+    "28468353-d226-4215-b923-459a32c1f88f"
+  ],
+  "upstream_regmap_type": "dict",
+  "passthrough_taken": true,
+  "normalization_taken": false,
+  "candidate_regs_count": 4,
+  "goal_present": true,
+  "toolchain_keys": [
+    "coverage_fw",
+    "coverage_rtl",
+    "fw_build",
+    "fw_language",
+    "rtl_sim",
+    "tb_framework"
+  ],
+  "toggle_keys": [
+    "enable_cosim",
+    "enable_coverage"
+  ],
+  "mode": "artifact_passthrough",
+  "register_names_preview": [
+    "CONTROL",
+    "DUTY_CYCLE",
+    "PERIOD",
+    "COUNTER_VALUE"
+  ]
+}

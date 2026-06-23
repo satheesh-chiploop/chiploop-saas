@@ -1,0 +1,68 @@
+{
+  "type": "vv_testcases",
+  "version": "1.0",
+  "top_module": "pwm_controller",
+  "mode": "digital",
+  "test_selection": "both",
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity",
+    "memory_write_read_directed"
+  ],
+  "tests": [
+    {
+      "name": "smoke_test",
+      "description": "Basic smoke test with clock/reset bring-up and settle window.",
+      "kind": "smoke",
+      "top_module": "pwm_controller",
+      "mode": "digital",
+      "clock_names": [
+        "clk"
+      ],
+      "reset_names": [
+        "reset_n"
+      ],
+      "tags": [
+        "smoke",
+        "sanity"
+      ],
+      "timeout_ns": 200
+    },
+    {
+      "name": "constrained_random_sanity",
+      "description": "Simple constrained-random sanity test using only spec-declared inputs.",
+      "kind": "cr_sanity",
+      "top_module": "pwm_controller",
+      "mode": "digital",
+      "clock_names": [
+        "clk"
+      ],
+      "reset_names": [
+        "reset_n"
+      ],
+      "tags": [
+        "sanity",
+        "random"
+      ],
+      "timeout_ns": 1000
+    },
+    {
+      "name": "memory_write_read_directed",
+      "description": "Directed test generated from detected spec-declared interface semantics.",
+      "kind": "directed",
+      "top_module": "pwm_controller",
+      "mode": "digital",
+      "clock_names": [
+        "clk"
+      ],
+      "reset_names": [
+        "reset_n"
+      ],
+      "tags": [
+        "directed",
+        "coverage"
+      ],
+      "timeout_ns": 2000
+    }
+  ]
+}

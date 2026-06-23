@@ -1,0 +1,16 @@
+{
+  "agent": "Embedded Rust Driver Scaffold Agent",
+  "phase": "driver_scaffold",
+  "driver_path": "firmware/drivers/driver_scaffold.rs",
+  "driver_name": "DigitalSubsystemDriver",
+  "register_count": 4,
+  "register_names": [
+    "CONTROL",
+    "DUTY_CYCLE",
+    "PERIOD",
+    "COUNTER_VALUE"
+  ],
+  "used_regmap": true,
+  "used_hal": true,
+  "used_spec": true
+}

@@ -1,0 +1,25 @@
+{
+  "type": "vv_simulation_manifest",
+  "version": "1.1",
+  "top_module": "pwm_controller",
+  "spec_path": "/root/chiploop-backend/backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/spec/pwm_controller_spec.json",
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/handoff/rtl/pwm_controller.v"
+  ],
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity",
+    "memory_write_read_directed"
+  ],
+  "runner": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/run_regression.py",
+  "makefile": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/Makefile",
+  "testcases_json": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/testcases.json",
+  "tb_contract_json": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/tb_contract.json",
+  "reports_dir": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/reports",
+  "simulator": "verilator",
+  "sva_assertions_path": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/pwm_controller_assertions.sv",
+  "sva_bind_path": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/pwm_controller_assertions_bind.sv",
+  "coverage_model_py": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/coverage_model.py",
+  "functional_coverage_summary_json": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/reports/functional_coverage_summary.json",
+  "functional_coverage_md": "backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/vv/tb/reports/COVERAGE.md"
+}

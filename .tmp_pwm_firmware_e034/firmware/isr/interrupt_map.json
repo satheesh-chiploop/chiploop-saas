@@ -1,0 +1,6 @@
+{
+  "agent": "Embedded Interrupt Mapping Agent",
+  "phase": "irq_map",
+  "top_irq_signal": "irq",
+  "sources": []
+}

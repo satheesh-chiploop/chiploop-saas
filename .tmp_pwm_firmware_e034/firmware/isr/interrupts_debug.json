@@ -1,0 +1,7 @@
+{
+  "agent": "Embedded Interrupt Mapping Agent",
+  "manifest_present": true,
+  "register_count": 4,
+  "source_count": 0,
+  "sources": []
+}

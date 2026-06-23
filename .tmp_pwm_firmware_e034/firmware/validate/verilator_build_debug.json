@@ -1,0 +1,51 @@
+{
+  "agent": "Embedded Verilator Build Agent",
+  "workflow_dir": "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d",
+  "status": "resolved",
+  "top_module": "pwm_controller",
+  "rtl_top_resolution": {
+    "resolution": "metadata_top_found_in_rtl",
+    "candidate_top": "pwm_controller",
+    "module_map": {
+      "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/rtl/pwm_controller.v": [
+        "pwm_controller"
+      ]
+    }
+  },
+  "rtl_paths_scanned": [
+    "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/rtl/pwm_controller.v"
+  ],
+  "rtl_filelist": "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/firmware/validate/verilator_rtl_filelist.f",
+  "rtl_filelist_entries": [
+    "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/rtl/pwm_controller.v"
+  ],
+  "harness": "firmware/validate/cocotb_harness.py",
+  "harness_required_for_plan": false,
+  "harness_source": "default_expected_path",
+  "include_dirs": [],
+  "defines": [],
+  "output_path": "firmware/validate/verilator_build.md",
+  "resolved_from_state": {
+    "soc_top_sim_module": "pwm_controller",
+    "system_top_sim_module": "pwm_controller",
+    "rtl_top": "pwm_controller",
+    "top_module": "pwm_controller",
+    "design_name": null,
+    "system_rtl_filelist_sim": null,
+    "rtl_inputs": [
+      "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/rtl/pwm_controller.v"
+    ],
+    "system_rtl_files": [
+      "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/rtl/pwm_controller.v"
+    ],
+    "system_block": {
+      "soc_top_sim_module": "pwm_controller",
+      "system_top_sim_module": "pwm_controller"
+    },
+    "rtl_filelist_path": null,
+    "system_filelist_sim_path": null,
+    "filelist_path": null,
+    "cocotb_harness_path": null,
+    "sim_harness_path": null
+  }
+}

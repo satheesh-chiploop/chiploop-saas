@@ -1,0 +1,32 @@
+{
+  "type": "vv_tb_contract",
+  "version": "1.1",
+  "mode": "digital",
+  "top_module": "pwm_controller",
+  "spec_path": "/root/chiploop-backend/backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/spec/pwm_controller_spec.json",
+  "spec_source": "state",
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/ea8f5880-ce6f-4b22-b64d-ab3804c842ec/handoff/rtl/pwm_controller.v"
+  ],
+  "rtl_source": "state.rtl_files",
+  "verification_files": [],
+  "clock_names": [
+    "clk"
+  ],
+  "reset_names": [
+    "reset_n"
+  ],
+  "soc_mode": false,
+  "generated_testbench": "vv/tb/test_pwm_controller.py",
+  "generated_makefile": "vv/tb/Makefile",
+  "generated_rtl_sources_mk": "vv/tb/rtl_sources.mk",
+  "generated_verification_sources_mk": "vv/tb/verification_sources.mk",
+  "generated_testcases_manifest": "vv/tb/testcases.json",
+  "verification_plan_path": "vv/tb/verification_plan.md",
+  "verification_plan_source": "generated_from_spec",
+  "monitor_checker_plan_path": "vv/tb/monitor_checker_plan.md",
+  "monitor_checker_plan_source": "generated_from_spec",
+  "coverage_point_plan_path": "vv/tb/coverage_point_plan.md",
+  "coverage_point_plan_source": "generated_from_spec",
+  "test_selection": "both"
+}

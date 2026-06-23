@@ -1,0 +1,16 @@
+{
+  "agent": "Embedded Firmware Register Extract Agent",
+  "phase": "register_extract",
+  "mode": "artifact_passthrough",
+  "source_path": "state.digital_regmap",
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "register_count": 4,
+  "register_names": [
+    "CONTROL",
+    "DUTY_CYCLE",
+    "PERIOD",
+    "COUNTER_VALUE"
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "top_module": "pwm_controller",
+  "soc_mode": false,
+  "clock_names": [
+    "clk"
+  ],
+  "reset_signals": [
+    {
+      "name": "reset_n",
+      "active_low": true,
+      "async": false
+    }
+  ],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "reset_n",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "wr_en",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "wr_addr",
+      "direction": "input",
+      "width_expr": "8"
+    },
+    {
+      "name": "wr_data",
+      "direction": "input",
+      "width_expr": "8"
+    },
+    {
+      "name": "rd_en",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "rd_addr",
+      "direction": "input",
+      "width_expr": "8"
+    },
+    {
+      "name": "rd_data",
+      "direction": "output",
+      "width_expr": "8"
+    },
+    {
+      "name": "pwm_out",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "counter_value",
+      "direction": "output",
+      "width_expr": "8"
+    }
+  ]
+}

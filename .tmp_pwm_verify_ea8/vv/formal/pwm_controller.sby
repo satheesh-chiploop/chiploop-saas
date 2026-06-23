@@ -1,0 +1,19 @@
+# Auto-generated SymbiYosys config for pwm_controller
+
+[options]
+mode bmc
+depth 40
+multiclock on
+
+[engines]
+smtbmc z3
+
+[script]
+read_verilog -sv pwm_controller.v
+prep -top pwm_controller
+
+[files]
+../../handoff/rtl/pwm_controller.v
+
+# clock clk
+# reset: reset_n active_low=True async=False

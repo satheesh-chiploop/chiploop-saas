@@ -1,0 +1,10 @@
+{
+  "soc_top_relpath": "digital/rtl/pwm_controller.v",
+  "instantiated_modules": [],
+  "resolved_modules": {},
+  "missing_modules": [],
+  "ambiguous_modules": {},
+  "state_rtl_candidates": [
+    "digital/rtl/pwm_controller.v"
+  ]
+}

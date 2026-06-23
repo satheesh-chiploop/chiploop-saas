@@ -1,0 +1,54 @@
+{
+  "source_workflow_id": "28468353-d226-4215-b923-459a32c1f88f",
+  "source_verification_workflow_id": "ea8f5880-ce6f-4b22-b64d-ab3804c842ec",
+  "rtl_source_paths": [
+    "backend/workflows/28468353-d226-4215-b923-459a32c1f88f/rtl/pwm_controller.v"
+  ],
+  "rtl_top_resolution": {
+    "resolution": "metadata_top_found_in_rtl",
+    "candidate_top": "pwm_controller",
+    "module_map": {
+      "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/rtl/pwm_controller.v": [
+        "pwm_controller"
+      ]
+    }
+  },
+  "regmap_source_path": "backend/workflows/28468353-d226-4215-b923-459a32c1f88f/digital/digital_regmap.json",
+  "local_sdc_files": [],
+  "clock_intent": {
+    "type": "digital_clock_intent",
+    "clocks": [
+      {
+        "name": "clk",
+        "port": "clk",
+        "frequency_mhz": null,
+        "period_ns": null,
+        "source": "rtl_port_inference",
+        "needs_user_frequency": true
+      }
+    ],
+    "resets": [
+      {
+        "name": "reset_n",
+        "port": "reset_n",
+        "active_low": true,
+        "source": "rtl_port_inference"
+      }
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n",
+    "needs_user_review": true,
+    "provenance": {
+      "requested": false,
+      "sdc_clocks": 0,
+      "spec_clocks": 0,
+      "rtl_clocks": 1,
+      "spec_resets": 0,
+      "rtl_resets": 1
+    }
+  },
+  "local_rtl_paths": [
+    "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/rtl/pwm_controller.v"
+  ],
+  "local_regmap_path": "/root/chiploop-backend/backend/workflows/e03418bc-ee6a-4dba-871a-31edd775db8d/digital/digital_regmap.json"
+}
