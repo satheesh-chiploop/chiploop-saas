@@ -27,10 +27,10 @@ const activeNavButtonClass = "whitespace-nowrap text-sm font-semibold text-cyan-
 function AnimatedTesseractLogo() {
   return (
     <span
-      className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-cyan-300/70 bg-cyan-400/10 shadow-[0_0_22px_rgba(34,211,238,0.28)] transition group-hover:border-cyan-100 group-hover:bg-cyan-300/15"
+      className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-cyan-300/70 bg-cyan-400/10 shadow-[0_0_24px_rgba(34,211,238,0.3)] transition group-hover:border-cyan-100 group-hover:bg-cyan-300/15"
       aria-hidden="true"
     >
-      <svg className="h-8 w-8 text-cyan-200" viewBox="0 0 64 64" fill="none">
+      <svg className="h-9 w-9 text-cyan-200" viewBox="0 0 64 64" fill="none">
         <g stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
           <g opacity="0.95">
             <path d="M14 18h28v28H14z" />
