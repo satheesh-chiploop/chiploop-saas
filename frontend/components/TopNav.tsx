@@ -24,6 +24,56 @@ const navButtonClass = "whitespace-nowrap text-sm font-medium text-slate-300 tra
 const activeNavButtonClass = "whitespace-nowrap text-sm font-semibold text-cyan-200 transition hover:text-cyan-100";
 
 
+function AnimatedTesseractLogo() {
+  return (
+    <span
+      className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-cyan-300/70 bg-cyan-400/10 shadow-[0_0_22px_rgba(34,211,238,0.28)] transition group-hover:border-cyan-100 group-hover:bg-cyan-300/15"
+      aria-hidden="true"
+    >
+      <svg className="h-8 w-8 text-cyan-200" viewBox="0 0 64 64" fill="none">
+        <g stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <g opacity="0.95">
+            <path d="M14 18h28v28H14z" />
+            <path d="M22 10h28v28H22z" />
+            <path d="M14 18 22 10" />
+            <path d="M42 18 50 10" />
+            <path d="M42 46 50 38" />
+            <path d="M14 46 22 38" />
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from="0 32 32"
+              to="360 32 32"
+              dur="9s"
+              repeatCount="indefinite"
+            />
+          </g>
+          <g opacity="0.55">
+            <path d="M20 24h20v20H20z" />
+            <path d="M25 19h20v20H25z" />
+            <path d="M20 24 25 19" />
+            <path d="M40 24 45 19" />
+            <path d="M40 44 45 39" />
+            <path d="M20 44 25 39" />
+            <animateTransform
+              attributeName="transform"
+              type="rotate"
+              from="360 32 32"
+              to="0 32 32"
+              dur="6s"
+              repeatCount="indefinite"
+            />
+          </g>
+        </g>
+        <circle cx="32" cy="32" r="2.8" className="fill-cyan-200">
+          <animate attributeName="opacity" values="0.55;1;0.55" dur="2.4s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    </span>
+  );
+}
+
+
 function getDisplayName(user: User | null): string | null {
   if (!user) return null;
   const metadata = user.user_metadata || {};
@@ -107,12 +157,7 @@ export default function TopNav({
           className="group flex self-start items-center gap-3 text-2xl font-extrabold text-cyan-300 sm:self-auto"
           aria-label="ChipLoop home"
         >
-          <span
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-cyan-300/60 bg-cyan-400/15 text-base font-black leading-none text-cyan-200 shadow-[0_0_18px_rgba(34,211,238,0.24)] transition group-hover:border-cyan-200 group-hover:bg-cyan-300/20 group-hover:text-cyan-100 sm:h-11 sm:w-11"
-            aria-hidden="true"
-          >
-            CL
-          </span>
+          <AnimatedTesseractLogo />
           <span>ChipLoop</span>
         </button>
 
