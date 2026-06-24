@@ -1,7 +1,7 @@
 export type HelpTopic = {
   slug: string;
   title: string;
-  category: "Basics" | "Apps" | "Inspection" | "Studio" | "Integrations" | "Developer" | "Examples";
+  category: "Basics" | "Apps" | "Products" | "Inspection" | "Studio" | "Integrations" | "Developer" | "Examples";
   summary: string;
   body: string[];
   comparisonRows?: Array<{ area: string; traditional: string; chiploop: string; differentiation: string }>;
@@ -18,24 +18,25 @@ export const helpTopics: HelpTopic[] = [
     category: "Basics",
     summary: "Start with Apps for guided flows or Studio for custom workflows.",
     body: [
-      "ChipLoop has two main work areas. Apps are reusable guided workflows such as Arch2RTL, System Architecture Explorer, Architecture-to-RTL Delivery, and Product App Builder. Studio is where users compose, inspect, and run agent workflows. Reference Journeys provide prefilled end-to-end examples across those Apps.",
-      "A good first path is Apps, Arch2RTL, run the PWM demo, or System Architecture Explorer, run the matrix-multiply gem5 demo, then use Ask This Run after completion to inspect generated artifacts and logs. After a System Architecture run, Architecture-to-RTL Delivery can convert the selected gem5 result into reviewed Arch2RTL intent.",
-      "Step 1: Log in and open Apps if you want a guided first run, or Studio if you want to compose a custom workflow.",
-      "Step 2: Start with Arch2RTL or System Architecture Explorer so you can see inputs, execution, outputs, downloads, and Ask This Run in one path. Use Architecture-to-RTL Delivery when you want to bridge a completed architecture run into RTL intent.",
+      "ChipLoop has three main work areas. Apps are reusable guided workflows such as Arch2RTL, Verify, Arch2Synthesis, Arch2Tapeout, System RTL, System Firmware, System Software, Validation, and Product App Builder. Products turn those Apps into ordered product journeys with saved stage configuration and workflow handoffs. Studio is where users compose, inspect, and run custom agent workflows.",
+      "A good first path is Products, choose a reference journey such as PWM Fan Controller, Soft Digital IP Product, or Temperature Monitor SoC, then configure and run the stages in order. For a single guided workflow, open Apps and run Arch2RTL, Verify, or System Architecture Explorer. After a run completes, use Ask This Run to inspect generated artifacts and logs.",
+      "Step 1: Log in and open Products when you want an end-to-end journey, Apps when you want one guided workflow, or Studio when you want to compose a custom workflow.",
+      "Step 2: In Products, start from a reference journey and review the Development Stages list. In Apps, start with Arch2RTL or System Architecture Explorer so you can see inputs, execution, outputs, downloads, and Ask This Run in one path.",
       "Step 3: After the run finishes, review downloads and open Ask This Run to ask what was generated, what needs review, and what to do next.",
-      "Step 4: Move into Studio when you want to reuse agents, connect multiple steps, save private agents, or compose a workflow.",
+      "Step 4: Move into Studio when you want to reuse agents, connect multiple steps, save private agents, or compose a custom workflow.",
     ],
-    actions: ["Open Apps", "Run the Arch2RTL or System Architecture demo", "Ask This Run after the workflow finishes"],
+    actions: ["Open Products for a reference journey", "Open Apps for a single guided workflow", "Run Arch2RTL, Verify, or System Architecture", "Ask This Run after the workflow finishes"],
     exampleQuestions: [
       "What should I try first in ChipLoop?",
       "Should I start with Apps or Studio?",
       "How do I inspect a completed demo run?",
     ],
     links: [
+      { label: "Products", href: "/products" },
       { label: "Apps", href: "/apps" },
       { label: "Studio", href: "/workflow" },
     ],
-    keywords: ["start", "begin", "onboarding", "apps", "studio", "demo"],
+    keywords: ["start", "begin", "onboarding", "products", "reference journey", "apps", "studio", "demo"],
   },
   {
     slug: "apps-arch2rtl",
@@ -157,6 +158,41 @@ export const helpTopics: HelpTopic[] = [
       { label: "Apps", href: "/apps" },
     ],
     keywords: ["agent catalog", "workflow catalog", "agents", "workflows", "loop", "registry", "studio", "browse", "count", "digital agents", "system agents"],
+  },
+  {
+    slug: "products-reference-journeys",
+    title: "Products and Reference Journeys",
+    category: "Products",
+    summary: "Create or clone product journeys, add existing Apps as stages, reorder the sequence, configure stage settings, and run with workflow handoffs.",
+    body: [
+      "Products are saved journey configurations built from existing ChipLoop Apps. A Product stage is not a new App; it is a configured use of an existing App inside an ordered sequence.",
+      "The current reference journeys are PWM Fan Controller, UART Packet Engine, Image DMA Pipeline, Soft Digital IP Product, and Temperature Monitor SoC. They are loaded from the backend reference journey catalog and can be copied into a user-owned Product.",
+      "On a Product detail page, Development Stages is the editable sequence. Users can add an existing App from the Add Stage dropdown, drag stages to reorder them, use Move Up or Move Down for precise ordering, remove non-required stages, and change a stage between Required, Recommended, and Optional.",
+      "Sequence guidance validates handoffs before a run. For example, Verify, DQA, Synthesis, Tapeout, and Embedded firmware need an RTL handoff first; System Software needs firmware or system-firmware lineage; Product App Builder needs software plus validation lineage.",
+      "Stage configuration uses the same dynamic schema as standalone Apps. Current digital stage controls include MBIST insertion, MBIST algorithm selection, Spec2RTL conformance, synthesis closure toggles, signoff closure toggles, DRC/LVS/fill/LEC controls, and tapeout effort.",
+      "System PD is available as a Product stage after System RTL lineage exists. Standalone System PD can run the larger System RTL plus PD sequence, but inside a Product it should be placed after System RTL so the journey handoff is explicit.",
+      "Run Product executes supported enabled stages in order, passes workflow IDs between stages, tracks per-stage status, and stores product-level stage results. Required stages stay enabled; recommended and optional stages can be skipped.",
+      "Step 1: Open Products and choose a reference journey or create a product.",
+      "Step 2: Review stages, add any existing Apps needed for the customer flow, and drag or move stages into the intended order.",
+      "Step 3: Fill required stage settings and watch Sequence guidance for missing handoffs or mismatched flow choices.",
+      "Step 4: Save Draft, then Run Product. Inspect the product run dashboard and per-stage workflow dashboards after execution.",
+    ],
+    actions: ["Open Products", "Choose a reference journey", "Add existing Apps as stages", "Reorder stages", "Fix sequence guidance", "Run Product"],
+    exampleQuestions: [
+      "How do I add an existing App to a product journey?",
+      "Can I create a new product journey from existing Apps?",
+      "Why does sequence guidance block my run?",
+      "Where do I configure MBIST in a Product?",
+      "When should I use System PD in a Product?",
+    ],
+    links: [
+      { label: "Products", href: "/products" },
+      { label: "Apps", href: "/apps" },
+      { label: "Arch2RTL", href: "/apps/arch2rtl" },
+      { label: "Arch2Tapeout", href: "/apps/arch2tapeout" },
+      { label: "System PD", href: "/apps/system-pd" },
+    ],
+    keywords: ["products", "reference journey", "journey", "stage", "add stage", "drag", "reorder", "sequence guidance", "handoff", "mbist", "system pd", "product run", "soft digital ip", "temperature monitor"],
   },
   {
     slug: "spec2rtl-check",
@@ -465,12 +501,13 @@ export const helpTopics: HelpTopic[] = [
     summary: "Run a focused memory/DFT demo with a prebuilt Sky130 SRAM macro controller, scan DFT, ATPG readiness, and MBIST applicability evidence.",
     body: [
       "SRAM MBIST Reference Journey is a compact Memory / DFT demo. It starts from a small memory-mapped SRAM scratchpad controller instead of a large image pipeline.",
-      "The Arch2RTL spec asks for a 32x256 Sky130 SRAM macro contract with a synthesizable model wrapper, so downstream synthesis and DFT agents can detect memory intent.",
-      "After Arch2RTL, open Synthesis to inspect synthesis metrics, logic-equivalence evidence, scan DFT evidence, open-source ATPG tool readiness, and MBIST applicability.",
-      "Scan DFT is backed by OpenROAD/OpenLane2 where supported. ATPG and MBIST report real coverage or insertion only when the corresponding open-source/customer tool adapter is configured.",
+      "The current Arch2RTL configuration exposes Insert MBIST and MBIST algorithm controls. The supported algorithms are march-c and march-raw. These controls are available both in the standalone Arch2RTL app and when Arch2RTL is used as a Product stage.",
+      "The Arch2RTL spec asks for a 32x256 SRAM macro-style contract with a synthesizable model wrapper, so downstream synthesis and DFT agents can detect memory intent.",
+      "After Arch2RTL, open Synthesis or add Arch2Synthesis/Arch2Tapeout as downstream Product stages to inspect synthesis metrics, logic-equivalence evidence, scan DFT evidence, open-source ATPG readiness, and MBIST applicability.",
+      "Scan DFT is backed by OpenROAD/OpenLane2 where supported. ATPG and MBIST report real coverage or insertion only when the corresponding open-source/customer tool adapter is configured. Missing adapter output is reported as unavailable or failed, not as a fake pass.",
       "Segment: Memory / DFT.",
     ],
-    actions: ["Open Apps", "Start MBIST SRAM Journey", "Run Arch2RTL", "Open Synthesis", "Inspect Scan, ATPG, and MBIST dashboard evidence"],
+    actions: ["Open Apps or Products", "Start MBIST SRAM Journey", "Enable Insert MBIST when needed", "Run Arch2RTL", "Open Synthesis or Tapeout", "Inspect Scan, ATPG, and MBIST dashboard evidence"],
     exampleQuestions: [
       "How do I demo MBIST without the image pipeline?",
       "Does PWM have MBIST?",
@@ -481,7 +518,7 @@ export const helpTopics: HelpTopic[] = [
       { label: "Arch2RTL", href: "/apps/arch2rtl?guided=1&mbist_chain=1" },
       { label: "Arch2Synthesis", href: "/apps/arch2synthesis" },
     ],
-    keywords: ["sram", "mbist", "sky130", "prebuilt macro", "autombist", "scan", "atpg", "dft", "reference journey", "arch2rtl", "synthesis"],
+    keywords: ["sram", "mbist", "march-c", "march-raw", "sky130", "prebuilt macro", "autombist", "scan", "atpg", "dft", "reference journey", "arch2rtl", "synthesis", "product stage"],
   },
   {
     slug: "apps-smart-sensor-hub-reference-journey",
@@ -579,27 +616,29 @@ export const helpTopics: HelpTopic[] = [
     category: "Apps",
     summary: "Turn validated RTL, firmware, software, and validation collateral into a simulator-backed product interface.",
     body: [
-      "Product App Builder is the final demo handoff after System Software Validation. It reads workflow lineage and generated collateral from Arch2RTL, Verify, Firmware, System Software, and Validation, then builds a runnable product-facing dashboard package.",
-      "For the PWM reference journey, the generated app visualizes a fan-control style product interface backed by a JavaScript simulator model derived from the generated register map, firmware/software capability model, and validation evidence. It is not a static screenshot or made-up chart.",
+      "Product App Builder is the final handoff after System Software Validation or a completed Product journey. It reads workflow lineage and generated collateral from RTL, Verify/System Sim, Firmware, System Software, and Validation, then builds a runnable product-facing dashboard package.",
+      "For the PWM reference journey, the generated app visualizes a fan-control style product interface backed by a JavaScript simulator model derived from the generated register map, firmware/software capability model, and validation evidence. Other journeys generate product dashboards based on their own capability model and validation collateral rather than hardcoded PWM content.",
       "The generated product app is intended to prove the user-facing behavior before hardware is available. Later, the simulator adapter can be replaced by a real board or silicon transport such as UART, USB serial, JTAG/OpenOCD, Ethernet, or an FPGA/MMIO bridge.",
       "Generated artifacts include system/product/app/index.html, system_product_dashboard_manifest.json, system_product_package.json, and README_PRODUCT_APP.md.",
-      "Step 1: Complete System Software Validation, then click Build Product App from the validation results.",
-      "Step 2: Confirm the prefilled workflow IDs and product intent, then run Product App Builder.",
+      "As a Product stage, Product App Builder should come after System Software and Validation so the product capability model has enough evidence. Sequence guidance flags missing software or validation lineage before the Product run starts.",
+      "Step 1: Complete System Software Validation, or configure a Product journey with Product App Builder after software and validation stages.",
+      "Step 2: Confirm the prefilled workflow IDs and product intent, then run Product App Builder or Run Product.",
       "Step 3: Download the ZIP and open system/product/app/index.html to inspect the generated dashboard.",
       "Step 4: Review README_PRODUCT_APP.md when planning how to replace the simulator adapter with board or silicon access.",
     ],
-    actions: ["Open Product App Builder", "Run with completed validation lineage", "Download ZIP", "Open system/product/app/index.html"],
+    actions: ["Open Product App Builder or Products", "Run with completed software and validation lineage", "Download ZIP", "Open system/product/app/index.html"],
     exampleQuestions: [
       "What inputs does Product App Builder need?",
       "Is the generated product app connected to real workflow collateral?",
       "How can the simulator later connect to a board or silicon?",
     ],
     links: [
+      { label: "Products", href: "/products" },
       { label: "Product App Builder", href: "/apps/system-product-builder" },
       { label: "System Software Validation", href: "/apps/system-software-validation" },
       { label: "Apps", href: "/apps" },
     ],
-    keywords: ["product app", "dashboard", "simulator", "validation", "firmware", "software", "rtl", "pwm", "board", "silicon"],
+    keywords: ["product app", "dashboard", "simulator", "validation", "firmware", "software", "rtl", "pwm", "products", "product journey", "board", "silicon"],
   },
   {
     slug: "apps-architecture-to-rtl-delivery",
@@ -947,7 +986,7 @@ export const helpTopics: HelpTopic[] = [
   },
 ];
 
-export const helpCategories = ["Basics", "Apps", "Inspection", "Studio", "Integrations", "Developer", "Examples"] as const;
+export const helpCategories = ["Basics", "Apps", "Products", "Inspection", "Studio", "Integrations", "Developer", "Examples"] as const;
 
 export function findHelpTopic(slug: string | null): HelpTopic {
   const normalizedSlug = slug === "optimize-workflow" ? "workflow-composer" : slug;

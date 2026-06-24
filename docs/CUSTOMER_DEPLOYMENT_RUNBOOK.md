@@ -180,13 +180,16 @@ Review:
 
 Run these in order:
 
-1. PWM Arch2RTL.
-2. PWM Verify with Verilator coverage and optional SymbiYosys.
-3. PWM Embedded Firmware and co-simulation.
-4. System Architecture gem5 X86.
-5. System Architecture gem5 RISC-V.
-6. Smart Sensor Hub Arch2RTL.
-7. Download or inspect artifacts according to the selected artifact policy.
+1. Health and readiness: `GET /health`, `GET /ready`, and Settings > Deployment.
+2. Product catalog: open Products, confirm reference journeys load, and create a Product from a reference journey.
+3. Product editor: add an existing App as a stage, reorder stages, confirm sequence guidance catches missing upstream handoffs, save draft, and reload.
+4. PWM journey: run Arch2RTL, Verify, Firmware/Embedded, Software, Validation, and Product App Builder. Confirm every completed stage emits a dashboard or an explicit unavailable/missing-evidence status.
+5. Verify closure loop: run a baseline Verify flow, enable closure loop, and confirm the closure artifacts show baseline coverage, coverage gaps, testcase/seed updates, rerun manifest, and coverage trend without invented improvement.
+6. SRAM MBIST: run Arch2RTL with Insert MBIST enabled and select `march-c` or `march-raw`; continue into Synthesis or Tapeout and inspect scan, ATPG, LEC, and MBIST evidence.
+7. Soft Digital IP Product: confirm synthesis, verification, optional firmware/software, and optional product app stages can be configured from Products.
+8. Temperature Monitor SoC: run System RTL, System DQA, System Sim, System Firmware, System Software, Validation, optional System PD, and Product App Builder. System PD should use prior System RTL lineage when run as a Product stage.
+9. System Architecture gem5 X86 and RISC-V apps, then Architecture-to-RTL Delivery.
+10. Download or inspect artifacts according to the selected artifact policy.
 
 ## Support Bundle
 
