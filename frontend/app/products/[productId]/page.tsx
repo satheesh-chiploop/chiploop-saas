@@ -68,6 +68,7 @@ const APP_LINKS: Record<string, string> = {
   Digital_DQA: "/apps/dqa",
   Digital_Verify: "/apps/verify",
   Digital_Arch2Synthesis: "/apps/arch2synthesis",
+  Digital_Arch2Tapeout: "/apps/arch2tapeout",
   verify_closure_loop: "/apps/verify",
   Embedded_Run: "/apps/embedded-run",
   System_Software: "/apps/system-software",
@@ -83,10 +84,11 @@ const APP_LINKS: Record<string, string> = {
 type StageField = {
   key: string;
   label: string;
-  type: "text" | "number" | "boolean";
+  type: "text" | "number" | "boolean" | "select";
   defaultValue: string | number | boolean;
   required?: boolean;
   helper?: string;
+  options?: string[];
 };
 
 type StageSchema = {
@@ -106,6 +108,8 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
       { key: "enable_upf_lite", label: "Generate UPF-lite", type: "boolean", defaultValue: false },
       { key: "enable_packaging", label: "Generate handoff package", type: "boolean", defaultValue: true },
       { key: "enable_scan_dft", label: "Enable scan/DFT intent", type: "boolean", defaultValue: false },
+      { key: "insert_mbist", label: "Insert MBIST", type: "boolean", defaultValue: false },
+      { key: "mbist_algorithm", label: "MBIST algorithm", type: "select", defaultValue: "march-c", options: ["march-c", "march-raw"] },
       { key: "run_spec2rtl_check", label: "Run Spec2RTL compliance check", type: "boolean", defaultValue: false },
       { key: "throughput_latency_targets", label: "Throughput/latency targets", type: "text", defaultValue: "" },
       { key: "power_priority", label: "Power priority", type: "text", defaultValue: "" },
@@ -160,6 +164,35 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
       { key: "max_synthesis_closure_iterations", label: "Max synthesis closure iterations", type: "number", defaultValue: 1 },
       { key: "allow_synthesis_timing_repair", label: "Allow synthesis setup timing repair", type: "boolean", defaultValue: true },
       { key: "allow_synthesis_lec_repair", label: "Allow synthesis LEC repair", type: "boolean", defaultValue: true },
+      { key: "stop_on_synthesis_closure_failure", label: "Stop downstream on synthesis closure failure", type: "boolean", defaultValue: false },
+      { key: "stop_on_synthesis_lec_failure", label: "Stop downstream on synthesis LEC failure", type: "boolean", defaultValue: false },
+    ],
+  },
+  Digital_Arch2Tapeout: {
+    note: "Tapeout uses the generated Arch2RTL handoff as RTL input and runs synthesis through physical signoff.",
+    fields: [
+      { key: "foundry", label: "Foundry", type: "text", defaultValue: "sky130" },
+      { key: "pdk", label: "PDK", type: "text", defaultValue: "sky130A" },
+      { key: "toolchain", label: "Toolchain", type: "text", defaultValue: "openlane2" },
+      { key: "target_frequency_mhz", label: "Target frequency MHz", type: "number", defaultValue: 100 },
+      { key: "constraints_sdc", label: "Constraints SDC", type: "text", defaultValue: "" },
+      { key: "effort", label: "Implementation effort", type: "select", defaultValue: "balanced", options: ["fast", "balanced", "signoff"] },
+      { key: "run_fill", label: "Run fill", type: "boolean", defaultValue: true },
+      { key: "run_drc", label: "Run DRC", type: "boolean", defaultValue: true },
+      { key: "run_lvs", label: "Run LVS", type: "boolean", defaultValue: true },
+      { key: "run_logic_equivalence", label: "Run logic equivalence", type: "boolean", defaultValue: true },
+      { key: "run_signoff_closure_loop", label: "Run signoff closure loop", type: "boolean", defaultValue: false },
+      { key: "max_signoff_closure_iterations", label: "Max signoff closure iterations", type: "number", defaultValue: 1 },
+      { key: "allow_timing_repair", label: "Allow timing repair", type: "boolean", defaultValue: true },
+      { key: "allow_drc_repair", label: "Allow DRC repair", type: "boolean", defaultValue: true },
+      { key: "allow_lvs_repair", label: "Allow LVS repair", type: "boolean", defaultValue: true },
+      { key: "allow_lec_repair", label: "Allow LEC repair", type: "boolean", defaultValue: true },
+      { key: "run_synthesis_closure_loop", label: "Run synthesis closure loop", type: "boolean", defaultValue: false },
+      { key: "max_synthesis_closure_iterations", label: "Max synthesis closure iterations", type: "number", defaultValue: 1 },
+      { key: "allow_synthesis_timing_repair", label: "Allow synthesis setup timing repair", type: "boolean", defaultValue: true },
+      { key: "allow_synthesis_lec_repair", label: "Allow synthesis LEC repair", type: "boolean", defaultValue: true },
+      { key: "allow_synthesis_retiming", label: "Allow synthesis retiming", type: "boolean", defaultValue: false },
+      { key: "allow_synthesis_hierarchy_flattening", label: "Allow synthesis hierarchy flattening", type: "boolean", defaultValue: false },
       { key: "stop_on_synthesis_closure_failure", label: "Stop downstream on synthesis closure failure", type: "boolean", defaultValue: false },
       { key: "stop_on_synthesis_lec_failure", label: "Stop downstream on synthesis LEC failure", type: "boolean", defaultValue: false },
     ],
@@ -272,6 +305,35 @@ const FALLBACK_STAGE_SCHEMA: StageSchema = {
   fields: [{ key: "notes", label: "Notes", type: "text", defaultValue: "" }],
 };
 
+type StageCatalogItem = {
+  app: string;
+  label: string;
+  category: "Digital" | "System" | "Embedded" | "Software" | "Validation" | "Product";
+  produces: string[];
+  requires?: string[][];
+  warning?: string;
+};
+
+const STAGE_CATALOG: StageCatalogItem[] = [
+  { app: "Digital_Arch2RTL", label: "Digital RTL", category: "Digital", produces: ["arch2rtl", "digital_rtl"] },
+  { app: "Digital_DQA", label: "Digital DQA", category: "Digital", produces: ["dqa"], requires: [["arch2rtl"]] },
+  { app: "Digital_Verify", label: "Digital Verify", category: "Digital", produces: ["verify"], requires: [["arch2rtl"]] },
+  { app: "Digital_Arch2Synthesis", label: "Digital Synthesis", category: "Digital", produces: ["arch2synthesis"], requires: [["arch2rtl"]] },
+  { app: "Digital_Arch2Tapeout", label: "Digital Tapeout", category: "Digital", produces: ["tapeout"], requires: [["arch2rtl"]] },
+  { app: "verify_closure_loop", label: "Verify Closure Loop", category: "Digital", produces: ["closure"], requires: [["verify"]] },
+  { app: "Embedded_Run", label: "Firmware", category: "Embedded", produces: ["firmware"], requires: [["arch2rtl"], ["system_rtl"]] },
+  { app: "System_RTL", label: "System RTL", category: "System", produces: ["system_rtl"] },
+  { app: "System_DQA", label: "System DQA", category: "System", produces: ["system_dqa"], requires: [["system_rtl"]] },
+  { app: "System_Sim", label: "System Sim / Verify", category: "System", produces: ["system_sim", "validation"], requires: [["system_rtl"]] },
+  { app: "System_Firmware", label: "System Firmware", category: "System", produces: ["system_firmware", "firmware"], requires: [["system_rtl"]] },
+  { app: "System_PD", label: "System PD", category: "System", produces: ["system_pd"], warning: "As a Product stage this uses a prior System RTL handoff. Standalone System PD can run the full System RTL plus PD sequence." },
+  { app: "System_Software", label: "System Software", category: "Software", produces: ["software"], requires: [["firmware"], ["system_firmware"]] },
+  { app: "System_Software_Validation_L2", label: "Software Validation", category: "Validation", produces: ["validation"], requires: [["software"]] },
+  { app: "System_Product_App_Builder", label: "Product App", category: "Product", produces: ["product_app"], requires: [["software", "validation"]] },
+];
+
+const STAGE_CATALOG_BY_APP: Record<string, StageCatalogItem> = Object.fromEntries(STAGE_CATALOG.map((item) => [item.app, item]));
+
 function typeLabel(value: string) {
   return value.replace(/_/g, "-").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
@@ -338,6 +400,55 @@ function voiceLoopTypeForApp(app: string) {
   return "digital";
 }
 
+function defaultStageLabel(app: string) {
+  return STAGE_CATALOG_BY_APP[app]?.label || app.replace(/_/g, " ");
+}
+
+function makeStageId(app: string, stages: Stage[]) {
+  const base = app.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "stage";
+  const used = new Set(stages.map((stage) => stage.id));
+  if (!used.has(base)) return base;
+  let index = 2;
+  while (used.has(`${base}_${index}`)) index += 1;
+  return `${base}_${index}`;
+}
+
+function validateStageSequence(stages: Stage[]) {
+  const produced = new Set<string>();
+  const enabledStages = stages.filter(stageEnabled);
+  const findings: Array<{ severity: "error" | "warning"; stageId: string; stageLabel: string; message: string }> = [];
+  for (const stage of enabledStages) {
+    const meta = STAGE_CATALOG_BY_APP[stage.app];
+    if (!meta) {
+      findings.push({ severity: "warning", stageId: stage.id, stageLabel: stage.label, message: "This app is not in the Product stage catalog yet." });
+      continue;
+    }
+    const requirementOptions = meta.requires || [];
+    const missingRequirement = requirementOptions.length && !requirementOptions.some((group) => group.every((key) => produced.has(key)))
+      ? requirementOptions[0]
+      : null;
+    if (missingRequirement) {
+      findings.push({
+        severity: "error",
+        stageId: stage.id,
+        stageLabel: stage.label,
+        message: `${meta.label} expects upstream ${missingRequirement.join(" + ")} output before this stage.`,
+      });
+    }
+    if (meta.warning) {
+      findings.push({ severity: "warning", stageId: stage.id, stageLabel: stage.label, message: meta.warning });
+    }
+    if (stage.app === "Digital_Verify" && produced.has("system_rtl") && !produced.has("arch2rtl")) {
+      findings.push({ severity: "warning", stageId: stage.id, stageLabel: stage.label, message: "Digital Verify is normally paired with Digital Arch2RTL. For System RTL, use System Sim / Verify." });
+    }
+    if ((stage.app === "Embedded_Run" || stage.app === "System_Firmware") && !produced.has("arch2rtl") && !produced.has("system_rtl")) {
+      findings.push({ severity: "error", stageId: stage.id, stageLabel: stage.label, message: "Firmware stages need an RTL/register-map handoff before they run." });
+    }
+    for (const output of meta.produces) produced.add(output);
+  }
+  return findings;
+}
+
 function StepRail({ active }: { active: "define" | "configure" | "run" }) {
   const steps = [
     { id: "define", label: "Define", text: "Create product" },
@@ -372,6 +483,8 @@ export default function ProductDetailPage() {
   const [running, setRunning] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
+  const [newStageApp, setNewStageApp] = useState(STAGE_CATALOG[0]?.app || "Digital_Arch2RTL");
+  const [draggedStageId, setDraggedStageId] = useState<string | null>(null);
   const [productRun, setProductRun] = useState<ProductRun | null>(null);
   const [stageRuns, setStageRuns] = useState<StageRun[]>([]);
   const [runHistory, setRunHistory] = useState<ProductRunWithStages[]>([]);
@@ -420,6 +533,8 @@ export default function ProductDetailPage() {
   }, [productId]);
 
   const stages = useMemo(() => product?.stage_config?.stages || [], [product]);
+  const sequenceFindings = useMemo(() => validateStageSequence(stages), [stages]);
+  const sequenceErrors = sequenceFindings.filter((finding) => finding.severity === "error");
   const selectedStage = stages.find((stage) => stage.id === selectedStageId) || stages[0] || null;
   const stageRunById = useMemo(() => {
     const out: Record<string, StageRun> = {};
@@ -444,8 +559,11 @@ export default function ProductDetailPage() {
         }
       }
     }
+    for (const finding of sequenceErrors) {
+      missing.push({ stageId: finding.stageId, stageLabel: finding.stageLabel, fieldLabel: finding.message });
+    }
     return missing;
-  }, [product, stages, stageSchemas]);
+  }, [product, stages, stageSchemas, sequenceErrors]);
   const activeRun = Boolean(productRun && ["queued", "running"].includes(productRun.status));
   const failedStageRun = stageRuns.find((stageRun) => stageRun.status === "failed") || null;
   const failedStage = failedStageRun ? stages.find((stage) => stage.id === failedStageRun.stage_id) || null : null;
@@ -501,6 +619,72 @@ export default function ProductDetailPage() {
           stages: nextStages,
         },
       };
+    });
+  }
+
+  function replaceStages(nextStages: Stage[], selectedId?: string | null) {
+    setProduct((current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        stage_config: {
+          ...(current.stage_config || {}),
+          stages: nextStages,
+        },
+      };
+    });
+    if (selectedId !== undefined) setSelectedStageId(selectedId);
+  }
+
+  function addStageFromCatalog() {
+    const catalogItem = STAGE_CATALOG_BY_APP[newStageApp] || STAGE_CATALOG[0];
+    if (!catalogItem) return;
+    const newStage: Stage = {
+      id: makeStageId(catalogItem.app, stages),
+      label: catalogItem.label,
+      app: catalogItem.app,
+      optional: true,
+      enabled: true,
+      settings: {},
+    };
+    replaceStages([...stages, newStage], newStage.id);
+  }
+
+  function moveStage(stageId: string, direction: -1 | 1) {
+    const currentIndex = stages.findIndex((stage) => stage.id === stageId);
+    const nextIndex = currentIndex + direction;
+    if (currentIndex < 0 || nextIndex < 0 || nextIndex >= stages.length) return;
+    const nextStages = [...stages];
+    const [stage] = nextStages.splice(currentIndex, 1);
+    nextStages.splice(nextIndex, 0, stage);
+    replaceStages(nextStages, stageId);
+  }
+
+  function dropStageOnTarget(targetStageId: string) {
+    if (!draggedStageId || draggedStageId === targetStageId) return;
+    const draggedIndex = stages.findIndex((stage) => stage.id === draggedStageId);
+    const targetIndex = stages.findIndex((stage) => stage.id === targetStageId);
+    if (draggedIndex < 0 || targetIndex < 0) return;
+    const nextStages = [...stages];
+    const [draggedStage] = nextStages.splice(draggedIndex, 1);
+    nextStages.splice(targetIndex, 0, draggedStage);
+    replaceStages(nextStages, draggedStageId);
+    setDraggedStageId(null);
+  }
+
+  function removeStage(stageId: string) {
+    const stage = stages.find((item) => item.id === stageId);
+    if (!stage || stage.required) return;
+    const nextStages = stages.filter((item) => item.id !== stageId);
+    replaceStages(nextStages, nextStages[0]?.id || null);
+  }
+
+  function updateStageKind(stageId: string, kind: "required" | "recommended" | "optional") {
+    updateStage(stageId, {
+      required: kind === "required",
+      recommended: kind === "recommended",
+      optional: kind === "optional",
+      enabled: kind === "required" ? true : stageEnabled(stages.find((stage) => stage.id === stageId) || { id: stageId, label: "", app: "" }),
     });
   }
 
@@ -666,21 +850,68 @@ export default function ProductDetailPage() {
 
         <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-lg border border-slate-800 bg-slate-900/45 p-5">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col gap-4">
               <div>
                 <h2 className="text-xl font-semibold text-white">Development Stages</h2>
-                <p className="mt-1 text-sm text-slate-400">Required stages stay enabled. Recommended and optional stages can be switched off.</p>
+                <p className="mt-1 text-sm text-slate-400">Add existing Apps to this product, then drag or move stages into the intended sequence.</p>
               </div>
-              <span className="rounded-md bg-slate-950 px-2 py-1 text-xs text-slate-300">{stages.length} stages</span>
+              <div className="flex flex-col gap-2 rounded-lg border border-slate-800 bg-slate-950/60 p-3 sm:flex-row sm:items-center">
+                <select
+                  value={newStageApp}
+                  onChange={(event) => setNewStageApp(event.target.value)}
+                  className="min-w-0 flex-1 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                >
+                  {STAGE_CATALOG.map((item) => (
+                    <option key={item.app} value={item.app}>{item.category} - {item.label}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={addStageFromCatalog}
+                  className="rounded-md bg-cyan-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-300"
+                >
+                  Add Stage
+                </button>
+                <span className="rounded-md bg-slate-900 px-2 py-2 text-center text-xs text-slate-300">{stages.length} stages</span>
+              </div>
             </div>
+            {sequenceFindings.length ? (
+              <div className="mt-4 rounded-lg border border-amber-500/25 bg-amber-950/20 p-3">
+                <div className="text-sm font-semibold text-amber-100">Sequence guidance</div>
+                <div className="mt-2 grid gap-2">
+                  {sequenceFindings.map((finding) => (
+                    <button
+                      key={`${finding.stageId}-${finding.message}`}
+                      onClick={() => setSelectedStageId(finding.stageId)}
+                      className={`rounded-md border px-3 py-2 text-left text-xs leading-5 ${
+                        finding.severity === "error"
+                          ? "border-rose-500/30 bg-rose-950/20 text-rose-100 hover:border-rose-400/70"
+                          : "border-amber-500/25 bg-slate-950/40 text-amber-100 hover:border-amber-400/70"
+                      }`}
+                    >
+                      {finding.stageLabel}: {finding.message}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <div className="mt-5 space-y-3">
               {stages.length === 0 ? (
                 <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">No stages configured yet.</div>
               ) : stages.map((stage, index) => (
-                <button
+                <div
                   key={stage.id}
+                  draggable
                   onClick={() => setSelectedStageId(stage.id)}
-                  className={`w-full rounded-lg border p-4 text-left transition ${
+                  onDragStart={() => setDraggedStageId(stage.id)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={() => dropStageOnTarget(stage.id)}
+                  onDragEnd={() => setDraggedStageId(null)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") setSelectedStageId(stage.id);
+                  }}
+                  className={`w-full cursor-grab rounded-lg border p-4 text-left transition active:cursor-grabbing ${
                     selectedStage?.id === stage.id ? "border-cyan-400 bg-cyan-500/10" : "border-slate-800 bg-slate-950/60 hover:border-slate-600"
                   }`}
                 >
@@ -707,7 +938,43 @@ export default function ProductDetailPage() {
                       </div>
                     </div>
                   </div>
-                </button>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        moveStage(stage.id, -1);
+                      }}
+                      disabled={index === 0}
+                      className="rounded-md border border-slate-700 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Move Up
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        moveStage(stage.id, 1);
+                      }}
+                      disabled={index === stages.length - 1}
+                      className="rounded-md border border-slate-700 px-2 py-1 text-xs font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Move Down
+                    </button>
+                    {!stage.required ? (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          removeStage(stage.id);
+                        }}
+                        className="rounded-md border border-rose-500/40 px-2 py-1 text-xs font-semibold text-rose-100 hover:bg-rose-950/40"
+                      >
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
               ))}
             </div>
           </section>
@@ -721,7 +988,16 @@ export default function ProductDetailPage() {
                     <h2 className="mt-2 text-xl font-semibold text-white">{selectedStage.label}</h2>
                     <p className="mt-1 text-sm text-slate-400">{selectedStage.app}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    <select
+                      value={selectedStage.required ? "required" : selectedStage.recommended ? "recommended" : "optional"}
+                      onChange={(event) => updateStageKind(selectedStage.id, event.target.value as "required" | "recommended" | "optional")}
+                      className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-200 outline-none focus:border-cyan-400"
+                    >
+                      <option value="required">Required</option>
+                      <option value="recommended">Recommended</option>
+                      <option value="optional">Optional</option>
+                    </select>
                     {!selectedStage.required ? (
                       <button
                         onClick={() => updateStage(selectedStage.id, { enabled: !stageEnabled(selectedStage) })}
@@ -736,6 +1012,14 @@ export default function ProductDetailPage() {
                     >
                       Open App
                     </button>
+                    {!selectedStage.required ? (
+                      <button
+                        onClick={() => removeStage(selectedStage.id)}
+                        className="rounded-lg border border-rose-500/40 px-3 py-2 text-sm font-semibold text-rose-100 hover:bg-rose-950/40"
+                      >
+                        Remove
+                      </button>
+                    ) : null}
                   </div>
                 </div>
 
@@ -782,6 +1066,28 @@ export default function ProductDetailPage() {
                               field.required && isBlank(value) ? "ring-1 ring-rose-500/70" : ""
                             }`}
                           />
+                        );
+                      }
+                      if (field.type === "select") {
+                        const options = field.options?.length ? field.options : [String(field.defaultValue)];
+                        return (
+                          <label key={field.key} className="grid gap-2">
+                            <span className="text-sm font-medium text-slate-200">
+                              {field.label}{field.required ? <span className="text-rose-300"> *</span> : null}
+                            </span>
+                            <select
+                              value={String(value)}
+                              onChange={(event) => updateStageSetting(selectedStage.id, field.key, event.target.value)}
+                              className={`rounded-lg border bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400 ${
+                                field.required && isBlank(value) ? "border-rose-500/70" : "border-slate-700"
+                              }`}
+                            >
+                              {options.map((option) => (
+                                <option key={option} value={option}>{option}</option>
+                              ))}
+                            </select>
+                            {field.helper ? <span className="text-xs text-slate-500">{field.helper}</span> : null}
+                          </label>
                         );
                       }
                       return (
