@@ -64,6 +64,12 @@ type ProductRunWithStages = ProductRun & {
   stage_runs?: StageRun[];
 };
 
+type StageOption = string | {
+  value: string;
+  label?: string;
+  disabled?: boolean;
+};
+
 const APP_LINKS: Record<string, string> = {
   Digital_Arch2RTL: "/apps/arch2rtl",
   Digital_DQA: "/apps/dqa",
@@ -89,7 +95,7 @@ type StageField = {
   defaultValue: string | number | boolean;
   required?: boolean;
   helper?: string;
-  options?: string[];
+  options?: StageOption[];
 };
 
 type StageSchema = {
@@ -133,14 +139,43 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
       { key: "test_intent", label: "Test intent", type: "text", defaultValue: "Run smoke, reset, register access, and representative functional tests." },
       { key: "verification_plan", label: "Verification plan", type: "text", defaultValue: "" },
       { key: "monitor_checker_plan", label: "Monitor/checker plan", type: "text", defaultValue: "" },
-      { key: "random_vs_directed", label: "Random vs directed", type: "text", defaultValue: "both" },
+      { key: "random_vs_directed", label: "Random vs directed", type: "select", defaultValue: "both", options: [
+        { value: "both", label: "Directed then random" },
+        { value: "directed", label: "Directed only" },
+        { value: "random", label: "Random only" },
+      ] },
       { key: "coverage_targets", label: "Coverage target", type: "text", defaultValue: "90% functional, 70% line" },
       { key: "coverage_plan", label: "Coverage plan", type: "text", defaultValue: "" },
-      { key: "simulator_type", label: "Simulator", type: "text", defaultValue: "verilator" },
-      { key: "code_coverage_tool", label: "Code coverage tool", type: "text", defaultValue: "verilator_coverage" },
-      { key: "formal_tool", label: "Formal tool", type: "text", defaultValue: "none" },
-      { key: "formal_solver", label: "Formal solver", type: "text", defaultValue: "z3" },
-      { key: "golden_model_tool", label: "Golden model tool", type: "text", defaultValue: "none" },
+      { key: "simulator_type", label: "Simulator", type: "select", defaultValue: "verilator", options: [
+        { value: "verilator", label: "Verilator + Cocotb" },
+        { value: "icarus", label: "Icarus Verilog (planned)", disabled: true },
+        { value: "questa", label: "Questa (planned)", disabled: true },
+        { value: "vcs", label: "VCS (planned)", disabled: true },
+        { value: "xcelium", label: "Xcelium (planned)", disabled: true },
+      ] },
+      { key: "code_coverage_tool", label: "Code coverage tool", type: "select", defaultValue: "verilator_coverage", options: [
+        { value: "verilator_coverage", label: "verilator_coverage" },
+        { value: "none", label: "Disabled" },
+        { value: "urg", label: "Synopsys URG (planned)", disabled: true },
+        { value: "imc", label: "Cadence IMC (planned)", disabled: true },
+        { value: "vcover", label: "Questa vcover (planned)", disabled: true },
+      ] },
+      { key: "formal_tool", label: "Formal tool", type: "select", defaultValue: "none", options: [
+        { value: "none", label: "Disabled" },
+        { value: "symbiyosys", label: "SymbiYosys (sby)" },
+        { value: "jasper", label: "JasperGold (planned)", disabled: true },
+        { value: "vc_formal", label: "VC Formal (planned)", disabled: true },
+      ] },
+      { key: "formal_solver", label: "Formal solver", type: "select", defaultValue: "z3", options: [
+        { value: "z3", label: "Z3" },
+        { value: "boolector", label: "Boolector" },
+      ] },
+      { key: "golden_model_tool", label: "Golden model tool", type: "select", defaultValue: "none", options: [
+        { value: "none", label: "Disabled" },
+        { value: "chiploop_python_scoreboard", label: "ChipLoop Python scoreboard" },
+        { value: "custom_python", label: "Custom Python model (planned)", disabled: true },
+        { value: "matlab", label: "MATLAB reference model (planned)", disabled: true },
+      ] },
       { key: "seed_count", label: "Seed count", type: "number", defaultValue: 10 },
       { key: "run_closure_analysis", label: "Run closure analysis", type: "boolean", defaultValue: true },
       { key: "enable_failure_debug", label: "Run failure debug", type: "boolean", defaultValue: false },
@@ -213,10 +248,31 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
       { key: "system_sim_testcases", label: "Testcases", type: "text", defaultValue: "system_smoke_test, integrated_input_sanity" },
       { key: "system_sim_seeds", label: "Seeds", type: "text", defaultValue: "1,2,3,4" },
       { key: "coverage_targets", label: "Coverage target", type: "text", defaultValue: "90% functional" },
-      { key: "simulator_type", label: "Simulator", type: "text", defaultValue: "verilator" },
-      { key: "random_vs_directed", label: "Random vs directed", type: "text", defaultValue: "both" },
-      { key: "enable_formal", label: "Run formal", type: "boolean", defaultValue: false },
-      { key: "enable_golden_model", label: "Golden model", type: "boolean", defaultValue: true },
+      { key: "simulator_type", label: "Simulator", type: "select", defaultValue: "verilator", options: [
+        { value: "verilator", label: "verilator" },
+        { value: "icarus", label: "icarus" },
+      ] },
+      { key: "code_coverage_tool", label: "Code coverage", type: "select", defaultValue: "verilator_coverage", options: [
+        { value: "verilator_coverage", label: "verilator_coverage" },
+        { value: "none", label: "Disabled" },
+      ] },
+      { key: "formal_tool", label: "Formal tool", type: "select", defaultValue: "none", options: [
+        { value: "none", label: "Disabled" },
+        { value: "symbiyosys", label: "SymbiYosys (sby)" },
+      ] },
+      { key: "formal_solver", label: "Formal solver", type: "select", defaultValue: "z3", options: [
+        { value: "z3", label: "Z3" },
+        { value: "boolector", label: "Boolector" },
+      ] },
+      { key: "golden_model_tool", label: "Golden model comparison", type: "select", defaultValue: "none", options: [
+        { value: "none", label: "Disabled" },
+        { value: "chiploop_python_scoreboard", label: "ChipLoop Python scoreboard" },
+      ] },
+      { key: "random_vs_directed", label: "Random vs directed", type: "select", defaultValue: "both", options: [
+        { value: "both", label: "Directed then random" },
+        { value: "directed", label: "Directed only" },
+        { value: "random", label: "Random only" },
+      ] },
     ],
   },
   System_DQA: {
@@ -231,7 +287,10 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
   System_Firmware: {
     note: "Firmware auto-binds the System RTL workflow ID, including register-map and top-level handoff artifacts.",
     fields: [
-      { key: "firmware_language", label: "Firmware language", type: "text", defaultValue: "rust" },
+      { key: "firmware_language", label: "Firmware language", type: "select", defaultValue: "rust", options: [
+        { value: "rust", label: "Rust" },
+        { value: "c", label: "C" },
+      ] },
       { key: "validate_registers", label: "Validate registers", type: "boolean", defaultValue: true },
       { key: "enable_cosim", label: "Enable firmware co-sim", type: "boolean", defaultValue: true },
     ],
@@ -263,7 +322,10 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
   },
   Embedded_Run: {
     fields: [
-      { key: "firmware_language", label: "Firmware language", type: "text", defaultValue: "rust" },
+      { key: "firmware_language", label: "Firmware language", type: "select", defaultValue: "rust", options: [
+        { value: "rust", label: "Rust" },
+        { value: "c", label: "C" },
+      ] },
       { key: "enable_cosim", label: "Enable firmware co-sim", type: "boolean", defaultValue: false },
     ],
   },
@@ -273,8 +335,16 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
       { key: "seed_count", label: "Seed count", type: "number", defaultValue: 10 },
       { key: "seed_budget", label: "Seed budget", type: "number", defaultValue: 10 },
       { key: "coverage_targets", label: "Coverage target", type: "text", defaultValue: "90% functional, 70% line" },
-      { key: "rerun_mode", label: "Rerun mode", type: "text", defaultValue: "coverage_targeted" },
-      { key: "random_vs_directed", label: "Random vs directed", type: "text", defaultValue: "both" },
+      { key: "rerun_mode", label: "Rerun mode", type: "select", defaultValue: "coverage_targeted", options: [
+        { value: "coverage_targeted", label: "Coverage targeted" },
+        { value: "failed_only", label: "Failed tests only" },
+        { value: "full_regression", label: "Full regression" },
+      ] },
+      { key: "random_vs_directed", label: "Random vs directed", type: "select", defaultValue: "both", options: [
+        { value: "both", label: "Directed then random" },
+        { value: "directed", label: "Directed only" },
+        { value: "random", label: "Random only" },
+      ] },
       { key: "enable_failure_debug", label: "Run failure debug", type: "boolean", defaultValue: false },
       { key: "failure_debug_log_only_first", label: "Failure debug log-only first", type: "boolean", defaultValue: true },
       { key: "failure_debug_generate_vcd", label: "Generate VCD for failures", type: "boolean", defaultValue: true },
@@ -286,18 +356,41 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
   System_Software: {
     fields: [
       { key: "app_names", label: "App names", type: "text", defaultValue: "status_cli, product_service" },
-      { key: "target_language", label: "Target language", type: "text", defaultValue: "rust" },
+      { key: "target_language", label: "Target language", type: "select", defaultValue: "rust", options: [
+        { value: "rust", label: "Rust" },
+        { value: "c", label: "C" },
+        { value: "mixed", label: "Mixed C/Rust" },
+      ] },
+      { key: "sdk_style", label: "SDK style", type: "select", defaultValue: "rust_crate", options: [
+        { value: "rust_crate", label: "Rust crate" },
+        { value: "c_sdk", label: "C SDK" },
+        { value: "mixed", label: "Mixed SDK" },
+      ] },
+      { key: "build_system", label: "Build system", type: "select", defaultValue: "cargo", options: [
+        { value: "cargo", label: "Cargo" },
+        { value: "cmake", label: "CMake" },
+        { value: "make", label: "Make" },
+      ] },
     ],
   },
   System_Software_Validation_L2: {
     fields: [
-      { key: "validation_mode", label: "Validation mode", type: "text", defaultValue: "full_co_simulation" },
+      { key: "validation_mode", label: "Validation mode", type: "select", defaultValue: "full_co_simulation", options: [
+        { value: "full_co_simulation", label: "Full co-simulation" },
+        { value: "software_package_validation", label: "Software package validation" },
+      ] },
     ],
   },
   System_Product_App_Builder: {
     fields: [
-      { key: "app_type", label: "App type", type: "text", defaultValue: "web_dashboard" },
-      { key: "target_runtime", label: "Target runtime", type: "text", defaultValue: "simulated_device" },
+      { key: "app_type", label: "App type", type: "select", defaultValue: "web_dashboard", options: [
+        { value: "web_dashboard", label: "Web dashboard" },
+        { value: "cli_tool", label: "CLI tool (planned)", disabled: true },
+      ] },
+      { key: "target_runtime", label: "Target runtime", type: "select", defaultValue: "simulated_device", options: [
+        { value: "simulated_device", label: "Simulated device" },
+        { value: "board_transport", label: "Board transport (planned)", disabled: true },
+      ] },
     ],
   },
 };
@@ -354,6 +447,18 @@ function stageEnabled(stage: Stage) {
 
 function fieldValue(stage: Stage, field: StageField) {
   return stage.settings?.[field.key] ?? field.defaultValue;
+}
+
+function optionValue(option: StageOption) {
+  return typeof option === "string" ? option : option.value;
+}
+
+function optionLabel(option: StageOption) {
+  return typeof option === "string" ? option : option.label || option.value;
+}
+
+function optionDisabled(option: StageOption) {
+  return typeof option === "string" ? false : Boolean(option.disabled);
 }
 
 function isBlank(value: unknown) {
@@ -413,6 +518,42 @@ function parseLogLines(logs?: string | null) {
   return logs.split("\n").map((line) => line.trimEnd()).filter((line) => line.trim().length > 0);
 }
 
+function stageSummaryStatus(status: string) {
+  const normalized = String(status || "").toLowerCase();
+  if (normalized === "completed" || normalized === "success" || normalized === "succeeded") return "Passed";
+  if (normalized === "failed" || normalized === "error") return "Failed";
+  if (normalized === "cancelled" || normalized === "canceled") return "Cancelled";
+  return "Running";
+}
+
+function stageSummaryTone(summary: string) {
+  if (summary === "Passed") return "bg-emerald-500/10 text-emerald-200";
+  if (summary === "Failed") return "bg-rose-500/10 text-rose-200";
+  if (summary === "Cancelled") return "bg-slate-700/60 text-slate-200";
+  return "bg-cyan-500/10 text-cyan-200";
+}
+
+function stageRunAgentCount(stageRun: StageRun): number | null {
+  const outputs = stageRun.outputs || {};
+  const candidates = [
+    outputs.agent_count,
+    outputs.agents_participated,
+    outputs.agents_executed,
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate === "number" && Number.isFinite(candidate)) return candidate;
+    if (typeof candidate === "string" && candidate.trim()) {
+      const parsed = Number(candidate);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return null;
+}
+
+function workflowSummaryName(stageRun: StageRun) {
+  return stageRun.app || stageRun.stage_label || stageRun.stage_id;
+}
+
 function isRichTextField(field: StageField) {
   return [
     "spec_text",
@@ -432,10 +573,6 @@ function voiceLoopTypeForApp(app: string) {
   if (app.startsWith("System_")) return "system";
   if (app.startsWith("Embedded_")) return "embedded";
   return "digital";
-}
-
-function defaultStageLabel(app: string) {
-  return STAGE_CATALOG_BY_APP[app]?.label || app.replace(/_/g, " ");
 }
 
 function makeStageId(app: string, stages: Stage[]) {
@@ -606,6 +743,25 @@ export default function ProductDetailPage() {
     failed: stageRuns.filter((stageRun) => stageRun.status === "failed").length,
     running: stageRuns.filter((stageRun) => ["queued", "running"].includes(stageRun.status)).length,
   }), [stageRuns]);
+  const stageRunSummaries = useMemo(() => stageRuns.map((stageRun) => ({
+    stageRun,
+    name: workflowSummaryName(stageRun),
+    summary: stageSummaryStatus(stageRun.status),
+    agentCount: stageRunAgentCount(stageRun),
+  })), [stageRuns]);
+  const overallRunSummary = useMemo(() => {
+    if (!stageRunSummaries.length) return { status: "Not Run", totalAgents: 0, knownAgentCounts: false };
+    const hasFailed = stageRunSummaries.some((item) => item.summary === "Failed");
+    const hasCancelled = stageRunSummaries.some((item) => item.summary === "Cancelled");
+    const hasRunning = stageRunSummaries.some((item) => item.summary === "Running");
+    const knownAgentCounts = stageRunSummaries.some((item) => item.agentCount !== null);
+    const totalAgents = stageRunSummaries.reduce((sum, item) => sum + (item.agentCount || 0), 0);
+    return {
+      status: hasFailed ? "Failed" : hasCancelled ? "Cancelled" : hasRunning ? "Running" : "Passed",
+      totalAgents,
+      knownAgentCounts,
+    };
+  }, [stageRunSummaries]);
   const productRunLogLines = useMemo(() => parseLogLines(productRun?.logs), [productRun?.logs]);
 
   useEffect(() => {
@@ -1117,7 +1273,9 @@ export default function ProductDetailPage() {
                               }`}
                             >
                               {options.map((option) => (
-                                <option key={option} value={option}>{option}</option>
+                                <option key={optionValue(option)} value={optionValue(option)} disabled={optionDisabled(option)}>
+                                  {optionLabel(option)}
+                                </option>
                               ))}
                             </select>
                             {field.helper ? <span className="text-xs text-slate-500">{field.helper}</span> : null}
@@ -1228,7 +1386,76 @@ export default function ProductDetailPage() {
                 </div>
               </div>
               {stageRuns.length ? (
-                <div className="mt-4 grid gap-2">
+                <div className="mt-4 space-y-4">
+                  <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <div className="text-sm font-semibold text-white">Overall Summary</div>
+                        <div className="mt-1 text-xs text-slate-500">
+                          Aggregated from completed Product stage workflow runs. Open individual dashboards for detailed evidence.
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        <span className={`rounded-md px-2 py-1 font-semibold ${stageSummaryTone(overallRunSummary.status)}`}>
+                          {overallRunSummary.status}
+                        </span>
+                        <span className="rounded-md bg-slate-950 px-2 py-1 text-slate-300">
+                          Total Agents: {overallRunSummary.knownAgentCounts ? overallRunSummary.totalAgents : "not reported"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-4 overflow-x-auto rounded-lg border border-slate-800">
+                      <table className="min-w-[720px] w-full divide-y divide-slate-800 text-left text-sm">
+                        <thead className="bg-slate-950/80 text-xs font-semibold uppercase text-slate-400">
+                          <tr>
+                            <th scope="col" className="px-3 py-2">Workflow</th>
+                            <th scope="col" className="px-3 py-2">Stage</th>
+                            <th scope="col" className="px-3 py-2">Summary</th>
+                            <th scope="col" className="px-3 py-2">Agents Executed</th>
+                            <th scope="col" className="px-3 py-2">Details</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800 bg-slate-950/40">
+                          {stageRunSummaries.map(({ stageRun, name, summary, agentCount }) => (
+                            <tr key={`summary-${stageRun.id}`} className="align-middle">
+                              <th scope="row" className="px-3 py-3 font-semibold text-white">{name}</th>
+                              <td className="px-3 py-3 text-slate-300">{stageRun.stage_label || stageRun.stage_id}</td>
+                              <td className="px-3 py-3">
+                                <span className={`rounded-md px-2 py-1 text-xs font-semibold ${stageSummaryTone(summary)}`}>
+                                  {summary}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 text-slate-300">{agentCount === null ? "not reported" : agentCount}</td>
+                              <td className="px-3 py-3">
+                                {stageRun.workflow_id ? (
+                                  <div className="flex flex-wrap gap-2">
+                                    <a
+                                      href={stageRunDashboardLink(stageRun)}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="rounded-md border border-cyan-700/70 px-2 py-1 text-xs text-cyan-100 hover:bg-cyan-950/40"
+                                    >
+                                      Open Dashboard
+                                    </a>
+                                    <a
+                                      href={`/api/workflow/${stageRun.workflow_id}/download_zip?full=1`}
+                                      className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
+                                    >
+                                      Download ZIP
+                                    </a>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-slate-500">No workflow</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2">
                   {stageRuns.map((stageRun) => (
                     <div key={stageRun.id} className="flex flex-col gap-2 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
                       <div>
@@ -1238,12 +1465,14 @@ export default function ProductDetailPage() {
                       <div className="flex items-center gap-2">
                         {stageRun.workflow_id ? (
                           <>
-                            <button
-                              onClick={() => router.push(stageRunDashboardLink(stageRun))}
+                            <a
+                              href={stageRunDashboardLink(stageRun)}
+                              target="_blank"
+                              rel="noreferrer"
                               className="rounded-md border border-cyan-700/70 px-2 py-1 text-xs text-cyan-100 hover:bg-cyan-950/40"
                             >
                               Open Dashboard
-                            </button>
+                            </a>
                             <button
                               onClick={() => router.push(appLink(stageRun.app, stageRun.workflow_id, stageRun.run_id))}
                               className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
@@ -1269,11 +1498,12 @@ export default function ProductDetailPage() {
                         </span>
                       </div>
                       <div className="text-xs text-slate-500 sm:basis-full">
-                        Started {formatDate(stageRun.started_at)} | Completed {formatDate(stageRun.completed_at)}
+                        Started {formatDate(stageRun.started_at)} | Completed {formatDate(stageRun.completed_at)} | Agents {stageRunAgentCount(stageRun) ?? "not reported"}
                       </div>
                       {stageRun.error ? <div className="text-xs text-rose-300 sm:basis-full">{stageRun.error}</div> : null}
                     </div>
                   ))}
+                  </div>
                 </div>
               ) : null}
               <div className="mt-4 rounded-lg border border-slate-800 bg-slate-950 p-4">
