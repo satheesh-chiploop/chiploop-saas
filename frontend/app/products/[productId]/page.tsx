@@ -54,6 +54,7 @@ type StageRun = {
   status: string;
   workflow_id?: string | null;
   run_id?: string | null;
+  outputs?: Record<string, unknown> | null;
   error?: string | null;
   started_at?: string | null;
   completed_at?: string | null;
@@ -372,6 +373,39 @@ function appLink(app: string, workflowId?: string | null, runId?: string | null)
   const params = new URLSearchParams({ workflow_id: workflowId });
   if (runId) params.set("run_id", runId);
   return `${base}?${params.toString()}`;
+}
+
+function dashboardStageForApp(app: string) {
+  const map: Record<string, string> = {
+    Digital_Arch2RTL: "arch2rtl",
+    System_RTL: "arch2rtl",
+    Digital_DQA: "dqa",
+    System_DQA: "dqa",
+    Digital_Verify: "verification",
+    verify_closure_loop: "verification",
+    System_Sim: "verification",
+    Digital_Arch2Synthesis: "synthesis",
+    System_Synthesis: "synthesis",
+    Digital_Arch2Tapeout: "tapeout",
+    System_PD: "tapeout",
+    Embedded_Run: "embedded",
+    System_Firmware: "embedded",
+    System_Software: "software",
+    System_Software_Validation_L2: "validation",
+    System_Product_App_Builder: "product",
+  };
+  return map[app] || "arch2rtl";
+}
+
+function stageRunDashboardLink(stageRun: StageRun) {
+  if (!stageRun.workflow_id) return appLink(stageRun.app);
+  const params = new URLSearchParams({
+    stage: dashboardStageForApp(stageRun.app),
+    status: stageRun.status || "completed",
+    app: stageRun.app,
+  });
+  if (stageRun.run_id) params.set("run_id", stageRun.run_id);
+  return `/dashboard/${encodeURIComponent(stageRun.workflow_id)}?${params.toString()}`;
 }
 
 function parseLogLines(logs?: string | null) {
@@ -1205,10 +1239,16 @@ export default function ProductDetailPage() {
                         {stageRun.workflow_id ? (
                           <>
                             <button
-                              onClick={() => router.push(appLink(stageRun.app, stageRun.workflow_id, stageRun.run_id))}
+                              onClick={() => router.push(stageRunDashboardLink(stageRun))}
                               className="rounded-md border border-cyan-700/70 px-2 py-1 text-xs text-cyan-100 hover:bg-cyan-950/40"
                             >
                               Open Dashboard
+                            </button>
+                            <button
+                              onClick={() => router.push(appLink(stageRun.app, stageRun.workflow_id, stageRun.run_id))}
+                              className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
+                            >
+                              Open App Form
                             </button>
                             <a
                               href={`/api/workflow/${stageRun.workflow_id}/download_zip?full=1`}
