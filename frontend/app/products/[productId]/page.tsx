@@ -979,7 +979,6 @@ export default function ProductDetailPage() {
     try {
       await saveDraft();
       const out = await apiPost<{ status: string; product_run: ProductRun }>(`/products/${product.id}/run`, {
-        max_stages: 8,
         start_stage: startStage,
         resume_product_run_id: resumeProductRunId,
       });
