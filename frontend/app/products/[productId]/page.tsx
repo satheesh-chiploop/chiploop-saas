@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import TopNav from "@/components/TopNav";
 import SpecTextBox from "@/components/SpecTextBox";
-import { apiGet, apiPatch, apiPost } from "@/lib/apiClient";
+import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/apiClient";
 
 type Stage = {
   id: string;
@@ -668,6 +668,9 @@ function validateStageSequence(stages: Stage[]) {
   return findings;
 }
 
+const STAGE_ACTION_BUTTON_CLASS =
+  "flex h-12 w-28 shrink-0 items-center justify-center rounded-md border border-cyan-700/70 px-2 text-center text-sm font-semibold leading-5 text-cyan-100 transition hover:bg-cyan-950/40";
+
 function StepRail({ active }: { active: "define" | "configure" | "run" }) {
   const steps = [
     { id: "define", label: "Define", text: "Create product" },
@@ -700,6 +703,7 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [running, setRunning] = useState(false);
+  const [deletingRunId, setDeletingRunId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
   const [newStageApp, setNewStageApp] = useState(STAGE_CATALOG[0]?.app || "Digital_Arch2RTL");
@@ -1005,6 +1009,27 @@ export default function ProductDetailPage() {
       setMessage("Product run cancellation requested. The orchestrator will stop before the next stage.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Failed to cancel product run");
+    }
+  }
+
+  async function deleteRunHistory(run: ProductRunWithStages) {
+    if (!product || deletingRunId) return;
+    setDeletingRunId(run.id);
+    setMessage(null);
+    try {
+      await apiDelete<{ status: string; deleted_product_run_id: string }>(`/products/${product.id}/runs/${run.id}`);
+      const nextHistory = runHistory.filter((item) => item.id !== run.id);
+      setRunHistory(nextHistory);
+      if (productRun?.id === run.id) {
+        const next = nextHistory[0] || null;
+        setProductRun(next);
+        setStageRuns(next?.stage_runs || []);
+      }
+      setMessage("Run history entry deleted.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Failed to delete run history entry");
+    } finally {
+      setDeletingRunId(null);
     }
   }
 
@@ -1480,13 +1505,13 @@ export default function ProductDetailPage() {
                                       href={stageRunDashboardLink(stageRun)}
                                       target="_blank"
                                       rel="noreferrer"
-                                      className="rounded-md border border-cyan-700/70 px-2 py-1 text-xs text-cyan-100 hover:bg-cyan-950/40"
+                                      className={STAGE_ACTION_BUTTON_CLASS}
                                     >
                                       Open Dashboard
                                     </a>
                                     <a
                                       href={`/api/workflow/${stageRun.workflow_id}/download_zip?full=1`}
-                                      className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
+                                      className={STAGE_ACTION_BUTTON_CLASS}
                                     >
                                       Download ZIP
                                     </a>
@@ -1516,19 +1541,19 @@ export default function ProductDetailPage() {
                               href={stageRunDashboardLink(stageRun)}
                               target="_blank"
                               rel="noreferrer"
-                              className="rounded-md border border-cyan-700/70 px-2 py-1 text-xs text-cyan-100 hover:bg-cyan-950/40"
+                              className={STAGE_ACTION_BUTTON_CLASS}
                             >
                               Open Dashboard
                             </a>
                             <button
                               onClick={() => router.push(appLink(stageRun.app, stageRun.workflow_id, stageRun.run_id))}
-                              className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
+                              className={STAGE_ACTION_BUTTON_CLASS}
                             >
                               Open App Form
                             </button>
                             <a
                               href={`/api/workflow/${stageRun.workflow_id}/download_zip?full=1`}
-                              className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800"
+                              className={STAGE_ACTION_BUTTON_CLASS}
                             >
                               Download ZIP
                             </a>
@@ -1578,27 +1603,44 @@ export default function ProductDetailPage() {
               <div className="text-sm font-semibold text-white">Run history</div>
               <div className="mt-3 grid gap-2">
                 {runHistory.slice(0, 8).map((run) => (
-                  <button
+                  <div
                     key={run.id}
-                    onClick={() => {
-                      setProductRun(run);
-                      setStageRuns(run.stage_runs || []);
-                    }}
                     className={`flex flex-col gap-1 rounded-lg border px-3 py-2 text-left transition sm:flex-row sm:items-center sm:justify-between ${
                       productRun?.id === run.id ? "border-cyan-400 bg-cyan-500/10" : "border-slate-800 bg-slate-900/60 hover:border-slate-600"
                     }`}
                   >
-                    <span className="text-xs text-slate-300">{run.id}</span>
-                    <span className={`rounded-md px-2 py-1 text-xs ${
-                      run.status === "completed"
-                        ? "bg-emerald-500/10 text-emerald-200"
-                        : run.status === "failed"
-                        ? "bg-rose-500/10 text-rose-200"
-                        : "bg-cyan-500/10 text-cyan-200"
-                    }`}>
-                      {run.status}
-                    </span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProductRun(run);
+                        setStageRuns(run.stage_runs || []);
+                      }}
+                      className="min-w-0 flex-1 text-left"
+                    >
+                      <span className="block truncate text-xs text-slate-300">{run.id}</span>
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <span className={`rounded-md px-2 py-1 text-xs ${
+                        run.status === "completed"
+                          ? "bg-emerald-500/10 text-emerald-200"
+                          : run.status === "failed"
+                          ? "bg-rose-500/10 text-rose-200"
+                          : "bg-cyan-500/10 text-cyan-200"
+                      }`}>
+                        {run.status}
+                      </span>
+                      <button
+                        type="button"
+                        title="Delete run history entry"
+                        aria-label="Delete run history entry"
+                        onClick={() => deleteRunHistory(run)}
+                        disabled={deletingRunId === run.id}
+                        className="rounded-md border border-slate-700 px-2 py-1 text-xs font-semibold text-slate-300 transition hover:border-rose-400 hover:bg-rose-500/10 hover:text-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {deletingRunId === run.id ? "Deleting" : "Delete"}
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
