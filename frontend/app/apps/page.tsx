@@ -26,6 +26,7 @@ const supabase = createClientComponentClient();
 type LoopType = "digital" | "validation" | "analog" | "embedded" | "system";
 
 const LOOP_TYPES: LoopType[] = ["digital", "analog", "system", "embedded", "validation"];
+type CatalogView = "home" | "digital" | "system" | "analog" | "embedded" | "reference" | "segments";
 
 type OnboardingResponse = {
   status: string;
@@ -67,6 +68,15 @@ type AppCard = {
   status?: "Flagship" | "New" | "Coming";
   nudge?: string;
   promise?: string;
+};
+
+type ReferenceJourney = {
+  segment: string;
+  title: string;
+  copy: string;
+  button: string;
+  onClick: () => void;
+  stages?: string[];
 };
 
 const LOOP_META: Record<LoopType, {
@@ -127,7 +137,7 @@ export default function AppsHomePage() {
   const [onboardingBusy, setOnboardingBusy] = useState(false);
 
   const [view, setView] = useState<"recommended" | "all">("recommended");
-  const [selectedLoop, setSelectedLoop] = useState<LoopType | null>(null);
+  const [catalogView, setCatalogView] = useState<CatalogView>("home");
 
   useEffect(() => {
     let mounted = true;
@@ -159,7 +169,9 @@ export default function AppsHomePage() {
   useEffect(() => {
     const loop = new URLSearchParams(window.location.search).get("loop");
     if (LOOP_TYPES.includes(loop as LoopType)) {
-      setSelectedLoop(loop as LoopType);
+      if (["digital", "analog", "system", "embedded"].includes(loop || "")) {
+        setCatalogView(loop as CatalogView);
+      }
       setView("all");
     }
   }, []);
@@ -595,8 +607,6 @@ export default function AppsHomePage() {
 
   const flagship = primaryApps;
 
-  const loops: LoopType[] = useMemo(() => LOOP_TYPES, []);
-
   const outcomeInputs: Record<LoopType, string> = {
     digital: "Architecture spec or RTL",
     analog: "Analog spec or netlist",
@@ -611,12 +621,6 @@ export default function AppsHomePage() {
     embedded: "HAL, drivers, diagnostics, and co-sim proof",
     validation: "Plans, run results, gaps, and executive report",
     system: "Integrated top, simulation evidence, firmware, and reports",
-  };
-
-  const visibleAppsForLoop = (loop: LoopType) => {
-    const rowApps = apps.filter((a) => a.loop_type === loop);
-    if (view === "all") return rowApps;
-    return rowApps.filter((a) => a.status === "Flagship").slice(0, 6);
   };
 
   const go = (path: string) => router.push(path);
@@ -818,6 +822,84 @@ export default function AppsHomePage() {
     
     return dedicated[slug] || `/apps/${slug}`;
   };
+
+  const referenceJourneys: ReferenceJourney[] = [
+    {
+      segment: "Mixed-Signal / Product SoC",
+      title: "Temperature Monitor SoC: analog sensor, System RTL, Sim, Firmware, Software, Validation, Product App",
+      copy: "A System-first journey using digital_spec, analog_spec, and soc_spec. It builds a temperature sensor ADC behavioral model, digital threshold/alert RTL, integrated SoC top, system simulation, firmware/software, validation, and dashboard.",
+      button: "Start System Temp Monitor Journey",
+      onClick: startTempMonitorSystemDemo,
+      stages: ["System RTL", "System Sim", "Firmware", "Software", "Validation", "Product App"],
+    },
+    {
+      segment: "Embedded Control / Motor & Power",
+      title: "PWM Controller: RTL to Firmware to Software to Product App",
+      copy: "A compact peripheral demo for first-time walkthroughs. Generated RTL, simulation, firmware co-simulation, and validation evidence come from actual workflow runs.",
+      button: "Start PWM Reference Journey",
+      onClick: startPwmFullStackDemo,
+    },
+    {
+      segment: "Connectivity / Communications IP",
+      title: "UART Packet Engine: FIFO, interrupts, firmware, software, and product app",
+      copy: "A larger peripheral demo intended to produce roughly 150-200 flip-flops through FIFOs, shifters, counters, state machines, and interrupt logic.",
+      button: "Start UART Reference Journey",
+      onClick: startUartPacketDemo,
+    },
+    {
+      segment: "Vision / Edge AI Preprocessing",
+      title: "Image DMA Pipeline: 25k FF visual processing demo",
+      copy: "A large visual demo with DMA, register-based line buffers, 3x3 filtering, thresholding, histogram, interrupts, firmware, software, and product dashboard.",
+      button: "Start Image DMA Journey",
+      onClick: startImageDmaDemo,
+    },
+    {
+      segment: "Memory / DFT",
+      title: "SRAM MBIST Demo: Sky130 SRAM macro, scan, ATPG, and MBIST evidence",
+      copy: "A focused memory-test journey using a 32x256 Sky130 SRAM scratchpad controller. Run Arch2RTL, then Arch2Synthesis to see scan DFT, ATPG readiness, and MBIST applicability evidence.",
+      button: "Start MBIST SRAM Journey",
+      onClick: startMbistSramDemo,
+    },
+    {
+      segment: "IoT / Embedded Edge Devices",
+      title: "Smart Sensor Hub MCU: telemetry, alerts, low power, and product app",
+      copy: "An IoT edge-node demo with a microcontroller-style sensor hub, threshold alerts, FIFO telemetry buffering, low-power sampling, firmware, software, validation, and dashboard.",
+      button: "Start Sensor Hub Journey",
+      onClick: startSensorHubDemo,
+    },
+    {
+      segment: "Security / Root-of-Trust IP",
+      title: "Secure Boot + Key Manager: authentication, rollback, debug lock",
+      copy: "A security reference journey with secure boot policy, key-slot selection, anti-rollback checks, tamper handling, firmware provisioning, validation, and dashboard.",
+      button: "Start Secure Boot Journey",
+      onClick: startSecureBootDemo,
+    },
+    {
+      segment: "Automotive / Safety Control",
+      title: "Safety Fault Manager + Watchdog: faults, heartbeat, reset escalation",
+      copy: "A safety reference journey with watchdog timeout, heartbeat service, fault masks, escalation policy, reset request, firmware diagnostics, validation, and dashboard.",
+      button: "Start Safety Journey",
+      onClick: startSafetyFaultDemo,
+    },
+  ];
+
+  const catalogButtons: Array<{ view: CatalogView; title: string; body: string; count?: number }> = [
+    { view: "digital", title: "Explore Digital apps", body: "RTL, DQA, verify, synthesis, tapeout, and handoff apps.", count: apps.filter((app) => app.loop_type === "digital").length },
+    { view: "system", title: "Explore System apps", body: "System RTL, simulation, synthesis, PD, firmware, software, validation, and product builder.", count: apps.filter((app) => app.loop_type === "system").length },
+    { view: "analog", title: "Explore Analog apps", body: "Analog spec, netlist, model, validation, correlation, iteration, and abstracts.", count: apps.filter((app) => app.loop_type === "analog").length },
+    { view: "embedded", title: "Explore Embedded apps", body: "HAL, drivers, boot, diagnostics, log analysis, co-sim, and firmware run.", count: apps.filter((app) => app.loop_type === "embedded").length },
+    { view: "reference", title: "Explore Reference journeys", body: "Start end-to-end demos using standard ChipLoop apps.", count: referenceJourneys.length },
+    { view: "segments", title: "Explore journeys by segment", body: "Browse demos by product domain and market segment.", count: new Set(referenceJourneys.map((journey) => journey.segment)).size },
+  ];
+
+  const selectedCatalogLoop = ["digital", "system", "analog", "embedded"].includes(catalogView)
+    ? catalogView as LoopType
+    : null;
+
+  const journeysBySegment = referenceJourneys.reduce<Record<string, ReferenceJourney[]>>((groups, journey) => {
+    groups[journey.segment] = [...(groups[journey.segment] || []), journey];
+    return groups;
+  }, {});
 
   if (!onboardingLoading && !onboardingComplete) {
     return (
@@ -1031,9 +1113,12 @@ export default function AppsHomePage() {
 
             <div className="mt-6 flex items-center gap-2">
               <button
-                onClick={() => setView("recommended")}
+                onClick={() => {
+                  setView("recommended");
+                  setCatalogView("home");
+                }}
                 className={`rounded-xl px-4 py-2 text-sm border transition ${
-                  view === "recommended"
+                  view === "recommended" && catalogView === "home"
                     ? "border-cyan-700 bg-cyan-500/10 text-cyan-200"
                     : "border-slate-800 bg-slate-950/20 text-slate-300 hover:bg-slate-950/40"
                 }`}
@@ -1041,20 +1126,77 @@ export default function AppsHomePage() {
                 Recommended
               </button>
               <button
-                onClick={() => setView("all")}
+                onClick={() => {
+                  setView("all");
+                  setCatalogView("digital");
+                }}
                 className={`rounded-xl px-4 py-2 text-sm border transition ${
-                  view === "all"
+                  catalogView === "digital"
                     ? "border-cyan-700 bg-cyan-500/10 text-cyan-200"
                     : "border-slate-800 bg-slate-950/20 text-slate-300 hover:bg-slate-950/40"
                 }`}
               >
-                Explore all loops
+                Explore Digital apps
               </button>
             </div>
           </div>
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 pb-7">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Explore Apps</div>
+              <h2 className="mt-2 text-2xl font-extrabold text-white">Choose one catalog view</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+                Open a focused page for one app family or browse the reference journeys without scrolling through every app at once.
+              </p>
+            </div>
+            {catalogView !== "home" ? (
+              <button
+                onClick={() => setCatalogView("home")}
+                className="rounded-xl border border-slate-600 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200"
+              >
+                Back to overview
+              </button>
+            ) : null}
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {catalogButtons.map((item, index) => {
+              const active = catalogView === item.view;
+              return (
+                <button
+                  key={item.view}
+                  onClick={() => {
+                    setCatalogView(item.view);
+                    setView("all");
+                  }}
+                  className={`min-h-[132px] rounded-xl px-5 py-4 text-left transition ${
+                    active || (catalogView === "home" && index === 0)
+                      ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-950/30 hover:bg-cyan-300"
+                      : "border border-slate-600 bg-slate-950/35 text-white hover:border-cyan-300 hover:text-cyan-200"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="text-lg font-extrabold">{item.title}</div>
+                    {item.count !== undefined ? (
+                      <span className={`rounded-full px-2 py-1 text-xs font-bold ${active || (catalogView === "home" && index === 0) ? "bg-slate-950/10 text-slate-900" : "border border-slate-700 text-slate-300"}`}>
+                        {item.count}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className={`mt-3 text-sm font-semibold leading-6 ${active || (catalogView === "home" && index === 0) ? "text-slate-900" : "text-slate-300"}`}>
+                    {item.body}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {catalogView === "reference" ? (
       <section className="mx-auto max-w-6xl px-6 pb-7">
         <div className="border-y border-slate-800 py-6">
           <div className="text-xs font-semibold uppercase text-emerald-300">Reference Journeys</div>
@@ -1142,8 +1284,48 @@ export default function AppsHomePage() {
           </div>
         </div>
       </section>
+      ) : null}
+
+      {catalogView === "segments" ? (
+        <section className="mx-auto max-w-6xl px-6 pb-7">
+          <div className="border-y border-slate-800 py-6">
+            <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Journeys by Segment</div>
+            <div className="mt-2 text-xl font-bold text-white">Pick a product domain, then start a reference journey</div>
+            <div className="mt-5 space-y-6">
+              {Object.entries(journeysBySegment).map(([segment, journeys]) => (
+                <div key={segment}>
+                  <div className="mb-3 text-sm font-bold uppercase tracking-wide text-emerald-300">{segment}</div>
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    {journeys.map((journey) => (
+                      <div key={journey.title} className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
+                        <div className="text-lg font-bold text-white">{journey.title}</div>
+                        <p className="mt-2 text-sm leading-6 text-slate-300">{journey.copy}</p>
+                        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                          {(journey.stages || ["Arch2RTL", "Verify", "Firmware", "Software", "Validation", "Product App"]).map((stage, index, stages) => (
+                            <div key={stage} className="flex items-center gap-2">
+                              <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
+                              {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}
+                            </div>
+                          ))}
+                        </div>
+                        <button
+                          onClick={journey.onClick}
+                          className="mt-5 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500"
+                        >
+                          {journey.button}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* Flagship row */}
+      {catalogView === "home" ? (
       <section className="mx-auto max-w-6xl px-6 pb-4">
         <div className="mb-3 flex items-end justify-between">
           <div>
@@ -1176,12 +1358,14 @@ export default function AppsHomePage() {
           ))}
         </div>
       </section>
+      ) : null}
 
       {/* Loop rows */}
+      {selectedCatalogLoop ? (
       <section className="mx-auto max-w-6xl px-6 pb-16 space-y-10">
-        {(selectedLoop ? loops.filter((loop) => loop === selectedLoop) : loops).map((loop) => {
+        {[selectedCatalogLoop].map((loop) => {
           const meta = LOOP_META[loop];
-          const rowApps = visibleAppsForLoop(loop);
+          const rowApps = apps.filter((a) => a.loop_type === loop);
 
           return (
             <div key={loop}>
@@ -1194,8 +1378,8 @@ export default function AppsHomePage() {
                   <div className="text-sm text-slate-400">{meta.tagline}</div>
                 </div>
 
-                <button onClick={() => setView("all")} className="text-sm text-cyan-300 hover:underline">
-                  See all
+                <button onClick={() => setCatalogView("home")} className="text-sm text-cyan-300 hover:underline">
+                  Back to overview
                 </button>
               </div>
 
@@ -1247,6 +1431,7 @@ export default function AppsHomePage() {
           );
         })}
       </section>
+      ) : null}
     </main>
   );
 }
