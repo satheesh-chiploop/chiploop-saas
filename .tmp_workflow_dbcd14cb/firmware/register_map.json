@@ -1,0 +1,229 @@
+{
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "bus": "MINIMAL",
+  "registers": [
+    {
+      "name": "CONTROL",
+      "offset": "0x00000000",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Control register. Bit 0 ENABLE is stored. Bit 1 SAMPLE_START is a write pulse and reads back as 0. Bit 2 IRQ_ENABLE is stored. Bit 3 ALERT_CLEAR is a write pulse and reads back as 0. Upper bits read as 0.",
+      "fields": [
+        {
+          "name": "ENABLE",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Global enable for periodic sampling behavior."
+        },
+        {
+          "name": "SAMPLE_START",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Writing 1 requests one conversion and generates a one-cycle sample_req pulse; readback is always 0."
+        },
+        {
+          "name": "IRQ_ENABLE",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Interrupt output enable gate."
+        },
+        {
+          "name": "ALERT_CLEAR",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Writing 1 clears alert_status and STATUS.alert_pending; readback is always 0."
+        },
+        {
+          "name": "RESERVED",
+          "bit_offset": 4,
+          "bit_width": 12,
+          "access": "RO",
+          "description": "Reads as 0."
+        }
+      ]
+    },
+    {
+      "name": "STATUS",
+      "offset": "0x00000004",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Read-only sticky/live status. Bit 0 sample_done is sticky until IRQ_CLEAR bit 1 is written. Bit 1 alert_pending mirrors latched alert_status until ALERT_CLEAR or IRQ_CLEAR bit 0 is written. Bit 2 adc_valid_seen is sticky after first adc_valid until reset. Bit 3 busy is high while a requested sample is pending. Upper bits read as 0.",
+      "fields": [
+        {
+          "name": "sample_done",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Sticky indication that at least one adc_valid sample completed since last clear."
+        },
+        {
+          "name": "alert_pending",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Mirrors latched alert_status until cleared by ALERT_CLEAR or IRQ_CLEAR bit 0."
+        },
+        {
+          "name": "adc_valid_seen",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Sticky after the first adc_valid after reset."
+        },
+        {
+          "name": "busy",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "High while a requested sample is pending."
+        },
+        {
+          "name": "RESERVED",
+          "bit_offset": 4,
+          "bit_width": 12,
+          "access": "RO",
+          "description": "Reads as 0."
+        }
+      ]
+    },
+    {
+      "name": "THRESHOLD",
+      "offset": "0x00000008",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Threshold register. threshold_code is bits [11:0]. Upper bits read as 0.",
+      "fields": [
+        {
+          "name": "threshold_code",
+          "bit_offset": 0,
+          "bit_width": 12,
+          "access": "RW",
+          "description": "Temperature threshold compared against filtered temp_code. Alert latches when temp_code is strictly above this value."
+        },
+        {
+          "name": "RESERVED",
+          "bit_offset": 12,
+          "bit_width": 4,
+          "access": "RO",
+          "description": "Reads as 0."
+        }
+      ]
+    },
+    {
+      "name": "LATEST_TEMP",
+      "offset": "0x0000000C",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Latest filtered temperature code. temp_code is bits [11:0]. Upper bits read as 0.",
+      "fields": [
+        {
+          "name": "temp_code",
+          "bit_offset": 0,
+          "bit_width": 12,
+          "access": "RO",
+          "description": "Latest filtered temperature result from the two-sample moving average."
+        },
+        {
+          "name": "RESERVED",
+          "bit_offset": 12,
+          "bit_width": 4,
+          "access": "RO",
+          "description": "Reads as 0."
+        }
+      ]
+    },
+    {
+      "name": "SAMPLE_COUNT",
+      "offset": "0x00000010",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Completed sample count. Increments on every completed adc_valid sample.",
+      "fields": [
+        {
+          "name": "sample_count",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Count of completed adc_valid samples since reset."
+        }
+      ]
+    },
+    {
+      "name": "IRQ_STATUS",
+      "offset": "0x00000014",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Read-only sticky interrupt status. Bit 0 alert and bit 1 sample_done. Upper bits read as 0.",
+      "fields": [
+        {
+          "name": "alert",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Sticky alert interrupt status."
+        },
+        {
+          "name": "sample_done",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Sticky sample_done interrupt status."
+        },
+        {
+          "name": "RESERVED",
+          "bit_offset": 2,
+          "bit_width": 14,
+          "access": "RO",
+          "description": "Reads as 0."
+        }
+      ]
+    },
+    {
+      "name": "IRQ_CLEAR",
+      "offset": "0x00000018",
+      "address": null,
+      "access": "WO",
+      "reset": "0x00000000",
+      "description": "Write-one-to-clear register. Writing bit 0 clears IRQ_STATUS.alert and alert_status. Writing bit 1 clears IRQ_STATUS.sample_done and STATUS.sample_done. Reads as 0.",
+      "fields": [
+        {
+          "name": "clear_alert",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "W1C",
+          "description": "Writing 1 clears IRQ_STATUS.alert and alert_status."
+        },
+        {
+          "name": "clear_sample_done",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "W1C",
+          "description": "Writing 1 clears IRQ_STATUS.sample_done and STATUS.sample_done."
+        },
+        {
+          "name": "RESERVED",
+          "bit_offset": 2,
+          "bit_width": 14,
+          "access": "RO",
+          "description": "Reads as 0."
+        }
+      ]
+    }
+  ],
+  "__source": {
+    "mode": "artifact_passthrough",
+    "path": "state.digital_regmap"
+  }
+}

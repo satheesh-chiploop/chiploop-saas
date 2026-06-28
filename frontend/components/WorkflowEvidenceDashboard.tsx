@@ -331,6 +331,14 @@ async function artifact(workflowId: string, filename: string): Promise<JsonMap |
   }
 }
 
+function stageEvidenceReady(stage: DashboardStage, evidence: Record<string, unknown>): boolean {
+  const has = (key: string) => Object.keys(record(evidence[key])).length > 0;
+  if (stage === "product") {
+    return has("system_product_dashboard_manifest.json") || has("system_product_package.json");
+  }
+  return Object.values(evidence).some((value) => Object.keys(record(value)).length > 0);
+}
+
 function Stat({ title, value }: { title: string; value: string | number }) {
   return (
     <div className="min-w-0 rounded-lg border border-slate-800 bg-black/30 p-3">
@@ -638,7 +646,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             merged[key] = value;
           }
         }
-        const hasEvidence = entries.some(([, value]) => Object.keys(record(value)).length > 0);
+        const hasEvidence = stageEvidenceReady(stage, merged);
         setEvidence(merged);
         setArtifactsLoaded(hasEvidence);
         if (!hasEvidence && attempt < 12) {
@@ -1263,13 +1271,21 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const execution = evidence["system_firmware_execution.json"] || evidence["system_firmware_coverage_summary.json"] || {};
       const readiness = record(execution.readiness);
       const inputs = record(execution.inputs);
+      const results = record(execution.results);
       const missingInputs = array(dashboard.missing_inputs).length
         ? array(dashboard.missing_inputs).map(String)
         : array(readiness.missing).map(String);
       const firmwareElfPlaceholder = dashboard.firmware_elf_placeholder === true || inputs.firmware_elf_placeholder === true;
-      const passed = number(dashboard.passed_test_count);
-      const failed = number(dashboard.failed_test_count);
-      const executed = number(dashboard.executed_test_count);
+      const testMatrix = array(execution.test_matrix);
+      const passed = firstNumber(dashboard.passed_test_count, results.passed_test_count);
+      const failed = firstNumber(dashboard.failed_test_count, results.failed_test_count);
+      const executed = firstNumber(dashboard.executed_test_count, results.executed_test_count);
+      const planned = firstNumber(dashboard.planned_test_count, testMatrix.length);
+      const attempted = results.attempted === true || executed > 0;
+      const runtimeRequested = results.runtime_requested === true;
+      const runtimeCapable = results.runtime_capable === true;
+      const executionMode = firstString(execution.execution_mode, dashboard.execution_mode);
+      const status = String(dashboard.overall_status || execution.overall_status || "unavailable");
       return (
         <div className="mt-5 space-y-5">
           {missingInputs.length ? (
@@ -1283,16 +1299,34 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               ) : null}
             </div>
           ) : null}
+          {!missingInputs.length && !attempted && status === "ready_for_execution" ? (
+            <div className="rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-4 text-sm text-cyan-100">
+              Firmware co-simulation inputs are ready, but runtime execution was not requested for this run.
+              {runtimeCapable ? " Re-run with firmware co-sim enabled to produce pass/fail results." : ""}
+            </div>
+          ) : null}
           <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
             <div className="space-y-3">
-              <Bar label="Co-simulation passed" value={passed} total={executed} color="bg-emerald-500" />
-              <Bar label="Co-simulation failed" value={failed} total={executed} color="bg-rose-500" />
+              {attempted ? (
+                <>
+                  <Bar label="Co-simulation passed" value={passed} total={executed} color="bg-emerald-500" />
+                  <Bar label="Co-simulation failed" value={failed} total={executed} color="bg-rose-500" />
+                </>
+              ) : (
+                <>
+                  <Bar label="Planned tests" value={planned} total={Math.max(planned, 1)} color="bg-cyan-500" />
+                  <Bar label="Executed tests" value={executed} total={Math.max(planned, 1)} color="bg-slate-500" />
+                </>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Stat title="Status" value={String(dashboard.overall_status || "unavailable")} />
+              <Stat title="Status" value={status} />
+              <Stat title="Planned" value={planned} />
               <Stat title="Executed" value={executed} />
               {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
               <Stat title="ELF" value={firmwareElfPlaceholder ? "placeholder" : String(dashboard.firmware_elf_detected ? "detected" : "missing")} />
+              <Stat title="Runtime" value={attempted ? "attempted" : runtimeRequested ? "requested" : "not requested"} />
+              {executionMode ? <Stat title="Mode" value={executionMode} /> : null}
               <Stat title="Missing Inputs" value={missingInputs.length} />
             </div>
           </div>
@@ -1333,6 +1367,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const pkg = record(evidence["system_product_package.json"]);
       const manifest = record(evidence["system_product_dashboard_manifest.json"]);
       const contract = record(evidence["system_product_collateral_contract.json"]);
+      const packageArtifacts = record(pkg.artifacts);
       const lineage = record(model.lineage || contract.lineage);
       const sourceArtifacts = record(contract.source_artifacts);
       const firmwareSourceLoaded = Boolean(
@@ -1371,7 +1406,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             </div>
           </div>
           <div className="grid min-w-0 grid-cols-2 gap-3 md:grid-cols-4">
-            <Stat title="Dashboard" value={String(manifest.entrypoint || pkg.entrypoint || "not produced")} />
+            <Stat title="Dashboard" value={String(manifest.entrypoint || pkg.entrypoint || packageArtifacts.dashboard || "not produced")} />
             <Stat title="Firmware Source" value={firmwareSourceLoaded ? "loaded" : "missing"} />
             <Stat title="Software Source" value={record(sourceArtifacts.software_api).data || record(sourceArtifacts.software_package).data ? "loaded" : "missing"} />
             <Stat title="Validation Source" value={record(sourceArtifacts.validation_summary).data ? "loaded" : "missing"} />

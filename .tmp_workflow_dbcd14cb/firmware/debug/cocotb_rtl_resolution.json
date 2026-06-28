@@ -1,0 +1,14 @@
+{
+  "soc_top_relpath": "digital/rtl/temp_monitor_digital.v",
+  "instantiated_modules": [],
+  "resolved_modules": {},
+  "missing_modules": [],
+  "ambiguous_modules": {},
+  "state_rtl_candidates": [
+    "digital/rtl/temp_monitor_digital.v",
+    "system/imported_rtl/temp_sensor_adc_model.v",
+    "system/imported_rtl/temp_monitor_digital.v",
+    "system/imported_rtl/temp_monitor_soc_phys.sv",
+    "system/imported_rtl/temp_monitor_soc_sim.sv"
+  ]
+}

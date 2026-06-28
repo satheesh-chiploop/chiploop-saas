@@ -1,0 +1,67 @@
+{
+  "agent": "Embedded Verilator Build Agent",
+  "workflow_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital",
+  "status": "resolved",
+  "top_module": "temp_monitor_soc_sim",
+  "rtl_top_resolution": {
+    "resolution": "metadata_top_found_in_rtl",
+    "candidate_top": "temp_monitor_soc_sim",
+    "module_map": {
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/digital/rtl/temp_monitor_digital.v": [
+        "temp_monitor_digital"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/imported_rtl/temp_sensor_adc_model.v": [
+        "temp_sensor_adc_model"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/imported_rtl/temp_monitor_digital.v": [
+        "temp_monitor_digital"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/imported_rtl/temp_monitor_soc_phys.sv": [
+        "temp_monitor_soc_phys"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/imported_rtl/temp_monitor_soc_sim.sv": [
+        "temp_monitor_soc_sim"
+      ]
+    }
+  },
+  "rtl_paths_scanned": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/digital/rtl/temp_monitor_digital.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/imported_rtl/temp_sensor_adc_model.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/imported_rtl/temp_monitor_digital.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/imported_rtl/temp_monitor_soc_phys.sv",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/imported_rtl/temp_monitor_soc_sim.sv"
+  ],
+  "rtl_filelist": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/integration/system_rtl_filelist_sim.txt",
+  "rtl_filelist_entries": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/digital/rtl/temp_monitor_digital.v"
+  ],
+  "harness": "firmware/validate/cocotb_harness.py",
+  "harness_required_for_plan": false,
+  "harness_source": "default_expected_path",
+  "include_dirs": [],
+  "defines": [],
+  "output_path": "firmware/validate/verilator_build.md",
+  "resolved_from_state": {
+    "soc_top_sim_module": "temp_monitor_soc_sim",
+    "system_top_sim_module": "temp_monitor_soc_sim",
+    "rtl_top": "temp_monitor_soc_sim",
+    "top_module": "temp_monitor_soc_sim",
+    "design_name": null,
+    "system_rtl_filelist_sim": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/system/integration/system_rtl_filelist_sim.txt",
+    "rtl_inputs": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/digital/rtl/temp_monitor_digital.v"
+    ],
+    "system_rtl_files": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dbcd14cb-c206-4b70-b2cc-5eeed0d92698/b59df0e7-5965-4c86-be8c-aa5cf85abd3f/digital/digital/rtl/temp_monitor_digital.v"
+    ],
+    "system_block": {
+      "soc_top_sim_module": "temp_monitor_soc_sim",
+      "system_top_sim_module": "temp_monitor_soc_sim"
+    },
+    "rtl_filelist_path": null,
+    "system_filelist_sim_path": null,
+    "filelist_path": null,
+    "cocotb_harness_path": null,
+    "sim_harness_path": null
+  }
+}

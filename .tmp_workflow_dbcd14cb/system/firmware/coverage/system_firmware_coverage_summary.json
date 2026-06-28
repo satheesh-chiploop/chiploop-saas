@@ -1,0 +1,70 @@
+{
+  "agent": "System Firmware Coverage Summary Agent",
+  "generated_at": "2026-06-28T02:12:13.218065",
+  "coverage_metrics": {
+    "functional_coverage_pct": null,
+    "rtl_coverage_pct": null,
+    "assertion_coverage_pct": null,
+    "coverage_available": false,
+    "coverage_reason": "Execution was not attempted or did not complete; coverage is unavailable."
+  },
+  "health": {
+    "headline_status": "partial",
+    "execution_overall_status": "ready_for_execution",
+    "execution_readiness": "ready",
+    "executed_test_count": 0,
+    "passed_test_count": 0,
+    "failed_test_count": 0,
+    "validation_status": null
+  },
+  "execution": {
+    "overall_status": "ready_for_execution",
+    "readiness": {
+      "status": "ready",
+      "present": [
+        "soc_top_sim_path",
+        "resolved_top_module",
+        "firmware_elf_path",
+        "makefile_path",
+        "test_paths",
+        "rtl_inputs"
+      ],
+      "missing": []
+    },
+    "results": {
+      "attempted": false,
+      "executed_test_count": 0,
+      "passed_test_count": 0,
+      "failed_test_count": 0,
+      "runtime_seconds_total": null,
+      "waveform_paths": [],
+      "log_paths": [
+        "system/firmware/cosim/logs/system_firmware_execution.log"
+      ],
+      "runtime_requested": false,
+      "runtime_capable": true,
+      "stdout_tail": "",
+      "stderr_tail": "",
+      "resolved_top_module": "temp_monitor_soc_sim",
+      "resolved_verilog_sources": [
+        "digital/rtl/temp_monitor_digital.v",
+        "system/imported_rtl/temp_sensor_adc_model.v",
+        "system/imported_rtl/temp_monitor_digital.v",
+        "system/imported_rtl/temp_monitor_soc_phys.sv",
+        "system/imported_rtl/temp_monitor_soc_sim.sv"
+      ]
+    }
+  },
+  "inputs_observed": {
+    "execution_present": true,
+    "dashboard_present": true,
+    "embedded_coverage_present": false,
+    "validation_report_present": false
+  },
+  "notes": [
+    "Coverage percentages are intentionally left unavailable because execution did not actually run or no coverage numbers were provided.",
+    "No firmware functional coverage percentage was detected from upstream coverage artifacts.",
+    "No RTL/code coverage percentage was detected from upstream coverage artifacts.",
+    "No assertion coverage percentage was detected from upstream coverage artifacts."
+  ]
+}

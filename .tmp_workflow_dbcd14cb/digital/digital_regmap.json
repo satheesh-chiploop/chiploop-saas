@@ -1,0 +1,272 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "flat",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 16,
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control register. Bit 0 ENABLE is stored. Bit 1 SAMPLE_START is a write pulse and reads back as 0. Bit 2 IRQ_ENABLE is stored. Bit 3 ALERT_CLEAR is a write pulse and reads back as 0. Upper bits read as 0.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Global enable for periodic sampling behavior."
+          },
+          {
+            "name": "SAMPLE_START",
+            "lsb": 1,
+            "msb": 1,
+            "access": "W1P",
+            "reset": 0,
+            "description": "Writing 1 requests one conversion and generates a one-cycle sample_req pulse; readback is always 0."
+          },
+          {
+            "name": "IRQ_ENABLE",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Interrupt output enable gate."
+          },
+          {
+            "name": "ALERT_CLEAR",
+            "lsb": 3,
+            "msb": 3,
+            "access": "W1P",
+            "reset": 0,
+            "description": "Writing 1 clears alert_status and STATUS.alert_pending; readback is always 0."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 4,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "Read-only sticky/live status. Bit 0 sample_done is sticky until IRQ_CLEAR bit 1 is written. Bit 1 alert_pending mirrors latched alert_status until ALERT_CLEAR or IRQ_CLEAR bit 0 is written. Bit 2 adc_valid_seen is sticky after first adc_valid until reset. Bit 3 busy is high while a requested sample is pending. Upper bits read as 0.",
+        "fields": [
+          {
+            "name": "sample_done",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky indication that at least one adc_valid sample completed since last clear."
+          },
+          {
+            "name": "alert_pending",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirrors latched alert_status until cleared by ALERT_CLEAR or IRQ_CLEAR bit 0."
+          },
+          {
+            "name": "adc_valid_seen",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky after the first adc_valid after reset."
+          },
+          {
+            "name": "busy",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "High while a requested sample is pending."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 4,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "THRESHOLD",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Threshold register. threshold_code is bits [11:0]. Upper bits read as 0.",
+        "fields": [
+          {
+            "name": "threshold_code",
+            "lsb": 0,
+            "msb": 11,
+            "access": "RW",
+            "reset": 0,
+            "description": "Temperature threshold compared against filtered temp_code. Alert latches when temp_code is strictly above this value."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 12,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "LATEST_TEMP",
+        "offset": "0x0C",
+        "access": "RO",
+        "description": "Latest filtered temperature code. temp_code is bits [11:0]. Upper bits read as 0.",
+        "fields": [
+          {
+            "name": "temp_code",
+            "lsb": 0,
+            "msb": 11,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latest filtered temperature result from the two-sample moving average."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 12,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "SAMPLE_COUNT",
+        "offset": "0x10",
+        "access": "RO",
+        "description": "Completed sample count. Increments on every completed adc_valid sample.",
+        "fields": [
+          {
+            "name": "sample_count",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Count of completed adc_valid samples since reset."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_STATUS",
+        "offset": "0x14",
+        "access": "RO",
+        "description": "Read-only sticky interrupt status. Bit 0 alert and bit 1 sample_done. Upper bits read as 0.",
+        "fields": [
+          {
+            "name": "alert",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky alert interrupt status."
+          },
+          {
+            "name": "sample_done",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky sample_done interrupt status."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 2,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_CLEAR",
+        "offset": "0x18",
+        "access": "WO",
+        "description": "Write-one-to-clear register. Writing bit 0 clears IRQ_STATUS.alert and alert_status. Writing bit 1 clears IRQ_STATUS.sample_done and STATUS.sample_done. Reads as 0.",
+        "fields": [
+          {
+            "name": "clear_alert",
+            "lsb": 0,
+            "msb": 0,
+            "access": "W1C",
+            "reset": 0,
+            "description": "Writing 1 clears IRQ_STATUS.alert and alert_status."
+          },
+          {
+            "name": "clear_sample_done",
+            "lsb": 1,
+            "msb": 1,
+            "access": "W1C",
+            "reset": 0,
+            "description": "Writing 1 clears IRQ_STATUS.sample_done and STATUS.sample_done."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 2,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reads as 0."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "ALERT_IRQ",
+        "description": "Asserted when CONTROL.IRQ_ENABLE is set and any IRQ_STATUS bit is latched. The latched sources are IRQ_STATUS.alert and IRQ_STATUS.sample_done."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Write CONTROL=0 to ensure ENABLE, IRQ_ENABLE, SAMPLE_START, and ALERT_CLEAR are deasserted.",
+      "Write THRESHOLD[11:0] with the desired comparison threshold.",
+      "If needed, clear stale sticky state by writing IRQ_CLEAR with bit 0 and/or bit 1 set.",
+      "Set CONTROL.ENABLE=1 to allow periodic sampling.",
+      "Optionally set CONTROL.IRQ_ENABLE=1 to allow alert_irq assertion."
+    ],
+    "polling_sequence": [
+      "Poll STATUS.busy to observe pending requested sampling.",
+      "Poll STATUS.sample_done or IRQ_STATUS.sample_done to detect completed samples.",
+      "Read LATEST_TEMP to obtain the latest filtered temperature code.",
+      "Read SAMPLE_COUNT to obtain the completed-sample count.",
+      "Read STATUS.alert_pending or IRQ_STATUS.alert to determine whether the measured temperature exceeded THRESHOLD."
+    ],
+    "irq_sequence": [
+      "On alert_irq, read IRQ_STATUS and STATUS to determine whether alert and/or sample_done caused the interrupt.",
+      "Clear IRQ_STATUS.alert and alert_status by writing IRQ_CLEAR bit 0 = 1.",
+      "Clear IRQ_STATUS.sample_done and STATUS.sample_done by writing IRQ_CLEAR bit 1 = 1.",
+      "If using CONTROL.ALERT_CLEAR, write bit 3 = 1 to clear alert_status and STATUS.alert_pending."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is flat and uses the exact top-level digital ports already specified.",
+    "No AXI/APB or additional hierarchy is implied by this register map.",
+    "The register addresses are word-addressed at the documented byte offsets 0x00, 0x04, 0x08, 0x0C, 0x10, 0x14, and 0x18."
+  ]
+}

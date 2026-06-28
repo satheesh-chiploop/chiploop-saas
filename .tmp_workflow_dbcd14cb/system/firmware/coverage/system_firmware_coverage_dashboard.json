@@ -1,0 +1,14 @@
+{
+  "title": "System Firmware Coverage Dashboard",
+  "generated_at": "2026-06-28T02:12:13.218065",
+  "headline_status": "partial",
+  "execution_overall_status": "ready_for_execution",
+  "coverage_available": false,
+  "functional_coverage_pct": null,
+  "rtl_coverage_pct": null,
+  "assertion_coverage_pct": null,
+  "executed_test_count": 0,
+  "passed_test_count": 0,
+  "failed_test_count": 0,
+  "summary_path": "system/firmware/coverage/system_firmware_coverage_summary.md"
+}

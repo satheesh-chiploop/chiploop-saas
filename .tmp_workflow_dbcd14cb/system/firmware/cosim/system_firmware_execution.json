@@ -1,0 +1,84 @@
+{
+  "agent": "System Firmware CoSim Execution Agent",
+  "generated_at": "2026-06-28T02:12:12.467242",
+  "execution_mode": "artifact_readiness_only",
+  "overall_status": "ready_for_execution",
+  "readiness": {
+    "status": "ready",
+    "present": [
+      "soc_top_sim_path",
+      "resolved_top_module",
+      "firmware_elf_path",
+      "makefile_path",
+      "test_paths",
+      "rtl_inputs"
+    ],
+    "missing": []
+  },
+  "inputs": {
+    "soc_top_sim_path": "digital/rtl/temp_monitor_digital.v",
+    "firmware_elf_path": "firmware/build/target/x86_64-unknown-linux-gnu/release/firmware_app.elf",
+    "firmware_elf_exists": true,
+    "firmware_elf_placeholder": false,
+    "makefile_path": "firmware/validate/Makefile",
+    "test_paths": [
+      "firmware/validate/test_firmware_smoke.py"
+    ],
+    "coverage_model_path": "",
+    "assertions_path": "",
+    "rtl_inputs": [
+      "digital/rtl/temp_monitor_digital.v",
+      "system/imported_rtl/temp_sensor_adc_model.v",
+      "system/imported_rtl/temp_monitor_digital.v",
+      "system/imported_rtl/temp_monitor_soc_phys.sv",
+      "system/imported_rtl/temp_monitor_soc_sim.sv"
+    ],
+    "resolved_top_module": "temp_monitor_soc_sim"
+  },
+  "test_matrix": [
+    {
+      "test_name": "test_firmware_smoke.py",
+      "seed": 1,
+      "status": "planned",
+      "runtime_seconds": null,
+      "failure_reason": null
+    },
+    {
+      "test_name": "test_firmware_smoke.py",
+      "seed": 2,
+      "status": "planned",
+      "runtime_seconds": null,
+      "failure_reason": null
+    }
+  ],
+  "results": {
+    "attempted": false,
+    "executed_test_count": 0,
+    "passed_test_count": 0,
+    "failed_test_count": 0,
+    "runtime_seconds_total": null,
+    "waveform_paths": [],
+    "log_paths": [
+      "system/firmware/cosim/logs/system_firmware_execution.log"
+    ],
+    "runtime_requested": false,
+    "runtime_capable": true,
+    "stdout_tail": "",
+    "stderr_tail": "",
+    "resolved_top_module": "temp_monitor_soc_sim",
+    "resolved_verilog_sources": [
+      "digital/rtl/temp_monitor_digital.v",
+      "system/imported_rtl/temp_sensor_adc_model.v",
+      "system/imported_rtl/temp_monitor_digital.v",
+      "system/imported_rtl/temp_monitor_soc_phys.sv",
+      "system/imported_rtl/temp_monitor_soc_sim.sv"
+    ]
+  },
+  "elf_detection_source": "state_flag",
+  "notes": [
+    "Artifact readiness was evaluated without attempting runtime execution.",
+    "No coverage model detected; downstream summary should avoid reporting functional coverage percentages.",
+    "No digital assertions collateral detected; assertion coverage should remain unavailable, not fabricated.",
+    "Firmware ELF was detected for firmware-aware co-simulation."
+  ]
+}
