@@ -1,0 +1,40 @@
+{
+  "type": "digital_synthesis_closure_chart",
+  "metric_scope": "synthesis_pre_place",
+  "series": [
+    {
+      "iteration": 0,
+      "label": "baseline",
+      "wns": -1.5829924485958398,
+      "tns": -26.098672406371836,
+      "setup_violations": 17,
+      "lec_status": "incomplete_stdcell_models",
+      "lec_unproven_points": 0,
+      "post_dft_lec_status": "inconclusive",
+      "post_dft_lec_unproven_points": 0,
+      "dominant_issue": "setup_timing",
+      "selected_restart_stage": "Digital Synthesis Agent"
+    },
+    {
+      "iteration": 1,
+      "label": "iteration 1",
+      "wns": 5.221770275087738,
+      "tns": 0,
+      "setup_violations": 0,
+      "lec_status": "incomplete_stdcell_models",
+      "lec_unproven_points": 0,
+      "post_dft_lec_status": "inconclusive",
+      "post_dft_lec_unproven_points": 0,
+      "dominant_issue": "synthesis_lec",
+      "selected_restart_stage": "Digital Logic Equivalence Check Agent"
+    }
+  ],
+  "baseline_only": false,
+  "no_fake_iterations": true,
+  "downstream_policy": {
+    "continue_downstream_pd": true,
+    "stop_on_synthesis_closure_failure": false,
+    "stop_on_synthesis_lec_failure": false,
+    "default_behavior": "continue_downstream_pd_signoff"
+  }
+}

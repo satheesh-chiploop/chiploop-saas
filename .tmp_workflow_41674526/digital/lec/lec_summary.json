@@ -1,0 +1,58 @@
+{
+  "workflow_id": "41674526-178c-4697-8807-decc13101353",
+  "agent": "Digital Logic Equivalence Check Agent",
+  "status": "incomplete_stdcell_models",
+  "tool": "yosys",
+  "tool_available": true,
+  "return_code": null,
+  "top_module": "uart_packet_engine",
+  "rtl_files": [
+    "uart_packet_engine.v"
+  ],
+  "yosys_rtl_files": [
+    "uart_packet_engine.v"
+  ],
+  "golden_macro_blackbox_stubs": [],
+  "synth_netlist": "uart_packet_engine_synth.v",
+  "yosys_synth_netlist": "uart_packet_engine_synth.v",
+  "macro_cutpoint_count": 0,
+  "macro_cutpoints": [],
+  "liberty_files": [
+    "sky130_fd_sc_hd__tt_025C_1v80.lib"
+  ],
+  "liberty_file_count": 1,
+  "liberty_usage": "discovered_not_required_for_verilog_model_lec",
+  "stdcell_verilog_files": [
+    "sky130_fd_sc_hd.v"
+  ],
+  "stdcell_verilog_file_count": 1,
+  "yosys_stdcell_verilog_files": [
+    "stdcell_functional_wrappers.v"
+  ],
+  "generated_stdcell_model": "stdcell_functional_wrappers.v",
+  "stdcell_model_strategy": "generated_functional_wrappers_from_gate_netlist",
+  "missing_stdcell_models": [
+    "sky130_fd_sc_hd__conb_1"
+  ],
+  "missing_stdcell_model_count": 1,
+  "unproven_points": 0,
+  "unproven_equiv_points": [],
+  "primary_status": "inconclusive",
+  "primary_unproven_points": 0,
+  "primary_unproven_equiv_points": [],
+  "reset_sequence_repair": null,
+  "proof_strategy": "primary_equiv_induct",
+  "failure_reason": "standard_cell_verilog_models_incomplete",
+  "generated_at": "2026-06-28T05:04:50.495434Z",
+  "artifacts": {
+    "script": "digital/lec/yosys_lec.ys",
+    "log": "digital/lec/logs/yosys_lec.log",
+    "summary": "digital/lec/lec_summary.json",
+    "report": "digital/lec/lec_report.md",
+    "reset_repair_script": null,
+    "reset_repair_log": null,
+    "generated_stdcell_model": "digital/lec/input/stdcell_functional_wrappers.v",
+    "cutpoint_synth_netlist": null,
+    "golden_macro_blackbox_stubs": []
+  }
+}

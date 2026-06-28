@@ -1,0 +1,3 @@
+Standard-cell Verilog model coverage is incomplete for synthesized gate netlist LEC.
+Missing cells:
+sky130_fd_sc_hd__conb_1

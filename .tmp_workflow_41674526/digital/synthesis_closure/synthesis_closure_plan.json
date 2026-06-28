@@ -1,0 +1,102 @@
+{
+  "type": "digital_synthesis_closure_plan",
+  "agent": "Digital Synthesis Closure Agent",
+  "enabled": true,
+  "status": "planned",
+  "closure_complete": false,
+  "max_iterations": 1,
+  "iterations_planned": 1,
+  "dominant_issue": "synthesis_lec",
+  "selected_restart_stage": "Digital Logic Equivalence Check Agent",
+  "post_synthesis_timing": {
+    "stage": "synth",
+    "wns": 5.221770275087738,
+    "tns": 0,
+    "setup_violations": 0,
+    "status": null
+  },
+  "post_dft_netlist": {
+    "dft_status": "scan_replace_pass",
+    "post_dft_lec_status": "inconclusive",
+    "post_dft_lec_failure_reason": "missing_stdcell_models_for_post_dft_lec"
+  },
+  "issue_summary": [
+    {
+      "type": "synthesis_lec",
+      "restart_stage": "Digital Logic Equivalence Check Agent",
+      "severity": 80,
+      "evidence": {
+        "status": "incomplete_stdcell_models",
+        "reason": "standard_cell_verilog_models_incomplete",
+        "unproven_points": 0,
+        "unproven_equiv_points": []
+      },
+      "reason": "Synthesis LEC is not proven; repair LEC setup/model/netlist issue before trusting downstream PD."
+    },
+    {
+      "type": "post_dft_lec",
+      "restart_stage": "Digital Post-DFT Logic Equivalence Check Agent",
+      "severity": 76,
+      "evidence": {
+        "status": "inconclusive",
+        "reason": "missing_stdcell_models_for_post_dft_lec",
+        "unproven_points": 0,
+        "ignored_gate_only_ports": [
+          "scan_en",
+          "scan_in",
+          "scan_out"
+        ]
+      },
+      "reason": "Post-DFT LEC is not proven; repair scan/LEC settings before treating the post-DFT netlist as closed."
+    }
+  ],
+  "advisories": [],
+  "repair_actions": [
+    {
+      "type": "synthesis_lec",
+      "restart_stage": "Digital Logic Equivalence Check Agent",
+      "action": "Repair synthesis LEC setup/model/netlist and rerun LEC.",
+      "evidence": {
+        "status": "incomplete_stdcell_models",
+        "reason": "standard_cell_verilog_models_incomplete",
+        "unproven_points": 0,
+        "unproven_equiv_points": []
+      }
+    },
+    {
+      "type": "post_dft_lec",
+      "restart_stage": "Digital Post-DFT Logic Equivalence Check Agent",
+      "action": "Repair Post-DFT LEC setup/scan constraints and rerun Post-DFT LEC before ATPG.",
+      "evidence": {
+        "status": "inconclusive",
+        "reason": "missing_stdcell_models_for_post_dft_lec",
+        "unproven_points": 0,
+        "ignored_gate_only_ports": [
+          "scan_en",
+          "scan_in",
+          "scan_out"
+        ]
+      }
+    }
+  ],
+  "skipped_repairs": [],
+  "downstream_policy": {
+    "continue_downstream_pd": true,
+    "stop_on_synthesis_closure_failure": false,
+    "stop_on_synthesis_lec_failure": false,
+    "default_behavior": "continue_downstream_pd_signoff"
+  },
+  "policy": {
+    "bounded_iterations": "1-2",
+    "setup_timing_repair_included": true,
+    "lec_repair_included": true,
+    "post_dft_lec_repair_included": true,
+    "tool_only_optimization": true,
+    "retiming_allowed": false,
+    "hierarchy_flattening_allowed": false,
+    "rtl_edits_allowed": false,
+    "eco_edits_allowed": false,
+    "advisory_by_default": true,
+    "no_fake_closure": true
+  }
+}

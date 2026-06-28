@@ -1,0 +1,12 @@
+[2026-06-28T05:04:10.820331Z] Digital Implementation Setup Agent
+status=ok
+profile_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/foundry/foundry_profile.json
+spec_json=None
+top_module=uart_packet_engine
+rtl_files=1
+sdc_source=request_clock_constraints
+canonical_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/impl_setup/constraints/uart_packet_engine.sdc
+filelist=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/impl_setup/filelist.f
+corners_json=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/impl_setup/corners.json
+openlane_config=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/impl_setup/openlane/config.json
+input_resolution_log=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/impl_setup/logs/implementation_setup_input_resolution.log

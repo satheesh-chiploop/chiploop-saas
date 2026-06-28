@@ -1,0 +1,67 @@
+{
+  "workflow_id": "41674526-178c-4697-8807-decc13101353",
+  "agent": "Digital Synthesis Agent",
+  "status": "ok",
+  "return_code": 0,
+  "inputs": {
+    "rtl_files": [
+      "uart_packet_engine.v"
+    ],
+    "pre_synthesis_rtl_repairs": {},
+    "macro_libs": [],
+    "macro_lefs": [],
+    "macro_gds": [],
+    "macro_spice": [],
+    "macro_verilog": [],
+    "pdk_sram_collateral": [],
+    "top_module": "uart_packet_engine",
+    "clock_port": "clk",
+    "clock_period_ns": 9.0,
+    "synthesis_closure_iteration": 1,
+    "synthesis_closure_timing_repair_enabled": true,
+    "synthesis_closure_optimization_profile": {
+      "enabled": true,
+      "iteration": 1,
+      "clock_margin": 0.9,
+      "strategy": "DELAY 0",
+      "allow_retiming": false,
+      "allow_flattening": false,
+      "techniques": [
+        "clock_period_margin_0.90",
+        "synth_strategy_DELAY 0",
+        "synth_buffering",
+        "synth_sizing",
+        "max_fanout_8",
+        "path_group_weight_3",
+        "critical_range_1.000ns"
+      ],
+      "critical_range_ns": 1.0,
+      "path_group_weight": 3,
+      "max_fanout": 8
+    },
+    "synthesis_closure_openlane_overrides": {
+      "SYNTH_STRATEGY": "DELAY 0",
+      "SYNTH_BUFFERING": true,
+      "SYNTH_SIZING": true,
+      "MAX_FANOUT_CONSTRAINT": 8
+    },
+    "pdk_variant": "sky130A",
+    "openlane_image": "ghcr.io/efabless/openlane2:2.4.0.dev1",
+    "openlane_to_step": "OpenROAD.STAPrePNR",
+    "pdk_root_host": "/root/chiploop-backend/backend/pdk"
+  },
+  "outputs": {
+    "stage_dir": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/synth",
+    "config_json": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/synth/config.json",
+    "sdc": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/synth/constraints/uart_packet_engine.sdc",
+    "run_sh": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/synth/run.sh",
+    "exec_log": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/synth/logs/openlane_synth.log",
+    "metrics_json": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/synth/metrics.json",
+    "netlist": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/synth/netlist/uart_packet_engine_synth.v",
+    "netlist_candidates": [
+      "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/synth/runs/Digital_Arch2Synthesis_41674526-178c-4697-8807-decc13101353/02-yosys-synthesis/uart_packet_engine.nl.v",
+      "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/digital/synth/runs/Digital_Arch2Synthesis_41674526-178c-4697-8807-decc13101353/10-yosys-synthesis/uart_packet_engine.nl.v"
+    ],
+    "enriched_metrics": true
+  }
+}

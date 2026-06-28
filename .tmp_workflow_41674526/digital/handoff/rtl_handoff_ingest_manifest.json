@@ -1,0 +1,54 @@
+{
+  "source_mode": "from_arch2rtl",
+  "source_workflow_id": "ebeb20f5-2334-42c0-b71d-716fc5bc4859",
+  "rtl_files": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/41674526-178c-4697-8807-decc13101353/ba0e4323-1a09-4cd3-a062-2e5e5913a435/digital/arch2synthesis/handoff/rtl/uart_packet_engine.v"
+  ],
+  "upf_files": [],
+  "sdc_files": [],
+  "spec_imported": true,
+  "regmap_imported": true,
+  "top_module": "uart_packet_engine",
+  "clock_intent": {
+    "type": "digital_clock_intent",
+    "clocks": [
+      {
+        "name": "clk",
+        "port": "clk",
+        "frequency_mhz": 100.0,
+        "period_ns": 10.0,
+        "source": "rtl_port_inference",
+        "needs_user_frequency": false
+      }
+    ],
+    "resets": [
+      {
+        "name": "reset_n",
+        "port": "reset_n",
+        "active_low": true,
+        "source": "rtl_port_inference"
+      }
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n",
+    "needs_user_review": false,
+    "provenance": {
+      "requested": true,
+      "sdc_clocks": 0,
+      "spec_clocks": 0,
+      "rtl_clocks": 1,
+      "spec_resets": 0,
+      "rtl_resets": 1
+    }
+  },
+  "agent": "Digital RTL Handoff Ingest Agent",
+  "workflow_id": "41674526-178c-4697-8807-decc13101353",
+  "run_id": "ba0e4323-1a09-4cd3-a062-2e5e5913a435",
+  "parent_workflow_id": null,
+  "source_arch2rtl_workflow_id": "ebeb20f5-2334-42c0-b71d-716fc5bc4859",
+  "upstream_workflows": {
+    "arch2rtl": "ebeb20f5-2334-42c0-b71d-716fc5bc4859"
+  },
+  "rtl_file_count": 1,
+  "status": "ok"
+}

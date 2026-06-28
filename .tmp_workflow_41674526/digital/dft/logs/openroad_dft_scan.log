@@ -1,0 +1,612 @@
+OpenROAD edf00dff99f6c40d67a30c0e22a8191c5d2ed9d6 
+Features included (+) or not (-): +Charts +GPU +GUI +Python
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[INFO ODB-0227] LEF file: /pdk/sky130A/libs.ref/sky130_fd_sc_hd/techlef/sky130_fd_sc_hd__nom.tlef, created 13 layers, 25 vias
+[WARNING ODB-0220] WARNING (LEFPARS-2008): NOWIREEXTENSIONATPIN statement is obsolete in version 5.6 or later.
+The NOWIREEXTENSIONATPIN statement will be ignored. See file /pdk/sky130A/libs.ref/sky130_fd_sc_hd/lef/sky130_fd_sc_hd.lef at line 2.
+
+[INFO ODB-0227] LEF file: /pdk/sky130A/libs.ref/sky130_fd_sc_hd/lef/sky130_fd_sc_hd.lef, created 437 library cells
+no_mix
+[WARNING DFT-0007] Cell '_2405_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2428_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2432_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2433_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2434_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2435_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2436_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2437_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2438_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2439_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2475_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2580_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2581_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2582_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2583_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2584_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2585_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2586_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2587_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2588_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2589_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2590_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2591_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2592_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2593_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2594_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2595_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2596_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2597_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2598_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2599_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2600_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2601_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2602_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2603_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2604_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2605_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2606_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2607_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2608_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2609_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2610_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2611_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2612_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2613_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2614_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2615_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2616_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2617_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2618_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2619_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2620_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2621_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2622_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2623_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2624_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2625_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2626_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2627_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2628_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2629_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2630_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2631_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2632_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2633_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2634_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2635_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2636_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2637_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2638_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2639_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2640_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2641_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2642_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2643_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2644_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2645_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2646_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2647_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2648_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2649_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2650_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2651_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2652_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2653_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2654_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2655_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2656_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2657_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2658_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2659_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2660_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2661_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2662_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2663_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2664_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2665_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2666_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2667_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2668_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2669_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2670_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2671_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2672_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2673_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2674_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2675_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2676_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2677_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2678_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2679_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2680_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2681_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2682_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2683_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2684_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2685_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2686_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2687_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2688_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2689_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2690_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2691_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2692_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2693_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2694_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2695_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2696_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2697_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2698_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2699_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2700_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2701_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2702_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2703_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2704_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2705_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2706_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2707_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2708_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2709_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2710_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2711_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2712_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2713_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2714_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2715_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2716_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2717_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2718_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2719_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2720_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2721_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2722_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2723_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2724_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2725_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2726_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2727_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2728_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2729_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2730_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2731_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2732_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2733_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2734_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2735_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2736_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2737_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2738_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2739_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2740_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2741_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2742_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2743_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2744_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2745_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2746_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2747_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2748_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2749_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2750_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2751_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2752_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2753_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2754_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2755_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2756_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2757_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2758_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2759_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2760_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2761_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2762_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2763_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2764_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2765_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2766_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2767_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2768_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2769_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2770_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2771_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2772_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2773_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2774_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2775_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2776_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2777_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2778_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2779_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2780_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2781_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2782_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2783_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2784_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2785_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2786_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2787_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2788_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2789_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2790_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2791_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2792_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2793_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2794_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2795_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2796_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2797_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2798_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2799_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2800_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2801_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2802_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2803_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2804_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2805_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2806_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2807_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2808_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2809_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2810_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2811_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2812_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2813_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2814_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2815_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2816_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2817_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2818_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2819_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2820_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2821_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2822_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2823_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2824_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2825_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2826_' is not a scan cell. Can't use it for scan architect
+[WARNING DFT-0007] Cell '_2827_' is not a scan cell. Can't use it for scan architect
+***************************
+Preview DFT Report
+Number of chains: 2
+Clock domain: No Mix
+***************************
+
+Scan chain 'chain_0' has 83 cells (83 bits)
+
+  _2474_ (clk, rising)
+  _2473_
+  _2472_
+  _2471_
+  _2470_
+  _2469_
+  _2468_
+  _2467_
+  _2466_
+  _2404_
+  _2464_
+  _2463_
+  _2462_
+  _2461_
+  _2460_
+  _2459_
+  _2458_
+  _2457_
+  _2456_
+  _2465_
+  _2496_
+  _2495_
+  _2494_
+  _2493_
+  _2492_
+  _2491_
+  _2490_
+  _2489_
+  _2488_
+  _2476_
+  _2486_
+  _2485_
+  _2484_
+  _2483_
+  _2482_
+  _2481_
+  _2480_
+  _2479_
+  _2478_
+  _2477_
+  _2487_
+  _2424_
+  _2423_
+  _2422_
+  _2421_
+  _2420_
+  _2419_
+  _2418_
+  _2417_
+  _2416_
+  _2455_
+  _2414_
+  _2413_
+  _2412_
+  _2411_
+  _2410_
+  _2409_
+  _2408_
+  _2407_
+  _2406_
+  _2415_
+  _2454_
+  _2453_
+  _2452_
+  _2451_
+  _2450_
+  _2449_
+  _2448_
+  _2447_
+  _2446_
+  _2425_
+  _2444_
+  _2443_
+  _2442_
+  _2441_
+  _2440_
+  _2431_
+  _2430_
+  _2429_
+  _2427_
+  _2426_
+  _2445_
+  _2558_
+
+Scan chain 'chain_1' has 82 cells (82 bits)
+
+  _2557_ (clk, rising)
+  _2556_
+  _2555_
+  _2554_
+  _2553_
+  _2552_
+  _2551_
+  _2550_
+  _2497_
+  _2548_
+  _2547_
+  _2546_
+  _2545_
+  _2544_
+  _2543_
+  _2542_
+  _2541_
+  _2540_
+  _2549_
+  _2579_
+  _2578_
+  _2577_
+  _2576_
+  _2575_
+  _2574_
+  _2573_
+  _2572_
+  _2571_
+  _2559_
+  _2569_
+  _2568_
+  _2567_
+  _2566_
+  _2565_
+  _2564_
+  _2563_
+  _2562_
+  _2561_
+  _2560_
+  _2570_
+  _2517_
+  _2516_
+  _2515_
+  _2514_
+  _2513_
+  _2512_
+  _2511_
+  _2510_
+  _2509_
+  _2539_
+  _2507_
+  _2506_
+  _2505_
+  _2504_
+  _2503_
+  _2502_
+  _2501_
+  _2500_
+  _2499_
+  _2498_
+  _2508_
+  _2538_
+  _2537_
+  _2536_
+  _2535_
+  _2534_
+  _2533_
+  _2532_
+  _2531_
+  _2530_
+  _2518_
+  _2528_
+  _2527_
+  _2526_
+  _2525_
+  _2524_
+  _2523_
+  _2522_
+  _2521_
+  _2520_
+  _2519_
+  _2529_
+
+
+[INFO DFT-0003] Cell '_2404_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2406_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2407_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2408_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2409_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2410_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2411_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2412_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2413_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2414_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2415_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2416_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2417_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2418_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2419_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2420_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2421_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2422_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2423_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2424_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2425_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2426_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2427_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2429_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2430_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2431_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2440_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2441_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2442_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2443_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2444_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2445_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2446_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2447_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2448_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2449_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2450_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2451_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2452_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2453_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2454_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2455_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2456_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2457_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2458_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2459_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2460_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2461_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2462_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2463_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2464_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2465_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2466_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2467_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2468_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2469_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2470_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2471_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2472_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2473_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2474_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2476_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2477_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2478_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2479_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2480_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2481_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2482_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2483_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2484_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2485_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2486_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2487_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2488_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2489_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2490_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2491_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2492_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2493_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2494_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2495_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2496_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2497_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2498_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2499_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2500_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2501_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2502_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2503_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2504_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2505_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2506_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2507_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2508_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2509_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2510_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2511_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2512_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2513_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2514_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2515_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2516_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2517_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2518_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2519_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2520_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2521_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2522_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2523_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2524_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2525_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2526_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2527_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2528_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2529_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2530_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2531_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2532_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2533_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2534_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2535_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2536_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2537_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2538_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2539_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2540_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2541_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2542_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2543_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2544_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2545_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2546_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2547_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2548_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2549_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2550_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2551_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2552_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2553_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2554_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2555_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2556_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2557_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2558_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2559_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2560_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2561_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2562_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2563_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2564_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2565_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2566_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2567_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2568_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2569_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2570_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2571_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2572_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2573_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2574_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2575_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2576_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2577_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2578_' is already an scan cell, we will not replace it
+[INFO DFT-0003] Cell '_2579_' is already an scan cell, we will not replace it

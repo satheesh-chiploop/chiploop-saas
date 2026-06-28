@@ -1,0 +1,24 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "uart_packet_engine",
+  "generated_at": "2026-06-28T05:04:09.405413",
+  "file_count": 3,
+  "files": [
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "48e90a0f49ce6882434cd05d3b78255d475a74e6193cf9b614839a1bb2a32772",
+      "bytes": 14320
+    },
+    {
+      "path": "docs/spec/digital_spec.json",
+      "sha256": "aca0bda878801ad2242108d10c9929e3c0ec06f5002e3ccaa82de1ed30de517c",
+      "bytes": 9311
+    },
+    {
+      "path": "rtl/uart_packet_engine.v",
+      "sha256": "a98f094871557a8deb590c7b16c74a2ea6db5b61ed43a8ed0bffa88e474c7028",
+      "bytes": 13457
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "workflow_id": "41674526-178c-4697-8807-decc13101353",
+  "agent": "Digital Scan ATPG Coverage Agent",
+  "status": "atpg_bench_generation_failed",
+  "tool": "atalanta",
+  "tool_executable": "/usr/local/bin/atalanta",
+  "return_code": null,
+  "input_netlist": "scan_stitched_netlist.v",
+  "pattern_count": null,
+  "stuck_at_coverage_pct": null,
+  "faults_detected": null,
+  "faults_undetected": null,
+  "faults_aborted": null,
+  "pattern_count_source": "not_reported",
+  "coverage_source": "not_reported",
+  "metrics_file": null,
+  "bench_generation": {
+    "status": "failed",
+    "inputs": 441,
+    "outputs": 415,
+    "gates": 2869,
+    "scan_state_inputs": 421,
+    "scan_capture_outputs": 421,
+    "floating_inputs_promoted": [
+      "rx_state_0",
+      "tx_state_0",
+      "uart_tx"
+    ],
+    "unsupported_cells": [
+      "sky130_fd_sc_hd__conb_1",
+      "sky130_fd_sc_hd__sdfsbp_2"
+    ]
+  },
+  "tool_diagnostics": [],
+  "generated_at": "2026-06-28T05:04:56.869651Z",
+  "artifacts": {
+    "summary": "digital/atpg/atpg_summary.json",
+    "report": "digital/atpg/atpg_report.md",
+    "log": "digital/atpg/logs/scan_atpg.log",
+    "input_netlist": "digital/atpg/input/scan_or_gate_netlist.v",
+    "bench": null,
+    "metrics": null,
+    "patterns": null,
+    "tool_output": null
+  }
+}

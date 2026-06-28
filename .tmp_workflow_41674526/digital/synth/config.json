@@ -1,0 +1,27 @@
+{
+  "DESIGN_NAME": "uart_packet_engine",
+  "VERILOG_FILES": [
+    "rtl/uart_packet_engine.v"
+  ],
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 9.0,
+  "SYNTH_STRATEGY": "DELAY 0",
+  "SYNTH_SDC_FILE": "constraints/uart_packet_engine.sdc",
+  "PNR_SDC_FILE": "constraints/uart_packet_engine.sdc",
+  "EXTRA_LIBS": [],
+  "EXTRA_LEFS": [],
+  "EXTRA_GDS_FILES": [],
+  "CHIPLOOP_WORKFLOW_ID": "41674526-178c-4697-8807-decc13101353",
+  "CHIPLOOP_GENERATED_BY": "Digital Synthesis Agent",
+  "CHIPLOOP_GENERATED_AT": "2026-06-28T05:04:35.396129Z",
+  "CHIPLOOP_MACRO_LIBS": [],
+  "CHIPLOOP_MACRO_LEFS": [],
+  "CHIPLOOP_MACRO_GDS": [],
+  "CHIPLOOP_MACRO_SPICE": [],
+  "CHIPLOOP_MACRO_VERILOG": [],
+  "CHIPLOOP_YOSYS_MACRO_LIB_SCRIPT": "yosys_macro_libs.ys",
+  "RUN_LINTER": false,
+  "SYNTH_BUFFERING": true,
+  "SYNTH_SIZING": true,
+  "MAX_FANOUT_CONSTRAINT": 8
+}
