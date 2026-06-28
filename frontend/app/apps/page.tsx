@@ -71,6 +71,8 @@ type AppCard = {
 };
 
 type ReferenceJourney = {
+  key: string;
+  exploreTitle: string;
   segment: string;
   title: string;
   copy: string;
@@ -138,6 +140,7 @@ export default function AppsHomePage() {
 
   const [view, setView] = useState<"recommended" | "all">("recommended");
   const [catalogView, setCatalogView] = useState<CatalogView>("home");
+  const [selectedReferenceJourney, setSelectedReferenceJourney] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -818,6 +821,8 @@ export default function AppsHomePage() {
 
   const referenceJourneys: ReferenceJourney[] = [
     {
+      key: "temperature-monitor",
+      exploreTitle: "Explore Temperature Monitor",
       segment: "Mixed-Signal / Product SoC",
       title: "Temperature Monitor SoC: analog sensor, System RTL, Sim, Firmware, Software, Validation, Product App",
       copy: "A System-first journey using digital_spec, analog_spec, and soc_spec. It builds a temperature sensor ADC behavioral model, digital threshold/alert RTL, integrated SoC top, system simulation, firmware/software, validation, and dashboard.",
@@ -826,6 +831,8 @@ export default function AppsHomePage() {
       stages: ["System RTL", "System Sim", "Firmware", "Software", "Validation", "Product App"],
     },
     {
+      key: "pwm-controller",
+      exploreTitle: "Explore PWM",
       segment: "Embedded Control / Motor & Power",
       title: "PWM Controller: RTL to Firmware to Software to Product App",
       copy: "A compact peripheral demo for first-time walkthroughs. Generated RTL, simulation, firmware co-simulation, and validation evidence come from actual workflow runs.",
@@ -833,6 +840,8 @@ export default function AppsHomePage() {
       onClick: startPwmFullStackDemo,
     },
     {
+      key: "uart-packet-engine",
+      exploreTitle: "Explore UART",
       segment: "Connectivity / Communications IP",
       title: "UART Packet Engine: FIFO, interrupts, firmware, software, and product app",
       copy: "A larger peripheral demo intended to produce roughly 150-200 flip-flops through FIFOs, shifters, counters, state machines, and interrupt logic.",
@@ -840,6 +849,8 @@ export default function AppsHomePage() {
       onClick: startUartPacketDemo,
     },
     {
+      key: "image-dma",
+      exploreTitle: "Explore Image DMA",
       segment: "Vision / Edge AI Preprocessing",
       title: "Image DMA Pipeline: 25k FF visual processing demo",
       copy: "A large visual demo with DMA, register-based line buffers, 3x3 filtering, thresholding, histogram, interrupts, firmware, software, and product dashboard.",
@@ -847,6 +858,8 @@ export default function AppsHomePage() {
       onClick: startImageDmaDemo,
     },
     {
+      key: "sram-mbist",
+      exploreTitle: "Explore SRAM MBIST",
       segment: "Memory / DFT",
       title: "SRAM MBIST Demo: Sky130 SRAM macro, scan, ATPG, and MBIST evidence",
       copy: "A focused memory-test journey using a 32x256 Sky130 SRAM scratchpad controller. Run Arch2RTL, then Arch2Synthesis to see scan DFT, ATPG readiness, and MBIST applicability evidence.",
@@ -854,6 +867,8 @@ export default function AppsHomePage() {
       onClick: startMbistSramDemo,
     },
     {
+      key: "sensor-hub",
+      exploreTitle: "Explore Sensor Hub",
       segment: "IoT / Embedded Edge Devices",
       title: "Smart Sensor Hub MCU: telemetry, alerts, low power, and product app",
       copy: "An IoT edge-node demo with a microcontroller-style sensor hub, threshold alerts, FIFO telemetry buffering, low-power sampling, firmware, software, validation, and dashboard.",
@@ -861,6 +876,8 @@ export default function AppsHomePage() {
       onClick: startSensorHubDemo,
     },
     {
+      key: "secure-boot",
+      exploreTitle: "Explore Secure Boot",
       segment: "Security / Root-of-Trust IP",
       title: "Secure Boot + Key Manager: authentication, rollback, debug lock",
       copy: "A security reference journey with secure boot policy, key-slot selection, anti-rollback checks, tamper handling, firmware provisioning, validation, and dashboard.",
@@ -868,6 +885,8 @@ export default function AppsHomePage() {
       onClick: startSecureBootDemo,
     },
     {
+      key: "safety-fault",
+      exploreTitle: "Explore Safety Fault Manager",
       segment: "Automotive / Safety Control",
       title: "Safety Fault Manager + Watchdog: faults, heartbeat, reset escalation",
       copy: "A safety reference journey with watchdog timeout, heartbeat service, fault masks, escalation policy, reset request, firmware diagnostics, validation, and dashboard.",
@@ -894,10 +913,12 @@ export default function AppsHomePage() {
     groups[journey.segment] = [...(groups[journey.segment] || []), journey];
     return groups;
   }, {});
+  const selectedReference = referenceJourneys.find((journey) => journey.key === selectedReferenceJourney) || null;
 
   const openCatalog = (nextView: CatalogView) => {
     setCatalogView(nextView);
     setView(nextView === "home" ? "recommended" : "all");
+    setSelectedReferenceJourney(null);
     window.setTimeout(() => {
       document.getElementById("apps-catalog-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
@@ -1274,88 +1295,56 @@ export default function AppsHomePage() {
       <section id="apps-catalog-content" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
         <div className="border-y border-slate-800 py-6">
           <div className="text-xs font-semibold uppercase text-emerald-300">Reference Journeys</div>
-          <div className="mt-2 text-xl font-bold text-white">End-to-end demos using the standard ChipLoop apps</div>
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
-            {[
-              {
-                segment: "Mixed-Signal / Product SoC",
-                title: "Temperature Monitor SoC: analog sensor, System RTL, Sim, Firmware, Software, Validation, Product App",
-                copy: "A System-first journey using digital_spec, analog_spec, and soc_spec. It builds a temperature sensor ADC behavioral model, digital threshold/alert RTL, integrated SoC top, system simulation, firmware/software, validation, and dashboard.",
-                button: "Start System Temp Monitor Journey",
-                onClick: startTempMonitorSystemDemo,
-                stages: ["System RTL", "System Sim", "Firmware", "Software", "Validation", "Product App"],
-              },
-              {
-                segment: "Embedded Control / Motor & Power",
-                title: "PWM Controller: RTL to Firmware to Software to Product App",
-                copy: "A compact peripheral demo for first-time walkthroughs. Generated RTL, simulation, firmware co-simulation, and validation evidence come from actual workflow runs.",
-                button: "Start PWM Reference Journey",
-                onClick: startPwmFullStackDemo,
-              },
-              {
-                segment: "Connectivity / Communications IP",
-                title: "UART Packet Engine: FIFO, interrupts, firmware, software, and product app",
-                copy: "A larger peripheral demo intended to produce roughly 150-200 flip-flops through FIFOs, shifters, counters, state machines, and interrupt logic.",
-                button: "Start UART Reference Journey",
-                onClick: startUartPacketDemo,
-              },
-              {
-                segment: "Vision / Edge AI Preprocessing",
-                title: "Image DMA Pipeline: 25k FF visual processing demo",
-                copy: "A large visual demo with DMA, register-based line buffers, 3x3 filtering, thresholding, histogram, interrupts, firmware, software, and product dashboard.",
-                button: "Start Image DMA Journey",
-                onClick: startImageDmaDemo,
-              },
-              {
-                segment: "Memory / DFT",
-                title: "SRAM MBIST Demo: Sky130 SRAM macro, scan, ATPG, and MBIST evidence",
-                copy: "A focused memory-test journey using a 32x256 Sky130 SRAM scratchpad controller. Run Arch2RTL, then Arch2Synthesis to see scan DFT, ATPG readiness, and MBIST applicability evidence.",
-                button: "Start MBIST SRAM Journey",
-                onClick: startMbistSramDemo,
-              },
-              {
-                segment: "IoT / Embedded Edge Devices",
-                title: "Smart Sensor Hub MCU: telemetry, alerts, low power, and product app",
-                copy: "An IoT edge-node demo with a microcontroller-style sensor hub, threshold alerts, FIFO telemetry buffering, low-power sampling, firmware, software, validation, and dashboard.",
-                button: "Start Sensor Hub Journey",
-                onClick: startSensorHubDemo,
-              },
-              {
-                segment: "Security / Root-of-Trust IP",
-                title: "Secure Boot + Key Manager: authentication, rollback, debug lock",
-                copy: "A security reference journey with secure boot policy, key-slot selection, anti-rollback checks, tamper handling, firmware provisioning, validation, and dashboard.",
-                button: "Start Secure Boot Journey",
-                onClick: startSecureBootDemo,
-              },
-              {
-                segment: "Automotive / Safety Control",
-                title: "Safety Fault Manager + Watchdog: faults, heartbeat, reset escalation",
-                copy: "A safety reference journey with watchdog timeout, heartbeat service, fault masks, escalation policy, reset request, firmware diagnostics, validation, and dashboard.",
-                button: "Start Safety Journey",
-                onClick: startSafetyFaultDemo,
-              },
-            ].map((journey) => (
-              <div key={journey.title} className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-300">{journey.segment}</div>
-                <div className="text-lg font-bold text-white">{journey.title}</div>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{journey.copy}</p>
-                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                  {(("stages" in journey && journey.stages) ? journey.stages : ["Arch2RTL", "Verify", "Firmware", "Software", "Validation", "Product App"]).map((stage, index, stages) => (
-                    <div key={stage} className="flex items-center gap-2">
-                      <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
-                      {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}
-                    </div>
-                  ))}
-                </div>
+          <div className="mt-2 text-xl font-bold text-white">Pick a reference journey to inspect</div>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+            Each reference journey opens a focused detail view with the journey scope, stage sequence, and launch action.
+          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {referenceJourneys.map((journey) => {
+              const active = selectedReferenceJourney === journey.key;
+              return (
                 <button
-                  onClick={journey.onClick}
-                  className="mt-5 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500"
+                  key={journey.key}
+                  onClick={() => setSelectedReferenceJourney(journey.key)}
+                  className={`min-h-[96px] rounded-xl px-4 py-3 text-left transition ${
+                    active
+                      ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-950/30"
+                      : "border border-slate-700 bg-slate-950/45 text-white hover:border-cyan-300 hover:text-cyan-200"
+                  }`}
                 >
-                  {journey.button}
+                  <div className="text-base font-extrabold">{journey.exploreTitle}</div>
+                  <div className={`mt-2 text-xs font-semibold leading-5 ${active ? "text-slate-900" : "text-slate-400"}`}>
+                    {journey.segment}
+                  </div>
                 </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
+          {selectedReference ? (
+            <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
+              <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-300">{selectedReference.segment}</div>
+              <div className="text-xl font-bold text-white">{selectedReference.title}</div>
+              <p className="mt-2 text-sm leading-6 text-slate-300">{selectedReference.copy}</p>
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                {(selectedReference.stages || ["Arch2RTL", "Verify", "Firmware", "Software", "Validation", "Product App"]).map((stage, index, stages) => (
+                  <div key={stage} className="flex items-center gap-2">
+                    <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
+                    {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={selectedReference.onClick}
+                className="mt-5 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500"
+              >
+                {selectedReference.button}
+              </button>
+            </div>
+          ) : (
+            <div className="mt-6 rounded-xl border border-slate-800 bg-slate-950/35 p-5 text-sm text-slate-300">
+              Select a reference journey above to view the details and start the guided flow.
+            </div>
+          )}
         </div>
       </section>
       ) : null}
