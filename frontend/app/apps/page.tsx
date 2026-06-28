@@ -26,7 +26,7 @@ const supabase = createClientComponentClient();
 type LoopType = "digital" | "validation" | "analog" | "embedded" | "system";
 
 const LOOP_TYPES: LoopType[] = ["digital", "analog", "system", "embedded", "validation"];
-type CatalogView = "home" | "digital" | "system" | "analog" | "embedded" | "validation" | "reference" | "segments";
+type CatalogView = "home" | "digital" | "system" | "analog" | "embedded" | "validation";
 
 type OnboardingResponse = {
   status: string;
@@ -901,24 +901,17 @@ export default function AppsHomePage() {
     { view: "analog", title: "Explore Analog apps", body: "Analog spec, netlist, model, validation, correlation, iteration, and abstracts.", count: apps.filter((app) => app.loop_type === "analog").length },
     { view: "embedded", title: "Explore Embedded apps", body: "HAL, drivers, boot, diagnostics, log analysis, co-sim, and firmware run.", count: apps.filter((app) => app.loop_type === "embedded").length },
     { view: "validation", title: "Explore Validation apps", body: "Bench setup, preflight, validation plans, hardware runs, and insights.", count: apps.filter((app) => app.loop_type === "validation").length },
-    { view: "reference", title: "Explore Reference journeys", body: "Start end-to-end demos using standard ChipLoop apps.", count: referenceJourneys.length },
-    { view: "segments", title: "Explore journeys by segment", body: "Browse demos by product domain and market segment.", count: new Set(referenceJourneys.map((journey) => journey.segment)).size },
   ];
 
   const selectedCatalogLoop = ["digital", "system", "analog", "embedded", "validation"].includes(catalogView)
     ? catalogView as LoopType
     : null;
 
-  const journeysBySegment = referenceJourneys.reduce<Record<string, ReferenceJourney[]>>((groups, journey) => {
-    groups[journey.segment] = [...(groups[journey.segment] || []), journey];
-    return groups;
-  }, {});
   const selectedReference = referenceJourneys.find((journey) => journey.key === selectedReferenceJourney) || null;
 
   const openCatalog = (nextView: CatalogView) => {
     setCatalogView(nextView);
     setView(nextView === "home" ? "recommended" : "all");
-    setSelectedReferenceJourney(null);
     window.setTimeout(() => {
       document.getElementById("apps-catalog-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
@@ -1248,7 +1241,7 @@ export default function AppsHomePage() {
               <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Explore Apps</div>
               <h2 className="mt-2 text-2xl font-extrabold text-white">Choose one catalog view</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
-                Open a focused page for one app family or browse the reference journeys without scrolling through every app at once.
+                Open a focused page for one app family without scrolling through every app at once.
               </p>
             </div>
             {catalogView !== "home" ? (
@@ -1291,98 +1284,74 @@ export default function AppsHomePage() {
         </div>
       </section>
 
-      {catalogView === "reference" ? (
-      <section id="apps-catalog-content" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
-        <div className="border-y border-slate-800 py-6">
-          <div className="text-xs font-semibold uppercase text-emerald-300">Reference Journeys</div>
-          <div className="mt-2 text-xl font-bold text-white">Pick a reference journey to inspect</div>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
-            Each reference journey opens a focused detail view with the journey scope, stage sequence, and launch action.
-          </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mx-auto max-w-6xl px-6 pb-7">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Explore Reference Journeys</div>
+              <h2 className="mt-2 text-2xl font-extrabold text-white">Choose one guided product journey</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+                Start an end-to-end reference flow using the standard ChipLoop apps, stage sequence, and demo collateral.
+              </p>
+            </div>
+            {selectedReference ? (
+              <button
+                onClick={() => setSelectedReferenceJourney(null)}
+                className="rounded-xl border border-slate-600 px-5 py-3 text-sm font-bold text-white transition hover:border-emerald-300 hover:text-emerald-200"
+              >
+                Clear journey
+              </button>
+            ) : null}
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {referenceJourneys.map((journey) => {
               const active = selectedReferenceJourney === journey.key;
               return (
                 <button
                   key={journey.key}
-                  onClick={() => setSelectedReferenceJourney(journey.key)}
-                  className={`min-h-[96px] rounded-xl px-4 py-3 text-left transition ${
+                  onClick={() => {
+                    setSelectedReferenceJourney(journey.key);
+                    window.setTimeout(() => {
+                      document.getElementById("reference-journey-detail")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 0);
+                  }}
+                  className={`min-h-[132px] rounded-xl px-5 py-4 text-left transition ${
                     active
-                      ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-950/30"
-                      : "border border-slate-700 bg-slate-950/45 text-white hover:border-cyan-300 hover:text-cyan-200"
+                      ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-950/30 hover:bg-cyan-300"
+                      : "border border-slate-600 bg-slate-950/35 text-white hover:border-cyan-300 hover:text-cyan-200"
                   }`}
                 >
-                  <div className="text-base font-extrabold">{journey.exploreTitle}</div>
-                  <div className={`mt-2 text-xs font-semibold leading-5 ${active ? "text-slate-900" : "text-slate-400"}`}>
+                  <div className="text-lg font-extrabold">{journey.exploreTitle}</div>
+                  <div className={`mt-3 text-sm font-semibold leading-6 ${active ? "text-slate-900" : "text-slate-300"}`}>
                     {journey.segment}
                   </div>
                 </button>
               );
             })}
           </div>
-          {selectedReference ? (
-            <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
-              <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-300">{selectedReference.segment}</div>
-              <div className="text-xl font-bold text-white">{selectedReference.title}</div>
-              <p className="mt-2 text-sm leading-6 text-slate-300">{selectedReference.copy}</p>
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                {(selectedReference.stages || ["Arch2RTL", "Verify", "Firmware", "Software", "Validation", "Product App"]).map((stage, index, stages) => (
-                  <div key={stage} className="flex items-center gap-2">
-                    <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
-                    {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={selectedReference.onClick}
-                className="mt-5 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500"
-              >
-                {selectedReference.button}
-              </button>
-            </div>
-          ) : (
-            <div className="mt-6 rounded-xl border border-slate-800 bg-slate-950/35 p-5 text-sm text-slate-300">
-              Select a reference journey above to view the details and start the guided flow.
-            </div>
-          )}
         </div>
       </section>
-      ) : null}
 
-      {catalogView === "segments" ? (
-        <section id="apps-catalog-content" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
-          <div className="border-y border-slate-800 py-6">
-            <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Journeys by Segment</div>
-            <div className="mt-2 text-xl font-bold text-white">Pick a product domain, then start a reference journey</div>
-            <div className="mt-5 space-y-6">
-              {Object.entries(journeysBySegment).map(([segment, journeys]) => (
-                <div key={segment}>
-                  <div className="mb-3 text-sm font-bold uppercase tracking-wide text-emerald-300">{segment}</div>
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    {journeys.map((journey) => (
-                      <div key={journey.title} className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
-                        <div className="text-lg font-bold text-white">{journey.title}</div>
-                        <p className="mt-2 text-sm leading-6 text-slate-300">{journey.copy}</p>
-                        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                          {(journey.stages || ["Arch2RTL", "Verify", "Firmware", "Software", "Validation", "Product App"]).map((stage, index, stages) => (
-                            <div key={stage} className="flex items-center gap-2">
-                              <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
-                              {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}
-                            </div>
-                          ))}
-                        </div>
-                        <button
-                          onClick={journey.onClick}
-                          className="mt-5 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500"
-                        >
-                          {journey.button}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+      {selectedReference ? (
+        <section id="reference-journey-detail" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
+          <div className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-300">{selectedReference.segment}</div>
+            <div className="text-xl font-bold text-white">{selectedReference.title}</div>
+            <p className="mt-2 text-sm leading-6 text-slate-300">{selectedReference.copy}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+              {(selectedReference.stages || ["Arch2RTL", "Verify", "Firmware", "Software", "Validation", "Product App"]).map((stage, index, stages) => (
+                <div key={stage} className="flex items-center gap-2">
+                  <span className="rounded border border-slate-700 bg-slate-900 px-2 py-1">{stage}</span>
+                  {index < stages.length - 1 ? <span className="text-slate-500">&gt;</span> : null}
                 </div>
               ))}
             </div>
+            <button
+              onClick={selectedReference.onClick}
+              className="mt-5 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500"
+            >
+              {selectedReference.button}
+            </button>
           </div>
         </section>
       ) : null}
