@@ -120,6 +120,9 @@ function LandingPageContent() {
           <button onClick={startGuidedDemo} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
             Start Arch2RTL Demo
           </button>
+          <button onClick={() => goTo("/apps#reference-journeys")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
+            Explore Reference Journeys
+          </button>
           <button onClick={() => router.push("/loops")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
             Explore Loops
           </button>

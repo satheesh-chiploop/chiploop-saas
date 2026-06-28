@@ -175,6 +175,13 @@ export default function AppsHomePage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (onboardingLoading || window.location.hash !== "#reference-journeys") return;
+    window.setTimeout(() => {
+      document.getElementById("reference-journeys")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  }, [onboardingLoading]);
+
   // Apps are grouped by loop so the page can present both guided entry points and full catalog sections.
   const apps: AppCard[] = useMemo(() => ([
     {
@@ -1048,7 +1055,7 @@ export default function AppsHomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-7">
+      <section id="reference-journeys" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
