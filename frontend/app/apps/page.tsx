@@ -26,7 +26,7 @@ const supabase = createClientComponentClient();
 type LoopType = "digital" | "validation" | "analog" | "embedded" | "system";
 
 const LOOP_TYPES: LoopType[] = ["digital", "analog", "system", "embedded", "validation"];
-type CatalogView = "home" | "digital" | "system" | "analog" | "embedded" | "reference" | "segments";
+type CatalogView = "home" | "digital" | "system" | "analog" | "embedded" | "validation" | "reference" | "segments";
 
 type OnboardingResponse = {
   status: string;
@@ -458,6 +458,15 @@ export default function AppsHomePage() {
       promise: "Simulation report + coverage + waves",
     },
     {
+      slug: "system-verify",
+      title: "System Verify",
+      subtitle: "System-level test intent, simulation, coverage, formal options, and debug evidence",
+      loop_type: "system",
+      status: "Flagship",
+      nudge: "Recommended",
+      promise: "System verification dashboard + coverage evidence",
+    },
+    {
       slug: "system-architecture",
       title: "System Architecture Explorer",
       subtitle: "No-code gem5 workload/cache sweeps with performance, power, area, and charts",
@@ -540,7 +549,7 @@ export default function AppsHomePage() {
     },
     {
       slug: "system-rtl",
-      title: "System RTL",
+      title: "System RTL Handoff",
       subtitle: "Digital + Analog + SoC intent to integrated top RTL + handoff package",
       loop_type: "system",
       status: "Flagship",
@@ -586,26 +595,9 @@ export default function AppsHomePage() {
 
   ]), []);
 
-  const featuredApps = ["arch2rtl", "system-architecture", "system-product-builder"]
+  const featuredApps = ["arch2rtl", "system-rtl", "system-synthesis", "system-verify"]
     .map((slug) => apps.find((app) => app.slug === slug))
     .filter((app): app is AppCard => Boolean(app));
-
-  const primarySlugs = [
-    "arch2rtl",
-    "dqa",
-    "analog-run",
-    "system-architecture",
-    "architecture-to-rtl",
-    "system-sim",
-    "embedded-run",
-    "validation-run",
-  ];
-
-  const primaryApps = primarySlugs
-    .map((slug) => apps.find((app) => app.slug === slug))
-    .filter((app): app is AppCard => Boolean(app));
-
-  const flagship = primaryApps;
 
   const outcomeInputs: Record<LoopType, string> = {
     digital: "Architecture spec or RTL",
@@ -811,6 +803,7 @@ export default function AppsHomePage() {
       "system-memory-bottleneck": "/apps/system-memory-bottleneck",
       "system-cpu-model": "/apps/system-cpu-model",
       "system-sim": "/apps/system-sim",
+      "system-verify": "/apps/system-sim",
       "system-synthesis": "/apps/system-synthesis",
       "system-pd": "/apps/system-pd",
       "system-firmware": "/apps/system-firmware",
@@ -888,11 +881,12 @@ export default function AppsHomePage() {
     { view: "system", title: "Explore System apps", body: "System RTL, simulation, synthesis, PD, firmware, software, validation, and product builder.", count: apps.filter((app) => app.loop_type === "system").length },
     { view: "analog", title: "Explore Analog apps", body: "Analog spec, netlist, model, validation, correlation, iteration, and abstracts.", count: apps.filter((app) => app.loop_type === "analog").length },
     { view: "embedded", title: "Explore Embedded apps", body: "HAL, drivers, boot, diagnostics, log analysis, co-sim, and firmware run.", count: apps.filter((app) => app.loop_type === "embedded").length },
+    { view: "validation", title: "Explore Validation apps", body: "Bench setup, preflight, validation plans, hardware runs, and insights.", count: apps.filter((app) => app.loop_type === "validation").length },
     { view: "reference", title: "Explore Reference journeys", body: "Start end-to-end demos using standard ChipLoop apps.", count: referenceJourneys.length },
     { view: "segments", title: "Explore journeys by segment", body: "Browse demos by product domain and market segment.", count: new Set(referenceJourneys.map((journey) => journey.segment)).size },
   ];
 
-  const selectedCatalogLoop = ["digital", "system", "analog", "embedded"].includes(catalogView)
+  const selectedCatalogLoop = ["digital", "system", "analog", "embedded", "validation"].includes(catalogView)
     ? catalogView as LoopType
     : null;
 
@@ -900,6 +894,14 @@ export default function AppsHomePage() {
     groups[journey.segment] = [...(groups[journey.segment] || []), journey];
     return groups;
   }, {});
+
+  const openCatalog = (nextView: CatalogView) => {
+    setCatalogView(nextView);
+    setView(nextView === "home" ? "recommended" : "all");
+    window.setTimeout(() => {
+      document.getElementById("apps-catalog-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  };
 
   if (!onboardingLoading && !onboardingComplete) {
     return (
@@ -1069,6 +1071,45 @@ export default function AppsHomePage() {
               </button>
 
               <button
+                onClick={() => go("/apps/system-rtl")}
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left transition hover:border-cyan-700 hover:bg-slate-950"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-sm font-semibold leading-5 sm:text-base">System RTL handoff</div>
+                  <span className="rounded-full border border-cyan-900/60 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200">
+                    Recommended
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-slate-400">System RTL: integrated top + handoff package</div>
+              </button>
+
+              <button
+                onClick={() => go("/apps/system-synthesis")}
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left transition hover:border-cyan-700 hover:bg-slate-950"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-sm font-semibold leading-5 sm:text-base">System synthesis</div>
+                  <span className="rounded-full border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200">
+                    New
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-slate-400">System netlist + LEC/DFT/ATPG evidence</div>
+              </button>
+
+              <button
+                onClick={() => go("/apps/system-sim")}
+                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left transition hover:border-cyan-700 hover:bg-slate-950"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-sm font-semibold leading-5 sm:text-base">System verify</div>
+                  <span className="rounded-full border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200">
+                    New
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-slate-400">System simulation, coverage, and debug evidence</div>
+              </button>
+
+              <button
                 onClick={() => go("/apps/system-software-validation")}
                 className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
               >
@@ -1128,7 +1169,7 @@ export default function AppsHomePage() {
               <button
                 onClick={() => {
                   setView("all");
-                  setCatalogView("digital");
+                  openCatalog("digital");
                 }}
                 className={`rounded-xl px-4 py-2 text-sm border transition ${
                   catalogView === "digital"
@@ -1143,6 +1184,42 @@ export default function AppsHomePage() {
         </div>
       </section>
 
+      {/* Flagship row */}
+      {catalogView === "home" ? (
+      <section className="mx-auto max-w-6xl px-6 pb-7">
+        <div className="mb-3 flex items-end justify-between">
+          <div>
+            <div className="text-lg font-bold">Recommended flagship apps</div>
+            <div className="text-sm text-slate-400">Best starting points before choosing a category.</div>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {featuredApps.map((app) => (
+            <button
+              key={app.slug}
+              onClick={() => openApp(app.slug)}
+              className="rounded-2xl border border-slate-800 bg-slate-950/50 p-5 text-left transition hover:border-cyan-700 hover:bg-slate-950"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-xl font-bold">{app.title}</div>
+                <span className="rounded-full border border-cyan-900/60 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200">
+                  {app.nudge || "Recommended"}
+                </span>
+              </div>
+              <div className="mt-2 text-slate-300">{app.subtitle}</div>
+              {app.promise ? (
+                <div className="mt-3 text-sm text-slate-400">
+                  Outcome: <span className="text-slate-200">{app.promise}</span>
+                </div>
+              ) : null}
+              <div className="mt-4 text-xs text-slate-500">One click to progressive outputs to ZIP</div>
+            </button>
+          ))}
+        </div>
+      </section>
+      ) : null}
+
       <section className="mx-auto max-w-6xl px-6 pb-7">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -1155,7 +1232,7 @@ export default function AppsHomePage() {
             </div>
             {catalogView !== "home" ? (
               <button
-                onClick={() => setCatalogView("home")}
+                onClick={() => openCatalog("home")}
                 className="rounded-xl border border-slate-600 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200"
               >
                 Back to overview
@@ -1163,17 +1240,14 @@ export default function AppsHomePage() {
             ) : null}
           </div>
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {catalogButtons.map((item, index) => {
+            {catalogButtons.map((item) => {
               const active = catalogView === item.view;
               return (
                 <button
                   key={item.view}
-                  onClick={() => {
-                    setCatalogView(item.view);
-                    setView("all");
-                  }}
+                  onClick={() => openCatalog(item.view)}
                   className={`min-h-[132px] rounded-xl px-5 py-4 text-left transition ${
-                    active || (catalogView === "home" && index === 0)
+                    active
                       ? "bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-950/30 hover:bg-cyan-300"
                       : "border border-slate-600 bg-slate-950/35 text-white hover:border-cyan-300 hover:text-cyan-200"
                   }`}
@@ -1181,12 +1255,12 @@ export default function AppsHomePage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="text-lg font-extrabold">{item.title}</div>
                     {item.count !== undefined ? (
-                      <span className={`rounded-full px-2 py-1 text-xs font-bold ${active || (catalogView === "home" && index === 0) ? "bg-slate-950/10 text-slate-900" : "border border-slate-700 text-slate-300"}`}>
+                      <span className={`rounded-full px-2 py-1 text-xs font-bold ${active ? "bg-slate-950/10 text-slate-900" : "border border-slate-700 text-slate-300"}`}>
                         {item.count}
                       </span>
                     ) : null}
                   </div>
-                  <div className={`mt-3 text-sm font-semibold leading-6 ${active || (catalogView === "home" && index === 0) ? "text-slate-900" : "text-slate-300"}`}>
+                  <div className={`mt-3 text-sm font-semibold leading-6 ${active ? "text-slate-900" : "text-slate-300"}`}>
                     {item.body}
                   </div>
                 </button>
@@ -1197,7 +1271,7 @@ export default function AppsHomePage() {
       </section>
 
       {catalogView === "reference" ? (
-      <section className="mx-auto max-w-6xl px-6 pb-7">
+      <section id="apps-catalog-content" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
         <div className="border-y border-slate-800 py-6">
           <div className="text-xs font-semibold uppercase text-emerald-300">Reference Journeys</div>
           <div className="mt-2 text-xl font-bold text-white">End-to-end demos using the standard ChipLoop apps</div>
@@ -1287,7 +1361,7 @@ export default function AppsHomePage() {
       ) : null}
 
       {catalogView === "segments" ? (
-        <section className="mx-auto max-w-6xl px-6 pb-7">
+        <section id="apps-catalog-content" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
           <div className="border-y border-slate-800 py-6">
             <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Journeys by Segment</div>
             <div className="mt-2 text-xl font-bold text-white">Pick a product domain, then start a reference journey</div>
@@ -1324,45 +1398,9 @@ export default function AppsHomePage() {
         </section>
       ) : null}
 
-      {/* Flagship row */}
-      {catalogView === "home" ? (
-      <section className="mx-auto max-w-6xl px-6 pb-4">
-        <div className="mb-3 flex items-end justify-between">
-          <div>
-            <div className="text-lg font-bold">Flagship apps</div>
-            <div className="text-sm text-slate-400">Best starting points.</div>
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          {flagship.map((app) => (
-            <button
-              key={app.slug}
-              onClick={() => openApp(app.slug)}
-              className="rounded-2xl border border-slate-800 bg-slate-950/50 p-5 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-xl font-bold">{app.title}</div>
-                <span className="rounded-full bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200 border border-cyan-900/60">
-                  {app.nudge || "Flagship"}
-                </span>
-              </div>
-              <div className="mt-2 text-slate-300">{app.subtitle}</div>
-              {app.promise ? (
-                <div className="mt-3 text-sm text-slate-400">
-                  Outcome: <span className="text-slate-200">{app.promise}</span>
-                </div>
-              ) : null}
-              <div className="mt-4 text-xs text-slate-500">One click to progressive outputs to ZIP</div>
-            </button>
-          ))}
-        </div>
-      </section>
-      ) : null}
-
       {/* Loop rows */}
       {selectedCatalogLoop ? (
-      <section className="mx-auto max-w-6xl px-6 pb-16 space-y-10">
+      <section id="apps-catalog-content" className="mx-auto max-w-6xl px-6 pb-16 space-y-10 scroll-mt-24">
         {[selectedCatalogLoop].map((loop) => {
           const meta = LOOP_META[loop];
           const rowApps = apps.filter((a) => a.loop_type === loop);
