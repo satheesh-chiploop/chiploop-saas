@@ -138,7 +138,6 @@ export default function AppsHomePage() {
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [onboardingBusy, setOnboardingBusy] = useState(false);
 
-  const [view, setView] = useState<"recommended" | "all">("recommended");
   const [catalogView, setCatalogView] = useState<CatalogView>("home");
   const [selectedReferenceJourney, setSelectedReferenceJourney] = useState<string | null>(null);
 
@@ -172,10 +171,7 @@ export default function AppsHomePage() {
   useEffect(() => {
     const loop = new URLSearchParams(window.location.search).get("loop");
     if (LOOP_TYPES.includes(loop as LoopType)) {
-      if (["digital", "analog", "system", "embedded"].includes(loop || "")) {
-        setCatalogView(loop as CatalogView);
-      }
-      setView("all");
+      setCatalogView(loop as CatalogView);
     }
   }, []);
 
@@ -911,7 +907,6 @@ export default function AppsHomePage() {
 
   const openCatalog = (nextView: CatalogView) => {
     setCatalogView(nextView);
-    setView(nextView === "home" ? "recommended" : "all");
     window.setTimeout(() => {
       document.getElementById("apps-catalog-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
@@ -1000,8 +995,7 @@ export default function AppsHomePage() {
 
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-6 pt-10 pb-6">
-        <div className="grid gap-4 md:grid-cols-5">
-          <div className="md:col-span-3 rounded-2xl border border-slate-800 bg-slate-900/30 p-6 shadow-lg">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/30 p-6 shadow-lg">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-xs text-slate-400">
@@ -1048,153 +1042,6 @@ export default function AppsHomePage() {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Right */}
-          <div className="md:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/20 p-6">
-            <div className="text-sm text-slate-400">Quick choices</div>
-            <div className="mt-2 text-xl font-bold">What do you want to do today?</div>
-
-            <div className="mt-4 space-y-3">
-              {/* Digital daily-use entry */}
-              <button
-                onClick={() => go("/apps/arch2rtl")}
-                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">Digital - Spec to RTL + handoff</div>
-                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
-                    Most used
-                  </span>
-                </div>
-                <div className="mt-1 text-sm text-slate-400"> Digital - Arch2RTL: docs + SV + package</div>
-              </button>
-
-              {/* Analog daily-use entry */}
-              <button
-                onClick={() => go("/apps/analog-run")}
-                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">Run analog loop end-to-end</div>
-                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
-                    Recommended
-                  </span>
-                </div>
-                  <div className="mt-1 text-sm text-slate-400">Analog Run: netlist to model to validate to correlate</div>
-              </button>
-
-              <button
-                onClick={() => go("/apps/system-rtl")}
-                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left transition hover:border-cyan-700 hover:bg-slate-950"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-semibold leading-5 sm:text-base">System RTL handoff</div>
-                  <span className="rounded-full border border-cyan-900/60 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200">
-                    Recommended
-                  </span>
-                </div>
-                <div className="mt-1 text-sm text-slate-400">System RTL: integrated top + handoff package</div>
-              </button>
-
-              <button
-                onClick={() => go("/apps/system-synthesis")}
-                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left transition hover:border-cyan-700 hover:bg-slate-950"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-semibold leading-5 sm:text-base">System synthesis</div>
-                  <span className="rounded-full border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200">
-                    New
-                  </span>
-                </div>
-                <div className="mt-1 text-sm text-slate-400">System netlist + LEC/DFT/ATPG evidence</div>
-              </button>
-
-              <button
-                onClick={() => go("/apps/system-sim")}
-                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left transition hover:border-cyan-700 hover:bg-slate-950"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-semibold leading-5 sm:text-base">System verify</div>
-                  <span className="rounded-full border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-200">
-                    New
-                  </span>
-                </div>
-                <div className="mt-1 text-sm text-slate-400">System simulation, coverage, and debug evidence</div>
-              </button>
-
-              <button
-                onClick={() => go("/apps/system-software-validation")}
-                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">Validate system software stack</div>
-                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
-                    New
-                  </span>
-                </div>
-                <div className="mt-1 text-sm text-slate-400">
-                  Software validation or full co-simulation (SW to FW to RTL)
-                </div>
-              </button>
-
-              {/* Embedded daily-use entry */}
-              <button
-                onClick={() => go("/apps/embedded-run")}
-                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">Run firmware loop end-to-end</div>
-                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs text-slate-200 border border-slate-700">
-                    Recommended
-                  </span>
-                </div>
-                  <div className="mt-1 text-sm text-slate-400">Embedded Run: HAL to drivers to boot to diagnostics to report</div>
-              </button>
-
-              <button
-                onClick={() => go("/apps/validation-run")}
-                className="w-full rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-left hover:border-cyan-700 hover:bg-slate-950 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">Run validation on hardware</div>
-                  <span className="rounded-full bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200 border border-cyan-900/60">
-                    Recommended
-                  </span>
-                </div>
-                <div className="mt-1 text-sm text-slate-400">Bench to instruments to preflight to run to report</div>
-              </button>
-            </div>
-
-            <div className="mt-6 flex items-center gap-2">
-              <button
-                onClick={() => {
-                  setView("recommended");
-                  setCatalogView("home");
-                }}
-                className={`rounded-xl px-4 py-2 text-sm border transition ${
-                  view === "recommended" && catalogView === "home"
-                    ? "border-cyan-700 bg-cyan-500/10 text-cyan-200"
-                    : "border-slate-800 bg-slate-950/20 text-slate-300 hover:bg-slate-950/40"
-                }`}
-              >
-                Recommended
-              </button>
-              <button
-                onClick={() => {
-                  setView("all");
-                  openCatalog("digital");
-                }}
-                className={`rounded-xl px-4 py-2 text-sm border transition ${
-                  catalogView === "digital"
-                    ? "border-cyan-700 bg-cyan-500/10 text-cyan-200"
-                    : "border-slate-800 bg-slate-950/20 text-slate-300 hover:bg-slate-950/40"
-                }`}
-              >
-                Explore Digital apps
-              </button>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -1203,7 +1050,8 @@ export default function AppsHomePage() {
       <section className="mx-auto max-w-6xl px-6 pb-7">
         <div className="mb-3 flex items-end justify-between">
           <div>
-            <div className="text-lg font-bold">Recommended flagship apps</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">What would you like to do today?</div>
+            <div className="mt-2 text-lg font-bold">Recommended flagship apps</div>
             <div className="text-sm text-slate-400">Best starting points before choosing a category.</div>
           </div>
         </div>
