@@ -996,97 +996,63 @@ export default function AppsHomePage() {
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-6 pt-10 pb-6">
         <div className="rounded-2xl border border-slate-800 bg-slate-900/30 p-6 shadow-lg">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="text-xs text-slate-400">
-                  Welcome{userEmail ? `, ${userEmail}` : ""} | <span className="text-cyan-300">Start here</span>
-                </div>
-                <h1 className="mt-2 text-3xl font-extrabold leading-tight">
-                  Run outcomes, not workflows.
-                </h1>
-                <p className="mt-2 max-w-xl text-slate-300">
-                  Pick an app, give inputs once, click run. ChipLoop handles execution, learning, and reporting.
-                </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="text-xs text-slate-400">
+                Welcome{userEmail ? `, ${userEmail}` : ""} | <span className="text-cyan-300">Start here</span>
               </div>
-
-              <span className="shrink-0 rounded-full border border-cyan-900/60 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200">
-                Recommended
-              </span>
+              <h1 className="mt-2 text-3xl font-extrabold leading-tight">
+                Run outcomes, not workflows.
+              </h1>
+              <p className="mt-2 max-w-xl text-slate-300">
+                Pick an app, give inputs once, click run. ChipLoop handles execution, learning, and reporting.
+              </p>
             </div>
 
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              {featuredApps.map((featured) => (
-                <div key={featured.slug} className="rounded-2xl border border-slate-800 bg-black/30 p-5">
-                  <div className="text-sm text-slate-400">Featured</div>
-                  <div className="mt-1 text-2xl font-bold text-white">{featured.title}</div>
-                  <div className="mt-1 min-h-[48px] text-slate-300">{featured.subtitle}</div>
+            <span className="shrink-0 rounded-full border border-cyan-900/60 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200">
+              Recommended
+            </span>
+          </div>
 
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <button
-                      onClick={() => openApp(featured.slug)}
-                      className="rounded-xl bg-cyan-600 px-5 py-3 font-semibold hover:bg-cyan-500 transition"
-                    >
-                      Run now
-                    </button>
-                    <button
-                      onClick={() => openApp(featured.slug)}
-                      className="rounded-xl border border-slate-700 bg-slate-950/40 px-5 py-3 text-slate-200 hover:bg-slate-950 transition"
-                    >
-                      Preview outputs
-                    </button>
-                  </div>
-
-                  <div className="mt-4 text-xs text-slate-500">
-                    Progressive outputs | Executive summary | ZIP artifacts
-                  </div>
-                </div>
-              ))}
-            </div>
-        </div>
-      </section>
-
-      {/* Flagship row */}
-      {catalogView === "home" ? (
-      <section className="mx-auto max-w-6xl px-6 pb-7">
-        <div className="mb-3 flex items-end justify-between">
-          <div>
+          <div className="mt-6">
             <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">What would you like to do today?</div>
-            <div className="mt-2 text-lg font-bold">Recommended flagship apps</div>
+            <div className="mt-2 text-lg font-bold">Flagship apps</div>
             <div className="text-sm text-slate-400">Best starting points before choosing a category.</div>
           </div>
-        </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {featuredApps.map((app) => (
-            <button
-              key={app.slug}
-              onClick={() => openApp(app.slug)}
-              className="rounded-2xl border border-slate-800 bg-slate-950/50 p-5 text-left transition hover:border-cyan-700 hover:bg-slate-950"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-xl font-bold">{app.title}</div>
-                <span className="rounded-full border border-cyan-900/60 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200">
-                  {app.nudge || "Recommended"}
-                </span>
-              </div>
-              <div className="mt-2 text-slate-300">{app.subtitle}</div>
-              {app.promise ? (
-                <div className="mt-3 text-sm text-slate-400">
-                  Outcome: <span className="text-slate-200">{app.promise}</span>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            {featuredApps.map((featured) => (
+              <button
+                key={featured.slug}
+                onClick={() => openApp(featured.slug)}
+                className="rounded-2xl border border-slate-800 bg-black/30 p-5 text-left transition hover:border-cyan-700 hover:bg-slate-950"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-xl font-bold text-white">{featured.title}</div>
+                  <span className="rounded-full border border-cyan-900/60 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200">
+                    {featured.nudge || "Recommended"}
+                  </span>
                 </div>
-              ) : null}
-              <div className="mt-4 text-xs text-slate-500">One click to progressive outputs to ZIP</div>
-            </button>
-          ))}
+                <div className="mt-2 min-h-[48px] text-slate-300">{featured.subtitle}</div>
+                {featured.promise ? (
+                  <div className="mt-3 text-sm text-slate-400">
+                    Outcome: <span className="text-slate-200">{featured.promise}</span>
+                  </div>
+                ) : null}
+                <div className="mt-4 text-xs text-slate-500">
+                  Progressive outputs | Executive summary | ZIP artifacts
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
-      ) : null}
 
       <section className="mx-auto max-w-6xl px-6 pb-7">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Explore Apps</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Experience Apps</div>
               <h2 className="mt-2 text-2xl font-extrabold text-white">Choose one catalog view</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                 Open a focused page for one app family without scrolling through every app at once.
@@ -1136,7 +1102,7 @@ export default function AppsHomePage() {
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-emerald-300">Explore Reference Journeys</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Experience Reference Journeys</div>
               <h2 className="mt-2 text-2xl font-extrabold text-white">Choose one guided product journey</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                 Start an end-to-end reference flow using the standard ChipLoop apps, stage sequence, and demo collateral.
@@ -1145,7 +1111,7 @@ export default function AppsHomePage() {
             {selectedReference ? (
               <button
                 onClick={() => setSelectedReferenceJourney(null)}
-                className="rounded-xl border border-slate-600 px-5 py-3 text-sm font-bold text-white transition hover:border-emerald-300 hover:text-emerald-200"
+                className="rounded-xl border border-slate-600 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200"
               >
                 Clear journey
               </button>
@@ -1183,7 +1149,7 @@ export default function AppsHomePage() {
       {selectedReference ? (
         <section id="reference-journey-detail" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
           <div className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-300">{selectedReference.segment}</div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-300">{selectedReference.segment}</div>
             <div className="text-xl font-bold text-white">{selectedReference.title}</div>
             <p className="mt-2 text-sm leading-6 text-slate-300">{selectedReference.copy}</p>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
@@ -1196,7 +1162,7 @@ export default function AppsHomePage() {
             </div>
             <button
               onClick={selectedReference.onClick}
-              className="mt-5 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white transition hover:bg-emerald-500"
+              className="mt-5 rounded-xl bg-cyan-600 px-5 py-3 font-semibold text-white transition hover:bg-cyan-500"
             >
               {selectedReference.button}
             </button>
