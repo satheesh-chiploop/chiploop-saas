@@ -38,8 +38,38 @@ export default function EventsPage() {
             <div className="mt-4 space-y-4">
               <button
                 type="button"
-                onClick={() => router.push("/events/blogs/navigating-loops-engineering-context")}
+                onClick={() => router.push("/events/blogs/future-end-to-end-ic-engineer")}
                 className="block w-full rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-cyan-100">The Future End-to-End IC Engineer</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  How agentic and generative AI can help engineers define, run, fix, and iterate across the full chip journey, and how ChipLoop makes startup tools easier to integrate.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/events/blogs/agentic-ai-future-chip-design")}
+                className="block w-full rounded-lg border border-slate-800 bg-slate-950/40 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-cyan-100">Agentic AI and the Future of Chip Design</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  How AI assistance, copilots, agentic workflows, and traditional EDA reference flows can work together.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/events/blogs/ask-this-run-engineering-review")}
+                className="block w-full rounded-lg border border-slate-800 bg-slate-950/40 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-cyan-100">Why Ask This Run Changes Engineering Review</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  How run-grounded questions help engineers inspect logs, artifacts, warnings, and next steps without hunting through files.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/events/blogs/navigating-loops-engineering-context")}
+                className="block w-full rounded-lg border border-slate-800 bg-slate-950/40 p-4 text-left hover:border-cyan-400"
               >
                 <div className="text-sm font-bold text-cyan-100">Navigating Loops and Engineering Context</div>
                 <p className="mt-2 text-sm leading-6 text-slate-300">
