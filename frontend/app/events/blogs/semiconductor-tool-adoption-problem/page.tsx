@@ -18,7 +18,7 @@ export default function SemiconductorToolAdoptionProblemPage() {
           Back to Events
         </button>
 
-        <div className="mt-8 text-xs font-semibold uppercase tracking-wide text-cyan-300">Investor View</div>
+        <div className="mt-8 text-xs font-semibold uppercase tracking-wide text-cyan-300">Events Blog</div>
         <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
           The Semiconductor Tool Adoption Problem
         </h1>
@@ -78,9 +78,9 @@ export default function SemiconductorToolAdoptionProblemPage() {
         </section>
 
         <section className="mt-8 space-y-4 text-slate-300">
-          <h2 className="text-2xl font-bold text-white">Investor Takeaway</h2>
+          <h2 className="text-2xl font-bold text-white">Why It Matters</h2>
           <p className="leading-8">
-            If ChipLoop becomes the place where emerging semiconductor tools are tried, connected, reviewed, and reused, it can create leverage beyond its own first-party apps. That is a marketplace and ecosystem thesis, not just a workflow thesis.
+            If ChipLoop becomes the place where emerging semiconductor tools are tried, connected, reviewed, and reused, it can create leverage beyond its own first-party apps. That is an ecosystem opportunity, not just a workflow improvement.
           </p>
         </section>
       </article>

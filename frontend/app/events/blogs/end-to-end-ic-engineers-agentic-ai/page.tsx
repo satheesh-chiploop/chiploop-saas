@@ -18,7 +18,7 @@ export default function EndToEndIcEngineersAgenticAiPage() {
           Back to Events
         </button>
 
-        <div className="mt-8 text-xs font-semibold uppercase tracking-wide text-cyan-300">Investor View</div>
+        <div className="mt-8 text-xs font-semibold uppercase tracking-wide text-cyan-300">Events Blog</div>
         <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
           From Specialist Teams to End-to-End IC Engineers
         </h1>
@@ -27,7 +27,7 @@ export default function EndToEndIcEngineersAgenticAiPage() {
         </p>
 
         <section className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-6">
-          <h2 className="text-2xl font-bold text-white">The Productivity Thesis</h2>
+          <h2 className="text-2xl font-bold text-white">The Productivity Shift</h2>
           <p className="mt-3 leading-8 text-cyan-100">
             The future IC engineer will not replace every specialist. But they will define, configure, run, inspect, and iterate across more stages with AI and tool assistance.
           </p>
@@ -55,7 +55,7 @@ export default function EndToEndIcEngineersAgenticAiPage() {
         </section>
 
         <section className="mt-8 space-y-4 text-slate-300">
-          <h2 className="text-2xl font-bold text-white">Why This Is Investable</h2>
+          <h2 className="text-2xl font-bold text-white">Why This Matters</h2>
           <p className="leading-8">
             Semiconductor engineering is expensive because each stage requires specialized knowledge and careful handoff. Agentic AI can reduce coordination cost by helping engineers navigate tasks that used to require multiple disconnected tools and teams.
           </p>
@@ -84,7 +84,7 @@ export default function EndToEndIcEngineersAgenticAiPage() {
         </section>
 
         <section className="mt-8 space-y-4 text-slate-300">
-          <h2 className="text-2xl font-bold text-white">Investor Takeaway</h2>
+          <h2 className="text-2xl font-bold text-white">The Practical Impact</h2>
           <p className="leading-8">
             The core value is engineering leverage. ChipLoop can help teams do more with the same people by connecting AI-generated work to real execution, review, and iteration. That makes the platform relevant to startups, enterprise teams, and training markets.
           </p>

@@ -18,7 +18,7 @@ export default function WorkflowLayerAiNativeChipDesignPage() {
           Back to Events
         </button>
 
-        <div className="mt-8 text-xs font-semibold uppercase tracking-wide text-cyan-300">Investor View</div>
+        <div className="mt-8 text-xs font-semibold uppercase tracking-wide text-cyan-300">Events Blog</div>
         <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
           Why ChipLoop Is Building the Workflow Layer for AI-Native Chip Design
         </h1>
@@ -27,7 +27,7 @@ export default function WorkflowLayerAiNativeChipDesignPage() {
         </p>
 
         <section className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-6">
-          <h2 className="text-2xl font-bold text-white">The Thesis</h2>
+          <h2 className="text-2xl font-bold text-white">The Core Idea</h2>
           <p className="mt-3 leading-8 text-cyan-100">
             ChipLoop sits between AI models, EDA tools, and engineering teams. It turns design intent into repeatable loops, captures the evidence from each run, and helps teams move to the next stage with context.
           </p>
@@ -78,7 +78,7 @@ export default function WorkflowLayerAiNativeChipDesignPage() {
         </section>
 
         <section className="mt-8 space-y-4 text-slate-300">
-          <h2 className="text-2xl font-bold text-white">Investor Takeaway</h2>
+          <h2 className="text-2xl font-bold text-white">Why It Matters</h2>
           <p className="leading-8">
             The opportunity is not a single AI feature. It is the workflow layer where AI, tools, data, and engineering review meet. That layer can expand across RTL, verification, synthesis, physical design, embedded software, validation, and product journeys.
           </p>
