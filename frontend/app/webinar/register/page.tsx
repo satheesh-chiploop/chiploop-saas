@@ -110,14 +110,14 @@ export default function WebinarRegistrationPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <TopNav current="webinar" showWebinar showWorkshop showSettings={false} maxWidthClass="max-w-5xl" />
+      <TopNav current="webinar" showWebinar showSettings={false} maxWidthClass="max-w-5xl" />
       <div className="mx-auto max-w-5xl px-6 py-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-8">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Weekly ChipLoop Webinar</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Biweekly ChipLoop Webinar</p>
             <h1 className="mt-4 text-4xl font-extrabold leading-tight">Register for the Saturday ChipLoop demo</h1>
             <p className="mt-5 leading-7 text-slate-300">
-              Join a 30-minute walkthrough every Saturday starting June 13, 2026, with six weeks of sessions through July 18. Choose 9:00 AM PT or 9:00 PM PT.
+              Join a 30-minute walkthrough once every two weeks at 9:00 AM PST, starting July 11, 2026.
             </p>
             <div className="mt-8 rounded-xl border border-slate-700 bg-slate-950/70 p-5 text-sm text-slate-300">
               <div className="font-bold text-white">We will cover:</div>
@@ -131,15 +131,16 @@ export default function WebinarRegistrationPage() {
               </ul>
             </div>
             <div className="mt-5 rounded-xl border border-cyan-800 bg-cyan-950/25 p-5 text-sm text-cyan-100">
-              <div className="font-bold text-white">Want hands-on training?</div>
+              <div className="font-bold text-white">New to ChipLoop?</div>
               <p className="mt-2 leading-6 text-cyan-100/85">
-                Join the 2-day ChipLoop Agentic AI Workshop across two Saturdays.
+                Read how chip design is moving from prompt-based experiments toward connected ChipLoop workflows.
               </p>
               <button
-                onClick={() => router.push("/workshop")}
+                type="button"
+                onClick={() => router.push("/events/blogs/prompt-based-chip-design-to-chiploop")}
                 className="mt-4 rounded-lg bg-cyan-400 px-4 py-2 font-bold text-slate-950 transition hover:bg-cyan-300"
               >
-                View paid workshop
+                Read the article
               </button>
             </div>
           </section>
