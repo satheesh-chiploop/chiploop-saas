@@ -38,8 +38,38 @@ export default function EventsPage() {
             <div className="mt-4 space-y-4">
               <button
                 type="button"
-                onClick={() => router.push("/events/blogs/top-five-chiploop-industry-problems")}
+                onClick={() => router.push("/events/blogs/workflow-layer-ai-native-chip-design")}
                 className="block w-full rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-cyan-100">The Workflow Layer for AI-Native Chip Design</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  Why the durable value in AI chip design is workflow orchestration, not standalone prompt boxes.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/events/blogs/semiconductor-tool-adoption-problem")}
+                className="block w-full rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-cyan-100">The Semiconductor Tool Adoption Problem</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  Why great EDA startups struggle to reach engineers, and how ChipLoop can become an integration layer.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/events/blogs/end-to-end-ic-engineers-agentic-ai")}
+                className="block w-full rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-cyan-100">From Specialist Teams to End-to-End IC Engineers</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  How agentic AI expands engineering leverage without removing expert judgment.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/events/blogs/top-five-chiploop-industry-problems")}
+                className="block w-full rounded-lg border border-slate-800 bg-slate-950/40 p-4 text-left hover:border-cyan-400"
               >
                 <div className="text-sm font-bold text-cyan-100">Top 5 Industry Problems ChipLoop Addresses</div>
                 <p className="mt-2 text-sm leading-6 text-slate-300">
