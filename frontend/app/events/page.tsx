@@ -38,8 +38,18 @@ export default function EventsPage() {
             <div className="mt-4 space-y-4">
               <button
                 type="button"
-                onClick={() => router.push("/events/blogs/future-end-to-end-ic-engineer")}
+                onClick={() => router.push("/events/blogs/top-five-chiploop-industry-problems")}
                 className="block w-full rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-cyan-100">Top 5 Industry Problems ChipLoop Addresses</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  A short priority view of the biggest industry workflow problems ChipLoop is positioned to solve.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/events/blogs/future-end-to-end-ic-engineer")}
+                className="block w-full rounded-lg border border-slate-800 bg-slate-950/40 p-4 text-left hover:border-cyan-400"
               >
                 <div className="text-sm font-bold text-cyan-100">The Future End-to-End IC Engineer</div>
                 <p className="mt-2 text-sm leading-6 text-slate-300">
