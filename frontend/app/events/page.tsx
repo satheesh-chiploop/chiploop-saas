@@ -34,16 +34,29 @@ export default function EventsPage() {
           </article>
           <article className="rounded-xl border border-slate-800 bg-slate-900/70 p-6">
             <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Events Blog</div>
-            <h2 className="mt-2 text-2xl font-bold text-cyan-300">From Prompt-Based Chip Design to ChipLoop</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              The first Events article explains why standalone prompts are not enough for real chip work, and how ChipLoop turns intent, tools, artifacts, checks, and handoffs into a connected workflow.
-            </p>
-            <button
-              onClick={() => router.push("/events/blogs/prompt-based-chip-design-to-chiploop")}
-              className="mt-5 rounded-lg border border-slate-700 px-5 py-3 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200"
-            >
-              Read Article
-            </button>
+            <h2 className="mt-2 text-2xl font-bold text-cyan-300">Latest Articles</h2>
+            <div className="mt-4 space-y-4">
+              <button
+                type="button"
+                onClick={() => router.push("/events/blogs/navigating-loops-engineering-context")}
+                className="block w-full rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-cyan-100">Navigating Loops and Engineering Context</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  How ChipLoop helps teams define, configure, and run connected engineering loops, using the PWM reference journey as an example.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/events/blogs/prompt-based-chip-design-to-chiploop")}
+                className="block w-full rounded-lg border border-slate-800 bg-slate-950/40 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-cyan-100">From Prompt-Based Chip Design to ChipLoop</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  Why standalone prompts are not enough for real chip work, and how ChipLoop connects intent, tools, artifacts, checks, and handoffs.
+                </p>
+              </button>
+            </div>
           </article>
         </div>
       </section>
