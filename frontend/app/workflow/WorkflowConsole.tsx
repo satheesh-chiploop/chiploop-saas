@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FiMic } from "react-icons/fi";
 import { apiPost } from "@/lib/apiClient";
 //import { createClient } from "@supabase/supabase-js";
 
@@ -33,6 +34,25 @@ type AskThisRunResponse = {
   source_count?: number;
 };
 
+async function parseResponse(response: Response): Promise<unknown> {
+  const text = await response.text();
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { detail: text };
+  }
+}
+
+function errorMessage(data: unknown, fallback: string): string {
+  const responseObject = data && typeof data === "object" ? (data as Record<string, unknown>) : null;
+  const detail = responseObject && "detail" in responseObject ? responseObject.detail : data;
+  if (typeof detail === "string") return detail;
+  const detailObject = detail && typeof detail === "object" ? (detail as Record<string, unknown>) : null;
+  if (detailObject && typeof detailObject.message === "string") return detailObject.message;
+  return fallback;
+}
+
 
 
 type TableName = "workflows" | "runs";
@@ -60,6 +80,11 @@ export default function WorkflowConsole({
   const [askLoading, setAskLoading] = useState(false);
   const [askError, setAskError] = useState<string | null>(null);
   const [askHistory, setAskHistory] = useState<AskThisRunResponse[]>([]);
+  const [askVoiceRecording, setAskVoiceRecording] = useState(false);
+  const [askVoiceBusy, setAskVoiceBusy] = useState(false);
+  const [askVoiceStatus, setAskVoiceStatus] = useState<string | null>(null);
+  const askVoiceRecorderRef = useRef<MediaRecorder | null>(null);
+  const askVoiceStreamRef = useRef<MediaStream | null>(null);
 
     // ✅ Schematic / Mapping viewer
   const [viewOpen, setViewOpen] = useState(false);
@@ -75,6 +100,11 @@ export default function WorkflowConsole({
     return s;
   };
   const router = useRouter();
+
+  function stopAskVoiceTracks() {
+    askVoiceStreamRef.current?.getTracks().forEach((track) => track.stop());
+    askVoiceStreamRef.current = null;
+  }
 
   const fetchArtifactAsTextOrJson = async (path: string) => {
     setViewError(null);
@@ -416,6 +446,17 @@ export default function WorkflowConsole({
     window.addEventListener("refreshWorkflows", refreshHandler);
     return () => window.removeEventListener("refreshWorkflows", refreshHandler);
   }, []);
+  useEffect(() => {
+    return () => {
+      const recorder = askVoiceRecorderRef.current;
+      if (recorder && recorder.state !== "inactive") {
+        recorder.onstop = null;
+        recorder.stop();
+      }
+      stopAskVoiceTracks();
+    };
+  }, []);
+
   const [wfId, setWfId] = useState<string>(jobId);
   // ---------- 🧠 FETCH + LIVE SYNC ----------
   useEffect(() => {
@@ -637,6 +678,77 @@ export default function WorkflowConsole({
   };
 
   // ---------- 🧩 Render ----------
+  const askAuthHeaders = async (): Promise<Record<string, string>> => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    return session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+  };
+
+  const toggleAskVoiceRecording = async () => {
+    setAskError(null);
+    setAskVoiceStatus(null);
+
+    const activeRecorder = askVoiceRecorderRef.current;
+    if (askVoiceRecording && activeRecorder && activeRecorder.state !== "inactive") {
+      activeRecorder.stop();
+      setAskVoiceRecording(false);
+      return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setAskError("Voice recording is not supported in this browser.");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: BlobPart[] = [];
+      askVoiceStreamRef.current = stream;
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunks.push(event.data);
+      };
+
+      recorder.onstop = async () => {
+        stopAskVoiceTracks();
+        askVoiceRecorderRef.current = null;
+        setAskVoiceBusy(true);
+        try {
+          const form = new FormData();
+          form.append("file", new Blob(chunks, { type: "audio/webm" }), `ask-this-run-${Date.now()}.webm`);
+          const response = await fetch("/api/studio/voice/transcribe", {
+            method: "POST",
+            headers: await askAuthHeaders(),
+            body: form,
+            cache: "no-store",
+          });
+          const data = await parseResponse(response);
+          if (!response.ok) throw new Error(errorMessage(data, `Transcription failed with status ${response.status}.`));
+          const responseObject = data && typeof data === "object" ? (data as Record<string, unknown>) : null;
+          const transcript = String(responseObject?.transcript || "").trim();
+          if (!transcript) throw new Error("No transcript returned.");
+          setAskQuestion((current) => [current.trim(), transcript].filter(Boolean).join("\n\n"));
+          setAskVoiceStatus("Transcript added.");
+          setActiveTab("ask");
+        } catch (err) {
+          setAskError(err instanceof Error ? err.message : "Voice transcription failed.");
+        } finally {
+          setAskVoiceBusy(false);
+        }
+      };
+
+      recorder.start();
+      askVoiceRecorderRef.current = recorder;
+      setAskVoiceRecording(true);
+    } catch (err) {
+      stopAskVoiceTracks();
+      setAskVoiceRecording(false);
+      setAskError(err instanceof Error ? err.message : "Microphone permission was not granted.");
+    }
+  };
+
   const renderSummary = () => (
     <div className="space-y-2">
       <div><strong>ID:</strong> {workflowMeta?.id}</div>
@@ -759,13 +871,31 @@ export default function WorkflowConsole({
             placeholder="Ask about failures, warnings, generated files, coverage, handoff readiness..."
             className="min-h-24 w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-slate-100 outline-none focus:border-cyan-500"
           />
-          <button
-            type="submit"
-            disabled={askLoading || askQuestion.trim().length < 3}
-            className="rounded bg-cyan-700 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700"
-          >
-            {askLoading ? "Inspecting..." : "Ask this run"}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="submit"
+              disabled={askLoading || askQuestion.trim().length < 3}
+              className="rounded bg-cyan-700 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+            >
+              {askLoading ? "Inspecting..." : "Ask this run"}
+            </button>
+            <button
+              type="button"
+              disabled={askVoiceBusy}
+              onClick={toggleAskVoiceRecording}
+              title={askVoiceRecording ? "Stop voice recording" : "Use voice input"}
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                askVoiceRecording
+                  ? "border-red-500 bg-red-950/40 text-red-100 hover:bg-red-900/50"
+                  : "border-cyan-800 bg-cyan-950/30 text-cyan-100 hover:bg-cyan-900/40"
+              }`}
+            >
+              <FiMic aria-hidden="true" />
+              <span className="sr-only">{askVoiceRecording ? "Stop voice recording" : "Use voice input"}</span>
+            </button>
+            {askVoiceBusy ? <span className="text-xs text-cyan-200">Transcribing...</span> : null}
+            {askVoiceStatus ? <span className="text-xs text-cyan-200">{askVoiceStatus}</span> : null}
+          </div>
         </form>
 
         {askError ? (
