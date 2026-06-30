@@ -3667,7 +3667,7 @@ type SystemPlannerIntent = {
                 }
                 setShowWorkflowConfigModal(true);
               }}
-              className="rounded-lg bg-slate-700 px-4 py-2 font-bold text-white hover:bg-slate-600"
+              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
             >
               Configure Workflow
             </button>
