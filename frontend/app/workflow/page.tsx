@@ -26,6 +26,7 @@ import WorkflowConsole from "./WorkflowConsole";
 import PlannerModal from "@/components/PlannerModal";
 import AgentPlannerModal from "@/components/AgentPlannerModal";
 import StudioAgentPlannerModal from "@/components/studio/AgentPlannerModal";
+import CreateAppModal from "@/components/studio/CreateAppModal";
 import DagPreviewModal from "@/components/studio/DagPreviewModal";
 import { LowCreditBanner } from "@/components/PlanCreditStatus";
 import TopNav from "@/components/TopNav";
@@ -1403,6 +1404,7 @@ type SystemPlannerIntent = {
   const [showPlanner, setShowPlanner] = useState(false);
   const [showAgentPlanner, setShowAgentPlanner] = useState(false);
   const [showStudioAgentPlanner, setShowStudioAgentPlanner] = useState(false);
+  const [showCreateApp, setShowCreateApp] = useState(false);
   const [systemPlannerIntent, setSystemPlannerIntent] = useState<SystemPlannerIntent | null>(null);
   const [showDagPreview, setShowDagPreview] = useState(false);
   const [selectedWorkflowName, setSelectedWorkflowName] = useState<string | null>(null);
@@ -2827,6 +2829,14 @@ type SystemPlannerIntent = {
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const workflowId = params.get("workflow_id");
+    if (!workflowId) return;
+    void loadWorkflowFromDB({ id: workflowId, name: "Workflow", loop_type: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const runWorkflowWithFormData = async (
     workflowPayload: any,
     text: string,
@@ -3260,6 +3270,12 @@ type SystemPlannerIntent = {
             className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
           >
             System Planner
+          </button>
+          <button
+            onClick={() => setShowCreateApp(true)}
+            className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
+          >
+            Create App
           </button>
           <button
             onClick={() => setShowStudioAgentPlanner(true)}
@@ -4612,6 +4628,28 @@ type SystemPlannerIntent = {
         <StudioAgentPlannerModal
           initialLoop={loop}
           onClose={() => setShowStudioAgentPlanner(false)}
+        />
+      )}
+      {showCreateApp && (
+        <CreateAppModal
+          workflowId={selectedWorkflowId}
+          workflowName={selectedWorkflowName}
+          loopType={(selectedWorkflowLoopType || loop).toLowerCase()}
+          configSchema={selectedWorkflowConfigSchema}
+          defaultConfig={selectedWorkflowDefaultConfig}
+          workflowSnapshot={{
+            id: selectedWorkflowId,
+            name: selectedWorkflowName,
+            loop_type: selectedWorkflowLoopType || loop,
+            definitions: selectedWorkflowDefinitions || {
+              nodes,
+              edges,
+              workflow_config_schema: selectedWorkflowConfigSchema,
+              default_run_config: selectedWorkflowDefaultConfig,
+            },
+          }}
+          authHeaders={authHeaders}
+          onClose={() => setShowCreateApp(false)}
         />
       )}
       {showDagPreview && (

@@ -11,6 +11,7 @@ type Submission = {
   submitted_by?: string;
   status?: string;
   agent_json?: Record<string, unknown>;
+  workflow_json?: Record<string, unknown>;
   review_notes?: string;
   created_at?: string;
 };
@@ -21,7 +22,13 @@ function submissionId(item: Submission): string {
   return String(item.id || item.submission_id || "");
 }
 
-function agentName(item: Submission): string {
+function submissionKind(item: Submission): "App" | "Agent" {
+  return item.workflow_json ? "App" : "Agent";
+}
+
+function submissionName(item: Submission): string {
+  const app = item.workflow_json || {};
+  if (item.workflow_json) return String(app.name || app.workflow_name || "Unnamed app");
   const agent = item.agent_json || {};
   return String(agent.agent_name || agent.name || "Unnamed agent");
 }
@@ -77,8 +84,8 @@ export default function AdminMarketplacePage() {
           <div className="mt-4 space-y-2">
             {submissions.map((item) => (
               <button key={submissionId(item)} onClick={() => setSelected(item)} className={`w-full rounded-xl border p-3 text-left text-sm transition ${submissionId(selected || {}) === submissionId(item) ? "border-cyan-700 bg-cyan-950/30" : "border-slate-800 bg-black/25 hover:bg-slate-900"}`}>
-                <div className="font-semibold text-slate-100">{agentName(item)}</div>
-                <div className="mt-1 text-xs text-slate-400">{item.status || "pending"} · {item.submitted_by || "unknown"}</div>
+                <div className="font-semibold text-slate-100">{submissionName(item)}</div>
+                <div className="mt-1 text-xs text-slate-400">{submissionKind(item)} · {item.status || "pending"} · {item.submitted_by || "unknown"}</div>
               </button>
             ))}
           </div>
@@ -94,15 +101,15 @@ export default function AdminMarketplacePage() {
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="text-sm uppercase tracking-wide text-cyan-300">Submission</div>
-                  <h2 className="mt-1 text-2xl font-extrabold">{agentName(selected)}</h2>
-                  <div className="mt-1 text-sm text-slate-400">Status: {selected.status || "pending"}</div>
+                  <h2 className="mt-1 text-2xl font-extrabold">{submissionName(selected)}</h2>
+                  <div className="mt-1 text-sm text-slate-400">{submissionKind(selected)} · Status: {selected.status || "pending"}</div>
                 </div>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-xl border border-slate-800 bg-black/30 p-4">
-                  <h3 className="font-bold text-cyan-300">Agent JSON</h3>
-                  <pre className="mt-3 max-h-[420px] overflow-auto whitespace-pre-wrap text-xs text-slate-200">{JSON.stringify(selected.agent_json || {}, null, 2)}</pre>
+                  <h3 className="font-bold text-cyan-300">{submissionKind(selected)} JSON</h3>
+                  <pre className="mt-3 max-h-[420px] overflow-auto whitespace-pre-wrap text-xs text-slate-200">{JSON.stringify(selected.workflow_json || selected.agent_json || {}, null, 2)}</pre>
                 </div>
                 <div className="rounded-xl border border-slate-800 bg-black/30 p-4">
                   <h3 className="font-bold text-cyan-300">Review notes</h3>
@@ -112,7 +119,7 @@ export default function AdminMarketplacePage() {
                     <button onClick={() => act("request-changes")} className="rounded-xl border border-amber-700 px-4 py-2 text-sm font-semibold text-amber-100 hover:bg-amber-950/30">Request changes</button>
                     <button onClick={() => act("reject")} className="rounded-xl border border-red-800 px-4 py-2 text-sm font-semibold text-red-100 hover:bg-red-950/30">Reject</button>
                   </div>
-                  <p className="mt-4 text-xs leading-5 text-slate-400">Approval creates a separate marketplace listing and version. The source private agent remains owned by the creator.</p>
+                  <p className="mt-4 text-xs leading-5 text-slate-400">Approval creates a separate marketplace listing and version. The source private app or agent remains owned by the creator.</p>
                 </div>
               </div>
             </div>

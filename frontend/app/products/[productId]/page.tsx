@@ -70,6 +70,22 @@ type StageOption = string | {
   disabled?: boolean;
 };
 
+type UserApp = {
+  id: string;
+  workflow_id: string;
+  workflow_name?: string | null;
+  name: string;
+  description?: string | null;
+  category?: string | null;
+  loop_type?: string | null;
+  marketplace_status?: string | null;
+};
+
+type UserAppsResponse = {
+  status: string;
+  apps: UserApp[];
+};
+
 const APP_LINKS: Record<string, string> = {
   Digital_Arch2RTL: "/apps/arch2rtl",
   Digital_DQA: "/apps/dqa",
@@ -448,7 +464,7 @@ const FALLBACK_STAGE_SCHEMA: StageSchema = {
 type StageCatalogItem = {
   app: string;
   label: string;
-  category: "Digital" | "System" | "Embedded" | "Software" | "Validation" | "Product";
+  category: "Digital" | "System" | "Embedded" | "Software" | "Validation" | "Product" | "My Apps";
   produces: string[];
   requires?: string[][];
   warning?: string;
@@ -712,6 +728,8 @@ export default function ProductDetailPage() {
   const [stageRuns, setStageRuns] = useState<StageRun[]>([]);
   const [runHistory, setRunHistory] = useState<ProductRunWithStages[]>([]);
   const [stageSchemas, setStageSchemas] = useState<Record<string, StageSchema>>(FALLBACK_STAGE_SCHEMAS);
+  const [userApps, setUserApps] = useState<UserApp[]>([]);
+  const [selectedUserAppId, setSelectedUserAppId] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -754,6 +772,19 @@ export default function ProductDetailPage() {
     })();
     return () => { mounted = false; };
   }, [productId]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const out = await apiGet<UserAppsResponse>("/studio/user-apps");
+        if (mounted) setUserApps(out.apps || []);
+      } catch {
+        if (mounted) setUserApps([]);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const stages = useMemo(() => product?.stage_config?.stages || [], [product]);
   const sequenceFindings = useMemo(() => validateStageSequence(stages), [stages]);
@@ -888,6 +919,29 @@ export default function ProductDetailPage() {
       optional: true,
       enabled: true,
       settings: {},
+    };
+    replaceStages([...stages, newStage], newStage.id);
+  }
+
+  function addUserAppStage() {
+    const app = userApps.find((item) => item.id === selectedUserAppId);
+    if (!app) {
+      setMessage("Choose one of your apps first.");
+      return;
+    }
+    const appKey = `User_App:${app.id}`;
+    const newStage: Stage = {
+      id: makeStageId(`user_app_${app.name}`, stages),
+      label: app.name,
+      app: appKey,
+      optional: true,
+      enabled: true,
+      settings: {
+        user_app_id: app.id,
+        workflow_id: app.workflow_id,
+        workflow_name: app.workflow_name,
+        source: "user_app",
+      },
     };
     replaceStages([...stages, newStage], newStage.id);
   }
@@ -1135,6 +1189,25 @@ export default function ProductDetailPage() {
                 </button>
                 <span className="rounded-md bg-slate-900 px-2 py-2 text-center text-xs text-slate-300">{stages.length} stages</span>
               </div>
+              <div className="flex flex-col gap-2 rounded-lg border border-slate-800 bg-slate-950/60 p-3 sm:flex-row sm:items-center">
+                <select
+                  value={selectedUserAppId}
+                  onChange={(event) => setSelectedUserAppId(event.target.value)}
+                  className="min-w-0 flex-1 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                >
+                  <option value="">Select one of My Apps</option>
+                  {userApps.map((app) => (
+                    <option key={app.id} value={app.id}>{app.name} - {app.workflow_name || app.workflow_id}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={addUserAppStage}
+                  disabled={!selectedUserAppId}
+                  className="rounded-md border border-cyan-700 px-3 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/40 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-600"
+                >
+                  Add My App
+                </button>
+              </div>
             </div>
             {sequenceFindings.length ? (
               <div className="mt-4 rounded-lg border border-amber-500/25 bg-amber-950/20 p-3">
@@ -1269,7 +1342,14 @@ export default function ProductDetailPage() {
                       </button>
                     ) : null}
                     <button
-                      onClick={() => router.push(APP_LINKS[selectedStage.app] || "/apps")}
+                      onClick={() => {
+                        const workflowId = selectedStage.settings?.workflow_id;
+                        if (selectedStage.app.startsWith("User_App:") && typeof workflowId === "string") {
+                          router.push(`/workflow?workflow_id=${encodeURIComponent(workflowId)}&app_id=${encodeURIComponent(String(selectedStage.settings?.user_app_id || ""))}`);
+                          return;
+                        }
+                        router.push(APP_LINKS[selectedStage.app] || "/apps");
+                      }}
                       className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-white"
                     >
                       Open App

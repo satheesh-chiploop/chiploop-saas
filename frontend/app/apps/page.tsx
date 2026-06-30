@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import { apiGet, apiPost } from "@/lib/apiClient";
+import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/apiClient";
 import { LowCreditBanner } from "@/components/PlanCreditStatus";
 import TopNav from "@/components/TopNav";
 import {
@@ -68,6 +68,27 @@ type AppCard = {
   status?: "Flagship" | "New" | "Coming";
   nudge?: string;
   promise?: string;
+};
+
+type UserApp = {
+  id: string;
+  workflow_id: string;
+  workflow_name?: string | null;
+  name: string;
+  slug?: string | null;
+  description?: string | null;
+  category?: LoopType | string | null;
+  loop_type?: LoopType | string | null;
+  visibility?: string | null;
+  status?: string | null;
+  marketplace_status?: string | null;
+  price_usd?: number | null;
+  created_at?: string | null;
+};
+
+type UserAppsResponse = {
+  status: string;
+  apps: UserApp[];
 };
 
 type ReferenceJourney = {
@@ -137,6 +158,12 @@ export default function AppsHomePage() {
   const [onboardingLoading, setOnboardingLoading] = useState(true);
   const [onboardingComplete, setOnboardingComplete] = useState(true);
   const [onboardingBusy, setOnboardingBusy] = useState(false);
+  const [myApps, setMyApps] = useState<UserApp[]>([]);
+  const [myAppsLoading, setMyAppsLoading] = useState(false);
+  const [submittingAppId, setSubmittingAppId] = useState<string | null>(null);
+  const [editingAppId, setEditingAppId] = useState<string | null>(null);
+  const [editAppDraft, setEditAppDraft] = useState<Partial<UserApp>>({});
+  const [deletingAppId, setDeletingAppId] = useState<string | null>(null);
 
   const [catalogView, setCatalogView] = useState<CatalogView>("home");
   const [selectedReferenceJourney, setSelectedReferenceJourney] = useState<string | null>(null);
@@ -153,6 +180,18 @@ export default function AppsHomePage() {
         setOnboardingLoading(false);
         return;
       }
+
+      setMyAppsLoading(true);
+      apiGet<UserAppsResponse>("/studio/user-apps")
+        .then((response) => {
+          if (mounted) setMyApps(response.apps || []);
+        })
+        .catch(() => {
+          if (mounted) setMyApps([]);
+        })
+        .finally(() => {
+          if (mounted) setMyAppsLoading(false);
+        });
 
       try {
         const response = await apiGet<OnboardingResponse>("/settings/onboarding");
@@ -748,6 +787,82 @@ export default function AppsHomePage() {
 
   const openApp = (slug: string) => go(routeForApp(slug));
 
+  const openUserApp = (app: UserApp) => {
+    const params = new URLSearchParams({
+      workflow_id: app.workflow_id,
+      app_id: app.id,
+    });
+    go(`/workflow?${params.toString()}`);
+  };
+
+  const submitUserApp = async (app: UserApp) => {
+    setSubmittingAppId(app.id);
+    try {
+      const response = await apiPost<{ status: string; app?: UserApp }>(`/studio/user-apps/${app.id}/submit`);
+      if (response.app) {
+        setMyApps((current) => current.map((item) => (item.id === app.id ? { ...item, ...response.app } : item)));
+      } else {
+        setMyApps((current) =>
+          current.map((item) =>
+            item.id === app.id ? { ...item, status: "submitted", marketplace_status: "pending" } : item,
+          ),
+        );
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Could not submit app for review.");
+    } finally {
+      setSubmittingAppId(null);
+    }
+  };
+
+  const beginEditUserApp = (app: UserApp) => {
+    setEditingAppId(app.id);
+    setEditAppDraft({
+      name: app.name,
+      description: app.description || "",
+      category: app.category || app.loop_type || "system",
+      price_usd: app.price_usd ?? null,
+    });
+    setDeletingAppId(null);
+  };
+
+  const saveUserAppEdit = async (app: UserApp) => {
+    const name = String(editAppDraft.name || "").trim();
+    if (!name) {
+      alert("App name is required.");
+      return;
+    }
+    try {
+      const response = await apiPatch<{ status: string; app: UserApp }>(`/studio/user-apps/${app.id}`, {
+        name,
+        description: String(editAppDraft.description || "").trim(),
+        category: editAppDraft.category || app.category || app.loop_type || "system",
+        price_usd: editAppDraft.price_usd ?? null,
+      });
+      setMyApps((current) => current.map((item) => (item.id === app.id ? { ...item, ...response.app } : item)));
+      setEditingAppId(null);
+      setEditAppDraft({});
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Could not update app.");
+    }
+  };
+
+  const deleteUserApp = async (app: UserApp) => {
+    setDeletingAppId(app.id);
+    try {
+      await apiDelete(`/studio/user-apps/${app.id}`);
+      setMyApps((current) => current.filter((item) => item.id !== app.id));
+      if (editingAppId === app.id) {
+        setEditingAppId(null);
+        setEditAppDraft({});
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Could not delete app.");
+    } finally {
+      setDeletingAppId(null);
+    }
+  };
+
   async function skipOnboarding() {
     setOnboardingBusy(true);
     try {
@@ -912,6 +1027,11 @@ export default function AppsHomePage() {
 
   const selectedReference = referenceJourneys.find((journey) => journey.key === selectedReferenceJourney) || null;
 
+  const loopForUserApp = (app: UserApp): LoopType => {
+    const raw = String(app.loop_type || app.category || "system").toLowerCase();
+    return LOOP_TYPES.includes(raw as LoopType) ? (raw as LoopType) : "system";
+  };
+
   const openCatalog = (nextView: CatalogView) => {
     setCatalogView(nextView);
     window.setTimeout(() => {
@@ -1054,6 +1174,155 @@ export default function AppsHomePage() {
           </div>
         </div>
       </section>
+
+      {(myAppsLoading || myApps.length > 0) ? (
+        <section className="mx-auto max-w-6xl px-6 pb-7">
+          <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">My Apps</div>
+                <h2 className="mt-2 text-2xl font-extrabold text-white">Private apps from Studio</h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+                  Apps created from your workflows stay private until submitted and approved for marketplace publication.
+                </p>
+              </div>
+              <button
+                onClick={() => go("/workflow")}
+                className="rounded-xl border border-slate-600 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200"
+              >
+                Create in Studio
+              </button>
+            </div>
+
+            {myAppsLoading ? (
+              <div className="mt-6 rounded-xl border border-slate-800 bg-slate-950/45 p-4 text-sm text-slate-400">
+                Loading private apps...
+              </div>
+            ) : (
+              <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {myApps.map((app) => {
+                  const loopKey = loopForUserApp(app);
+                  const meta = LOOP_META[loopKey];
+                  const editing = editingAppId === app.id;
+                  return (
+                    <div
+                      key={app.id}
+                      className={`rounded-2xl border ${meta.border} bg-slate-950/55 p-4 text-left transition hover:bg-slate-950`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${meta.border} ${meta.softBg} text-sm font-bold`}>
+                            {meta.icon}
+                          </div>
+                          <div className="truncate text-lg font-bold text-slate-100">{app.name}</div>
+                        </div>
+                        <span className="rounded-full border border-slate-700 bg-slate-900/40 px-2 py-1 text-xs text-slate-200">
+                          {app.visibility || "private"}
+                        </span>
+                      </div>
+                      <div className="mt-3 min-h-10 text-sm leading-5 text-slate-300">
+                          {app.description || `Workflow app from ${app.workflow_name || "Studio"}.`}
+                      </div>
+                      {editing ? (
+                        <div className="mt-4 grid gap-3 rounded-xl border border-slate-800 bg-black/25 p-3">
+                          <input
+                            value={String(editAppDraft.name || "")}
+                            onChange={(event) => setEditAppDraft((current) => ({ ...current, name: event.target.value }))}
+                            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                            placeholder="App name"
+                          />
+                          <textarea
+                            value={String(editAppDraft.description || "")}
+                            onChange={(event) => setEditAppDraft((current) => ({ ...current, description: event.target.value }))}
+                            rows={3}
+                            className="resize-none rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                            placeholder="Description"
+                          />
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <select
+                              value={String(editAppDraft.category || loopKey)}
+                              onChange={(event) => setEditAppDraft((current) => ({ ...current, category: event.target.value }))}
+                              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                            >
+                              {LOOP_TYPES.map((item) => <option key={item} value={item}>{LOOP_META[item].title}</option>)}
+                            </select>
+                            <input
+                              value={editAppDraft.price_usd == null ? "" : String(editAppDraft.price_usd)}
+                              onChange={(event) => setEditAppDraft((current) => ({ ...current, price_usd: event.target.value ? Number(event.target.value) : null }))}
+                              className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
+                              placeholder="Price USD"
+                            />
+                          </div>
+                        </div>
+                      ) : null}
+                      <div className="mt-4 space-y-2 rounded-xl border border-slate-800 bg-black/20 p-3 text-xs text-slate-400">
+                        <div>
+                          Workflow: <span className="text-slate-200">{app.workflow_name || app.workflow_id}</span>
+                        </div>
+                        <div>
+                          Marketplace: <span className="text-slate-200">{app.marketplace_status || "draft"}</span>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {editing ? (
+                          <>
+                            <button
+                              onClick={() => saveUserAppEdit(app)}
+                              className="rounded-lg bg-cyan-500 px-3 py-2 text-xs font-bold text-black transition hover:bg-cyan-400"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingAppId(null);
+                                setEditAppDraft({});
+                              }}
+                              className="rounded-lg border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-200"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => beginEditUserApp(app)}
+                            className="rounded-lg border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-200"
+                          >
+                            Edit
+                          </button>
+                        )}
+                        <button
+                          onClick={() => openUserApp(app)}
+                          className="rounded-lg bg-cyan-500 px-3 py-2 text-xs font-bold text-black transition hover:bg-cyan-400"
+                        >
+                          Open in Studio
+                        </button>
+                        <button
+                          onClick={() => submitUserApp(app)}
+                          disabled={submittingAppId === app.id || app.marketplace_status === "pending" || app.status === "submitted"}
+                          className="rounded-lg border border-slate-700 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-cyan-400 hover:text-cyan-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-600"
+                        >
+                          {app.marketplace_status === "pending" || app.status === "submitted"
+                            ? "Submitted"
+                            : submittingAppId === app.id
+                            ? "Submitting..."
+                            : "Submit for Review"}
+                        </button>
+                        <button
+                          onClick={() => deleteUserApp(app)}
+                          disabled={deletingAppId === app.id}
+                          className="rounded-lg border border-rose-700 px-3 py-2 text-xs font-bold text-rose-100 transition hover:bg-rose-950/30 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-600"
+                        >
+                          {deletingAppId === app.id ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+      ) : null}
 
       <section id="reference-journeys" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
