@@ -7,6 +7,7 @@ type WorkflowConfigField = {
   label?: string;
   type?: string;
   required?: boolean;
+  options?: Array<string | { value: string; label?: string; disabled?: boolean }>;
 };
 
 type WorkflowConfigSchema = {
@@ -36,6 +37,7 @@ type Props = {
   workflowSnapshot: unknown;
   authHeaders: () => Promise<Record<string, string>>;
   onClose: () => void;
+  onConfigureWorkflow?: () => void;
 };
 
 function defaultDescription(workflowName: string | null, loopType: string) {
@@ -60,6 +62,7 @@ export default function CreateAppModal({
   workflowSnapshot,
   authHeaders,
   onClose,
+  onConfigureWorkflow,
 }: Props) {
   const [name, setName] = useState(appNameFromWorkflow(workflowName));
   const [description, setDescription] = useState(defaultDescription(workflowName, loopType));
@@ -78,7 +81,8 @@ export default function CreateAppModal({
       .join(", ");
   }, [configSchema]);
 
-  const canSave = Boolean(workflowId && name.trim() && !saving);
+  const hasInputContract = Boolean((configSchema.fields || []).length);
+  const canSave = Boolean(workflowId && name.trim() && hasInputContract && !saving);
 
   const save = async () => {
     if (!workflowId) {
@@ -87,6 +91,10 @@ export default function CreateAppModal({
     }
     if (!name.trim()) {
       setError("App name is required.");
+      return;
+    }
+    if (!hasInputContract) {
+      setError("Configure workflow settings before creating an app. Product stages use this real input contract.");
       return;
     }
     setSaving(true);
@@ -190,6 +198,15 @@ export default function CreateAppModal({
           <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300">
             <div className="text-xs font-semibold uppercase text-slate-500">Inputs</div>
             <div className="mt-1">{inputSummary}</div>
+            {!hasInputContract && (
+              <button
+                type="button"
+                onClick={onConfigureWorkflow}
+                className="mt-3 rounded border border-cyan-700 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-950/40"
+              >
+                Configure Workflow Settings
+              </button>
+            )}
           </div>
         </div>
 

@@ -53,7 +53,7 @@ type WorkflowConfigField = {
   type: "text" | "textarea" | "number" | "boolean" | "select";
   default?: string | number | boolean;
   required?: boolean;
-  options?: string[];
+  options?: Array<string | { value: string; label?: string; disabled?: boolean }>;
 };
 
 type WorkflowConfigSchema = {
@@ -607,7 +607,19 @@ function normalizeWorkflowConfigSchema(schema?: WorkflowConfigSchema | null): Wo
           key: String(field.key || "").trim(),
           label: String(field.label || field.key || "").trim(),
           type: field.type || "text",
-          options: Array.isArray(field.options) ? field.options.map((option) => String(option).trim()).filter(Boolean) : [],
+          options: Array.isArray(field.options)
+            ? field.options.flatMap((option) => {
+                if (typeof option === "string") {
+                  const value = option.trim();
+                  return value ? [value] : [];
+                }
+                if (option && typeof option === "object") {
+                  const value = String(option.value || "").trim();
+                  return value ? [{ value, label: option.label, disabled: option.disabled }] : [];
+                }
+                return [];
+              })
+            : [],
         }))
         .filter((field) => field.key && field.label)
     : [];
@@ -4743,6 +4755,14 @@ type SystemPlannerIntent = {
             },
           }}
           authHeaders={authHeaders}
+          onConfigureWorkflow={() => {
+            if (!selectedWorkflowId) {
+              alert("Select or save a workflow before configuring settings.");
+              return;
+            }
+            setShowCreateApp(false);
+            setShowWorkflowConfigModal(true);
+          }}
           onClose={() => setShowCreateApp(false)}
         />
       )}
@@ -4770,7 +4790,7 @@ type SystemPlannerIntent = {
 }
 
 /* =========================
-   Modals (unchanged)
+   Modals
 ========================= */
 function WorkflowConfigModal({
   schema,
@@ -4831,23 +4851,27 @@ function WorkflowConfigModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="max-h-[92vh] w-[920px] max-w-[96vw] overflow-y-auto rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+      <div className="max-h-[92vh] w-[920px] max-w-[96vw] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900 p-6 text-slate-100 shadow-2xl scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-cyan-400">Configure Workflow Settings</h2>
-            <p className="mt-1 text-sm text-slate-400">These fields appear before every Studio run and are passed to agents as run_config.</p>
+            <p className="mt-1 text-sm leading-6 text-slate-400">
+              Define the real input contract for this workflow. These fields appear in Product configuration when the workflow is packaged as an app.
+            </p>
           </div>
-          <button onClick={onClose} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">Close</button>
+          <button onClick={onClose} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">
+            Close
+          </button>
         </div>
 
         <div className="mt-5 grid gap-3">
           {fields.map((field, index) => {
             const currentDefault = defaultValues[field.key] ?? field.default ?? (field.type === "boolean" ? false : "");
             return (
-              <div key={`${field.key}-${index}`} className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+              <div key={`${field.key}-${index}`} className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
                 <div className="grid gap-3 md:grid-cols-[1fr_1fr_150px]">
                   <label className="grid gap-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Key</span>
+                    <span className="text-xs font-semibold uppercase text-slate-400">Key</span>
                     <input
                       value={field.key}
                       onChange={(event) => updateField(index, { key: event.target.value.replace(/\s+/g, "_") })}
@@ -4855,7 +4879,7 @@ function WorkflowConfigModal({
                     />
                   </label>
                   <label className="grid gap-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Label</span>
+                    <span className="text-xs font-semibold uppercase text-slate-400">Label</span>
                     <input
                       value={field.label}
                       onChange={(event) => updateField(index, { label: event.target.value })}
@@ -4863,7 +4887,7 @@ function WorkflowConfigModal({
                     />
                   </label>
                   <label className="grid gap-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Type</span>
+                    <span className="text-xs font-semibold uppercase text-slate-400">Type</span>
                     <select
                       value={field.type}
                       onChange={(event) => updateField(index, { type: event.target.value as WorkflowConfigField["type"] })}
@@ -4879,14 +4903,16 @@ function WorkflowConfigModal({
                 </div>
                 <div className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
                   <label className="grid gap-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Default</span>
+                    <span className="text-xs font-semibold uppercase text-slate-400">Default</span>
                     {field.type === "boolean" ? (
-                      <input
-                        type="checkbox"
-                        checked={Boolean(currentDefault)}
-                        onChange={(event) => setDefaultValues((current) => ({ ...current, [field.key]: event.target.checked }))}
-                        className="mt-2 h-4 w-4 accent-cyan-500"
-                      />
+                      <div className="flex h-10 items-center rounded-lg border border-slate-700 bg-slate-950 px-3">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(currentDefault)}
+                          onChange={(event) => setDefaultValues((current) => ({ ...current, [field.key]: event.target.checked }))}
+                          className="h-4 w-4 accent-cyan-500"
+                        />
+                      </div>
                     ) : (
                       <input
                         type={field.type === "number" ? "number" : "text"}
@@ -4897,9 +4923,9 @@ function WorkflowConfigModal({
                     )}
                   </label>
                   <label className="grid gap-1">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Select Options</span>
+                    <span className="text-xs font-semibold uppercase text-slate-400">Select Options</span>
                     <input
-                      value={(field.options || []).join(", ")}
+                      value={(field.options || []).map((option) => (typeof option === "string" ? option : option.value)).join(", ")}
                       onChange={(event) => updateField(index, { options: event.target.value.split(",").map((item) => item.trim()).filter(Boolean) })}
                       placeholder="verilator, icarus"
                       disabled={field.type !== "select"}
@@ -4907,7 +4933,7 @@ function WorkflowConfigModal({
                     />
                   </label>
                   <div className="flex items-end gap-3">
-                    <label className="flex items-center gap-2 rounded-lg border border-slate-800 px-3 py-2 text-sm text-slate-200">
+                    <label className="flex h-10 items-center gap-2 rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-200">
                       <input
                         type="checkbox"
                         checked={Boolean(field.required)}
@@ -4918,7 +4944,7 @@ function WorkflowConfigModal({
                     </label>
                     <button
                       onClick={() => removeField(index)}
-                      className="rounded-lg border border-red-500/50 px-3 py-2 text-sm font-semibold text-red-200 hover:bg-red-950/40"
+                      className="h-10 rounded-lg border border-red-500/50 px-3 text-sm font-semibold text-red-200 hover:bg-red-950/40"
                     >
                       Remove
                     </button>
@@ -4934,8 +4960,10 @@ function WorkflowConfigModal({
             Add Setting
           </button>
           <div className="flex gap-3">
-            <button onClick={onClose} className="rounded-lg bg-slate-700 px-4 py-2 font-semibold hover:bg-slate-600">Cancel</button>
-            <button onClick={save} className="rounded-lg bg-cyan-500 px-5 py-2 font-bold text-black hover:bg-cyan-400">
+            <button onClick={onClose} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800">
+              Cancel
+            </button>
+            <button onClick={save} className="rounded-lg bg-cyan-500 px-5 py-2 text-sm font-bold text-black hover:bg-cyan-400">
               Save Settings
             </button>
           </div>
@@ -5061,9 +5089,12 @@ function SpecInputModal({
                         onChange={(event) => update(event.target.value)}
                         className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400"
                       >
-                        {(field.options || []).map((option) => (
-                          <option key={option} value={option}>{option}</option>
-                        ))}
+                        {(field.options || []).map((option) => {
+                          const value = typeof option === "string" ? option : option.value;
+                          const label = typeof option === "string" ? option : option.label || option.value;
+                          const disabled = typeof option === "string" ? false : Boolean(option.disabled);
+                          return <option key={value} value={value} disabled={disabled}>{label}</option>;
+                        })}
                       </select>
                     ) : field.type === "textarea" ? (
                       <textarea

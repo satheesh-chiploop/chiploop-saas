@@ -87,7 +87,7 @@ type UserApp = {
       defaultValue?: string | number | boolean;
       required?: boolean;
       helper?: string;
-      options?: string[];
+      options?: StageOption[];
     }>;
     note?: string;
   } | null;
@@ -557,7 +557,22 @@ function userAppSchemaFromStage(stage: Stage): StageSchema | null {
       defaultValue: typeof defaultValue === "number" || typeof defaultValue === "boolean" ? defaultValue : String(defaultValue ?? ""),
       required: Boolean(item.required),
       helper: typeof item.helper === "string" ? item.helper : undefined,
-      options: Array.isArray(item.options) ? item.options.map((option) => String(option)) : undefined,
+      options: Array.isArray(item.options)
+        ? item.options.flatMap((option): StageOption[] => {
+            if (typeof option === "string") return option.trim() ? [option.trim()] : [];
+            if (option && typeof option === "object" && !Array.isArray(option)) {
+              const optionRow = option as Record<string, unknown>;
+              const value = String(optionRow.value || "").trim();
+              if (!value) return [];
+              return [{
+                value,
+                label: typeof optionRow.label === "string" ? optionRow.label : undefined,
+                disabled: Boolean(optionRow.disabled),
+              }];
+            }
+            return [];
+          })
+        : undefined,
     }];
   });
   return {
@@ -570,6 +585,58 @@ function userAppSchemaFromStage(stage: Stage): StageSchema | null {
 
 function stageSchemaForStage(stage: Stage, stageSchemas: Record<string, StageSchema>): StageSchema | null {
   return userAppSchemaFromStage(stage) || stageSchemas[stage.app] || null;
+}
+
+function userAppPlatformSchema(app: UserApp, stageSchemas: Record<string, StageSchema>): StageSchema | null {
+  const candidates = [
+    app.workflow_name,
+    app.name,
+    app.workflow_name?.replace(/^App:\s*/, ""),
+    app.name?.replace(/^App:\s*/, ""),
+  ].filter(Boolean) as string[];
+  for (const candidate of candidates) {
+    const schema = stageSchemas[candidate];
+    if (schema?.fields?.length) return schema;
+  }
+  return null;
+}
+
+function defaultConfigFromSchema(schema?: StageSchema | null): Record<string, string | number | boolean> {
+  const out: Record<string, string | number | boolean> = {};
+  for (const field of schema?.fields || []) {
+    out[field.key] = field.defaultValue;
+  }
+  return out;
+}
+
+function inputSchemaHasFields(schema: unknown): boolean {
+  if (!schema || typeof schema !== "object" || Array.isArray(schema)) return false;
+  const fields = (schema as { fields?: unknown }).fields;
+  return Array.isArray(fields) && fields.length > 0;
+}
+
+function appContractForProductStage(app: UserApp, stageSchemas: Record<string, StageSchema>) {
+  const savedFields = app.input_schema?.fields || [];
+  if (savedFields.length) {
+    return {
+      inputSchema: app.input_schema,
+      defaultConfig: app.default_config || {},
+      source: "user_app_contract",
+    };
+  }
+  const platformSchema = userAppPlatformSchema(app, stageSchemas);
+  if (platformSchema) {
+    return {
+      inputSchema: platformSchema,
+      defaultConfig: defaultConfigFromSchema(platformSchema),
+      source: "platform_stage_schema",
+    };
+  }
+  return {
+    inputSchema: { fields: [] },
+    defaultConfig: {},
+    source: "missing_contract",
+  };
 }
 
 function optionValue(option: StageOption) {
@@ -853,21 +920,23 @@ export default function ProductDetailPage() {
     let changed = false;
     const nextStages = (product.stage_config?.stages || []).map((stage) => {
       if (!stage.app.startsWith("User_App:")) return stage;
-      const userAppId = String(stage.settings?.user_app_id || stage.app.split(":", 1)[1] || "");
+      const userAppId = String(stage.settings?.user_app_id || stage.app.split(":")[1] || "");
       const app = userApps.find((item) => item.id === userAppId);
       if (!app) return stage;
-      const needsContract = !stage.settings?.input_schema;
+      const needsContract = !inputSchemaHasFields(stage.settings?.input_schema);
       const needsDefaults = !stage.settings?.default_config;
       if (!needsContract && !needsDefaults) return stage;
       changed = true;
-      const defaultConfig = app.default_config || {};
+      const contract = appContractForProductStage(app, stageSchemas);
+      const defaultConfig = contract.defaultConfig || {};
       return {
         ...stage,
         settings: {
           ...defaultConfig,
           ...(stage.settings || {}),
-          input_schema: stage.settings?.input_schema || app.input_schema || { fields: [] },
+          input_schema: inputSchemaHasFields(stage.settings?.input_schema) ? stage.settings?.input_schema : contract.inputSchema || { fields: [] },
           default_config: stage.settings?.default_config || defaultConfig,
+          contract_source: stage.settings?.contract_source || contract.source,
         },
       };
     });
@@ -879,7 +948,7 @@ export default function ProductDetailPage() {
         stages: nextStages,
       },
     });
-  }, [product, userApps]);
+  }, [product, userApps, stageSchemas]);
 
   const sequenceFindings = useMemo(() => validateStageSequence(stages), [stages]);
   const sequenceErrors = sequenceFindings.filter((finding) => finding.severity === "error");
@@ -1028,7 +1097,8 @@ export default function ProductDetailPage() {
       return;
     }
     const appKey = `User_App:${app.id}`;
-    const defaultConfig = app.default_config || {};
+    const contract = appContractForProductStage(app, stageSchemas);
+    const defaultConfig = contract.defaultConfig || {};
     const newStage: Stage = {
       id: makeStageId(`user_app_${app.name}`, stages),
       label: app.name,
@@ -1040,8 +1110,9 @@ export default function ProductDetailPage() {
         user_app_id: app.id,
         workflow_id: app.workflow_id,
         workflow_name: app.workflow_name,
-        input_schema: app.input_schema || { fields: [] },
+        input_schema: contract.inputSchema || { fields: [] },
         default_config: defaultConfig,
+        contract_source: contract.source,
         source: "user_app",
       },
     };
@@ -1107,6 +1178,35 @@ export default function ProductDetailPage() {
         },
       };
     });
+  }
+
+  async function refreshUserAppContract(stage: Stage) {
+    const userAppId = String(stage.settings?.user_app_id || stage.app.split(":")[1] || "");
+    if (!userAppId) return;
+    setMessage(null);
+    try {
+      const response = await apiPatch<{ status: string; app: UserApp }>(`/studio/user-apps/${userAppId}`, {
+        refresh_contract: true,
+      });
+      const app = response.app;
+      const defaultConfig = app.default_config || {};
+      setUserApps((current) => current.map((item) => (item.id === app.id ? { ...item, ...app } : item)));
+      updateStage(stage.id, {
+        settings: {
+          ...defaultConfig,
+          ...(stage.settings || {}),
+          input_schema: app.input_schema || { fields: [] },
+          default_config: defaultConfig,
+        },
+      });
+      setMessage("App input contract refreshed from the backing workflow.");
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not refresh app contract. Open the backing workflow in Studio and save Configure Workflow settings first.",
+      );
+    }
   }
 
   async function saveDraft() {
@@ -1483,7 +1583,14 @@ export default function ProductDetailPage() {
                   ) : null}
                   {missingUserAppContract ? (
                     <div className="mt-3 rounded-md border border-rose-500/30 bg-rose-950/25 px-3 py-2 text-xs leading-5 text-rose-100">
-                      This app has no real input contract saved on it. Product Run is blocked until the app is recreated or updated from a workflow with workflow settings.
+                      <div>This app has no real input contract saved on it. Product Run is blocked until the app is recreated or updated from a workflow with workflow settings.</div>
+                      <button
+                        type="button"
+                        onClick={() => refreshUserAppContract(selectedStage)}
+                        className="mt-3 rounded border border-rose-300/50 px-3 py-1.5 text-xs font-semibold text-rose-50 hover:bg-rose-900/40"
+                      >
+                        Refresh Contract from Workflow
+                      </button>
                     </div>
                   ) : null}
                   <div className="mt-4 grid gap-3">
