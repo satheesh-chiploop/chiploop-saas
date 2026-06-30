@@ -657,6 +657,24 @@ type PrivateAgentResponseItem = {
   source?: string;
 };
 
+type UserAppItem = {
+  id: string;
+  workflow_id: string;
+  workflow_name?: string | null;
+  name: string;
+  description?: string | null;
+  category?: string | null;
+  loop_type?: string | null;
+  visibility?: string | null;
+  status?: string | null;
+  marketplace_status?: string | null;
+};
+
+type UserAppsResponse = {
+  status: string;
+  apps: UserAppItem[];
+};
+
 // if (typeof window !== "undefined" && !localStorage.getItem("anon_user_id")) {
 //  localStorage.setItem("anon_user_id", crypto.randomUUID());
 // }
@@ -1391,6 +1409,7 @@ type SystemPlannerIntent = {
 };
   const [prebuiltWorkflows, setPrebuiltWorkflows] = useState<CustomWorkflowRow[]>([]);
   const [customWorkflows, setCustomWorkflows] = useState<CustomWorkflowRow[]>([]);
+  const [userApps, setUserApps] = useState<UserAppItem[]>([]);
 
 
 
@@ -1810,6 +1829,15 @@ type SystemPlannerIntent = {
     }));
   }, [authHeaders]);
 
+  const loadUserApps = useCallback(async () => {
+    const res = await fetch("/api/studio/user-apps", {
+      headers: await authHeaders(),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = (await res.json()) as UserAppsResponse;
+    return data.apps || [];
+  }, [authHeaders]);
+
 // NEW: API calls
   const openAgentEditor = (name: string) => {
     const agent = customAgents.find((item) => item.backendLabel === name);
@@ -2152,10 +2180,12 @@ type SystemPlannerIntent = {
         const savedWF = Object.keys(localStorage).filter((k) => k.startsWith("workflow_"));
         // Load custom agents per user from Supabase
         const privateAgents = await loadPrivateAgents();
+        const privateApps = await loadUserApps();
 
         await loadIntents()
 
         setCustomAgents(privateAgents);
+        setUserApps(privateApps);
 
         await loadPrebuiltWorkflowsFromDB();
 
@@ -2180,7 +2210,7 @@ type SystemPlannerIntent = {
         setLoadingWorkflows(false);
       }
     })();
-  }, [supabase, router, loadPrivateAgents]);
+  }, [supabase, router, loadPrivateAgents, loadUserApps]);
 
   
 
@@ -2195,6 +2225,15 @@ type SystemPlannerIntent = {
     window.addEventListener("refreshWorkflows", refreshHandler);
     return () => window.removeEventListener("refreshWorkflows", refreshHandler);
   }, [loadPrivateAgents]);
+
+  useEffect(() => {
+    const refreshApps = async () => {
+      const apps = await loadUserApps();
+      setUserApps(apps);
+    };
+    window.addEventListener("refreshApps", refreshApps);
+    return () => window.removeEventListener("refreshApps", refreshApps);
+  }, [loadUserApps]);
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -3366,6 +3405,61 @@ type SystemPlannerIntent = {
             </div>
           </section>
   
+          {/* ===== Divider before Apps ===== */}
+          <div className="border-t border-slate-800 my-3" />
+
+          {/* Apps */}
+          <section className="mb-6">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-lg font-bold text-cyan-400">Apps</h3>
+              <button
+                type="button"
+                onClick={() => setShowCreateApp(true)}
+                className="rounded border border-slate-700 px-2 py-1 text-xs font-semibold text-slate-200 hover:border-cyan-400 hover:text-cyan-200"
+              >
+                Create
+              </button>
+            </div>
+            <div className="mt-3 pl-2">
+              <p className="text-sm text-cyan-400 font-medium mb-1">My Apps</p>
+              <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-48 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                {userApps.length ? (
+                  userApps
+                    .filter((app) => normalizeLoopType(app.loop_type || app.category, app.name) === loop)
+                    .map((app) => (
+                      <button
+                        key={app.id}
+                        className={`w-full text-left px-2 py-1 rounded text-xs hover:bg-slate-700 ${
+                          selectedWorkflowId === app.workflow_id ? "bg-slate-700 border border-cyan-400" : ""
+                        }`}
+                        onClick={() => {
+                          loadWorkflowFromDB({
+                            id: app.workflow_id,
+                            name: app.workflow_name || app.name,
+                            loop_type: app.loop_type || app.category || loop,
+                          });
+                          const runKey = app.workflow_name || app.name;
+                          const loaded = loadRunsForWorkflow(runKey);
+                          setRuns(loaded);
+                          setSelectedRunId(loaded[0]?.run_id || null);
+                        }}
+                        title={app.description || app.workflow_name || app.workflow_id}
+                      >
+                        <span>{app.name}</span>
+                        {app.marketplace_status && app.marketplace_status !== "draft" ? (
+                          <span className="ml-2 rounded border border-slate-700 px-1 text-[10px] text-slate-300">
+                            {app.marketplace_status}
+                          </span>
+                        ) : null}
+                      </button>
+                    ))
+                ) : (
+                  <p className="text-xs text-slate-400">No private apps yet</p>
+                )}
+              </ul>
+            </div>
+          </section>
+
           {/* ===== Divider before Agents ===== */}
           <div className="border-t border-slate-800 my-3" />
   

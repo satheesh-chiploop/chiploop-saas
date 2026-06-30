@@ -117,6 +117,7 @@ export default function CreateAppModal({
         throw new Error(data.detail || data.message || "Could not create app.");
       }
       setCreated(data.app || null);
+      window.dispatchEvent(new Event("refreshApps"));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create app.");
     } finally {

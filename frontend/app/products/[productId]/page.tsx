@@ -78,6 +78,20 @@ type UserApp = {
   description?: string | null;
   category?: string | null;
   loop_type?: string | null;
+  input_schema?: {
+    fields?: Array<{
+      key: string;
+      label?: string;
+      type?: "text" | "textarea" | "number" | "boolean" | "select";
+      default?: string | number | boolean;
+      defaultValue?: string | number | boolean;
+      required?: boolean;
+      helper?: string;
+      options?: string[];
+    }>;
+    note?: string;
+  } | null;
+  default_config?: Record<string, string | number | boolean> | null;
   marketplace_status?: string | null;
 };
 
@@ -108,7 +122,7 @@ const APP_LINKS: Record<string, string> = {
 type StageField = {
   key: string;
   label: string;
-  type: "text" | "number" | "boolean" | "select";
+  type: "text" | "textarea" | "number" | "boolean" | "select";
   defaultValue: string | number | boolean;
   required?: boolean;
   helper?: string;
@@ -512,6 +526,52 @@ function fieldValue(stage: Stage, field: StageField) {
   return stage.settings?.[field.key] ?? field.defaultValue;
 }
 
+function userAppSchemaFromStage(stage: Stage): StageSchema | null {
+  if (!stage.app.startsWith("User_App:")) return null;
+  const inputSchema = stage.settings?.input_schema;
+  if (!inputSchema || typeof inputSchema !== "object" || Array.isArray(inputSchema)) {
+    return { fields: [], note: "This app does not have a stored input contract. Recreate or update the app from a workflow that defines workflow settings." };
+  }
+  const rawFields = (inputSchema as { fields?: unknown }).fields;
+  if (!Array.isArray(rawFields)) {
+    return { fields: [], note: "This app input contract has no fields. Recreate or update the app from a workflow that defines workflow settings." };
+  }
+  const defaultConfig = stage.settings?.default_config && typeof stage.settings.default_config === "object" && !Array.isArray(stage.settings.default_config)
+    ? stage.settings.default_config as Record<string, string | number | boolean>
+    : {};
+  const fields = rawFields.flatMap((raw): StageField[] => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return [];
+    const item = raw as Record<string, unknown>;
+    const key = String(item.key || "").trim();
+    if (!key) return [];
+    const rawType = String(item.type || "text");
+    const type: StageField["type"] =
+      rawType === "number" || rawType === "boolean" || rawType === "select" || rawType === "textarea"
+        ? rawType
+        : "text";
+    const defaultValue = defaultConfig[key] ?? item.defaultValue ?? item.default ?? (type === "boolean" ? false : "");
+    return [{
+      key,
+      label: String(item.label || key),
+      type,
+      defaultValue: typeof defaultValue === "number" || typeof defaultValue === "boolean" ? defaultValue : String(defaultValue ?? ""),
+      required: Boolean(item.required),
+      helper: typeof item.helper === "string" ? item.helper : undefined,
+      options: Array.isArray(item.options) ? item.options.map((option) => String(option)) : undefined,
+    }];
+  });
+  return {
+    fields,
+    note: typeof (inputSchema as { note?: unknown }).note === "string"
+      ? String((inputSchema as { note?: unknown }).note)
+      : "Inputs come from the app's saved workflow contract.",
+  };
+}
+
+function stageSchemaForStage(stage: Stage, stageSchemas: Record<string, StageSchema>): StageSchema | null {
+  return userAppSchemaFromStage(stage) || stageSchemas[stage.app] || null;
+}
+
 function optionValue(option: StageOption) {
   return typeof option === "string" ? option : option.value;
 }
@@ -787,6 +847,40 @@ export default function ProductDetailPage() {
   }, []);
 
   const stages = useMemo(() => product?.stage_config?.stages || [], [product]);
+
+  useEffect(() => {
+    if (!product || !userApps.length) return;
+    let changed = false;
+    const nextStages = (product.stage_config?.stages || []).map((stage) => {
+      if (!stage.app.startsWith("User_App:")) return stage;
+      const userAppId = String(stage.settings?.user_app_id || stage.app.split(":", 1)[1] || "");
+      const app = userApps.find((item) => item.id === userAppId);
+      if (!app) return stage;
+      const needsContract = !stage.settings?.input_schema;
+      const needsDefaults = !stage.settings?.default_config;
+      if (!needsContract && !needsDefaults) return stage;
+      changed = true;
+      const defaultConfig = app.default_config || {};
+      return {
+        ...stage,
+        settings: {
+          ...defaultConfig,
+          ...(stage.settings || {}),
+          input_schema: stage.settings?.input_schema || app.input_schema || { fields: [] },
+          default_config: stage.settings?.default_config || defaultConfig,
+        },
+      };
+    });
+    if (!changed) return;
+    setProduct({
+      ...product,
+      stage_config: {
+        ...(product.stage_config || {}),
+        stages: nextStages,
+      },
+    });
+  }, [product, userApps]);
+
   const sequenceFindings = useMemo(() => validateStageSequence(stages), [stages]);
   const sequenceErrors = sequenceFindings.filter((finding) => finding.severity === "error");
   const selectedStage = stages.find((stage) => stage.id === selectedStageId) || stages[0] || null;
@@ -800,7 +894,11 @@ export default function ProductDetailPage() {
     const missing: Array<{ stageId: string; stageLabel: string; fieldLabel: string }> = [];
     for (const stage of stages) {
       if (!stageEnabled(stage)) continue;
-      const schema = stageSchemas[stage.app];
+      const schema = stageSchemaForStage(stage, stageSchemas);
+      if (stage.app.startsWith("User_App:") && (!schema || schema.fields.length === 0)) {
+        missing.push({ stageId: stage.id, stageLabel: stage.label, fieldLabel: "App input contract" });
+        continue;
+      }
       for (const field of schema?.fields || []) {
         if (field.required && isBlank(fieldValue(stage, field))) {
           missing.push({ stageId: stage.id, stageLabel: stage.label, fieldLabel: field.label });
@@ -930,6 +1028,7 @@ export default function ProductDetailPage() {
       return;
     }
     const appKey = `User_App:${app.id}`;
+    const defaultConfig = app.default_config || {};
     const newStage: Stage = {
       id: makeStageId(`user_app_${app.name}`, stages),
       label: app.name,
@@ -937,9 +1036,12 @@ export default function ProductDetailPage() {
       optional: true,
       enabled: true,
       settings: {
+        ...defaultConfig,
         user_app_id: app.id,
         workflow_id: app.workflow_id,
         workflow_name: app.workflow_name,
+        input_schema: app.input_schema || { fields: [] },
+        default_config: defaultConfig,
         source: "user_app",
       },
     };
@@ -1317,6 +1419,12 @@ export default function ProductDetailPage() {
           <section className="rounded-lg border border-slate-800 bg-slate-900/45 p-5">
             {selectedStage ? (
               <>
+                {(() => {
+                  const selectedStageSchema = stageSchemaForStage(selectedStage, stageSchemas);
+                  const schemaFields = selectedStageSchema?.fields || [];
+                  const missingUserAppContract = selectedStage.app.startsWith("User_App:") && schemaFields.length === 0;
+                  return (
+                    <>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">{stageKind(selectedStage)}</div>
@@ -1368,13 +1476,18 @@ export default function ProductDetailPage() {
                 <div className="mt-5 rounded-lg border border-slate-800 bg-slate-950/60 p-4">
                   <h3 className="font-semibold text-white">Configuration</h3>
                   <p className="mt-1 text-sm text-slate-400">Stage settings are saved with the product. Workflow IDs from earlier stages are auto-bound during Run.</p>
-                  {stageSchemas[selectedStage.app]?.note ? (
+                  {selectedStageSchema?.note ? (
                     <div className="mt-3 rounded-md border border-cyan-500/20 bg-cyan-950/20 px-3 py-2 text-xs leading-5 text-cyan-100">
-                      {stageSchemas[selectedStage.app]?.note}
+                      {selectedStageSchema.note}
+                    </div>
+                  ) : null}
+                  {missingUserAppContract ? (
+                    <div className="mt-3 rounded-md border border-rose-500/30 bg-rose-950/25 px-3 py-2 text-xs leading-5 text-rose-100">
+                      This app has no real input contract saved on it. Product Run is blocked until the app is recreated or updated from a workflow with workflow settings.
                     </div>
                   ) : null}
                   <div className="mt-4 grid gap-3">
-                    {(stageSchemas[selectedStage.app] || FALLBACK_STAGE_SCHEMA).fields.map((field) => {
+                    {(selectedStage.app.startsWith("User_App:") ? schemaFields : (selectedStageSchema || FALLBACK_STAGE_SCHEMA).fields).map((field) => {
                       const value = fieldValue(selectedStage, field);
                       if (field.type === "boolean") {
                         return (
@@ -1389,7 +1502,7 @@ export default function ProductDetailPage() {
                           </label>
                         );
                       }
-                      if (field.type === "text" && isRichTextField(field)) {
+                      if ((field.type === "text" && isRichTextField(field)) || field.type === "textarea") {
                         return (
                           <SpecTextBox
                             key={field.key}
@@ -1457,6 +1570,9 @@ export default function ProductDetailPage() {
                 <div className="mt-5 rounded-lg border border-cyan-500/25 bg-cyan-950/15 p-4 text-sm leading-6 text-cyan-100">
                   Product Run uses existing App workflows and passes generated workflow IDs between stages. Existing standalone Apps remain available.
                 </div>
+                    </>
+                  );
+                })()}
               </>
             ) : (
               <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">Select a stage to configure it.</div>
