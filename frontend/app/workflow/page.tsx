@@ -61,6 +61,21 @@ type WorkflowConfigSchema = {
   fields?: WorkflowConfigField[];
 };
 
+type ProductStageField = {
+  key: string;
+  label?: string;
+  type?: "text" | "textarea" | "number" | "boolean" | "select";
+  defaultValue?: string | number | boolean;
+  default?: string | number | boolean;
+  required?: boolean;
+  options?: Array<string | { value: string; label?: string; disabled?: boolean }>;
+};
+
+type ProductStageSchema = {
+  fields?: ProductStageField[];
+  note?: string;
+};
+
 type CatalogItem = {
   id?: string;
   uiLabel: string;
@@ -642,6 +657,117 @@ function buildConfigDefaults(
     }
   }
   return out;
+}
+
+function mergeWorkflowConfigFields(
+  existing: WorkflowConfigField[],
+  suggested: WorkflowConfigField[],
+): WorkflowConfigField[] {
+  const seen = new Set(existing.map((field) => field.key));
+  const next = [...existing];
+  for (const field of suggested) {
+    if (seen.has(field.key)) continue;
+    seen.add(field.key);
+    next.push(field);
+  }
+  return next;
+}
+
+function suggestWorkflowInputsFromAgents(nodes: Node<AgentNodeData>[]): WorkflowConfigField[] {
+  const labels = nodes.map((node) => String(node.data?.backendLabel || node.data?.uiLabel || "").toLowerCase());
+  const has = (...terms: string[]) => labels.some((label) => terms.some((term) => label.includes(term)));
+  const suggestions: WorkflowConfigField[] = [];
+  const add = (field: WorkflowConfigField) => {
+    if (!suggestions.some((item) => item.key === field.key)) suggestions.push(field);
+  };
+
+  if (has("spec", "architecture", "microarchitecture", "rtl agent", "rtl handoff")) {
+    add({ key: "spec_text", label: "Design requirement", type: "textarea", default: "", required: true });
+    add({ key: "top_module", label: "Top module", type: "text", default: "", required: false });
+  }
+  if (has("foundry", "implementation", "synthesis", "physical", "pd", "tapeout", "sta")) {
+    add({ key: "foundry", label: "Foundry", type: "text", default: "sky130", required: false });
+    add({ key: "pdk", label: "PDK", type: "text", default: "sky130A", required: false });
+    add({ key: "toolchain", label: "Toolchain", type: "select", default: "openlane2", options: ["openlane2", "yosys"], required: false });
+    add({ key: "target_frequency_mhz", label: "Target frequency MHz", type: "number", default: 100, required: false });
+    add({ key: "constraints_sdc", label: "Constraints SDC", type: "textarea", default: "", required: false });
+  }
+  if (has("lec", "logic equivalence")) {
+    add({ key: "run_logic_equivalence", label: "Run logic equivalence", type: "boolean", default: true, required: false });
+  }
+  if (has("synthesis", "implementation setup", "logic equivalence", "lec")) {
+    add({ key: "run_synthesis_closure_loop", label: "Run synthesis closure loop", type: "boolean", default: false, required: false });
+    add({ key: "max_synthesis_closure_iterations", label: "Max synthesis closure iterations", type: "number", default: 1, required: false });
+  }
+  if (has("tapeout", "physical", "pd", "sta", "drc", "lvs", "signoff")) {
+    add({ key: "run_signoff_closure_loop", label: "Run signoff closure loop", type: "boolean", default: false, required: false });
+    add({ key: "max_signoff_closure_iterations", label: "Max signoff closure iterations", type: "number", default: 1, required: false });
+  }
+  if (has("testbench", "simulation", "coverage", "verify", "validation")) {
+    add({ key: "test_intent", label: "Test intent", type: "textarea", default: "Run smoke, reset, and representative functional tests.", required: false });
+    add({ key: "verification_plan", label: "Verification plan", type: "textarea", default: "", required: false });
+    add({ key: "simulator_type", label: "Simulator", type: "select", default: "verilator", options: ["verilator", "icarus"], required: false });
+    add({ key: "random_vs_directed", label: "Random vs directed", type: "select", default: "both", options: [
+      { value: "both", label: "Directed then random" },
+      { value: "directed", label: "Directed only" },
+      { value: "random", label: "Random only" },
+    ], required: false });
+    add({ key: "seed_count", label: "Seed count", type: "number", default: 10, required: false });
+    add({ key: "coverage_targets", label: "Coverage target", type: "text", default: "90% functional", required: false });
+  }
+  if (has("firmware", "hal", "driver", "boot")) {
+    add({ key: "firmware_language", label: "Firmware language", type: "select", default: "rust", options: ["rust", "c"], required: false });
+    add({ key: "validate_registers", label: "Validate registers", type: "boolean", default: true, required: false });
+  }
+  if (has("software")) {
+    add({ key: "software_intent", label: "Software intent", type: "textarea", default: "Create a simple software flow that exercises the generated firmware interface.", required: false });
+  }
+  if (has("analog", "spice", "model", "correlation")) {
+    add({ key: "analog_spec", label: "Analog spec", type: "textarea", default: "", required: true });
+    add({ key: "process_corner", label: "Process corner", type: "select", default: "tt", options: ["tt", "ss", "ff"], required: false });
+  }
+
+  return suggestions;
+}
+
+function workflowSchemaHasFields(schema?: WorkflowConfigSchema | null): boolean {
+  return Boolean(normalizeWorkflowConfigSchema(schema).fields?.length);
+}
+
+function productStageSchemaToWorkflowConfig(schema?: ProductStageSchema | null): WorkflowConfigSchema {
+  const fields = Array.isArray(schema?.fields)
+    ? schema.fields.flatMap((field): WorkflowConfigField[] => {
+        const key = String(field.key || "").trim();
+        if (!key) return [];
+        return [{
+          key,
+          label: String(field.label || key),
+          type: field.type || "text",
+          default: field.defaultValue ?? field.default,
+          required: Boolean(field.required),
+          options: field.options || [],
+        }];
+      })
+    : [];
+  return normalizeWorkflowConfigSchema({ version: 1, fields });
+}
+
+function platformSchemaForWorkflow(
+  workflowName: string | null,
+  definitions: { app_intent?: unknown; template_workflow?: unknown } | null | undefined,
+  stageSchemas: Record<string, ProductStageSchema>,
+): ProductStageSchema | null {
+  const candidates = [
+    workflowName,
+    typeof definitions?.app_intent === "string" ? definitions.app_intent : null,
+    typeof definitions?.template_workflow === "string" ? definitions.template_workflow : null,
+    workflowName?.replace(/^App:\s*/, ""),
+  ].filter(Boolean) as string[];
+  for (const candidate of candidates) {
+    const schema = stageSchemas[candidate];
+    if (schema?.fields?.length) return schema;
+  }
+  return null;
 }
 
 function coerceConfigValue(field: WorkflowConfigField, raw: string | number | boolean): string | number | boolean {
@@ -1459,6 +1585,7 @@ type SystemPlannerIntent = {
   const [selectedWorkflowDefinitions, setSelectedWorkflowDefinitions] = useState<WorkflowRecord["definitions"] | null>(null);
   const [selectedWorkflowConfigSchema, setSelectedWorkflowConfigSchema] = useState<WorkflowConfigSchema>({ version: 1, fields: [] });
   const [selectedWorkflowDefaultConfig, setSelectedWorkflowDefaultConfig] = useState<Record<string, string | number | boolean>>({});
+  const [productStageSchemas, setProductStageSchemas] = useState<Record<string, ProductStageSchema>>({});
   const [pendingRunConfig, setPendingRunConfig] = useState<Record<string, string | number | boolean>>({});
   const [showWorkflowConfigModal, setShowWorkflowConfigModal] = useState(false);
 
@@ -1816,6 +1943,23 @@ type SystemPlannerIntent = {
       ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
     };
   }, [supabase]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/products/stage-schemas", {
+          headers: await authHeaders(),
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as { stage_schemas?: Record<string, ProductStageSchema> };
+        if (mounted) setProductStageSchemas(data.stage_schemas || {});
+      } catch {
+        if (mounted) setProductStageSchemas({});
+      }
+    })();
+    return () => { mounted = false; };
+  }, [authHeaders]);
 
   const loadPrivateAgents = useCallback(async () => {
     const res = await fetch("/api/studio/user-agents", {
@@ -2602,6 +2746,20 @@ type SystemPlannerIntent = {
       return workflowDisplayName(a).localeCompare(workflowDisplayName(b));
     });
   }, [customWorkflows, prebuiltWorkflows]);
+
+  const selectedWorkflowEffectiveConfigSchema = useMemo(() => {
+    if (workflowSchemaHasFields(selectedWorkflowConfigSchema)) {
+      return normalizeWorkflowConfigSchema(selectedWorkflowConfigSchema);
+    }
+    return productStageSchemaToWorkflowConfig(
+      platformSchemaForWorkflow(selectedWorkflowName, selectedWorkflowDefinitions, productStageSchemas),
+    );
+  }, [productStageSchemas, selectedWorkflowConfigSchema, selectedWorkflowDefinitions, selectedWorkflowName]);
+
+  const selectedWorkflowEffectiveDefaultConfig = useMemo(
+    () => buildConfigDefaults(selectedWorkflowEffectiveConfigSchema, selectedWorkflowDefaultConfig),
+    [selectedWorkflowDefaultConfig, selectedWorkflowEffectiveConfigSchema],
+  );
 
   const loadPrebuiltWorkflow = (wf: CustomWorkflowRow) => {
     loadWorkflowFromDB(wf);
@@ -4499,7 +4657,7 @@ type SystemPlannerIntent = {
       {showSpecModal && (
         <SpecInputModal
           loop={loop}
-          configSchema={selectedWorkflowConfigSchema}
+          configSchema={selectedWorkflowEffectiveConfigSchema}
           runConfig={pendingRunConfig}
           onRunConfigChange={setPendingRunConfig}
           showTestPlanName={selectedWorkflowName === "Validation_Generate_Lab_Handoff"}
@@ -4517,8 +4675,9 @@ type SystemPlannerIntent = {
 
       {showWorkflowConfigModal && (
         <WorkflowConfigModal
-          schema={selectedWorkflowConfigSchema}
-          defaults={selectedWorkflowDefaultConfig}
+          schema={selectedWorkflowEffectiveConfigSchema}
+          defaults={selectedWorkflowEffectiveDefaultConfig}
+          suggestedFields={suggestWorkflowInputsFromAgents(nodes)}
           onClose={() => setShowWorkflowConfigModal(false)}
           onSave={saveWorkflowConfigSchema}
         />
@@ -4741,17 +4900,16 @@ type SystemPlannerIntent = {
           workflowId={selectedWorkflowId}
           workflowName={selectedWorkflowName}
           loopType={(selectedWorkflowLoopType || loop).toLowerCase()}
-          configSchema={selectedWorkflowConfigSchema}
-          defaultConfig={selectedWorkflowDefaultConfig}
+          configSchema={selectedWorkflowEffectiveConfigSchema}
+          defaultConfig={selectedWorkflowEffectiveDefaultConfig}
           workflowSnapshot={{
             id: selectedWorkflowId,
             name: selectedWorkflowName,
             loop_type: selectedWorkflowLoopType || loop,
-            definitions: selectedWorkflowDefinitions || {
-              nodes,
-              edges,
-              workflow_config_schema: selectedWorkflowConfigSchema,
-              default_run_config: selectedWorkflowDefaultConfig,
+            definitions: {
+              ...(selectedWorkflowDefinitions || { nodes, edges }),
+              workflow_config_schema: selectedWorkflowEffectiveConfigSchema,
+              default_run_config: selectedWorkflowEffectiveDefaultConfig,
             },
           }}
           authHeaders={authHeaders}
@@ -4795,19 +4953,19 @@ type SystemPlannerIntent = {
 function WorkflowConfigModal({
   schema,
   defaults,
+  suggestedFields,
   onClose,
   onSave,
 }: {
   schema: WorkflowConfigSchema;
   defaults: Record<string, string | number | boolean>;
+  suggestedFields: WorkflowConfigField[];
   onClose: () => void;
   onSave: (schema: WorkflowConfigSchema, defaults: Record<string, string | number | boolean>) => void;
 }) {
   const initialFields = normalizeWorkflowConfigSchema(schema).fields || [];
   const [fields, setFields] = useState<WorkflowConfigField[]>(
-    initialFields.length
-      ? initialFields
-      : [{ key: "timeout_sec", label: "Timeout Seconds", type: "number", default: 300, required: false, options: [] }],
+    initialFields,
   );
   const [defaultValues, setDefaultValues] = useState<Record<string, string | number | boolean>>(
     buildConfigDefaults({ version: 1, fields }, defaults),
@@ -4826,6 +4984,28 @@ function WorkflowConfigModal({
       ...current,
       { key: `setting_${current.length + 1}`, label: `Setting ${current.length + 1}`, type: "text", default: "", required: false, options: [] },
     ]);
+  };
+
+  const addAdvancedOverride = () => {
+    setFields((current) => [
+      ...current,
+      {
+        key: `advanced_control_${current.length + 1}`,
+        label: `Advanced control ${current.length + 1}`,
+        type: "text",
+        default: "",
+        required: false,
+        options: [],
+      },
+    ]);
+  };
+
+  const applySuggestedInputs = () => {
+    setFields((current) => {
+      const next = mergeWorkflowConfigFields(current, suggestedFields);
+      setDefaultValues((values) => buildConfigDefaults({ version: 1, fields: next }, values));
+      return next;
+    });
   };
 
   const removeField = (index: number) => {
@@ -4858,6 +5038,9 @@ function WorkflowConfigModal({
             <p className="mt-1 text-sm leading-6 text-slate-400">
               Define the real input contract for this workflow. These fields appear in Product configuration when the workflow is packaged as an app.
             </p>
+            <p className="mt-2 text-xs leading-5 text-slate-500">
+              Suggestions focus on user-facing setup values and meaningful run controls. Agent-to-agent handoff artifacts are skipped by default. Expose downstream controls only when they materially affect the run, such as synthesis loop count, simulator choice, seed count, effort, or stop-on-failure policy.
+            </p>
           </div>
           <button onClick={onClose} className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">
             Close
@@ -4865,6 +5048,37 @@ function WorkflowConfigModal({
         </div>
 
         <div className="mt-5 grid gap-3">
+          {suggestedFields.length ? (
+            <div className="rounded-lg border border-cyan-500/20 bg-cyan-950/20 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <div className="text-xs font-semibold uppercase text-cyan-300">Suggested Inputs</div>
+                  <p className="mt-1 text-sm leading-6 text-slate-300">
+                    Review these before saving. Examples include spec text, target frequency, simulator, toolchain, synthesis loop count, seed count, and stop-on-failure controls when they should be user-configurable.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={applySuggestedInputs}
+                  className="rounded-lg border border-cyan-600 px-3 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/40"
+                >
+                  Suggest Inputs from Agents
+                </button>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {suggestedFields.slice(0, 8).map((field) => (
+                  <span key={field.key} className="rounded border border-slate-700 bg-slate-950/70 px-2 py-1 text-xs text-slate-300">
+                    {field.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {!fields.length ? (
+            <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-sm leading-6 text-slate-400">
+              No workflow inputs are saved yet. Use Suggest Inputs from Agents when available, or add the values a user must provide or tune. Internal handoff artifacts should stay hidden by default. Add downstream controls only when they make sense for the app, such as synthesis iterations, simulator, seed count, effort, or stop-on-failure behavior.
+            </div>
+          ) : null}
           {fields.map((field, index) => {
             const currentDefault = defaultValues[field.key] ?? field.default ?? (field.type === "boolean" ? false : "");
             return (
@@ -4956,9 +5170,14 @@ function WorkflowConfigModal({
         </div>
 
         <div className="mt-5 flex justify-between gap-3">
-          <button onClick={addField} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800">
-            Add Setting
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button onClick={addField} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800">
+              Add Setting
+            </button>
+            <button onClick={addAdvancedOverride} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800">
+              Add Advanced Control
+            </button>
+          </div>
           <div className="flex gap-3">
             <button onClick={onClose} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800">
               Cancel
