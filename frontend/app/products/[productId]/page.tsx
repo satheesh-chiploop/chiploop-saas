@@ -218,8 +218,10 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
     ],
   },
   Digital_Arch2Synthesis: {
-    note: "Synthesis uses the generated Arch2RTL handoff as RTL input and runs the synthesis stage directly.",
+    note: "Synthesis uses an upstream Arch2RTL handoff when available. For an Arch2Synthesis private app that runs the full workflow, provide the digital spec text here.",
     fields: [
+      { key: "spec_text", label: "Digital spec text", type: "textarea", defaultValue: "", helper: "Required when this app is not using an upstream Arch2RTL handoff." },
+      { key: "top_module", label: "Top module", type: "text", defaultValue: "" },
       { key: "foundry", label: "Foundry", type: "text", defaultValue: "sky130" },
       { key: "pdk", label: "PDK", type: "text", defaultValue: "sky130A" },
       { key: "toolchain", label: "Toolchain", type: "text", defaultValue: "openlane2" },
@@ -587,6 +589,43 @@ function stageSchemaForStage(stage: Stage, stageSchemas: Record<string, StageSch
   return userAppSchemaFromStage(stage) || stageSchemas[stage.app] || null;
 }
 
+function normalizedWorkflowName(value?: string | null) {
+  return String(value || "").replace(/^App:\s*/, "").trim();
+}
+
+function mergeSchemaFields(fields: StageField[], additions: StageField[]) {
+  const seen = new Set(additions.map((field) => field.key));
+  return [...additions, ...fields.filter((field) => !seen.has(field.key))];
+}
+
+function fullWorkflowRootInputs(workflowName: string): StageField[] {
+  const name = normalizedWorkflowName(workflowName);
+  if (/^Digital_/.test(name) && !["Digital_Arch2RTL", "Digital_Spec2RTL_Check"].includes(name)) {
+    return [
+      { key: "spec_text", label: "Digital spec text", type: "textarea", defaultValue: "", helper: "Required when this workflow app runs without an upstream Arch2RTL handoff." },
+      { key: "top_module", label: "Top module", type: "text", defaultValue: "" },
+    ];
+  }
+  if (/^System_/.test(name) && !["System_RTL", "System_Product_App_Builder"].includes(name)) {
+    return [
+      { key: "digital_spec", label: "Digital spec", type: "textarea", defaultValue: "", helper: "Required when this workflow app runs without an upstream System RTL handoff." },
+      { key: "analog_spec", label: "Analog spec", type: "textarea", defaultValue: "", helper: "Required when this workflow app runs without an upstream System RTL handoff." },
+      { key: "soc_spec", label: "SoC spec", type: "textarea", defaultValue: "", helper: "Required when this workflow app runs without an upstream System RTL handoff." },
+    ];
+  }
+  return [];
+}
+
+function augmentSchemaForWorkflowApp(schema: StageSchema, workflowName: string): StageSchema {
+  const additions = fullWorkflowRootInputs(workflowName);
+  if (!additions.length) return schema;
+  return {
+    ...schema,
+    note: schema.note || "This private app can run as a full workflow. Provide root specs when no upstream handoff stage exists.",
+    fields: mergeSchemaFields(schema.fields || [], additions),
+  };
+}
+
 function userAppPlatformSchema(app: UserApp, stageSchemas: Record<string, StageSchema>): StageSchema | null {
   const candidates = [
     app.workflow_name,
@@ -596,7 +635,7 @@ function userAppPlatformSchema(app: UserApp, stageSchemas: Record<string, StageS
   ].filter(Boolean) as string[];
   for (const candidate of candidates) {
     const schema = stageSchemas[candidate];
-    if (schema?.fields?.length) return schema;
+    if (schema?.fields?.length) return augmentSchemaForWorkflowApp(schema, candidate);
   }
   return null;
 }
@@ -613,6 +652,22 @@ function inputSchemaHasFields(schema: unknown): boolean {
   if (!schema || typeof schema !== "object" || Array.isArray(schema)) return false;
   const fields = (schema as { fields?: unknown }).fields;
   return Array.isArray(fields) && fields.length > 0;
+}
+
+function inputSchemaHasAllFieldKeys(schema: unknown, expectedSchema: unknown): boolean {
+  if (!schema || typeof schema !== "object" || Array.isArray(schema)) return false;
+  if (!expectedSchema || typeof expectedSchema !== "object" || Array.isArray(expectedSchema)) return true;
+  const currentFields = (schema as { fields?: unknown }).fields;
+  const expectedFields = (expectedSchema as { fields?: unknown }).fields;
+  if (!Array.isArray(currentFields) || !Array.isArray(expectedFields)) return true;
+  const currentKeys = new Set(currentFields.flatMap((field) => (
+    field && typeof field === "object" && !Array.isArray(field) ? [String((field as { key?: unknown }).key || "")] : []
+  )));
+  return expectedFields.every((field) => {
+    if (!field || typeof field !== "object" || Array.isArray(field)) return true;
+    const key = String((field as { key?: unknown }).key || "");
+    return !key || currentKeys.has(key);
+  });
 }
 
 function appContractForProductStage(app: UserApp, stageSchemas: Record<string, StageSchema>) {
@@ -923,18 +978,20 @@ export default function ProductDetailPage() {
       const userAppId = String(stage.settings?.user_app_id || stage.app.split(":")[1] || "");
       const app = userApps.find((item) => item.id === userAppId);
       if (!app) return stage;
-      const needsContract = !inputSchemaHasFields(stage.settings?.input_schema);
+      const contract = appContractForProductStage(app, stageSchemas);
+      const currentSchema = stage.settings?.input_schema;
+      const needsContract = !inputSchemaHasFields(currentSchema)
+        || !inputSchemaHasAllFieldKeys(currentSchema, contract.inputSchema);
       const needsDefaults = !stage.settings?.default_config;
       if (!needsContract && !needsDefaults) return stage;
       changed = true;
-      const contract = appContractForProductStage(app, stageSchemas);
       const defaultConfig = contract.defaultConfig || {};
       return {
         ...stage,
         settings: {
           ...defaultConfig,
           ...(stage.settings || {}),
-          input_schema: inputSchemaHasFields(stage.settings?.input_schema) ? stage.settings?.input_schema : contract.inputSchema || { fields: [] },
+          input_schema: needsContract ? contract.inputSchema || { fields: [] } : stage.settings?.input_schema,
           default_config: stage.settings?.default_config || defaultConfig,
           contract_source: stage.settings?.contract_source || contract.source,
         },
@@ -961,6 +1018,7 @@ export default function ProductDetailPage() {
   const missingRequirements = useMemo(() => {
     if (!product) return [];
     const missing: Array<{ stageId: string; stageLabel: string; fieldLabel: string }> = [];
+    const produced = new Set<string>();
     for (const stage of stages) {
       if (!stageEnabled(stage)) continue;
       const schema = stageSchemaForStage(stage, stageSchemas);
@@ -979,6 +1037,41 @@ export default function ProductDetailPage() {
           missing.push({ stageId: stage.id, stageLabel: stage.label, fieldLabel: "Spec text or product description" });
         }
       }
+      const workflowName = String(stage.settings?.workflow_name || stage.label || stage.app);
+      const normalizedWorkflow = normalizedWorkflowName(workflowName);
+      if (
+        stage.app.startsWith("User_App:")
+        && normalizedWorkflow.startsWith("Digital_")
+        && !["Digital_Arch2RTL", "Digital_Spec2RTL_Check"].includes(normalizedWorkflow)
+        && !produced.has("arch2rtl")
+      ) {
+        const specText = String(stage.settings?.spec_text || "").trim();
+        if (!specText && !String(product.description || "").trim()) {
+          missing.push({ stageId: stage.id, stageLabel: stage.label, fieldLabel: "Digital spec text or product description" });
+        }
+      }
+      if (
+        stage.app.startsWith("User_App:")
+        && normalizedWorkflow.startsWith("System_")
+        && !["System_RTL", "System_Product_App_Builder"].includes(normalizedWorkflow)
+        && !produced.has("system_rtl")
+      ) {
+        for (const [key, label] of [
+          ["digital_spec", "Digital spec"],
+          ["analog_spec", "Analog spec"],
+          ["soc_spec", "SoC spec"],
+        ] as const) {
+          if (isBlank(stage.settings?.[key])) {
+            missing.push({ stageId: stage.id, stageLabel: stage.label, fieldLabel: label });
+          }
+        }
+      }
+      const meta = STAGE_CATALOG_BY_APP[stage.app];
+      if (meta) {
+        for (const output of meta.produces) produced.add(output);
+      }
+      if (stage.app.startsWith("User_App:") && workflowName.includes("Digital_Arch2RTL")) produced.add("arch2rtl");
+      if (stage.app.startsWith("User_App:") && normalizedWorkflow.includes("System_RTL")) produced.add("system_rtl");
     }
     for (const finding of sequenceErrors) {
       missing.push({ stageId: finding.stageId, stageLabel: finding.stageLabel, fieldLabel: finding.message });

@@ -39,6 +39,8 @@ Products are saved journey configurations built from existing Apps. A product st
 
 Products can also include user-owned My Apps created from Studio workflows. These stages keep the real workflow `input_schema` and `default_config`; the Product page must render those fields directly and should not invent fallback contracts. If the workflow contract exposes option/select values, those options should appear in Product stage settings.
 
+For My Apps backed by known platform workflows, Product and Studio Configure Workflow should use the same Product stage schema from `/products/stage-schemas`. For custom workflows, Configure Workflow defines the app input contract. Suggested inputs should focus on user-facing setup values and meaningful run controls, while ordinary agent-to-agent handoff artifacts stay hidden by default. Advanced controls should be exposed only when they materially affect run behavior, cost, debug, or quality of result, such as synthesis loop count, simulator choice, seed count, implementation effort, closure enablement, or stop-on-failure policy.
+
 The backend currently provides these reference journeys:
 
 - PWM Fan Controller.
@@ -76,7 +78,7 @@ The frontend depends on these backend surfaces:
 
 The in-app Playbook source is `lib/helpContent.ts`. The backend Ask Help corpus is `backend/help_center/content.py`. Keep both updated when product behavior, app names, reference journey sequences, dashboards, or interpretation guidance changes.
 
-When changing private App behavior, update both Playbook sources with the Studio -> Create App -> Apps/My Apps -> Product stage -> Marketplace review flow.
+When changing private App behavior, update both Playbook sources with the Studio -> Configure Workflow or Suggest Inputs -> Create App -> Apps/My Apps -> Product stage -> Marketplace review flow.
 
 ## Validation
 

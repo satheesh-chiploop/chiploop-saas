@@ -752,6 +752,39 @@ function productStageSchemaToWorkflowConfig(schema?: ProductStageSchema | null):
   return normalizeWorkflowConfigSchema({ version: 1, fields });
 }
 
+function normalizeWorkflowName(value?: string | null) {
+  return String(value || "").replace(/^App:\s*/, "").trim();
+}
+
+function fullWorkflowRootInputFields(workflowName: string): ProductStageField[] {
+  const name = normalizeWorkflowName(workflowName);
+  if (/^Digital_/.test(name) && !["Digital_Arch2RTL", "Digital_Spec2RTL_Check"].includes(name)) {
+    return [
+      { key: "spec_text", label: "Digital spec text", type: "textarea", defaultValue: "" },
+      { key: "top_module", label: "Top module", type: "text", defaultValue: "" },
+    ];
+  }
+  if (/^System_/.test(name) && !["System_RTL", "System_Product_App_Builder"].includes(name)) {
+    return [
+      { key: "digital_spec", label: "Digital spec", type: "textarea", defaultValue: "" },
+      { key: "analog_spec", label: "Analog spec", type: "textarea", defaultValue: "" },
+      { key: "soc_spec", label: "SoC spec", type: "textarea", defaultValue: "" },
+    ];
+  }
+  return [];
+}
+
+function augmentProductStageSchemaForWorkflow(schema: ProductStageSchema, workflowName: string): ProductStageSchema {
+  const additions = fullWorkflowRootInputFields(workflowName);
+  if (!additions.length) return schema;
+  const seen = new Set(additions.map((field) => field.key));
+  return {
+    ...schema,
+    note: schema.note || "This workflow app can run as a full workflow. Provide root specs when no upstream handoff stage exists.",
+    fields: [...additions, ...(schema.fields || []).filter((field) => !seen.has(field.key))],
+  };
+}
+
 function platformSchemaForWorkflow(
   workflowName: string | null,
   definitions: { app_intent?: unknown; template_workflow?: unknown } | null | undefined,
@@ -765,7 +798,7 @@ function platformSchemaForWorkflow(
   ].filter(Boolean) as string[];
   for (const candidate of candidates) {
     const schema = stageSchemas[candidate];
-    if (schema?.fields?.length) return schema;
+    if (schema?.fields?.length) return augmentProductStageSchemaForWorkflow(schema, candidate);
   }
   return null;
 }
