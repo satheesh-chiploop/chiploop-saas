@@ -331,7 +331,7 @@ async function artifact(workflowId: string, filename: string): Promise<JsonMap |
   }
 }
 
-function stageEvidenceReady(stage: DashboardStage, evidence: Record<string, unknown>): boolean {
+function stageEvidenceReady(stage: Stage, evidence: Record<string, JsonMap | null>): boolean {
   const has = (key: string) => Object.keys(record(evidence[key])).length > 0;
   if (stage === "product") {
     return has("system_product_dashboard_manifest.json") || has("system_product_package.json");
@@ -515,6 +515,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       ],
       synthesis: [
         "digital/handoff/rtl_handoff_ingest_manifest.json",
+        "handoff/MANIFEST.json",
         "implementation_setup_summary.json",
         "digital/synth/synth_summary.json",
         "digital/synth/metrics.json",
@@ -524,14 +525,19 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/synthesis_closure/synthesis_closure_chart.json",
         "digital/post_dft_lec/post_dft_lec_summary.json",
         "upf_static_check.json",
+        "digital/upf/upf_static_check.json",
         "scan_summary.json",
+        "digital/dft/scan_summary.json",
         "atpg_summary.json",
+        "digital/atpg/atpg_summary.json",
         "mbist_summary.json",
+        "digital/mbist/mbist_summary.json",
         "synthesis_readiness_findings.json",
         "executive_summary.json",
       ],
       tapeout: [
         "digital/handoff/rtl_handoff_ingest_manifest.json",
+        "handoff/MANIFEST.json",
         "implementation_setup_summary.json",
         "digital/synth/synth_summary.json",
         "digital/synth/metrics.json",
@@ -541,9 +547,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/synthesis_closure/synthesis_closure_chart.json",
         "digital/post_dft_lec/post_dft_lec_summary.json",
         "upf_static_check.json",
+        "digital/upf/upf_static_check.json",
         "scan_summary.json",
+        "digital/dft/scan_summary.json",
         "atpg_summary.json",
+        "digital/atpg/atpg_summary.json",
         "mbist_summary.json",
+        "digital/mbist/mbist_summary.json",
         "floorplan_metrics.json",
         "floorplan_summary.json",
         "placement_metrics.json",
@@ -640,7 +650,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       Promise.all((files[stage] || []).map(async (filename) => [filename.split("/").pop() || filename, await artifact(workflowId, filename)] as const))
         .then((entries) => {
         if (!active) return;
-        const merged: Record<string, unknown> = {};
+        const merged: Record<string, JsonMap | null> = {};
         for (const [key, value] of entries) {
           if (Object.keys(record(value)).length || !(key in merged)) {
             merged[key] = value;

@@ -54,6 +54,7 @@ type StageRun = {
   status: string;
   workflow_id?: string | null;
   run_id?: string | null;
+  inputs?: Record<string, unknown> | null;
   outputs?: Record<string, unknown> | null;
   error?: string | null;
   started_at?: string | null;
@@ -747,10 +748,47 @@ function dashboardStageForApp(app: string) {
   return map[app] || "arch2rtl";
 }
 
+function dashboardStageFromText(...values: unknown[]) {
+  const text = values.map((value) => String(value || "")).join(" ").toLowerCase();
+  if (["tapeout", "physical design", " signoff", "system_pd", "system pd"].some((token) => text.includes(token))) return "tapeout";
+  if (["synthesis", "arch2synthesis", "system_synthesis", "system synthesis"].some((token) => text.includes(token))) return "synthesis";
+  if (["verify", "verification", "system_sim", "system sim", "closure"].some((token) => text.includes(token))) return "verification";
+  if (["dqa", "quality"].some((token) => text.includes(token))) return "dqa";
+  if (["firmware", "embedded"].some((token) => text.includes(token))) return "embedded";
+  if (text.includes("software validation") || text.includes("validation_l2")) return "validation";
+  if (text.includes("software")) return "software";
+  if (["product app", "product_app", "builder"].some((token) => text.includes(token))) return "product";
+  return "arch2rtl";
+}
+
+function dashboardStageForStageRun(stageRun: StageRun) {
+  const outputStage = stageRun.outputs?.dashboard_stage;
+  if (typeof outputStage === "string" && outputStage.trim()) return outputStage.trim();
+  if (!stageRun.app.startsWith("User_App:")) return dashboardStageForApp(stageRun.app);
+  const inputs = stageRun.inputs || {};
+  const settings = inputs.settings && typeof inputs.settings === "object" && !Array.isArray(inputs.settings)
+    ? inputs.settings as Record<string, unknown>
+    : {};
+  const runConfig = inputs.run_config && typeof inputs.run_config === "object" && !Array.isArray(inputs.run_config)
+    ? inputs.run_config as Record<string, unknown>
+    : {};
+  return dashboardStageFromText(
+    stageRun.stage_label,
+    stageRun.app,
+    inputs.workflow_name,
+    inputs.source_workflow_name,
+    inputs.source_workflow_id,
+    runConfig.workflow_name,
+    runConfig.source,
+    settings.workflow_name,
+    settings.source,
+  );
+}
+
 function stageRunDashboardLink(stageRun: StageRun) {
   if (!stageRun.workflow_id) return appLink(stageRun.app);
   const params = new URLSearchParams({
-    stage: dashboardStageForApp(stageRun.app),
+    stage: dashboardStageForStageRun(stageRun),
     status: stageRun.status || "completed",
     app: stageRun.app,
   });
@@ -761,6 +799,15 @@ function stageRunDashboardLink(stageRun: StageRun) {
 function parseLogLines(logs?: string | null) {
   if (!logs) return [];
   return logs.split("\n").map((line) => line.trimEnd()).filter((line) => line.trim().length > 0);
+}
+
+function stageRunAgentLogLines(stageRun: StageRun): string[] {
+  const rawLines = stageRun.outputs?.agent_log_lines;
+  if (!Array.isArray(rawLines)) return [];
+  return rawLines.flatMap((line) => {
+    const text = typeof line === "string" ? line.trim() : "";
+    return text ? [`${stageRun.stage_label || stageRun.app}: ${text}`] : [];
+  });
 }
 
 function stageSummaryStatus(status: string) {
@@ -1105,7 +1152,12 @@ export default function ProductDetailPage() {
       knownAgentCounts,
     };
   }, [stageRunSummaries]);
-  const productRunLogLines = useMemo(() => parseLogLines(productRun?.logs), [productRun?.logs]);
+  const productRunLogLines = useMemo(() => {
+    const baseLines = parseLogLines(productRun?.logs);
+    const childLines = stageRuns.flatMap(stageRunAgentLogLines);
+    if (!childLines.length) return baseLines;
+    return [...baseLines, "Child workflow agent execution:", ...childLines];
+  }, [productRun?.logs, stageRuns]);
 
   useEffect(() => {
     if (!productRun || !product || !["queued", "running"].includes(productRun.status)) return;
