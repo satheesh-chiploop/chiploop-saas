@@ -82,6 +82,7 @@ const workflowAgentChart = [
 ];
 
 const workflowAgentMax = 120;
+const workflowAgentPlotHeight = 224;
 
 function LandingPageContent() {
   const router = useRouter();
@@ -213,7 +214,7 @@ function LandingPageContent() {
                           <div className="text-sm font-bold text-cyan-200">{totalAgents}</div>
                           <div
                             className="flex w-full max-w-20 flex-col-reverse overflow-hidden rounded-t-md shadow-lg shadow-slate-950/30"
-                            style={{ height: `${Math.max((totalAgents / workflowAgentMax) * 100, 6)}%` }}
+                            style={{ height: `${Math.max((totalAgents / workflowAgentMax) * workflowAgentPlotHeight, 8)}px` }}
                           >
                             {agentSegments.map((segment) => {
                               const segmentAgents = item.agents[segment.key as keyof typeof item.agents];
