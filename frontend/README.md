@@ -15,7 +15,7 @@ The browser API client lives in `lib/apiClient.ts`. It calls relative `/api/*` r
 
 ## Main User Surfaces
 
-- `/apps`: guided single-workflow Apps grouped by loop, plus My Apps created from Studio workflows.
+- `/apps`: guided single-workflow Apps grouped by loop, Ask this Project, plus My Apps created from Studio workflows.
 - `/products`: reference journeys and saved product journeys.
 - `/products/[productId]`: editable product stage sequence, stage settings, product run dashboard, and per-stage run history.
 - `/workflow`: Studio canvas for custom workflows, planners, workflow composition, private agents, and private Apps created from workflows.
@@ -24,6 +24,8 @@ The browser API client lives in `lib/apiClient.ts`. It calls relative `/api/*` r
 - `/marketplace` and `/admin/marketplace`: agent and app marketplace surfaces.
 
 ## Current App Catalog
+
+Ask this Project is a project-intake app for uploaded files, pasted content, selected GitHub repository files, specs, logs, reports, scripts, constraints, and documentation. It supports multiple questions in the current browser session and does not persist project files or chat history in Supabase in the MVP.
 
 Digital Apps include Arch2RTL, Spec2RTL Check, Arch2Synthesis, Arch2Tapeout, DQA, Verify, Smoke, and Integrate.
 
@@ -36,6 +38,8 @@ Validation Apps include Validation Run, Validation Plan, Bench Setup, Preflight,
 ## Products and Reference Journeys
 
 Products are saved journey configurations built from existing Apps. A product stage is a configured use of an existing App in an ordered sequence, not a new App definition.
+
+Products expose Ask this Project as a Project Intake helper before and during stage configuration. It is not an executable Product stage in the MVP; users use it to summarize existing collateral, inspect a Git repo, identify risks or missing inputs, and decide which Product stages to configure next.
 
 Products can also include user-owned My Apps created from Studio workflows. These stages keep the real workflow `input_schema` and `default_config`; the Product page must render those fields directly and should not invent fallback contracts. If the workflow contract exposes option/select values, those options should appear in Product stage settings.
 
@@ -73,6 +77,7 @@ The frontend depends on these backend surfaces:
 - Artifact endpoints: `/list_artifacts/{workflow_id}`, `/download_artifacts/{workflow_id}/{rel_path}`, `/workflow/{workflow_id}/download_zip`, and `/apps/dashboard/artifact/{workflow_id}`.
 - Product endpoints: `/products/reference-journeys`, `/products/stage-schemas`, `/products`, `/products/{product_id}`, `/products/{product_id}/run`, and `/products/{product_id}/runs`.
 - Help endpoints: `/help/ask` and `/help/catalog`.
+- Project inspection endpoint: `/project/ask` for Ask this Project request-scoped context.
 - Studio/planner endpoints: `/plan_workflow`, `/analyze_spec`, `/plan_agent`, `/save_custom_agent`, `/save_custom_workflow`, `/build_workflow`, workflow composition routes, and `/studio/user-apps`.
 - Settings, billing, API key, marketplace, deployment, and integration routes exposed through backend browser routes. Marketplace includes app listing, install, submission, and admin approval flows.
 

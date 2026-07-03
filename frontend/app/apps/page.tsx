@@ -1153,6 +1153,23 @@ export default function AppsHomePage() {
 
           <div className="mt-6">
             <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">What would you like to do today?</div>
+            <button
+              onClick={() => openApp("ask-project")}
+              className="mt-4 w-full rounded-2xl border border-cyan-800 bg-cyan-950/25 p-5 text-left transition hover:border-cyan-400 hover:bg-cyan-950/40"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Project intake</div>
+                  <div className="mt-2 text-xl font-bold text-white">Ask this Project</div>
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-cyan-100/85">
+                    Upload files, paste content, or import selected GitHub repo files. Ask for summaries, risks, suggestions, and the next ChipLoop workflow to run.
+                  </p>
+                </div>
+                <span className="shrink-0 rounded-full border border-cyan-700 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+                  New
+                </span>
+              </div>
+            </button>
             <div className="mt-2 text-lg font-bold">Flagship apps</div>
             <div className="text-sm text-slate-400">Best starting points before choosing a category.</div>
           </div>
