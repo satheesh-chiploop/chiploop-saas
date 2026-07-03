@@ -198,32 +198,43 @@ function LandingPageContent() {
                 <span>0</span>
               </div>
               <div>
-                <div className="grid h-72 grid-cols-4 items-end gap-3 border-b border-slate-800 px-1 pb-3 sm:gap-5">
-                  {workflowAgentChart.map((item) => {
-                    const totalAgents = agentSegments.reduce((sum, segment) => sum + item.agents[segment.key as keyof typeof item.agents], 0);
-                    return (
-                      <div key={item.label} className="flex min-w-0 flex-col items-center gap-3">
-                        <div className="text-sm font-bold text-cyan-200">{totalAgents}</div>
-                        <div className="flex h-56 w-full max-w-20 flex-col-reverse overflow-hidden rounded-t-lg bg-slate-950/70">
-                          {agentSegments.map((segment) => {
-                            const segmentAgents = item.agents[segment.key as keyof typeof item.agents];
-                            if (!segmentAgents) return null;
-                            return (
-                              <div
-                                key={segment.key}
-                                title={`${segment.label}: ${segmentAgents} agents`}
-                                className="w-full border-t border-slate-950/40"
-                                style={{
-                                  height: `${Math.max((segmentAgents / workflowAgentMax) * 100, 3)}%`,
-                                  backgroundColor: segment.color,
-                                }}
-                              />
-                            );
-                          })}
+                <div className="relative h-72 border-b border-slate-700 px-1 pb-3">
+                  <div className="pointer-events-none absolute inset-x-1 bottom-3 top-0 flex flex-col justify-between">
+                    <span className="border-t border-slate-800" />
+                    <span className="border-t border-slate-800" />
+                    <span className="border-t border-slate-800" />
+                    <span className="border-t border-slate-700" />
+                  </div>
+                  <div className="relative grid h-full grid-cols-4 items-end gap-3 sm:gap-5">
+                    {workflowAgentChart.map((item) => {
+                      const totalAgents = agentSegments.reduce((sum, segment) => sum + item.agents[segment.key as keyof typeof item.agents], 0);
+                      return (
+                        <div key={item.label} className="flex min-w-0 flex-col items-center gap-3">
+                          <div className="text-sm font-bold text-cyan-200">{totalAgents}</div>
+                          <div
+                            className="flex w-full max-w-20 flex-col-reverse overflow-hidden rounded-t-md shadow-lg shadow-slate-950/30"
+                            style={{ height: `${Math.max((totalAgents / workflowAgentMax) * 100, 6)}%` }}
+                          >
+                            {agentSegments.map((segment) => {
+                              const segmentAgents = item.agents[segment.key as keyof typeof item.agents];
+                              if (!segmentAgents) return null;
+                              return (
+                                <div
+                                  key={segment.key}
+                                  title={`${segment.label}: ${segmentAgents} agents`}
+                                  className="w-full border-t border-slate-950/40"
+                                  style={{
+                                    height: `${(segmentAgents / totalAgents) * 100}%`,
+                                    backgroundColor: segment.color,
+                                  }}
+                                />
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className="mt-3 grid grid-cols-4 gap-3 px-1 text-center sm:gap-5">
                   {workflowAgentChart.map((item) => (
