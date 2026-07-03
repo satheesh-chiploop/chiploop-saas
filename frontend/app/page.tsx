@@ -82,7 +82,7 @@ const workflowAgentChart = [
 ];
 
 const workflowAgentMax = 120;
-const workflowAgentPlotHeight = 224;
+const workflowAgentPlotHeight = 288;
 
 function LandingPageContent() {
   const router = useRouter();
@@ -192,15 +192,15 @@ function LandingPageContent() {
                   Number of agents orchestrated
                 </span>
               </div>
-              <div className="flex h-72 flex-col justify-between border-r border-slate-800 pr-3 text-right text-xs text-slate-500">
-                <span>120</span>
-                <span>80</span>
-                <span>40</span>
-                <span>0</span>
+              <div className="relative h-72 border-r border-slate-800 text-right text-xs text-slate-500">
+                <span className="absolute right-3 top-0 -translate-y-1/2">120</span>
+                <span className="absolute right-3 top-1/3 -translate-y-1/2">80</span>
+                <span className="absolute right-3 top-2/3 -translate-y-1/2">40</span>
+                <span className="absolute bottom-0 right-3 translate-y-1/2">0</span>
               </div>
               <div>
-                <div className="relative h-72 border-b border-slate-700 px-1 pb-3">
-                  <div className="pointer-events-none absolute inset-x-1 bottom-3 top-0 flex flex-col justify-between">
+                <div className="relative h-72 border-b border-slate-700 px-1">
+                  <div className="pointer-events-none absolute inset-x-1 bottom-0 top-0 flex flex-col justify-between">
                     <span className="border-t border-slate-800" />
                     <span className="border-t border-slate-800" />
                     <span className="border-t border-slate-800" />
@@ -209,12 +209,18 @@ function LandingPageContent() {
                   <div className="relative grid h-full grid-cols-4 items-end gap-3 sm:gap-5">
                     {workflowAgentChart.map((item) => {
                       const totalAgents = agentSegments.reduce((sum, segment) => sum + item.agents[segment.key as keyof typeof item.agents], 0);
+                      const barHeight = Math.max((totalAgents / workflowAgentMax) * workflowAgentPlotHeight, 8);
                       return (
-                        <div key={item.label} className="flex min-w-0 flex-col items-center gap-3">
-                          <div className="text-sm font-bold text-cyan-200">{totalAgents}</div>
+                        <div key={item.label} className="relative flex h-full min-w-0 items-end justify-center">
+                          <div
+                            className="absolute text-sm font-bold text-cyan-200"
+                            style={{ bottom: `${barHeight + 10}px` }}
+                          >
+                            {totalAgents}
+                          </div>
                           <div
                             className="flex w-full max-w-20 flex-col-reverse overflow-hidden rounded-t-md shadow-lg shadow-slate-950/30"
-                            style={{ height: `${Math.max((totalAgents / workflowAgentMax) * workflowAgentPlotHeight, 8)}px` }}
+                            style={{ height: `${barHeight}px` }}
                           >
                             {agentSegments.map((segment) => {
                               const segmentAgents = item.agents[segment.key as keyof typeof item.agents];
