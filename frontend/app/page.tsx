@@ -49,11 +49,36 @@ const platformStats = [
   ["SDK + CLI + Studio", "Developer Access"],
 ];
 
+const agentSegments = [
+  { key: "system", label: "System", color: "#a78bfa" },
+  { key: "analog", label: "Analog", color: "#fb7185" },
+  { key: "digital", label: "Digital", color: "#22d3ee" },
+  { key: "firmware", label: "Firmware", color: "#34d399" },
+  { key: "software", label: "Software + validation + co-sim", color: "#fbbf24" },
+  { key: "product", label: "Product demo", color: "#f472b6" },
+];
+
 const workflowAgentChart = [
-  { label: "Digital IP Product", example: "PWM to demo", agents: 70 },
-  { label: "Mixed-Signal IP Product", example: "Temp Monitor SoC", agents: 95 },
-  { label: "Digital IP + Tapeout", example: "RTL to GDS/signoff", agents: 85 },
-  { label: "Mixed-Signal Product + Tapeout", example: "SoC to demo + GDS", agents: 120 },
+  {
+    label: "Digital IP Product",
+    example: "PWM to demo",
+    agents: { system: 6, analog: 0, digital: 36, firmware: 10, software: 12, product: 6 },
+  },
+  {
+    label: "Mixed-Signal IP Product",
+    example: "Temp Monitor SoC",
+    agents: { system: 12, analog: 18, digital: 35, firmware: 10, software: 12, product: 8 },
+  },
+  {
+    label: "Digital IP + Tapeout",
+    example: "RTL to GDS/signoff",
+    agents: { system: 5, analog: 0, digital: 73, firmware: 0, software: 0, product: 7 },
+  },
+  {
+    label: "Mixed-Signal Product + Tapeout",
+    example: "SoC to demo + GDS",
+    agents: { system: 16, analog: 22, digital: 48, firmware: 12, software: 14, product: 8 },
+  },
 ];
 
 const workflowAgentMax = 120;
@@ -150,38 +175,65 @@ function LandingPageContent() {
             <p className="mt-4 leading-7 text-slate-300">
               As a chip journey grows from a digital IP block to mixed-signal products, tapeout, validation, and demos, ChipLoop keeps the agents, tools, artifacts, dashboards, and handoffs connected.
             </p>
-            <p className="mt-4 text-sm text-slate-500">
-              Max-agent view with optional verification, synthesis, DFT, tapeout, firmware, software, co-simulation, validation, and product-demo stages enabled where they apply.
-            </p>
+            <div className="mt-5 grid grid-cols-1 gap-3 text-sm text-slate-300 sm:grid-cols-2">
+              {agentSegments.map((segment) => (
+                <div key={segment.key} className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-sm" style={{ backgroundColor: segment.color }} />
+                  <span>{segment.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="min-w-0">
-            <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <span>Number of agents orchestrated</span>
-              <span>Workflows</span>
-            </div>
-            <div className="grid min-h-80 grid-cols-[40px_1fr] gap-4">
+            <div className="grid min-h-96 grid-cols-[24px_40px_1fr] gap-4">
+              <div className="flex items-center justify-center">
+                <span className="-rotate-90 whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Number of agents orchestrated
+                </span>
+              </div>
               <div className="flex flex-col justify-between border-r border-slate-800 pr-3 text-right text-xs text-slate-500">
                 <span>120</span>
                 <span>80</span>
                 <span>40</span>
                 <span>0</span>
               </div>
-              <div className="grid grid-cols-4 items-end gap-3 border-b border-slate-800 px-1 pb-3 sm:gap-5">
-                {workflowAgentChart.map((item) => (
-                  <div key={item.label} className="flex min-w-0 flex-col items-center gap-3">
-                    <div className="text-sm font-bold text-cyan-200">{item.agents}</div>
-                    <div className="flex h-56 w-full max-w-20 items-end justify-center rounded-t-lg bg-slate-950/70 px-2">
-                      <div
-                        className="w-full rounded-t-md bg-cyan-400 shadow-lg shadow-cyan-950/40"
-                        style={{ height: `${Math.max((item.agents / workflowAgentMax) * 100, 8)}%` }}
-                      />
-                    </div>
-                    <div className="min-h-20 text-center">
+              <div>
+                <div className="grid h-72 grid-cols-4 items-end gap-3 border-b border-slate-800 px-1 pb-3 sm:gap-5">
+                  {workflowAgentChart.map((item) => {
+                    const totalAgents = agentSegments.reduce((sum, segment) => sum + item.agents[segment.key as keyof typeof item.agents], 0);
+                    return (
+                      <div key={item.label} className="flex min-w-0 flex-col items-center gap-3">
+                        <div className="text-sm font-bold text-cyan-200">{totalAgents}</div>
+                        <div className="flex h-56 w-full max-w-20 flex-col-reverse overflow-hidden rounded-t-lg bg-slate-950/70">
+                          {agentSegments.map((segment) => {
+                            const segmentAgents = item.agents[segment.key as keyof typeof item.agents];
+                            if (!segmentAgents) return null;
+                            return (
+                              <div
+                                key={segment.key}
+                                title={`${segment.label}: ${segmentAgents} agents`}
+                                className="w-full border-t border-slate-950/40"
+                                style={{
+                                  height: `${Math.max((segmentAgents / workflowAgentMax) * 100, 3)}%`,
+                                  backgroundColor: segment.color,
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 grid grid-cols-4 gap-3 px-1 text-center sm:gap-5">
+                  {workflowAgentChart.map((item) => (
+                    <div key={item.label} className="min-h-20">
                       <div className="text-xs font-bold leading-4 text-slate-100">{item.label}</div>
                       <div className="mt-1 text-xs leading-4 text-slate-500">Ex: {item.example}</div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div className="mt-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Workflows</div>
               </div>
             </div>
           </div>
