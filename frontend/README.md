@@ -25,7 +25,7 @@ The browser API client lives in `lib/apiClient.ts`. It calls relative `/api/*` r
 
 ## Current App Catalog
 
-Ask this Project is a project-intake app for uploaded files, pasted content, selected GitHub repository files, specs, logs, reports, scripts, constraints, and documentation. It supports multiple questions in the current browser session and does not persist project files or chat history in Supabase in the MVP.
+Ask this Project is a project-review app for uploaded files, pasted content, selected GitHub repository files, specs, logs, reports, scripts, constraints, and documentation. It supports multiple questions in the current browser session and does not persist project files or chat history in Supabase in the MVP.
 
 Digital Apps include Arch2RTL, Spec2RTL Check, Arch2Synthesis, Arch2Tapeout, DQA, Verify, Smoke, and Integrate.
 
@@ -39,7 +39,7 @@ Validation Apps include Validation Run, Validation Plan, Bench Setup, Preflight,
 
 Products are saved journey configurations built from existing Apps. A product stage is a configured use of an existing App in an ordered sequence, not a new App definition.
 
-Products expose Ask this Project as a Project Intake helper before and during stage configuration. It is not an executable Product stage in the MVP; users use it to summarize existing collateral, inspect a Git repo, identify risks or missing inputs, and decide which Product stages to configure next.
+Products expose Ask this Project as a Project Review helper before and during stage configuration. It is not an executable Product stage in the MVP; users use it to summarize existing collateral, inspect a Git repo, identify risks or missing inputs, and decide which Product stages to configure next.
 
 Products can also include user-owned My Apps created from Studio workflows. These stages keep the real workflow `input_schema` and `default_config`; the Product page must render those fields directly and should not invent fallback contracts. If the workflow contract exposes option/select values, those options should appear in Product stage settings.
 

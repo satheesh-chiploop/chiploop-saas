@@ -20,6 +20,15 @@ type AskProjectResponse = {
   source_count?: number;
 };
 
+type SourceMode = "files" | "folder" | "github" | "paste";
+
+const sourceOptions: Array<{ key: SourceMode; title: string; body: string }> = [
+  { key: "files", title: "Upload files", body: "Select one or more local text files." },
+  { key: "folder", title: "Upload folder", body: "Bring in a directory from your machine." },
+  { key: "github", title: "Import from GitHub", body: "Choose repository files as context." },
+  { key: "paste", title: "Paste content", body: "Add a snippet, log, spec, or note." },
+];
+
 const suggestions = [
   "Summarize this project and the most important files.",
   "What risks or missing pieces should I fix first?",
@@ -71,6 +80,12 @@ export default function AskProjectPage() {
   const router = useRouter();
   const [projectName, setProjectName] = useState("Uploaded project");
   const [files, setFiles] = useState<ProjectFile[]>([]);
+  const [sourceModes, setSourceModes] = useState<Record<SourceMode, boolean>>({
+    files: true,
+    folder: false,
+    github: false,
+    paste: false,
+  });
   const [manualPath, setManualPath] = useState("notes.md");
   const [manualContent, setManualContent] = useState("");
   const [question, setQuestion] = useState("");
@@ -80,6 +95,10 @@ export default function AskProjectPage() {
   const [error, setError] = useState<string | null>(null);
 
   const totalChars = useMemo(() => files.reduce((sum, file) => sum + file.content.length, 0), [files]);
+
+  function toggleSourceMode(mode: SourceMode) {
+    setSourceModes((current) => ({ ...current, [mode]: !current[mode] }));
+  }
 
   async function addSelectedFiles(selectedFiles: FileList | null) {
     if (!selectedFiles?.length) return;
@@ -182,96 +201,128 @@ export default function AskProjectPage() {
         </div>
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <div>
-              <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">Project Intake</div>
-              <h1 className="mt-2 text-3xl font-extrabold text-white">Ask this Project</h1>
-              <p className="mt-3 leading-7 text-slate-300">
-                Chat with uploaded files, codebases, specs, reports, logs, scripts, and docs. Ask for summaries, risks, suggestions, and the next ChipLoop workflow to run.
-              </p>
-              <div className="mt-5 grid grid-cols-1 gap-3 text-sm text-slate-300 sm:grid-cols-2">
-                <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-                  <div className="font-bold text-slate-100">Ask anything</div>
-                  <p className="mt-2 text-slate-400">Architecture, missing files, review gaps, failure reports, handoff readiness, or workflow suggestions.</p>
-                </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-                  <div className="font-bold text-slate-100">Upload or import</div>
-                  <p className="mt-2 text-slate-400">Use local files, pasted content, or selected GitHub repository files as project context.</p>
-                </div>
-              </div>
+          <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">Project Review</div>
+          <h1 className="mt-2 text-3xl font-extrabold text-white">Ask this Project</h1>
+          <p className="mt-3 max-w-4xl leading-7 text-slate-300">
+            Chat with uploaded files, codebases, specs, reports, logs, scripts, and docs. Ask for summaries, risks, suggestions, and the next ChipLoop workflow to run.
+          </p>
+          <div className="mt-5 grid grid-cols-1 gap-3 text-sm text-slate-300 md:grid-cols-2">
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+              <div className="font-bold text-slate-100">Ask anything</div>
+              <p className="mt-2 text-slate-400">Architecture, missing files, review gaps, failure reports, handoff readiness, or workflow suggestions.</p>
             </div>
-
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-5">
-              <label className="block">
-                <span className="text-sm font-semibold text-slate-300">Project name</span>
-                <input
-                  value={projectName}
-                  onChange={(event) => setProjectName(event.target.value)}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-cyan-500"
-                />
-              </label>
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <label className="block rounded-lg border border-dashed border-slate-700 p-4 text-center hover:border-cyan-500">
-                  <span className="text-sm font-bold text-cyan-200">Upload files</span>
-                  <span className="mt-1 block text-xs text-slate-500">Select multiple text files</span>
-                  <input
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={(event) => addSelectedFiles(event.target.files)}
-                  />
-                </label>
-                <label className="block rounded-lg border border-dashed border-slate-700 p-4 text-center hover:border-cyan-500">
-                  <span className="text-sm font-bold text-cyan-200">Upload folder</span>
-                  <span className="mt-1 block text-xs text-slate-500">Chrome/Edge directory picker</span>
-                  <input
-                    type="file"
-                    multiple
-                    {...({ webkitdirectory: "" } as Record<string, string>)}
-                    className="hidden"
-                    onChange={(event) => addSelectedFiles(event.target.files)}
-                  />
-                </label>
-              </div>
-              <div className="mt-3 text-xs text-slate-500">
-                {fileLoading ? "Reading files..." : `${files.length} file(s), ${totalChars.toLocaleString()} characters loaded`}
-              </div>
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+              <div className="font-bold text-slate-100">One project context</div>
+              <p className="mt-2 text-slate-400">Choose one or more sources, then ask questions against the combined context.</p>
             </div>
           </div>
         </section>
 
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-            <h2 className="text-xl font-extrabold text-white">Project files</h2>
-            <div className="mt-4">
+            <h2 className="text-xl font-extrabold text-white">Project context</h2>
+            <p className="mt-2 text-sm text-slate-400">
+              Choose one or more ways to add context. The selected controls open below and all loaded files are used together.
+            </p>
+
+            <label className="mt-5 block">
+              <span className="text-sm font-semibold text-slate-300">Project name</span>
+              <input
+                value={projectName}
+                onChange={(event) => setProjectName(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-cyan-500"
+              />
+            </label>
+
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {sourceOptions.map((option) => {
+                const selected = sourceModes[option.key];
+                return (
+                  <button
+                    key={option.key}
+                    type="button"
+                    onClick={() => toggleSourceMode(option.key)}
+                    className={`rounded-xl border p-4 text-left transition ${
+                      selected
+                        ? "border-cyan-400 bg-cyan-500/10 text-cyan-50"
+                        : "border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-600"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-bold">{option.title}</span>
+                      <span className={`h-4 w-4 rounded border ${selected ? "border-cyan-300 bg-cyan-300" : "border-slate-600"}`} />
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-slate-400">{option.body}</p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {sourceModes.files ? (
+              <label className="mt-5 block rounded-lg border border-dashed border-slate-700 p-4 text-center hover:border-cyan-500">
+                <span className="text-sm font-bold text-cyan-200">Upload files</span>
+                <span className="mt-1 block text-xs text-slate-500">Select multiple RTL, code, spec, log, report, JSON, YAML, SDC, UPF, script, or markdown files.</span>
+                <input
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={(event) => addSelectedFiles(event.target.files)}
+                />
+              </label>
+            ) : null}
+
+            {sourceModes.folder ? (
+              <label className="mt-3 block rounded-lg border border-dashed border-slate-700 p-4 text-center hover:border-cyan-500">
+                <span className="text-sm font-bold text-cyan-200">Upload folder</span>
+                <span className="mt-1 block text-xs text-slate-500">Use the browser directory picker to add supported text files from a folder.</span>
+                <input
+                  type="file"
+                  multiple
+                  {...({ webkitdirectory: "" } as Record<string, string>)}
+                  className="hidden"
+                  onChange={(event) => addSelectedFiles(event.target.files)}
+                />
+              </label>
+            ) : null}
+
+            {sourceModes.github ? (
+              <div className="mt-5">
               <GitHubImportPanel
                 compact
                 onImport={(_text, importedFiles, source) => importGitHubFiles(importedFiles, source)}
               />
-            </div>
-            <div className="mt-4 space-y-3">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[0.45fr_1fr]">
-                <input
-                  value={manualPath}
-                  onChange={(event) => setManualPath(event.target.value)}
-                  className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none focus:border-cyan-500"
-                  placeholder="file path"
-                />
-                <button
-                  type="button"
-                  onClick={addManualFile}
-                  disabled={!manualContent.trim()}
-                  className="rounded-lg bg-cyan-500 px-4 py-3 text-sm font-bold text-slate-950 hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
-                >
-                  Add pasted file
-                </button>
               </div>
-              <textarea
-                value={manualContent}
-                onChange={(event) => setManualContent(event.target.value)}
-                className="min-h-36 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none focus:border-cyan-500"
-                placeholder="Paste code, spec, log, report, constraints, README, or notes..."
-              />
+            ) : null}
+
+            {sourceModes.paste ? (
+              <div className="mt-5 space-y-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-[0.45fr_1fr]">
+                  <input
+                    value={manualPath}
+                    onChange={(event) => setManualPath(event.target.value)}
+                    className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none focus:border-cyan-500"
+                    placeholder="file path"
+                  />
+                  <button
+                    type="button"
+                    onClick={addManualFile}
+                    disabled={!manualContent.trim()}
+                    className="rounded-lg bg-cyan-500 px-4 py-3 text-sm font-bold text-slate-950 hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
+                  >
+                    Add pasted content
+                  </button>
+                </div>
+                <textarea
+                  value={manualContent}
+                  onChange={(event) => setManualContent(event.target.value)}
+                  className="min-h-36 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none focus:border-cyan-500"
+                  placeholder="Paste code, spec, log, report, constraints, README, or notes..."
+                />
+              </div>
+            ) : null}
+
+            <div className="mt-5 text-xs text-slate-500">
+              {fileLoading ? "Reading files..." : `${files.length} file(s), ${totalChars.toLocaleString()} characters loaded`}
             </div>
 
             <div className="mt-5 max-h-96 space-y-2 overflow-y-auto pr-1">

@@ -229,7 +229,7 @@ export default function AppsHomePage() {
       subtitle: "Chat with uploaded files, codebases, specs, reports, logs, and docs",
       loop_type: "system",
       status: "New",
-      nudge: "Project intake",
+      nudge: "Project review",
       promise: "Summaries, risks, suggestions, and recommended next workflows",
     },
     {
@@ -1159,7 +1159,7 @@ export default function AppsHomePage() {
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Project intake</div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Project review</div>
                   <div className="mt-2 text-xl font-bold text-white">Ask this Project</div>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-cyan-100/85">
                     Upload files, paste content, or import selected GitHub repo files. Ask for summaries, risks, suggestions, and the next ChipLoop workflow to run.
