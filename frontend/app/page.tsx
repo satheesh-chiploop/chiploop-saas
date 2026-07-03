@@ -186,13 +186,13 @@ function LandingPageContent() {
             </div>
           </div>
           <div className="min-w-0">
-            <div className="grid min-h-96 grid-cols-[24px_40px_1fr] gap-4">
-              <div className="flex items-center justify-center">
+            <div className="grid grid-cols-[24px_40px_1fr] gap-4">
+              <div className="flex h-72 items-center justify-center">
                 <span className="-rotate-90 whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Number of agents orchestrated
                 </span>
               </div>
-              <div className="flex flex-col justify-between border-r border-slate-800 pr-3 text-right text-xs text-slate-500">
+              <div className="flex h-72 flex-col justify-between border-r border-slate-800 pr-3 text-right text-xs text-slate-500">
                 <span>120</span>
                 <span>80</span>
                 <span>40</span>
