@@ -41,6 +41,8 @@ Products can also include user-owned My Apps created from Studio workflows. Thes
 
 For My Apps backed by known platform workflows, Product and Studio Configure Workflow should use the same Product stage schema from `/products/stage-schemas`. For custom workflows, Configure Workflow defines the app input contract. Suggested inputs should focus on user-facing setup values and meaningful run controls, while ordinary agent-to-agent handoff artifacts stay hidden by default. Advanced controls should be exposed only when they materially affect run behavior, cost, debug, or quality of result, such as synthesis loop count, simulator choice, seed count, implementation effort, closure enablement, or stop-on-failure policy.
 
+Product runs should expose the spawned stage `workflow_id` and `run_id`, infer the correct dashboard stage for private apps, and surface child workflow agent execution lines in the Product log. Digital private apps may use either `spec_text` or `digital_spec_text`; backend execution must normalize those values into the Digital Spec Agent path so Product stages can produce spec JSON, RTL, synthesis inputs, and downstream implementation evidence.
+
 The backend currently provides these reference journeys:
 
 - PWM Fan Controller.

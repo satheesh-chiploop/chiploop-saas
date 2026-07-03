@@ -40,6 +40,24 @@ const paths = [
   ["Studio", "Create custom agents and workflows.", "/workflow", "Open Studio"],
 ];
 
+const platformStats = [
+  ["195+", "Agents"],
+  ["40+", "Apps"],
+  ["11+", "Workflow Templates"],
+  ["8+", "Reference Journeys"],
+  ["5+", "Product Journeys"],
+  ["SDK + CLI + Studio", "Developer Access"],
+];
+
+const workflowAgentChart = [
+  { label: "Digital IP Product", example: "PWM to demo", agents: 70 },
+  { label: "Mixed-Signal IP Product", example: "Temp Monitor SoC", agents: 95 },
+  { label: "Digital IP + Tapeout", example: "RTL to GDS/signoff", agents: 85 },
+  { label: "Mixed-Signal Product + Tapeout", example: "SoC to demo + GDS", agents: 120 },
+];
+
+const workflowAgentMax = 120;
+
 function LandingPageContent() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -108,6 +126,65 @@ function LandingPageContent() {
           <button onClick={() => goTo("/workflow")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
             Open Studio
           </button>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {platformStats.map(([value, label]) => (
+            <div key={label} className="rounded-xl border border-slate-800 bg-slate-900/70 px-4 py-5 text-center">
+              <div className="break-words text-xl font-extrabold leading-tight text-cyan-300 sm:text-2xl">{value}</div>
+              <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="grid gap-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Workflow Scale</p>
+            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+              One connected workflow can coordinate many specialized agents.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-300">
+              As a chip journey grows from a digital IP block to mixed-signal products, tapeout, validation, and demos, ChipLoop keeps the agents, tools, artifacts, dashboards, and handoffs connected.
+            </p>
+            <p className="mt-4 text-sm text-slate-500">
+              Max-agent view with optional verification, synthesis, DFT, tapeout, firmware, software, co-simulation, validation, and product-demo stages enabled where they apply.
+            </p>
+          </div>
+          <div className="min-w-0">
+            <div className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span>Number of agents orchestrated</span>
+              <span>Workflows</span>
+            </div>
+            <div className="grid min-h-80 grid-cols-[40px_1fr] gap-4">
+              <div className="flex flex-col justify-between border-r border-slate-800 pr-3 text-right text-xs text-slate-500">
+                <span>120</span>
+                <span>80</span>
+                <span>40</span>
+                <span>0</span>
+              </div>
+              <div className="grid grid-cols-4 items-end gap-3 border-b border-slate-800 px-1 pb-3 sm:gap-5">
+                {workflowAgentChart.map((item) => (
+                  <div key={item.label} className="flex min-w-0 flex-col items-center gap-3">
+                    <div className="text-sm font-bold text-cyan-200">{item.agents}</div>
+                    <div className="flex h-56 w-full max-w-20 items-end justify-center rounded-t-lg bg-slate-950/70 px-2">
+                      <div
+                        className="w-full rounded-t-md bg-cyan-400 shadow-lg shadow-cyan-950/40"
+                        style={{ height: `${Math.max((item.agents / workflowAgentMax) * 100, 8)}%` }}
+                      />
+                    </div>
+                    <div className="min-h-20 text-center">
+                      <div className="text-xs font-bold leading-4 text-slate-100">{item.label}</div>
+                      <div className="mt-1 text-xs leading-4 text-slate-500">Ex: {item.example}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
