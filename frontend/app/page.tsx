@@ -84,6 +84,14 @@ const workflowAgentChart = [
 const workflowAgentMax = 120;
 const workflowAgentPlotHeight = 288;
 
+const marketplaceFlow = [
+  ["Agents", "Specialized AI and tool agents for chip tasks"],
+  ["Workflows", "Reusable execution flows with saved context"],
+  ["Apps", "Packaged workflows users can run or customize"],
+  ["Products", "Connected journeys from requirement to handoff"],
+  ["Marketplace", "Approved apps and products teams can reuse"],
+];
+
 function LandingPageContent() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -171,7 +179,7 @@ function LandingPageContent() {
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Workflow Scale</p>
             <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
-              One connected workflow can coordinate many specialized agents.
+              Agent coverage grows with journey complexity.
             </h2>
             <p className="mt-4 leading-7 text-slate-300">
               As a chip journey grows from a digital IP block to mixed-signal products, tapeout, validation, and demos, ChipLoop keeps the agents, tools, artifacts, dashboards, and handoffs connected.
@@ -254,6 +262,36 @@ function LandingPageContent() {
                 <div className="mt-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Workflows</div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
+          <div className="max-w-3xl">
+            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Reusable Workflow Marketplace</p>
+            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+              Package engineering know-how into reusable chip design products.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-300">
+              ChipLoop turns individual agents and workflows into private apps, product journeys, and marketplace-ready solutions that other teams can run without rebuilding the environment.
+            </p>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr_auto_1fr] md:items-stretch">
+            {marketplaceFlow.map(([title, body], index) => (
+              <div key={title} className="contents">
+                <article className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 text-center">
+                  <div className="text-lg font-extrabold text-cyan-200">{title}</div>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
+                </article>
+                {index < marketplaceFlow.length - 1 && (
+                  <div className="flex items-center justify-center text-xl font-bold text-slate-600" aria-hidden="true">
+                    <span className="md:hidden">↓</span>
+                    <span className="hidden md:inline">→</span>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
