@@ -92,6 +92,18 @@ const marketplaceFlow = [
   ["Marketplace", "Approved apps and products teams can reuse"],
 ];
 
+const endToEndJourney = [
+  "Requirements",
+  "RTL",
+  "Verification",
+  "Firmware",
+  "Software",
+  "Co-simulation",
+  "Tapeout",
+  "Validation",
+  "Product Demo",
+];
+
 function LandingPageContent() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -145,10 +157,10 @@ function LandingPageContent() {
 
       <section className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-12 pt-36 text-center sm:px-6 sm:pb-16 sm:pt-32">
         <h1 className="max-w-6xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-7xl">
-          Agentic AI Platform for Chip Design and Implementation
+          All-in-one agentic AI platform for chip design
         </h1>
         <p className="mt-6 max-w-4xl text-base leading-7 text-slate-300 sm:mt-7 sm:text-lg sm:leading-8">
-          Orchestrate chip workflows from specs to implementation, firmware, software, validation, and product handoff.
+          Help one engineer or a small team move from requirements to RTL, verification, firmware, software, co-simulation, tapeout, validation, and product demo in one connected platform.
         </p>
         <div className="mt-8 flex w-full flex-col gap-4 sm:mt-10 sm:w-auto sm:flex-row">
           <button onClick={() => goTo("/products")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
@@ -171,6 +183,35 @@ function LandingPageContent() {
               <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Connected Chip Journey</p>
+            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+              From requirement capture to product demo without losing engineering context.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-300">
+              ChipLoop keeps each stage connected, so outputs, logs, dashboards, and decisions carry forward instead of living in disconnected tools.
+            </p>
+          </div>
+          <div className="mt-8 flex flex-col gap-3 xl:flex-row xl:items-stretch">
+            {endToEndJourney.map((stage, index) => (
+              <div key={stage} className="contents xl:flex xl:items-center">
+                <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-4 text-center text-sm font-bold text-slate-100 xl:flex-1">
+                  {stage}
+                </div>
+                {index < endToEndJourney.length - 1 && (
+                  <div className="flex items-center justify-center text-lg font-bold text-slate-600" aria-hidden="true">
+                    <span className="xl:hidden">↓</span>
+                    <span className="hidden xl:inline">→</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -296,48 +337,13 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-10 text-center sm:px-6 sm:py-14">
-        <h2 className="text-3xl font-extrabold sm:text-4xl">One Platform. Many Chip Design Loops. Connected Engineering Context.</h2>
-        <p className="mx-auto mt-4 max-w-4xl text-base leading-7 text-slate-300">
-          ChipLoop keeps specs, settings, logs, artifacts, dashboards, and handoffs connected across every chip design loop.
-        </p>
-        <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-          <button onClick={startGuidedDemo} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
-            Start Arch2RTL Demo
-          </button>
-          <button onClick={() => goTo("/apps#reference-journeys")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
-            Explore Reference Journeys
-          </button>
-          <button onClick={() => router.push("/loops")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
-            Explore Loops
-          </button>
-          <button onClick={() => router.push("/why-chiploop")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
-            Why ChipLoop
-          </button>
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold">Design Intent to Execution</h2>
+          <p className="mx-auto mt-3 max-w-3xl text-base leading-7 text-slate-300">
+            ChipLoop turns complex multi-dimensional chip design workflows into connected, traceable execution loops.
+          </p>
         </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {paths.map(([title, body, href, cta]) => (
-            <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-center">
-              <h3 className="text-2xl font-extrabold text-cyan-300">{title}</h3>
-              <p className="mt-3 text-base font-semibold leading-6 text-slate-200">{body}</p>
-              <button onClick={() => goTo(href)} className="mt-5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
-                {cta}
-              </button>
-            </article>
-          ))}
-        </div>
-      </section>
-
-        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
-          <div className="text-center">
-            <h2 className="text-3xl font-extrabold">Design Intent to Execution</h2>
-            <p className="mx-auto mt-3 max-w-3xl text-base leading-7 text-slate-300">
-              ChipLoop turns complex multi-dimensional chip design workflows into connected, traceable execution loops.
-            </p>
-          </div>
         <div className="mt-8 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
           {[
             ["01", "Define", "Specs, products, or workflows"],
@@ -360,6 +366,41 @@ function LandingPageContent() {
               ) : null}
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {paths.map(([title, body, href, cta]) => (
+            <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-center">
+              <h3 className="text-2xl font-extrabold text-cyan-300">{title}</h3>
+              <p className="mt-3 text-base font-semibold leading-6 text-slate-200">{body}</p>
+              <button onClick={() => goTo(href)} className="mt-5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
+                {cta}
+              </button>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-10 text-center sm:px-6 sm:py-14">
+        <h2 className="text-3xl font-extrabold sm:text-4xl">One Platform. Many Chip Design Loops. Connected Engineering Context.</h2>
+        <p className="mx-auto mt-4 max-w-4xl text-base leading-7 text-slate-300">
+          ChipLoop keeps specs, settings, logs, artifacts, dashboards, and handoffs connected across every chip design loop.
+        </p>
+        <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+          <button onClick={startGuidedDemo} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
+            Start Arch2RTL Demo
+          </button>
+          <button onClick={() => goTo("/apps#reference-journeys")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
+            Explore Reference Journeys
+          </button>
+          <button onClick={() => router.push("/loops")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
+            Explore Loops
+          </button>
+          <button onClick={() => router.push("/why-chiploop")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
+            Why ChipLoop
+          </button>
         </div>
       </section>
 
