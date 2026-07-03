@@ -1505,6 +1505,24 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
+        <section className="mb-5 rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Project Intake Helper</div>
+              <p className="mt-1 text-sm leading-6 text-cyan-100/80">
+                Review uploaded files or GitHub repo context before finalizing stages. Ask this Project can summarize risks, missing inputs, and recommended workflows.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => router.push("/apps/ask-project")}
+              className="shrink-0 rounded-lg border border-cyan-700 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/40"
+            >
+              Ask this Project
+            </button>
+          </div>
+        </section>
+
         <div className="mb-5">
           <StepRail active="configure" />
         </div>

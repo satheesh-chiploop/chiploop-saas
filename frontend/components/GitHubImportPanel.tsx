@@ -86,7 +86,7 @@ export default function GitHubImportPanel({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-bold text-cyan-300">Import from GitHub</h3>
-          <p className="mt-1 text-xs text-slate-400">Bring repo files into this ChipLoop run input.</p>
+          <p className="mt-1 text-xs text-slate-400">Bring selected repository files into ChipLoop context.</p>
         </div>
         {configured === false && connectUrl ? (
           <a href={connectUrl} className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-200 hover:bg-slate-900">

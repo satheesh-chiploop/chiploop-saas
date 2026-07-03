@@ -49,6 +49,7 @@ export default function AppSlugRouter() {
       "embedded-run": "/apps/embedded-run",
 
       // ✅ SYSTEM (dedicated pages)
+      "ask-project": "/apps/ask-project",
       "system-end2end": "/apps/system-end2end",
       "system-architecture": "/apps/system-architecture",
       "architecture-to-rtl": "/apps/architecture-to-rtl",

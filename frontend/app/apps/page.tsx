@@ -224,6 +224,15 @@ export default function AppsHomePage() {
   // Apps are grouped by loop so the page can present both guided entry points and full catalog sections.
   const apps: AppCard[] = useMemo(() => ([
     {
+      slug: "ask-project",
+      title: "Ask this Project",
+      subtitle: "Chat with uploaded files, codebases, specs, reports, logs, and docs",
+      loop_type: "system",
+      status: "New",
+      nudge: "Project intake",
+      promise: "Summaries, risks, suggestions, and recommended next workflows",
+    },
+    {
       slug: "validation-run",
       title: "Validation Run",
       subtitle: "One-click run on real hardware with preflight + learning",
@@ -916,6 +925,7 @@ export default function AppsHomePage() {
       "embedded-run": "/apps/embedded-run",
 
       // System
+      "ask-project": "/apps/ask-project",
       "system-end2end": "/apps/system-end2end",
       "system-architecture": "/apps/system-architecture",
       "architecture-to-rtl": "/apps/architecture-to-rtl",
