@@ -163,7 +163,10 @@ function LandingPageContent() {
           Help one engineer or a small team move from requirements to RTL, verification, firmware, software, co-simulation, tapeout, validation, and product demo in one connected platform.
         </p>
         <div className="mt-8 flex w-full flex-col gap-4 sm:mt-10 sm:w-auto sm:flex-row">
-          <button onClick={() => goTo("/products")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
+          <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
+            Book Demo
+          </button>
+          <button onClick={() => goTo("/products")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
             Explore Products
           </button>
           <button onClick={() => goTo("/apps")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
@@ -389,7 +392,10 @@ function LandingPageContent() {
           ChipLoop keeps specs, settings, logs, artifacts, dashboards, and handoffs connected across every chip design loop.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-          <button onClick={startGuidedDemo} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
+          <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
+            Book Demo
+          </button>
+          <button onClick={startGuidedDemo} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
             Start Arch2RTL Demo
           </button>
           <button onClick={() => goTo("/apps#reference-journeys")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
@@ -470,7 +476,10 @@ function LandingPageContent() {
           Begin with the guided Arch2RTL demo, then continue through Products, Apps, or Studio.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-          <button onClick={startGuidedDemo} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
+          <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
+            Book Demo
+          </button>
+          <button onClick={startGuidedDemo} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
             Start Arch2RTL Demo
           </button>
           <button onClick={() => goTo("/products")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">

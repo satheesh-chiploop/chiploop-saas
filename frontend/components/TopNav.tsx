@@ -6,7 +6,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import type { User } from "@supabase/supabase-js";
 import { PlanCreditBadge } from "@/components/PlanCreditStatus";
 
-type NavKey = "home" | "apps" | "products" | "studio" | "marketplace" | "pricing" | "events" | "help" | "settings" | "admin" | "webinar" | "workshop";
+type NavKey = "home" | "apps" | "products" | "studio" | "marketplace" | "pricing" | "events" | "help" | "settings" | "admin" | "webinar" | "workshop" | "demo";
 
 type TopNavProps = {
   current?: NavKey;
@@ -139,6 +139,7 @@ export default function TopNav({
     { key: "studio", label: "Studio", href: "/workflow", show: true },
     { key: "marketplace", label: "Marketplace", href: "/marketplace", show: showMarketplace },
     { key: "pricing", label: "Pricing", href: "/pricing", show: true },
+    { key: "demo", label: "Book Demo", href: "/book-demo", show: true },
     { key: "events", label: "Events", href: "/events", show: true },
     { key: "help", label: "Playbook", href: "/help", show: true },
     { key: "settings", label: "Settings", href: "/settings/plan", show: showSettings },
@@ -167,7 +168,13 @@ export default function TopNav({
             <button
               key={link.key}
               onClick={() => router.push(link.href)}
-              className={current === link.key ? activeNavButtonClass : navButtonClass}
+              className={
+                link.key === "demo"
+                  ? "whitespace-nowrap rounded-lg bg-cyan-400 px-3 py-2 text-sm font-bold text-slate-950 transition hover:bg-cyan-300 sm:px-4"
+                  : current === link.key
+                  ? activeNavButtonClass
+                  : navButtonClass
+              }
             >
               {link.label}
             </button>
