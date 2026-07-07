@@ -55,32 +55,22 @@ const subscriptionLoops = [
   {
     name: "Digital Design",
     body: "Requirements, design intent, spec-to-RTL, RTL generation, review, and handoff.",
-    core: "Generate, configure, run, review",
-    advanced: "Analyze, check, refine, hand off",
   },
   {
     name: "Digital Implementation",
     body: "Synthesis, implementation setup, constraints, reports, closure, and tapeout handoff.",
-    core: "Synthesis setup and reports",
-    advanced: "LEC, MBIST, RTL-to-GDS, STA, signoff",
   },
   {
     name: "Mixed Signal",
     body: "System RTL, analog/digital partitioning, models, smoke tests, and system synthesis.",
-    core: "System RTL, smoke tests, synthesis",
-    advanced: "Integration debug, closure, signoff",
   },
   {
     name: "Firmware/Software",
     body: "Firmware, drivers, software examples, validation, co-simulation, and demos.",
-    core: "Generate and run basic firmware/software",
-    advanced: "Validation loops and co-simulation",
   },
   {
     name: "Validation",
     body: "Validation plans, bring-up checklists, logs, dashboards, debug, and readiness packages.",
-    core: "Plan, review, summarize",
-    advanced: "Debug, root cause, close, release",
   },
 ];
 
@@ -249,17 +239,7 @@ function LandingPageContent() {
             {subscriptionLoops.map((loop) => (
               <article key={loop.name} className="rounded-xl border border-slate-800 bg-slate-950/70 p-5">
                 <h3 className="text-lg font-extrabold text-cyan-200">{loop.name}</h3>
-                <p className="mt-3 min-h-24 text-sm leading-6 text-slate-400">{loop.body}</p>
-                <div className="mt-4 space-y-2 text-sm">
-                  <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-3">
-                    <span className="font-bold text-slate-100">Core: </span>
-                    <span className="text-slate-300">{loop.core}</span>
-                  </div>
-                  <div className="rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-3">
-                    <span className="font-bold text-cyan-100">Advanced: </span>
-                    <span className="text-slate-300">{loop.advanced}</span>
-                  </div>
-                </div>
+                <p className="mt-3 min-h-28 text-sm leading-6 text-slate-400">{loop.body}</p>
               </article>
             ))}
           </div>
