@@ -529,7 +529,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-800 bg-slate-950 px-6 py-8 text-center text-sm text-slate-500">
+      <footer className="border-t border-slate-800 bg-slate-950 px-6 py-8 text-center text-base text-slate-500">
         <div className="mb-4 flex flex-wrap justify-center gap-4 text-slate-400">
           <button onClick={() => router.push("/events")} className="hover:text-cyan-200">Events</button>
           <button onClick={() => router.push("/help")} className="hover:text-cyan-200">Playbook</button>

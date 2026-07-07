@@ -20,8 +20,8 @@ type TopNavProps = {
   className?: string;
 };
 
-const navButtonClass = "whitespace-nowrap text-sm font-medium text-slate-300 transition hover:text-cyan-300";
-const activeNavButtonClass = "whitespace-nowrap text-sm font-semibold text-cyan-200 transition hover:text-cyan-100";
+const navButtonClass = "whitespace-nowrap text-[15px] font-medium text-slate-300 transition hover:text-cyan-300";
+const activeNavButtonClass = "whitespace-nowrap text-[15px] font-semibold text-cyan-200 transition hover:text-cyan-100";
 
 
 function AnimatedTesseractLogo() {
@@ -171,7 +171,7 @@ export default function TopNav({
               onClick={() => router.push(link.href)}
               className={
                 link.key === "demo"
-                  ? "whitespace-nowrap rounded-lg bg-cyan-400 px-3 py-2 text-sm font-bold text-slate-950 transition hover:bg-cyan-300 sm:px-4"
+                  ? "whitespace-nowrap rounded-lg bg-cyan-400 px-3 py-2 text-[15px] font-bold text-slate-950 transition hover:bg-cyan-300 sm:px-4"
                   : current === link.key
                   ? activeNavButtonClass
                   : navButtonClass
@@ -187,14 +187,14 @@ export default function TopNav({
                 setDisplayName(null);
                 router.push("/login");
               }}
-              className="whitespace-nowrap rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-cyan-200 sm:px-4"
+              className="whitespace-nowrap rounded-lg border border-slate-700 px-3 py-2 text-[15px] font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-cyan-200 sm:px-4"
             >
               <span className="mr-2 text-cyan-200">Hi, {displayName}</span>Logout
             </button>
           ) : (
             <button
               onClick={() => router.push(`/login?next=${encodeURIComponent(next)}`)}
-              className="whitespace-nowrap text-sm font-medium text-slate-300 transition hover:text-cyan-300"
+              className="whitespace-nowrap text-[15px] font-medium text-slate-300 transition hover:text-cyan-300"
             >
               Login
             </button>
