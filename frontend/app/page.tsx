@@ -535,7 +535,9 @@ function LandingPageContent() {
           <button onClick={() => router.push("/help")} className="hover:text-cyan-200">Playbook</button>
           <button onClick={() => router.push("/why-chiploop")} className="hover:text-cyan-200">Why ChipLoop</button>
           <button onClick={() => router.push("/webinar/register")} className="hover:text-cyan-200">Webinar</button>
+          <button onClick={() => router.push("/contact")} className="hover:text-cyan-200">Contact Us</button>
         </div>
+        <p className="mb-2 text-cyan-100">chiploop.agx@gmail.com</p>
         <p>Copyright 2026 ChipLoop</p>
       </footer>
     </main>
