@@ -51,8 +51,8 @@ const plans: Plan[] = [
   {
     key: "starter",
     name: "Starter",
-    price: "$14.99/month",
-    discountPrice: "$9.99/month for first 3 months",
+    price: "$19.99/month",
+    discountPrice: "$14.99/month for first 3 months",
     credits: "500 credits/month",
     loopAccess: "1 Loop Core",
     cta: "Start Starter",
@@ -108,8 +108,8 @@ const plans: Plan[] = [
   {
     key: "pro_max",
     name: "Pro Max",
-    price: "$199/month",
-    discountPrice: "$149/month for first 3 months",
+    price: "$99.99/month",
+    discountPrice: "$79.99/month for first 3 months",
     credits: "12,000 credits/month",
     loopAccess: "All Loops Advanced",
     cta: "Start Pro Max",
@@ -177,6 +177,12 @@ const addOns = [
   ["500 extra credits", "$9.99", "One-time credit pack for additional usage."],
   ["1,500 extra credits", "$24.99", "One-time credit pack for heavier short-term usage."],
   ["5,000 extra credits", "$69.99", "One-time credit pack for larger workflow runs."],
+];
+
+const setupSteps = [
+  ["1", "Choose included loop", "After signup, select the Core loop included with your plan."],
+  ["2", "Add capability", "Upgrade that loop to Advanced or add another Core/Advanced loop."],
+  ["3", "Add usage", "Buy extra credits only when you need more runs."],
 ];
 
 function normalizePlanId(value?: string): CurrentPlanKey | null {
@@ -263,6 +269,20 @@ function PricingContent() {
             Monthly credits control usage and do not roll over. Advanced loop upgrades unlock capability;
             extra credits are purchased separately when users need more runs.
           </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button
+              onClick={() => document.getElementById("setup-flow")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200"
+            >
+              How loop add-ons work
+            </button>
+            <button
+              onClick={() => router.push("/settings/plan")}
+              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200"
+            >
+              Plan Settings
+            </button>
+          </div>
           {currentPlanName ? (
             <div className="mt-4 inline-flex rounded-lg border border-cyan-700/60 bg-cyan-950/30 px-3 py-2 text-sm text-cyan-100">
               Current plan: {currentPlanName}
@@ -280,7 +300,7 @@ function PricingContent() {
             <div>
               <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">Starter intro</div>
               <p className="mt-2 text-sm leading-6 text-cyan-50">
-                Start at $9.99/month for the first 3 months, then $14.99/month. Includes 1 Loop Core and 500 monthly credits.
+                Start at $14.99/month for the first 3 months, then $19.99/month. Includes 1 Loop Core and 500 monthly credits.
               </p>
             </div>
             <button
@@ -308,6 +328,11 @@ function PricingContent() {
                   <div className="mt-2 text-sm font-semibold text-slate-300">{plan.credits}</div>
                   <div className="mt-1 text-sm font-semibold text-cyan-100">{plan.loopAccess}</div>
                   <p className="mt-4 text-sm leading-6 text-slate-400">{plan.note}</p>
+                  {plan.key !== "enterprise" ? (
+                    <p className="mt-3 text-xs leading-5 text-slate-500">
+                      After checkout, configure loops and add-ons from Plan Settings.
+                    </p>
+                  ) : null}
                 </div>
                 <button
                   onClick={() => handlePlanAction(plan)}
@@ -321,7 +346,34 @@ function PricingContent() {
           })}
         </section>
 
-        <section className="mt-10 rounded-lg border border-slate-800 bg-slate-950/70 p-5">
+        <section id="setup-flow" className="mt-10 rounded-lg border border-cyan-800/70 bg-cyan-950/20 p-5 scroll-mt-24">
+          <div className="max-w-3xl">
+            <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">After Signup</div>
+            <h2 className="mt-2 text-xl font-bold">Set up your loop access</h2>
+            <p className="mt-2 text-sm leading-6 text-cyan-50/90">
+              Checkout starts the base subscription. Loop choices, Advanced upgrades, and credit packs are managed from Plan Settings after signup.
+            </p>
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {setupSteps.map(([step, title, body]) => (
+              <article key={step} className="rounded-lg border border-cyan-900/70 bg-slate-950/60 p-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">{step}</div>
+                <h3 className="mt-3 font-extrabold text-cyan-100">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
+              </article>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button onClick={() => router.push("/settings/plan")} className="rounded-lg bg-cyan-500 px-5 py-3 text-sm font-bold text-slate-950 hover:bg-cyan-400">
+              Open Plan Settings
+            </button>
+            <button onClick={() => document.getElementById("add-ons")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="rounded-lg border border-slate-700 px-5 py-3 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
+              View Add-ons
+            </button>
+          </div>
+        </section>
+
+        <section id="add-ons" className="mt-10 rounded-lg border border-slate-800 bg-slate-950/70 p-5 scroll-mt-24">
           <div className="max-w-3xl">
             <h2 className="text-xl font-bold">Five subscription loops</h2>
             <p className="mt-2 text-sm leading-6 text-slate-400">

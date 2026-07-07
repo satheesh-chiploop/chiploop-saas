@@ -63,6 +63,24 @@ const unlockExamples = [
   ["Full product handoff", "Design + Implementation + Software + Validation"],
 ];
 
+const referenceJourneys = [
+  {
+    title: "PWM Controller",
+    body: "A compact digital IP journey from RTL to firmware, software validation, and product app.",
+    href: "/apps#reference-journeys",
+  },
+  {
+    title: "Temperature Monitor SoC",
+    body: "A mixed-signal journey with digital RTL, analog model, System Sim, firmware, software, and validation.",
+    href: "/apps#reference-journeys",
+  },
+  {
+    title: "SRAM MBIST",
+    body: "A memory and DFT journey with synthesis, scan/ATPG readiness, MBIST evidence, and implementation handoff.",
+    href: "/apps#reference-journeys",
+  },
+];
+
 export default function LoopsPage() {
   const router = useRouter();
 
@@ -241,6 +259,33 @@ export default function LoopsPage() {
             <button onClick={() => router.push("/pricing")} className="rounded-lg border border-slate-700 px-5 py-3 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
               View Pricing
             </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
+          <div className="max-w-3xl">
+            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Reference Journeys</p>
+            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+              Try a journey that already connects the loops.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-300">
+              Start with a guided example, inspect the outputs, then adapt the flow to your own product.
+            </p>
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {referenceJourneys.map((journey) => (
+              <button
+                key={journey.title}
+                onClick={() => router.push(journey.href)}
+                className="rounded-xl border border-slate-800 bg-slate-950/70 p-5 text-left transition hover:border-cyan-500 hover:bg-slate-950"
+              >
+                <h3 className="text-lg font-extrabold text-cyan-200">{journey.title}</h3>
+                <p className="mt-3 min-h-20 text-sm leading-6 text-slate-300">{journey.body}</p>
+                <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Open reference journey</div>
+              </button>
+            ))}
           </div>
         </div>
       </section>

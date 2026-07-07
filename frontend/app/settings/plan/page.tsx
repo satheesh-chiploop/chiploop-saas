@@ -66,6 +66,32 @@ const featureLabels: Record<string, string> = {
   custom_limits: "Custom limits",
 };
 
+const loopChoices = [
+  { key: "digital_design", label: "Digital Design" },
+  { key: "digital_implementation", label: "Digital Implementation" },
+  { key: "mixed_signal", label: "Mixed Signal" },
+  { key: "firmware_software", label: "Firmware/Software" },
+  { key: "validation", label: "Validation" },
+];
+
+const loopAddOns = [
+  { key: "add_core", label: "Add Loop Core", price: "+$4.99/mo" },
+  { key: "upgrade_to_advanced", label: "Upgrade Loop to Advanced", price: "+$9.99/mo" },
+  { key: "add_advanced", label: "Add Loop Advanced", price: "+$14.99/mo" },
+] as const;
+
+const creditPacks = [
+  { credits: 500, label: "500 credits", price: "$9.99" },
+  { credits: 1500, label: "1,500 credits", price: "$24.99" },
+  { credits: 5000, label: "5,000 credits", price: "$69.99" },
+];
+
+const planChoices = [
+  { key: "starter", label: "Starter", price: "$19.99/mo", detail: "1 Core loop, 500 credits" },
+  { key: "pro", label: "Pro", price: "$49.99/mo", detail: "3 Core loops or 1 Advanced loop, 2,500 credits" },
+  { key: "pro_max", label: "Pro Max", price: "$99.99/mo", detail: "All loops Advanced, 12,000 credits" },
+];
+
 function formatCredits(value?: number | null): string {
   if (value === null || value === undefined) return "Custom";
   return value.toLocaleString();
@@ -85,6 +111,9 @@ export default function SettingsPlanPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [billingBusy, setBillingBusy] = useState(false);
+  const [checkoutBusy, setCheckoutBusy] = useState<string | null>(null);
+  const [selectedLoop, setSelectedLoop] = useState(loopChoices[0].key);
+  const [planBusy, setPlanBusy] = useState<string | null>(null);
 
   async function loadPlan() {
     setLoading(true);
@@ -117,6 +146,56 @@ export default function SettingsPlanPage() {
     }
   }
 
+  async function startLoopCheckout(addonType: string) {
+    const busyKey = `${selectedLoop}:${addonType}`;
+    setCheckoutBusy(busyKey);
+    setError(null);
+    try {
+      const response = await apiPost<{ status: string; url?: string }>("/settings/billing/loop-checkout", {
+        loop_key: selectedLoop,
+        addon_type: addonType,
+      });
+      if (!response.url) throw new Error("Loop checkout URL was not returned.");
+      window.location.href = response.url;
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setCheckoutBusy(null);
+    }
+  }
+
+  async function startCreditCheckout(credits: number) {
+    const busyKey = `credits:${credits}`;
+    setCheckoutBusy(busyKey);
+    setError(null);
+    try {
+      const response = await apiPost<{ status: string; url?: string }>("/settings/billing/credit-checkout", {
+        credits,
+      });
+      if (!response.url) throw new Error("Credit checkout URL was not returned.");
+      window.location.href = response.url;
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setCheckoutBusy(null);
+    }
+  }
+
+  async function changePlan(planId: string) {
+    setPlanBusy(planId);
+    setError(null);
+    try {
+      await apiPost<{ status: string; changed?: boolean }>("/settings/billing/change-plan", {
+        plan_id: planId,
+      });
+      await loadPlan();
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setPlanBusy(null);
+    }
+  }
+
   const entitlements = useMemo(() => plan?.entitlements || {}, [plan?.entitlements]);
   const enabledFeatures = useMemo(
     () =>
@@ -129,6 +208,7 @@ export default function SettingsPlanPage() {
   );
 
   const planName = plan?.current_plan?.display_name || plan?.current_plan?.name || "Trial";
+  const currentPlanId = (plan?.current_plan?.id || "").toLowerCase();
   const monthlyCredits = plan?.credits ?? plan?.monthly_credits;
   const usedCredits = plan?.credits_used ?? 0;
   const remainingCredits = plan?.credits_remaining;
@@ -249,7 +329,7 @@ export default function SettingsPlanPage() {
               <section className="rounded-lg border border-cyan-700/50 bg-cyan-950/20 p-5">
                 <div className="text-sm font-semibold text-cyan-100">Intro discount</div>
                 <div className="mt-2 text-sm text-cyan-100/85">
-                  25% off remains for {discountMonthsRemaining} billing cycle{discountMonthsRemaining === 1 ? "" : "s"}.
+                  Intro discount remains for {discountMonthsRemaining} billing cycle{discountMonthsRemaining === 1 ? "" : "s"}.
                 </div>
               </section>
             ) : null}
@@ -265,6 +345,130 @@ export default function SettingsPlanPage() {
                 </div>
               </section>
             ) : null}
+
+            {!plan.requires_checkout ? (
+              <section className="rounded-lg border border-slate-800 bg-slate-950/60 p-5">
+                <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold">Change plan</h3>
+                    <p className="mt-1 text-sm text-slate-400">
+                      Upgrade or downgrade the existing Stripe subscription. Add-ons and credits stay separate.
+                    </p>
+                  </div>
+                  <button
+                    onClick={openBillingPortal}
+                    disabled={billingBusy}
+                    className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:text-slate-500"
+                  >
+                    {billingBusy ? "Opening..." : "Invoices / payment"}
+                  </button>
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                  {planChoices.map((choice) => {
+                    const isCurrent = currentPlanId === choice.key;
+                    return (
+                      <button
+                        key={choice.key}
+                        onClick={() => changePlan(choice.key)}
+                        disabled={isCurrent || planBusy !== null}
+                        className={`rounded-lg border p-4 text-left transition disabled:cursor-not-allowed ${
+                          isCurrent
+                            ? "border-cyan-500 bg-cyan-950/30"
+                            : "border-slate-800 bg-black/25 hover:border-cyan-700"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="font-bold text-slate-100">{choice.label}</span>
+                          <span className="text-sm font-bold text-cyan-100">
+                            {planBusy === choice.key ? "Updating..." : choice.price}
+                          </span>
+                        </div>
+                        <div className="mt-2 text-sm leading-5 text-slate-400">{choice.detail}</div>
+                        {isCurrent ? <div className="mt-3 text-xs font-bold uppercase tracking-wide text-cyan-300">Current plan</div> : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ) : null}
+
+            <section id="loop-setup" className="rounded-lg border border-cyan-800/60 bg-cyan-950/20 p-5 scroll-mt-24">
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wide text-cyan-300">Loop Access Setup</div>
+                  <h3 className="mt-2 text-lg font-bold text-white">Choose the loop you start with. Add more when needed.</h3>
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-cyan-50/85">
+                    Starter includes one Core loop. Advanced upgrades unlock deeper capability, while credits stay separate and pay for usage.
+                  </p>
+                </div>
+                <button
+                  onClick={openBillingPortal}
+                  disabled={billingBusy}
+                  className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-slate-700"
+                >
+                  {billingBusy ? "Opening..." : "Manage billing"}
+                </button>
+              </div>
+
+              <div className="mt-5 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
+                  <div className="text-sm font-semibold text-slate-200">Available design loops</div>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {loopChoices.map((loop) => (
+                      <button
+                        key={loop.key}
+                        onClick={() => setSelectedLoop(loop.key)}
+                        className={`rounded-md border px-3 py-2 text-left text-sm transition ${
+                          selectedLoop === loop.key
+                            ? "border-cyan-500 bg-cyan-950/50 text-cyan-100"
+                            : "border-slate-800 bg-black/25 text-slate-300 hover:border-cyan-800"
+                        }`}
+                      >
+                        {loop.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
+                  <div className="text-sm font-semibold text-slate-200">Add-ons</div>
+                  <div className="mt-3 space-y-2">
+                    {loopAddOns.map((addOn) => (
+                      <button
+                        key={addOn.key}
+                        onClick={() => startLoopCheckout(addOn.key)}
+                        disabled={checkoutBusy !== null}
+                        className="flex w-full items-center justify-between gap-3 rounded-md border border-slate-800 bg-black/25 px-3 py-2 text-left text-sm transition hover:border-cyan-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <span className="text-slate-300">{addOn.label}</span>
+                        <span className="font-bold text-cyan-100">
+                          {checkoutBusy === `${selectedLoop}:${addOn.key}` ? "Opening..." : addOn.price}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 rounded-lg border border-slate-800 bg-slate-950/60 p-4">
+                <div className="text-sm font-semibold text-slate-200">Credit packs</div>
+                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                  {creditPacks.map((pack) => (
+                    <button
+                      key={pack.credits}
+                      onClick={() => startCreditCheckout(pack.credits)}
+                      disabled={checkoutBusy !== null}
+                      className="rounded-md border border-slate-800 bg-black/25 px-3 py-2 text-left text-sm transition hover:border-cyan-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <div className="font-semibold text-slate-200">{pack.label}</div>
+                      <div className="mt-1 font-bold text-cyan-100">
+                        {checkoutBusy === `credits:${pack.credits}` ? "Opening..." : pack.price}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
 
             <section className="rounded-lg border border-slate-800 bg-slate-950/60 p-5">
               <h3 className="text-lg font-bold">Enabled features</h3>
