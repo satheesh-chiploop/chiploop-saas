@@ -1028,7 +1028,7 @@ export default function AppsHomePage() {
     { view: "system", title: "Explore System apps", body: "System RTL, simulation, synthesis, PD, firmware, software, validation, and product builder.", count: apps.filter((app) => app.loop_type === "system").length },
     { view: "analog", title: "Explore Analog apps", body: "Analog spec, netlist, model, validation, correlation, iteration, and abstracts.", count: apps.filter((app) => app.loop_type === "analog").length },
     { view: "embedded", title: "Explore Embedded apps", body: "HAL, drivers, boot, diagnostics, log analysis, co-sim, and firmware run.", count: apps.filter((app) => app.loop_type === "embedded").length },
-    { view: "validation", title: "Explore Validation apps", body: "Bench setup, preflight, validation plans, hardware runs, and insights.", count: apps.filter((app) => app.loop_type === "validation").length },
+    { view: "validation", title: "Explore Validation apps", body: "Validation plans, bench setup, preflight, execution orchestration, analytics, and insights.", count: apps.filter((app) => app.loop_type === "validation").length },
   ];
 
   const selectedCatalogLoop = ["digital", "system", "analog", "embedded", "validation"].includes(catalogView)

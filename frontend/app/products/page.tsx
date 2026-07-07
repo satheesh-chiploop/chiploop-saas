@@ -44,11 +44,11 @@ type Product = {
 const supabase = createClientComponentClient();
 
 const PRODUCT_TYPES: Array<{ id: ProductType; label: string; description: string }> = [
-  { id: "digital", label: "Digital", description: "RTL, DQA, verification, closure, synthesis, firmware/software handoff." },
+  { id: "digital", label: "Digital", description: "Arch2RTL, RTL quality, verification, synthesis, closure, and implementation handoff." },
   { id: "analog", label: "Analog", description: "Specs, behavioral models, SPICE/GDS collateral, LEF/LIB consistency." },
-  { id: "mixed_signal", label: "Mixed-Signal", description: "System RTL, analog collateral, System Sim, firmware, software, product app." },
-  { id: "embedded", label: "Embedded", description: "Firmware, HAL, drivers, software services, validation and app handoff." },
-  { id: "validation", label: "Validation", description: "Bench setup, preflight, hardware runs, evidence, and product-facing reports." },
+  { id: "mixed_signal", label: "Mixed-Signal", description: "System RTL, analog/digital interfaces, System Sim, System Synthesis, and optional PD/product handoff." },
+  { id: "embedded", label: "Embedded", description: "Register extraction, HAL, drivers, firmware, software services, co-simulation, and app handoff." },
+  { id: "validation", label: "Validation", description: "Validation plans, bench/instrument setup, connectivity, preflight, execution orchestration, analytics, and reports." },
 ];
 
 const STARTING_POINTS = [

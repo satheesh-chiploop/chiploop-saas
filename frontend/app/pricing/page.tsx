@@ -163,11 +163,11 @@ const plans: Plan[] = [
 ];
 
 const loopPackages = [
-  ["Digital Design", "Spec, design intent, spec-to-RTL, arch-to-RTL, RTL review", "Consistency checks, advanced analyzer, assertions, interface checks, refinement"],
-  ["Digital Implementation", "Synthesis setup, synthesis run, constraints, timing/power/area reports", "Auto synthesis closure, LEC, MBIST, RTL-to-GDS, STA, signoff"],
-  ["Mixed Signal", "System RTL, analog/digital partitioning, smoke tests, System Synthesis", "Integration debug, mixed-signal closure, model refinement, signoff support"],
-  ["Firmware/Software", "Firmware skeleton, drivers, examples, build/run, basic validation", "Validation loops, hardware/software co-simulation, integration debug, demo package"],
-  ["Validation", "Validation plan, bring-up checklist, logs, dashboards, run review", "Debug assistant, root cause, regression review, validation closure, readiness package"],
+  ["Digital Design", "Spec capture, Arch2RTL, RTL review, smoke compile/sim, DQA, basic verification setup", "Spec2RTL conformance, deeper DQA, assertions, coverage planning, verification closure analysis"],
+  ["Digital Implementation", "Synthesis setup, synthesis run, constraints, timing/power/area reports", "Auto synthesis closure, LEC, scan/DFT, ATPG, MBIST, RTL-to-GDS, STA, signoff"],
+  ["Mixed Signal", "System RTL, analog/digital interface intent, behavioral models, smoke tests, System Sim, System Synthesis", "System DQA, integration debug, mixed-signal evidence, System PD/signoff path, validation handoff"],
+  ["Firmware/Software", "Register-map extraction, HAL/driver scaffolds, boot setup, diagnostics, firmware build/run", "Software SDK/API generation, package validation, hardware/software co-simulation, integration debug, demo package"],
+  ["Validation", "Validation plan, bench/instrument setup, connectivity and wiring intent, preflight, run review", "Execution orchestration, analytics, pattern detection, coverage proposals, plan evolution"],
 ];
 
 const addOns = [

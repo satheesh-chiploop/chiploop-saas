@@ -54,31 +54,24 @@ const platformStats = [
 const subscriptionLoops = [
   {
     name: "Digital Design",
-    body: "Requirements, design intent, spec-to-RTL, RTL generation, review, and handoff.",
+    body: "Requirements, design intent, architecture-to-RTL, RTL quality, verification setup, and handoff.",
   },
   {
     name: "Digital Implementation",
-    body: "Synthesis, implementation setup, constraints, reports, closure, and tapeout handoff.",
+    body: "Synthesis, constraints, timing/power/area reports, DFT/MBIST, RTL-to-GDS, signoff, and tapeout handoff.",
   },
   {
     name: "Mixed Signal",
-    body: "System RTL, analog/digital partitioning, models, smoke tests, and system synthesis.",
+    body: "System and mixed-signal integration across digital RTL, analog models, SoC intent, simulation, and synthesis.",
   },
   {
     name: "Firmware/Software",
-    body: "Firmware, drivers, software examples, validation, co-simulation, and demos.",
+    body: "Register extraction, HAL, drivers, boot/diagnostics, firmware builds, software services, co-simulation, and demos.",
   },
   {
     name: "Validation",
-    body: "Validation plans, bring-up checklists, logs, dashboards, debug, and readiness packages.",
+    body: "Validation plans, bench/instrument setup, connectivity, preflight, execution analytics, and reports.",
   },
-];
-
-const accessModel = [
-  ["Plan", "Platform limits"],
-  ["Loop", "Engineering domain"],
-  ["Core / Advanced", "Automation depth"],
-  ["Credits", "Usage volume"],
 ];
 
 const agentSegments = [
@@ -241,14 +234,6 @@ function LandingPageContent() {
                 <h3 className="text-lg font-extrabold text-cyan-200">{loop.name}</h3>
                 <p className="mt-3 min-h-28 text-sm leading-6 text-slate-400">{loop.body}</p>
               </article>
-            ))}
-          </div>
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {accessModel.map(([title, body]) => (
-              <div key={title} className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-center">
-                <div className="font-extrabold text-slate-100">{title}</div>
-                <div className="mt-1 text-sm text-slate-400">{body}</div>
-              </div>
             ))}
           </div>
           <div className="mt-7 text-center">
