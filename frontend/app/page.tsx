@@ -35,9 +35,11 @@ const automationSnippets = {
 };
 
 const paths = [
+  ["Loops", "Choose your chip design domain.", "/loops", "Explore Loops"],
   ["Products", "Build complete chip journeys.", "/products", "Explore Products"],
   ["Apps", "Run ready-made chip workflows.", "/apps", "Explore Apps"],
   ["Studio", "Create custom agents and workflows.", "/workflow", "Open Studio"],
+  ["Marketplace", "Reuse approved engineering flows.", "/marketplace", "Explore Marketplace"],
 ];
 
 const platformStats = [
@@ -47,6 +49,46 @@ const platformStats = [
   ["8+", "Reference Journeys"],
   ["5+", "Product Journeys"],
   ["SDK + CLI + Studio", "Developer Access"],
+];
+
+const subscriptionLoops = [
+  {
+    name: "Digital Design",
+    body: "Requirements, design intent, spec-to-RTL, RTL generation, review, and handoff.",
+    core: "Generate, configure, run, review",
+    advanced: "Analyze, check, refine, hand off",
+  },
+  {
+    name: "Digital Implementation",
+    body: "Synthesis, implementation setup, constraints, reports, closure, and tapeout handoff.",
+    core: "Synthesis setup and reports",
+    advanced: "LEC, MBIST, RTL-to-GDS, STA, signoff",
+  },
+  {
+    name: "Mixed Signal",
+    body: "System RTL, analog/digital partitioning, models, smoke tests, and system synthesis.",
+    core: "System RTL, smoke tests, synthesis",
+    advanced: "Integration debug, closure, signoff",
+  },
+  {
+    name: "Firmware/Software",
+    body: "Firmware, drivers, software examples, validation, co-simulation, and demos.",
+    core: "Generate and run basic firmware/software",
+    advanced: "Validation loops and co-simulation",
+  },
+  {
+    name: "Validation",
+    body: "Validation plans, bring-up checklists, logs, dashboards, debug, and readiness packages.",
+    core: "Plan, review, summarize",
+    advanced: "Debug, root cause, close, release",
+  },
+];
+
+const accessModel = [
+  ["Plan", "Platform limits"],
+  ["Loop", "Engineering domain"],
+  ["Core / Advanced", "Automation depth"],
+  ["Credits", "Usage volume"],
 ];
 
 const agentSegments = [
@@ -166,6 +208,9 @@ function LandingPageContent() {
           <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
             Book Demo
           </button>
+          <button onClick={() => router.push("/loops")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
+            Explore Loops
+          </button>
           <button onClick={() => goTo("/products")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
             Explore Products
           </button>
@@ -185,6 +230,69 @@ function LandingPageContent() {
               <div className="break-words text-xl font-extrabold leading-tight text-cyan-300 sm:text-2xl">{value}</div>
               <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</div>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Choose Your Chip Design Loop</p>
+            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+              One platform. Five chip design loops. Connected engineering context.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-300">
+              Start with one Core loop. Add Advanced capability or more credits as your work grows.
+            </p>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+            {subscriptionLoops.map((loop) => (
+              <article key={loop.name} className="rounded-xl border border-slate-800 bg-slate-950/70 p-5">
+                <h3 className="text-lg font-extrabold text-cyan-200">{loop.name}</h3>
+                <p className="mt-3 min-h-24 text-sm leading-6 text-slate-400">{loop.body}</p>
+                <div className="mt-4 space-y-2 text-sm">
+                  <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-3">
+                    <span className="font-bold text-slate-100">Core: </span>
+                    <span className="text-slate-300">{loop.core}</span>
+                  </div>
+                  <div className="rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-3">
+                    <span className="font-bold text-cyan-100">Advanced: </span>
+                    <span className="text-slate-300">{loop.advanced}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {accessModel.map(([title, body]) => (
+              <div key={title} className="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-center">
+                <div className="font-extrabold text-slate-100">{title}</div>
+                <div className="mt-1 text-sm text-slate-400">{body}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-7 text-center">
+            <button onClick={() => router.push("/loops")} className="rounded-lg border border-cyan-700 px-5 py-3 text-sm font-bold text-cyan-100 hover:border-cyan-300 hover:text-cyan-200">
+              Explore Design Loops
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+        <div className="text-center">
+          <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Explore ChipLoop</p>
+          <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">Start where you need.</h2>
+        </div>
+        <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
+          {paths.map(([title, body, href, cta]) => (
+            <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-center">
+              <h3 className="text-2xl font-extrabold text-cyan-300">{title}</h3>
+              <p className="mt-3 min-h-12 text-base font-semibold leading-6 text-slate-200">{body}</p>
+              <button onClick={() => goTo(href)} className="mt-5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
+                {cta}
+              </button>
+            </article>
           ))}
         </div>
       </section>
@@ -372,44 +480,6 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {paths.map(([title, body, href, cta]) => (
-            <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-center">
-              <h3 className="text-2xl font-extrabold text-cyan-300">{title}</h3>
-              <p className="mt-3 text-base font-semibold leading-6 text-slate-200">{body}</p>
-              <button onClick={() => goTo(href)} className="mt-5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
-                {cta}
-              </button>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-10 text-center sm:px-6 sm:py-14">
-        <h2 className="text-3xl font-extrabold sm:text-4xl">One Platform. Many Chip Design Loops. Connected Engineering Context.</h2>
-        <p className="mx-auto mt-4 max-w-4xl text-base leading-7 text-slate-300">
-          ChipLoop keeps specs, settings, logs, artifacts, dashboards, and handoffs connected across every chip design loop.
-        </p>
-        <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-          <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
-            Book Demo
-          </button>
-          <button onClick={startGuidedDemo} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
-            Start Arch2RTL Demo
-          </button>
-          <button onClick={() => goTo("/apps#reference-journeys")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
-            Explore Reference Journeys
-          </button>
-          <button onClick={() => router.push("/loops")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
-            Explore Loops
-          </button>
-          <button onClick={() => router.push("/why-chiploop")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white hover:border-cyan-300 sm:w-auto">
-            Why ChipLoop
-          </button>
-        </div>
-      </section>
-
       <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 sm:p-8 md:p-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
@@ -495,6 +565,12 @@ function LandingPageContent() {
       </section>
 
       <footer className="border-t border-slate-800 bg-slate-950 px-6 py-8 text-center text-sm text-slate-500">
+        <div className="mb-4 flex flex-wrap justify-center gap-4 text-slate-400">
+          <button onClick={() => router.push("/events")} className="hover:text-cyan-200">Events</button>
+          <button onClick={() => router.push("/help")} className="hover:text-cyan-200">Playbook</button>
+          <button onClick={() => router.push("/why-chiploop")} className="hover:text-cyan-200">Why ChipLoop</button>
+          <button onClick={() => router.push("/webinar/register")} className="hover:text-cyan-200">Webinar</button>
+        </div>
         <p>Copyright 2026 ChipLoop</p>
       </footer>
     </main>

@@ -14,6 +14,7 @@ type Plan = {
   price: string;
   discountPrice?: string;
   credits: string;
+  loopAccess: string;
   cta: string;
   note: string;
   popular?: boolean;
@@ -28,12 +29,17 @@ type PlanResponse = {
 };
 
 const featureRows = [
+  "Included Loop Access",
+  "Monthly Credits",
   "Guided Apps",
+  "Product Journeys",
+  "Ask this Project",
+  "Design Intent Analyzer",
   "Studio Access",
-  "Agent Planner",
-  "Draft Agent Generation",
-  "Private Agents",
   "Workflow Composer",
+  "Create App from Workflow",
+  "Private Apps / Workflows",
+  "Custom Agents",
   "Developer Automation: SDK + CLI",
   "API Keys",
   "Marketplace Access",
@@ -45,18 +51,24 @@ const plans: Plan[] = [
   {
     key: "starter",
     name: "Starter",
-    price: "$19.99/month",
-    discountPrice: "$14.99/month for first 3 months",
-    credits: "2,000 credits/month",
+    price: "$14.99/month",
+    discountPrice: "$9.99/month for first 3 months",
+    credits: "500 credits/month",
+    loopAccess: "1 Loop Core",
     cta: "Start Starter",
-    note: "For users running guided Apps and basic Studio workflows from the browser.",
+    note: "For individuals starting with one chip design loop, guided apps, and basic Studio configuration.",
     features: {
+      "Included Loop Access": "1 Loop Core",
+      "Monthly Credits": "500, no rollover",
       "Guided Apps": "Included",
-      "Studio Access": "Basic",
-      "Agent Planner": "Included",
-      "Draft Agent Generation": "Included",
-      "Private Agents": "5 private agents",
-      "Workflow Composer": "Limited",
+      "Product Journeys": "Subscribed loop only",
+      "Ask this Project": "Included",
+      "Design Intent Analyzer": "Basic",
+      "Studio Access": "Basic configuration",
+      "Workflow Composer": "Use templates",
+      "Create App from Workflow": "Limited",
+      "Private Apps / Workflows": "1-2 private apps",
+      "Custom Agents": "Not included",
       "Developer Automation: SDK + CLI": "Not included",
       "API Keys": "Not included",
       "Marketplace Access": "Browse + install",
@@ -67,19 +79,25 @@ const plans: Plan[] = [
   {
     key: "pro",
     name: "Pro",
-    price: "$39.99/month",
-    discountPrice: "$29.99/month for first 3 months",
-    credits: "5,000 credits/month",
+    price: "$49.99/month",
+    discountPrice: "$39.99/month for first 3 months",
+    credits: "2,500 credits/month",
+    loopAccess: "3 Loop Core or 1 Loop Advanced",
     cta: "Start Pro",
-    note: "For developers and teams automating ChipLoop with Studio, SDK, and CLI.",
+    note: "For active users who need more loops, custom workflows, app creation, SDK, and CLI.",
     popular: true,
     features: {
+      "Included Loop Access": "3 Loop Core or 1 Loop Advanced",
+      "Monthly Credits": "2,500, no rollover",
       "Guided Apps": "Included",
-      "Studio Access": "Full",
-      "Agent Planner": "Included",
-      "Draft Agent Generation": "Included",
-      "Private Agents": "25 private agents",
+      "Product Journeys": "Subscribed loops",
+      "Ask this Project": "Included",
+      "Design Intent Analyzer": "Advanced",
+      "Studio Access": "Create and edit",
       "Workflow Composer": "Included",
+      "Create App from Workflow": "Included",
+      "Private Apps / Workflows": "Higher limits",
+      "Custom Agents": "Limited",
       "Developer Automation: SDK + CLI": "Included",
       "API Keys": "3 keys",
       "Marketplace Access": "Browse + install",
@@ -90,18 +108,24 @@ const plans: Plan[] = [
   {
     key: "pro_max",
     name: "Pro Max",
-    price: "$59.99/month",
-    discountPrice: "$44.99/month for first 3 months",
+    price: "$199/month",
+    discountPrice: "$149/month for first 3 months",
     credits: "12,000 credits/month",
+    loopAccess: "All Loops Advanced",
     cta: "Start Pro Max",
-    note: "For heavier automation, more private agents, and higher usage limits.",
+    note: "For users and teams running advanced flows across every chip design loop.",
     features: {
-      "Guided Apps": "Higher limits",
-      "Studio Access": "Full",
-      "Agent Planner": "Included",
-      "Draft Agent Generation": "Included",
-      "Private Agents": "100 private agents",
+      "Included Loop Access": "All Loops Advanced",
+      "Monthly Credits": "12,000, no rollover",
+      "Guided Apps": "Included",
+      "Product Journeys": "All subscribed journeys",
+      "Ask this Project": "Included",
+      "Design Intent Analyzer": "Advanced + team context",
+      "Studio Access": "Advanced",
       "Workflow Composer": "Included",
+      "Create App from Workflow": "Included",
+      "Private Apps / Workflows": "High limits",
+      "Custom Agents": "Included",
       "Developer Automation: SDK + CLI": "Included",
       "API Keys": "10 keys",
       "Marketplace Access": "Browse + install",
@@ -114,15 +138,21 @@ const plans: Plan[] = [
     name: "Enterprise",
     price: "Custom",
     credits: "Custom credits",
+    loopAccess: "Custom loop access",
     cta: "Contact Sales",
     note: "For pilots, beta programs, custom limits, governance, and private deployment review.",
     features: {
+      "Included Loop Access": "Custom",
+      "Monthly Credits": "Custom",
       "Guided Apps": "Custom limits",
+      "Product Journeys": "Custom",
+      "Ask this Project": "Included",
+      "Design Intent Analyzer": "Custom/private context",
       "Studio Access": "Full",
-      "Agent Planner": "Included",
-      "Draft Agent Generation": "Included",
-      "Private Agents": "Custom",
       "Workflow Composer": "Included",
+      "Create App from Workflow": "Included",
+      "Private Apps / Workflows": "Custom",
+      "Custom Agents": "Custom",
       "Developer Automation: SDK + CLI": "Included",
       "API Keys": "Custom",
       "Marketplace Access": "Optional / governed",
@@ -132,10 +162,28 @@ const plans: Plan[] = [
   },
 ];
 
+const loopPackages = [
+  ["Digital Design", "Spec, design intent, spec-to-RTL, arch-to-RTL, RTL review", "Consistency checks, advanced analyzer, assertions, interface checks, refinement"],
+  ["Digital Implementation", "Synthesis setup, synthesis run, constraints, timing/power/area reports", "Auto synthesis closure, LEC, MBIST, RTL-to-GDS, STA, signoff"],
+  ["Mixed Signal", "System RTL, analog/digital partitioning, smoke tests, System Synthesis", "Integration debug, mixed-signal closure, model refinement, signoff support"],
+  ["Firmware/Software", "Firmware skeleton, drivers, examples, build/run, basic validation", "Validation loops, hardware/software co-simulation, integration debug, demo package"],
+  ["Validation", "Validation plan, bring-up checklist, logs, dashboards, run review", "Debug assistant, root cause, regression review, validation closure, readiness package"],
+];
+
+const addOns = [
+  ["Add one Loop Core", "+$4.99/month", "Add another engineering domain at Core depth."],
+  ["Upgrade Loop to Advanced", "+$9.99/month", "Unlock Advanced capability for a loop you already have."],
+  ["Add one Loop Advanced", "+$14.99/month", "Add a new engineering domain directly at Advanced depth."],
+  ["500 extra credits", "$9.99", "One-time credit pack for additional usage."],
+  ["1,500 extra credits", "$24.99", "One-time credit pack for heavier short-term usage."],
+  ["5,000 extra credits", "$69.99", "One-time credit pack for larger workflow runs."],
+];
+
 function normalizePlanId(value?: string): CurrentPlanKey | null {
   if (!value) return null;
-  const key = value.toLowerCase().replace(/\s+/g, "_") as CurrentPlanKey;
-  if (key === "trial" || key === "free") return "trial";
+  const normalized = value.toLowerCase().replace(/\s+/g, "_");
+  if (normalized === "trial" || normalized === "free") return "trial";
+  const key = normalized as CurrentPlanKey;
   return plans.some((plan) => plan.key === key) ? key : null;
 }
 
@@ -207,11 +255,13 @@ function PricingContent() {
         <div className="max-w-3xl">
           <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">Pricing</h1>
           <p className="mt-4 text-lg text-slate-300">
-            Choose the plan that matches how you use ChipLoop. Guided Apps and Studio start with Starter.
-            Developer automation with SDK and CLI starts at Pro.
+            Choose a platform plan, then use the chip design loops your work needs. Core covers normal
+            generate, configure, run, and review flows. Advanced adds deeper analysis, closure, debug,
+            signoff, validation, and automation.
           </p>
           <p className="mt-3 text-sm text-cyan-100">
-            Start with a 3-day trial, then auto-convert to Starter at $19.99/month unless canceled. Starter, Pro, and Pro Max receive 25% off for the first 3 months after checkout is connected.
+            Monthly credits control usage and do not roll over. Advanced loop upgrades unlock capability;
+            extra credits are purchased separately when users need more runs.
           </p>
           {currentPlanName ? (
             <div className="mt-4 inline-flex rounded-lg border border-cyan-700/60 bg-cyan-950/30 px-3 py-2 text-sm text-cyan-100">
@@ -228,17 +278,17 @@ function PricingContent() {
         <section className="mt-8 rounded-lg border border-cyan-800/70 bg-cyan-950/25 p-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">3-day trial</div>
+              <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">Starter intro</div>
               <p className="mt-2 text-sm leading-6 text-cyan-50">
-                Start with 100 credits. No charge during trial. Converts to Starter at $19.99/month after 3 days unless canceled.
+                Start at $9.99/month for the first 3 months, then $14.99/month. Includes 1 Loop Core and 500 monthly credits.
               </p>
             </div>
             <button
-              onClick={() => startCheckout("starter", { trial: true })}
+              onClick={() => startCheckout("starter")}
               disabled={checkoutPlan !== null}
               className="rounded-lg bg-cyan-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-cyan-500 disabled:cursor-not-allowed disabled:bg-slate-700"
             >
-              {checkoutPlan === "trial" ? "Opening checkout..." : "Start 3-day trial"}
+              {checkoutPlan === "starter" ? "Opening checkout..." : "Start Starter"}
             </button>
           </div>
         </section>
@@ -256,6 +306,7 @@ function PricingContent() {
                   <div className="mt-3 text-2xl font-extrabold text-cyan-200">{plan.discountPrice || plan.price}</div>
                   {plan.discountPrice ? <div className="mt-1 text-sm text-slate-400">Then {plan.price}</div> : null}
                   <div className="mt-2 text-sm font-semibold text-slate-300">{plan.credits}</div>
+                  <div className="mt-1 text-sm font-semibold text-cyan-100">{plan.loopAccess}</div>
                   <p className="mt-4 text-sm leading-6 text-slate-400">{plan.note}</p>
                 </div>
                 <button
@@ -270,11 +321,60 @@ function PricingContent() {
           })}
         </section>
 
+        <section className="mt-10 rounded-lg border border-slate-800 bg-slate-950/70 p-5">
+          <div className="max-w-3xl">
+            <h2 className="text-xl font-bold">Five subscription loops</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Product journeys unlock from the loops a user subscribes to. Advanced never replaces Core;
+              it adds deeper analysis, checks, closure, debug, and signoff capability.
+            </p>
+          </div>
+          <div className="mt-6 overflow-x-auto">
+            <table className="w-full min-w-[920px] text-left text-sm">
+              <thead className="bg-slate-900/80 text-slate-300">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Loop</th>
+                  <th className="px-4 py-3 font-semibold">Core</th>
+                  <th className="px-4 py-3 font-semibold">Advanced</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800">
+                {loopPackages.map(([loop, core, advanced]) => (
+                  <tr key={loop}>
+                    <td className="px-4 py-3 font-semibold text-cyan-100">{loop}</td>
+                    <td className="px-4 py-3 text-slate-300">{core}</td>
+                    <td className="px-4 py-3 text-slate-300">{advanced}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="mt-10 rounded-lg border border-slate-800 bg-slate-950/70 p-5">
+          <div className="max-w-3xl">
+            <h2 className="text-xl font-bold">Loop and credit add-ons</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Add loop access when users need more engineering domains. Add credits when users need more usage.
+              Loop upgrades do not automatically add credits.
+            </p>
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {addOns.map(([name, price, body]) => (
+              <article key={name} className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
+                <div className="text-base font-extrabold text-cyan-100">{name}</div>
+                <div className="mt-2 text-xl font-extrabold text-white">{price}</div>
+                <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <section className="mt-10 overflow-hidden rounded-lg border border-slate-800 bg-slate-950/70">
           <div className="border-b border-slate-800 px-5 py-4">
             <h2 className="text-xl font-bold">Feature comparison</h2>
             <p className="mt-1 text-sm text-slate-400">
-              SDK and CLI are premium developer automation features for Pro, Pro Max, and Enterprise. Enterprise can be used for pilots, beta programs, and custom deployment discussions.
+              Plans control platform capability. Loops control engineering domain access. Credits control how much users run.
             </p>
           </div>
           <div className="overflow-x-auto">
@@ -303,6 +403,15 @@ function PricingContent() {
           </div>
         </section>
       </section>
+      <footer className="border-t border-slate-800 px-6 py-8 text-center text-sm text-slate-500">
+        <div className="mb-4 flex flex-wrap justify-center gap-4 text-slate-400">
+          <button onClick={() => router.push("/events")} className="hover:text-cyan-200">Events</button>
+          <button onClick={() => router.push("/help")} className="hover:text-cyan-200">Playbook</button>
+          <button onClick={() => router.push("/why-chiploop")} className="hover:text-cyan-200">Why ChipLoop</button>
+          <button onClick={() => router.push("/webinar/register")} className="hover:text-cyan-200">Webinar</button>
+        </div>
+        <p>Copyright 2026 ChipLoop</p>
+      </footer>
     </main>
   );
 }

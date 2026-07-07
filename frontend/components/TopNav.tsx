@@ -6,7 +6,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import type { User } from "@supabase/supabase-js";
 import { PlanCreditBadge } from "@/components/PlanCreditStatus";
 
-type NavKey = "home" | "apps" | "products" | "studio" | "marketplace" | "pricing" | "events" | "help" | "settings" | "admin" | "webinar" | "workshop" | "demo";
+type NavKey = "home" | "loops" | "apps" | "products" | "studio" | "marketplace" | "pricing" | "events" | "help" | "settings" | "admin" | "webinar" | "workshop" | "demo";
 
 type TopNavProps = {
   current?: NavKey;
@@ -134,14 +134,15 @@ export default function TopNav({
 
   const links: Array<{ key: NavKey; label: string; href: string; show: boolean }> = [
     { key: "home", label: "Home", href: "/", show: true },
+    { key: "loops", label: "Loops", href: "/loops", show: true },
     { key: "apps", label: "Apps", href: "/apps", show: true },
     { key: "products", label: "Products", href: "/products", show: true },
     { key: "studio", label: "Studio", href: "/workflow", show: true },
     { key: "marketplace", label: "Marketplace", href: "/marketplace", show: showMarketplace },
     { key: "pricing", label: "Pricing", href: "/pricing", show: true },
     { key: "demo", label: "Book Demo", href: "/book-demo", show: true },
-    { key: "events", label: "Events", href: "/events", show: true },
-    { key: "help", label: "Playbook", href: "/help", show: true },
+    { key: "events", label: "Events", href: "/events", show: showWebinar || showWorkshop },
+    { key: "help", label: "Playbook", href: "/help", show: false },
     { key: "settings", label: "Settings", href: "/settings/plan", show: showSettings },
     { key: "admin", label: "Admin", href: "/admin/marketplace", show: showAdmin },
     { key: "webinar", label: "Webinar", href: "/webinar/register", show: showWebinar },
