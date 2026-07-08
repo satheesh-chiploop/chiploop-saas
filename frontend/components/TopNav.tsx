@@ -153,17 +153,17 @@ export default function TopNav({
 
   return (
     <nav className={`${className} border-b border-slate-800 bg-slate-950/90 backdrop-blur`}>
-      <div className={`mx-auto flex ${maxWidthClass} flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4`}>
+      <div className={`mx-auto flex min-w-0 ${maxWidthClass} flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4`}>
         <button
           onClick={() => router.push("/")}
-          className="group flex self-start items-center gap-3 text-2xl font-extrabold text-cyan-300 sm:self-auto"
+          className="group flex shrink-0 self-start items-center gap-3 text-2xl font-extrabold text-cyan-300 sm:self-auto"
           aria-label="ChipLoop home"
         >
           <AnimatedTesseractLogo />
           <span>ChipLoop</span>
         </button>
 
-        <div className="flex w-full items-center gap-4 overflow-x-auto pb-1 sm:w-auto sm:flex-wrap sm:justify-end sm:gap-5 sm:overflow-visible sm:pb-0">
+        <div className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4 sm:pb-0 xl:gap-5">
           {showPlanBadge ? <PlanCreditBadge /> : null}
           {links.filter((link) => link.show).map((link) => (
             <button

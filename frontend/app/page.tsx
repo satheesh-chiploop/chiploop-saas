@@ -177,17 +177,17 @@ function LandingPageContent() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen overflow-x-hidden bg-slate-950 text-white">
       <TopNav current="home" showMarketplace showSettings={false} className="fixed left-0 top-0 z-50 w-full" />
 
-      <section className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-12 pt-36 text-center sm:px-6 sm:pb-16 sm:pt-32">
-        <h1 className="max-w-6xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-7xl">
+      <section className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-8 pt-28 text-center sm:px-6 sm:pb-10 lg:pt-24">
+        <h1 className="max-w-6xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
           All-in-one agentic AI platform for chip design
         </h1>
-        <p className="mt-6 max-w-4xl text-base leading-7 text-slate-300 sm:mt-7 sm:text-lg sm:leading-8">
+        <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
           Help one engineer or a small team move from requirements to RTL, verification, firmware, software, co-simulation, tapeout, validation, and product demo in one connected platform.
         </p>
-        <div className="mt-8 flex w-full flex-col gap-4 sm:mt-10 sm:w-auto sm:flex-row">
+        <div className="mt-7 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
           <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
             Book Demo
           </button>
