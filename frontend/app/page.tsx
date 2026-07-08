@@ -35,11 +35,11 @@ const automationSnippets = {
 };
 
 const paths = [
-  ["Loops", "Choose your chip design domain.", "/loops", "Explore Loops", "bg-cyan-300"],
-  ["Products", "Build complete chip journeys.", "/products", "Explore Products", "bg-pink-400"],
-  ["Apps", "Run ready-made chip workflows.", "/apps", "Explore Apps", "bg-emerald-400"],
-  ["Studio", "Create custom agents and workflows.", "/workflow", "Open Studio", "bg-violet-400"],
-  ["Marketplace", "Reuse approved engineering flows.", "/marketplace", "Explore Marketplace", "bg-amber-300"],
+  ["Loops", "Choose your chip design domain.", "/loops", "Explore Loops"],
+  ["Products", "Build complete chip journeys.", "/products", "Explore Products"],
+  ["Apps", "Run ready-made chip workflows.", "/apps", "Explore Apps"],
+  ["Studio", "Create custom agents and workflows.", "/workflow", "Open Studio"],
+  ["Marketplace", "Reuse approved engineering flows.", "/marketplace", "Explore Marketplace"],
 ];
 
 const platformStats = [
@@ -55,32 +55,27 @@ const subscriptionLoops = [
   {
     name: "Digital Design",
     body: "Requirements, design intent, architecture-to-RTL, RTL quality, verification setup, and handoff.",
-    accent: "bg-cyan-300",
-    border: "border-cyan-400/25",
+    hover: "hover:border-cyan-300/80 hover:shadow-cyan-950/35",
   },
   {
     name: "Digital Implementation",
     body: "Synthesis, constraints, timing/power/area reports, DFT/MBIST, RTL-to-GDS, signoff, and tapeout handoff.",
-    accent: "bg-violet-400",
-    border: "border-violet-400/25",
+    hover: "hover:border-violet-300/80 hover:shadow-violet-950/35",
   },
   {
     name: "Mixed Signal",
     body: "System and mixed-signal integration across digital RTL, analog models, SoC intent, simulation, and synthesis.",
-    accent: "bg-rose-400",
-    border: "border-rose-400/25",
+    hover: "hover:border-rose-300/80 hover:shadow-rose-950/35",
   },
   {
     name: "Firmware/Software",
     body: "Register extraction, HAL, drivers, boot/diagnostics, firmware builds, software services, co-simulation, and demos.",
-    accent: "bg-emerald-400",
-    border: "border-emerald-400/25",
+    hover: "hover:border-emerald-300/80 hover:shadow-emerald-950/35",
   },
   {
     name: "Validation",
     body: "Validation plans, bench/instrument setup, connectivity, preflight, execution analytics, and reports.",
-    accent: "bg-amber-300",
-    border: "border-amber-300/25",
+    hover: "hover:border-amber-300/80 hover:shadow-amber-950/35",
   },
 ];
 
@@ -128,15 +123,15 @@ const marketplaceFlow = [
 ];
 
 const endToEndJourney = [
-  { label: "Requirements", accent: "bg-slate-300", border: "border-slate-700", soft: "bg-slate-950/70" },
-  { label: "RTL", accent: "bg-cyan-300", border: "border-cyan-400/30", soft: "bg-cyan-400/10" },
-  { label: "Verification", accent: "bg-violet-400", border: "border-violet-400/30", soft: "bg-violet-400/10" },
-  { label: "Firmware", accent: "bg-emerald-400", border: "border-emerald-400/30", soft: "bg-emerald-400/10" },
-  { label: "Software", accent: "bg-lime-300", border: "border-lime-300/30", soft: "bg-lime-300/10" },
-  { label: "Co-simulation", accent: "bg-amber-300", border: "border-amber-300/30", soft: "bg-amber-300/10" },
-  { label: "Tapeout", accent: "bg-orange-300", border: "border-orange-300/30", soft: "bg-orange-300/10" },
-  { label: "Validation", accent: "bg-rose-400", border: "border-rose-400/30", soft: "bg-rose-400/10" },
-  { label: "Product Demo", accent: "bg-pink-400", border: "border-pink-400/30", soft: "bg-pink-400/10" },
+  "Requirements",
+  "RTL",
+  "Verification",
+  "Firmware",
+  "Software",
+  "Co-simulation",
+  "Tapeout",
+  "Validation",
+  "Product Demo",
 ];
 
 const eyebrowClass = "text-xs font-semibold uppercase text-cyan-300";
@@ -252,8 +247,7 @@ function LandingPageContent() {
           </div>
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
             {subscriptionLoops.map((loop) => (
-              <article key={loop.name} className={`rounded-xl border ${loop.border} bg-slate-950/70 p-5`}>
-                <div className={`mb-4 h-1.5 w-12 rounded-full ${loop.accent}`} />
+              <article key={loop.name} className={`rounded-xl border border-slate-700/70 bg-slate-950/70 p-5 shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
                 <h3 className={cardTitleClass}>{loop.name}</h3>
                 <p className={`${cardBodyClass} min-h-28`}>{loop.body}</p>
               </article>
@@ -275,9 +269,8 @@ function LandingPageContent() {
           <h2 className={`${sectionTitleClass} mx-auto`}>Start where you need.</h2>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
-          {paths.map(([title, body, href, cta, accent]) => (
-            <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-center">
-              <div className={`mx-auto mb-4 h-1.5 w-12 rounded-full ${accent}`} />
+          {paths.map(([title, body, href, cta]) => (
+            <article key={title} className="rounded-xl border border-slate-700/70 bg-slate-900/70 p-5 text-center shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:border-cyan-300/70 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-950/20">
               <h3 className="text-xl font-bold leading-tight text-white">{title}</h3>
               <p className="mt-3 min-h-12 text-sm leading-6 text-slate-300">{body}</p>
               <button onClick={() => goTo(href)} className="mt-5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
@@ -303,10 +296,9 @@ function LandingPageContent() {
           </div>
           <div className="mx-auto mt-8 flex max-w-6xl flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
             {endToEndJourney.map((stage, index) => (
-              <div key={stage.label} className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
-                <div className={`w-full min-w-32 rounded-xl border ${stage.border} ${stage.soft} px-4 py-4 text-center text-sm font-semibold text-slate-100 sm:w-36`}>
-                  <span className={`mx-auto mb-3 block h-1.5 w-10 rounded-full ${stage.accent}`} />
-                  {stage.label}
+              <div key={stage} className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
+                <div className="w-full min-w-32 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-4 text-center text-sm font-semibold text-slate-100 sm:w-36">
+                  {stage}
                 </div>
                 {index < endToEndJourney.length - 1 && (
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-slate-950 text-sm font-bold text-slate-500" aria-hidden="true">

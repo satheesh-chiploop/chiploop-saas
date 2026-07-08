@@ -13,8 +13,7 @@ const loops = [
     advanced: "Spec2RTL, assertions, closure analysis",
     href: "/apps?loop=digital",
     metrics: { agents: 46, apps: 8, workflows: 5, journeys: 5 },
-    accent: "bg-cyan-300",
-    border: "border-cyan-400/25",
+    hover: "hover:border-cyan-300/80 hover:shadow-cyan-950/35",
   },
   {
     name: "Digital Implementation",
@@ -23,8 +22,7 @@ const loops = [
     advanced: "LEC, MBIST, RTL-to-GDS, signoff",
     href: "/apps/system-pd",
     metrics: { agents: 39, apps: 6, workflows: 4, journeys: 3 },
-    accent: "bg-violet-400",
-    border: "border-violet-400/25",
+    hover: "hover:border-violet-300/80 hover:shadow-violet-950/35",
   },
   {
     name: "Mixed Signal",
@@ -33,8 +31,7 @@ const loops = [
     advanced: "Integration debug, System PD, validation handoff",
     href: "/apps?loop=system",
     metrics: { agents: 77, apps: 13, workflows: 6, journeys: 2 },
-    accent: "bg-rose-400",
-    border: "border-rose-400/25",
+    hover: "hover:border-rose-300/80 hover:shadow-rose-950/35",
   },
   {
     name: "Firmware/Software",
@@ -43,8 +40,7 @@ const loops = [
     advanced: "SDK/API, co-sim, package validation",
     href: "/apps?loop=embedded",
     metrics: { agents: 62, apps: 11, workflows: 4, journeys: 5 },
-    accent: "bg-emerald-400",
-    border: "border-emerald-400/25",
+    hover: "hover:border-emerald-300/80 hover:shadow-emerald-950/35",
   },
   {
     name: "Validation",
@@ -53,8 +49,7 @@ const loops = [
     advanced: "Orchestration, analytics, plan evolution",
     href: "/apps?loop=validation",
     metrics: { agents: 17, apps: 5, workflows: 2, journeys: 4 },
-    accent: "bg-amber-300",
-    border: "border-amber-300/25",
+    hover: "hover:border-amber-300/80 hover:shadow-amber-950/35",
   },
 ];
 
@@ -132,9 +127,8 @@ export default function LoopsPage() {
             <button
               key={loop.name}
               onClick={() => router.push(loop.href)}
-              className={`rounded-xl border ${loop.border} bg-slate-900/70 p-5 text-left transition hover:bg-slate-900`}
+              className={`rounded-xl border border-slate-700/70 bg-slate-900/70 p-5 text-left shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-900 hover:shadow-xl ${loop.hover}`}
             >
-              <div className={`mb-4 h-1.5 w-12 rounded-full ${loop.accent}`} />
               <h2 className="text-xl font-extrabold text-white">{loop.name}</h2>
               <p className="mt-3 min-h-20 text-sm leading-6 text-slate-300">{loop.short}</p>
               <div className="mt-4 text-xs font-semibold uppercase text-slate-500">Explore loop</div>
