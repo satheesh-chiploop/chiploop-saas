@@ -85,7 +85,7 @@ export default function AdminMarketplacePage() {
             {submissions.map((item) => (
               <button key={submissionId(item)} onClick={() => setSelected(item)} className={`w-full rounded-xl border p-3 text-left text-sm transition ${submissionId(selected || {}) === submissionId(item) ? "border-cyan-700 bg-cyan-950/30" : "border-slate-800 bg-black/25 hover:bg-slate-900"}`}>
                 <div className="font-semibold text-slate-100">{submissionName(item)}</div>
-                <div className="mt-1 text-xs text-slate-400">{submissionKind(item)} · {item.status || "pending"} · {item.submitted_by || "unknown"}</div>
+                <div className="mt-1 text-xs text-slate-400">{submissionKind(item)} / {item.status || "pending"} / {item.submitted_by || "unknown"}</div>
               </button>
             ))}
           </div>
@@ -102,7 +102,7 @@ export default function AdminMarketplacePage() {
                 <div>
                   <div className="text-xs font-semibold uppercase text-cyan-300">Submission</div>
                   <h2 className="mt-1 text-2xl font-extrabold">{submissionName(selected)}</h2>
-                  <div className="mt-1 text-sm text-slate-400">{submissionKind(selected)} · Status: {selected.status || "pending"}</div>
+                  <div className="mt-1 text-sm text-slate-400">{submissionKind(selected)} / Status: {selected.status || "pending"}</div>
                 </div>
               </div>
 
