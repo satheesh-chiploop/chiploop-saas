@@ -26,7 +26,7 @@ export default function EndToEndIcEngineersAgenticAiPage() {
           Agentic AI can expand engineering leverage by helping one engineer move across more of the chip lifecycle while still preserving expert review and tool-backed evidence.
         </p>
 
-        <section className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-6">
+        <section className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-6">
           <h2 className="text-2xl font-bold text-white">The Productivity Shift</h2>
           <p className="mt-3 leading-8 text-cyan-100">
             The future IC engineer will not replace every specialist. But they will define, configure, run, inspect, and iterate across more stages with AI and tool assistance.
@@ -35,19 +35,19 @@ export default function EndToEndIcEngineersAgenticAiPage() {
 
         <section className="mt-8 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-            <h3 className="text-lg font-bold text-cyan-300">Before</h3>
+            <h3 className="text-lg font-bold text-white">Before</h3>
             <p className="mt-3 text-sm leading-6 text-slate-300">
               Work moves between specialists through files, meetings, scripts, and manual context transfer.
             </p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-            <h3 className="text-lg font-bold text-cyan-300">With AI</h3>
+            <h3 className="text-lg font-bold text-white">With AI</h3>
             <p className="mt-3 text-sm leading-6 text-slate-300">
               Engineers can generate, summarize, repair, and reason faster, but still need evidence.
             </p>
           </div>
-          <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-            <h3 className="text-lg font-bold text-cyan-300">With ChipLoop</h3>
+          <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+            <h3 className="text-lg font-bold text-white">With ChipLoop</h3>
             <p className="mt-3 text-sm leading-6 text-slate-300">
               AI assistance is connected to workflows, artifacts, dashboards, and run-grounded review.
             </p>

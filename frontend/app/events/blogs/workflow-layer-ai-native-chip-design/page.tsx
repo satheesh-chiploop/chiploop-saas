@@ -26,7 +26,7 @@ export default function WorkflowLayerAiNativeChipDesignPage() {
           AI chip design will not be won by prompt boxes alone. The durable layer is workflow orchestration: intent, tools, artifacts, evidence, review, and handoffs.
         </p>
 
-        <section className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-6">
+        <section className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-6">
           <h2 className="text-2xl font-bold text-white">The Core Idea</h2>
           <p className="mt-3 leading-8 text-cyan-100">
             ChipLoop sits between AI models, EDA tools, and engineering teams. It turns design intent into repeatable loops, captures the evidence from each run, and helps teams move to the next stage with context.
@@ -36,7 +36,7 @@ export default function WorkflowLayerAiNativeChipDesignPage() {
         <section className="mt-8 grid gap-4 md:grid-cols-3">
           {["Intent", "Execution", "Evidence"].map((item) => (
             <div key={item} className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">{item}</h3>
+              <h3 className="text-lg font-bold text-white">{item}</h3>
               <p className="mt-3 text-sm leading-6 text-slate-300">
                 {item === "Intent"
                   ? "Capture what the engineer wants to build and which loop should run."

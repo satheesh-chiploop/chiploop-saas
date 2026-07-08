@@ -93,11 +93,12 @@ export default function MarketplacePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="marketplace" showMarketplace />
 
-      <section className="mx-auto max-w-[1440px] px-6 py-8">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/35 p-6">
+      <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.14),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_58%,#020617_100%)] px-6 py-8">
+        <div className="mx-auto max-w-[1440px]">
+        <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-6">
           <div className="text-xs font-semibold uppercase text-cyan-300">Marketplace ecosystem</div>
           <h1 className="mt-2 text-4xl font-extrabold leading-tight text-white sm:text-5xl">Install reviewed agents and apps into your workspace.</h1>
           <p className="mt-2 max-w-3xl text-slate-300">Approved agents install into My Agents. Approved apps install into My Apps as private editable copies.</p>
@@ -109,7 +110,11 @@ export default function MarketplacePage() {
             <button onClick={loadAgents} className="rounded-xl bg-cyan-600 px-4 py-3 font-bold hover:bg-cyan-500">Search</button>
           </div>
         </div>
+        </div>
+      </section>
 
+      <section className="w-full bg-slate-900/20 px-6 py-8">
+        <div className="mx-auto max-w-[1440px]">
         {error ? <div className="mt-5 rounded-xl border border-red-900/70 bg-red-950/30 p-4 text-red-200">{error}</div> : null}
         {message ? <div className="mt-5 rounded-xl border border-emerald-900/70 bg-emerald-950/30 p-4 text-emerald-200">{message}</div> : null}
         {loading ? <div className="mt-6 text-slate-400">Loading marketplace...</div> : null}
@@ -119,13 +124,13 @@ export default function MarketplacePage() {
             <h2 className="text-xl font-bold text-white">Apps</h2>
             <div className="mt-3 grid gap-4 md:grid-cols-2">
               {apps.map((app) => (
-                <div key={app.id} className="rounded-2xl border border-cyan-900/40 bg-slate-950/55 p-5">
+                <div key={app.id} className="rounded-2xl border border-slate-800 bg-slate-950/65 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h3 className="text-xl font-bold text-slate-100">{app.name}</h3>
                       <p className="mt-2 text-sm leading-6 text-slate-300">{app.description || "No description provided."}</p>
                     </div>
-                    <span className="rounded-full border border-cyan-800 bg-cyan-950/40 px-2 py-1 text-xs text-cyan-100">App</span>
+                    <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-200">App</span>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
                     <span className="rounded-full border border-slate-700 px-2 py-1">{app.loop_type || app.category || "system"}</span>
@@ -165,6 +170,7 @@ export default function MarketplacePage() {
         </div>
 
         {!loading && filtered.length === 0 ? <div className="mt-6 rounded-xl border border-slate-800 bg-black/30 p-6 text-slate-400">No marketplace agents found.</div> : null}
+        </div>
       </section>
     </main>
   );

@@ -329,7 +329,7 @@ export default function PlannerModal({ onClose, onBuildWorkflow }: PlannerModalP
       <div className="flex h-[calc(100vh-2rem)] max-h-[920px] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-white shadow-2xl">
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-800 p-5">
           <div>
-            <h2 className="text-2xl font-extrabold text-cyan-300">Design Intent Planner</h2>
+            <h2 className="text-2xl font-extrabold text-white">Design Intent Planner</h2>
             <p className="mt-1 text-sm text-slate-400">
               Capture an idea, clarify missing engineering details, and save a reusable design spec.
             </p>
@@ -378,7 +378,7 @@ export default function PlannerModal({ onClose, onBuildWorkflow }: PlannerModalP
                 />
               </div>
               <aside className="rounded-lg border border-slate-800 bg-black/30 p-4">
-                <h3 className="text-sm font-bold text-cyan-300">Good inputs</h3>
+                <h3 className="text-sm font-bold text-white">Good inputs</h3>
                 <ul className="mt-3 space-y-2 text-sm leading-5 text-slate-300">
                   <li>Design a 4-bit counter with enable, reset, and terminal count.</li>
                   <li>Create an SPI controller with APB interface and interrupt support.</li>
@@ -416,7 +416,7 @@ export default function PlannerModal({ onClose, onBuildWorkflow }: PlannerModalP
                 </div>
               </div>
               <aside className="rounded-lg border border-slate-800 bg-black/30 p-4">
-                <h3 className="text-sm font-bold text-cyan-300">Domain Interpretation</h3>
+                <h3 className="text-sm font-bold text-white">Domain Interpretation</h3>
                 <dl className="mt-3 space-y-3 text-sm">
                   <div><dt className="text-slate-500">Digital</dt><dd className="text-slate-200">{mergedInterpretation().digital || "Not specified"}</dd></div>
                   <div><dt className="text-slate-500">Embedded</dt><dd className="text-slate-200">{mergedInterpretation().embedded || "Not specified"}</dd></div>

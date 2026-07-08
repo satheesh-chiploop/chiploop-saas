@@ -26,7 +26,7 @@ export default function PromptBasedChipDesignToChipLoopPage() {
           Prompt-based chip design showed that AI can help engineers move faster. ChipLoop takes the next step: connected workflows where intent, tools, generated artifacts, checks, evidence, and handoffs stay together.
         </p>
 
-        <div className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5 text-sm leading-7 text-cyan-100">
+        <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-sm leading-7 text-slate-300">
           Webinar cadence: ChipLoop webinars run once every two weeks at 9:00 AM PST, starting July 11, 2026.
         </div>
 
@@ -63,7 +63,7 @@ export default function PromptBasedChipDesignToChipLoopPage() {
 
           <section className="grid gap-4 md:grid-cols-2">
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Traditional or Prompt-Only</h3>
+              <h3 className="text-lg font-bold text-white">Traditional or Prompt-Only</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6">
                 <li>- One-off answers and copied files</li>
                 <li>- Manual tool setup and brittle handoffs</li>
@@ -72,8 +72,8 @@ export default function PromptBasedChipDesignToChipLoopPage() {
                 <li>- Missing evidence can stay hidden until late</li>
               </ul>
             </div>
-            <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">ChipLoop-Based</h3>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+              <h3 className="text-lg font-bold text-white">ChipLoop-Based</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6">
                 <li>- Guided apps and reference journeys</li>
                 <li>- Connected loops across RTL, verification, implementation, embedded, validation, and products</li>

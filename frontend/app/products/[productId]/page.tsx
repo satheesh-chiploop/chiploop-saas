@@ -932,7 +932,7 @@ function StepRail({ active }: { active: "define" | "configure" | "run" }) {
           }`}
         >
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Step {index + 1}</div>
-          <div className={active === step.id ? "text-sm font-semibold text-cyan-100" : "text-sm font-semibold text-white"}>{step.label}</div>
+          <div className={active === step.id ? "text-sm font-semibold text-slate-100" : "text-sm font-semibold text-white"}>{step.label}</div>
           <div className="mt-1 text-xs text-slate-400">{step.text}</div>
         </div>
       ))}
@@ -1516,7 +1516,7 @@ export default function ProductDetailPage() {
             <button
               type="button"
               onClick={() => router.push("/apps/ask-project")}
-              className="shrink-0 rounded-lg border border-cyan-700 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/40"
+              className="shrink-0 rounded-lg border border-cyan-700 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-cyan-950/40"
             >
               Ask this Project
             </button>
@@ -1568,7 +1568,7 @@ export default function ProductDetailPage() {
                 <button
                   onClick={addUserAppStage}
                   disabled={!selectedUserAppId}
-                  className="rounded-md border border-cyan-700 px-3 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/40 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-600"
+                  className="rounded-md border border-cyan-700 px-3 py-2 text-sm font-semibold text-slate-100 hover:bg-cyan-950/40 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-600"
                 >
                   Add My App
                 </button>
@@ -1907,7 +1907,7 @@ export default function ProductDetailPage() {
                   {productRun.status === "failed" && failedStageRun ? (
                     <button
                       onClick={() => runProduct(failedStageRun.stage_id, productRun.id)}
-                      className="rounded-md border border-cyan-500/50 px-3 py-2 text-xs font-semibold text-cyan-100 hover:bg-cyan-950/50"
+                      className="rounded-md border border-cyan-500/50 px-3 py-2 text-xs font-semibold text-slate-100 hover:bg-cyan-950/50"
                     >
                       Rerun From Failed Stage
                     </button>

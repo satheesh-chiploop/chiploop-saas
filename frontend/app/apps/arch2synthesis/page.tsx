@@ -377,7 +377,7 @@ export default function Arch2SynthesisAppPage() {
           ⚡ Digital Loop
         </div>
 
-        <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">Arch2Synthesis</h1>
+        <h1 className="mt-2 text-3xl font-extrabold text-white">Arch2Synthesis</h1>
         <p className="mt-2 text-slate-300">
           Arch2RTL + Synthesis. You can also skip Arch2RTL by providing RTL input.
         </p>

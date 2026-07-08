@@ -26,7 +26,7 @@ export default function NavigatingLoopsEngineeringContextPage() {
           Chip design teams do not just need a generated file. They need a way to define intent, configure the right engineering path, run it, inspect the evidence, and then move into the next loop without losing context.
         </p>
 
-        <div className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5 text-sm leading-7 text-cyan-100">
+        <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-sm leading-7 text-slate-300">
           A loop is a repeatable engineering path: define what you want, configure the run, execute it, inspect results, and carry the context forward.
         </div>
 
@@ -53,19 +53,19 @@ export default function NavigatingLoopsEngineeringContextPage() {
 
           <section className="grid gap-4 md:grid-cols-3">
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Define</h3>
+              <h3 className="text-lg font-bold text-white">Define</h3>
               <p className="mt-3 text-sm leading-6">
                 Start with a spec, app, product stage, or reference journey. The goal is to establish the engineering intent and the expected handoff.
               </p>
             </div>
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Configure</h3>
+              <h3 className="text-lg font-bold text-white">Configure</h3>
               <p className="mt-3 text-sm leading-6">
                 Choose the loop, settings, run options, closure behavior, and any uploaded context that should shape the workflow.
               </p>
             </div>
-            <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Run</h3>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+              <h3 className="text-lg font-bold text-white">Run</h3>
               <p className="mt-3 text-sm leading-6">
                 Execute the workflow, inspect dashboards and artifacts, ask questions about the run, and continue into the next loop.
               </p>
@@ -98,7 +98,7 @@ export default function NavigatingLoopsEngineeringContextPage() {
             <h2 className="text-2xl font-bold text-white">Traditional Navigation vs ChipLoop Navigation</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-                <h3 className="text-lg font-bold text-cyan-300">Traditional</h3>
+                <h3 className="text-lg font-bold text-white">Traditional</h3>
                 <ul className="mt-4 space-y-3 text-sm leading-6">
                   <li>- Engineers manually track which files belong to which step</li>
                   <li>- Reports and logs live away from the original design intent</li>
@@ -106,8 +106,8 @@ export default function NavigatingLoopsEngineeringContextPage() {
                   <li>- Failed runs require manual triage across scattered artifacts</li>
                 </ul>
               </div>
-              <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-                <h3 className="text-lg font-bold text-cyan-300">ChipLoop</h3>
+              <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+                <h3 className="text-lg font-bold text-white">ChipLoop</h3>
                 <ul className="mt-4 space-y-3 text-sm leading-6">
                   <li>- Apps and reference journeys guide users into the right loop</li>
                   <li>- Configuration stays attached to the workflow run</li>

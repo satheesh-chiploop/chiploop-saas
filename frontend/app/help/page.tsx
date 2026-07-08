@@ -184,7 +184,7 @@ export default function HelpPage() {
                         onClick={() => selectTopic(topic.slug)}
                         className={`w-full rounded-md px-3 py-2 text-left text-sm transition ${
                           selectedTopic.slug === topic.slug
-                            ? "bg-cyan-400/15 font-semibold text-cyan-100"
+                            ? "bg-cyan-400/15 font-semibold text-slate-100"
                             : "text-slate-300 hover:bg-slate-800 hover:text-white"
                         }`}
                       >
@@ -224,7 +224,7 @@ export default function HelpPage() {
                   <tbody className="divide-y divide-slate-800 bg-slate-950/40 text-slate-300">
                     {selectedTopic.comparisonRows.map((row) => (
                       <tr key={row.area} className="align-top">
-                        <th scope="row" className="px-4 py-4 font-semibold text-cyan-100">{row.area}</th>
+                        <th scope="row" className="px-4 py-4 font-semibold text-slate-100">{row.area}</th>
                         <td className="px-4 py-4">{row.traditional}</td>
                         <td className="px-4 py-4">{row.chiploop}</td>
                         <td className="px-4 py-4 font-medium text-white">{row.differentiation}</td>
@@ -271,7 +271,7 @@ export default function HelpPage() {
                         <tbody className="divide-y divide-slate-800 bg-slate-950/40 text-slate-300">
                           {catalog.rows.map((row) => (
                             <tr key={`${row.type}:${row.name}`} className="align-top">
-                              <td className="px-4 py-4 font-semibold text-cyan-100">{row.type}</td>
+                              <td className="px-4 py-4 font-semibold text-slate-100">{row.type}</td>
                               <td className="px-4 py-4">{row.loop_type || "unknown"}</td>
                               <th scope="row" className="px-4 py-4 font-semibold text-white">{row.name}</th>
                               <td className="px-4 py-4">{row.type === "workflow" ? `${row.steps ?? 0} agents` : row.domain}</td>

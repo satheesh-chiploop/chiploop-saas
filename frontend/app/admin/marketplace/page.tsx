@@ -79,7 +79,7 @@ export default function AdminMarketplacePage() {
 
       <section className="mx-auto grid max-w-[1680px] gap-5 px-6 py-8 lg:grid-cols-[360px_1fr]">
         <aside className="rounded-2xl border border-slate-800 bg-slate-950/55 p-4">
-          <h1 className="text-xl font-bold text-cyan-300">Review queue</h1>
+          <h1 className="text-xl font-bold text-white">Review queue</h1>
           {loading ? <div className="mt-4 text-sm text-slate-400">Loading...</div> : null}
           <div className="mt-4 space-y-2">
             {submissions.map((item) => (

@@ -189,7 +189,7 @@ export default function AnalogValidateModelPage() {
 
         <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
           <div className="text-sm text-slate-400">Analog Loop</div>
-          <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">Model Validation</h1>
+          <h1 className="mt-2 text-3xl font-extrabold text-white">Model Validation</h1>
           <p className="mt-2 text-slate-300">
             Generate TB + assertions + coverage intent for the behavioral model (quick mode optional).
           </p>

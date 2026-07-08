@@ -1126,17 +1126,17 @@ export default function AppsHomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="apps" showPlanBadge />
       <LowCreditBanner />
 
       {/* Hero */}
-      <section className="mx-auto max-w-[1440px] px-6 pt-10 pb-6">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/30 p-6 shadow-lg">
+      <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.14),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_58%,#020617_100%)] px-6 pb-6 pt-10">
+        <div className="mx-auto max-w-[1440px] rounded-2xl border border-slate-800 bg-slate-950/55 p-6 shadow-lg">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-xs text-slate-400">
-                Welcome{userEmail ? `, ${userEmail}` : ""} | <span className="text-cyan-300">Start here</span>
+                Welcome{userEmail ? `, ${userEmail}` : ""} | <span className="text-slate-200">Start here</span>
               </div>
               <h1 className="mt-2 text-4xl font-extrabold leading-tight text-white sm:text-5xl">
                 Run outcomes, not workflows.
@@ -1146,7 +1146,7 @@ export default function AppsHomePage() {
               </p>
             </div>
 
-            <span className="shrink-0 rounded-full border border-cyan-900/60 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200">
+            <span className="shrink-0 rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-200">
               Recommended
             </span>
           </div>
@@ -1155,17 +1155,17 @@ export default function AppsHomePage() {
             <div className="text-xs font-semibold uppercase text-cyan-300">What would you like to do today?</div>
             <button
               onClick={() => openApp("ask-project")}
-              className="mt-4 w-full rounded-2xl border border-cyan-800 bg-cyan-950/25 p-5 text-left transition hover:border-cyan-400 hover:bg-cyan-950/40"
+              className="mt-4 w-full rounded-2xl border border-slate-800 bg-slate-900/70 p-5 text-left transition hover:border-cyan-400 hover:bg-slate-900"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <div className="text-xs font-semibold uppercase text-cyan-300">Project review</div>
                   <div className="mt-2 text-xl font-bold text-white">Ask this Project</div>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-cyan-100/85">
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                     Upload files, paste content, or import selected GitHub repo files. Ask for summaries, risks, suggestions, and the next ChipLoop workflow to run.
                   </p>
                 </div>
-                <span className="shrink-0 rounded-full border border-cyan-700 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+                <span className="shrink-0 rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-200">
                   New
                 </span>
               </div>
@@ -1183,7 +1183,7 @@ export default function AppsHomePage() {
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="text-xl font-bold text-white">{featured.title}</div>
-                  <span className="rounded-full border border-cyan-900/60 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200">
+                  <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-200">
                     {featured.nudge || "Recommended"}
                   </span>
                 </div>

@@ -212,7 +212,7 @@ export default function IntegrateAppPage() {
 
         <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
           <div className="text-sm text-slate-400">Digital Loop</div>
-          <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">Integrate</h1>
+          <h1 className="mt-2 text-3xl font-extrabold text-white">Integrate</h1>
           <p className="mt-2 text-slate-300">
             Model 2: describe integration in plain English → ChipLoop generates intent + top RTL + report.
           </p>

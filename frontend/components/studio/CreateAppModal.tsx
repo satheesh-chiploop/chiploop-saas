@@ -138,7 +138,7 @@ export default function CreateAppModal({
       <div className="max-h-[92vh] w-[760px] max-w-[96vw] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900 p-6 text-slate-100 shadow-2xl scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-cyan-400">Create App</h2>
+            <h2 className="text-2xl font-bold text-white">Create App</h2>
             <p className="mt-1 text-sm text-slate-400">
               Package the selected Studio workflow as a private app. Marketplace publishing can be reviewed later by admin.
             </p>

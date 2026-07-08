@@ -417,7 +417,7 @@ export default function Arch2TapeoutAppPage() {
           ⚡ Digital Loop
         </div>
 
-        <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">Arch2Tapeout</h1>
+        <h1 className="mt-2 text-3xl font-extrabold text-white">Arch2Tapeout</h1>
         <p className="mt-2 text-slate-300">
           Arch2RTL + Synthesis + RTL→GDS flow. You can start from RTL (or later: floorplan) for partial runs.
         </p>

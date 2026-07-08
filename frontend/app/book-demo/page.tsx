@@ -78,7 +78,8 @@ export default function BookDemoPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="demo" showMarketplace showSettings={false} />
-      <div className="mx-auto max-w-[1440px] px-6 py-10">
+      <div className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.14),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_58%,#020617_100%)] px-6 py-10">
+        <div className="mx-auto max-w-[1440px]">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_1.15fr]">
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-8">
             <p className="text-xs font-semibold uppercase text-cyan-300">Book Demo</p>
@@ -95,9 +96,9 @@ export default function BookDemoPage() {
                 <li>- SDK, CLI, and private environment integration</li>
               </ul>
             </div>
-            <div className="mt-5 rounded-xl border border-cyan-800 bg-cyan-950/25 p-5 text-sm text-cyan-100">
+            <div className="mt-5 rounded-xl border border-slate-700 bg-slate-950/70 p-5 text-sm text-slate-300">
               <div className="font-bold text-white">Looking for a quick start?</div>
-              <p className="mt-2 leading-6 text-cyan-100/85">
+              <p className="mt-2 leading-6 text-slate-300">
                 You can also explore the guided Arch2RTL demo while we review your request.
               </p>
               <button
@@ -114,7 +115,7 @@ export default function BookDemoPage() {
             {success ? (
               <div className="flex min-h-[520px] flex-col justify-center">
                 <div className="w-fit rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-800">Request received</div>
-                <h2 className="mt-6 text-4xl font-extrabold leading-tight text-white sm:text-5xl">Thanks, we received your demo request.</h2>
+                <h2 className="mt-6 text-4xl font-extrabold leading-tight text-slate-950 sm:text-5xl">Thanks, we received your demo request.</h2>
                 <p className="mt-4 leading-7 text-slate-600">
                   A copy was recorded for the ChipLoop team. We will use your email to follow up with next steps.
                 </p>
@@ -128,7 +129,7 @@ export default function BookDemoPage() {
             ) : (
               <form onSubmit={submit} className="space-y-5">
                 <div>
-                  <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">Request a demo</h2>
+                  <h2 className="text-3xl font-extrabold leading-tight text-slate-950 sm:text-4xl">Request a demo</h2>
                   <p className="mt-2 text-sm text-slate-600">A few details help us tailor the discussion.</p>
                 </div>
 
@@ -248,6 +249,7 @@ export default function BookDemoPage() {
               </form>
             )}
           </section>
+        </div>
         </div>
       </div>
     </main>

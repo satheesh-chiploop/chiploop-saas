@@ -26,7 +26,7 @@ export default function FutureEndToEndIcEngineerPage() {
           Agentic AI and generative AI tools are changing what an IC engineer can do. The future engineer will not only specialize in one task. They will be able to move across requirements, architecture, RTL, verification, implementation, software, validation, and product context with tool-backed assistance.
         </p>
 
-        <div className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5 text-sm leading-7 text-cyan-100">
+        <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-sm leading-7 text-slate-300">
           Generative AI creates or transforms content. Agentic AI plans, uses tools, checks results, and helps iterate. ChipLoop connects both into engineering loops with artifacts, evidence, and handoffs.
         </div>
 
@@ -53,19 +53,19 @@ export default function FutureEndToEndIcEngineerPage() {
 
           <section className="grid gap-4 md:grid-cols-3">
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Generate</h3>
+              <h3 className="text-lg font-bold text-white">Generate</h3>
               <p className="mt-3 text-sm leading-6">
                 Create candidate RTL, tests, constraints, scripts, summaries, and documentation from design intent.
               </p>
             </div>
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Check</h3>
+              <h3 className="text-lg font-bold text-white">Check</h3>
               <p className="mt-3 text-sm leading-6">
                 Run tools, inspect logs, surface warnings, verify outputs, and avoid treating generated content as proven.
               </p>
             </div>
-            <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Iterate</h3>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+              <h3 className="text-lg font-bold text-white">Iterate</h3>
               <p className="mt-3 text-sm leading-6">
                 Use requirements and tool feedback to repair, tune, rerun, and carry evidence into the next loop.
               </p>
@@ -104,7 +104,7 @@ export default function FutureEndToEndIcEngineerPage() {
 
           <section className="grid gap-4 md:grid-cols-2">
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Current Integration Pattern</h3>
+              <h3 className="text-lg font-bold text-white">Current Integration Pattern</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6">
                 <li>- Custom scripts for each environment</li>
                 <li>- Manual artifact movement</li>
@@ -113,8 +113,8 @@ export default function FutureEndToEndIcEngineerPage() {
                 <li>- Long path from useful tool to trusted workflow</li>
               </ul>
             </div>
-            <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">ChipLoop Integration Pattern</h3>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+              <h3 className="text-lg font-bold text-white">ChipLoop Integration Pattern</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6">
                 <li>- Tool becomes a loop, app, agent, or workflow stage</li>
                 <li>- Inputs and outputs stay attached to the run</li>

@@ -644,7 +644,7 @@ export default function VerifyAppPage() {
 
         <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
           <div className="text-sm text-slate-400">Digital Loop</div>
-          <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">Verify</h1>
+          <h1 className="mt-2 text-3xl font-extrabold text-white">Verify</h1>
           <p className="mt-2 text-slate-300">
             Verification Intelligence: TB + SVA + Coverage plan + Simulation summary (optional formal/golden model).
           </p>

@@ -175,7 +175,7 @@ export default function Spec2RTLCheckPage() {
         </button>
         <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
           <div className="text-sm text-slate-400">Digital Loop</div>
-          <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">Spec2RTL Check</h1>
+          <h1 className="mt-2 text-3xl font-extrabold text-white">Spec2RTL Check</h1>
           <p className="mt-2 max-w-3xl text-slate-300">
             Check whether generated, purchased, or vendor RTL appears consistent with the claimed spec. This is a conformance analysis, not a formal proof.
           </p>

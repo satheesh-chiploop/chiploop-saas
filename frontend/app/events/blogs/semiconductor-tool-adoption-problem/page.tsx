@@ -26,7 +26,7 @@ export default function SemiconductorToolAdoptionProblemPage() {
           Many promising EDA and AI semiconductor startups fail to scale because getting into a real engineering workflow is slow, expensive, and highly custom.
         </p>
 
-        <section className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-6">
+        <section className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-6">
           <h2 className="text-2xl font-bold text-white">The Bottleneck</h2>
           <p className="mt-3 leading-8 text-cyan-100">
             A startup tool may solve one painful problem, but customers still ask: how does it connect to our specs, scripts, reports, design data, reviews, and signoff process?
@@ -35,7 +35,7 @@ export default function SemiconductorToolAdoptionProblemPage() {
 
         <section className="mt-8 grid gap-4 md:grid-cols-2">
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-            <h3 className="text-lg font-bold text-cyan-300">Current Adoption Path</h3>
+            <h3 className="text-lg font-bold text-white">Current Adoption Path</h3>
             <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
               <li>- Custom pilot with one team</li>
               <li>- Manual data movement</li>
@@ -44,8 +44,8 @@ export default function SemiconductorToolAdoptionProblemPage() {
               <li>- Hard to prove end-to-end value</li>
             </ul>
           </div>
-          <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-            <h3 className="text-lg font-bold text-cyan-300">ChipLoop Adoption Path</h3>
+          <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+            <h3 className="text-lg font-bold text-white">ChipLoop Adoption Path</h3>
             <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
               <li>- Tool becomes an app, agent, or workflow stage</li>
               <li>- Inputs and outputs attach to a run</li>
@@ -68,7 +68,7 @@ export default function SemiconductorToolAdoptionProblemPage() {
 
         <section className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-6">
           <h2 className="text-2xl font-bold text-white">Platform Opportunity</h2>
-          <div className="mt-5 grid gap-3 text-center text-sm font-semibold text-cyan-100 sm:grid-cols-4">
+          <div className="mt-5 grid gap-3 text-center text-sm font-semibold text-slate-100 sm:grid-cols-4">
             {["Startup Tool", "ChipLoop Stage", "Run Evidence", "Customer Workflow"].map((step) => (
               <div key={step} className="rounded-lg border border-cyan-900/70 bg-slate-950/60 p-4">
                 {step}

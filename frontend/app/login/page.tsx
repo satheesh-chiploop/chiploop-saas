@@ -118,7 +118,7 @@ export default function LoginPage() {
     <main className="min-h-screen flex flex-col justify-center items-center bg-[#0b0b0c] text-white">
       <Toaster position="top-center" reverseOrder={false} />
       <div className="bg-slate-900 border border-slate-700 p-8 rounded-2xl shadow-2xl w-96">
-        <h1 className="text-3xl font-extrabold text-cyan-400 text-center mb-4">
+        <h1 className="text-3xl font-extrabold text-white text-center mb-4">
           {mode === "signup" && trialIntent ? "Start ChipLoop 3-Day Trial" : "ChipLoop Login"}
         </h1>
 

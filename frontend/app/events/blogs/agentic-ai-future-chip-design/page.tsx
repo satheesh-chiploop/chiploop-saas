@@ -26,7 +26,7 @@ export default function AgenticAiFutureChipDesignPage() {
           AI is entering chip design in several forms: assistants, copilots, workflow agents, and orchestration around traditional EDA environments. The future is not one technique replacing everything else. It is these techniques working together with engineering evidence.
         </p>
 
-        <div className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5 text-sm leading-7 text-cyan-100">
+        <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-sm leading-7 text-slate-300">
           Agentic AI is most useful when it can plan, run, inspect, and hand off work across real engineering loops instead of producing isolated text.
         </div>
 
@@ -43,7 +43,7 @@ export default function AgenticAiFutureChipDesignPage() {
 
           <section className="grid gap-4 md:grid-cols-2">
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Traditional EDA and Reference Flows</h3>
+              <h3 className="text-lg font-bold text-white">Traditional EDA and Reference Flows</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6">
                 <li>- Proven toolchains and signoff methodology</li>
                 <li>- Company-specific scripts, constraints, checks, and reports</li>
@@ -51,8 +51,8 @@ export default function AgenticAiFutureChipDesignPage() {
                 <li>- Often hard for new users to navigate end to end</li>
               </ul>
             </div>
-            <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">AI-Native Workflow Layer</h3>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+              <h3 className="text-lg font-bold text-white">AI-Native Workflow Layer</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6">
                 <li>- Captures intent and setup choices</li>
                 <li>- Helps select, configure, and run the right loop</li>
@@ -114,19 +114,19 @@ export default function AgenticAiFutureChipDesignPage() {
 
           <section className="grid gap-4 md:grid-cols-3">
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Assist</h3>
+              <h3 className="text-lg font-bold text-white">Assist</h3>
               <p className="mt-3 text-sm leading-6">
                 Explain, draft, summarize, and accelerate local engineering tasks.
               </p>
             </div>
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Orchestrate</h3>
+              <h3 className="text-lg font-bold text-white">Orchestrate</h3>
               <p className="mt-3 text-sm leading-6">
                 Move from intent to configured workflows and tool-backed execution.
               </p>
             </div>
-            <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Review</h3>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+              <h3 className="text-lg font-bold text-white">Review</h3>
               <p className="mt-3 text-sm leading-6">
                 Preserve logs, artifacts, reports, and evidence so teams can decide what comes next.
               </p>

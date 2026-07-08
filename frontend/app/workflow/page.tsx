@@ -3534,7 +3534,7 @@ type SystemPlannerIntent = {
         {/* ===== Sidebar ===== */}
         <aside className="w-96 bg-slate-900/70 border-r border-slate-800 p-4 flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {/* Agentic Tools */}
-          <h2 className="text-lg font-bold mb-3 text-cyan-400">Agentic Tools</h2>
+          <h2 className="text-lg font-bold mb-3 text-white">Agentic Tools</h2>
           <button
             onClick={() => setShowPlanner(true)}
             className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white"
@@ -3587,10 +3587,10 @@ type SystemPlannerIntent = {
   
           {/* Workflows */}
           <section className="mb-6">
-            <h3 className="text-lg font-bold mb-3 text-cyan-400">Workflows</h3>
+            <h3 className="text-lg font-bold mb-3 text-white">Workflows</h3>
   
             <div className="pl-2">
-              <p className="text-sm text-cyan-400 font-medium mb-1">Prebuilt</p>
+              <p className="text-sm text-slate-300 font-medium mb-1">Prebuilt</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
                 {visiblePrebuiltWorkflows.map((wf) => (
                   <li
@@ -3605,7 +3605,7 @@ type SystemPlannerIntent = {
               </ul>
           {customWorkflows && customWorkflows.length > 0 && (
             <>
-              <p className="text-sm text-cyan-400 font-medium mb-1">My Workflows</p>
+              <p className="text-sm text-slate-300 font-medium mb-1">My Workflows</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
 
                 {customWorkflows
@@ -3648,7 +3648,7 @@ type SystemPlannerIntent = {
           {/* Apps */}
           <section className="mb-6">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-lg font-bold text-cyan-400">Apps</h3>
+              <h3 className="text-lg font-bold text-white">Apps</h3>
               <button
                 type="button"
                 onClick={() => setShowCreateApp(true)}
@@ -3658,7 +3658,7 @@ type SystemPlannerIntent = {
               </button>
             </div>
             <div className="mt-3 pl-2">
-              <p className="text-sm text-cyan-400 font-medium mb-1">My Apps</p>
+              <p className="text-sm text-slate-300 font-medium mb-1">My Apps</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-48 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {userApps.length ? (
                   userApps
@@ -3702,10 +3702,10 @@ type SystemPlannerIntent = {
   
           {/* Agents */}
           <section className="mb-6">
-            <h3 className="text-lg font-bold mb-3 text-cyan-400">Agents</h3>
+            <h3 className="text-lg font-bold mb-3 text-white">Agents</h3>
   
             <div className="pl-2">
-              <p className="text-sm text-cyan-400 font-medium mb-1">Prebuilt</p>
+              <p className="text-sm text-slate-300 font-medium mb-1">Prebuilt</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-32 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent mb-3">
                 {prebuiltAgents.map((a) => (
                   <li
@@ -3720,7 +3720,7 @@ type SystemPlannerIntent = {
                 ))}
               </ul>
   
-              <p className="text-sm text-cyan-400 font-medium mb-1">My Agents</p>
+              <p className="text-sm text-slate-300 font-medium mb-1">My Agents</p>
               <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-48 pr-1 pl-3 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                 {customAgents.length ? (
                   customAgents.map((a, idx) => (
@@ -3750,7 +3750,7 @@ type SystemPlannerIntent = {
           <div className="border-t border-slate-800 my-3" />
 
           <section className="mb-6">
-            <h3 className="text-lg font-bold mb-3 text-cyan-400">Design Intent Library</h3>
+            <h3 className="text-lg font-bold mb-3 text-white">Design Intent Library</h3>
 
             <ul className="space-y-1 text-sm text-gray-300 overflow-y-auto max-h-60 pr-1 pl-3 
                  scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
@@ -3782,7 +3782,7 @@ type SystemPlannerIntent = {
   
           {/* Marketplace */}
           <div className="mt-auto border-t border-slate-700 pt-3">
-            <h3 className="text-lg font-bold mb-3 text-cyan-400">Marketplace</h3>
+            <h3 className="text-lg font-bold mb-3 text-white">Marketplace</h3>
   
             <button
               onClick={() => setShowSubmitMarketplaceModal(true)}
@@ -4001,7 +4001,7 @@ type SystemPlannerIntent = {
       <aside className="w-[420px] bg-slate-900/60 border-l border-slate-800 p-4 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="text-lg font-bold text-cyan-400">Runs</h3>
+            <h3 className="text-lg font-bold text-white">Runs</h3>
             <div className="text-xs text-slate-400">
               {selectedWorkflowName ? `Workflow: ${selectedWorkflowName}` : "Select a workflow to see runs"}
             </div>
@@ -4127,7 +4127,7 @@ type SystemPlannerIntent = {
       {renameTarget.oldName && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
           <div className="bg-slate-900 rounded-xl p-6 shadow-xl w-96">
-            <h3 className="text-lg font-bold mb-3 text-cyan-400">Rename Workflow</h3>
+            <h3 className="text-lg font-bold mb-3 text-white">Rename Workflow</h3>
             <p className="text-sm mb-2 text-slate-400">Old name: {renameTarget.oldName}</p>
             <input
               type="text"
@@ -4195,7 +4195,7 @@ type SystemPlannerIntent = {
           <div className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-slate-700 bg-slate-950 text-white shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-slate-800 p-5">
               <div>
-                <h3 className="text-xl font-bold text-cyan-300">Private Draft Agent</h3>
+                <h3 className="text-xl font-bold text-white">Private Draft Agent</h3>
                 <p className="mt-1 text-sm text-slate-400">View and edit the saved draft content. JSON fields must remain valid before saving.</p>
               </div>
               <button className="rounded border border-slate-700 px-3 py-2 text-sm text-slate-300 hover:bg-slate-900" onClick={() => setAgentEditor(null)}>
@@ -5110,7 +5110,7 @@ function WorkflowConfigModal({
       <div className="max-h-[92vh] w-[920px] max-w-[96vw] overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900 p-6 text-slate-100 shadow-2xl scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-cyan-400">Configure Workflow Settings</h2>
+            <h2 className="text-2xl font-bold text-white">Configure Workflow Settings</h2>
             <p className="mt-1 text-sm leading-6 text-slate-400">
               Define the real input contract for this workflow. These fields appear in Product configuration when the workflow is packaged as an app.
             </p>
@@ -5136,7 +5136,7 @@ function WorkflowConfigModal({
                 <button
                   type="button"
                   onClick={applySuggestedInputs}
-                  className="rounded-lg border border-cyan-600 px-3 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/40"
+                  className="rounded-lg border border-cyan-600 px-3 py-2 text-sm font-semibold text-slate-100 hover:bg-cyan-950/40"
                 >
                   Suggest Inputs from Agents
                 </button>
@@ -5297,7 +5297,7 @@ function SpecInputModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-      <h2 className="mb-4 text-2xl font-bold text-cyan-400">Enter Spec for {loop.charAt(0).toUpperCase() + loop.slice(1)} Loop</h2>
+      <h2 className="mb-4 text-2xl font-bold text-white">Enter Spec for {loop.charAt(0).toUpperCase() + loop.slice(1)} Loop</h2>
         {showTestPlanName && (
           <div className="mb-4">
             <label className="mb-2 block text-sm font-medium text-slate-200">
@@ -5434,7 +5434,7 @@ function CreateAgentModal({ onClose, onSubmit }: { onClose: () => void; onSubmit
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div className="w-full max-w-lg rounded-2xl bg-slate-900 p-6 text-slate-100 shadow-2xl">
-        <h2 className="mb-4 text-2xl font-bold text-cyan-400">Create Custom Agent</h2>
+        <h2 className="mb-4 text-2xl font-bold text-white">Create Custom Agent</h2>
         <input type="text" placeholder='Backend label (e.g. "Digital RTL Agent")' value={backendKey} onChange={(e) => setBackendKey(e.target.value)} className="mb-3 w-full rounded border border-slate-600 bg-slate-800 p-2" />
         <input type="text" placeholder='UI label (e.g. "RTL Agent")' value={uiLabel} onChange={(e) => setUiLabel(e.target.value)} className="mb-3 w-full rounded border border-slate-600 bg-slate-800 p-2" />
         <textarea placeholder="Describe what this agent does." value={desc} onChange={(e) => setDesc(e.target.value)} className="mb-4 h-28 w-full rounded border border-slate-600 bg-slate-800 p-2" />

@@ -130,7 +130,7 @@ export default function WebinarRegistrationPage() {
                 <li>- Live Q&A</li>
               </ul>
             </div>
-            <div className="mt-5 rounded-xl border border-cyan-800 bg-cyan-950/25 p-5 text-sm text-cyan-100">
+            <div className="mt-5 rounded-xl border border-slate-700 bg-slate-950/70 p-5 text-sm text-slate-300">
               <div className="font-bold text-white">New to ChipLoop?</div>
               <p className="mt-2 leading-6 text-cyan-100/85">
                 Read how chip design is moving from prompt-based experiments toward connected ChipLoop workflows.

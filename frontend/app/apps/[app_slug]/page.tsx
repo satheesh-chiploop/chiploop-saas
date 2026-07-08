@@ -92,7 +92,7 @@ export default function AppSlugRouter() {
 
         <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
           <div className="text-sm text-slate-400">Generic App Runner</div>
-          <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">{slug || "unknown"}</h1>
+          <h1 className="mt-2 text-3xl font-extrabold text-white">{slug || "unknown"}</h1>
           <p className="mt-3 text-slate-300">
             This app doesn’t have a dedicated page yet.
           </p>

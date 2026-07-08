@@ -175,8 +175,8 @@ function WorkshopContent() {
               Choose the 9:30 AM PST or 9:30 PM PST batch. The first cohort starts June 6, 2026, and new cohorts open every other Saturday.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <span className="rounded-full border border-cyan-700 bg-cyan-950/40 px-4 py-2 text-sm font-semibold text-cyan-100">$49.99 per day</span>
-              <span className="rounded-full border border-cyan-700 bg-cyan-950/40 px-4 py-2 text-sm font-semibold text-cyan-100">$99.98 total</span>
+              <span className="rounded-full border border-cyan-700 bg-cyan-950/40 px-4 py-2 text-sm font-semibold text-slate-100">$49.99 per day</span>
+              <span className="rounded-full border border-cyan-700 bg-cyan-950/40 px-4 py-2 text-sm font-semibold text-slate-100">$99.98 total</span>
               <span className="rounded-full border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-semibold text-slate-200">2 Saturdays</span>
               <span className="rounded-full border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-semibold text-slate-200">2 hours each day</span>
               <span className="rounded-full border border-emerald-700 bg-emerald-950/30 px-4 py-2 text-sm font-semibold text-emerald-100">Completion certificate</span>
@@ -184,13 +184,13 @@ function WorkshopContent() {
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
               <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-5">
-                <h2 className="text-lg font-bold text-cyan-200">Day 1: Foundations to First System</h2>
+                <h2 className="text-lg font-bold text-white">Day 1: Foundations to First System</h2>
                 <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-300">
                   {dayOne.map((item) => <li key={item}>- {item}</li>)}
                 </ul>
               </div>
               <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-5">
-                <h2 className="text-lg font-bold text-cyan-200">Day 2: Build, Connect, and Scale</h2>
+                <h2 className="text-lg font-bold text-white">Day 2: Build, Connect, and Scale</h2>
                 <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-300">
                   {dayTwo.map((item) => <li key={item}>- {item}</li>)}
                 </ul>
@@ -204,14 +204,14 @@ function WorkshopContent() {
               </p>
             </div>
 
-            <div className="mt-8 rounded-xl border border-cyan-800/60 bg-cyan-950/20 p-5">
+            <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5">
               <div className="font-bold text-cyan-100">Not ready for the paid workshop?</div>
-              <p className="mt-2 text-sm leading-6 text-cyan-100/85">
+              <p className="mt-2 text-sm leading-6 text-slate-300">
                 Join the free weekly Saturday webinar first, then come back when you want hands-on training.
               </p>
               <button
                 onClick={() => router.push("/webinar/register")}
-                className="mt-4 rounded-lg border border-cyan-700 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-900/30"
+                className="mt-4 rounded-lg border border-cyan-700 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-cyan-900/30"
               >
                 Register for free webinar
               </button>

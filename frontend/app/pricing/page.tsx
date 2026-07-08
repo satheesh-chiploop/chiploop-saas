@@ -254,10 +254,11 @@ function PricingContent() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
+    <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="pricing" showMarketplace showSettings={false} />
 
-      <section className="mx-auto max-w-[1680px] px-6 py-12">
+      <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.14),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_58%,#020617_100%)] px-6 py-12">
+        <div className="mx-auto max-w-[1680px]">
         <div className="max-w-3xl">
           <h1 className="text-5xl font-extrabold leading-[1.05] text-white md:text-6xl">Pricing</h1>
           <p className="mt-4 text-lg text-slate-300">
@@ -265,7 +266,7 @@ function PricingContent() {
             generate, configure, run, and review flows. Advanced adds deeper analysis, closure, debug,
             signoff, validation, and automation.
           </p>
-          <p className="mt-3 text-sm text-cyan-100">
+          <p className="mt-3 text-sm text-slate-400">
             Monthly credits control usage and do not roll over. Advanced loop upgrades unlock capability;
             extra credits are purchased separately when users need more runs.
           </p>
@@ -284,7 +285,7 @@ function PricingContent() {
             </button>
           </div>
           {currentPlanName ? (
-            <div className="mt-4 inline-flex rounded-lg border border-cyan-700/60 bg-cyan-950/30 px-3 py-2 text-sm text-cyan-100">
+            <div className="mt-4 inline-flex rounded-lg border border-slate-700 bg-slate-950/60 px-3 py-2 text-sm text-slate-200">
               Current plan: {currentPlanName}
             </div>
           ) : null}
@@ -295,11 +296,11 @@ function PricingContent() {
           ) : null}
         </div>
 
-        <section className="mt-8 rounded-lg border border-cyan-800/70 bg-cyan-950/25 p-5">
+        <section className="mt-8 rounded-lg border border-slate-800 bg-slate-950/70 p-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <div className="text-xs font-semibold uppercase text-cyan-300">Starter intro</div>
-              <p className="mt-2 text-sm leading-6 text-cyan-50">
+              <p className="mt-2 text-sm leading-6 text-slate-300">
                 Start at $14.99/month for the first 3 months, then $19.99/month. Includes 1 Loop Core and 500 monthly credits.
               </p>
             </div>
@@ -317,7 +318,7 @@ function PricingContent() {
           {plans.map((plan) => {
             const isCurrent = currentPlan === plan.key;
             return (
-              <article key={plan.key} className={`relative rounded-lg border p-5 ${plan.popular ? "border-cyan-500 bg-cyan-950/20" : isCurrent ? "border-cyan-500 bg-slate-950/70" : "border-slate-800 bg-slate-950/70"}`}>
+              <article key={plan.key} className={`relative rounded-lg border p-5 ${plan.popular ? "border-cyan-500 bg-slate-950/80" : isCurrent ? "border-cyan-500 bg-slate-950/70" : "border-slate-800 bg-slate-950/70"}`}>
                 {plan.popular ? (
                   <div className="absolute right-3 top-3 rounded-full bg-cyan-500 px-3 py-1 text-xs font-bold text-black">Most Popular</div>
                 ) : null}
@@ -326,7 +327,7 @@ function PricingContent() {
                   <div className="mt-3 text-2xl font-extrabold text-cyan-200">{plan.discountPrice || plan.price}</div>
                   {plan.discountPrice ? <div className="mt-1 text-sm text-slate-400">Then {plan.price}</div> : null}
                   <div className="mt-2 text-sm font-semibold text-slate-300">{plan.credits}</div>
-                  <div className="mt-1 text-sm font-semibold text-cyan-100">{plan.loopAccess}</div>
+                  <div className="mt-1 text-sm font-semibold text-slate-200">{plan.loopAccess}</div>
                   <p className="mt-4 text-sm leading-6 text-slate-400">{plan.note}</p>
                   {plan.key !== "enterprise" ? (
                     <p className="mt-3 text-xs leading-5 text-slate-500">
@@ -346,19 +347,19 @@ function PricingContent() {
           })}
         </section>
 
-        <section id="setup-flow" className="mt-10 rounded-lg border border-cyan-800/70 bg-cyan-950/20 p-5 scroll-mt-24">
+        <section id="setup-flow" className="mt-10 rounded-lg border border-slate-800 bg-slate-950/70 p-5 scroll-mt-24">
           <div className="max-w-3xl">
             <div className="text-xs font-semibold uppercase text-cyan-300">After Signup</div>
             <h2 className="mt-2 text-xl font-bold">Set up your loop access</h2>
-            <p className="mt-2 text-sm leading-6 text-cyan-50/90">
+            <p className="mt-2 text-sm leading-6 text-slate-300">
               Checkout starts the base subscription. Loop choices, Advanced upgrades, and credit packs are managed from Plan Settings after signup.
             </p>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
             {setupSteps.map(([step, title, body]) => (
-              <article key={step} className="rounded-lg border border-cyan-900/70 bg-slate-950/60 p-4">
+              <article key={step} className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">{step}</div>
-                <h3 className="mt-3 font-extrabold text-cyan-100">{title}</h3>
+                <h3 className="mt-3 font-extrabold text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
               </article>
             ))}
@@ -393,7 +394,7 @@ function PricingContent() {
               <tbody className="divide-y divide-slate-800">
                 {loopPackages.map(([loop, core, advanced]) => (
                   <tr key={loop}>
-                    <td className="px-4 py-3 font-semibold text-cyan-100">{loop}</td>
+                    <td className="px-4 py-3 font-semibold text-slate-100">{loop}</td>
                     <td className="px-4 py-3 text-slate-300">{core}</td>
                     <td className="px-4 py-3 text-slate-300">{advanced}</td>
                   </tr>
@@ -414,7 +415,7 @@ function PricingContent() {
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {addOns.map(([name, price, body]) => (
               <article key={name} className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-                <div className="text-base font-extrabold text-cyan-100">{name}</div>
+                <div className="text-base font-extrabold text-white">{name}</div>
                 <div className="mt-2 text-xl font-extrabold text-white">{price}</div>
                 <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
               </article>
@@ -454,6 +455,7 @@ function PricingContent() {
             </table>
           </div>
         </section>
+        </div>
       </section>
       <footer className="border-t border-slate-800 px-6 py-8 text-center text-base text-slate-500">
         <div className="mb-4 flex flex-wrap justify-center gap-4 text-slate-400">
@@ -463,7 +465,7 @@ function PricingContent() {
           <button onClick={() => router.push("/webinar/register")} className="hover:text-cyan-200">Webinar</button>
           <button onClick={() => router.push("/contact")} className="hover:text-cyan-200">Contact Us</button>
         </div>
-        <p className="mb-2 text-cyan-100">chiploop.agx@gmail.com</p>
+        <p className="mb-2 text-slate-300">Connect with us: chiploop.agx@gmail.com</p>
         <p>Copyright 2026 ChipLoop</p>
       </footer>
     </main>

@@ -268,7 +268,7 @@ export default function SettingsPlanPage() {
           <>
             {plan.requires_checkout ? (
               <section className="rounded-lg border border-cyan-700/50 bg-cyan-950/20 p-5">
-                <div className="text-sm font-semibold text-cyan-100">Trial checkout required</div>
+                <div className="text-sm font-semibold text-slate-100">Trial checkout required</div>
                 <div className="mt-2 text-sm text-cyan-100/85">
                   Your account is created. Start the 3-day trial when you are ready to run workflows.
                 </div>
@@ -283,7 +283,7 @@ export default function SettingsPlanPage() {
 
             {trial?.status ? (
               <section className="rounded-lg border border-cyan-700/50 bg-cyan-950/20 p-5">
-                <div className="text-sm font-semibold text-cyan-100">Trial status</div>
+                <div className="text-sm font-semibold text-slate-100">Trial status</div>
                 <div className="mt-2 text-sm text-cyan-100/85">
                   {trial.status === "active"
                     ? `${trial.days_remaining ?? "-"} days remaining. Starter is $19.99/month after the 3-day trial. Cancel anytime before paid conversion.`
@@ -327,7 +327,7 @@ export default function SettingsPlanPage() {
 
             {discountMonthsRemaining > 0 ? (
               <section className="rounded-lg border border-cyan-700/50 bg-cyan-950/20 p-5">
-                <div className="text-sm font-semibold text-cyan-100">Intro discount</div>
+                <div className="text-sm font-semibold text-slate-100">Intro discount</div>
                 <div className="mt-2 text-sm text-cyan-100/85">
                   Intro discount remains for {discountMonthsRemaining} billing cycle{discountMonthsRemaining === 1 ? "" : "s"}.
                 </div>
@@ -379,7 +379,7 @@ export default function SettingsPlanPage() {
                       >
                         <div className="flex items-center justify-between gap-3">
                           <span className="font-bold text-slate-100">{choice.label}</span>
-                          <span className="text-sm font-bold text-cyan-100">
+                          <span className="text-sm font-bold text-white">
                             {planBusy === choice.key ? "Updating..." : choice.price}
                           </span>
                         </div>

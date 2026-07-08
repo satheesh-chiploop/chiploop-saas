@@ -88,7 +88,8 @@ export default function LoopsPage() {
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="loops" showMarketplace showSettings={false} />
 
-      <section className="mx-auto max-w-[1680px] px-4 py-12 sm:px-6">
+      <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.14),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_58%,#020617_100%)] px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-[1680px]">
         <div className="mx-auto max-w-4xl text-center">
           <div className="text-xs font-semibold uppercase text-cyan-300">Explore Design Loops</div>
           <h1 className="mt-3 text-5xl font-extrabold leading-[1.05] text-white sm:text-6xl">
@@ -98,7 +99,7 @@ export default function LoopsPage() {
             Start with the loop you need. Expand from design to implementation, software, validation,
             and product journeys as your chip matures.
           </p>
-          <p className="mt-3 text-xl font-extrabold text-cyan-100">Core gets you moving. Advanced helps you close.</p>
+          <p className="mt-3 text-xl font-extrabold text-slate-100">Core gets you moving. Advanced helps you close.</p>
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
             <button onClick={() => router.push("/pricing")} className="rounded-lg bg-cyan-500 px-5 py-3 text-sm font-bold text-slate-950 hover:bg-cyan-400">
               View Pricing
@@ -111,9 +112,11 @@ export default function LoopsPage() {
             </button>
           </div>
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-[1680px] px-4 pb-10 sm:px-6">
+      <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-[1680px]">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           {loops.map((loop) => (
             <button
@@ -121,15 +124,17 @@ export default function LoopsPage() {
               onClick={() => router.push(loop.href)}
               className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-left transition hover:border-cyan-500 hover:bg-slate-900"
             >
-              <h2 className="text-xl font-extrabold text-cyan-200">{loop.name}</h2>
+              <h2 className="text-xl font-extrabold text-white">{loop.name}</h2>
               <p className="mt-3 min-h-20 text-sm leading-6 text-slate-300">{loop.short}</p>
               <div className="mt-4 text-xs font-semibold uppercase text-slate-500">Explore loop</div>
             </button>
           ))}
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6">
+      <section className="w-full border-y border-slate-800 bg-slate-800/30 px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-[1680px]">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase text-cyan-300">Platform Coverage</p>
@@ -203,9 +208,11 @@ export default function LoopsPage() {
             Counts reflect the current prebuilt frontend catalog and backend agent/workflow registry. Some agents are shared across loops and product stages.
           </p>
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6">
+      <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-[1680px]">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase text-cyan-300">Core vs Advanced</p>
@@ -225,7 +232,7 @@ export default function LoopsPage() {
               <tbody className="divide-y divide-slate-800">
                 {loops.map((loop) => (
                   <tr key={loop.name}>
-                    <td className="px-4 py-3 font-bold text-cyan-100">{loop.name}</td>
+                    <td className="px-4 py-3 font-bold text-slate-100">{loop.name}</td>
                     <td className="px-4 py-3 text-slate-300">{loop.core}</td>
                     <td className="px-4 py-3 text-slate-300">{loop.advanced}</td>
                   </tr>
@@ -234,9 +241,11 @@ export default function LoopsPage() {
             </table>
           </div>
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6">
+      <section className="w-full border-y border-slate-800 bg-slate-800/30 px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-[1680px]">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase text-cyan-300">Product Journeys</p>
@@ -247,7 +256,7 @@ export default function LoopsPage() {
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {unlockExamples.map(([title, body]) => (
               <article key={title} className="rounded-xl border border-slate-800 bg-slate-950/70 p-5">
-                <h3 className="text-lg font-extrabold text-cyan-200">{title}</h3>
+                <h3 className="text-lg font-extrabold text-white">{title}</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-300">{body}</p>
               </article>
             ))}
@@ -261,9 +270,11 @@ export default function LoopsPage() {
             </button>
           </div>
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6">
+      <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-[1680px]">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase text-cyan-300">Reference Journeys</p>
@@ -281,12 +292,13 @@ export default function LoopsPage() {
                 onClick={() => router.push(journey.href)}
                 className="rounded-xl border border-slate-800 bg-slate-950/70 p-5 text-left transition hover:border-cyan-500 hover:bg-slate-950"
               >
-                <h3 className="text-lg font-extrabold text-cyan-200">{journey.title}</h3>
+                <h3 className="text-lg font-extrabold text-white">{journey.title}</h3>
                 <p className="mt-3 min-h-20 text-sm leading-6 text-slate-300">{journey.body}</p>
                 <div className="mt-4 text-xs font-semibold uppercase text-slate-500">Open reference journey</div>
               </button>
             ))}
           </div>
+        </div>
         </div>
       </section>
     </main>

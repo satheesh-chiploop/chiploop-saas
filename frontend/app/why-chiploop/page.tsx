@@ -33,7 +33,8 @@ export default function WhyChipLoopPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav showMarketplace showSettings={false} />
-      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.14),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_58%,#020617_100%)] px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-[1680px]">
         <div className="max-w-4xl">
           <div className="text-xs font-semibold uppercase text-cyan-300">Why ChipLoop</div>
           <h1 className="mt-3 text-5xl font-extrabold leading-[1.05] text-white sm:text-6xl">
@@ -47,7 +48,7 @@ export default function WhyChipLoopPage() {
         </div>
 
         <div className="mt-8 overflow-hidden rounded-xl border border-slate-800 bg-slate-900/80">
-          <div className="grid grid-cols-1 bg-slate-950 text-sm font-bold text-cyan-200 md:grid-cols-[0.8fr_1fr_1fr]">
+          <div className="grid grid-cols-1 bg-slate-950 text-sm font-bold text-slate-200 md:grid-cols-[0.8fr_1fr_1fr]">
             <div className="border-b border-slate-800 p-4 md:border-b-0 md:border-r">Feature</div>
             <div className="border-b border-slate-800 p-4 md:border-b-0 md:border-r">Traditional</div>
             <div className="p-4">ChipLoop</div>
@@ -67,7 +68,7 @@ export default function WhyChipLoopPage() {
           ))}
         </div>
 
-        <section className="mt-10 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-6 sm:p-8">
+        <section className="mt-10 rounded-xl border border-slate-800 bg-slate-950/70 p-6 sm:p-8">
           <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">Design Intent to Execution</h2>
           <div className="mt-6 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
             {[
@@ -76,7 +77,7 @@ export default function WhyChipLoopPage() {
               ["03", "Run", "Logs, dashboards, and ZIPs"],
             ].map(([step, title, body], index) => (
               <div key={title} className="contents">
-                <div className="rounded-xl border border-cyan-400/20 bg-slate-950/50 p-5 text-center">
+                <div className="rounded-xl border border-slate-800 bg-slate-900/65 p-5 text-center">
                   <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">
                     {step}
                   </div>
@@ -84,7 +85,7 @@ export default function WhyChipLoopPage() {
                   <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
                 </div>
                 {index < 2 ? (
-                  <div className="flex items-center justify-center text-3xl font-extrabold text-cyan-300 md:px-2">
+                  <div className="flex items-center justify-center text-3xl font-extrabold text-white md:px-2">
                     <span className="hidden md:inline">{"\u2192"}</span>
                     <span className="md:hidden">{"\u2193"}</span>
                   </div>
@@ -108,6 +109,7 @@ export default function WhyChipLoopPage() {
             ))}
           </div>
         </section>
+        </div>
       </section>
     </main>
   );

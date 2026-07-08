@@ -215,7 +215,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full border-b border-slate-800 bg-slate-900/35">
+      <section className="w-full border-b border-slate-800 bg-slate-900/45">
         <div className={`${landingShellClass} px-4 py-8 sm:px-6`}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {platformStats.map(([value, label]) => (
@@ -228,7 +228,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6 sm:py-14">
         <div className={landingShellClass}>
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="mx-auto max-w-4xl text-center">
@@ -249,7 +249,7 @@ function LandingPageContent() {
             ))}
           </div>
           <div className="mt-7 text-center">
-            <button onClick={() => router.push("/loops")} className="rounded-lg border border-cyan-700 px-5 py-3 text-sm font-bold text-cyan-100 hover:border-cyan-300 hover:text-cyan-200">
+            <button onClick={() => router.push("/loops")} className="rounded-lg border border-slate-700 px-5 py-3 text-sm font-bold text-slate-100 hover:border-cyan-300 hover:text-cyan-200">
               Explore Design Loops
             </button>
           </div>
@@ -257,7 +257,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full border-y border-slate-800 bg-slate-900/30 px-4 py-8 sm:px-6 sm:py-10">
+      <section className="w-full border-y border-slate-800 bg-slate-800/30 px-4 py-8 sm:px-6 sm:py-10">
         <div className={landingShellClass}>
         <div className="text-center">
           <p className={eyebrowClass}>Explore ChipLoop</p>
@@ -277,7 +277,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6 sm:py-14">
         <div className={landingShellClass}>
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="mx-auto max-w-4xl text-center">
@@ -308,7 +308,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full border-y border-slate-800 bg-slate-900/30 px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full border-y border-slate-800 bg-slate-800/30 px-4 py-10 sm:px-6 sm:py-14">
         <div className={landingShellClass}>
         <div className="grid gap-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
@@ -402,7 +402,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6 sm:py-14">
         <div className={landingShellClass}>
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
@@ -434,7 +434,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full border-y border-slate-800 bg-slate-900/30 px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full border-y border-slate-800 bg-slate-800/30 px-4 py-10 sm:px-6 sm:py-14">
         <div className={landingShellClass}>
         <div className="text-center">
           <h2 className={`${sectionTitleClass} mx-auto`}>Design Intent to Execution</h2>
@@ -457,7 +457,7 @@ function LandingPageContent() {
                 <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
               </div>
               {index < 2 ? (
-                <div className="flex items-center justify-center text-3xl font-extrabold text-cyan-300 md:px-2">
+                <div className="flex items-center justify-center text-3xl font-extrabold text-white md:px-2">
                   <span className="hidden md:inline">→</span>
                   <span className="md:hidden">↓</span>
                 </div>
@@ -468,7 +468,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6 sm:py-14">
         <div className="mx-auto max-w-[1440px]">
         <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 sm:p-8 md:p-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
@@ -498,7 +498,7 @@ function LandingPageContent() {
                   </button>
                 ))}
               </div>
-              <p className="mt-4 text-sm text-cyan-100/80">Available for scripted, local, and CI-driven workflows.</p>
+              <p className="mt-4 text-sm text-slate-400">Available for scripted, local, and CI-driven workflows.</p>
             </div>
             <div className="overflow-hidden rounded-xl border border-slate-700 bg-slate-950 shadow-2xl">
               <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
@@ -511,7 +511,7 @@ function LandingPageContent() {
                   {automationSnippets[automationMode][automationStep].title}
                 </div>
               </div>
-              <pre className="min-h-36 overflow-x-auto whitespace-pre-wrap break-words px-4 py-4 text-left text-xs leading-6 text-cyan-100 sm:min-h-44 sm:px-5 sm:py-5 sm:text-sm sm:leading-7">
+              <pre className="min-h-36 overflow-x-auto whitespace-pre-wrap break-words px-4 py-4 text-left text-xs leading-6 text-slate-200 sm:min-h-44 sm:px-5 sm:py-5 sm:text-sm sm:leading-7">
                 <code>{automationSnippets[automationMode][automationStep].code}</code>
               </pre>
               <div className="flex gap-2 border-t border-slate-800 px-4 py-3">
@@ -530,7 +530,7 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full border-t border-slate-800 bg-slate-900/35 px-4 py-12 text-center sm:px-6 sm:py-16">
+      <section className="w-full border-t border-slate-800 bg-slate-800/30 px-4 py-12 text-center sm:px-6 sm:py-16">
         <div className="mx-auto max-w-5xl">
         <h2 className={`${sectionTitleClass} mx-auto`}>Start Building Connected Chip Workflows</h2>
         <p className={`${sectionBodyClass} mx-auto`}>
@@ -564,7 +564,7 @@ function LandingPageContent() {
           <button onClick={() => router.push("/webinar/register")} className="hover:text-cyan-200">Webinar</button>
           <button onClick={() => router.push("/contact")} className="hover:text-cyan-200">Contact Us</button>
         </div>
-        <p className="mb-2 text-cyan-100">Connect with us: chiploop.agx@gmail.com</p>
+        <p className="mb-2 text-slate-300">Connect with us: chiploop.agx@gmail.com</p>
         <p>Copyright 2026 ChipLoop</p>
       </footer>
     </main>

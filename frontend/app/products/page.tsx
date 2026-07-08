@@ -85,7 +85,7 @@ function StepRail({ active }: { active: "define" | "configure" | "run" }) {
           }`}
         >
           <div className="text-xs font-semibold uppercase text-slate-500">Step {index + 1}</div>
-          <div className={active === step.id ? "text-sm font-semibold text-cyan-100" : "text-sm font-semibold text-white"}>{step.label}</div>
+          <div className={active === step.id ? "text-sm font-semibold text-slate-100" : "text-sm font-semibold text-white"}>{step.label}</div>
           <div className="mt-1 text-xs text-slate-400">{step.text}</div>
         </div>
       ))}
@@ -274,17 +274,17 @@ export default function ProductsPage() {
         </div>
 
         {message ? (
-          <div className="mb-5 rounded-lg border border-cyan-500/30 bg-cyan-950/30 px-4 py-3 text-sm text-cyan-100">
+          <div className="mb-5 rounded-lg border border-slate-700 bg-slate-900/70 px-4 py-3 text-sm text-slate-200">
             {message}
           </div>
         ) : null}
 
-        <section className="mb-6 rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-5">
+        <section className="mb-6 rounded-lg border border-slate-800 bg-slate-900/55 p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="text-xs font-semibold uppercase text-cyan-300">Project Review</div>
               <h2 className="mt-1 text-lg font-semibold text-white">Already have files, reports, or a Git repo?</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-cyan-100/80">
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                 Use Ask this Project to summarize the codebase, identify risks, and get recommended product stages before configuring the product journey.
               </p>
             </div>

@@ -26,7 +26,7 @@ export default function AskThisRunEngineeringReviewPage() {
           Engineering review is not just reading one final answer. It is understanding what was generated, what failed, what changed, what evidence exists, and what should happen next.
         </p>
 
-        <div className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5 text-sm leading-7 text-cyan-100">
+        <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-sm leading-7 text-slate-300">
           Ask This Run turns a completed workflow into a reviewable engineering object: logs, artifacts, summaries, warnings, and context can be queried from the run itself.
         </div>
 
@@ -76,7 +76,7 @@ export default function AskThisRunEngineeringReviewPage() {
 
           <section className="grid gap-4 md:grid-cols-2">
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">Without Run-Grounded Review</h3>
+              <h3 className="text-lg font-bold text-white">Without Run-Grounded Review</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6">
                 <li>- Users hunt through files and logs manually</li>
                 <li>- Important warnings can be missed</li>
@@ -84,8 +84,8 @@ export default function AskThisRunEngineeringReviewPage() {
                 <li>- Handoffs require separate summaries</li>
               </ul>
             </div>
-            <div className="rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-5">
-              <h3 className="text-lg font-bold text-cyan-300">With Ask This Run</h3>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
+              <h3 className="text-lg font-bold text-white">With Ask This Run</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6">
                 <li>- Questions are grounded in that workflow run</li>
                 <li>- Artifacts and logs stay part of the review context</li>

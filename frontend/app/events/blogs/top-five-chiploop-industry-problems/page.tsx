@@ -76,9 +76,9 @@ export default function TopFiveChipLoopIndustryProblemsPage() {
           ))}
         </section>
 
-        <section className="mt-8 rounded-xl border border-cyan-900/70 bg-cyan-950/20 p-6">
+        <section className="mt-8 rounded-xl border border-slate-800 bg-slate-900/70 p-6">
           <h2 className="text-2xl font-bold text-white">The Simple Model</h2>
-          <div className="mt-5 grid gap-3 text-center text-sm font-semibold text-cyan-100 sm:grid-cols-5">
+          <div className="mt-5 grid gap-3 text-center text-sm font-semibold text-slate-100 sm:grid-cols-5">
             {["Define", "Configure", "Run", "Review", "Continue"].map((step, index) => (
               <div key={step} className="rounded-lg border border-cyan-800 bg-slate-950/50 p-4">
                 <div>{step}</div>

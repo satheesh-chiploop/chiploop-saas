@@ -79,7 +79,8 @@ export default function ContactPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="contact" showMarketplace showSettings={false} />
-      <div className="mx-auto max-w-[1200px] px-6 py-10">
+      <div className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.14),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_58%,#020617_100%)] px-6 py-10">
+        <div className="mx-auto max-w-[1200px]">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="rounded-lg border border-slate-800 bg-slate-900/70 p-8">
             <p className="text-xs font-semibold uppercase text-cyan-300">Contact Us</p>
@@ -87,9 +88,9 @@ export default function ContactPage() {
             <p className="mt-5 leading-7 text-slate-300">
               Send a question, partnership note, pricing question, or product request. The ChipLoop team receives a copy.
             </p>
-            <div className="mt-8 rounded-lg border border-cyan-800 bg-cyan-950/25 p-5 text-sm text-cyan-100">
+            <div className="mt-8 rounded-lg border border-slate-700 bg-slate-950/70 p-5 text-sm text-slate-300">
               <div className="font-bold text-white">Email</div>
-              <a href="mailto:chiploop.agx@gmail.com" className="mt-2 block text-cyan-200 hover:text-cyan-100">
+              <a href="mailto:chiploop.agx@gmail.com" className="mt-2 block text-slate-100 hover:text-cyan-200">
                 chiploop.agx@gmail.com
               </a>
             </div>
@@ -99,7 +100,7 @@ export default function ContactPage() {
             {success ? (
               <div className="flex min-h-[480px] flex-col justify-center">
                 <div className="w-fit rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-800">Request received</div>
-                <h2 className="mt-6 text-4xl font-extrabold leading-tight text-white sm:text-5xl">Thanks, we received your note.</h2>
+                <h2 className="mt-6 text-4xl font-extrabold leading-tight text-slate-950 sm:text-5xl">Thanks, we received your note.</h2>
                 <p className="mt-4 leading-7 text-slate-600">
                   We recorded your details and will use your email to follow up.
                 </p>
@@ -113,7 +114,7 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={submit} className="space-y-5">
                 <div>
-                  <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">Contact ChipLoop</h2>
+                  <h2 className="text-3xl font-extrabold leading-tight text-slate-950 sm:text-4xl">Contact ChipLoop</h2>
                   <p className="mt-2 text-sm text-slate-600">A few details help us route the request.</p>
                 </div>
 
@@ -233,6 +234,7 @@ export default function ContactPage() {
               </form>
             )}
           </section>
+        </div>
         </div>
       </div>
     </main>

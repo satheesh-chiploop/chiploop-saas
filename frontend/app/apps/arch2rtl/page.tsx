@@ -480,7 +480,7 @@ export default function Arch2RTLAppPage() {
 
         <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
           <div className="text-sm text-slate-400">Digital Loop</div>
-          <h1 className="mt-2 text-3xl font-extrabold text-cyan-300">Arch2RTL</h1>
+          <h1 className="mt-2 text-3xl font-extrabold text-white">Arch2RTL</h1>
           <p className="mt-2 text-slate-300">One-shot intake to one click run to progressive outputs to ZIP handoff.</p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
