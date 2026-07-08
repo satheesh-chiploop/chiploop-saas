@@ -35,11 +35,11 @@ const automationSnippets = {
 };
 
 const paths = [
-  ["Loops", "Choose your chip design domain.", "/loops", "Explore Loops"],
-  ["Products", "Build complete chip journeys.", "/products", "Explore Products"],
-  ["Apps", "Run ready-made chip workflows.", "/apps", "Explore Apps"],
-  ["Studio", "Create custom agents and workflows.", "/workflow", "Open Studio"],
-  ["Marketplace", "Reuse approved engineering flows.", "/marketplace", "Explore Marketplace"],
+  ["Loops", "Choose your chip design domain.", "/loops", "Explore Loops", "border-cyan-400/55", "hover:border-cyan-300 hover:shadow-cyan-950/35"],
+  ["Products", "Build complete chip journeys.", "/products", "Explore Products", "border-pink-400/55", "hover:border-pink-300 hover:shadow-pink-950/35"],
+  ["Apps", "Run ready-made chip workflows.", "/apps", "Explore Apps", "border-emerald-400/55", "hover:border-emerald-300 hover:shadow-emerald-950/35"],
+  ["Studio", "Create custom agents and workflows.", "/workflow", "Open Studio", "border-violet-400/55", "hover:border-violet-300 hover:shadow-violet-950/35"],
+  ["Marketplace", "Reuse approved engineering flows.", "/marketplace", "Explore Marketplace", "border-amber-300/55", "hover:border-amber-300 hover:shadow-amber-950/35"],
 ];
 
 const platformStats = [
@@ -274,8 +274,8 @@ function LandingPageContent() {
           <h2 className={`${sectionTitleClass} mx-auto`}>Start where you need.</h2>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
-          {paths.map(([title, body, href, cta]) => (
-            <article key={title} className="rounded-xl border border-slate-700/70 bg-slate-900/70 p-5 text-center shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:border-cyan-300/70 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-950/20">
+          {paths.map(([title, body, href, cta, border, hover]) => (
+            <article key={title} className={`rounded-xl border-2 ${border} bg-slate-900/70 p-5 text-center shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-900 hover:shadow-xl ${hover}`}>
               <h3 className="text-xl font-bold leading-tight text-white">{title}</h3>
               <p className="mt-3 min-h-12 text-sm leading-6 text-slate-300">{body}</p>
               <button onClick={() => goTo(href)} className="mt-5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
@@ -299,15 +299,15 @@ function LandingPageContent() {
               ChipLoop keeps each stage connected, so outputs, logs, dashboards, and decisions carry forward instead of living in disconnected tools.
             </p>
           </div>
-          <div className="mx-auto mt-8 w-full max-w-[1680px] overflow-x-auto pb-2">
-            <div className="flex min-w-max flex-nowrap items-center justify-center gap-3">
+          <div className="mx-auto mt-8 w-full max-w-[1680px]">
+            <div className="grid grid-cols-[repeat(17,minmax(0,auto))] items-center justify-center gap-1.5 lg:gap-2">
             {endToEndJourney.map((stage, index) => (
-              <div key={stage} className="flex shrink-0 items-center gap-3">
-                <div className="flex h-16 w-36 min-w-36 items-center justify-center rounded-xl border border-slate-700 bg-slate-950/70 px-4 text-center text-sm font-semibold text-slate-100">
+              <div key={stage} className="contents">
+                <div className="flex h-12 w-[88px] items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 px-2 text-center text-[10px] font-semibold leading-4 text-slate-100 sm:w-24 md:w-28 md:text-xs lg:w-32">
                   {stage}
                 </div>
                 {index < endToEndJourney.length - 1 && (
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-slate-950 text-sm font-bold text-slate-500" aria-hidden="true">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-700 bg-slate-950 text-[10px] font-bold text-slate-500 md:h-6 md:w-6 md:text-xs" aria-hidden="true">
                     {"\u2192"}
                   </div>
                 )}
