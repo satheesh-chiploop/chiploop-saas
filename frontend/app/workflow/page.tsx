@@ -36,7 +36,8 @@ import { FiGrid } from "react-icons/fi";
    Types & Constants
 ========================= */
 type LoopKey = "digital" | "analog" | "embedded" | "system" |"validation";
-type AgentNodeData = { uiLabel: string; backendLabel: string; desc?: string };
+type AgentNodeSize = "regular" | "cozy" | "compact";
+type AgentNodeData = { uiLabel: string; backendLabel: string; desc?: string; nodeSize?: AgentNodeSize };
 type WorkflowGraphDefinition = {
   nodes: Array<{
     id: string;
@@ -173,9 +174,9 @@ function linearWorkflowDefinition(agentNames: string[]): WorkflowGraphDefinition
   };
 }
 
-const STUDIO_NODE_WIDTH = 264;
-const STUDIO_NODE_X_GAP = 108;
-const STUDIO_NODE_Y_GAP = 210;
+const STUDIO_NODE_WIDTH = 236;
+const STUDIO_NODE_X_GAP = 96;
+const STUDIO_NODE_Y_GAP = 190;
 const STUDIO_MAX_COLUMNS = 6;
 const STUDIO_EDGE_STYLE = { stroke: "#22d3ee", strokeWidth: 2.5 };
 const STUDIO_EDGE_MARKER = {
@@ -185,21 +186,44 @@ const STUDIO_EDGE_MARKER = {
   height: 20,
 };
 
+function studioNodeSizeForCount(nodeCount: number): AgentNodeSize {
+  if (nodeCount >= 18) return "compact";
+  if (nodeCount >= 10) return "cozy";
+  return "regular";
+}
+
+function studioNodeMetrics(nodeCount: number) {
+  const nodeSize = studioNodeSizeForCount(nodeCount);
+  if (nodeSize === "compact") {
+    return { width: 204, xGap: 72, yGap: 162, startX: 56, startY: 78 };
+  }
+  if (nodeSize === "cozy") {
+    return { width: 220, xGap: 84, yGap: 176, startX: 64, startY: 88 };
+  }
+  return {
+    width: STUDIO_NODE_WIDTH,
+    xGap: STUDIO_NODE_X_GAP,
+    yGap: STUDIO_NODE_Y_GAP,
+    startX: 72,
+    startY: 96,
+  };
+}
+
 function layoutNodePositions(nodeCount: number, canvasWidth?: number): Array<{ x: number; y: number }> {
+  const metrics = studioNodeMetrics(nodeCount);
   let responsiveColumns = 4;
   if (canvasWidth) {
-    if (canvasWidth < 900) responsiveColumns = 2;
-    else if (canvasWidth < 1150) responsiveColumns = 3;
-    else if (canvasWidth >= 1900) responsiveColumns = STUDIO_MAX_COLUMNS;
-    else if (canvasWidth >= 1500) responsiveColumns = 5;
+    const usableWidth = Math.max(320, canvasWidth - metrics.startX * 2);
+    responsiveColumns = Math.max(1, Math.floor((usableWidth + metrics.xGap) / (metrics.width + metrics.xGap)));
+    responsiveColumns = Math.min(responsiveColumns, nodeCount >= 18 ? 7 : STUDIO_MAX_COLUMNS);
   }
   const columns = Math.max(1, Math.min(nodeCount, responsiveColumns));
   return Array.from({ length: nodeCount }, (_, index) => {
     const row = Math.floor(index / columns);
     const column = index % columns;
     return {
-      x: 80 + column * (STUDIO_NODE_WIDTH + STUDIO_NODE_X_GAP),
-      y: 160 + row * STUDIO_NODE_Y_GAP,
+      x: metrics.startX + column * (metrics.width + metrics.xGap),
+      y: metrics.startY + row * metrics.yGap,
     };
   });
 }
@@ -2793,6 +2817,16 @@ type SystemPlannerIntent = {
     () => buildConfigDefaults(selectedWorkflowEffectiveConfigSchema, selectedWorkflowDefaultConfig),
     [selectedWorkflowDefaultConfig, selectedWorkflowEffectiveConfigSchema],
   );
+  const renderedNodes = useMemo(() => {
+    const nodeSize = studioNodeSizeForCount(nodes.length);
+    return nodes.map((node) => ({
+      ...node,
+      data: {
+        ...node.data,
+        nodeSize,
+      },
+    }));
+  }, [nodes]);
 
   const loadPrebuiltWorkflow = (wf: CustomWorkflowRow) => {
     loadWorkflowFromDB(wf);
@@ -3767,47 +3801,56 @@ type SystemPlannerIntent = {
         </aside>
   
         {/* ===== Canvas & Console ===== */}
-        <section className="flex-1 flex flex-col p-4 overflow-hidden">
-          {/* Canvas */}
-          <div
-            ref={canvasRef}
-            className="relative flex-1 border border-slate-800 rounded-xl overflow-hidden bg-black/60"
-            onDrop={onDropCanvas}
-            onDragOver={onDragOverCanvas}
-          >
-            <div className="absolute left-3 top-3 z-10 flex flex-wrap items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/90 p-2 text-xs text-slate-200 shadow-lg">
-              <label className="flex items-center gap-2">
+        <section className="flex-1 flex flex-col gap-3 overflow-y-auto p-4 min-w-0">
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-2 text-xs text-slate-200 shadow-sm">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-cyan-300">Workflow Canvas</p>
+              <p className="truncate text-slate-400">
+                {selectedWorkflowName ? selectedWorkflowName : "Drag agents from the sidebar and connect the workflow."}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="flex items-center gap-2 rounded border border-slate-700 bg-slate-900 px-2 py-1">
                 <input
                   type="checkbox"
                   checked={autoConnectOnDrop}
                   onChange={(event) => setAutoConnectOnDrop(event.target.checked)}
                   className="h-4 w-4 accent-cyan-500"
                 />
-                Auto-connect dropped agents
+                Auto-connect
               </label>
               <button
                 type="button"
                 onClick={deleteSelectedEdge}
                 disabled={!selectedEdgeId}
-                className="rounded border border-slate-700 px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-600"
+                className="rounded border border-slate-700 bg-slate-900 px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-600"
               >
-                Delete selected edge
+                Delete edge
               </button>
               <button
                 type="button"
                 onClick={arrangeCanvas}
                 disabled={!nodes.length}
-                className="flex items-center gap-1.5 rounded border border-slate-700 px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-600"
+                className="flex items-center gap-1.5 rounded border border-slate-700 bg-slate-900 px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:text-slate-600"
                 title="Arrange agents on the canvas"
               >
                 <FiGrid aria-hidden="true" />
                 Arrange
               </button>
-              <span className="text-slate-500">Drag right dot to left dot to connect branches.</span>
+              <span className="hidden text-slate-500 xl:inline">Connect right dot to left dot for branches.</span>
             </div>
+          </div>
+
+          {/* Canvas */}
+          <div
+            ref={canvasRef}
+            className="relative min-h-[500px] flex-[1_1_560px] rounded-xl border border-slate-800 bg-black/60 overflow-hidden lg:min-h-[560px] 2xl:min-h-[660px]"
+            onDrop={onDropCanvas}
+            onDragOver={onDragOverCanvas}
+          >
             <ReactFlow
               key={nodes.map(n => n.id).join("-")}
-              nodes={nodes}
+              nodes={renderedNodes}
               edges={edges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
@@ -3831,7 +3874,7 @@ type SystemPlannerIntent = {
           </div>
   
           {/* Action Buttons */}
-          <div className="flex justify-center gap-4 py-4 border-t border-slate-800 bg-black/40 mt-4">
+          <div className="flex shrink-0 flex-wrap justify-center gap-3 border-t border-slate-800 bg-black/40 py-3">
             <button 
               className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
               onClick={() => {
@@ -3904,7 +3947,7 @@ type SystemPlannerIntent = {
           </div>
   
           {/* Workflow Execution Tabs */}
-          <div className="border-t border-slate-800 bg-black/70 p-4 mt-2 rounded-md overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          <div className="shrink-0 max-h-[260px] overflow-y-auto rounded-md border-t border-slate-800 bg-black/70 p-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
             <h3 className="mb-2 text-cyan-400 font-semibold">Workflow run updates</h3>
   
             <div className="flex gap-4 border-b border-slate-800 mb-4">

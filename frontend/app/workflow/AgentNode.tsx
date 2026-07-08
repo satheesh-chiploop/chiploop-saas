@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -9,7 +8,12 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 export default function AgentNode({
   data,
 }: {
-  data: { uiLabel: string; backendLabel: string; desc?: string };
+  data: {
+    uiLabel: string;
+    backendLabel: string;
+    desc?: string;
+    nodeSize?: "regular" | "cozy" | "compact";
+  };
 }) {
   const handleSuggestNext = async () => {
     try {
@@ -25,56 +29,77 @@ export default function AgentNode({
 
       const j = await res.json();
       alert(
-        `✨ Suggested Next Agent: ${
+        `Suggested next agent: ${
           j?.suggestion || j?.data || "No suggestion available"
         }`
       );
     } catch (e) {
-      console.error("❌ AI suggestion error:", e);
+      console.error("AI suggestion error:", e);
       alert("Error contacting AI engine for next agent suggestion.");
     }
   };
 
-  // ✅ NEW: When clicking the node → tell WorkflowConsole which agent to focus on
   const handleSelectAgent = () => {
     window.dispatchEvent(
       new CustomEvent("selectAgent", { detail: data.backendLabel })
     );
   };
 
+  const nodeSize = data?.nodeSize || "regular";
+  const sizeClasses = {
+    regular: {
+      card: "w-[236px] px-3 py-2.5",
+      title: "text-[13px] leading-4",
+      desc: "line-clamp-2 text-[11px] leading-4",
+      backend: "pr-14 text-[10px] leading-3",
+      action: "text-[10px]",
+    },
+    cozy: {
+      card: "w-[220px] px-3 py-2",
+      title: "text-[12px] leading-4",
+      desc: "line-clamp-1 text-[10px] leading-3",
+      backend: "pr-12 text-[9px] leading-3",
+      action: "text-[9px]",
+    },
+    compact: {
+      card: "w-[204px] px-2.5 py-2",
+      title: "text-[11px] leading-3",
+      desc: "line-clamp-1 text-[9px] leading-3",
+      backend: "pr-10 text-[8px] leading-3",
+      action: "text-[8px]",
+    },
+  }[nodeSize];
+
   return (
     <div
-      onClick={handleSelectAgent}   
-      className="relative w-[264px] cursor-pointer rounded-lg border border-cyan-400 bg-slate-800/90 px-4 py-3 text-white shadow-lg transition hover:border-cyan-300"
+      onClick={handleSelectAgent}
+      className={`relative cursor-pointer rounded-md border border-cyan-400 bg-slate-800/90 text-white shadow-lg transition hover:border-cyan-300 ${sizeClasses.card}`}
     >
-      {/* Agent name */}
-      <div className="break-words pr-2 text-sm font-bold leading-5 text-cyan-300">
+      <div className={`break-words pr-2 font-bold text-cyan-300 ${sizeClasses.title}`}>
         {data?.uiLabel || "Agent"}
       </div>
 
-      {/* Description */}
       {data?.desc && (
-        <div className="mt-2 line-clamp-3 break-words text-xs leading-5 text-slate-300">{data.desc}</div>
+        <div className={`mt-1.5 break-words text-slate-300 ${sizeClasses.desc}`}>
+          {data.desc}
+        </div>
       )}
 
-      {/* Backend label */}
-      <div className="mt-2 break-words pr-16 text-[10px] leading-4 text-slate-400">
+      <div className={`mt-1.5 break-words text-slate-400 ${sizeClasses.backend}`}>
         {data?.backendLabel}
       </div>
 
-      {/* ✨ AI Suggest Next */}
       <button
         onClick={(e) => {
-          e.stopPropagation(); // prevent interfering with click-select behavior
+          e.stopPropagation();
           handleSuggestNext();
         }}
-        className="absolute bottom-1 right-2 text-[10px] text-cyan-400 hover:text-cyan-300 transition-colors"
+        className={`absolute bottom-1 right-2 text-cyan-400 transition-colors hover:text-cyan-300 ${sizeClasses.action}`}
         title="AI Suggest Next Agent"
       >
-        ✨ Suggest Next
+        Suggest Next
       </button>
 
-      {/* Handles for ReactFlow */}
       <span className="pointer-events-none absolute -left-3 top-1/2 z-10 -translate-x-full -translate-y-1/2 rounded bg-slate-950 px-1.5 py-0.5 text-[9px] font-bold text-emerald-300">
         IN
       </span>
@@ -94,6 +119,3 @@ export default function AgentNode({
     </div>
   );
 }
-
-
-
