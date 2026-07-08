@@ -180,44 +180,49 @@ function LandingPageContent() {
     <main className="min-h-screen overflow-x-hidden bg-slate-950 text-white">
       <TopNav current="home" showMarketplace showSettings={false} className="fixed left-0 top-0 z-50 w-full" />
 
-      <section className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-8 pt-28 text-center sm:px-6 sm:pb-10 lg:pt-24">
-        <h1 className="max-w-6xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-          All-in-one agentic AI platform for chip design
-        </h1>
-        <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-          Help one engineer or a small team move from requirements to RTL, verification, firmware, software, co-simulation, tapeout, validation, and product demo in one connected platform.
-        </p>
-        <div className="mt-7 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
-          <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
-            Book Demo
-          </button>
-          <button onClick={() => router.push("/loops")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
-            Explore Loops
-          </button>
-          <button onClick={() => goTo("/products")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
-            Explore Products
-          </button>
-          <button onClick={() => goTo("/apps")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
-            Explore Apps
-          </button>
-          <button onClick={() => goTo("/workflow")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
-            Open Studio
-          </button>
+      <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.16),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_62%,#020617_100%)]">
+        <div className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-8 pt-28 text-center sm:px-6 sm:pb-10 lg:pt-24">
+          <h1 className="max-w-6xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+            All-in-one agentic AI platform for chip design
+          </h1>
+          <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+            Help one engineer or a small team move from requirements to RTL, verification, firmware, software, co-simulation, tapeout, validation, and product demo in one connected platform.
+          </p>
+          <div className="mt-7 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
+            <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
+              Book Demo
+            </button>
+            <button onClick={() => router.push("/loops")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
+              Explore Loops
+            </button>
+            <button onClick={() => goTo("/products")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
+              Explore Products
+            </button>
+            <button onClick={() => goTo("/apps")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
+              Explore Apps
+            </button>
+            <button onClick={() => goTo("/workflow")} className="w-full rounded-xl border border-slate-600 px-7 py-3 font-bold text-white transition hover:border-cyan-300 hover:text-cyan-200 sm:w-auto">
+              Open Studio
+            </button>
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {platformStats.map(([value, label]) => (
-            <div key={label} className="rounded-xl border border-slate-800 bg-slate-900/70 px-4 py-5 text-center">
-              <div className="break-words text-xl font-extrabold leading-tight text-cyan-300 sm:text-2xl">{value}</div>
-              <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</div>
-            </div>
-          ))}
+      <section className="w-full border-b border-slate-800 bg-slate-900/35">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {platformStats.map(([value, label]) => (
+              <div key={label} className="rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-5 text-center">
+                <div className="break-words text-xl font-extrabold leading-tight text-cyan-300 sm:text-2xl">{value}</div>
+                <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-7xl">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Choose Your Chip Design Loop</p>
@@ -242,9 +247,11 @@ function LandingPageContent() {
             </button>
           </div>
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+      <section className="w-full border-y border-slate-800 bg-slate-900/30 px-4 py-8 sm:px-6 sm:py-10">
+        <div className="mx-auto max-w-7xl">
         <div className="text-center">
           <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Explore ChipLoop</p>
           <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">Start where you need.</h2>
@@ -260,9 +267,11 @@ function LandingPageContent() {
             </article>
           ))}
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-7xl">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Connected Chip Journey</p>
@@ -289,9 +298,11 @@ function LandingPageContent() {
             ))}
           </div>
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full border-y border-slate-800 bg-slate-900/30 px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-7xl">
         <div className="grid gap-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Workflow Scale</p>
@@ -381,9 +392,11 @@ function LandingPageContent() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-7xl">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Reusable Workflow Marketplace</p>
@@ -411,9 +424,11 @@ function LandingPageContent() {
             ))}
           </div>
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full border-y border-slate-800 bg-slate-900/30 px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-7xl">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold">Design Intent to Execution</h2>
           <p className="mx-auto mt-3 max-w-3xl text-base leading-7 text-slate-300">
@@ -443,9 +458,11 @@ function LandingPageContent() {
             </div>
           ))}
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+      <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-6xl">
         <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 sm:p-8 md:p-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
@@ -503,9 +520,11 @@ function LandingPageContent() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-12 text-center sm:px-6 sm:py-16">
+      <section className="w-full border-t border-slate-800 bg-slate-900/35 px-4 py-12 text-center sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-5xl">
         <h2 className="text-2xl font-extrabold sm:text-3xl">Start Building Connected Chip Workflows</h2>
         <p className="mt-4 text-slate-300">
           Begin with the guided Arch2RTL demo, then continue through Products, Apps, or Studio.
@@ -527,6 +546,7 @@ function LandingPageContent() {
             Explore Studio
           </button>
         </div>
+        </div>
       </section>
 
       <footer className="border-t border-slate-800 bg-slate-950 px-6 py-8 text-center text-base text-slate-500">
@@ -537,7 +557,7 @@ function LandingPageContent() {
           <button onClick={() => router.push("/webinar/register")} className="hover:text-cyan-200">Webinar</button>
           <button onClick={() => router.push("/contact")} className="hover:text-cyan-200">Contact Us</button>
         </div>
-        <p className="mb-2 text-cyan-100">chiploop.agx@gmail.com</p>
+        <p className="mb-2 text-cyan-100">Connect with us: chiploop.agx@gmail.com</p>
         <p>Copyright 2026 ChipLoop</p>
       </footer>
     </main>
