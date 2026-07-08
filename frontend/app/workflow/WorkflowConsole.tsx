@@ -913,7 +913,7 @@ export default function WorkflowConsole({
             <div key={`${item.question}-${index}`} className="rounded-lg border border-slate-700 bg-slate-900/50 p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Question</div>
               <div className="mt-1 text-slate-100">{item.question}</div>
-              <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-cyan-300">Answer</div>
+              <div className="mt-4 text-xs font-semibold uppercase text-cyan-300">Answer</div>
               <div className="mt-2 whitespace-pre-wrap leading-6 text-slate-200">{item.answer}</div>
               {item.sources && item.sources.length > 0 ? (
                 <div className="mt-4">

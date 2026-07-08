@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { usePathname, useRouter } from "next/navigation";
 import UpgradeNudge from "@/components/UpgradeNudge";
@@ -17,9 +17,9 @@ export default function SettingsNav({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <TopNav current="settings" showPlanBadge maxWidthClass="max-w-6xl" />
+      <TopNav current="settings" showPlanBadge />
 
-      <section className="mx-auto max-w-6xl px-6 py-8">
+      <section className="mx-auto max-w-[1440px] px-6 py-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-extrabold">Settings</h1>

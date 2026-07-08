@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { apiGet, apiPost } from "@/lib/apiClient";
@@ -75,9 +75,9 @@ export default function AdminMarketplacePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <TopNav current="admin" showMarketplace showAdmin showPlanBadge maxWidthClass="max-w-7xl" />
+      <TopNav current="admin" showMarketplace showAdmin showPlanBadge />
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-6 py-8 lg:grid-cols-[360px_1fr]">
+      <section className="mx-auto grid max-w-[1680px] gap-5 px-6 py-8 lg:grid-cols-[360px_1fr]">
         <aside className="rounded-2xl border border-slate-800 bg-slate-950/55 p-4">
           <h1 className="text-xl font-bold text-cyan-300">Review queue</h1>
           {loading ? <div className="mt-4 text-sm text-slate-400">Loading...</div> : null}
@@ -85,7 +85,7 @@ export default function AdminMarketplacePage() {
             {submissions.map((item) => (
               <button key={submissionId(item)} onClick={() => setSelected(item)} className={`w-full rounded-xl border p-3 text-left text-sm transition ${submissionId(selected || {}) === submissionId(item) ? "border-cyan-700 bg-cyan-950/30" : "border-slate-800 bg-black/25 hover:bg-slate-900"}`}>
                 <div className="font-semibold text-slate-100">{submissionName(item)}</div>
-                <div className="mt-1 text-xs text-slate-400">{submissionKind(item)} Â· {item.status || "pending"} Â· {item.submitted_by || "unknown"}</div>
+                <div className="mt-1 text-xs text-slate-400">{submissionKind(item)} · {item.status || "pending"} · {item.submitted_by || "unknown"}</div>
               </button>
             ))}
           </div>
@@ -100,9 +100,9 @@ export default function AdminMarketplacePage() {
             <div className="space-y-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <div className="text-sm uppercase tracking-wide text-cyan-300">Submission</div>
+                  <div className="text-xs font-semibold uppercase text-cyan-300">Submission</div>
                   <h2 className="mt-1 text-2xl font-extrabold">{submissionName(selected)}</h2>
-                  <div className="mt-1 text-sm text-slate-400">{submissionKind(selected)} Â· Status: {selected.status || "pending"}</div>
+                  <div className="mt-1 text-sm text-slate-400">{submissionKind(selected)} · Status: {selected.status || "pending"}</div>
                 </div>
               </div>
 

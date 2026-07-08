@@ -88,10 +88,10 @@ export default function LoopsPage() {
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="loops" showMarketplace showSettings={false} />
 
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+      <section className="mx-auto max-w-[1680px] px-4 py-12 sm:px-6">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">Explore Design Loops</div>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
+          <div className="text-xs font-semibold uppercase text-cyan-300">Explore Design Loops</div>
+          <h1 className="mt-3 text-5xl font-extrabold leading-[1.05] text-white sm:text-6xl">
             Start with one loop. Grow into a complete chip journey.
           </h1>
           <p className="mt-5 text-lg leading-8 text-slate-300">
@@ -113,7 +113,7 @@ export default function LoopsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6">
+      <section className="mx-auto max-w-[1680px] px-4 pb-10 sm:px-6">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           {loops.map((loop) => (
             <button
@@ -123,17 +123,17 @@ export default function LoopsPage() {
             >
               <h2 className="text-xl font-extrabold text-cyan-200">{loop.name}</h2>
               <p className="mt-3 min-h-20 text-sm leading-6 text-slate-300">{loop.short}</p>
-              <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Explore loop</div>
+              <div className="mt-4 text-xs font-semibold uppercase text-slate-500">Explore loop</div>
             </button>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Platform Coverage</p>
-            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+            <p className="text-xs font-semibold uppercase text-cyan-300">Platform Coverage</p>
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
               Coverage grows across the chip journey.
             </h2>
             <p className="mt-4 leading-7 text-slate-300">
@@ -194,7 +194,7 @@ export default function LoopsPage() {
                       <div key={loop.name} className="text-xs font-bold leading-4 text-slate-100">{loop.name}</div>
                     ))}
                   </div>
-                  <div className="mt-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Design loops</div>
+                  <div className="mt-3 text-center text-xs font-semibold uppercase text-slate-500">Design loops</div>
                 </div>
               </div>
             </div>
@@ -205,11 +205,11 @@ export default function LoopsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Core vs Advanced</p>
-            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+            <p className="text-xs font-semibold uppercase text-cyan-300">Core vs Advanced</p>
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
               Core gets you moving. Advanced helps you close.
             </h2>
           </div>
@@ -236,11 +236,11 @@ export default function LoopsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Product Journeys</p>
-            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+            <p className="text-xs font-semibold uppercase text-cyan-300">Product Journeys</p>
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
               Product journeys unlock as loops connect.
             </h2>
           </div>
@@ -263,11 +263,11 @@ export default function LoopsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Reference Journeys</p>
-            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+            <p className="text-xs font-semibold uppercase text-cyan-300">Reference Journeys</p>
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
               Try a journey that already connects the loops.
             </h2>
             <p className="mt-4 leading-7 text-slate-300">
@@ -283,7 +283,7 @@ export default function LoopsPage() {
               >
                 <h3 className="text-lg font-extrabold text-cyan-200">{journey.title}</h3>
                 <p className="mt-3 min-h-20 text-sm leading-6 text-slate-300">{journey.body}</p>
-                <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Open reference journey</div>
+                <div className="mt-4 text-xs font-semibold uppercase text-slate-500">Open reference journey</div>
               </button>
             ))}
           </div>

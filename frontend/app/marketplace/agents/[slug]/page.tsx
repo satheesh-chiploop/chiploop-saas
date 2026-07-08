@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -83,9 +83,9 @@ export default function MarketplaceAgentDetailPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <TopNav current="marketplace" showMarketplace maxWidthClass="max-w-6xl" />
+      <TopNav current="marketplace" showMarketplace />
 
-      <section className="mx-auto max-w-6xl px-6 py-8">
+      <section className="mx-auto max-w-[1440px] px-6 py-8">
         {loading ? <div className="text-slate-400">Loading...</div> : null}
         {error ? <div className="rounded-xl border border-red-900/70 bg-red-950/30 p-4 text-red-200">{error}</div> : null}
         {message ? <div className="rounded-xl border border-emerald-900/70 bg-emerald-950/30 p-4 text-emerald-200">{message}</div> : null}
@@ -96,7 +96,7 @@ export default function MarketplaceAgentDetailPage() {
               <section className="rounded-2xl border border-slate-800 bg-slate-900/35 p-6">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <div className="text-sm uppercase tracking-wide text-cyan-300">Verified marketplace agent</div>
+                    <div className="text-xs font-semibold uppercase text-cyan-300">Verified marketplace agent</div>
                     <h1 className="mt-2 text-3xl font-extrabold">{agent.name}</h1>
                     <p className="mt-3 max-w-3xl leading-7 text-slate-300">{agent.description || "No description provided."}</p>
                   </div>

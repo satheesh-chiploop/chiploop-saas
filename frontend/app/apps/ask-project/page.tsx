@@ -190,7 +190,7 @@ export default function AskProjectPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="apps" showMarketplace />
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-[1680px] px-6 py-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <button onClick={() => router.push("/apps")} className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-900">
             Back to Apps
@@ -201,7 +201,7 @@ export default function AskProjectPage() {
         </div>
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
-          <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">Project Review</div>
+          <div className="text-xs font-semibold uppercase text-cyan-300">Project Review</div>
           <h1 className="mt-2 text-3xl font-extrabold text-white">Ask this Project</h1>
           <p className="mt-3 max-w-4xl leading-7 text-slate-300">
             Chat with uploaded files, codebases, specs, reports, logs, scripts, and docs. Ask for summaries, risks, suggestions, and the next ChipLoop workflow to run.
@@ -383,7 +383,7 @@ export default function AskProjectPage() {
                 <article key={`${item.question}-${index}`} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Question</div>
                   <div className="mt-1 text-slate-100">{item.question}</div>
-                  <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-cyan-300">Answer</div>
+                  <div className="mt-4 text-xs font-semibold uppercase text-cyan-300">Answer</div>
                   <div className="mt-2 whitespace-pre-wrap leading-6 text-slate-200">{item.answer}</div>
                   {item.sources?.length ? (
                     <div className="mt-4">

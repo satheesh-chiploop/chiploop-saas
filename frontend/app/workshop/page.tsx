@@ -164,11 +164,11 @@ function WorkshopContent() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <TopNav current="workshop" showWebinar showWorkshop showSettings={false} maxWidthClass="max-w-6xl" />
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <TopNav current="workshop" showWebinar showWorkshop showSettings={false} />
+      <div className="mx-auto max-w-[1440px] px-6 py-10">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr]">
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-8">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Paid Workshop</p>
+            <p className="text-xs font-semibold uppercase text-cyan-300">Paid Workshop</p>
             <h1 className="mt-4 text-4xl font-extrabold leading-tight">Agentic AI in Chip Design</h1>
             <p className="mt-5 leading-7 text-slate-300">
               A hands-on 2-day workshop across two consecutive Saturdays. Each session runs for 2 hours.

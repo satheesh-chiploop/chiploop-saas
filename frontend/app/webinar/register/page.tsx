@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -110,12 +110,12 @@ export default function WebinarRegistrationPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <TopNav current="webinar" showWebinar showSettings={false} maxWidthClass="max-w-5xl" />
-      <div className="mx-auto max-w-5xl px-6 py-10">
+      <TopNav current="webinar" showWebinar showSettings={false} />
+      <div className="mx-auto max-w-[1200px] px-6 py-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-8">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Biweekly ChipLoop Webinar</p>
-            <h1 className="mt-4 text-4xl font-extrabold leading-tight">Register for the Saturday ChipLoop demo</h1>
+            <p className="text-xs font-semibold uppercase text-cyan-300">Biweekly ChipLoop Webinar</p>
+            <h1 className="mt-4 text-5xl font-extrabold leading-[1.05] text-white sm:text-6xl">Register for the Saturday ChipLoop demo</h1>
             <p className="mt-5 leading-7 text-slate-300">
               Join a 30-minute walkthrough once every two weeks at 9:00 AM PST, starting July 11, 2026.
             </p>
@@ -149,7 +149,7 @@ export default function WebinarRegistrationPage() {
             {success ? (
               <div className="flex min-h-[420px] flex-col justify-center">
                 <div className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-800 w-fit">Registration received</div>
-                <h2 className="mt-6 text-3xl font-extrabold">You are registered.</h2>
+                <h2 className="mt-6 text-4xl font-extrabold leading-tight text-white sm:text-5xl">You are registered.</h2>
                 <p className="mt-4 leading-7 text-slate-600">
                   Thanks for registering. We captured your preferred session{selectedSession ? `: ${selectedSession.label}` : ""}. We will use your email for webinar updates.
                 </p>
@@ -163,7 +163,7 @@ export default function WebinarRegistrationPage() {
             ) : (
               <form onSubmit={submit} className="space-y-5">
                 <div>
-                  <h2 className="text-2xl font-extrabold">Save your seat</h2>
+                  <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">Save your seat</h2>
                   <p className="mt-2 text-sm text-slate-600">A few details help us tailor the demo to your interests.</p>
                 </div>
 

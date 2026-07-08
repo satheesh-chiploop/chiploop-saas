@@ -169,7 +169,7 @@ export default function Spec2RTLCheckPage() {
 
   return (
     <main className="min-h-screen bg-black px-6 py-10 text-white">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-[1440px]">
         <button onClick={() => router.push("/apps")} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
           Back to Apps
         </button>

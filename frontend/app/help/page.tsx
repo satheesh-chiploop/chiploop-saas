@@ -53,7 +53,7 @@ function renderHelpBodyLine(text: string) {
     const command = text.slice(commandPrefix.length).trim();
     return (
       <div key={text} className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
-        <p className="text-xs font-bold uppercase tracking-wide text-cyan-300">{commandPrefix.replace(":", "")}</p>
+        <p className="text-xs font-semibold uppercase text-cyan-300">{commandPrefix.replace(":", "")}</p>
         <pre className="mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-sm font-bold leading-6 text-cyan-100">
           {command}
         </pre>
@@ -148,17 +148,17 @@ export default function HelpPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      <TopNav current="help" showMarketplace showPlanBadge maxWidthClass="max-w-7xl" />
+      <TopNav current="help" showMarketplace showPlanBadge />
 
-      <section className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 sm:px-6 lg:grid lg:grid-cols-[280px_1fr_360px]">
+      <section className="mx-auto flex max-w-[1680px] flex-col gap-6 px-4 py-8 sm:px-6 lg:grid lg:grid-cols-[280px_1fr_360px]">
         <aside className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
           <div className="mb-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">User Guide</p>
+            <p className="text-xs font-semibold uppercase text-cyan-300">User Guide</p>
             <h1 className="mt-2 text-2xl font-bold text-white">ChipLoop Help</h1>
             <p className="mt-2 text-sm text-slate-400">Find the workflow, integration, and inspection steps users need.</p>
           </div>
 
-          <label className="text-xs font-semibold uppercase tracking-wide text-slate-400" htmlFor="help-search">
+          <label className="text-xs font-semibold uppercase text-slate-400" htmlFor="help-search">
             Search
           </label>
           <input
@@ -175,7 +175,7 @@ export default function HelpPage() {
               if (!topics.length) return null;
               return (
                 <div key={category}>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">{category}</p>
+                  <p className="mb-2 text-xs font-semibold uppercase text-slate-500">{category}</p>
                   <div className="space-y-1">
                     {topics.map((topic) => (
                       <button
@@ -323,7 +323,7 @@ export default function HelpPage() {
         </article>
 
         <aside className="rounded-lg border border-cyan-400/30 bg-cyan-950/20 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Ask ChipLoop Help</p>
+          <p className="text-xs font-semibold uppercase text-cyan-300">Ask ChipLoop Help</p>
           <h2 className="mt-2 text-xl font-bold text-white">Get a quick answer</h2>
           <p className="mt-2 text-sm text-slate-300">
             Ask about Apps, Studio, GitHub, CLI, SDK, agents, or run inspection.
@@ -336,7 +336,7 @@ export default function HelpPage() {
             className="mt-4 min-h-28 w-full resize-y rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none transition focus:border-cyan-400"
           />
           <div className="mt-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Example questions</p>
+            <p className="text-xs font-semibold uppercase text-cyan-300">Example questions</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {selectedTopic.exampleQuestions.map((sample) => (
                 <button
@@ -365,7 +365,7 @@ export default function HelpPage() {
             <section className="mt-4 rounded-lg border border-slate-800 bg-slate-950/70 p-4">
               <p className="text-sm leading-6 text-slate-200">{answer.answer}</p>
               <div className="mt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Suggested actions</p>
+                <p className="text-xs font-semibold uppercase text-slate-500">Suggested actions</p>
                 <ul className="mt-2 space-y-2 text-sm text-slate-300">
                   {answer.suggested_actions.map((action) => (
                     <li key={action}>{action}</li>

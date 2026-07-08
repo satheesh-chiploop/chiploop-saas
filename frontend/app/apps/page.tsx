@@ -1053,7 +1053,7 @@ export default function AppsHomePage() {
     return (
       <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
         <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4">
             <button className="flex items-center gap-2 text-xl font-extrabold" onClick={() => go("/apps")}>
               <span className="text-cyan-400">ChipLoop</span>
               <span className="text-slate-400">/</span>
@@ -1069,10 +1069,10 @@ export default function AppsHomePage() {
           </div>
         </div>
 
-        <section className="mx-auto grid max-w-6xl gap-6 px-6 py-10 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="mx-auto grid max-w-[1440px] gap-6 px-6 py-10 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-2xl border border-cyan-900/50 bg-slate-900/40 p-7 shadow-2xl">
-            <div className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Welcome to ChipLoop</div>
-            <h1 className="mt-3 text-4xl font-extrabold leading-tight text-white">
+            <div className="text-xs font-semibold uppercase text-cyan-300">Welcome to ChipLoop</div>
+            <h1 className="mt-3 text-5xl font-extrabold leading-[1.05] text-white sm:text-6xl">
               Complete your first chip workflow in a few minutes.
             </h1>
             <p className="mt-4 max-w-2xl text-slate-300">
@@ -1127,18 +1127,18 @@ export default function AppsHomePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <TopNav current="apps" showPlanBadge maxWidthClass="max-w-6xl" />
+      <TopNav current="apps" showPlanBadge />
       <LowCreditBanner />
 
       {/* Hero */}
-      <section className="mx-auto max-w-6xl px-6 pt-10 pb-6">
+      <section className="mx-auto max-w-[1440px] px-6 pt-10 pb-6">
         <div className="rounded-2xl border border-slate-800 bg-slate-900/30 p-6 shadow-lg">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-xs text-slate-400">
                 Welcome{userEmail ? `, ${userEmail}` : ""} | <span className="text-cyan-300">Start here</span>
               </div>
-              <h1 className="mt-2 text-3xl font-extrabold leading-tight">
+              <h1 className="mt-2 text-4xl font-extrabold leading-tight text-white sm:text-5xl">
                 Run outcomes, not workflows.
               </h1>
               <p className="mt-2 max-w-xl text-slate-300">
@@ -1152,14 +1152,14 @@ export default function AppsHomePage() {
           </div>
 
           <div className="mt-6">
-            <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">What would you like to do today?</div>
+            <div className="text-xs font-semibold uppercase text-cyan-300">What would you like to do today?</div>
             <button
               onClick={() => openApp("ask-project")}
               className="mt-4 w-full rounded-2xl border border-cyan-800 bg-cyan-950/25 p-5 text-left transition hover:border-cyan-400 hover:bg-cyan-950/40"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Project review</div>
+                  <div className="text-xs font-semibold uppercase text-cyan-300">Project review</div>
                   <div className="mt-2 text-xl font-bold text-white">Ask this Project</div>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-cyan-100/85">
                     Upload files, paste content, or import selected GitHub repo files. Ask for summaries, risks, suggestions, and the next ChipLoop workflow to run.
@@ -1203,12 +1203,12 @@ export default function AppsHomePage() {
       </section>
 
       {(myAppsLoading || myApps.length > 0) ? (
-        <section className="mx-auto max-w-6xl px-6 pb-7">
+        <section className="mx-auto max-w-[1440px] px-6 pb-7">
           <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">My Apps</div>
-                <h2 className="mt-2 text-2xl font-extrabold text-white">Private apps from Studio</h2>
+                <div className="text-xs font-semibold uppercase text-cyan-300">My Apps</div>
+                <h2 className="mt-2 text-3xl font-extrabold leading-tight text-white sm:text-4xl">Private apps from Studio</h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                   Apps created from your workflows stay private until submitted and approved for marketplace publication.
                 </p>
@@ -1351,12 +1351,12 @@ export default function AppsHomePage() {
         </section>
       ) : null}
 
-      <section id="reference-journeys" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
+      <section id="reference-journeys" className="mx-auto max-w-[1440px] px-6 pb-7 scroll-mt-24">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Experience Apps</div>
-              <h2 className="mt-2 text-2xl font-extrabold text-white">Choose one catalog view</h2>
+              <div className="text-xs font-semibold uppercase text-cyan-300">Experience Apps</div>
+              <h2 className="mt-2 text-3xl font-extrabold leading-tight text-white sm:text-4xl">Choose one catalog view</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                 Open a focused page for one app family without scrolling through every app at once.
               </p>
@@ -1401,12 +1401,12 @@ export default function AppsHomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-7">
+      <section className="mx-auto max-w-[1440px] px-6 pb-7">
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Experience Reference Journeys</div>
-              <h2 className="mt-2 text-2xl font-extrabold text-white">Choose one guided product journey</h2>
+              <div className="text-xs font-semibold uppercase text-cyan-300">Experience Reference Journeys</div>
+              <h2 className="mt-2 text-3xl font-extrabold leading-tight text-white sm:text-4xl">Choose one guided product journey</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                 Start an end-to-end reference flow using the standard ChipLoop apps, stage sequence, and demo collateral.
               </p>
@@ -1450,9 +1450,9 @@ export default function AppsHomePage() {
       </section>
 
       {selectedReference ? (
-        <section id="reference-journey-detail" className="mx-auto max-w-6xl px-6 pb-7 scroll-mt-24">
+        <section id="reference-journey-detail" className="mx-auto max-w-[1440px] px-6 pb-7 scroll-mt-24">
           <div className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-cyan-300">{selectedReference.segment}</div>
+            <div className="mb-2 text-xs font-semibold uppercase text-cyan-300">{selectedReference.segment}</div>
             <div className="text-xl font-bold text-white">{selectedReference.title}</div>
             <p className="mt-2 text-sm leading-6 text-slate-300">{selectedReference.copy}</p>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
@@ -1475,7 +1475,7 @@ export default function AppsHomePage() {
 
       {/* Loop rows */}
       {selectedCatalogLoop ? (
-      <section id="apps-catalog-content" className="mx-auto max-w-6xl px-6 pb-16 space-y-10 scroll-mt-24">
+      <section id="apps-catalog-content" className="mx-auto max-w-[1440px] px-6 pb-16 space-y-10 scroll-mt-24">
         {[selectedCatalogLoop].map((loop) => {
           const meta = LOOP_META[loop];
           const rowApps = apps.filter((a) => a.loop_type === loop);

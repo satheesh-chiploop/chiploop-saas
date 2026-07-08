@@ -424,7 +424,7 @@ export default function Arch2RTLAppPage() {
           <div className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/20 p-5">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <div className="text-sm font-semibold uppercase tracking-wide text-cyan-300">Guided first activity</div>
+                <div className="text-xs font-semibold uppercase text-cyan-300">Guided first activity</div>
                 <h2 className="mt-1 text-2xl font-bold text-white">
                   {pwmChainDemo ? "Generate the PWM controller RTL" : uartChainDemo ? "Generate the UART packet engine RTL" : imageChainDemo ? "Generate the image DMA pipeline RTL" : mbistChainDemo ? "Generate the SRAM MBIST demo RTL" : sensorChainDemo ? "Generate the smart sensor hub MCU RTL" : secureChainDemo ? "Generate the secure boot key manager RTL" : safetyChainDemo ? "Generate the safety fault manager RTL" : "Run Arch2RTL and inspect the handoff package"}
                 </h2>

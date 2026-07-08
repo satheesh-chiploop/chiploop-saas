@@ -1462,7 +1462,7 @@ export default function ProductDetailPage() {
     return (
       <main className="min-h-screen bg-slate-950 text-slate-100">
         <TopNav current="products" showPlanBadge />
-        <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-slate-300">Loading product...</div>
+        <div className="mx-auto max-w-[1680px] px-4 py-8 text-sm text-slate-300">Loading product...</div>
       </main>
     );
   }
@@ -1471,7 +1471,7 @@ export default function ProductDetailPage() {
     return (
       <main className="min-h-screen bg-slate-950 text-slate-100">
         <TopNav current="products" showPlanBadge />
-        <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="mx-auto max-w-[1680px] px-4 py-8">
           <div className="rounded-lg border border-rose-500/30 bg-rose-950/30 p-4 text-sm text-rose-100">{message || "Product not found."}</div>
           <button onClick={() => router.push("/products")} className="mt-4 rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800">Back to Products</button>
         </div>
@@ -1482,11 +1482,11 @@ export default function ProductDetailPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <TopNav current="products" showPlanBadge />
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-[1680px] px-4 py-6 sm:px-6">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <button onClick={() => router.push("/products")} className="mb-3 text-sm font-semibold text-cyan-300 hover:text-cyan-200">Back to Products</button>
-            <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Step 2: Configure Product</div>
+            <div className="text-xs font-semibold uppercase text-cyan-300">Step 2: Configure Product</div>
             <h1 className="mt-2 text-3xl font-bold tracking-normal text-white">{product.name}</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">{product.description || "Review stages, configure required inputs, then run product development."}</p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs">
@@ -1508,7 +1508,7 @@ export default function ProductDetailPage() {
         <section className="mb-5 rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Project Review Helper</div>
+              <div className="text-xs font-semibold uppercase text-cyan-300">Project Review Helper</div>
               <p className="mt-1 text-sm leading-6 text-cyan-100/80">
                 Review uploaded files or GitHub repo context before finalizing stages. Ask this Project can summarize risks, missing inputs, and recommended workflows.
               </p>
@@ -1690,7 +1690,7 @@ export default function ProductDetailPage() {
                     <>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">{stageKind(selectedStage)}</div>
+                    <div className="text-xs font-semibold uppercase text-cyan-300">{stageKind(selectedStage)}</div>
                     <h2 className="mt-2 text-xl font-semibold text-white">{selectedStage.label}</h2>
                     <p className="mt-1 text-sm text-slate-400">{selectedStage.app}</p>
                   </div>
@@ -1853,7 +1853,7 @@ export default function ProductDetailPage() {
         <section className="mt-5 rounded-lg border border-slate-800 bg-slate-900/45 p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Step 3: Run</div>
+              <div className="text-xs font-semibold uppercase text-cyan-300">Step 3: Run</div>
               <h2 className="mt-2 text-xl font-semibold text-white">Product run dashboard</h2>
               <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">
                 This launches supported enabled stages in order, passes workflow IDs between stages, stops on failures, and shows product-level results.

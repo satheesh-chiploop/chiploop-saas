@@ -257,8 +257,8 @@ export default function ArchitectureToRtlDeliveryPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <TopNav current="apps" showPlanBadge maxWidthClass="max-w-7xl" />
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <TopNav current="apps" showPlanBadge />
+      <div className="mx-auto max-w-[1680px] px-4 py-8 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-sm font-medium text-emerald-200">System Loop</div>

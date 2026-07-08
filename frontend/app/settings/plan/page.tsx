@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -384,7 +384,7 @@ export default function SettingsPlanPage() {
                           </span>
                         </div>
                         <div className="mt-2 text-sm leading-5 text-slate-400">{choice.detail}</div>
-                        {isCurrent ? <div className="mt-3 text-xs font-bold uppercase tracking-wide text-cyan-300">Current plan</div> : null}
+                        {isCurrent ? <div className="mt-3 text-xs font-semibold uppercase text-cyan-300">Current plan</div> : null}
                       </button>
                     );
                   })}
@@ -395,7 +395,7 @@ export default function SettingsPlanPage() {
             <section id="loop-setup" className="rounded-lg border border-cyan-800/60 bg-cyan-950/20 p-5 scroll-mt-24">
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
-                  <div className="text-xs font-bold uppercase tracking-wide text-cyan-300">Loop Access Setup</div>
+                  <div className="text-xs font-semibold uppercase text-cyan-300">Loop Access Setup</div>
                   <h3 className="mt-2 text-lg font-bold text-white">Choose the loop you start with. Add more when needed.</h3>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-cyan-50/85">
                     Starter includes one Core loop. Advanced upgrades unlock deeper capability, while credits stay separate and pay for usage.

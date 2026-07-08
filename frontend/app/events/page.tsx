@@ -8,17 +8,17 @@ export default function EventsPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="events" showMarketplace showSettings={false} />
-      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <section className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6">
         <div className="max-w-4xl">
-          <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Events</div>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Webinars</h1>
+          <div className="text-xs font-semibold uppercase text-cyan-300">Events</div>
+          <h1 className="mt-3 text-5xl font-extrabold leading-[1.05] text-white sm:text-6xl">Webinars</h1>
           <p className="mt-4 text-lg leading-8 text-slate-300">
             Learn agentic chip design workflows, product journeys, Apps, Studio, implementation flows, and best practices.
           </p>
         </div>
         <div className="mt-8 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
           <article className="rounded-xl border border-slate-800 bg-slate-900/70 p-6">
-            <h2 className="text-2xl font-bold text-cyan-300">Webinars</h2>
+            <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">Webinars</h2>
             <p className="mt-3 text-sm leading-6 text-slate-300">
               Join focused walkthroughs of ChipLoop Apps, Studio, Products, connected Loops, generated artifacts, and dashboards once every two weeks.
             </p>
@@ -33,8 +33,8 @@ export default function EventsPage() {
             </button>
           </article>
           <article className="rounded-xl border border-slate-800 bg-slate-900/70 p-6">
-            <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Events Blog</div>
-            <h2 className="mt-2 text-2xl font-bold text-cyan-300">Latest Articles</h2>
+            <div className="text-xs font-semibold uppercase text-slate-400">Events Blog</div>
+            <h2 className="mt-2 text-3xl font-extrabold leading-tight text-white sm:text-4xl">Latest Articles</h2>
             <div className="mt-4 space-y-4">
               <button
                 type="button"

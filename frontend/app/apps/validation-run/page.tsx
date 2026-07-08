@@ -469,7 +469,7 @@ export default function ValidationRunAppPage() {
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
       {/* Top nav */}
       <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4">
           <button onClick={() => router.push("/apps")} className="flex items-center gap-2 text-xl font-extrabold">
             <span className="text-cyan-400">ChipLoop</span>
             <span className="text-slate-400">/</span>
@@ -495,7 +495,7 @@ export default function ValidationRunAppPage() {
       </div>
 
       {/* Header / nudge */}
-      <section className="mx-auto max-w-6xl px-6 pt-10 pb-6">
+      <section className="mx-auto max-w-[1440px] px-6 pt-10 pb-6">
         <div className="rounded-2xl border border-slate-800 bg-slate-900/25 p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -524,7 +524,7 @@ export default function ValidationRunAppPage() {
       </section>
 
       {/* Body */}
-      <section className="mx-auto max-w-6xl px-6 pb-16 grid gap-6 lg:grid-cols-5">
+      <section className="mx-auto max-w-[1440px] px-6 pb-16 grid gap-6 lg:grid-cols-5">
         {/* Left: inputs */}
         <div className="lg:col-span-3 space-y-6">
           {/* Bench selection */}

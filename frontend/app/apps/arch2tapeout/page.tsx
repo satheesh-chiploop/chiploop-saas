@@ -412,7 +412,7 @@ export default function Arch2TapeoutAppPage() {
 
   return (
     <main className="min-h-screen bg-black text-white px-6 py-10">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-[1440px]">
         <div className="inline-flex items-center rounded-full border border-slate-800 bg-black/30 px-3 py-1 text-xs text-slate-300">
           ⚡ Digital Loop
         </div>

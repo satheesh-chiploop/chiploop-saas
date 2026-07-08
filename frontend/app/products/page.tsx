@@ -84,7 +84,7 @@ function StepRail({ active }: { active: "define" | "configure" | "run" }) {
             active === step.id ? "border-cyan-400 bg-cyan-500/10" : "border-slate-800 bg-slate-950/60"
           }`}
         >
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Step {index + 1}</div>
+          <div className="text-xs font-semibold uppercase text-slate-500">Step {index + 1}</div>
           <div className={active === step.id ? "text-sm font-semibold text-cyan-100" : "text-sm font-semibold text-white"}>{step.label}</div>
           <div className="mt-1 text-xs text-slate-400">{step.text}</div>
         </div>
@@ -258,12 +258,12 @@ export default function ProductsPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <TopNav current="products" showPlanBadge />
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-[1680px] px-4 py-6 sm:px-6">
         <LowCreditBanner />
 
         <section className="mb-6">
-          <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Products</div>
-          <h1 className="mt-2 text-3xl font-bold tracking-normal text-white">Define, configure, and run product development</h1>
+          <div className="text-xs font-semibold uppercase text-cyan-300">Products</div>
+          <h1 className="mt-2 text-4xl font-extrabold leading-tight text-white sm:text-5xl">Define, configure, and run product development</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
             Start with the product intent, review the development stages, then run the workflows with product-level lineage and results.
           </p>
@@ -282,7 +282,7 @@ export default function ProductsPage() {
         <section className="mb-6 rounded-lg border border-cyan-900/60 bg-cyan-950/20 p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Project Review</div>
+              <div className="text-xs font-semibold uppercase text-cyan-300">Project Review</div>
               <h2 className="mt-1 text-lg font-semibold text-white">Already have files, reports, or a Git repo?</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-cyan-100/80">
                 Use Ask this Project to summarize the codebase, identify risks, and get recommended product stages before configuring the product journey.
@@ -411,7 +411,7 @@ export default function ProductsPage() {
                     {editingProductId === product.id ? (
                       <div className="grid gap-3">
                         <label className="grid gap-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Name</span>
+                          <span className="text-xs font-semibold uppercase text-slate-400">Name</span>
                           <input
                             value={String(editDraft.name || "")}
                             onChange={(event) => setEditDraft((current) => ({ ...current, name: event.target.value }))}
@@ -420,7 +420,7 @@ export default function ProductsPage() {
                         </label>
                         <div className="grid gap-3 sm:grid-cols-2">
                           <label className="grid gap-2">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Product type</span>
+                            <span className="text-xs font-semibold uppercase text-slate-400">Product type</span>
                             <select
                               value={String(editDraft.product_type || product.product_type)}
                               onChange={(event) => setEditDraft((current) => ({ ...current, product_type: event.target.value }))}
@@ -432,7 +432,7 @@ export default function ProductsPage() {
                             </select>
                           </label>
                           <label className="grid gap-2">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Status</span>
+                            <span className="text-xs font-semibold uppercase text-slate-400">Status</span>
                             <select
                               value={String(editDraft.status || product.status)}
                               onChange={(event) => setEditDraft((current) => ({ ...current, status: event.target.value }))}
@@ -445,7 +445,7 @@ export default function ProductsPage() {
                           </label>
                         </div>
                         <label className="grid gap-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Description</span>
+                          <span className="text-xs font-semibold uppercase text-slate-400">Description</span>
                           <textarea
                             value={String(editDraft.description || "")}
                             onChange={(event) => setEditDraft((current) => ({ ...current, description: event.target.value }))}
@@ -582,7 +582,7 @@ export default function ProductsPage() {
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {references.map((reference) => (
               <article key={reference.slug} className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">{typeLabel(reference.product_type)}</div>
+                <div className="text-xs font-semibold uppercase text-cyan-300">{typeLabel(reference.product_type)}</div>
                 <h3 className="mt-2 text-lg font-semibold text-white">{reference.name}</h3>
                 <p className="mt-2 min-h-[72px] text-sm leading-6 text-slate-300">{reference.summary}</p>
                 <div className="mt-4 space-y-2">

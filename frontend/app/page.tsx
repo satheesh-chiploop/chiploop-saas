@@ -129,6 +129,13 @@ const endToEndJourney = [
   "Product Demo",
 ];
 
+const eyebrowClass = "text-xs font-semibold uppercase text-cyan-300";
+const sectionTitleClass = "mt-3 max-w-4xl text-3xl font-extrabold leading-tight text-white sm:text-4xl";
+const sectionBodyClass = "mt-4 max-w-3xl text-base leading-7 text-slate-300";
+const cardTitleClass = "text-lg font-bold leading-snug text-white";
+const cardBodyClass = "mt-3 text-sm leading-6 text-slate-400";
+const landingShellClass = "mx-auto max-w-[1680px]";
+
 function LandingPageContent() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -181,11 +188,11 @@ function LandingPageContent() {
       <TopNav current="home" showMarketplace showSettings={false} className="fixed left-0 top-0 z-50 w-full" />
 
       <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.16),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_62%,#020617_100%)]">
-        <div className="mx-auto flex max-w-7xl flex-col items-center px-4 pb-8 pt-28 text-center sm:px-6 sm:pb-10 lg:pt-24">
-          <h1 className="max-w-6xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+        <div className={`${landingShellClass} flex flex-col items-center px-4 pb-8 pt-28 text-center sm:px-6 sm:pb-10 lg:pt-24`}>
+          <h1 className="max-w-[1440px] text-5xl font-extrabold leading-[1.05] text-white sm:text-6xl lg:text-7xl">
             All-in-one agentic AI platform for chip design
           </h1>
-          <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+          <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300 sm:text-xl sm:leading-9">
             Help one engineer or a small team move from requirements to RTL, verification, firmware, software, co-simulation, tapeout, validation, and product demo in one connected platform.
           </p>
           <div className="mt-7 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
@@ -209,12 +216,12 @@ function LandingPageContent() {
       </section>
 
       <section className="w-full border-b border-slate-800 bg-slate-900/35">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <div className={`${landingShellClass} px-4 py-8 sm:px-6`}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {platformStats.map(([value, label]) => (
               <div key={label} className="rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-5 text-center">
-                <div className="break-words text-xl font-extrabold leading-tight text-cyan-300 sm:text-2xl">{value}</div>
-                <div className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</div>
+                <div className="break-words text-2xl font-extrabold leading-tight text-cyan-300 sm:text-3xl">{value}</div>
+                <div className="mt-2 text-xs font-medium uppercase text-slate-400">{label}</div>
               </div>
             ))}
           </div>
@@ -222,22 +229,22 @@ function LandingPageContent() {
       </section>
 
       <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto max-w-7xl">
+        <div className={landingShellClass}>
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Choose Your Chip Design Loop</p>
-            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+            <p className={eyebrowClass}>Choose Your Chip Design Loop</p>
+            <h2 className={`${sectionTitleClass} mx-auto`}>
               One platform. Five chip design loops. Connected engineering context.
             </h2>
-            <p className="mt-4 leading-7 text-slate-300">
+            <p className={`${sectionBodyClass} mx-auto`}>
               Start with one Core loop. Add Advanced capability or more credits as your work grows.
             </p>
           </div>
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
             {subscriptionLoops.map((loop) => (
               <article key={loop.name} className="rounded-xl border border-slate-800 bg-slate-950/70 p-5">
-                <h3 className="text-lg font-extrabold text-cyan-200">{loop.name}</h3>
-                <p className="mt-3 min-h-28 text-sm leading-6 text-slate-400">{loop.body}</p>
+                <h3 className={cardTitleClass}>{loop.name}</h3>
+                <p className={`${cardBodyClass} min-h-28`}>{loop.body}</p>
               </article>
             ))}
           </div>
@@ -251,16 +258,16 @@ function LandingPageContent() {
       </section>
 
       <section className="w-full border-y border-slate-800 bg-slate-900/30 px-4 py-8 sm:px-6 sm:py-10">
-        <div className="mx-auto max-w-7xl">
+        <div className={landingShellClass}>
         <div className="text-center">
-          <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Explore ChipLoop</p>
-          <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">Start where you need.</h2>
+          <p className={eyebrowClass}>Explore ChipLoop</p>
+          <h2 className={`${sectionTitleClass} mx-auto`}>Start where you need.</h2>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
           {paths.map(([title, body, href, cta]) => (
             <article key={title} className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-center">
-              <h3 className="text-2xl font-extrabold text-cyan-300">{title}</h3>
-              <p className="mt-3 min-h-12 text-base font-semibold leading-6 text-slate-200">{body}</p>
+              <h3 className="text-xl font-bold leading-tight text-white">{title}</h3>
+              <p className="mt-3 min-h-12 text-sm leading-6 text-slate-300">{body}</p>
               <button onClick={() => goTo(href)} className="mt-5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
                 {cta}
               </button>
@@ -271,21 +278,21 @@ function LandingPageContent() {
       </section>
 
       <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto max-w-7xl">
+        <div className={landingShellClass}>
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Connected Chip Journey</p>
-            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+            <p className={eyebrowClass}>Connected Chip Journey</p>
+            <h2 className={`${sectionTitleClass} mx-auto`}>
               From requirement capture to product demo without losing engineering context.
             </h2>
-            <p className="mt-4 leading-7 text-slate-300">
+            <p className={`${sectionBodyClass} mx-auto`}>
               ChipLoop keeps each stage connected, so outputs, logs, dashboards, and decisions carry forward instead of living in disconnected tools.
             </p>
           </div>
           <div className="mt-8 flex flex-col gap-3 xl:flex-row xl:items-stretch">
             {endToEndJourney.map((stage, index) => (
               <div key={stage} className="contents xl:flex xl:items-center">
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-4 text-center text-sm font-bold text-slate-100 xl:flex-1">
+                <div className="rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-4 text-center text-sm font-semibold text-slate-100 xl:flex-1">
                   {stage}
                 </div>
                 {index < endToEndJourney.length - 1 && (
@@ -302,14 +309,14 @@ function LandingPageContent() {
       </section>
 
       <section className="w-full border-y border-slate-800 bg-slate-900/30 px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto max-w-7xl">
+        <div className={landingShellClass}>
         <div className="grid gap-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Workflow Scale</p>
-            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+            <p className={eyebrowClass}>Workflow Scale</p>
+            <h2 className={sectionTitleClass}>
               Agent coverage grows with journey complexity.
             </h2>
-            <p className="mt-4 leading-7 text-slate-300">
+            <p className={sectionBodyClass}>
               As a chip journey grows from a digital IP block to mixed-signal products, tapeout, validation, and demos, ChipLoop keeps the agents, tools, artifacts, dashboards, and handoffs connected.
             </p>
             <div className="mt-5 grid grid-cols-1 gap-3 text-sm text-slate-300 sm:grid-cols-2">
@@ -324,7 +331,7 @@ function LandingPageContent() {
           <div className="min-w-0">
             <div className="grid grid-cols-[24px_40px_1fr] gap-4">
               <div className="flex h-72 items-center justify-center">
-                <span className="-rotate-90 whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span className="-rotate-90 whitespace-nowrap text-xs font-medium uppercase text-slate-500">
                   Number of agents orchestrated
                 </span>
               </div>
@@ -349,7 +356,7 @@ function LandingPageContent() {
                       return (
                         <div key={item.label} className="relative flex h-full min-w-0 items-end justify-center">
                           <div
-                            className="absolute text-sm font-bold text-cyan-200"
+                            className="absolute text-base font-extrabold text-cyan-200"
                             style={{ bottom: `${barHeight + 10}px` }}
                           >
                             {totalAgents}
@@ -382,12 +389,12 @@ function LandingPageContent() {
                 <div className="mt-3 grid grid-cols-4 gap-3 px-1 text-center sm:gap-5">
                   {workflowAgentChart.map((item) => (
                     <div key={item.label} className="min-h-20">
-                      <div className="text-xs font-bold leading-4 text-slate-100">{item.label}</div>
+                      <div className="text-xs font-semibold leading-4 text-slate-100">{item.label}</div>
                       <div className="mt-1 text-xs leading-4 text-slate-500">Ex: {item.example}</div>
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">Workflows</div>
+                <div className="mt-3 text-center text-xs font-medium uppercase text-slate-500">Workflows</div>
               </div>
             </div>
           </div>
@@ -396,14 +403,14 @@ function LandingPageContent() {
       </section>
 
       <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto max-w-7xl">
+        <div className={landingShellClass}>
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Reusable Workflow Marketplace</p>
-            <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">
+            <p className={eyebrowClass}>Reusable Workflow Marketplace</p>
+            <h2 className={sectionTitleClass}>
               Package engineering know-how into reusable chip design products.
             </h2>
-            <p className="mt-4 leading-7 text-slate-300">
+            <p className={sectionBodyClass}>
               ChipLoop turns individual agents and workflows into private apps, product journeys, and marketplace-ready solutions that other teams can run without rebuilding the environment.
             </p>
           </div>
@@ -411,8 +418,8 @@ function LandingPageContent() {
             {marketplaceFlow.map(([title, body], index) => (
               <div key={title} className="contents">
                 <article className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 text-center">
-                  <div className="text-lg font-extrabold text-cyan-200">{title}</div>
-                  <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
+                  <div className={cardTitleClass}>{title}</div>
+                  <p className={cardBodyClass}>{body}</p>
                 </article>
                 {index < marketplaceFlow.length - 1 && (
                   <div className="flex items-center justify-center text-xl font-bold text-slate-600" aria-hidden="true">
@@ -428,10 +435,10 @@ function LandingPageContent() {
       </section>
 
       <section className="w-full border-y border-slate-800 bg-slate-900/30 px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto max-w-7xl">
+        <div className={landingShellClass}>
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold">Design Intent to Execution</h2>
-          <p className="mx-auto mt-3 max-w-3xl text-base leading-7 text-slate-300">
+          <h2 className={`${sectionTitleClass} mx-auto`}>Design Intent to Execution</h2>
+          <p className={`${sectionBodyClass} mx-auto`}>
             ChipLoop turns complex multi-dimensional chip design workflows into connected, traceable execution loops.
           </p>
         </div>
@@ -446,7 +453,7 @@ function LandingPageContent() {
                 <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">
                   {step}
                 </div>
-                <h3 className="mt-4 text-xl font-extrabold text-white">{title}</h3>
+                <h3 className="mt-4 text-xl font-bold text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
               </div>
               {index < 2 ? (
@@ -462,13 +469,13 @@ function LandingPageContent() {
       </section>
 
       <section className="w-full bg-slate-950 px-4 py-10 sm:px-6 sm:py-14">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-[1440px]">
         <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 sm:p-8 md:p-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
-              <p className="text-sm font-bold uppercase tracking-wide text-cyan-300">Developer Automation</p>
-              <h2 className="mt-3 text-2xl font-extrabold text-white sm:text-3xl">Automate from CLI, SDK, IDE, or GitHub</h2>
-              <p className="mt-4 leading-7 text-slate-300">
+              <p className={eyebrowClass}>Developer Automation</p>
+              <h2 className={sectionTitleClass}>Automate from CLI, SDK, IDE, or GitHub</h2>
+              <p className={sectionBodyClass}>
                 Use the same ChipLoop context in scripts, editors, CI, and private runners.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
@@ -500,7 +507,7 @@ function LandingPageContent() {
                   <span className="h-3 w-3 rounded-full bg-yellow-400" />
                   <span className="h-3 w-3 rounded-full bg-emerald-400" />
                 </div>
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <div className="text-xs font-medium uppercase text-slate-500">
                   {automationSnippets[automationMode][automationStep].title}
                 </div>
               </div>
@@ -525,8 +532,8 @@ function LandingPageContent() {
 
       <section className="w-full border-t border-slate-800 bg-slate-900/35 px-4 py-12 text-center sm:px-6 sm:py-16">
         <div className="mx-auto max-w-5xl">
-        <h2 className="text-2xl font-extrabold sm:text-3xl">Start Building Connected Chip Workflows</h2>
-        <p className="mt-4 text-slate-300">
+        <h2 className={`${sectionTitleClass} mx-auto`}>Start Building Connected Chip Workflows</h2>
+        <p className={`${sectionBodyClass} mx-auto`}>
           Begin with the guided Arch2RTL demo, then continue through Products, Apps, or Studio.
         </p>
         <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">

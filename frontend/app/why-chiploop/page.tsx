@@ -33,10 +33,10 @@ export default function WhyChipLoopPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav showMarketplace showSettings={false} />
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+      <section className="mx-auto max-w-[1680px] px-4 py-10 sm:px-6 sm:py-14">
         <div className="max-w-4xl">
-          <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Why ChipLoop</div>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
+          <div className="text-xs font-semibold uppercase text-cyan-300">Why ChipLoop</div>
+          <h1 className="mt-3 text-5xl font-extrabold leading-[1.05] text-white sm:text-6xl">
             One Platform for Connected Chip Execution
           </h1>
           <p className="mt-4 text-lg leading-8 text-slate-300">
@@ -68,7 +68,7 @@ export default function WhyChipLoopPage() {
         </div>
 
         <section className="mt-10 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-6 sm:p-8">
-          <h2 className="text-2xl font-extrabold">Design Intent to Execution</h2>
+          <h2 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl">Design Intent to Execution</h2>
           <div className="mt-6 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
             {[
               ["01", "Define", "Product, app, or workflow"],

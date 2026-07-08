@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -257,9 +257,9 @@ function PricingContent() {
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
       <TopNav current="pricing" showMarketplace showSettings={false} />
 
-      <section className="mx-auto max-w-7xl px-6 py-12">
+      <section className="mx-auto max-w-[1680px] px-6 py-12">
         <div className="max-w-3xl">
-          <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">Pricing</h1>
+          <h1 className="text-5xl font-extrabold leading-[1.05] text-white md:text-6xl">Pricing</h1>
           <p className="mt-4 text-lg text-slate-300">
             Choose a platform plan, then use the chip design loops your work needs. Core covers normal
             generate, configure, run, and review flows. Advanced adds deeper analysis, closure, debug,
@@ -298,7 +298,7 @@ function PricingContent() {
         <section className="mt-8 rounded-lg border border-cyan-800/70 bg-cyan-950/25 p-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">Starter intro</div>
+              <div className="text-xs font-semibold uppercase text-cyan-300">Starter intro</div>
               <p className="mt-2 text-sm leading-6 text-cyan-50">
                 Start at $14.99/month for the first 3 months, then $19.99/month. Includes 1 Loop Core and 500 monthly credits.
               </p>
@@ -348,7 +348,7 @@ function PricingContent() {
 
         <section id="setup-flow" className="mt-10 rounded-lg border border-cyan-800/70 bg-cyan-950/20 p-5 scroll-mt-24">
           <div className="max-w-3xl">
-            <div className="text-sm font-bold uppercase tracking-wide text-cyan-300">After Signup</div>
+            <div className="text-xs font-semibold uppercase text-cyan-300">After Signup</div>
             <h2 className="mt-2 text-xl font-bold">Set up your loop access</h2>
             <p className="mt-2 text-sm leading-6 text-cyan-50/90">
               Checkout starts the base subscription. Loop choices, Advanced upgrades, and credit packs are managed from Plan Settings after signup.

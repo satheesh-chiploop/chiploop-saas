@@ -51,7 +51,7 @@ export default function TopFiveChipLoopIndustryProblemsPage() {
           Back to Events
         </button>
 
-        <div className="mt-8 text-xs font-semibold uppercase tracking-wide text-cyan-300">Events Blog</div>
+        <div className="mt-8 text-xs font-semibold uppercase text-cyan-300">Events Blog</div>
         <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
           Top 5 Industry Problems ChipLoop Addresses
         </h1>

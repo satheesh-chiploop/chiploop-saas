@@ -41,13 +41,13 @@ export default function WorkflowDashboardPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <TopNav current="apps" showPlanBadge />
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-[1680px] px-4 py-6 sm:px-6">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <button onClick={() => router.back()} className="mb-3 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
               Back
             </button>
-            <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Workflow Dashboard</div>
+            <div className="text-xs font-semibold uppercase text-cyan-300">Workflow Dashboard</div>
             <h1 className="mt-2 text-3xl font-bold tracking-normal text-white">Dashboard Results</h1>
             <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-slate-300">
               Workflow {workflowId}{app ? ` | ${app}` : ""} | {stage}

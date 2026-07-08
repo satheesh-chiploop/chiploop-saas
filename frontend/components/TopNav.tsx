@@ -95,7 +95,7 @@ export default function TopNav({
   showWorkshop = false,
   showSettings = true,
   showAdmin = false,
-  maxWidthClass = "max-w-7xl",
+  maxWidthClass = "max-w-none",
   className = "sticky top-0 z-50",
 }: TopNavProps) {
   const router = useRouter();
@@ -153,7 +153,7 @@ export default function TopNav({
 
   return (
     <nav className={`${className} border-b border-slate-800 bg-slate-950/90 backdrop-blur`}>
-      <div className={`mx-auto flex min-w-0 ${maxWidthClass} flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4`}>
+      <div className={`mx-auto flex min-w-0 ${maxWidthClass} flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4 xl:px-8`}>
         <button
           onClick={() => router.push("/")}
           className="group flex shrink-0 self-start items-center gap-3 text-2xl font-extrabold text-cyan-300 sm:self-auto"

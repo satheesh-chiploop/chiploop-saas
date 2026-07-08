@@ -280,7 +280,7 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
       {/* Top bar (same vibe as DQA/Apps) */}
       <div className="sticky top-0 z-40 border-b border-slate-800 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4">
           <button
             className="flex items-center gap-2 text-xl font-extrabold"
             onClick={() => router.push("/apps")}
@@ -311,7 +311,7 @@ export default function EmbeddedAppTemplate({ title, subtitle, runPath }: Props)
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-6 py-8 space-y-6">
+      <div className="mx-auto max-w-[1440px] px-6 py-8 space-y-6">
         <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-6">
           <div className="text-2xl font-extrabold">{title}</div>
           <div className="mt-1 text-slate-300">{subtitle}</div>

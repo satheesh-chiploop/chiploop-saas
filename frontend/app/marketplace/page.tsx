@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -94,12 +94,12 @@ export default function MarketplacePage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <TopNav current="marketplace" showMarketplace maxWidthClass="max-w-6xl" />
+      <TopNav current="marketplace" showMarketplace />
 
-      <section className="mx-auto max-w-6xl px-6 py-8">
+      <section className="mx-auto max-w-[1440px] px-6 py-8">
         <div className="rounded-2xl border border-slate-800 bg-slate-900/35 p-6">
-          <div className="text-sm uppercase tracking-wide text-cyan-300">Marketplace ecosystem</div>
-          <h1 className="mt-2 text-3xl font-extrabold">Install reviewed agents and apps into your workspace.</h1>
+          <div className="text-xs font-semibold uppercase text-cyan-300">Marketplace ecosystem</div>
+          <h1 className="mt-2 text-4xl font-extrabold leading-tight text-white sm:text-5xl">Install reviewed agents and apps into your workspace.</h1>
           <p className="mt-2 max-w-3xl text-slate-300">Approved agents install into My Agents. Approved apps install into My Apps as private editable copies.</p>
           <div className="mt-5 grid gap-3 md:grid-cols-[1fr_180px_120px]">
             <input value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") loadAgents(); }} placeholder="Search agents, apps, workflows..." className="rounded-xl border border-slate-700 bg-black/30 px-4 py-3 text-slate-100 outline-none focus:border-cyan-600" />
