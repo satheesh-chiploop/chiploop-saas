@@ -55,27 +55,32 @@ const subscriptionLoops = [
   {
     name: "Digital Design",
     body: "Requirements, design intent, architecture-to-RTL, RTL quality, verification setup, and handoff.",
-    hover: "hover:border-cyan-300/80 hover:shadow-cyan-950/35",
+    border: "border-cyan-400/55",
+    hover: "hover:border-cyan-300 hover:shadow-cyan-950/35",
   },
   {
     name: "Digital Implementation",
     body: "Synthesis, constraints, timing/power/area reports, DFT/MBIST, RTL-to-GDS, signoff, and tapeout handoff.",
-    hover: "hover:border-violet-300/80 hover:shadow-violet-950/35",
+    border: "border-violet-400/55",
+    hover: "hover:border-violet-300 hover:shadow-violet-950/35",
   },
   {
     name: "Mixed Signal",
     body: "System and mixed-signal integration across digital RTL, analog models, SoC intent, simulation, and synthesis.",
-    hover: "hover:border-rose-300/80 hover:shadow-rose-950/35",
+    border: "border-rose-400/55",
+    hover: "hover:border-rose-300 hover:shadow-rose-950/35",
   },
   {
     name: "Firmware/Software",
     body: "Register extraction, HAL, drivers, boot/diagnostics, firmware builds, software services, co-simulation, and demos.",
-    hover: "hover:border-emerald-300/80 hover:shadow-emerald-950/35",
+    border: "border-emerald-400/55",
+    hover: "hover:border-emerald-300 hover:shadow-emerald-950/35",
   },
   {
     name: "Validation",
     body: "Validation plans, bench/instrument setup, connectivity, preflight, execution analytics, and reports.",
-    hover: "hover:border-amber-300/80 hover:shadow-amber-950/35",
+    border: "border-amber-300/55",
+    hover: "hover:border-amber-300 hover:shadow-amber-950/35",
   },
 ];
 
@@ -247,7 +252,7 @@ function LandingPageContent() {
           </div>
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
             {subscriptionLoops.map((loop) => (
-              <article key={loop.name} className={`rounded-xl border border-slate-700/70 bg-slate-950/70 p-5 shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
+              <article key={loop.name} className={`rounded-xl border-2 ${loop.border} bg-slate-950/70 p-5 shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
                 <h3 className={cardTitleClass}>{loop.name}</h3>
                 <p className={`${cardBodyClass} min-h-28`}>{loop.body}</p>
               </article>
@@ -294,20 +299,21 @@ function LandingPageContent() {
               ChipLoop keeps each stage connected, so outputs, logs, dashboards, and decisions carry forward instead of living in disconnected tools.
             </p>
           </div>
-          <div className="mx-auto mt-8 flex max-w-6xl flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mx-auto mt-8 w-full max-w-[1680px] overflow-x-auto pb-2">
+            <div className="flex min-w-max flex-nowrap items-center justify-center gap-3">
             {endToEndJourney.map((stage, index) => (
-              <div key={stage} className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
-                <div className="w-full min-w-32 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-4 text-center text-sm font-semibold text-slate-100 sm:w-36">
+              <div key={stage} className="flex shrink-0 items-center gap-3">
+                <div className="flex h-16 w-36 min-w-36 items-center justify-center rounded-xl border border-slate-700 bg-slate-950/70 px-4 text-center text-sm font-semibold text-slate-100">
                   {stage}
                 </div>
                 {index < endToEndJourney.length - 1 && (
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-slate-950 text-sm font-bold text-slate-500" aria-hidden="true">
-                    <span className="sm:hidden">{"\u2193"}</span>
-                    <span className="hidden sm:inline">{"\u2192"}</span>
+                    {"\u2192"}
                   </div>
                 )}
               </div>
             ))}
+            </div>
           </div>
         </div>
         </div>
