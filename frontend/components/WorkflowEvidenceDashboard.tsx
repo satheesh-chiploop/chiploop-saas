@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ApiClientError, apiGet } from "@/lib/apiClient";
 
-type Stage = "arch2rtl" | "dqa" | "smoke" | "synthesis" | "tapeout" | "verification" | "embedded" | "software" | "validation" | "product";
+type Stage = "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "verification" | "embedded" | "software" | "validation" | "product";
 type JsonMap = Record<string, unknown>;
 
 type Props = {
@@ -26,15 +26,18 @@ const MAIN_FLOW: FlowItem[] = [
   { id: "product", label: "Product" },
 ];
 
-const OPTIONAL_DIGITAL_FLOW: Record<Extract<Stage, "dqa" | "smoke" | "synthesis" | "tapeout">, FlowItem> = {
+const OPTIONAL_DIGITAL_FLOW: Record<Extract<Stage, "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout">, FlowItem> = {
   dqa: { id: "dqa", label: "DQA" },
+  rtl_review: { id: "rtl_review", label: "RTL Review" },
+  constraint_review: { id: "constraint_review", label: "Constraints" },
+  timing_debug: { id: "timing_debug", label: "Timing Debug" },
   smoke: { id: "smoke", label: "Smoke" },
   synthesis: { id: "synthesis", label: "Synth" },
   tapeout: { id: "tapeout", label: "Tapeout" },
 };
 
 function displayedFlow(stage: Stage): FlowItem[] {
-  if (stage === "dqa" || stage === "smoke" || stage === "synthesis" || stage === "tapeout") {
+  if (stage === "dqa" || stage === "rtl_review" || stage === "constraint_review" || stage === "timing_debug" || stage === "smoke" || stage === "synthesis" || stage === "tapeout") {
     return [RTL_STAGE, OPTIONAL_DIGITAL_FLOW[stage]];
   }
   return MAIN_FLOW;
@@ -507,6 +510,22 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/tool_execution_summary.json",
         "digital/tool_profile_used.json",
       ],
+      rtl_review: [
+        "digital/handoff/rtl_handoff_ingest_manifest.json",
+        "rtl_handoff_ingest_manifest.json",
+        "rtl_review.json",
+        "rtl_review/rtl_review.json",
+      ],
+      constraint_review: [
+        "digital/handoff/rtl_handoff_ingest_manifest.json",
+        "rtl_handoff_ingest_manifest.json",
+        "constraint_review.json",
+        "constraint_review/constraint_review.json",
+      ],
+      timing_debug: [
+        "timing_debug.json",
+        "timing_debug/timing_debug.json",
+      ],
       smoke: [
         "digital/handoff/rtl_handoff_ingest_manifest.json",
         "simulation_manifest.json",
@@ -883,6 +902,95 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           </div>
         </div>
       ) : <div className="mt-5 text-sm text-amber-300">Register-map artifact is not available for this completed run.</div>;
+    }
+
+    if (stage === "rtl_review") {
+      const review = record(evidence["rtl_review.json"]);
+      const summary = record(review.summary);
+      const files = array(review.files).map(record);
+      const fileRows = files.slice(0, 10).map((file) => ({
+        check: firstString(file.path, "rtl file"),
+        status: `${metricValue(file.module_count)} modules`,
+        detail: `${metricValue(file.always_block_count)} always blocks, ${metricValue(file.continuous_assign_count)} assigns`,
+        tool: "RTL review",
+      }));
+      return (
+        <div className="mt-5 space-y-5">
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat title="Status" value={statusLabel(summary.status)} />
+            <Stat title="RTL Files" value={metricValue(summary.rtl_file_count)} />
+            <Stat title="Modules" value={metricValue(summary.module_count)} />
+            <Stat title="Issues" value={metricValue(summary.issue_count)} />
+            <Stat title="High Issues" value={metricValue(summary.high_issue_count)} />
+            <Stat title="Medium Issues" value={metricValue(summary.medium_issue_count)} />
+            <Stat title="Review Depth" value={metricValue(summary.review_depth)} />
+            <Stat title="Tool Pass" value={metricValue(summary.tool_pass_count)} />
+            <Stat title="Tool Fail" value={metricValue(summary.tool_fail_count)} />
+            <Stat title="Tool Missing" value={metricValue(summary.tool_unavailable_count)} />
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+          </div>
+          {fileRows.length ? <CheckTable rows={fileRows} /> : null}
+        </div>
+      );
+    }
+
+    if (stage === "constraint_review") {
+      const review = record(evidence["constraint_review.json"]);
+      const summary = record(review.summary);
+      const findingRows = array(review.findings).map(record).slice(0, 10).map((finding) => ({
+        check: firstString(finding.category, "constraint finding"),
+        status: firstString(finding.severity, "info"),
+        detail: firstString(finding.message, finding.recommendation, "review generated"),
+        tool: "SDC review",
+      }));
+      return (
+        <div className="mt-5 space-y-5">
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat title="Status" value={statusLabel(summary.status)} />
+            <Stat title="RTL Clocks" value={metricValue(summary.rtl_clock_count)} />
+            <Stat title="Create Clocks" value={metricValue(summary.create_clock_count)} />
+            <Stat title="Generated Clocks" value={metricValue(summary.generated_clock_count)} />
+            <Stat title="Input Delays" value={metricValue(summary.input_delay_count)} />
+            <Stat title="Output Delays" value={metricValue(summary.output_delay_count)} />
+            <Stat title="False Paths" value={metricValue(summary.false_path_count)} />
+            <Stat title="Findings" value={metricValue(summary.finding_count)} />
+            <Stat title="Tool Pass" value={metricValue(summary.tool_pass_count)} />
+            <Stat title="Tool Fail" value={metricValue(summary.tool_fail_count)} />
+            <Stat title="Tool Missing" value={metricValue(summary.tool_unavailable_count)} />
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+          </div>
+          {findingRows.length ? <CheckTable rows={findingRows} /> : null}
+        </div>
+      );
+    }
+
+    if (stage === "timing_debug") {
+      const debug = record(evidence["timing_debug.json"]);
+      const summary = record(debug.summary);
+      const reportRows = array(debug.reports).map(record).slice(0, 10).map((report) => {
+        const metrics = record(report.metrics);
+        return {
+          check: firstString(report.path, "timing report"),
+          status: `${metricValue(metrics.wns)} WNS`,
+          detail: `setup ${metricValue(metrics.setup_wns)}, hold ${metricValue(metrics.hold_wns)}`,
+          tool: "STA report parser",
+        };
+      });
+      return (
+        <div className="mt-5 space-y-5">
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat title="Status" value={statusLabel(summary.status)} />
+            <Stat title="Reports" value={metricValue(summary.timing_report_count)} />
+            <Stat title="Worst Slack" value={metricValue(summary.worst_slack_observed)} />
+            <Stat title="Findings" value={metricValue(summary.finding_count)} />
+            <Stat title="Stage" value={metricValue(summary.stage)} />
+            <Stat title="OpenSTA" value={summary.opensta_available === true ? "available" : "not found"} />
+            <Stat title="OpenROAD" value={summary.openroad_available === true ? "available" : "not found"} />
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+          </div>
+          {reportRows.length ? <CheckTable rows={reportRows} /> : null}
+        </div>
+      );
     }
 
     if (stage === "dqa") {

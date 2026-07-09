@@ -116,6 +116,9 @@ const APP_PREBUILT_WORKFLOWS: CustomWorkflowRow[] = [
   { name: "Digital_Arch2Sim", displayName: "Arch2Sim", loop_type: "digital", is_prebuilt: true },
   { name: "Digital_Arch2Tapeout", displayName: "Arch2Tapeout", loop_type: "digital", is_prebuilt: true },
   { name: "Digital_DQA", displayName: "DQA", loop_type: "digital", is_prebuilt: true },
+  { name: "Digital_RTL_Review", displayName: "RTL Review", loop_type: "digital", is_prebuilt: true },
+  { name: "Digital_Constraint_Review", displayName: "Constraint Review", loop_type: "digital", is_prebuilt: true },
+  { name: "Digital_Timing_Debug", displayName: "Timing Debug", loop_type: "digital", is_prebuilt: true },
   { name: "Digital_Verify", displayName: "Verify", loop_type: "digital", is_prebuilt: true },
   { name: "Digital_Smoke", displayName: "Smoke", loop_type: "digital", is_prebuilt: true },
   { name: "Digital_Integrate", displayName: "Integrate", loop_type: "digital", is_prebuilt: true },
@@ -353,6 +356,17 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
     "Digital Reset Integrity Agent",
     "Digital Synthesis Readiness Agent",
     "Digital DQA Summary Agent",
+  ]),
+  Digital_RTL_Review: linearWorkflowDefinition([
+    "Digital RTL Handoff Ingest Agent",
+    "Digital RTL Review Agent",
+  ]),
+  Digital_Constraint_Review: linearWorkflowDefinition([
+    "Digital RTL Handoff Ingest Agent",
+    "Digital Constraint Review Agent",
+  ]),
+  Digital_Timing_Debug: linearWorkflowDefinition([
+    "Digital Timing Debug Agent",
   ]),
   Digital_Verify: linearWorkflowDefinition([
     "Digital Verification Handoff Ingest Agent",

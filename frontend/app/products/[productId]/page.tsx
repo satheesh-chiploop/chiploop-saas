@@ -104,6 +104,9 @@ type UserAppsResponse = {
 const APP_LINKS: Record<string, string> = {
   Digital_Arch2RTL: "/apps/arch2rtl",
   Digital_DQA: "/apps/dqa",
+  Digital_RTL_Review: "/apps/rtl-review",
+  Digital_Constraint_Review: "/apps/constraint-review",
+  Digital_Timing_Debug: "/apps/timing-debug",
   Digital_Verify: "/apps/verify",
   Digital_Arch2Synthesis: "/apps/arch2synthesis",
   Digital_Arch2Tapeout: "/apps/arch2tapeout",
@@ -164,6 +167,44 @@ const FALLBACK_STAGE_SCHEMAS: Record<string, StageSchema> = {
       { key: "lint_profile", label: "Lint profile", type: "text", defaultValue: "default" },
       { key: "cdc_profile", label: "CDC profile", type: "text", defaultValue: "default" },
       { key: "enable_autofix", label: "Enable autofix", type: "boolean", defaultValue: false },
+    ],
+  },
+  Digital_RTL_Review: {
+    note: "Review RTL from a prior workflow, pasted source, or repo path.",
+    fields: [
+      { key: "rtl_source_mode", label: "RTL source", type: "select", defaultValue: "from_arch2rtl", options: [
+        { value: "from_arch2rtl", label: "Prior workflow" },
+        { value: "paste", label: "Paste RTL" },
+        { value: "repo_path", label: "Repo/path" },
+      ] },
+      { key: "from_workflow_id", label: "Source workflow ID", type: "text", defaultValue: "" },
+      { key: "repo_path", label: "Repo/path", type: "text", defaultValue: "" },
+      { key: "rtl_text", label: "RTL text", type: "textarea", defaultValue: "" },
+      { key: "review_depth", label: "Review depth", type: "select", defaultValue: "standard", options: ["quick", "standard", "deep"] },
+    ],
+  },
+  Digital_Constraint_Review: {
+    note: "Review timing constraints before synthesis, STA, or tapeout.",
+    fields: [
+      { key: "rtl_source_mode", label: "RTL source", type: "select", defaultValue: "from_arch2rtl", options: [
+        { value: "from_arch2rtl", label: "Prior workflow" },
+        { value: "paste", label: "Paste RTL" },
+        { value: "repo_path", label: "Repo/path" },
+      ] },
+      { key: "from_workflow_id", label: "Source workflow ID", type: "text", defaultValue: "" },
+      { key: "repo_path", label: "Repo/path", type: "text", defaultValue: "" },
+      { key: "rtl_text", label: "RTL text", type: "textarea", defaultValue: "" },
+      { key: "constraints_sdc", label: "Constraints SDC", type: "textarea", defaultValue: "" },
+      { key: "target_frequency_mhz", label: "Target frequency MHz", type: "number", defaultValue: 100 },
+    ],
+  },
+  Digital_Timing_Debug: {
+    note: "Debug timing reports from synthesis or implementation runs.",
+    fields: [
+      { key: "source_workflow_id", label: "Source workflow ID", type: "text", defaultValue: "" },
+      { key: "timing_report_text", label: "Timing report text", type: "textarea", defaultValue: "" },
+      { key: "stage", label: "Timing stage", type: "select", defaultValue: "auto", options: ["auto", "synthesis", "preplace", "postplace", "postcts", "postroute", "postfill"] },
+      { key: "target_frequency_mhz", label: "Target frequency MHz", type: "number", defaultValue: 100 },
     ],
   },
   Digital_Verify: {
@@ -490,6 +531,9 @@ type StageCatalogItem = {
 const STAGE_CATALOG: StageCatalogItem[] = [
   { app: "Digital_Arch2RTL", label: "Digital RTL", category: "Digital", produces: ["arch2rtl", "digital_rtl"] },
   { app: "Digital_DQA", label: "Digital DQA", category: "Digital", produces: ["dqa"], requires: [["arch2rtl"]] },
+  { app: "Digital_RTL_Review", label: "RTL Review", category: "Digital", produces: ["rtl_review"], requires: [["arch2rtl"]] },
+  { app: "Digital_Constraint_Review", label: "Constraint Review", category: "Digital", produces: ["constraint_review"], requires: [["arch2rtl"]] },
+  { app: "Digital_Timing_Debug", label: "Timing Debug", category: "Digital", produces: ["timing_debug"], requires: [["arch2synthesis"], ["tapeout"], ["system_pd"]] },
   { app: "Digital_Verify", label: "Digital Verify", category: "Digital", produces: ["verify"], requires: [["arch2rtl"]] },
   { app: "Digital_Arch2Synthesis", label: "Digital Synthesis", category: "Digital", produces: ["arch2synthesis"], requires: [["arch2rtl"]] },
   { app: "Digital_Arch2Tapeout", label: "Digital Tapeout", category: "Digital", produces: ["tapeout"], requires: [["arch2rtl"]] },
