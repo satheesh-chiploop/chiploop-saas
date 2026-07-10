@@ -519,12 +519,10 @@ function LandingPageContent() {
           {executionSteps.map(({ step, title, body, icon: Icon }, index) => (
             <div key={title} className="contents">
               <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-6 text-center">
-                <div className="mx-auto flex items-center justify-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">
-                    {step}
-                  </div>
-                  <Icon className="h-9 w-9 text-amber-300" aria-hidden="true" />
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">
+                  {step}
                 </div>
+                <Icon className="mx-auto mt-4 h-10 w-10 text-amber-300" aria-hidden="true" />
                 <h3 className="mt-4 text-xl font-bold text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
               </div>
