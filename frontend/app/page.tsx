@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FaInfinity, FaMicrochip, FaStore, FaTh, FaUserEdit } from "react-icons/fa";
 import { createClientComponentClient } from "@/lib/platformClient";
 import TopNav from "@/components/TopNav";
 
@@ -35,11 +36,56 @@ const automationSnippets = {
 };
 
 const paths = [
-  ["Loops", "Choose your chip design domain.", "/loops", "Explore Loops", "border-cyan-400/55", "hover:border-cyan-300 hover:shadow-cyan-950/35"],
-  ["Products", "Build complete chip journeys.", "/products", "Explore Products", "border-pink-400/55", "hover:border-pink-300 hover:shadow-pink-950/35"],
-  ["Apps", "Run ready-made chip workflows.", "/apps", "Explore Apps", "border-emerald-400/55", "hover:border-emerald-300 hover:shadow-emerald-950/35"],
-  ["Studio", "Create custom agents and workflows.", "/workflow", "Open Studio", "border-violet-400/55", "hover:border-violet-300 hover:shadow-violet-950/35"],
-  ["Marketplace", "Reuse approved engineering flows.", "/marketplace", "Explore Marketplace", "border-amber-300/55", "hover:border-amber-300 hover:shadow-amber-950/35"],
+  {
+    title: "Loops",
+    body: "Choose your chip design domain.",
+    href: "/loops",
+    cta: "Explore Loops",
+    icon: FaInfinity,
+    iconAccent: "text-amber-300",
+    border: "border-cyan-400/55",
+    hover: "hover:border-cyan-300 hover:shadow-cyan-950/35",
+  },
+  {
+    title: "Products",
+    body: "Build complete chip journeys.",
+    href: "/products",
+    cta: "Explore Products",
+    icon: FaMicrochip,
+    iconAccent: "text-amber-300",
+    border: "border-pink-400/55",
+    hover: "hover:border-pink-300 hover:shadow-pink-950/35",
+  },
+  {
+    title: "Apps",
+    body: "Run ready-made chip workflows.",
+    href: "/apps",
+    cta: "Explore Apps",
+    icon: FaTh,
+    iconAccent: "text-amber-300",
+    border: "border-emerald-400/55",
+    hover: "hover:border-emerald-300 hover:shadow-emerald-950/35",
+  },
+  {
+    title: "Studio",
+    body: "Create custom agents and workflows.",
+    href: "/workflow",
+    cta: "Open Studio",
+    icon: FaUserEdit,
+    iconAccent: "text-amber-300",
+    border: "border-violet-400/55",
+    hover: "hover:border-violet-300 hover:shadow-violet-950/35",
+  },
+  {
+    title: "Marketplace",
+    body: "Reuse approved engineering flows.",
+    href: "/marketplace",
+    cta: "Explore Marketplace",
+    icon: FaStore,
+    iconAccent: "text-amber-300",
+    border: "border-amber-300/55",
+    hover: "hover:border-amber-300 hover:shadow-amber-950/35",
+  },
 ];
 
 const platformStats = [
@@ -275,9 +321,12 @@ function LandingPageContent() {
           <h2 className={`${sectionTitleClass} mx-auto`}>Start where you need.</h2>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
-          {paths.map(([title, body, href, cta, border, hover]) => (
+          {paths.map(({ title, body, href, cta, icon: Icon, iconAccent, border, hover }) => (
             <article key={title} className={`rounded-xl border-2 ${border} bg-slate-900/70 p-5 text-center shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-900 hover:shadow-xl ${hover}`}>
-              <h3 className="text-xl font-bold leading-tight text-white">{title}</h3>
+              <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-current/40 bg-slate-950/60 ${iconAccent}`}>
+                <Icon className="h-8 w-8" aria-hidden="true" />
+              </div>
+              <h3 className="mt-4 text-xl font-bold leading-tight text-white">{title}</h3>
               <p className="mt-3 min-h-12 text-sm leading-6 text-slate-300">{body}</p>
               <button onClick={() => goTo(href)} className="mt-5 rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
                 {cta}
