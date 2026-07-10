@@ -278,11 +278,11 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full border-b border-slate-800 bg-slate-900/45">
+      <section className="w-full border-b border-slate-800 bg-slate-950">
         <div className={`${landingShellClass} px-4 py-8 sm:px-6`}>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3 lg:grid-cols-6">
             {platformStats.map(([value, label, color]) => (
-              <div key={label} className="rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-5 text-center">
+              <div key={label} className="text-center">
                 <div className={`break-words text-2xl font-extrabold leading-tight ${color} sm:text-3xl`}>{value}</div>
                 <div className="mt-2 text-xs font-medium uppercase text-slate-400">{label}</div>
               </div>
