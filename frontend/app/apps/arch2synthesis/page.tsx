@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import { HemAutomaticRunControls, HemChildDashboardLinks } from "@/components/HemAutomaticRun";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 import SpecTextBox from "@/components/SpecTextBox";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
@@ -89,6 +90,8 @@ export default function Arch2SynthesisAppPage() {
   const [allowSynthesisHierarchyFlattening, setAllowSynthesisHierarchyFlattening] = useState(false);
   const [stopOnSynthesisClosureFailure, setStopOnSynthesisClosureFailure] = useState(false);
   const [stopOnSynthesisLecFailure, setStopOnSynthesisLecFailure] = useState(false);
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
 
   // --- Stage control ---
   const [startStage, setStartStage] = useState<"arch2rtl" | "synth">("arch2rtl");
@@ -279,6 +282,8 @@ export default function Arch2SynthesisAppPage() {
     return true;
   }, [running, topModule, specText, rtlSourceMode, repoPath, fromWorkflowId]);
 
+  const hemRequiresSource = false;
+
   async function runNow() {
     setErr(null);
     setRunning(true);
@@ -308,6 +313,8 @@ export default function Arch2SynthesisAppPage() {
         target_frequency_mhz: targetFreqMhz.trim() ? Number(targetFreqMhz) : undefined,
         constraints_sdc: constraintsSdc.trim() ? constraintsSdc : undefined,
         clock_constraints: clockConstraintsPayload(),
+        hem_enabled: hemEnabled && !hemRequiresSource,
+        hem_mode: hemAdaptive ? "adaptive" : "fixed",
         run_synthesis_closure_loop: runSynthesisClosureLoop,
         max_synthesis_closure_iterations: runSynthesisClosureLoop ? Number(maxSynthesisClosureIterations) : 1,
         allow_synthesis_timing_repair: allowSynthesisTimingRepair,
@@ -623,6 +630,19 @@ export default function Arch2SynthesisAppPage() {
               <div className="text-xs text-slate-500">
                 Use <span className="text-slate-300">synth</span> when RTL is already available.
               </div>
+
+              <HemAutomaticRunControls
+                enabled={hemEnabled}
+                adaptive={hemAdaptive}
+                onEnabledChange={(value) => {
+                  setHemEnabled(value);
+                  if (!value) setHemAdaptive(false);
+                }}
+                onAdaptiveChange={setHemAdaptive}
+                currentStageLabel="Synthesis"
+                nextStageLabel="Tapeout"
+                disabled={hemRequiresSource}
+              />
             </div>
 
             <button
@@ -707,6 +727,7 @@ export default function Arch2SynthesisAppPage() {
                   disabled={workflowRow?.status !== "completed"}
                 />
               </div>
+              <HemChildDashboardLinks logs={workflowRow?.logs} />
             </div>
             <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="synthesis" logs={workflowRow?.logs} />
             <AskThisRunPanel workflowId={workflowId} compact />

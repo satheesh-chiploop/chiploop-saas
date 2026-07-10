@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import { HemAutomaticRunControls, HemChildDashboardLinks } from "@/components/HemAutomaticRun";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 import SpecTextBox from "@/components/SpecTextBox";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
@@ -101,6 +102,8 @@ export default function Arch2TapeoutAppPage() {
   const [allowSynthesisHierarchyFlattening, setAllowSynthesisHierarchyFlattening] = useState(false);
   const [stopOnSynthesisClosureFailure, setStopOnSynthesisClosureFailure] = useState(false);
   const [stopOnSynthesisLecFailure, setStopOnSynthesisLecFailure] = useState(false);
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
 
   // --- Stage control ---
   const [startStage, setStartStage] = useState<"arch2rtl" | "synth" | "floorplan">("arch2rtl");
@@ -292,6 +295,8 @@ export default function Arch2TapeoutAppPage() {
     return true;
   }, [running, topModule, specText, rtlSourceMode, repoPath, fromWorkflowId]);
 
+  const hemRequiresSource = false;
+
   async function runNow() {
     setErr(null);
     setRunning(true);
@@ -321,6 +326,8 @@ export default function Arch2TapeoutAppPage() {
         target_frequency_mhz: targetFreqMhz.trim() ? Number(targetFreqMhz) : undefined,
         constraints_sdc: constraintsSdc.trim() ? constraintsSdc : undefined,
         clock_constraints: clockConstraintsPayload(),
+        hem_enabled: hemEnabled && !hemRequiresSource,
+        hem_mode: hemAdaptive ? "adaptive" : "fixed",
 
         // tapeout knobs
         effort,
@@ -715,6 +722,19 @@ export default function Arch2TapeoutAppPage() {
                 Use <span className="text-slate-300">synth</span> when RTL exists;{" "}
                 <span className="text-slate-300">floorplan</span> is for advanced partial runs (requires prior artifacts).
               </div>
+
+              <HemAutomaticRunControls
+                enabled={hemEnabled}
+                adaptive={hemAdaptive}
+                onEnabledChange={(value) => {
+                  setHemEnabled(value);
+                  if (!value) setHemAdaptive(false);
+                }}
+                onAdaptiveChange={setHemAdaptive}
+                currentStageLabel="Tapeout"
+                nextStageLabel={null}
+                disabled={hemRequiresSource}
+              />
             </div>
 
             <button
@@ -799,6 +819,7 @@ export default function Arch2TapeoutAppPage() {
                   disabled={workflowRow?.status !== "completed"}
                 />
               </div>
+              <HemChildDashboardLinks logs={workflowRow?.logs} />
             </div>
             <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
             <AskThisRunPanel workflowId={workflowId} compact />

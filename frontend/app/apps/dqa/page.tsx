@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import { HemAutomaticRunControls, HemChildDashboardLinks } from "@/components/HemAutomaticRun";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 
@@ -54,6 +55,8 @@ export default function DQAAppPage() {
   const [cdcProfile, setCdcProfile] = useState<"default" | "aggressive">("default");
   const [target, setTarget] = useState<"asic" | "fpga">("asic");
   const [enableAutofix, setEnableAutofix] = useState(false);
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -169,6 +172,8 @@ export default function DQAAppPage() {
     return true;
   }, [running, rtlSourceMode, repoPath, fromWorkflowId, pastedRtl]);
 
+  const hemRequiresSource = rtlSourceMode !== "from_arch2rtl" || !fromWorkflowId.trim();
+
   async function runNow() {
     setErr(null);
     setRunning(true);
@@ -191,6 +196,8 @@ export default function DQAAppPage() {
           lint_profile: lintProfile,
           cdc_profile: cdcProfile,
           target,
+          hem_enabled: hemEnabled && !hemRequiresSource,
+          hem_mode: hemAdaptive ? "adaptive" : "fixed",
 
           toggles: { enable_autofix: enableAutofix },
         }
@@ -325,6 +332,20 @@ export default function DQAAppPage() {
                 Enable auto-fix (generate patch)
               </label>
 
+              <HemAutomaticRunControls
+                enabled={hemEnabled}
+                adaptive={hemAdaptive}
+                onEnabledChange={(value) => {
+                  setHemEnabled(value);
+                  if (!value) setHemAdaptive(false);
+                }}
+                onAdaptiveChange={setHemAdaptive}
+                currentStageLabel="DQA"
+                nextStageLabel="Verification"
+                disabled={hemRequiresSource}
+                disabledReason="Select 'Use Arch2RTL output' and enter the source workflow_id before enabling HEM from DQA."
+              />
+
               <button
                 onClick={runNow}
                 disabled={!canRun}
@@ -380,6 +401,7 @@ export default function DQAAppPage() {
                     disabled={workflowRow?.status !== "completed"}
                   />
                 </div>
+                <HemChildDashboardLinks logs={workflowRow?.logs} />
               </div>
               <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="dqa" logs={workflowRow?.logs} />
               <AskThisRunPanel workflowId={workflowId} compact />

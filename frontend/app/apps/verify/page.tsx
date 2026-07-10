@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import { HemAutomaticRunControls, HemChildDashboardLinks } from "@/components/HemAutomaticRun";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 import SpecTextBox from "@/components/SpecTextBox";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
@@ -114,6 +115,8 @@ export default function VerifyAppPage() {
   const [sensorChainDemo, setSensorChainDemo] = useState(false);
   const [secureChainDemo, setSecureChainDemo] = useState(false);
   const [safetyChainDemo, setSafetyChainDemo] = useState(false);
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -417,6 +420,8 @@ export default function VerifyAppPage() {
     return true;
   }, [running, testIntent, rtlSourceMode, repoPath, fromWorkflowId, pastedRtl, seedCount]);
 
+  const hemRequiresSource = rtlSourceMode !== "from_arch2rtl" || !fromWorkflowId.trim();
+
   async function runNow() {
     setErr(null);
     setRunning(true);
@@ -453,6 +458,8 @@ export default function VerifyAppPage() {
           simulator_type: simulatorType || undefined,
           seed_count: seedCount,
           clock_constraints: clockConstraintsPayload(),
+          hem_enabled: hemEnabled && !hemRequiresSource,
+          hem_mode: hemAdaptive ? "adaptive" : "fixed",
           toolchain: {
             simulator: simulatorType || "verilator",
             code_coverage: codeCoverageTool,
@@ -1038,6 +1045,20 @@ export default function VerifyAppPage() {
                 </div>
               ) : null}
 
+              <HemAutomaticRunControls
+                enabled={hemEnabled}
+                adaptive={hemAdaptive}
+                onEnabledChange={(value) => {
+                  setHemEnabled(value);
+                  if (!value) setHemAdaptive(false);
+                }}
+                onAdaptiveChange={setHemAdaptive}
+                currentStageLabel="Verify"
+                nextStageLabel="Synthesis"
+                disabled={hemRequiresSource}
+                disabledReason="Select 'Use Arch2RTL output' and enter the source workflow_id before enabling HEM from Verify."
+              />
+
               <button
                 onClick={runNow}
                 disabled={!canRun}
@@ -1146,6 +1167,7 @@ export default function VerifyAppPage() {
                         />
                       </div>
                     ) : null}
+                    <HemChildDashboardLinks logs={workflowRow?.logs} />
                   </div>
 
                   <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" logs={workflowRow?.logs} />
