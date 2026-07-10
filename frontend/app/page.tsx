@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaCog, FaFileAlt, FaInfinity, FaMicrochip, FaPlay, FaStore, FaTh, FaUserEdit } from "react-icons/fa";
+import { FaInfinity, FaMicrochip, FaStore, FaTh, FaUserEdit } from "react-icons/fa";
 import { createClientComponentClient } from "@/lib/platformClient";
 import TopNav from "@/components/TopNav";
 
@@ -174,12 +174,6 @@ const marketplaceFlow = [
   ["Marketplace", "Approved apps and products teams can reuse"],
 ];
 
-const executionSteps = [
-  { title: "Define", body: "Specs, products, or workflows", icon: FaFileAlt },
-  { title: "Configure", body: "Stages, tools, agents, goals", icon: FaCog },
-  { title: "Run", body: "Logs, dashboards, artifacts", icon: FaPlay },
-];
-
 const endToEndJourney = [
   "Requirements",
   "RTL",
@@ -278,11 +272,11 @@ function LandingPageContent() {
         </div>
       </section>
 
-      <section className="w-full border-b border-slate-800 bg-slate-950">
+      <section className="w-full border-b border-slate-800 bg-slate-900/45">
         <div className={`${landingShellClass} px-4 py-8 sm:px-6`}>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {platformStats.map(([value, label, color]) => (
-              <div key={label} className="text-center">
+              <div key={label} className="rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-5 text-center">
                 <div className={`break-words text-2xl font-extrabold leading-tight ${color} sm:text-3xl`}>{value}</div>
                 <div className="mt-2 text-xs font-medium uppercase text-slate-400">{label}</div>
               </div>
@@ -516,11 +510,15 @@ function LandingPageContent() {
           </p>
         </div>
         <div className="mt-8 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
-          {executionSteps.map(({ title, body, icon: Icon }, index) => (
+          {[
+            ["01", "Define", "Specs, products, or workflows"],
+            ["02", "Configure", "Stages, tools, agents, goals"],
+            ["03", "Run", "Logs, dashboards, artifacts"],
+          ].map(([step, title, body], index) => (
             <div key={title} className="contents">
               <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-6 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center text-amber-300">
-                  <Icon className="h-9 w-9" aria-hidden="true" />
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">
+                  {step}
                 </div>
                 <h3 className="mt-4 text-xl font-bold text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
