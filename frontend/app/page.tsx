@@ -43,9 +43,9 @@ const paths = [
 ];
 
 const platformStats = [
-  ["195+", "Agents", "text-cyan-300"],
-  ["40+", "Apps", "text-emerald-300"],
-  ["11+", "Workflow Templates", "text-violet-300"],
+  ["198+", "Agents", "text-cyan-300"],
+  ["43+", "Apps", "text-emerald-300"],
+  ["14+", "Workflow Templates", "text-violet-300"],
   ["8+", "Reference Journeys", "text-amber-300"],
   ["5+", "Product Journeys", "text-pink-300"],
   ["SDK + CLI + Studio", "Developer Access", "text-slate-100"],
@@ -97,27 +97,28 @@ const workflowAgentChart = [
   {
     label: "Digital IP Product",
     example: "PWM to demo",
-    agents: { system: 6, analog: 0, digital: 36, firmware: 10, software: 12, product: 6 },
+    agents: { system: 6, analog: 0, digital: 39, firmware: 10, software: 12, product: 6 },
   },
   {
     label: "Mixed-Signal IP Product",
     example: "Temp Monitor SoC",
-    agents: { system: 12, analog: 18, digital: 35, firmware: 10, software: 12, product: 8 },
+    agents: { system: 12, analog: 18, digital: 38, firmware: 10, software: 12, product: 8 },
   },
   {
     label: "Digital IP + Tapeout",
     example: "RTL to GDS/signoff",
-    agents: { system: 5, analog: 0, digital: 73, firmware: 0, software: 0, product: 7 },
+    agents: { system: 5, analog: 0, digital: 76, firmware: 0, software: 0, product: 7 },
   },
   {
     label: "Mixed-Signal Product + Tapeout",
     example: "SoC to demo + GDS",
-    agents: { system: 16, analog: 22, digital: 48, firmware: 12, software: 14, product: 8 },
+    agents: { system: 16, analog: 22, digital: 51, firmware: 12, software: 14, product: 8 },
   },
 ];
 
-const workflowAgentMax = 120;
+const workflowAgentMax = 130;
 const workflowAgentPlotHeight = 288;
+const workflowAgentTicks = [130, 100, 50, 0];
 
 const marketplaceFlow = [
   ["Agents", "Specialized AI and tool agents for chip tasks"],
@@ -347,19 +348,25 @@ function LandingPageContent() {
                 </span>
               </div>
               <div className="relative h-72 border-r border-slate-800 text-right text-xs text-slate-500">
-                <span className="absolute right-3 top-0 -translate-y-1/2">120</span>
-                <span className="absolute right-3 top-1/3 -translate-y-1/2">80</span>
-                <span className="absolute right-3 top-2/3 -translate-y-1/2">40</span>
-                <span className="absolute bottom-0 right-3 translate-y-1/2">0</span>
+                {workflowAgentTicks.map((tick) => (
+                  <span
+                    key={tick}
+                    className="absolute right-3 translate-y-1/2"
+                    style={{ bottom: `${(tick / workflowAgentMax) * 100}%` }}
+                  >
+                    {tick}
+                  </span>
+                ))}
               </div>
               <div>
                 <div className="relative h-72 border-b border-slate-700 px-1">
-                  <div className="pointer-events-none absolute inset-x-1 bottom-0 top-0 flex flex-col justify-between">
-                    <span className="border-t border-slate-800" />
-                    <span className="border-t border-slate-800" />
-                    <span className="border-t border-slate-800" />
-                    <span className="border-t border-slate-700" />
-                  </div>
+                  {workflowAgentTicks.map((tick) => (
+                    <span
+                      key={tick}
+                      className={`pointer-events-none absolute inset-x-1 border-t ${tick === 0 ? "border-slate-700" : "border-slate-800"}`}
+                      style={{ bottom: `${(tick / workflowAgentMax) * 100}%` }}
+                    />
+                  ))}
                   <div className="relative grid h-full grid-cols-4 items-end gap-3 sm:gap-5">
                     {workflowAgentChart.map((item) => {
                       const totalAgents = agentSegments.reduce((sum, segment) => sum + item.agents[segment.key as keyof typeof item.agents], 0);
