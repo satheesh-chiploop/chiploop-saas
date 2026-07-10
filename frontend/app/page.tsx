@@ -323,8 +323,8 @@ function LandingPageContent() {
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
           {paths.map(({ title, body, href, cta, icon: Icon, iconAccent, border, hover }) => (
             <article key={title} className={`rounded-xl border-2 ${border} bg-slate-900/70 p-5 text-center shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-900 hover:shadow-xl ${hover}`}>
-              <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-current/40 bg-slate-950/60 ${iconAccent}`}>
-                <Icon className="h-8 w-8" aria-hidden="true" />
+              <div className={`mx-auto flex h-12 w-12 items-center justify-center ${iconAccent}`}>
+                <Icon className="h-9 w-9" aria-hidden="true" />
               </div>
               <h3 className="mt-4 text-xl font-bold leading-tight text-white">{title}</h3>
               <p className="mt-3 min-h-12 text-sm leading-6 text-slate-300">{body}</p>
