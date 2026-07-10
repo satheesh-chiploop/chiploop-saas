@@ -293,7 +293,7 @@ function LandingPageContent() {
 
       <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6 sm:py-14">
         <div className={landingShellClass}>
-        <div>
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="mx-auto max-w-4xl text-center">
             <p className={eyebrowClass}>Choose Your Chip Design Loop</p>
             <h2 className={`${sectionTitleClass} mx-auto`}>
@@ -345,7 +345,7 @@ function LandingPageContent() {
 
       <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6 sm:py-14">
         <div className={landingShellClass}>
-        <div>
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="mx-auto max-w-4xl text-center">
             <p className={eyebrowClass}>Connected Chip Journey</p>
             <h2 className={`${sectionTitleClass} mx-auto`}>
@@ -377,7 +377,7 @@ function LandingPageContent() {
 
       <section className="w-full border-y border-slate-800 bg-slate-800/30 px-4 py-10 sm:px-6 sm:py-14">
         <div className={landingShellClass}>
-        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+        <div className="grid gap-8 rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
           <div>
             <p className={eyebrowClass}>Workflow Scale</p>
             <h2 className={sectionTitleClass}>
@@ -477,7 +477,7 @@ function LandingPageContent() {
 
       <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6 sm:py-14">
         <div className={landingShellClass}>
-        <div>
+        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="max-w-3xl">
             <p className={eyebrowClass}>Reusable Workflow Marketplace</p>
             <h2 className={sectionTitleClass}>
@@ -518,7 +518,7 @@ function LandingPageContent() {
         <div className="mt-8 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
           {executionSteps.map(({ title, body, icon: Icon }, index) => (
             <div key={title} className="contents">
-              <div className="p-4 text-center">
+              <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-6 text-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center text-amber-300">
                   <Icon className="h-9 w-9" aria-hidden="true" />
                 </div>
@@ -539,7 +539,7 @@ function LandingPageContent() {
 
       <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6 sm:py-14">
         <div className="mx-auto max-w-[1440px]">
-        <div>
+        <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 sm:p-8 md:p-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
               <p className={eyebrowClass}>Developer Automation</p>
