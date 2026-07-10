@@ -119,6 +119,8 @@ export default function Arch2RTLAppPage() {
   const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
   const [insertMbist, setInsertMbist] = useState(false);
   const [mbistAlgorithm, setMbistAlgorithm] = useState<"march-c" | "march-raw">("march-c");
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const arch2rtlReady = useMemo(() => {
@@ -339,6 +341,8 @@ export default function Arch2RTLAppPage() {
             insert_mbist: insertMbist,
             mbist_algorithm: mbistAlgorithm,
           },
+          hem_enabled: hemEnabled,
+          hem_mode: hemAdaptive ? "adaptive" : "fixed",
         }
       );
       setWorkflowId(out.workflow_id);
@@ -547,6 +551,46 @@ export default function Arch2RTLAppPage() {
                     </span>
                   </label>
                 ) : null}
+                <div className="rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-4">
+                  <div className="mb-3 rounded-lg border border-slate-800 bg-black/20 p-3 text-xs leading-5 text-slate-300">
+                    <span className="font-semibold text-cyan-200">What is HEM?</span>{" "}
+                    Hebbian Engineering Memory helps ChipLoop continue to the next proven engineering step after a successful run.
+                    In fixed mode, it follows built-in engineering policy. In adaptive mode, it also records outcomes for future learning.
+                  </div>
+                  <label className="flex items-start gap-2 text-sm text-slate-200">
+                    <input
+                      className="mt-1"
+                      type="checkbox"
+                      checked={hemEnabled}
+                      onChange={e => {
+                        setHemEnabled(e.target.checked);
+                        if (!e.target.checked) setHemAdaptive(false);
+                      }}
+                    />
+                    <span>
+                      Enable HEM Automatic Runs
+                      <span className="block text-xs leading-5 text-slate-400">
+                        If Arch2RTL passes, ChipLoop automatically starts the next Digital RTL check. For this MVP, the next stage is DQA.
+                      </span>
+                    </span>
+                  </label>
+                  {hemEnabled ? (
+                    <label className="mt-3 flex items-start gap-2 text-sm text-slate-300">
+                      <input
+                        className="mt-1"
+                        type="checkbox"
+                        checked={hemAdaptive}
+                        onChange={e => setHemAdaptive(e.target.checked)}
+                      />
+                      <span>
+                        Use Adaptive HEM
+                        <span className="block text-xs leading-5 text-slate-500">
+                          Starts from the fixed policy and records this run for future learning. Fixed HEM uses only the built-in policy.
+                        </span>
+                      </span>
+                    </label>
+                  ) : null}
+                </div>
               </div>
 
               <button
@@ -626,6 +670,14 @@ export default function Arch2RTLAppPage() {
                 <div className="mt-1">
                   status: <span className="text-slate-100">{arch2rtlReady ? "completed" : workflowRow?.status || "queued"}</span>
                 </div>
+                {hemEnabled ? (
+                  <div className="mt-3 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-3 text-sm text-cyan-100">
+                    <div className="font-semibold">HEM Automatic Runs enabled ({hemAdaptive ? "adaptive" : "fixed"} policy)</div>
+                    <div className="mt-1 text-slate-300">
+                      Next if Arch2RTL passes: DQA. The DQA run is created as a separate workflow with its own dashboard and artifacts.
+                    </div>
+                  </div>
+                ) : null}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button onClick={downloadZip} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                     {guidedOnboarding ? "Download ZIP and finish" : "Download ZIP (full=1)"}
