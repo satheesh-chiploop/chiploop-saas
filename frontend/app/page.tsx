@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaInfinity, FaMicrochip, FaStore, FaTh, FaUserEdit } from "react-icons/fa";
+import { FaCog, FaFileAlt, FaInfinity, FaMicrochip, FaPlay, FaStore, FaTh, FaUserEdit } from "react-icons/fa";
 import { createClientComponentClient } from "@/lib/platformClient";
 import TopNav from "@/components/TopNav";
 
@@ -172,6 +172,12 @@ const marketplaceFlow = [
   ["Apps", "Packaged workflows users can run or customize"],
   ["Products", "Connected journeys from requirement to handoff"],
   ["Marketplace", "Approved apps and products teams can reuse"],
+];
+
+const executionSteps = [
+  { title: "Define", body: "Specs, products, or workflows", icon: FaFileAlt },
+  { title: "Configure", body: "Stages, tools, agents, goals", icon: FaCog },
+  { title: "Run", body: "Logs, dashboards, artifacts", icon: FaPlay },
 ];
 
 const endToEndJourney = [
@@ -510,15 +516,11 @@ function LandingPageContent() {
           </p>
         </div>
         <div className="mt-8 grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
-          {[
-            ["01", "Define", "Specs, products, or workflows"],
-            ["02", "Configure", "Stages, tools, agents, goals"],
-            ["03", "Run", "Logs, dashboards, artifacts"],
-          ].map(([step, title, body], index) => (
+          {executionSteps.map(({ title, body, icon: Icon }, index) => (
             <div key={title} className="contents">
               <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-6 text-center">
-                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400 text-sm font-extrabold text-slate-950">
-                  {step}
+                <div className="mx-auto flex h-12 w-12 items-center justify-center text-amber-300">
+                  <Icon className="h-9 w-9" aria-hidden="true" />
                 </div>
                 <h3 className="mt-4 text-xl font-bold text-white">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{body}</p>
