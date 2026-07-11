@@ -13,27 +13,50 @@ export type HemChildRun = {
 export function parseHemChildRuns(logs: string | null | undefined): HemChildRun[] {
   if (!logs) return [];
   const runs: HemChildRun[] = [];
+  const byWorkflowId = new Map<string, HemChildRun>();
   const byLabel = new Map<string, HemChildRun>();
-  for (const line of logs.split("\n").map((entry) => entry.trimEnd())) {
-    const started = line.match(/HEM started (.+?) workflow ([0-9a-f-]{36})\. Dashboard: (\/dashboard\/\S+)/i);
-    if (started) {
+
+  const startedPattern = /HEM started (.+?) workflow ([0-9a-f-]{36})(?:\. Dashboard: (\/dashboard\/[^\s]+))?/gi;
+  for (const started of logs.matchAll(startedPattern)) {
+    const label = started[1].trim();
+    const workflowId = started[2];
+    const dashboardPath = started[3] || `/dashboard/${workflowId}?stage=${label.toLowerCase()}&app=HEM`;
+    if (byWorkflowId.has(workflowId)) continue;
+    const item = {
+      label,
+      workflowId,
+      dashboardPath,
+      status: "running",
+    };
+    byWorkflowId.set(workflowId, item);
+    byLabel.set(label.toLowerCase(), item);
+    runs.push(item);
+  }
+
+  const finishedPattern = /HEM (.+?) finished with status (\w+)/gi;
+  for (const finished of logs.matchAll(finishedPattern)) {
+    const item = byLabel.get(finished[1].trim().toLowerCase());
+    if (item) item.status = finished[2];
+  }
+
+  if (!runs.length) {
+    const fallbackPattern = /\/dashboard\/([0-9a-f-]{36})\?stage=([^&\s]+)&app=HEM/gi;
+    for (const match of logs.matchAll(fallbackPattern)) {
+      const workflowId = match[1];
+      if (byWorkflowId.has(workflowId)) continue;
+      const stage = match[2];
+      const label = stage === "verification" ? "Verification" : stage.charAt(0).toUpperCase() + stage.slice(1);
       const item = {
-        label: started[1],
-        workflowId: started[2],
-        dashboardPath: started[3],
+        label,
+        workflowId,
+        dashboardPath: match[0],
         status: "running",
       };
-      byLabel.set(item.label.toLowerCase(), item);
+      byWorkflowId.set(workflowId, item);
       runs.push(item);
-      continue;
-    }
-
-    const finished = line.match(/HEM (.+?) finished with status (\w+)/i);
-    if (finished) {
-      const item = byLabel.get(finished[1].toLowerCase());
-      if (item) item.status = finished[2];
     }
   }
+
   return runs;
 }
 
