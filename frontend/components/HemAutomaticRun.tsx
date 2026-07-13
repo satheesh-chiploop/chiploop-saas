@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { useRouter } from "next/navigation";
 
 export type HemChildRun = {
   label: string;
@@ -91,6 +90,7 @@ export function parseHemChildRuns(logs: string | null | undefined): HemChildRun[
   const runs: HemChildRun[] = [];
   const byWorkflowId = new Map<string, HemChildRun>();
   const byLabel = new Map<string, HemChildRun>();
+  const byStage = new Map<string, HemChildRun>();
 
   const startedPattern = /HEM started (.+?) workflow ([0-9a-f-]{36})(?:\. Dashboard: (\/dashboard\/[^\s]+))?/gi;
   for (const started of logs.matchAll(startedPattern)) {
@@ -106,13 +106,27 @@ export function parseHemChildRuns(logs: string | null | undefined): HemChildRun[
     };
     byWorkflowId.set(workflowId, item);
     byLabel.set(label.toLowerCase(), item);
+    byStage.set(stageFromLabel(label), item);
     runs.push(item);
   }
 
   const finishedPattern = /HEM (.+?) finished with status (\w+)/gi;
   for (const finished of logs.matchAll(finishedPattern)) {
-    const item = byLabel.get(finished[1].trim().toLowerCase());
+    const label = finished[1].trim();
+    const item = byLabel.get(label.toLowerCase()) || byStage.get(stageFromLabel(label));
     if (item) item.status = finished[2];
+  }
+
+  const completionPattern = /HEM Automatic Run \(.+?\) completed with respect to .+?: (.+?) completed\./gi;
+  for (const completed of logs.matchAll(completionPattern)) {
+    const completedLabels = completed[1]
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    for (const label of completedLabels) {
+      const item = byLabel.get(label.toLowerCase()) || byStage.get(stageFromLabel(label));
+      if (item) item.status = "completed";
+    }
   }
 
   const fallbackPattern = /\/dashboard\/([0-9a-f-]{36})\?stage=([^&\s]+)&app=HEM/gi;
@@ -129,6 +143,7 @@ export function parseHemChildRuns(logs: string | null | undefined): HemChildRun[
     };
     byWorkflowId.set(workflowId, item);
     byLabel.set(label.toLowerCase(), item);
+    byStage.set(stageFromLabel(label), item);
     runs.push(item);
   }
 
@@ -259,7 +274,6 @@ export function HemAutomaticRunControls({
 }
 
 export function HemChildDashboardLinks({ logs }: { logs: string | null | undefined }) {
-  const router = useRouter();
   const childRuns = useMemo(() => parseHemChildRuns(logs), [logs]);
 
   if (!childRuns.length) return null;
@@ -300,13 +314,14 @@ export function HemChildDashboardLinks({ logs }: { logs: string | null | undefin
                   {child.workflowId}
                 </td>
                 <td className="px-3 py-3 text-right">
-                  <button
-                    type="button"
-                    onClick={() => router.push(child.dashboardPath)}
+                  <a
+                    href={child.dashboardPath}
+                    target="_blank"
+                    rel="noreferrer"
                     className="rounded-lg bg-cyan-700 px-3 py-2 text-xs font-semibold text-white hover:bg-cyan-600"
                   >
                     Open Dashboard
-                  </button>
+                  </a>
                 </td>
               </tr>
             ))}
