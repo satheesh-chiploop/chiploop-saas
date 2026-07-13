@@ -100,7 +100,7 @@ const platformStats = [
 const subscriptionLoops = [
   {
     name: "Digital Design",
-    body: "Requirements, design intent, architecture-to-RTL, RTL quality, verification setup, and handoff.",
+    body: "Design intent, architecture-to-RTL, RTL quality, verification setup, and handoff.",
     border: "border-cyan-400/55",
     hover: "hover:border-cyan-300 hover:shadow-cyan-950/35",
   },
@@ -181,7 +181,7 @@ const executionSteps = [
 ];
 
 const endToEndJourney = [
-  "Requirements",
+  "Design Intent",
   "RTL",
   "Verification",
   "Firmware",
@@ -193,11 +193,11 @@ const endToEndJourney = [
 ];
 
 const eyebrowClass = "text-xs font-semibold uppercase text-cyan-300";
-const sectionTitleClass = "mt-3 max-w-4xl text-3xl font-extrabold leading-tight text-white sm:text-4xl";
+const sectionTitleClass = "mt-3 max-w-4xl text-2xl font-extrabold leading-tight text-white sm:text-3xl lg:text-4xl";
 const sectionBodyClass = "mt-4 max-w-3xl text-base leading-7 text-slate-300";
 const cardTitleClass = "text-lg font-bold leading-snug text-white";
 const cardBodyClass = "mt-3 text-sm leading-6 text-slate-400";
-const landingShellClass = "mx-auto max-w-[1680px]";
+const landingShellClass = "mx-auto w-full max-w-[1680px]";
 
 function LandingPageContent() {
   const router = useRouter();
@@ -251,11 +251,11 @@ function LandingPageContent() {
       <TopNav current="home" showMarketplace showSettings={false} className="fixed left-0 top-0 z-50 w-full" />
 
       <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.16),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_62%,#020617_100%)]">
-        <div className={`${landingShellClass} flex flex-col items-center px-4 pb-8 pt-28 text-center sm:px-6 sm:pb-10 lg:pt-24`}>
-          <h1 className="max-w-[1440px] text-5xl font-extrabold leading-[1.05] text-white sm:text-6xl lg:text-7xl">
+        <div className={`${landingShellClass} flex flex-col items-center px-4 pb-8 pt-24 text-center sm:px-6 sm:pb-10 sm:pt-28 lg:pt-28`}>
+          <h1 className="max-w-[1440px] text-4xl font-extrabold leading-[1.06] text-white min-[420px]:text-5xl sm:text-6xl lg:text-7xl">
             All-in-one agentic AI platform for chip design
           </h1>
-          <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300 sm:text-xl sm:leading-9">
+          <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-xl sm:leading-9">
             Help one engineer or a small team move from requirements to RTL, verification, firmware, software, co-simulation, tapeout, validation, and product demo in one connected platform.
           </p>
           <div className="mt-7 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
@@ -358,8 +358,8 @@ function LandingPageContent() {
               ChipLoop keeps each stage connected, so outputs, logs, dashboards, and decisions carry forward instead of living in disconnected tools.
             </p>
           </div>
-          <div className="mx-auto mt-8 w-full max-w-[1680px]">
-            <div className="grid grid-cols-[repeat(17,minmax(0,auto))] items-center justify-center gap-1.5 lg:gap-2">
+          <div className="mx-auto mt-8 w-full max-w-[1680px] overflow-x-auto pb-2">
+            <div className="grid min-w-[980px] grid-cols-[repeat(17,minmax(0,auto))] items-center justify-center gap-1.5 lg:gap-2">
             {endToEndJourney.map((stage, index) => (
               <div key={stage} className="contents">
                 <div className="flex h-12 w-[88px] items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 px-2 text-center text-[10px] font-semibold leading-4 text-slate-100 sm:w-24 md:w-28 md:text-xs lg:w-32">
@@ -398,8 +398,8 @@ function LandingPageContent() {
               ))}
             </div>
           </div>
-          <div className="min-w-0">
-            <div className="grid grid-cols-[24px_40px_1fr] gap-4">
+          <div className="min-w-0 overflow-x-auto pb-2">
+            <div className="grid min-w-[760px] grid-cols-[24px_40px_1fr] gap-4">
               <div className="flex h-72 items-center justify-center">
                 <span className="-rotate-90 whitespace-nowrap text-xs font-medium uppercase text-slate-500">
                   Number of agents orchestrated
@@ -609,7 +609,7 @@ function LandingPageContent() {
         <p className={`${sectionBodyClass} mx-auto`}>
           Begin with the guided Arch2RTL demo, then continue through Products, Apps, or Studio.
         </p>
-        <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+        <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row sm:flex-wrap">
           <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 hover:bg-cyan-300 sm:w-auto">
             Book Demo
           </button>

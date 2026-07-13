@@ -6,6 +6,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import {
+  HemAutomaticRunControls,
+  HemChildDashboardLinks,
+  SYSTEM_HEM_DEFAULT_STAGE_TOGGLES,
+  SYSTEM_HEM_GOAL_OPTIONS,
+  type SystemHemGoal,
+  systemHemStageOptions,
+} from "@/components/HemAutomaticRun";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import SpecTextBox from "@/components/SpecTextBox";
 import {
@@ -60,6 +68,10 @@ export default function SystemRTLAppPage() {
   const [socIntegrationSpecText, setSocIntegrationSpecText] = useState("");
   const [runSpec2RtlCheck, setRunSpec2RtlCheck] = useState(false);
   const [tempMonitorChain, setTempMonitorChain] = useState(false);
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
+  const [hemGoal, setHemGoal] = useState<SystemHemGoal>("product_demo");
+  const [hemStageToggles, setHemStageToggles] = useState({ ...SYSTEM_HEM_DEFAULT_STAGE_TOGGLES });
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const readyForSystemSim = useMemo(() => systemRtlReady(workflowRow), [workflowRow]);
@@ -206,6 +218,10 @@ export default function SystemRTLAppPage() {
           toggles: {
             run_spec2rtl_check: runSpec2RtlCheck,
           },
+          hem_enabled: hemEnabled,
+          hem_mode: hemAdaptive ? "adaptive" : "fixed",
+          hem_goal: hemGoal,
+          hem_stage_toggles: hemStageToggles,
         }
       );
       setWorkflowId(out.workflow_id);
@@ -328,6 +344,23 @@ export default function SystemRTLAppPage() {
                 </span>
               </label>
 
+              <HemAutomaticRunControls
+                enabled={hemEnabled}
+                adaptive={hemAdaptive}
+                onEnabledChange={(value) => {
+                  setHemEnabled(value);
+                  if (!value) setHemAdaptive(false);
+                }}
+                onAdaptiveChange={setHemAdaptive}
+                currentStageLabel="System RTL"
+                nextStageLabel="System DQA"
+                goal={hemGoal}
+                onGoalChange={(value) => setHemGoal(value as SystemHemGoal)}
+                goalOptions={SYSTEM_HEM_GOAL_OPTIONS}
+                stageOptions={systemHemStageOptions(hemGoal, hemStageToggles)}
+                onStageToggle={(key, value) => setHemStageToggles((current) => ({ ...current, [key]: value }))}
+              />
+
               {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
 
               {workflowId ? (
@@ -386,6 +419,7 @@ export default function SystemRTLAppPage() {
                       Open System Firmware
                     </button>
                   </div>
+                  <HemChildDashboardLinks logs={workflowRow?.logs} />
                 </div>
               ) : null}
             </div>

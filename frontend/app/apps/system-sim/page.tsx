@@ -6,6 +6,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import {
+  HemAutomaticRunControls,
+  HemChildDashboardLinks,
+  SYSTEM_HEM_DEFAULT_STAGE_TOGGLES,
+  SYSTEM_HEM_GOAL_OPTIONS,
+  type SystemHemGoal,
+  systemHemStageOptions,
+} from "@/components/HemAutomaticRun";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import SpecTextBox from "@/components/SpecTextBox";
 import {
@@ -87,6 +95,10 @@ export default function SystemSimAppPage() {
   const [systemSimSeeds, setSystemSimSeeds] = useState("");
   const [systemSimNumIters, setSystemSimNumIters] = useState(25);
   const [tempMonitorChain, setTempMonitorChain] = useState(false);
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
+  const [hemGoal, setHemGoal] = useState<SystemHemGoal>("product_demo");
+  const [hemStageToggles, setHemStageToggles] = useState({ ...SYSTEM_HEM_DEFAULT_STAGE_TOGGLES });
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const readyForFirmware = useMemo(() => systemSimReady(workflowRow), [workflowRow]);
@@ -363,6 +375,10 @@ export default function SystemSimAppPage() {
             enable_formal: formalTool !== "none",
             enable_golden_model: goldenModelTool !== "none",
           },
+          hem_enabled: hemEnabled,
+          hem_mode: hemAdaptive ? "adaptive" : "fixed",
+          hem_goal: hemGoal,
+          hem_stage_toggles: hemStageToggles,
         }
       );
       setWorkflowId(out.workflow_id);
@@ -726,6 +742,23 @@ export default function SystemSimAppPage() {
                 ) : null}
               </div>
 
+              <HemAutomaticRunControls
+                enabled={hemEnabled}
+                adaptive={hemAdaptive}
+                onEnabledChange={(value) => {
+                  setHemEnabled(value);
+                  if (!value) setHemAdaptive(false);
+                }}
+                onAdaptiveChange={setHemAdaptive}
+                currentStageLabel="System Sim"
+                nextStageLabel="Firmware"
+                goal={hemGoal}
+                onGoalChange={(value) => setHemGoal(value as SystemHemGoal)}
+                goalOptions={SYSTEM_HEM_GOAL_OPTIONS.filter((option) => option.value === "product_demo")}
+                stageOptions={systemHemStageOptions(hemGoal, hemStageToggles)}
+                onStageToggle={(key, value) => setHemStageToggles((current) => ({ ...current, [key]: value }))}
+              />
+
               <button
                 onClick={runNow}
                 disabled={!canRun}
@@ -928,6 +961,7 @@ export default function SystemSimAppPage() {
               <div className="mt-4">
                 <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" logs={workflowRow?.logs} />
               </div>
+              <HemChildDashboardLinks logs={workflowRow?.logs} />
               {closureWorkflowId ? (
                 <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/15 p-3">
                   <div className="font-semibold text-cyan-200">System Sim Closure Analysis</div>

@@ -7,6 +7,14 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import SpecTextBox from "@/components/SpecTextBox";
 import TextFileUpload from "@/components/TextFileUpload";
+import {
+  HemAutomaticRunControls,
+  HemChildDashboardLinks,
+  SYSTEM_HEM_DEFAULT_STAGE_TOGGLES,
+  SYSTEM_HEM_GOAL_OPTIONS,
+  type SystemHemGoal,
+  systemHemStageOptions,
+} from "@/components/HemAutomaticRun";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import { DESIGN_CHAIN_CONTEXT_KEY, type DesignChainContext } from "@/lib/pwmFullStackDemo";
@@ -91,6 +99,10 @@ export default function SystemPDAppPage() {
   const [analogSpiceText, setAnalogSpiceText] = useState("");
   const [spiceUploadMode, setSpiceUploadMode] = useState<"append" | "replace">("replace");
   const [nextFlow, setNextFlow] = useState<"system-firmware">("system-firmware");
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
+  const [hemGoal, setHemGoal] = useState<SystemHemGoal>("implementation");
+  const [hemStageToggles, setHemStageToggles] = useState({ ...SYSTEM_HEM_DEFAULT_STAGE_TOGGLES });
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -337,6 +349,10 @@ export default function SystemPDAppPage() {
             stop_on_synthesis_closure_failure: stopOnSynthesisClosureFailure,
             stop_on_synthesis_lec_failure: stopOnSynthesisLecFailure,
           },
+          hem_enabled: hemEnabled,
+          hem_mode: hemAdaptive ? "adaptive" : "fixed",
+          hem_goal: hemGoal,
+          hem_stage_toggles: hemStageToggles,
         }
       );
       setWorkflowId(out.workflow_id);
@@ -639,6 +655,23 @@ export default function SystemPDAppPage() {
                 ) : null}
               </div>
 
+              <HemAutomaticRunControls
+                enabled={hemEnabled}
+                adaptive={hemAdaptive}
+                onEnabledChange={(value) => {
+                  setHemEnabled(value);
+                  if (!value) setHemAdaptive(false);
+                }}
+                onAdaptiveChange={setHemAdaptive}
+                currentStageLabel="System PD"
+                nextStageLabel={null}
+                goal={hemGoal}
+                onGoalChange={(value) => setHemGoal(value as SystemHemGoal)}
+                goalOptions={SYSTEM_HEM_GOAL_OPTIONS.filter((option) => option.value === "implementation")}
+                stageOptions={systemHemStageOptions(hemGoal, hemStageToggles)}
+                onStageToggle={(key, value) => setHemStageToggles((current) => ({ ...current, [key]: value }))}
+              />
+
               <button
                 onClick={runNow}
                 disabled={!canRun}
@@ -687,6 +720,7 @@ export default function SystemPDAppPage() {
                   Source System RTL: <span className="break-all text-slate-200">{systemRtlWorkflowId.trim() || workflowId}</span>
                 </div>
               </div>
+              <HemChildDashboardLinks logs={workflowRow?.logs} />
               <div className="mt-4 w-full">
                 <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
               </div>

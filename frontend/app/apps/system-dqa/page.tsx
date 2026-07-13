@@ -6,6 +6,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
+import {
+  HemAutomaticRunControls,
+  HemChildDashboardLinks,
+  SYSTEM_HEM_DEFAULT_STAGE_TOGGLES,
+  SYSTEM_HEM_GOAL_OPTIONS,
+  type SystemHemGoal,
+  systemHemStageOptions,
+} from "@/components/HemAutomaticRun";
 import SpecTextBox from "@/components/SpecTextBox";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import { DESIGN_CHAIN_CONTEXT_KEY, type DesignChainContext } from "@/lib/pwmFullStackDemo";
@@ -48,6 +56,10 @@ export default function SystemDQAAppPage() {
   const [runReset, setRunReset] = useState(true);
   const [runSynthesisReadiness, setRunSynthesisReadiness] = useState(true);
   const [nextFlow, setNextFlow] = useState<"system-synthesis" | "system-pd" | "system-firmware">("system-synthesis");
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
+  const [hemGoal, setHemGoal] = useState<SystemHemGoal>("product_demo");
+  const [hemStageToggles, setHemStageToggles] = useState({ ...SYSTEM_HEM_DEFAULT_STAGE_TOGGLES });
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -153,6 +165,10 @@ export default function SystemDQAAppPage() {
           run_reset: runReset,
           run_synthesis_readiness: runSynthesisReadiness,
         },
+        hem_enabled: hemEnabled,
+        hem_mode: hemAdaptive ? "adaptive" : "fixed",
+        hem_goal: hemGoal,
+        hem_stage_toggles: hemStageToggles,
       });
       setWorkflowId(out.workflow_id);
       setRunId(out.run_id);
@@ -237,6 +253,23 @@ export default function SystemDQAAppPage() {
                 ))}
               </div>
 
+              <HemAutomaticRunControls
+                enabled={hemEnabled}
+                adaptive={hemAdaptive}
+                onEnabledChange={(value) => {
+                  setHemEnabled(value);
+                  if (!value) setHemAdaptive(false);
+                }}
+                onAdaptiveChange={setHemAdaptive}
+                currentStageLabel="System DQA"
+                nextStageLabel={hemGoal === "implementation" ? "System Synthesis" : "System Sim"}
+                goal={hemGoal}
+                onGoalChange={(value) => setHemGoal(value as SystemHemGoal)}
+                goalOptions={SYSTEM_HEM_GOAL_OPTIONS}
+                stageOptions={systemHemStageOptions(hemGoal, hemStageToggles)}
+                onStageToggle={(key, value) => setHemStageToggles((current) => ({ ...current, [key]: value }))}
+              />
+
               <button onClick={runNow} disabled={!canRun} className={`mt-2 w-full rounded-xl px-5 py-3 font-semibold transition ${canRun ? "bg-amber-600 hover:bg-amber-500" : "cursor-not-allowed bg-slate-700"}`}>
                 {running ? "Starting..." : "Run System DQA"}
               </button>
@@ -273,6 +306,7 @@ export default function SystemDQAAppPage() {
                     Source System RTL: <span className="break-all text-slate-200">{systemRtlWorkflowId.trim() || workflowId}</span>
                   </div>
                 </div>
+                <HemChildDashboardLinks logs={workflowRow?.logs} />
               </div>
               <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="dqa" logs={workflowRow?.logs} />
               <AskThisRunPanel workflowId={workflowId} compact />
