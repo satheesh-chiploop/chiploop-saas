@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createClientComponentClient } from "@/lib/platformClient";
 
 export type HemChildRun = {
   label: string;
@@ -275,6 +276,48 @@ export function HemAutomaticRunControls({
 
 export function HemChildDashboardLinks({ logs }: { logs: string | null | undefined }) {
   const childRuns = useMemo(() => parseHemChildRuns(logs), [logs]);
+  const workflowIds = useMemo(() => childRuns.map((child) => child.workflowId), [childRuns]);
+  const workflowIdKey = workflowIds.join(",");
+  const [workflowStatuses, setWorkflowStatuses] = useState<Record<string, string>>({});
+  const supabase = useMemo(() => createClientComponentClient(), []);
+
+  useEffect(() => {
+    const ids = workflowIdKey.split(",").filter(Boolean);
+    if (!ids.length) {
+      setWorkflowStatuses({});
+      return;
+    }
+
+    let active = true;
+    let interval: ReturnType<typeof window.setInterval> | null = null;
+    const fetchStatuses = async () => {
+      const { data, error } = await supabase
+        .from("workflows")
+        .select("id,status")
+        .in("id", ids);
+      if (!active || error || !data) return;
+      const nextStatuses: Record<string, string> = {};
+      for (const row of data as Array<{ id: string; status?: string | null }>) {
+        if (row.id && row.status) nextStatuses[row.id] = row.status;
+      }
+      setWorkflowStatuses(nextStatuses);
+      const currentStatuses = ids.map((id) => nextStatuses[id]).filter(Boolean);
+      const allTerminal =
+        currentStatuses.length === ids.length &&
+        currentStatuses.every((status) => ["completed", "failed", "cancelled", "stopped"].includes(status.toLowerCase()));
+      if (allTerminal && interval) window.clearInterval(interval);
+    };
+
+    void fetchStatuses();
+    interval = window.setInterval(() => {
+      void fetchStatuses();
+    }, 2500);
+
+    return () => {
+      active = false;
+      if (interval) window.clearInterval(interval);
+    };
+  }, [supabase, workflowIdKey]);
 
   if (!childRuns.length) return null;
 
@@ -307,7 +350,7 @@ export function HemChildDashboardLinks({ logs }: { logs: string | null | undefin
                 <td className="px-3 py-3 font-semibold text-slate-100">{child.label}</td>
                 <td className="px-3 py-3">
                   <span className="rounded-full border border-slate-700 bg-black/30 px-2 py-1 text-slate-300">
-                    {child.status || "running"}
+                    {workflowStatuses[child.workflowId] || child.status || "running"}
                   </span>
                 </td>
                 <td className="max-w-[340px] break-all px-3 py-3 font-mono text-[11px] text-slate-400">
