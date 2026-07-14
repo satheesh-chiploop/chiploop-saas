@@ -6,7 +6,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
-import { HemAutomaticRunControls, HemChildDashboardLinks } from "@/components/HemAutomaticRun";
+import {
+  DIGITAL_HEM_DEFAULT_STAGE_TOGGLES,
+  HemAutomaticRunControls,
+  HemChildDashboardLinks,
+  digitalHemNextStageLabel,
+  digitalHemStageOptions,
+} from "@/components/HemAutomaticRun";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 
@@ -57,6 +63,7 @@ export default function DQAAppPage() {
   const [enableAutofix, setEnableAutofix] = useState(false);
   const [hemEnabled, setHemEnabled] = useState(false);
   const [hemAdaptive, setHemAdaptive] = useState(false);
+  const [hemStageToggles, setHemStageToggles] = useState({ ...DIGITAL_HEM_DEFAULT_STAGE_TOGGLES });
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const logsRef = useRef<HTMLDivElement | null>(null);
@@ -198,6 +205,7 @@ export default function DQAAppPage() {
           target,
           hem_enabled: hemEnabled && !hemRequiresSource,
           hem_mode: hemAdaptive ? "adaptive" : "fixed",
+          hem_stage_toggles: hemStageToggles,
 
           toggles: { enable_autofix: enableAutofix },
         }
@@ -341,7 +349,9 @@ export default function DQAAppPage() {
                 }}
                 onAdaptiveChange={setHemAdaptive}
                 currentStageLabel="DQA"
-                nextStageLabel="Verification"
+                nextStageLabel={digitalHemNextStageLabel("dqa", hemStageToggles)}
+                stageOptions={digitalHemStageOptions("dqa", hemStageToggles)}
+                onStageToggle={(key, value) => setHemStageToggles((current) => ({ ...current, [key]: value }))}
                 disabled={hemRequiresSource}
                 disabledReason="Select 'Use Arch2RTL output' and enter the source workflow_id before enabling HEM from DQA."
               />

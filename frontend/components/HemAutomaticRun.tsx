@@ -13,6 +13,39 @@ export type HemChildRun = {
 export type SystemHemGoal = "product_demo" | "implementation";
 
 export type SystemHemStageToggleMap = Record<string, boolean>;
+export type DigitalHemStageToggleMap = Record<string, boolean>;
+
+export const DIGITAL_HEM_DEFAULT_STAGE_TOGGLES: DigitalHemStageToggleMap = {
+  dqa: true,
+  verify: true,
+  synthesis: true,
+  tapeout: true,
+};
+
+export function digitalHemStageOptions(currentStage: "arch2rtl" | "dqa" | "verify" | "arch2synthesis" | "arch2tapeout", toggles: DigitalHemStageToggleMap) {
+  const stageOrder = [
+    ["dqa", "DQA"],
+    ["verify", "Verification"],
+    ["synthesis", "Synthesis"],
+    ["tapeout", "Tapeout"],
+  ];
+  const startIndex = {
+    arch2rtl: -1,
+    dqa: 0,
+    verify: 1,
+    arch2synthesis: 2,
+    arch2tapeout: 3,
+  }[currentStage];
+  return stageOrder.slice(startIndex + 1).map(([key, label]) => ({
+    key,
+    label,
+    enabled: toggles[key] ?? true,
+  }));
+}
+
+export function digitalHemNextStageLabel(currentStage: "arch2rtl" | "dqa" | "verify" | "arch2synthesis" | "arch2tapeout", toggles: DigitalHemStageToggleMap) {
+  return digitalHemStageOptions(currentStage, toggles).find((stage) => stage.enabled)?.label || null;
+}
 
 export const SYSTEM_HEM_GOAL_OPTIONS = [
   {

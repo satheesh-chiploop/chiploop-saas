@@ -6,7 +6,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
-import { HemAutomaticRunControls, HemChildDashboardLinks } from "@/components/HemAutomaticRun";
+import {
+  DIGITAL_HEM_DEFAULT_STAGE_TOGGLES,
+  HemAutomaticRunControls,
+  HemChildDashboardLinks,
+  digitalHemNextStageLabel,
+  digitalHemStageOptions,
+} from "@/components/HemAutomaticRun";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 import SpecTextBox from "@/components/SpecTextBox";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
@@ -104,6 +110,7 @@ export default function Arch2TapeoutAppPage() {
   const [stopOnSynthesisLecFailure, setStopOnSynthesisLecFailure] = useState(false);
   const [hemEnabled, setHemEnabled] = useState(false);
   const [hemAdaptive, setHemAdaptive] = useState(false);
+  const [hemStageToggles, setHemStageToggles] = useState({ ...DIGITAL_HEM_DEFAULT_STAGE_TOGGLES });
 
   // --- Stage control ---
   const [startStage, setStartStage] = useState<"arch2rtl" | "synth" | "floorplan">("arch2rtl");
@@ -328,6 +335,7 @@ export default function Arch2TapeoutAppPage() {
         clock_constraints: clockConstraintsPayload(),
         hem_enabled: hemEnabled && !hemRequiresSource,
         hem_mode: hemAdaptive ? "adaptive" : "fixed",
+        hem_stage_toggles: hemStageToggles,
 
         // tapeout knobs
         effort,
@@ -732,7 +740,9 @@ export default function Arch2TapeoutAppPage() {
                 }}
                 onAdaptiveChange={setHemAdaptive}
                 currentStageLabel="Tapeout"
-                nextStageLabel={null}
+                nextStageLabel={digitalHemNextStageLabel("arch2tapeout", hemStageToggles)}
+                stageOptions={digitalHemStageOptions("arch2tapeout", hemStageToggles)}
+                onStageToggle={(key, value) => setHemStageToggles((current) => ({ ...current, [key]: value }))}
                 disabled={hemRequiresSource}
               />
             </div>

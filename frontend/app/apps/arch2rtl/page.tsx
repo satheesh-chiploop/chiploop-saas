@@ -6,7 +6,13 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import { apiPost } from "@/lib/apiClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import GitHubImportPanel from "@/components/GitHubImportPanel";
-import { HemAutomaticRunControls, HemChildDashboardLinks } from "@/components/HemAutomaticRun";
+import {
+  DIGITAL_HEM_DEFAULT_STAGE_TOGGLES,
+  HemAutomaticRunControls,
+  HemChildDashboardLinks,
+  digitalHemNextStageLabel,
+  digitalHemStageOptions,
+} from "@/components/HemAutomaticRun";
 import NextWorkflowLauncher from "@/components/NextWorkflowLauncher";
 import SpecTextBox from "@/components/SpecTextBox";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
@@ -122,6 +128,7 @@ export default function Arch2RTLAppPage() {
   const [mbistAlgorithm, setMbistAlgorithm] = useState<"march-c" | "march-raw">("march-c");
   const [hemEnabled, setHemEnabled] = useState(false);
   const [hemAdaptive, setHemAdaptive] = useState(false);
+  const [hemStageToggles, setHemStageToggles] = useState({ ...DIGITAL_HEM_DEFAULT_STAGE_TOGGLES });
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
   const arch2rtlReady = useMemo(() => {
@@ -344,6 +351,7 @@ export default function Arch2RTLAppPage() {
           },
           hem_enabled: hemEnabled,
           hem_mode: hemAdaptive ? "adaptive" : "fixed",
+          hem_stage_toggles: hemStageToggles,
         }
       );
       setWorkflowId(out.workflow_id);
@@ -561,7 +569,9 @@ export default function Arch2RTLAppPage() {
                   }}
                   onAdaptiveChange={setHemAdaptive}
                   currentStageLabel="Arch2RTL"
-                  nextStageLabel="DQA"
+                  nextStageLabel={digitalHemNextStageLabel("arch2rtl", hemStageToggles)}
+                  stageOptions={digitalHemStageOptions("arch2rtl", hemStageToggles)}
+                  onStageToggle={(key, value) => setHemStageToggles((current) => ({ ...current, [key]: value }))}
                 />
               </div>
 

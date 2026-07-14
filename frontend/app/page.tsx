@@ -253,7 +253,7 @@ function LandingPageContent() {
       <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.16),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_62%,#020617_100%)]">
         <div className={`${landingShellClass} flex flex-col items-center px-4 pb-8 pt-24 text-center sm:px-6 sm:pb-10 sm:pt-28 lg:pt-28`}>
           <h1 className="max-w-[1440px] text-4xl font-extrabold leading-[1.06] text-white min-[420px]:text-5xl sm:text-6xl lg:text-7xl">
-            All-in-one agentic AI platform for chip design
+            All-in-one agentic AI platform for Silicon Development
           </h1>
           <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-xl sm:leading-9">
             Help one engineer or a small team move from requirements to RTL, verification, firmware, software, co-simulation, tapeout, validation, and product demo in one connected platform.
