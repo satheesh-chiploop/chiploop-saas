@@ -39,6 +39,16 @@ export default function EventsPage() {
             <div className="mt-4 space-y-4">
               <button
                 type="button"
+                onClick={() => router.push("/events/blogs/hebbian-engineering-memory")}
+                className="block w-full rounded-lg border border-slate-800 bg-slate-950/55 p-4 text-left hover:border-cyan-400"
+              >
+                <div className="text-sm font-bold text-white">HEM: Automatic Engineering Memory for Connected Silicon Workflows</div>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  How Hebbian Engineering Memory helps ChipLoop continue successful runs into selected downstream workflows while preserving evidence and dashboards.
+                </p>
+              </button>
+              <button
+                type="button"
                 onClick={() => router.push("/events/blogs/workflow-layer-ai-native-chip-design")}
                 className="block w-full rounded-lg border border-slate-800 bg-slate-950/55 p-4 text-left hover:border-cyan-400"
               >
