@@ -6,7 +6,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import type { User } from "@supabase/supabase-js";
 import { PlanCreditBadge } from "@/components/PlanCreditStatus";
 
-type NavKey = "home" | "loops" | "apps" | "products" | "studio" | "marketplace" | "pricing" | "events" | "help" | "settings" | "admin" | "webinar" | "workshop" | "demo" | "contact";
+type NavKey = "home" | "loops" | "apps" | "products" | "studio" | "marketplace" | "blogs" | "pricing" | "events" | "help" | "settings" | "admin" | "webinar" | "workshop" | "demo" | "contact";
 
 type TopNavProps = {
   current?: NavKey;
@@ -20,8 +20,8 @@ type TopNavProps = {
   className?: string;
 };
 
-const navButtonClass = "whitespace-nowrap text-[15px] font-medium text-slate-300 transition hover:text-cyan-300";
-const activeNavButtonClass = "whitespace-nowrap text-[15px] font-semibold text-cyan-200 transition hover:text-cyan-100";
+const navButtonClass = "whitespace-nowrap text-base font-semibold text-slate-300 transition hover:text-cyan-300";
+const activeNavButtonClass = "whitespace-nowrap text-base font-bold text-cyan-200 transition hover:text-cyan-100";
 
 
 function AnimatedTesseractLogo() {
@@ -139,6 +139,7 @@ export default function TopNav({
     { key: "products", label: "Products", href: "/products", show: true },
     { key: "studio", label: "Studio", href: "/workflow", show: true },
     { key: "marketplace", label: "Marketplace", href: "/marketplace", show: showMarketplace },
+    { key: "blogs", label: "Blogs", href: "/blogs", show: true },
     { key: "pricing", label: "Pricing", href: "/pricing", show: true },
     { key: "demo", label: "Book Demo", href: "/book-demo", show: true },
     { key: "events", label: "Events", href: "/events", show: showWebinar || showWorkshop },
@@ -153,7 +154,7 @@ export default function TopNav({
 
   return (
     <nav className={`${className} border-b border-slate-800 bg-slate-950/90 backdrop-blur`}>
-      <div className={`mx-auto flex min-w-0 ${maxWidthClass} items-center justify-between gap-3 px-3 py-3 sm:px-6 sm:py-4 xl:px-8`}>
+      <div className={`mx-auto flex min-w-0 ${maxWidthClass} items-center justify-between gap-4 px-3 py-3 sm:px-6 sm:py-4 xl:px-8`}>
         <button
           onClick={() => router.push("/")}
           className="group flex shrink-0 items-center gap-2 text-xl font-extrabold text-cyan-300 sm:gap-3 sm:text-2xl"
@@ -163,7 +164,7 @@ export default function TopNav({
           <span className="hidden min-[380px]:inline">ChipLoop</span>
         </button>
 
-        <div className="flex min-w-0 flex-1 items-center justify-start gap-3 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4 sm:pb-0 xl:gap-5">
+        <div className="flex min-w-0 flex-1 items-center justify-start gap-4 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-5 sm:pb-0 xl:gap-7">
           {showPlanBadge ? <PlanCreditBadge /> : null}
           {links.filter((link) => link.show).map((link) => (
             <button
@@ -171,7 +172,7 @@ export default function TopNav({
               onClick={() => router.push(link.href)}
               className={
                 link.key === "demo"
-                  ? "whitespace-nowrap rounded-lg bg-cyan-400 px-3 py-2 text-[15px] font-bold text-slate-950 transition hover:bg-cyan-300 sm:px-4"
+                  ? "whitespace-nowrap rounded-lg bg-cyan-400 px-4 py-2.5 text-base font-bold text-slate-950 transition hover:bg-cyan-300 sm:px-5"
                   : current === link.key
                   ? activeNavButtonClass
                   : navButtonClass
@@ -187,14 +188,14 @@ export default function TopNav({
                 setDisplayName(null);
                 router.push("/login");
               }}
-              className="whitespace-nowrap rounded-lg border border-slate-700 px-3 py-2 text-[15px] font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-cyan-200 sm:px-4"
+              className="whitespace-nowrap rounded-lg border border-slate-700 px-4 py-2.5 text-base font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-cyan-200 sm:px-5"
             >
               <span className="mr-2 text-cyan-200">Hi, {displayName}</span>Logout
             </button>
           ) : (
             <button
               onClick={() => router.push(`/login?next=${encodeURIComponent(next)}`)}
-              className="whitespace-nowrap text-[15px] font-medium text-slate-300 transition hover:text-cyan-300"
+              className="whitespace-nowrap text-base font-semibold text-slate-300 transition hover:text-cyan-300"
             >
               Login
             </button>

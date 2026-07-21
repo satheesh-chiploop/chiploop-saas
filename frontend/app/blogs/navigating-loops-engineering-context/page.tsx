@@ -8,7 +8,7 @@ export default function NavigatingLoopsEngineeringContextPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <TopNav current="events" showMarketplace showSettings={false} />
+      <TopNav current="blogs" showMarketplace showSettings={false} />
       <article className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
         <button
           type="button"

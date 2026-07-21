@@ -66,7 +66,7 @@ export default function BlogsPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <TopNav current="home" showMarketplace showSettings={false} />
+      <TopNav current="blogs" showMarketplace showSettings={false} />
       <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.14),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_58%,#020617_100%)] px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-[1440px]">
           <div className="max-w-4xl">

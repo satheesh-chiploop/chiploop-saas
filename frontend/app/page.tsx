@@ -188,7 +188,7 @@ const selfRegulatedFeatures = [
   },
   {
     title: "Smart Context",
-    body: "Ask This Run and Ask This Project prioritize relevant logs, reports, and files before calling the model.",
+    body: "ChipLoop's token-aware context layer ranks relevant logs, reports, artifacts, and files before calling the model.",
     icon: FaCompressAlt,
   },
   {
@@ -405,7 +405,7 @@ function LandingPageContent() {
                 ChipLoop can continue the journey and keep AI context focused.
               </h2>
               <p className={`${sectionBodyClass} mx-auto`}>
-                HEM Automatic Runs moves from one passed stage to the next selected stage. Smart Context reduces unnecessary tokens by selecting the evidence that matters before the model answers.
+                HEM Automatic Runs moves from one passed stage to the next selected stage. Smart Context, ChipLoop&apos;s tokenmaxxing layer, reduces unnecessary tokens by selecting the evidence that matters before the model answers.
               </p>
             </div>
             <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
