@@ -19,6 +19,13 @@ const articles = [
     accent: "from-emerald-300 to-violet-300",
   },
   {
+    slug: "product-journey-define-configure-run",
+    title: "Product Journeys: Define, Configure, and Run Changes the Chip Design Landscape",
+    summary: "How product journeys turn scattered engineering steps into repeatable chip development paths with saved stages, real inputs, dashboards, and review context.",
+    tag: "Product Journey",
+    accent: "from-amber-300 to-cyan-300",
+  },
+  {
     slug: "smart-context-tokenmaxxing",
     title: "Smart Context: Tokenmaxxing for Practical Silicon Workflows",
     summary: "How ChipLoop reduces unnecessary context, shows token estimates, and keeps Ask This Run and Ask this Project grounded in useful evidence.",
