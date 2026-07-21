@@ -101,31 +101,27 @@ video {
   position: relative;
   overflow: hidden;
   border-color: rgba(148, 163, 184, 0.2);
+  border-left-width: 4px;
+  border-left-color: rgba(34, 211, 238, 0.5);
   background:
     linear-gradient(135deg, rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.76)),
     radial-gradient(circle at 100% 0%, rgba(34, 211, 238, 0.12), transparent 30%);
   box-shadow: 0 20px 60px rgba(2, 6, 23, 0.34);
 }
 
-.blog-route article section::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: linear-gradient(180deg, #22d3ee, #fbbf24, #a78bfa);
-  opacity: 0.72;
-}
-
 .blog-route article section:nth-of-type(3n + 1) {
   border-color: rgba(34, 211, 238, 0.28);
+  border-left-color: rgba(34, 211, 238, 0.68);
 }
 
 .blog-route article section:nth-of-type(3n + 2) {
   border-color: rgba(251, 191, 36, 0.24);
+  border-left-color: rgba(251, 191, 36, 0.62);
 }
 
 .blog-route article section:nth-of-type(3n) {
   border-color: rgba(167, 139, 250, 0.24);
+  border-left-color: rgba(167, 139, 250, 0.62);
 }
 
 .blog-route article h2 {
