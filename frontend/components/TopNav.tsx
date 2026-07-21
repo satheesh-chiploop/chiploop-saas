@@ -21,8 +21,8 @@ type TopNavProps = {
 };
 
 const handwrittenNavFont = "font-['Segoe_Print','Bradley_Hand','Comic_Sans_MS',cursive]";
-const navButtonClass = `whitespace-nowrap ${handwrittenNavFont} text-[1.22rem] font-black text-cyan-300 transition hover:text-cyan-100`;
-const activeNavButtonClass = `whitespace-nowrap ${handwrittenNavFont} text-[1.22rem] font-black text-cyan-300 transition hover:text-cyan-100`;
+const navButtonClass = `whitespace-nowrap ${handwrittenNavFont} text-[1.34rem] font-black text-cyan-300 transition hover:text-cyan-100`;
+const activeNavButtonClass = `whitespace-nowrap ${handwrittenNavFont} text-[1.34rem] font-black text-cyan-300 transition hover:text-cyan-100`;
 
 
 function AnimatedTesseractLogo() {
@@ -165,7 +165,7 @@ export default function TopNav({
           <span className={`hidden ${handwrittenNavFont} leading-none min-[380px]:inline`}>ChipLoop</span>
         </button>
 
-        <div className="flex min-w-0 flex-1 items-center justify-start gap-7 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-10 sm:pb-0 xl:gap-12 2xl:gap-14">
+        <div className="flex min-w-0 flex-1 items-center justify-start gap-8 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-12 sm:pb-0 xl:gap-14 2xl:gap-16">
           {showPlanBadge ? <PlanCreditBadge /> : null}
           {links.filter((link) => link.show).map((link) => (
             <button
@@ -173,7 +173,7 @@ export default function TopNav({
               onClick={() => router.push(link.href)}
               className={
                 link.key === "demo"
-                  ? `whitespace-nowrap rounded-lg bg-cyan-400 px-5 py-2.5 ${handwrittenNavFont} text-[1.22rem] font-black text-slate-950 transition hover:bg-cyan-300 sm:px-6`
+                  ? `whitespace-nowrap rounded-lg bg-cyan-400 px-5 py-2.5 ${handwrittenNavFont} text-[1.34rem] font-black text-slate-950 transition hover:bg-cyan-300 sm:px-6`
                   : current === link.key
                   ? activeNavButtonClass
                   : navButtonClass
@@ -189,14 +189,14 @@ export default function TopNav({
                 setDisplayName(null);
                 router.push("/login");
               }}
-              className={`whitespace-nowrap rounded-lg border border-cyan-400/30 px-5 py-2.5 ${handwrittenNavFont} text-[1.22rem] font-black text-cyan-300 transition hover:bg-slate-900 hover:text-cyan-100 sm:px-6`}
+              className={`whitespace-nowrap rounded-lg border border-cyan-400/30 px-5 py-2.5 ${handwrittenNavFont} text-[1.34rem] font-black text-cyan-300 transition hover:bg-slate-900 hover:text-cyan-100 sm:px-6`}
             >
               <span className="mr-2 text-cyan-200">Hi, {displayName}</span>Logout
             </button>
           ) : (
             <button
               onClick={() => router.push(`/login?next=${encodeURIComponent(next)}`)}
-              className={`whitespace-nowrap ${handwrittenNavFont} text-[1.22rem] font-black text-cyan-300 transition hover:text-cyan-100`}
+              className={`whitespace-nowrap ${handwrittenNavFont} text-[1.34rem] font-black text-cyan-300 transition hover:text-cyan-100`}
             >
               Login
             </button>
