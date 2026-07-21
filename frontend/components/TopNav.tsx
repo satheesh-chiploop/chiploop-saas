@@ -20,8 +20,8 @@ type TopNavProps = {
   className?: string;
 };
 
-const navButtonClass = "whitespace-nowrap text-base font-semibold text-slate-300 transition hover:text-cyan-300";
-const activeNavButtonClass = "whitespace-nowrap text-base font-bold text-cyan-200 transition hover:text-cyan-100";
+const navButtonClass = "whitespace-nowrap text-[1.05rem] font-semibold text-slate-300 transition hover:text-cyan-300";
+const activeNavButtonClass = "whitespace-nowrap text-[1.05rem] font-bold text-cyan-200 transition hover:text-cyan-100";
 
 
 function AnimatedTesseractLogo() {
@@ -154,17 +154,17 @@ export default function TopNav({
 
   return (
     <nav className={`${className} border-b border-slate-800 bg-slate-950/90 backdrop-blur`}>
-      <div className={`mx-auto flex min-w-0 ${maxWidthClass} items-center justify-between gap-4 px-3 py-3 sm:px-6 sm:py-4 xl:px-8`}>
+      <div className={`mx-auto flex min-w-0 ${maxWidthClass} items-center justify-between gap-5 px-4 py-3.5 sm:px-8 sm:py-4 xl:px-10`}>
         <button
           onClick={() => router.push("/")}
           className="group flex shrink-0 items-center gap-2 text-xl font-extrabold text-cyan-300 sm:gap-3 sm:text-2xl"
           aria-label="ChipLoop home"
         >
           <AnimatedTesseractLogo />
-          <span className="hidden min-[380px]:inline">ChipLoop</span>
+          <span className="hidden font-['Segoe_Print','Bradley_Hand','Comic_Sans_MS',cursive] leading-none min-[380px]:inline">ChipLoop</span>
         </button>
 
-        <div className="flex min-w-0 flex-1 items-center justify-start gap-4 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-5 sm:pb-0 xl:gap-7">
+        <div className="flex min-w-0 flex-1 items-center justify-start gap-5 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-6 sm:pb-0 xl:gap-8">
           {showPlanBadge ? <PlanCreditBadge /> : null}
           {links.filter((link) => link.show).map((link) => (
             <button
@@ -172,7 +172,7 @@ export default function TopNav({
               onClick={() => router.push(link.href)}
               className={
                 link.key === "demo"
-                  ? "whitespace-nowrap rounded-lg bg-cyan-400 px-4 py-2.5 text-base font-bold text-slate-950 transition hover:bg-cyan-300 sm:px-5"
+                  ? "whitespace-nowrap rounded-lg bg-cyan-400 px-5 py-2.5 text-[1.05rem] font-bold text-slate-950 transition hover:bg-cyan-300 sm:px-6"
                   : current === link.key
                   ? activeNavButtonClass
                   : navButtonClass
@@ -188,14 +188,14 @@ export default function TopNav({
                 setDisplayName(null);
                 router.push("/login");
               }}
-              className="whitespace-nowrap rounded-lg border border-slate-700 px-4 py-2.5 text-base font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-cyan-200 sm:px-5"
+              className="whitespace-nowrap rounded-lg border border-slate-700 px-5 py-2.5 text-[1.05rem] font-semibold text-slate-300 transition hover:bg-slate-900 hover:text-cyan-200 sm:px-6"
             >
               <span className="mr-2 text-cyan-200">Hi, {displayName}</span>Logout
             </button>
           ) : (
             <button
               onClick={() => router.push(`/login?next=${encodeURIComponent(next)}`)}
-              className="whitespace-nowrap text-base font-semibold text-slate-300 transition hover:text-cyan-300"
+              className="whitespace-nowrap text-[1.05rem] font-semibold text-slate-300 transition hover:text-cyan-300"
             >
               Login
             </button>
