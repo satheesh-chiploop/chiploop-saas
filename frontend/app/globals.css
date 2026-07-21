@@ -100,6 +100,8 @@ video {
 .blog-route article section {
   position: relative;
   overflow: hidden;
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  border-radius: 0.9rem;
   border-color: rgba(148, 163, 184, 0.2);
   border-left-width: 4px;
   border-left-color: rgba(34, 211, 238, 0.5);
@@ -107,6 +109,14 @@ video {
     linear-gradient(135deg, rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.76)),
     radial-gradient(circle at 100% 0%, rgba(34, 211, 238, 0.12), transparent 30%);
   box-shadow: 0 20px 60px rgba(2, 6, 23, 0.34);
+}
+
+.blog-route article section > :first-child {
+  margin-top: 0;
+}
+
+.blog-route article section > :last-child {
+  margin-bottom: 0;
 }
 
 .blog-route article section:nth-of-type(3n + 1) {
