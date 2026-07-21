@@ -5,6 +5,9 @@ import TopNav from "@/components/TopNav";
 
 const rows = [
   ["One platform", "Separate tools per loop", "Products, Apps, and Studio in one place"],
+  ["Self-regulated workflows", "Engineers manually decide and launch the next check after every stage", "HEM Automatic Runs can continue to the next selected workflow only after the current stage passes"],
+  ["Smart Context", "AI reviews often send too much unrelated context or require manual file selection", "Smart Context ranks logs, reports, artifacts, and project files before answering"],
+  ["Token visibility", "Context size and AI cost are usually hidden from the engineer", "Ask surfaces show Smart vs Full token estimates and estimated context reduction"],
   ["Ask this run", "Users inspect logs and artifacts manually", "Ask about the run, summarize loops, and get recommended next steps"],
   ["Run across loops", "Teams stitch loop execution manually", "Run within one loop or across multiple loops"],
   ["Architecture to RTL", "Architecture intent converts through manual setup", "Move from architecture intent to RTL execution"],
@@ -25,6 +28,24 @@ const actions = [
   ["Explore Products", "/products"],
   ["Explore Apps", "/apps"],
   ["Explore Studio", "/workflow"],
+];
+
+const relatedArticles = [
+  {
+    title: "HEM: Automatic Engineering Memory for Connected Silicon Workflows",
+    summary: "How HEM helps ChipLoop continue successful runs into selected downstream workflows while preserving dashboards and evidence.",
+    href: "/blogs/hebbian-engineering-memory",
+  },
+  {
+    title: "Smart Context: Tokenmaxxing for Practical Silicon Workflows",
+    summary: "How ChipLoop reduces unnecessary context and shows token estimates in Ask This Run and Ask this Project.",
+    href: "/blogs/smart-context-tokenmaxxing",
+  },
+  {
+    title: "The Workflow Layer for AI-Native Chip Design",
+    summary: "Why connected workflow orchestration creates more durable value than standalone prompt boxes.",
+    href: "/blogs/workflow-layer-ai-native-chip-design",
+  },
 ];
 
 export default function WhyChipLoopPage() {
@@ -105,6 +126,29 @@ export default function WhyChipLoopPage() {
                 }`}
               >
                 {label}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-10 rounded-xl border border-slate-800 bg-slate-950/70 p-6 sm:p-8">
+          <div className="max-w-3xl">
+            <div className="text-xs font-semibold uppercase text-cyan-300">Related Reading</div>
+            <h2 className="mt-2 text-3xl font-extrabold leading-tight text-white sm:text-4xl">Learn more about the connected workflow layer</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              These articles explain how HEM, Smart Context, and workflow orchestration fit into ChipLoop.
+            </p>
+          </div>
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+            {relatedArticles.map((article) => (
+              <button
+                key={article.href}
+                type="button"
+                onClick={() => router.push(article.href)}
+                className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 text-left transition hover:-translate-y-0.5 hover:border-cyan-400 hover:bg-slate-900"
+              >
+                <h3 className="text-lg font-bold leading-snug text-white">{article.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-300">{article.summary}</p>
               </button>
             ))}
           </div>

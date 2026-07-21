@@ -15,10 +15,10 @@ export default function NavigatingLoopsEngineeringContextPage() {
           onClick={() => router.push("/events")}
           className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200"
         >
-          Back to Events
+          Back to Blogs
         </button>
 
-        <div className="mt-8 text-xs font-semibold uppercase text-cyan-300">Events Blog</div>
+        <div className="mt-8 text-xs font-semibold uppercase text-cyan-300">ChipLoop Blog</div>
         <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
           Navigating Loops and Engineering Context
         </h1>

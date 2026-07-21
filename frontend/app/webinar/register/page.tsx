@@ -137,7 +137,7 @@ export default function WebinarRegistrationPage() {
               </p>
               <button
                 type="button"
-                onClick={() => router.push("/events/blogs/prompt-based-chip-design-to-chiploop")}
+                onClick={() => router.push("/blogs/prompt-based-chip-design-to-chiploop")}
                 className="mt-4 rounded-lg bg-cyan-400 px-4 py-2 font-bold text-slate-950 transition hover:bg-cyan-300"
               >
                 Read the article
