@@ -5,6 +5,20 @@ import TopNav from "@/components/TopNav";
 
 const articles = [
   {
+    slug: "connected-execution-layer-chip-design",
+    title: "Why Chip Design Needs a Connected Execution Layer",
+    summary: "Why prompts and point tools are not enough, and why silicon teams need an execution layer that keeps intent, tools, evidence, and handoffs together.",
+    tag: "Execution Layer",
+    accent: "from-cyan-300 to-amber-300",
+  },
+  {
+    slug: "one-engineer-full-silicon-workflow",
+    title: "From One Engineer to a Full Silicon Workflow",
+    summary: "How one engineer or a small team can move further across requirements, RTL, verification, implementation, software, validation, and product review.",
+    tag: "Productivity",
+    accent: "from-emerald-300 to-violet-300",
+  },
+  {
     slug: "smart-context-tokenmaxxing",
     title: "Smart Context: Tokenmaxxing for Practical Silicon Workflows",
     summary: "How ChipLoop reduces unnecessary context, shows token estimates, and keeps Ask This Run and Ask this Project grounded in useful evidence.",
