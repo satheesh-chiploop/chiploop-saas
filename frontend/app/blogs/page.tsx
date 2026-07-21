@@ -93,8 +93,8 @@ export default function BlogsPage() {
         <div className="mx-auto max-w-[1440px]">
           <div className="max-w-5xl">
             <div className="font-['Segoe_Print','Bradley_Hand',cursive] text-xl font-bold text-amber-300">ChipLoop Blog</div>
-            <h1 className="mt-3 max-w-4xl font-serif text-5xl font-extrabold leading-[0.98] text-white sm:text-7xl">
-              Field notes for AI-native silicon teams.
+            <h1 className="mt-3 max-w-4xl font-['Segoe_Print','Bradley_Hand',cursive] text-5xl font-extrabold leading-[1.08] text-white sm:text-7xl">
+              Ideas for connected silicon development.
             </h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
               Practical notes on agentic AI, connected chip workflows, HEM, Smart Context, product journeys, and semiconductor engineering productivity.
@@ -117,7 +117,7 @@ export default function BlogsPage() {
                     </span>
                     <span className="text-sm font-bold text-slate-500 transition group-hover:text-cyan-200">Read</span>
                   </div>
-                  <div className="mt-5 font-serif text-2xl font-bold leading-tight text-white">{article.title}</div>
+                  <div className="mt-5 font-['Segoe_Print','Bradley_Hand',cursive] text-2xl font-bold leading-snug text-white">{article.title}</div>
                   <p className="mt-4 text-sm leading-6 text-slate-300">{article.summary}</p>
                 </div>
               </button>
