@@ -1554,7 +1554,7 @@ export default function ProductDetailPage() {
             <div>
               <div className="text-xs font-semibold uppercase text-cyan-300">Project Review Helper</div>
               <p className="mt-1 text-sm leading-6 text-cyan-100/80">
-                Review uploaded files or GitHub repo context before finalizing stages. Ask this Project can summarize risks, missing inputs, and recommended workflows.
+                Review uploaded files or GitHub repo context before finalizing stages. Ask this Project uses Smart Context to summarize risks, missing inputs, and recommended workflows with token estimates.
               </p>
             </div>
             <button

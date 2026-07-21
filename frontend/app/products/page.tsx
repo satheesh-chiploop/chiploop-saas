@@ -285,7 +285,7 @@ export default function ProductsPage() {
               <div className="text-xs font-semibold uppercase text-cyan-300">Project Review</div>
               <h2 className="mt-1 text-lg font-semibold text-white">Already have files, reports, or a Git repo?</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
-                Use Ask this Project to summarize the codebase, identify risks, and get recommended product stages before configuring the product journey.
+                Use Ask this Project with Smart Context to summarize the codebase, identify risks, and get recommended product stages before configuring the product journey.
               </p>
             </div>
             <button

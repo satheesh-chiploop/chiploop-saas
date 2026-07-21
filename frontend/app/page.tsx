@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaCog, FaFileAlt, FaInfinity, FaMicrochip, FaPlay, FaStore, FaTh, FaUserEdit } from "react-icons/fa";
+import { FaBrain, FaCog, FaCompressAlt, FaFileAlt, FaInfinity, FaMicrochip, FaPlay, FaStore, FaTh, FaUserEdit } from "react-icons/fa";
 import { createClientComponentClient } from "@/lib/platformClient";
 import TopNav from "@/components/TopNav";
 
@@ -178,6 +178,24 @@ const executionSteps = [
   { step: "01", title: "Define", body: "Specs, products, or workflows", icon: FaFileAlt },
   { step: "02", title: "Configure", body: "Stages, tools, agents, goals", icon: FaCog },
   { step: "03", title: "Run", body: "Logs, dashboards, artifacts", icon: FaPlay },
+];
+
+const selfRegulatedFeatures = [
+  {
+    title: "HEM Automatic Runs",
+    body: "When a stage passes, ChipLoop can continue to the next selected stage and keep each dashboard linked.",
+    icon: FaBrain,
+  },
+  {
+    title: "Smart Context",
+    body: "Ask This Run and Ask This Project prioritize relevant logs, reports, and files before calling the model.",
+    icon: FaCompressAlt,
+  },
+  {
+    title: "Evidence Stays Connected",
+    body: "Workflow IDs, artifacts, logs, answers, and handoffs stay traceable across the silicon journey.",
+    icon: FaFileAlt,
+  },
 ];
 
 const endToEndJourney = [
@@ -375,6 +393,31 @@ function LandingPageContent() {
             </div>
           </div>
         </div>
+        </div>
+      </section>
+
+      <section className="w-full border-y border-slate-800 bg-slate-800/30 px-4 py-10 sm:px-6 sm:py-14">
+        <div className={landingShellClass}>
+          <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
+            <div className="mx-auto max-w-4xl text-center">
+              <p className={eyebrowClass}>Self-regulated Silicon Workflows</p>
+              <h2 className={`${sectionTitleClass} mx-auto`}>
+                ChipLoop can continue the journey and keep AI context focused.
+              </h2>
+              <p className={`${sectionBodyClass} mx-auto`}>
+                HEM Automatic Runs moves from one passed stage to the next selected stage. Smart Context reduces unnecessary tokens by selecting the evidence that matters before the model answers.
+              </p>
+            </div>
+            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+              {selfRegulatedFeatures.map(({ title, body, icon: Icon }) => (
+                <article key={title} className="rounded-xl border-2 border-cyan-400/45 bg-slate-950/70 p-5 text-center shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-slate-900">
+                  <Icon className="mx-auto h-9 w-9 text-amber-300" aria-hidden="true" />
+                  <h3 className="mt-4 text-xl font-bold text-white">{title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-300">{body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

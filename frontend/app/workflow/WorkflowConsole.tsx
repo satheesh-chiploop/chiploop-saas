@@ -32,6 +32,18 @@ type AskThisRunResponse = {
   answer: string;
   sources?: Array<{ type: string; path: string }>;
   source_count?: number;
+  context_summary?: ContextSummary;
+};
+
+type ContextSummary = {
+  mode: "smart" | "full";
+  full_tokens_estimate: number;
+  smart_tokens_estimate: number;
+  active_tokens_estimate: number;
+  reduction_percent: number;
+  considered_count: number;
+  included_count: number;
+  skipped_count: number;
 };
 
 async function parseResponse(response: Response): Promise<unknown> {
@@ -80,6 +92,7 @@ export default function WorkflowConsole({
   const [askLoading, setAskLoading] = useState(false);
   const [askError, setAskError] = useState<string | null>(null);
   const [askHistory, setAskHistory] = useState<AskThisRunResponse[]>([]);
+  const [askContextMode, setAskContextMode] = useState<"smart" | "full">("smart");
   const [askVoiceRecording, setAskVoiceRecording] = useState(false);
   const [askVoiceBusy, setAskVoiceBusy] = useState(false);
   const [askVoiceStatus, setAskVoiceStatus] = useState<string | null>(null);
@@ -666,7 +679,7 @@ export default function WorkflowConsole({
     setAskLoading(true);
     setAskError(null);
     try {
-      const response = await apiPost<AskThisRunResponse>(`/workflow/${wfId || jobId}/ask`, { question });
+      const response = await apiPost<AskThisRunResponse>(`/workflow/${wfId || jobId}/ask`, { question, context_mode: askContextMode });
       setAskHistory((current) => [response, ...current].slice(0, 10));
       setAskQuestion("");
       setActiveTab("ask");
@@ -843,6 +856,28 @@ export default function WorkflowConsole({
           <p className="mt-1 text-sm text-cyan-100/80">
             Ask questions about this workflow&apos;s logs, reports, and artifact index. Answers are generated with AI from this run&apos;s available context.
           </p>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+            <div>
+              <div className="text-sm font-semibold text-slate-100">Context mode</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">
+                Smart Context uses the most relevant logs and artifacts first. Full Context sends the broader run package.
+              </p>
+            </div>
+            <div className="flex rounded-lg border border-slate-700 bg-slate-900 p-1 text-xs font-semibold">
+              {(["smart", "full"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setAskContextMode(mode)}
+                  className={`rounded-md px-3 py-1.5 capitalize transition ${
+                    askContextMode === mode ? "bg-cyan-500 text-slate-950" : "text-slate-300 hover:bg-slate-800"
+                  }`}
+                >
+                  {mode}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {suggestions.map((suggestion) => (
               <button
@@ -915,6 +950,33 @@ export default function WorkflowConsole({
               <div className="mt-1 text-slate-100">{item.question}</div>
               <div className="mt-4 text-xs font-semibold uppercase text-cyan-300">Answer</div>
               <div className="mt-2 whitespace-pre-wrap leading-6 text-slate-200">{item.answer}</div>
+              {item.context_summary ? (
+                <div className="mt-4 rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+                  <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <span>Context Used</span>
+                    <span className="rounded-full border border-cyan-800 bg-cyan-950/40 px-2 py-0.5 text-cyan-200">
+                      {item.context_summary.mode === "smart" ? "Smart Context" : "Full Context"}
+                    </span>
+                  </div>
+                  <div className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+                    <div className="rounded border border-slate-800 bg-slate-900/60 p-2">
+                      <div className="text-xs text-slate-500">Smart estimate</div>
+                      <div className="font-bold text-cyan-200">{item.context_summary.smart_tokens_estimate.toLocaleString()} tokens</div>
+                    </div>
+                    <div className="rounded border border-slate-800 bg-slate-900/60 p-2">
+                      <div className="text-xs text-slate-500">Full estimate</div>
+                      <div className="font-bold text-slate-100">{item.context_summary.full_tokens_estimate.toLocaleString()} tokens</div>
+                    </div>
+                    <div className="rounded border border-slate-800 bg-slate-900/60 p-2">
+                      <div className="text-xs text-slate-500">Estimated reduction</div>
+                      <div className="font-bold text-emerald-300">{item.context_summary.reduction_percent}%</div>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-slate-400">
+                    Included {item.context_summary.included_count} of {item.context_summary.considered_count} evidence items.
+                  </div>
+                </div>
+              ) : null}
               {item.sources && item.sources.length > 0 ? (
                 <div className="mt-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Sources</div>
