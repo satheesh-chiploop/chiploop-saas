@@ -6172,12 +6172,19 @@ def _agent_name_from_llm_artifact_path(path: str) -> str:
 
 
 def _estimated_usage_rows_from_llm_artifacts(workflow_id: str) -> List[Dict[str, Any]]:
-    prefix = f"backend/workflows/{workflow_id}"
+    prefix = f"backend/workflows/{workflow_id}/"
     try:
         paths = _list_storage_tree_for_main(prefix, max_depth=6)
     except Exception:
         paths = []
-    rows: List[Dict[str, Any]] = []
+    paths = list(dict.fromkeys(paths + [
+        f"{prefix}spec/llm_raw_output.txt",
+        f"{prefix}digital/digital_architecture_raw_output.txt",
+        f"{prefix}digital/digital_microarchitecture_raw_output.txt",
+        f"{prefix}digital/digital_regmap_raw_output.txt",
+        f"{prefix}rtl/rtl_llm_raw_output.txt",
+    ]))
+    grouped: Dict[str, Dict[str, Any]] = {}
     seen = set()
     for path in paths:
         lowered = path.lower()
@@ -6190,29 +6197,38 @@ def _estimated_usage_rows_from_llm_artifacts(workflow_id: str) -> List[Dict[str,
         if not text:
             continue
         output_tokens = max(1, (len(text) + 3) // 4)
-        rows.append({
+        agent_name = _agent_name_from_llm_artifact_path(path)
+        row = grouped.setdefault(agent_name, {
             "workflow_id": workflow_id,
-            "agent_name": _agent_name_from_llm_artifact_path(path),
+            "agent_name": agent_name,
             "capability": "artifact_estimate",
             "provider": "artifact",
             "model": "estimated-from-artifacts",
             "input_tokens": 0,
-            "output_tokens": output_tokens,
-            "total_tokens": output_tokens,
+            "output_tokens": 0,
+            "total_tokens": 0,
             "estimated_cost_usd": None,
             "estimated_credits": 0,
             "status": "ok",
             "metadata": {
                 "estimated_tokens": True,
-                "estimated_from_artifact": path,
+                "estimated_from_artifacts": [],
                 "context_mode": "artifact-estimate",
             },
         })
-    return rows
+        row["output_tokens"] = _usage_int(row.get("output_tokens")) + output_tokens
+        row["total_tokens"] = _usage_int(row.get("total_tokens")) + output_tokens
+        metadata = row.get("metadata") if isinstance(row.get("metadata"), dict) else {}
+        paths_seen = metadata.get("estimated_from_artifacts") if isinstance(metadata.get("estimated_from_artifacts"), list) else []
+        paths_seen.append(path)
+        metadata["estimated_from_artifacts"] = paths_seen
+        row["metadata"] = metadata
+    return list(grouped.values())
 
 
 @app.get("/apps/dashboard/token_heatmap/{workflow_id}")
 def workflow_token_heatmap(workflow_id: str):
+    rows: List[Dict[str, Any]] = []
     try:
         result = (
             supabase.table("model_usage_events")
@@ -6222,29 +6238,17 @@ def workflow_token_heatmap(workflow_id: str):
             .limit(1000)
             .execute()
         )
+        rows = result.data or []
     except Exception as exc:
         logger.warning("Token heatmap lookup failed workflow=%s error=%s", workflow_id, exc)
-        return {
-            "workflow_id": workflow_id,
-            "available": False,
-            "agents": [],
-            "summary": {
-                "agent_count": 0,
-                "input_tokens": 0,
-                "output_tokens": 0,
-                "total_tokens": 0,
-                "estimated_cost_usd": None,
-                "estimated_credits": 0,
-                "event_count": 0,
-            },
-        }
 
-    rows = result.data or []
     artifact_rows = _model_usage_artifact_rows(workflow_id)
     if artifact_rows:
         rows = rows + artifact_rows
-    if not rows:
-        rows = _estimated_usage_rows_from_llm_artifacts(workflow_id)
+    if not rows or _aggregate_usage_rows(rows).get("total_tokens", 0) <= 0:
+        estimated_rows = _estimated_usage_rows_from_llm_artifacts(workflow_id)
+        if estimated_rows:
+            rows = [row for row in rows if _usage_int(row.get("total_tokens")) > 0] + estimated_rows
     current_usage = _aggregate_usage_rows(rows)
     grouped: Dict[str, Dict[str, Any]] = {}
 
