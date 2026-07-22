@@ -1,9 +1,0 @@
-{
-  "top_module": "uart_packet_engine",
-  "scan_chains": 4,
-  "max_chain_length_estimate": 106,
-  "scan_enable": "scan_en",
-  "scan_in_prefix": "scan_in",
-  "scan_out_prefix": "scan_out",
-  "clock_mixing": "no_mix"
-}

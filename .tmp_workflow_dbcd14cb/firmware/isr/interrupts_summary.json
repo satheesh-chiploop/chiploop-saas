@@ -1,7 +1,0 @@
-{
-  "agent": "Embedded Interrupt Mapping Agent",
-  "phase": "irq_map",
-  "interrupts_path": "firmware/isr/interrupts.rs",
-  "interrupt_map_path": "firmware/isr/interrupt_map.json",
-  "source_count": 6
-}

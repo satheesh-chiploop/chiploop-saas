@@ -559,11 +559,7 @@ function TokenHeatmap({
       </div>
     );
   }
-  const hasUsefulTokenUsage = Boolean(
-    usage?.available &&
-    usage.agents.length &&
-    (usage.summary.total_tokens > 0 || usage.agents.some((agent) => (agent.total_tokens || 0) > 0)),
-  );
+  const hasUsefulTokenUsage = tokenResponseHasUsefulUsage(usage);
   const shouldShowExecutionFallback = fallbackAgentNames.length > 0 && !hasUsefulTokenUsage;
   if (shouldShowExecutionFallback) {
     return (
@@ -694,6 +690,14 @@ function TokenHeatmap({
         <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-amber-300" />Output tokens</span>
       </div>
     </div>
+  );
+}
+
+function tokenResponseHasUsefulUsage(usage: TokenHeatmapResponse | null): boolean {
+  return Boolean(
+    usage?.available &&
+    usage.agents.length &&
+    (usage.summary.total_tokens > 0 || usage.agents.some((agent) => (agent.total_tokens || 0) > 0)),
   );
 }
 
@@ -960,23 +964,35 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     setTokenUsageLoading(false);
     if (!workflowId) return;
     let active = true;
-    setTokenUsageLoading(true);
-    apiGet<TokenHeatmapResponse>(`/apps/dashboard/token_heatmap/${encodeURIComponent(workflowId)}`)
-      .then((data) => {
-        if (!active) return;
-        setTokenUsage(data);
-      })
-      .catch((reason: unknown) => {
-        if (!active) return;
-        setTokenUsageError(reason instanceof Error ? reason.message : String(reason));
-      })
-      .finally(() => {
-        if (active) setTokenUsageLoading(false);
-      });
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const loadTokenUsage = (attempt = 0) => {
+      setTokenUsageLoading(true);
+      apiGet<TokenHeatmapResponse>(`/apps/dashboard/token_heatmap/${encodeURIComponent(workflowId)}`)
+        .then((data) => {
+          if (!active) return;
+          setTokenUsage(data);
+          setTokenUsageError(null);
+          if (!tokenResponseHasUsefulUsage(data) && attempt < 12) {
+            timer = setTimeout(() => loadTokenUsage(attempt + 1), 2500);
+          }
+        })
+        .catch((reason: unknown) => {
+          if (!active) return;
+          setTokenUsageError(reason instanceof Error ? reason.message : String(reason));
+          if (attempt < 4) {
+            timer = setTimeout(() => loadTokenUsage(attempt + 1), 2500);
+          }
+        })
+        .finally(() => {
+          if (active) setTokenUsageLoading(false);
+        });
+    };
+    loadTokenUsage(0);
     return () => {
       active = false;
+      if (timer) clearTimeout(timer);
     };
-  }, [workflowId]);
+  }, [workflowId, status]);
 
   const content = useMemo(() => {
     if (!workflowId || !resultsReady) {
