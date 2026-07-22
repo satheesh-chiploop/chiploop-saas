@@ -352,12 +352,20 @@ function countParticipatingAgents(logs: string | null | undefined): number | nul
 function extractParticipatingAgentNames(logs: string | null | undefined): string[] {
   if (!logs) return [];
   const agents = new Set<string>();
+  const normalizeAgentName = (value: string) =>
+    value
+      .replace(/^[^\w]+/u, "")
+      .replace(/\s+/g, " ")
+      .trim();
   for (const rawLine of logs.split("\n")) {
     const line = rawLine.trim();
     const running = line.match(/Running\s+(.+?\sAgent)\b/i);
     const finished = line.match(/^(.+?\sAgent)\s+(?:done|failed)\b/i);
     const name = running?.[1] || finished?.[1];
-    if (name) agents.add(name.trim());
+    if (name) {
+      const normalized = normalizeAgentName(name);
+      if (normalized) agents.add(normalized);
+    }
   }
   return [...agents];
 }
