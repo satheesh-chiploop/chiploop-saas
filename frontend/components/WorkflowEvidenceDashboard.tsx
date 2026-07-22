@@ -13,6 +13,44 @@ type Props = {
   logs?: string | null;
 };
 
+type TokenHeatmapAgent = {
+  agent_name: string;
+  capability?: string | null;
+  provider?: string | null;
+  model?: string | null;
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  estimated_cost_usd?: number | null;
+  estimated_credits?: number | null;
+  event_count?: number | null;
+  failed_event_count?: number | null;
+  context_mode?: string | null;
+  full_context_estimate_tokens?: number | null;
+  smart_context_tokens?: number | null;
+  smart_context_reduction_percent?: number | null;
+};
+
+type TokenHeatmapResponse = {
+  workflow_id: string;
+  available: boolean;
+  agents: TokenHeatmapAgent[];
+  summary: {
+    agent_count: number;
+    input_tokens: number;
+    output_tokens: number;
+    total_tokens: number;
+    estimated_cost_usd?: number | null;
+    estimated_credits?: number | null;
+    event_count?: number | null;
+    highest_usage_agent?: string | null;
+    previous_workflow_id?: string | null;
+    previous_total_tokens?: number | null;
+    token_delta_percent?: number | null;
+    optimization_suggestions?: string[];
+  };
+};
+
 type FlowItem = { id: Stage; label: string };
 
 const RTL_STAGE: FlowItem = { id: "arch2rtl", label: "RTL" };
@@ -100,6 +138,23 @@ function formatNumber(value: number): string | number {
   if (!Number.isFinite(value)) return "not produced";
   if (Number.isInteger(value)) return value;
   return Number(value.toFixed(3)).toString();
+}
+
+function formatCompactNumber(value: unknown): string {
+  const numeric = typeof value === "number" && Number.isFinite(value) ? value : 0;
+  return new Intl.NumberFormat("en-US", { notation: numeric >= 10000 ? "compact" : "standard", maximumFractionDigits: 1 }).format(numeric);
+}
+
+function formatCost(value: unknown): string {
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) return "not tracked";
+  if (value < 0.01) return `$${value.toFixed(4)}`;
+  return `$${value.toFixed(2)}`;
+}
+
+function formatDelta(value: unknown): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "no prior run";
+  if (value === 0) return "flat vs previous";
+  return `${value > 0 ? "+" : ""}${value}% vs previous`;
 }
 
 function unprovenMetric(status: unknown, value: unknown): string | number {
@@ -461,10 +516,118 @@ function ClosureTrend({ title, chart, metrics }: { title: string; chart: JsonMap
   );
 }
 
+function TokenHeatmap({ usage, loading, error }: { usage: TokenHeatmapResponse | null; loading: boolean; error: string | null }) {
+  if (loading) {
+    return (
+      <div className="mt-5 rounded-lg border border-slate-800 bg-black/25 p-4 text-sm text-slate-400">
+        Loading agent token heatmap...
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="mt-5 rounded-lg border border-amber-500/30 bg-amber-950/20 p-4 text-sm text-amber-200">
+        Token heatmap unavailable: {error}
+      </div>
+    );
+  }
+  if (!usage?.available || !usage.agents.length) {
+    return (
+      <div className="mt-5 rounded-lg border border-slate-800 bg-black/25 p-4 text-sm text-slate-400">
+        Agent token heatmap will appear when this workflow records model usage.
+      </div>
+    );
+  }
+
+  const maxTokens = Math.max(...usage.agents.map((agent) => agent.total_tokens || 0), 1);
+  const totalTokens = Math.max(usage.summary.total_tokens || 0, 1);
+
+  return (
+    <div className="mt-5 rounded-xl border border-cyan-400/25 bg-slate-950/70 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-sm font-bold text-white">Agent Token Heatmap</div>
+          <div className="mt-1 text-xs text-slate-400">Input and output tokens grouped by agent for this workflow run.</div>
+        </div>
+        <div className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-bold text-cyan-200">
+          {formatCompactNumber(usage.summary.total_tokens)} total tokens
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <MiniMetric label="Agents" value={formatCompactNumber(usage.summary.agent_count)} />
+        <MiniMetric label="Input Tokens" value={formatCompactNumber(usage.summary.input_tokens)} />
+        <MiniMetric label="Output Tokens" value={formatCompactNumber(usage.summary.output_tokens)} />
+        <MiniMetric label="Cost Estimate" value={formatCost(usage.summary.estimated_cost_usd)} />
+        <MiniMetric label="Prev Run Delta" value={formatDelta(usage.summary.token_delta_percent)} />
+      </div>
+
+      <div className="mt-3 rounded-lg border border-slate-800 bg-black/20 p-3">
+        <div className="text-xs font-semibold uppercase text-slate-500">Optimization Signals</div>
+        <div className="mt-2 space-y-1 text-sm leading-6 text-slate-300">
+          {(usage.summary.optimization_suggestions || []).map((suggestion) => (
+            <div key={suggestion}>- {suggestion}</div>
+          ))}
+          {!(usage.summary.optimization_suggestions || []).length ? <div>- No token optimization signal yet.</div> : null}
+        </div>
+      </div>
+
+      <div className="mt-5 space-y-3">
+        {usage.agents.map((agent) => {
+          const totalWidth = Math.max((agent.total_tokens / maxTokens) * 100, agent.total_tokens > 0 ? 4 : 0);
+          const inputWidth = agent.total_tokens > 0 ? (agent.input_tokens / agent.total_tokens) * 100 : 0;
+          const outputWidth = agent.total_tokens > 0 ? (agent.output_tokens / agent.total_tokens) * 100 : 0;
+          const share = (agent.total_tokens / totalTokens) * 100;
+          const statusText = agent.failed_event_count ? `${agent.failed_event_count} failed call(s)` : `${agent.event_count || 0} call(s)`;
+          return (
+            <div key={agent.agent_name} className="rounded-lg border border-slate-800 bg-black/25 p-3">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="break-words text-sm font-bold text-slate-100">{agent.agent_name}</div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    {[agent.model, agent.provider, agent.context_mode || "workflow", statusText].filter(Boolean).join(" | ")}
+                  </div>
+                </div>
+                <div className="text-right text-xs text-slate-400">
+                  <div className="font-bold text-cyan-200">{formatCompactNumber(agent.total_tokens)} tokens</div>
+                  <div>{share.toFixed(1)}% of run</div>
+                </div>
+              </div>
+              <div className="mt-3 h-4 rounded-full bg-slate-900">
+                <div className="flex h-full overflow-hidden rounded-full" style={{ width: `${totalWidth}%` }}>
+                  <div className="bg-cyan-400" style={{ width: `${inputWidth}%` }} title={`Input: ${agent.input_tokens.toLocaleString()} tokens`} />
+                  <div className="bg-amber-300" style={{ width: `${outputWidth}%` }} title={`Output: ${agent.output_tokens.toLocaleString()} tokens`} />
+                </div>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
+                <span>Input: <span className="text-cyan-200">{agent.input_tokens.toLocaleString()}</span></span>
+                <span>Output: <span className="text-amber-200">{agent.output_tokens.toLocaleString()}</span></span>
+                <span>Cost: <span className="text-slate-200">{formatCost(agent.estimated_cost_usd)}</span></span>
+                {agent.estimated_credits ? <span>Credits: <span className="text-slate-200">{agent.estimated_credits.toLocaleString()}</span></span> : null}
+                {agent.full_context_estimate_tokens ? <span>Full est: <span className="text-slate-200">{agent.full_context_estimate_tokens.toLocaleString()}</span></span> : null}
+                {agent.smart_context_tokens ? <span>Smart: <span className="text-cyan-200">{agent.smart_context_tokens.toLocaleString()}</span></span> : null}
+                {typeof agent.smart_context_reduction_percent === "number" ? <span>Saved: <span className="text-emerald-300">{agent.smart_context_reduction_percent}%</span></span> : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-400">
+        <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-cyan-400" />Input tokens</span>
+        <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-amber-300" />Output tokens</span>
+      </div>
+    </div>
+  );
+}
+
 export default function WorkflowEvidenceDashboard({ workflowId, status, stage, logs }: Props) {
   const [evidence, setEvidence] = useState<Record<string, JsonMap | null>>({});
   const [error, setError] = useState<string | null>(null);
   const [artifactsLoaded, setArtifactsLoaded] = useState(false);
+  const [tokenUsage, setTokenUsage] = useState<TokenHeatmapResponse | null>(null);
+  const [tokenUsageLoading, setTokenUsageLoading] = useState(false);
+  const [tokenUsageError, setTokenUsageError] = useState<string | null>(null);
   const flow = useMemo(() => displayedFlow(stage), [stage]);
   const stageIndex = flow.findIndex((item) => item.id === stage);
   const agentCount = useMemo(() => countParticipatingAgents(logs), [logs]);
@@ -692,6 +855,30 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       if (timer) clearTimeout(timer);
     };
   }, [workflowId, stage, resultsReady]);
+
+  useEffect(() => {
+    setTokenUsage(null);
+    setTokenUsageError(null);
+    setTokenUsageLoading(false);
+    if (!workflowId) return;
+    let active = true;
+    setTokenUsageLoading(true);
+    apiGet<TokenHeatmapResponse>(`/apps/dashboard/token_heatmap/${encodeURIComponent(workflowId)}`)
+      .then((data) => {
+        if (!active) return;
+        setTokenUsage(data);
+      })
+      .catch((reason: unknown) => {
+        if (!active) return;
+        setTokenUsageError(reason instanceof Error ? reason.message : String(reason));
+      })
+      .finally(() => {
+        if (active) setTokenUsageLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [workflowId]);
 
   const content = useMemo(() => {
     if (!workflowId || !resultsReady) {
@@ -1680,6 +1867,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           ))}
         </div>
       </div>
+      <TokenHeatmap usage={tokenUsage} loading={tokenUsageLoading} error={tokenUsageError} />
       {content}
     </section>
   );
