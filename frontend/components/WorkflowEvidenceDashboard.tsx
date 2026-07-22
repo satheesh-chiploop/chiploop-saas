@@ -559,7 +559,13 @@ function TokenHeatmap({
       </div>
     );
   }
-  if ((!usage?.available || !usage.agents.length) && fallbackAgentNames.length) {
+  const hasUsefulTokenUsage = Boolean(
+    usage?.available &&
+    usage.agents.length &&
+    (usage.summary.total_tokens > 0 || usage.agents.some((agent) => (agent.total_tokens || 0) > 0)),
+  );
+  const shouldShowExecutionFallback = fallbackAgentNames.length > 0 && !hasUsefulTokenUsage;
+  if (shouldShowExecutionFallback) {
     return (
       <div className="mt-5 rounded-xl border border-cyan-400/25 bg-slate-950/70 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
