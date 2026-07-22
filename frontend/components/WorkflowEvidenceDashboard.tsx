@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ApiClientError, apiGet } from "@/lib/apiClient";
+import { createClientComponentClient } from "@/lib/platformClient";
 
 type Stage = "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "verification" | "embedded" | "software" | "validation" | "product";
 type JsonMap = Record<string, unknown>;
@@ -10,6 +11,10 @@ type Props = {
   workflowId: string | null;
   status?: string | null;
   stage: Stage;
+  logs?: string | null;
+};
+
+type WorkflowLogRow = {
   logs?: string | null;
 };
 
@@ -340,7 +345,12 @@ function timingViolationValue(wns: unknown, tns: unknown, explicit: unknown): st
 }
 
 function countParticipatingAgents(logs: string | null | undefined): number | null {
-  if (!logs) return null;
+  const agents = extractParticipatingAgentNames(logs);
+  return agents.length || null;
+}
+
+function extractParticipatingAgentNames(logs: string | null | undefined): string[] {
+  if (!logs) return [];
   const agents = new Set<string>();
   for (const rawLine of logs.split("\n")) {
     const line = rawLine.trim();
@@ -349,7 +359,7 @@ function countParticipatingAgents(logs: string | null | undefined): number | nul
     const name = running?.[1] || finished?.[1];
     if (name) agents.add(name.trim());
   }
-  return agents.size || null;
+  return [...agents];
 }
 
 function hasTerminalEvidence(status: string | null | undefined, stage: Stage, logs: string | null | undefined): boolean {
@@ -516,7 +526,17 @@ function ClosureTrend({ title, chart, metrics }: { title: string; chart: JsonMap
   );
 }
 
-function TokenHeatmap({ usage, loading, error }: { usage: TokenHeatmapResponse | null; loading: boolean; error: string | null }) {
+function TokenHeatmap({
+  usage,
+  loading,
+  error,
+  fallbackAgentNames,
+}: {
+  usage: TokenHeatmapResponse | null;
+  loading: boolean;
+  error: string | null;
+  fallbackAgentNames: string[];
+}) {
   if (loading) {
     return (
       <div className="mt-5 rounded-lg border border-slate-800 bg-black/25 p-4 text-sm text-slate-400">
@@ -531,16 +551,54 @@ function TokenHeatmap({ usage, loading, error }: { usage: TokenHeatmapResponse |
       </div>
     );
   }
+  if ((!usage?.available || !usage.agents.length) && fallbackAgentNames.length) {
+    return (
+      <div className="mt-5 rounded-xl border border-cyan-400/25 bg-slate-950/70 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-sm font-bold text-white">Agent Token Heatmap</div>
+            <div className="mt-1 text-xs text-slate-400">
+              This workflow has agent execution evidence, but model-token accounting was not recorded per agent for this run.
+            </div>
+          </div>
+          <div className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-bold text-cyan-200">
+            {fallbackAgentNames.length} agents tracked
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-lg border border-amber-400/25 bg-amber-950/15 p-3 text-sm leading-6 text-amber-100">
+          Token bars will populate when model usage events are tied to this workflow. For this run, the chart below shows the agent execution map with token accounting pending.
+        </div>
+
+        <div className="mt-5 space-y-3">
+          {fallbackAgentNames.map((name, index) => (
+            <div key={`${name}-${index}`} className="rounded-lg border border-slate-800 bg-black/25 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="break-words text-sm font-bold text-slate-100">{name}</div>
+                <div className="text-xs font-semibold text-slate-500">token accounting pending</div>
+              </div>
+              <div className="mt-3 h-4 overflow-hidden rounded-full bg-slate-900">
+                <div className="h-full rounded-full bg-slate-700/80" style={{ width: "100%" }} />
+              </div>
+              <div className="mt-2 text-xs text-slate-500">Input/output tokens were not attributed to this agent in `model_usage_events`.</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (!usage?.available || !usage.agents.length) {
     return (
       <div className="mt-5 rounded-lg border border-slate-800 bg-black/25 p-4 text-sm text-slate-400">
-        Agent token heatmap will appear when this workflow records model usage.
+        Agent token heatmap will appear when this workflow records model usage or agent execution logs.
       </div>
     );
   }
 
   const maxTokens = Math.max(...usage.agents.map((agent) => agent.total_tokens || 0), 1);
   const totalTokens = Math.max(usage.summary.total_tokens || 0, 1);
+  const hasTrackedTokens = usage.summary.total_tokens > 0;
 
   return (
     <div className="mt-5 rounded-xl border border-cyan-400/25 bg-slate-950/70 p-4">
@@ -594,10 +652,14 @@ function TokenHeatmap({ usage, loading, error }: { usage: TokenHeatmapResponse |
                 </div>
               </div>
               <div className="mt-3 h-4 rounded-full bg-slate-900">
-                <div className="flex h-full overflow-hidden rounded-full" style={{ width: `${totalWidth}%` }}>
-                  <div className="bg-cyan-400" style={{ width: `${inputWidth}%` }} title={`Input: ${agent.input_tokens.toLocaleString()} tokens`} />
-                  <div className="bg-amber-300" style={{ width: `${outputWidth}%` }} title={`Output: ${agent.output_tokens.toLocaleString()} tokens`} />
-                </div>
+                {hasTrackedTokens || agent.total_tokens > 0 ? (
+                  <div className="flex h-full overflow-hidden rounded-full" style={{ width: `${totalWidth}%` }}>
+                    <div className="bg-cyan-400" style={{ width: `${inputWidth}%` }} title={`Input: ${agent.input_tokens.toLocaleString()} tokens`} />
+                    <div className="bg-amber-300" style={{ width: `${outputWidth}%` }} title={`Output: ${agent.output_tokens.toLocaleString()} tokens`} />
+                  </div>
+                ) : (
+                  <div className="h-full rounded-full bg-slate-700/80" style={{ width: "100%" }} title="Agent executed; no model tokens attributed." />
+                )}
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
                 <span>Input: <span className="text-cyan-200">{agent.input_tokens.toLocaleString()}</span></span>
@@ -628,10 +690,32 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
   const [tokenUsage, setTokenUsage] = useState<TokenHeatmapResponse | null>(null);
   const [tokenUsageLoading, setTokenUsageLoading] = useState(false);
   const [tokenUsageError, setTokenUsageError] = useState<string | null>(null);
+  const [fetchedLogs, setFetchedLogs] = useState<string | null>(null);
+  const effectiveLogs = logs ?? fetchedLogs;
   const flow = useMemo(() => displayedFlow(stage), [stage]);
   const stageIndex = flow.findIndex((item) => item.id === stage);
-  const agentCount = useMemo(() => countParticipatingAgents(logs), [logs]);
-  const resultsReady = hasTerminalEvidence(status, stage, logs);
+  const agentCount = useMemo(() => countParticipatingAgents(effectiveLogs), [effectiveLogs]);
+  const fallbackAgentNames = useMemo(() => extractParticipatingAgentNames(effectiveLogs), [effectiveLogs]);
+  const resultsReady = hasTerminalEvidence(status, stage, effectiveLogs);
+
+  useEffect(() => {
+    setFetchedLogs(null);
+    if (!workflowId || logs !== undefined) return;
+    let active = true;
+    const supabase = createClientComponentClient();
+    supabase
+      .from("workflows")
+      .select("logs")
+      .eq("id", workflowId)
+      .single()
+      .then(({ data, error }) => {
+        if (!active || error) return;
+        setFetchedLogs((data as WorkflowLogRow | null)?.logs || null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [workflowId, logs]);
 
   useEffect(() => {
     setArtifactsLoaded(false);
@@ -1867,7 +1951,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           ))}
         </div>
       </div>
-      <TokenHeatmap usage={tokenUsage} loading={tokenUsageLoading} error={tokenUsageError} />
+      <TokenHeatmap usage={tokenUsage} loading={tokenUsageLoading} error={tokenUsageError} fallbackAgentNames={fallbackAgentNames} />
       {content}
     </section>
   );
