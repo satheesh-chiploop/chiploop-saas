@@ -8,8 +8,11 @@ import { LowCreditBanner } from "@/components/PlanCreditStatus";
 import TopNav from "@/components/TopNav";
 import {
   DESIGN_CHAIN_CONTEXT_KEY,
+  FPGA_BITSTREAM_PREFILL_KEY,
   IMAGE_DMA_PIPELINE_ARCH2RTL_SPEC,
   MBIST_SRAM_ARCH2RTL_SPEC,
+  PWM_FPGA_ICEBREAKER_PCF,
+  PWM_FPGA_RTL_TEXT,
   PWM_FULL_STACK_ARCH2RTL_SPEC,
   SAFETY_FAULT_MANAGER_ARCH2RTL_SPEC,
   SECURE_BOOT_ARCH2RTL_SPEC,
@@ -752,6 +755,20 @@ export default function AppsHomePage() {
     go("/apps/arch2rtl?guided=1&pwm_chain=1");
   }
 
+  function startPwmFpgaPrototypeDemo() {
+    window.localStorage.setItem(FPGA_BITSTREAM_PREFILL_KEY, JSON.stringify({
+      rtlSourceMode: "paste",
+      rtlText: PWM_FPGA_RTL_TEXT,
+      board: "icebreaker",
+      topModule: "pwm_fpga_demo",
+      targetFrequency: "12",
+      pcfText: PWM_FPGA_ICEBREAKER_PCF,
+      notes: "Reference journey: PWM RTL generation to FPGA synthesis, place-and-route, timing, and bitstream handoff.",
+    }));
+    window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "pwm_fpga_prototype" }));
+    go("/apps/fpga-bitstream?guided=1&pwm_fpga=1");
+  }
+
   function startUartPacketDemo() {
     window.localStorage.setItem(ONBOARDING_DEMO_KEY, JSON.stringify({
       projectName: "uart_packet_engine_demo",
@@ -1074,11 +1091,11 @@ export default function AppsHomePage() {
       key: "fpga-prototype",
       exploreTitle: "Explore FPGA Prototype",
       segment: "FPGA / Board Bring-up",
-      title: "RTL to iCE40 Bitstream: synthesize, place, route, time, and package",
-      copy: "A board-oriented reference path for teams that want to prove generated RTL on FPGA hardware before moving deeper into ASIC implementation.",
-      button: "Open FPGA Prototype App",
-      onClick: () => router.push("/apps/fpga-bitstream"),
-      stages: ["RTL Handoff", "Constraints", "Yosys", "nextpnr", "Timing", "Bitstream"],
+      title: "PWM RTL to iCE40 Bitstream: generate, constrain, synthesize, place, route, time, and package",
+      copy: "A board-oriented reference journey for proving a PWM RTL block on FPGA hardware before moving deeper into ASIC implementation. Start from predefined PWM RTL and iCEBreaker constraints, then generate synthesis, place-and-route, timing, and bitstream handoff evidence.",
+      button: "Start PWM FPGA Journey",
+      onClick: startPwmFpgaPrototypeDemo,
+      stages: ["PWM RTL", "Board Constraints", "Yosys Synthesis", "nextpnr P&R", "Timing Check", "Bitstream"],
     },
   ];
 

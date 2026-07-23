@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import { FPGA_BITSTREAM_PREFILL_KEY } from "@/lib/pwmFullStackDemo";
+import SpecTextBox from "@/components/SpecTextBox";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -61,6 +63,16 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [board, setBoard] = useState("icebreaker");
   const [topModule, setTopModule] = useState("");
   const [pcfText, setPcfText] = useState("");
+  const [runFpgaSynthesisClosureLoop, setRunFpgaSynthesisClosureLoop] = useState(false);
+  const [maxFpgaSynthesisClosureIterations, setMaxFpgaSynthesisClosureIterations] = useState("1");
+  const [runFpgaTimingClosureLoop, setRunFpgaTimingClosureLoop] = useState(true);
+  const [maxFpgaTimingClosureIterations, setMaxFpgaTimingClosureIterations] = useState("3");
+  const [allowYosysFlatten, setAllowYosysFlatten] = useState(true);
+  const [allowNextpnrSeedSweep, setAllowNextpnrSeedSweep] = useState(true);
+  const [allowFrequencyRelaxation, setAllowFrequencyRelaxation] = useState(false);
+  const [contextMode, setContextMode] = useState<"smart" | "full">("smart");
+  const [hemEnabled, setHemEnabled] = useState(false);
+  const [hemMode, setHemMode] = useState<"fixed" | "adaptive">("fixed");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
 
@@ -90,6 +102,39 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     if (source) {
       setSourceMode("from_arch2rtl");
       setSourceWorkflowId(source);
+    }
+    if (!fields.includes("fpga")) return;
+    const raw = window.localStorage.getItem(FPGA_BITSTREAM_PREFILL_KEY);
+    if (!raw) return;
+    try {
+      const prefill = JSON.parse(raw) as Partial<{
+        rtlSourceMode: "from_arch2rtl" | "paste" | "repo_path";
+        sourceWorkflowId: string;
+        repoPath: string;
+        rtlText: string;
+        board: string;
+        topModule: string;
+        targetFrequency: string;
+        pcfText: string;
+        notes: string;
+        hemEnabled: boolean;
+        hemMode: "fixed" | "adaptive";
+      }>;
+      if (prefill.rtlSourceMode) setSourceMode(prefill.rtlSourceMode);
+      if (prefill.sourceWorkflowId) setSourceWorkflowId(prefill.sourceWorkflowId);
+      if (prefill.repoPath) setRepoPath(prefill.repoPath);
+      if (prefill.rtlText) setRtlText(prefill.rtlText);
+      if (prefill.board) setBoard(prefill.board);
+      if (prefill.topModule) setTopModule(prefill.topModule);
+      if (prefill.targetFrequency) setTargetFrequency(prefill.targetFrequency);
+      if (prefill.pcfText) setPcfText(prefill.pcfText);
+      if (prefill.notes) setNotes(prefill.notes);
+      if (typeof prefill.hemEnabled === "boolean") setHemEnabled(prefill.hemEnabled);
+      if (prefill.hemMode) setHemMode(prefill.hemMode);
+    } catch {
+      // Ignore malformed local prefill.
+    } finally {
+      window.localStorage.removeItem(FPGA_BITSTREAM_PREFILL_KEY);
     }
   }, [loading]);
 
@@ -156,6 +201,17 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         top_module: fields.includes("fpga") && topModule.trim() ? topModule.trim() : undefined,
         pcf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
         notes: notes.trim() || undefined,
+        run_fpga_synthesis_closure_loop: fields.includes("fpga") ? runFpgaSynthesisClosureLoop : undefined,
+        max_fpga_synthesis_closure_iterations: fields.includes("fpga") ? Number(maxFpgaSynthesisClosureIterations || 1) : undefined,
+        run_fpga_timing_closure_loop: fields.includes("fpga") ? runFpgaTimingClosureLoop : undefined,
+        max_fpga_timing_closure_iterations: fields.includes("fpga") ? Number(maxFpgaTimingClosureIterations || 1) : undefined,
+        allow_yosys_flatten: fields.includes("fpga") ? allowYosysFlatten : undefined,
+        allow_nextpnr_seed_sweep: fields.includes("fpga") ? allowNextpnrSeedSweep : undefined,
+        allow_frequency_relaxation: fields.includes("fpga") ? allowFrequencyRelaxation : undefined,
+        smart_context_enabled: fields.includes("fpga") ? contextMode === "smart" : undefined,
+        context_mode: fields.includes("fpga") ? contextMode : undefined,
+        hem_enabled: fields.includes("fpga") ? hemEnabled : undefined,
+        hem_mode: fields.includes("fpga") ? hemMode : undefined,
       };
       const resp = await fetch(`${API_BASE}${runPath}`, {
         method: "POST",
@@ -230,7 +286,21 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                 </div>
               ) : null}
 
-              {fields.includes("rtl") || sourceMode === "paste" ? (
+              {fields.includes("fpga") && (fields.includes("rtl") || sourceMode === "paste") ? (
+                <SpecTextBox
+                  label="RTL / FPGA source"
+                  value={rtlText}
+                  onChange={setRtlText}
+                  rows={9}
+                  voiceTitle="FPGA RTL Voice Input"
+                  voiceLoopType="fpga"
+                  voiceTarget="RTL source, board notes, or FPGA prototype intent"
+                  uploadLabel="Upload RTL"
+                  uploadHelper="Upload Verilog/SystemVerilog, board notes, or small source snippets."
+                  placeholder="Paste Verilog/SystemVerilog RTL or upload source files."
+                  textareaClassName="w-full resize-y bg-transparent p-1 font-mono text-sm text-slate-100 outline-none"
+                />
+              ) : fields.includes("rtl") || sourceMode === "paste" ? (
                 <label className="block">
                   <span className="text-sm text-slate-300">RTL text</span>
                   <textarea value={rtlText} onChange={(e) => setRtlText(e.target.value)} rows={8} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 font-mono text-sm text-white" />
@@ -296,17 +366,72 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
               </div>
 
               {fields.includes("fpga") ? (
-                <label className="block">
-                  <span className="text-sm text-slate-300">Pin constraints PCF</span>
-                  <textarea
+                <div className="space-y-4">
+                  <SpecTextBox
+                    label="Pin constraints PCF"
                     value={pcfText}
-                    onChange={(e) => setPcfText(e.target.value)}
+                    onChange={setPcfText}
                     rows={7}
-                    className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 font-mono text-sm text-white"
+                    voiceTitle="FPGA Constraint Voice Input"
+                    voiceLoopType="fpga"
+                    voiceTarget="PCF pin constraints or board pin mapping"
+                    uploadLabel="Upload PCF"
+                    uploadHelper="Upload PCF constraints, board pin notes, or implementation constraints."
                     placeholder={'set_io clk 35\nset_io reset_n 10\nset_io led 99'}
+                    textareaClassName="w-full resize-y bg-transparent p-1 font-mono text-sm text-slate-100 outline-none"
                   />
-                  <span className="mt-2 block text-xs text-amber-200">Use real board pin names before programming hardware. Blank PCF creates a starter file only.</span>
-                </label>
+                  <span className="block text-xs text-amber-200">Use real board pin names before programming hardware. Blank PCF creates a starter file only.</span>
+
+                  <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/10 p-4">
+                    <div className="text-sm font-bold text-cyan-200">FPGA closure and intelligence</div>
+                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                      <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-200">
+                        <input type="checkbox" checked={runFpgaSynthesisClosureLoop} onChange={(e) => setRunFpgaSynthesisClosureLoop(e.target.checked)} className="mt-1" />
+                        <span>
+                          <span className="block font-semibold text-white">Synthesis closure loop</span>
+                          <span className="text-slate-400">Retry synthesis with safe settings when Yosys reports fixable issues.</span>
+                        </span>
+                      </label>
+                      <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-200">
+                        <input type="checkbox" checked={runFpgaTimingClosureLoop} onChange={(e) => setRunFpgaTimingClosureLoop(e.target.checked)} className="mt-1" />
+                        <span>
+                          <span className="block font-semibold text-white">Timing closure loop</span>
+                          <span className="text-slate-400">Rerun implementation with nextpnr seed exploration when timing misses.</span>
+                        </span>
+                      </label>
+                    </div>
+                    <div className="mt-3 grid gap-3 md:grid-cols-4">
+                      <label className="block">
+                        <span className="text-xs uppercase tracking-wide text-slate-400">Synth tries</span>
+                        <input value={maxFpgaSynthesisClosureIterations} onChange={(e) => setMaxFpgaSynthesisClosureIterations(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white" />
+                      </label>
+                      <label className="block">
+                        <span className="text-xs uppercase tracking-wide text-slate-400">Timing tries</span>
+                        <input value={maxFpgaTimingClosureIterations} onChange={(e) => setMaxFpgaTimingClosureIterations(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white" />
+                      </label>
+                      <label className="block">
+                        <span className="text-xs uppercase tracking-wide text-slate-400">Context</span>
+                        <select value={contextMode} onChange={(e) => setContextMode(e.target.value as "smart" | "full")} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white">
+                          <option value="smart">Smart</option>
+                          <option value="full">Full</option>
+                        </select>
+                      </label>
+                      <label className="block">
+                        <span className="text-xs uppercase tracking-wide text-slate-400">HEM mode</span>
+                        <select value={hemMode} onChange={(e) => setHemMode(e.target.value as "fixed" | "adaptive")} disabled={!hemEnabled} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
+                          <option value="fixed">Fixed</option>
+                          <option value="adaptive">Adaptive</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div className="mt-3 grid gap-3 md:grid-cols-4">
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowYosysFlatten} onChange={(e) => setAllowYosysFlatten(e.target.checked)} /> Allow Yosys flatten</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowNextpnrSeedSweep} onChange={(e) => setAllowNextpnrSeedSweep(e.target.checked)} /> Seed sweep</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowFrequencyRelaxation} onChange={(e) => setAllowFrequencyRelaxation(e.target.checked)} /> Suggest relaxed clock</label>
+                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={hemEnabled} onChange={(e) => setHemEnabled(e.target.checked)} /> HEM run memory</label>
+                    </div>
+                  </div>
+                </div>
               ) : null}
 
               {fields.includes("notes") ? (

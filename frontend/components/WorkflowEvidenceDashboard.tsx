@@ -995,8 +995,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "fpga/handoff/fpga_handoff_ingest.json",
         "fpga/constraints/fpga_constraints_summary.json",
         "fpga/synth/fpga_synthesis_summary.json",
+        "fpga/closure/fpga_synthesis_closure_plan.json",
         "fpga/pnr/fpga_place_route_summary.json",
         "fpga/reports/fpga_timing_drc_summary.json",
+        "fpga/closure/fpga_timing_closure_plan.json",
+        "fpga/closure/fpga_timing_closure_chart.json",
         "fpga/bitstream/fpga_bitstream_summary.json",
       ],
       verification: ["simulation_summary_coverage.json", "formal_report.json", "system_sim_dashboard.json"],
@@ -1491,8 +1494,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synth = record(evidence["fpga_synthesis_summary.json"]);
       const pnr = record(evidence["fpga_place_route_summary.json"]);
       const timing = record(evidence["fpga_timing_drc_summary.json"]);
+      const synthClosure = record(evidence["fpga_synthesis_closure_plan.json"]);
+      const timingClosure = record(evidence["fpga_timing_closure_plan.json"]);
       const bitstream = record(evidence["fpga_bitstream_summary.json"]);
       const target = record(firstPresent(dashboard.target, handoff.target, constraints.target, synth.target, pnr.target, timing.target, bitstream.target));
+      const smartContext = record(dashboard.smart_context);
+      const hem = record(dashboard.hem);
       const toolSummary = {
         used: [
           firstString(synth.tool),
@@ -1521,13 +1528,17 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Top Module" value={firstString(target.top_module, handoff.top_module, "not inferred")} />
             <Stat title="RTL Files" value={firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length)} />
             <Stat title="Max Frequency" value={maxFrequency} />
+            <Stat title="Smart Context" value={smartContext.enabled === true ? firstString(smartContext.mode, "smart") : "full"} />
+            <Stat title="HEM" value={hem.enabled === true ? firstString(hem.mode, "fixed") : "off"} />
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={firstString(constraints.pcf, constraints.pcf_path, "PCF not reported")} />
             <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={firstString(synth.netlist_json, synth.json_netlist, synth.reason)} />
+            <CheckCard title="Synthesis Closure" status={statusLabel(synthClosure.status)} detail={array(synthClosure.actions).map(String).join(" ") || "closure plan not requested"} />
             <CheckCard title="Place & Route" status={statusLabel(pnr.status)} detail={firstString(pnr.asc, pnr.asc_path, pnr.reason)} />
             <CheckCard title="Timing / DRC" status={statusLabel(timing.status)} detail={firstString(timing.summary, timing.reason, "see timing report")} />
+            <CheckCard title="Timing Closure" status={statusLabel(timingClosure.status)} detail={array(timingClosure.actions).map(String).join(" ") || "closure plan not requested"} />
             <CheckCard title="Bitstream" status={statusLabel(bitstream.status)} detail={bitstreamPath} />
             <CheckCard title="Programming" status="handoff" detail={programCommand} />
           </div>

@@ -89,7 +89,7 @@ const paths = [
 ];
 
 const platformStats = [
-  ["205+", "Agents", "text-cyan-300"],
+  ["207+", "Agents", "text-cyan-300"],
   ["44+", "Apps", "text-emerald-300"],
   ["15+", "Workflow Templates", "text-violet-300"],
   ["9+", "Reference Journeys", "text-amber-300"],
@@ -324,17 +324,17 @@ function LandingPageContent() {
           <div className="mx-auto max-w-4xl text-center">
             <p className={eyebrowClass}>Choose Your Chip Design Loop</p>
             <h2 className={`${sectionTitleClass} mx-auto`}>
-              One platform. Five chip design loops. Connected engineering context.
+              One platform. Connected design loops. Shared engineering context.
             </h2>
             <p className={`${sectionBodyClass} mx-auto`}>
               Start with one Core loop. Add Advanced capability or more credits as your work grows.
             </p>
           </div>
-          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6">
             {subscriptionLoops.map((loop) => (
-              <article key={loop.name} className={`rounded-xl border-2 ${loop.border} bg-slate-950/70 p-5 shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
+              <article key={loop.name} className={`rounded-xl border-2 ${loop.border} bg-slate-950/70 p-4 shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
                 <h3 className={cardTitleClass}>{loop.name}</h3>
-                <p className={`${cardBodyClass} min-h-28`}>{loop.body}</p>
+                <p className={`${cardBodyClass} min-h-32`}>{loop.body}</p>
               </article>
             ))}
           </div>

@@ -32,7 +32,7 @@ const loops = [
     core: "RTL ingest, iCE40 synthesis, place-and-route, timing, bitstream",
     advanced: "Board presets, IP packaging, hardware bring-up, vendor flows",
     href: "/apps?loop=fpga",
-    metrics: { agents: 7, apps: 1, workflows: 1, journeys: 1 },
+    metrics: { agents: 9, apps: 1, workflows: 1, journeys: 1 },
     border: "border-lime-300/55",
     hover: "hover:border-lime-300 hover:shadow-lime-950/35",
   },
