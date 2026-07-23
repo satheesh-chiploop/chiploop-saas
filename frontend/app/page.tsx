@@ -89,10 +89,10 @@ const paths = [
 ];
 
 const platformStats = [
-  ["198+", "Agents", "text-cyan-300"],
-  ["43+", "Apps", "text-emerald-300"],
-  ["14+", "Workflow Templates", "text-violet-300"],
-  ["8+", "Reference Journeys", "text-amber-300"],
+  ["205+", "Agents", "text-cyan-300"],
+  ["44+", "Apps", "text-emerald-300"],
+  ["15+", "Workflow Templates", "text-violet-300"],
+  ["9+", "Reference Journeys", "text-amber-300"],
   ["5+", "Product Journeys", "text-pink-300"],
   ["SDK + CLI + Studio", "Developer Access", "text-slate-100"],
 ];
@@ -109,6 +109,12 @@ const subscriptionLoops = [
     body: "Synthesis, constraints, timing/power/area reports, DFT/MBIST, RTL-to-GDS, signoff, and tapeout handoff.",
     border: "border-violet-400/55",
     hover: "hover:border-violet-300 hover:shadow-violet-950/35",
+  },
+  {
+    name: "FPGA Prototyping",
+    body: "RTL handoff, iCE40 synthesis, place-and-route, timing checks, bitstream packaging, and board programming handoff.",
+    border: "border-lime-300/55",
+    hover: "hover:border-lime-300 hover:shadow-lime-950/35",
   },
   {
     name: "Mixed Signal",

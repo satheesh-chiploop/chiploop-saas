@@ -23,10 +23,10 @@ import {
 
 const supabase = createClientComponentClient();
 
-type LoopType = "digital" | "validation" | "analog" | "embedded" | "system";
+type LoopType = "digital" | "validation" | "analog" | "embedded" | "system" | "fpga";
 
-const LOOP_TYPES: LoopType[] = ["digital", "analog", "system", "embedded", "validation"];
-type CatalogView = "home" | "digital" | "system" | "analog" | "embedded" | "validation";
+const LOOP_TYPES: LoopType[] = ["digital", "fpga", "analog", "system", "embedded", "validation"];
+type CatalogView = "home" | "digital" | "fpga" | "system" | "analog" | "embedded" | "validation";
 
 type OnboardingResponse = {
   status: string;
@@ -117,6 +117,14 @@ const LOOP_META: Record<LoopType, {
     accent: "bg-sky-400",
     softBg: "bg-sky-500/10 text-sky-200",
     border: "border-sky-500/30",
+  },
+  fpga: {
+    title: "FPGA Loop",
+    tagline: "Prototype RTL to bitstream to board handoff",
+    icon: "F",
+    accent: "bg-lime-300",
+    softBg: "bg-lime-500/10 text-lime-100",
+    border: "border-lime-500/30",
   },
   validation: {
     title: "Validation Loop",
@@ -315,6 +323,15 @@ export default function AppsHomePage() {
       status: "Flagship",
       nudge: "Recommended",
       promise: "Catch issues before tape-in",
+    },
+    {
+      slug: "fpga-bitstream",
+      title: "FPGA RTL to Bitstream",
+      subtitle: "Run iCE40 synthesis, place-and-route, timing, and bitstream handoff",
+      loop_type: "fpga",
+      status: "New",
+      nudge: "Prototype",
+      promise: "Generate FPGA implementation evidence and programming handoff",
     },
     {
       slug: "verify",
@@ -682,6 +699,7 @@ export default function AppsHomePage() {
 
   const outcomeInputs: Record<LoopType, string> = {
     digital: "Architecture spec or RTL",
+    fpga: "RTL, board target, and PCF constraints",
     analog: "Analog spec or netlist",
     embedded: "Registers, firmware intent, or logs",
     validation: "Datasheet, bench, or run intent",
@@ -690,6 +708,7 @@ export default function AppsHomePage() {
 
   const outcomeOutputs: Record<LoopType, string> = {
     digital: "RTL, reports, constraints, and ZIP package",
+    fpga: "JSON netlist, place-and-route, timing report, and bitstream package",
     analog: "Models, correlation reports, and integration views",
     embedded: "HAL, drivers, diagnostics, and co-sim proof",
     validation: "Plans, run results, gaps, and executive report",
@@ -1051,17 +1070,28 @@ export default function AppsHomePage() {
       button: "Start Safety Journey",
       onClick: startSafetyFaultDemo,
     },
+    {
+      key: "fpga-prototype",
+      exploreTitle: "Explore FPGA Prototype",
+      segment: "FPGA / Board Bring-up",
+      title: "RTL to iCE40 Bitstream: synthesize, place, route, time, and package",
+      copy: "A board-oriented reference path for teams that want to prove generated RTL on FPGA hardware before moving deeper into ASIC implementation.",
+      button: "Open FPGA Prototype App",
+      onClick: () => router.push("/apps/fpga-bitstream"),
+      stages: ["RTL Handoff", "Constraints", "Yosys", "nextpnr", "Timing", "Bitstream"],
+    },
   ];
 
   const catalogButtons: Array<{ view: CatalogView; title: string; body: string; count?: number }> = [
     { view: "digital", title: "Explore Digital apps", body: "RTL, DQA, verify, synthesis, tapeout, and handoff apps.", count: apps.filter((app) => app.loop_type === "digital").length },
+    { view: "fpga", title: "Explore FPGA apps", body: "RTL handoff, iCE40 synthesis, place-and-route, timing, and bitstream handoff.", count: apps.filter((app) => app.loop_type === "fpga").length },
     { view: "system", title: "Explore System apps", body: "System RTL, simulation, synthesis, PD, firmware, software, validation, and product builder.", count: apps.filter((app) => app.loop_type === "system").length },
     { view: "analog", title: "Explore Analog apps", body: "Analog spec, netlist, model, validation, correlation, iteration, and abstracts.", count: apps.filter((app) => app.loop_type === "analog").length },
     { view: "embedded", title: "Explore Embedded apps", body: "HAL, drivers, boot, diagnostics, log analysis, co-sim, and firmware run.", count: apps.filter((app) => app.loop_type === "embedded").length },
     { view: "validation", title: "Explore Validation apps", body: "Validation plans, bench setup, preflight, execution orchestration, analytics, and insights.", count: apps.filter((app) => app.loop_type === "validation").length },
   ];
 
-  const selectedCatalogLoop = ["digital", "system", "analog", "embedded", "validation"].includes(catalogView)
+  const selectedCatalogLoop = ["digital", "fpga", "system", "analog", "embedded", "validation"].includes(catalogView)
     ? catalogView as LoopType
     : null;
 

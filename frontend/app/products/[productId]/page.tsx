@@ -107,6 +107,7 @@ const APP_LINKS: Record<string, string> = {
   Digital_RTL_Review: "/apps/rtl-review",
   Digital_Constraint_Review: "/apps/constraint-review",
   Digital_Timing_Debug: "/apps/timing-debug",
+  FPGA_RTL_to_Bitstream: "/apps/fpga-bitstream",
   Digital_Verify: "/apps/verify",
   Digital_Arch2Synthesis: "/apps/arch2synthesis",
   Digital_Arch2Tapeout: "/apps/arch2tapeout",
@@ -781,6 +782,7 @@ function dashboardStageForApp(app: string) {
     System_Sim: "verification",
     Digital_Arch2Synthesis: "synthesis",
     System_Synthesis: "synthesis",
+    FPGA_RTL_to_Bitstream: "fpga",
     Digital_Arch2Tapeout: "tapeout",
     System_PD: "tapeout",
     Embedded_Run: "embedded",
@@ -795,6 +797,7 @@ function dashboardStageForApp(app: string) {
 function dashboardStageFromText(...values: unknown[]) {
   const text = values.map((value) => String(value || "")).join(" ").toLowerCase();
   if (["tapeout", "physical design", " signoff", "system_pd", "system pd"].some((token) => text.includes(token))) return "tapeout";
+  if (["fpga", "bitstream", "nextpnr", "ice40"].some((token) => text.includes(token))) return "fpga";
   if (["synthesis", "arch2synthesis", "system_synthesis", "system synthesis"].some((token) => text.includes(token))) return "synthesis";
   if (["verify", "verification", "system_sim", "system sim", "closure"].some((token) => text.includes(token))) return "verification";
   if (["dqa", "quality"].some((token) => text.includes(token))) return "dqa";

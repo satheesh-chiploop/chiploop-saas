@@ -10,7 +10,7 @@ import {
 } from "@/lib/pwmFullStackDemo";
 
 type ChainStage = "arch2rtl" | "dqa" | "smoke" | "synthesis" | "tapeout" | "verify";
-type NextAction = "verify" | "dqa" | "smoke" | "synthesis" | "tapeout";
+type NextAction = "verify" | "dqa" | "smoke" | "synthesis" | "tapeout" | "fpga";
 
 const ACTION_LABELS: Record<NextAction, string> = {
   verify: "Verification",
@@ -18,6 +18,7 @@ const ACTION_LABELS: Record<NextAction, string> = {
   smoke: "Smoke simulation",
   synthesis: "Synthesis",
   tapeout: "Tapeout prep",
+  fpga: "FPGA bitstream",
 };
 
 const ACTION_ROUTES: Record<NextAction, string> = {
@@ -26,14 +27,15 @@ const ACTION_ROUTES: Record<NextAction, string> = {
   smoke: "/apps/smoke",
   synthesis: "/apps/arch2synthesis",
   tapeout: "/apps/arch2tapeout",
+  fpga: "/apps/fpga-bitstream",
 };
 
 function optionsForStage(stage: ChainStage): NextAction[] {
-  if (stage === "arch2rtl") return ["verify", "dqa", "smoke", "synthesis", "tapeout"];
-  if (stage === "dqa") return ["smoke", "verify", "synthesis", "tapeout"];
-  if (stage === "smoke") return ["verify", "synthesis", "tapeout"];
-  if (stage === "verify") return ["smoke", "synthesis", "tapeout"];
-  if (stage === "synthesis") return ["tapeout", "smoke", "verify"];
+  if (stage === "arch2rtl") return ["verify", "dqa", "smoke", "synthesis", "fpga", "tapeout"];
+  if (stage === "dqa") return ["smoke", "verify", "synthesis", "fpga", "tapeout"];
+  if (stage === "smoke") return ["verify", "synthesis", "fpga", "tapeout"];
+  if (stage === "verify") return ["smoke", "synthesis", "fpga", "tapeout"];
+  if (stage === "synthesis") return ["fpga", "tapeout", "smoke", "verify"];
   return ["smoke", "verify"];
 }
 

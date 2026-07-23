@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ApiClientError, apiGet } from "@/lib/apiClient";
 import { createClientComponentClient } from "@/lib/platformClient";
 
-type Stage = "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "verification" | "embedded" | "software" | "validation" | "product";
+type Stage = "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "fpga" | "verification" | "embedded" | "software" | "validation" | "product";
 type JsonMap = Record<string, unknown>;
 
 type Props = {
@@ -75,7 +75,7 @@ const MAIN_FLOW: FlowItem[] = [
   { id: "product", label: "Product" },
 ];
 
-const OPTIONAL_DIGITAL_FLOW: Record<Extract<Stage, "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout">, FlowItem> = {
+const OPTIONAL_DIGITAL_FLOW: Record<Extract<Stage, "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "fpga">, FlowItem> = {
   dqa: { id: "dqa", label: "DQA" },
   rtl_review: { id: "rtl_review", label: "RTL Review" },
   constraint_review: { id: "constraint_review", label: "Constraints" },
@@ -83,9 +83,18 @@ const OPTIONAL_DIGITAL_FLOW: Record<Extract<Stage, "dqa" | "rtl_review" | "const
   smoke: { id: "smoke", label: "Smoke" },
   synthesis: { id: "synthesis", label: "Synth" },
   tapeout: { id: "tapeout", label: "Tapeout" },
+  fpga: { id: "fpga", label: "FPGA" },
 };
 
 function displayedFlow(stage: Stage): FlowItem[] {
+  if (stage === "fpga") {
+    return [
+      RTL_STAGE,
+      { id: "synthesis", label: "Synth" },
+      { id: "fpga", label: "P&R" },
+      { id: "fpga", label: "Bitstream" },
+    ];
+  }
   if (stage === "dqa" || stage === "rtl_review" || stage === "constraint_review" || stage === "timing_debug" || stage === "smoke" || stage === "synthesis" || stage === "tapeout") {
     return [RTL_STAGE, OPTIONAL_DIGITAL_FLOW[stage]];
   }
@@ -380,7 +389,7 @@ function hasTerminalEvidence(status: string | null | undefined, stage: Stage, lo
   const normalized = String(status || "").toLowerCase();
   if (["completed", "complete", "success", "succeeded", "failed", "done"].includes(normalized)) return true;
   if (!logs) return false;
-  if (/(?:system|digital|embedded|analog|validation)\s+(?:run\s+)?app\s+complete/i.test(logs)) return true;
+  if (/(?:system|digital|embedded|analog|validation|fpga)\s+(?:run\s+)?app\s+complete/i.test(logs)) return true;
   if (/system\s+app\s+complete:\s*system[_\s-]*(?:firmware|software|software[_\s-]*validation|product[_\s-]*app[_\s-]*builder|rtl|sim)/i.test(logs)) {
     return true;
   }
@@ -395,6 +404,9 @@ function hasTerminalEvidence(status: string | null | undefined, stage: Stage, lo
   }
   if (stage === "product") {
     return /system\s+product\s+(?:package|dashboard|capability|collateral).*done|system_product_(?:package|dashboard_manifest|capability_model|collateral_contract)\.json|system\/product\/app\/index\.html/i.test(logs);
+  }
+  if (stage === "fpga") {
+    return /fpga\s+(?:dashboard|bitstream|timing|nextpnr|yosys).*done|fpga_dashboard\.json|fpga_bitstream_summary\.json/i.test(logs);
   }
   return false;
 }
@@ -978,6 +990,15 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/signoff_closure/signoff_closure_chart.json",
         "executive_summary.json",
       ],
+      fpga: [
+        "fpga/fpga_dashboard.json",
+        "fpga/handoff/fpga_handoff_ingest.json",
+        "fpga/constraints/fpga_constraints_summary.json",
+        "fpga/synth/fpga_synthesis_summary.json",
+        "fpga/pnr/fpga_place_route_summary.json",
+        "fpga/reports/fpga_timing_drc_summary.json",
+        "fpga/bitstream/fpga_bitstream_summary.json",
+      ],
       verification: ["simulation_summary_coverage.json", "formal_report.json", "system_sim_dashboard.json"],
       embedded: [
         "system_firmware_dashboard.json",
@@ -1458,6 +1479,57 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Simulation" value={failed > 0 ? "fail" : passed > 0 ? "pass" : "not run"} />
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
             <Stat title="Summary" value={firstString(summary.status, summary.verdict, status || "running")} />
+          </div>
+        </div>
+      );
+    }
+
+    if (stage === "fpga") {
+      const dashboard = record(evidence["fpga_dashboard.json"]);
+      const handoff = record(evidence["fpga_handoff_ingest.json"]);
+      const constraints = record(evidence["fpga_constraints_summary.json"]);
+      const synth = record(evidence["fpga_synthesis_summary.json"]);
+      const pnr = record(evidence["fpga_place_route_summary.json"]);
+      const timing = record(evidence["fpga_timing_drc_summary.json"]);
+      const bitstream = record(evidence["fpga_bitstream_summary.json"]);
+      const target = record(firstPresent(dashboard.target, handoff.target, constraints.target, synth.target, pnr.target, timing.target, bitstream.target));
+      const toolSummary = {
+        used: [
+          firstString(synth.tool),
+          firstString(pnr.tool),
+          firstString(timing.tool),
+          firstString(bitstream.tool),
+        ].filter(Boolean),
+        defaultTool: "Yosys + nextpnr + IceStorm",
+      };
+      const maxFrequency = metricValue(
+        pnr.max_frequency_mhz,
+        pnr.fmax_mhz,
+        timing.max_frequency_mhz,
+        target.target_frequency_mhz,
+      );
+      const bitstreamPath = firstString(bitstream.bitstream, bitstream.bitstream_path, "not generated");
+      const programCommand = firstString(bitstream.program_command, "available after bitstream generation");
+      return (
+        <div className="mt-5 space-y-5">
+          <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Stat title="Board" value={firstString(target.board, "icebreaker")} />
+            <Stat title="Family" value={firstString(target.family, "ice40")} />
+            <Stat title="Device" value={firstString(target.device, "not selected")} />
+            <Stat title="Package" value={firstString(target.package, "not selected")} />
+            <Stat title="Top Module" value={firstString(target.top_module, handoff.top_module, "not inferred")} />
+            <Stat title="RTL Files" value={firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length)} />
+            <Stat title="Max Frequency" value={maxFrequency} />
+            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+          </div>
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={firstString(constraints.pcf, constraints.pcf_path, "PCF not reported")} />
+            <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={firstString(synth.netlist_json, synth.json_netlist, synth.reason)} />
+            <CheckCard title="Place & Route" status={statusLabel(pnr.status)} detail={firstString(pnr.asc, pnr.asc_path, pnr.reason)} />
+            <CheckCard title="Timing / DRC" status={statusLabel(timing.status)} detail={firstString(timing.summary, timing.reason, "see timing report")} />
+            <CheckCard title="Bitstream" status={statusLabel(bitstream.status)} detail={bitstreamPath} />
+            <CheckCard title="Programming" status="handoff" detail={programCommand} />
           </div>
         </div>
       );

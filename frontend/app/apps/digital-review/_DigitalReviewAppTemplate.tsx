@@ -19,14 +19,14 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
-type FieldKind = "source" | "rtl" | "sdc" | "timing" | "frequency" | "stage" | "depth" | "notes";
+type FieldKind = "source" | "rtl" | "sdc" | "timing" | "frequency" | "stage" | "depth" | "notes" | "fpga";
 
 type Props = {
   slug: string;
   title: string;
   subtitle: string;
   runPath: string;
-  dashboardStage: "rtl_review" | "constraint_review" | "timing_debug";
+  dashboardStage: "rtl_review" | "constraint_review" | "timing_debug" | "fpga";
   fields: FieldKind[];
 };
 
@@ -58,6 +58,9 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [stage, setStage] = useState("auto");
   const [reviewDepth, setReviewDepth] = useState("standard");
   const [notes, setNotes] = useState("");
+  const [board, setBoard] = useState("icebreaker");
+  const [topModule, setTopModule] = useState("");
+  const [pcfText, setPcfText] = useState("");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
 
@@ -148,6 +151,10 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         target_frequency_mhz: targetFrequency ? Number(targetFrequency) : undefined,
         stage,
         review_depth: reviewDepth,
+        board: fields.includes("fpga") ? board : undefined,
+        family: fields.includes("fpga") ? "ice40" : undefined,
+        top_module: fields.includes("fpga") && topModule.trim() ? topModule.trim() : undefined,
+        pcf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
         notes: notes.trim() || undefined,
       };
       const resp = await fetch(`${API_BASE}${runPath}`, {
@@ -195,7 +202,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         </div>
 
         <section className="mt-6 rounded-2xl border border-cyan-500/40 bg-slate-950/80 p-6 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]">
-          <div className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">Digital Loop</div>
+          <div className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">{fields.includes("fpga") ? "FPGA Loop" : "Digital Loop"}</div>
           <h1 className="mt-2 text-3xl font-black text-white md:text-4xl">{title}</h1>
           <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">{subtitle}</p>
 
@@ -245,6 +252,23 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
               ) : null}
 
               <div className="grid gap-3 md:grid-cols-3">
+                {fields.includes("fpga") ? (
+                  <>
+                    <label className="block">
+                      <span className="text-sm text-slate-300">Board</span>
+                      <select value={board} onChange={(e) => setBoard(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white">
+                        <option value="icebreaker">Lattice iCEBreaker</option>
+                        <option value="upduino_v3">UPduino v3</option>
+                        <option value="icestick">Lattice iCEstick</option>
+                        <option value="custom_ice40">Custom iCE40</option>
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-sm text-slate-300">Top module</span>
+                      <input value={topModule} onChange={(e) => setTopModule(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white" placeholder="auto-detect if blank" />
+                    </label>
+                  </>
+                ) : null}
                 {fields.includes("frequency") ? (
                   <label className="block">
                     <span className="text-sm text-slate-300">Target MHz</span>
@@ -270,6 +294,20 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                   </label>
                 ) : null}
               </div>
+
+              {fields.includes("fpga") ? (
+                <label className="block">
+                  <span className="text-sm text-slate-300">Pin constraints PCF</span>
+                  <textarea
+                    value={pcfText}
+                    onChange={(e) => setPcfText(e.target.value)}
+                    rows={7}
+                    className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 font-mono text-sm text-white"
+                    placeholder={'set_io clk 35\nset_io reset_n 10\nset_io led 99'}
+                  />
+                  <span className="mt-2 block text-xs text-amber-200">Use real board pin names before programming hardware. Blank PCF creates a starter file only.</span>
+                </label>
+              ) : null}
 
               {fields.includes("notes") ? (
                 <label className="block">
@@ -308,7 +346,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         {workflowId ? (
           <section className="mt-6 space-y-6">
             <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage={dashboardStage} logs={workflowRow?.logs} />
-            <AskThisRunPanel workflowId={workflowId} runId={runId || undefined} />
+            <AskThisRunPanel workflowId={workflowId} />
           </section>
         ) : null}
       </div>

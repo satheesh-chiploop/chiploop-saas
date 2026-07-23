@@ -27,6 +27,16 @@ const loops = [
     hover: "hover:border-violet-300 hover:shadow-violet-950/35",
   },
   {
+    name: "FPGA Prototyping",
+    short: "Move RTL onto real FPGA boards with synthesis, place-and-route, timing, and bitstream handoff.",
+    core: "RTL ingest, iCE40 synthesis, place-and-route, timing, bitstream",
+    advanced: "Board presets, IP packaging, hardware bring-up, vendor flows",
+    href: "/apps?loop=fpga",
+    metrics: { agents: 7, apps: 1, workflows: 1, journeys: 1 },
+    border: "border-lime-300/55",
+    hover: "hover:border-lime-300 hover:shadow-lime-950/35",
+  },
+  {
     name: "Mixed Signal",
     short: "Connect digital RTL, analog models, and system-level execution.",
     core: "System RTL, Sim, Synthesis",
@@ -127,7 +137,7 @@ export default function LoopsPage() {
 
       <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-[1680px]">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
           {loops.map((loop) => (
             <button
               key={loop.name}
@@ -186,7 +196,7 @@ export default function LoopsPage() {
                       <span className="border-t border-slate-700" />
                     </div>
 
-                    <div className="relative grid h-full grid-cols-5 items-end gap-6 px-2">
+                    <div className="relative grid h-full grid-cols-6 items-end gap-6 px-2">
                       {loops.map((loop) => (
                         <div key={loop.name} className="flex h-full items-end justify-center gap-1.5">
                           {metrics.map((metric) => {
@@ -204,7 +214,7 @@ export default function LoopsPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-5 gap-6 px-2 text-center">
+                  <div className="mt-4 grid grid-cols-6 gap-6 px-2 text-center">
                     {loops.map((loop) => (
                       <div key={loop.name} className="text-xs font-bold leading-4 text-slate-100">{loop.name}</div>
                     ))}
