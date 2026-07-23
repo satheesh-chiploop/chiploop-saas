@@ -545,9 +545,10 @@ function TokenHeatmap({
   error: string | null;
   fallbackAgentNames: string[];
 }) {
+  const [expanded, setExpanded] = useState(false);
   if (loading) {
     return (
-      <div className="mt-5 rounded-lg border border-slate-800 bg-black/25 p-4 text-sm text-slate-400">
+      <div className="mt-5 rounded-lg border border-slate-800 bg-black/25 p-3 text-sm text-slate-400">
         Loading agent token heatmap...
       </div>
     );
@@ -561,6 +562,30 @@ function TokenHeatmap({
   }
   const hasUsefulTokenUsage = tokenResponseHasUsefulUsage(usage);
   const shouldShowExecutionFallback = fallbackAgentNames.length > 0 && !hasUsefulTokenUsage;
+  const agentCount = hasUsefulTokenUsage ? usage?.summary.agent_count || usage?.agents.length || 0 : fallbackAgentNames.length;
+  const compactTotalTokens = usage?.summary.total_tokens || 0;
+  const compactLabel = hasUsefulTokenUsage
+    ? `${formatCompactNumber(compactTotalTokens)} tokens across ${formatCompactNumber(agentCount)} agent${agentCount === 1 ? "" : "s"}`
+    : agentCount
+      ? `${formatCompactNumber(agentCount)} agent${agentCount === 1 ? "" : "s"} tracked; token accounting pending`
+      : "Open token and agent accounting";
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        className="mt-5 flex w-full flex-wrap items-center justify-between gap-3 rounded-lg border border-cyan-400/25 bg-slate-950/55 px-4 py-3 text-left transition hover:border-cyan-300/60 hover:bg-cyan-950/15"
+      >
+        <span>
+          <span className="block text-sm font-bold text-white">Agent Token Heatmap</span>
+          <span className="mt-1 block text-xs text-slate-400">{compactLabel}</span>
+        </span>
+        <span className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-bold text-cyan-200">
+          View summary
+        </span>
+      </button>
+    );
+  }
   if (shouldShowExecutionFallback) {
     return (
       <div className="mt-5 rounded-xl border border-cyan-400/25 bg-slate-950/70 p-4">
@@ -574,6 +599,13 @@ function TokenHeatmap({
           <div className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-bold text-cyan-200">
             {fallbackAgentNames.length} agents tracked
           </div>
+          <button
+            type="button"
+            onClick={() => setExpanded(false)}
+            className="rounded-full border border-slate-700 px-3 py-1 text-xs font-bold text-slate-300 transition hover:border-cyan-400/50 hover:text-cyan-100"
+          >
+            Hide
+          </button>
         </div>
 
         <div className="mt-4 rounded-lg border border-amber-400/25 bg-amber-950/15 p-3 text-sm leading-6 text-amber-100">
@@ -620,6 +652,13 @@ function TokenHeatmap({
         <div className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-bold text-cyan-200">
           {formatCompactNumber(usage.summary.total_tokens)} total tokens
         </div>
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="rounded-full border border-slate-700 px-3 py-1 text-xs font-bold text-slate-300 transition hover:border-cyan-400/50 hover:text-cyan-100"
+        >
+          Hide
+        </button>
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
