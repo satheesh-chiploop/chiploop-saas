@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaBrain, FaCog, FaCompressAlt, FaFileAlt, FaInfinity, FaMicrochip, FaPlay, FaStore, FaTh, FaUserEdit } from "react-icons/fa";
+import { FaBrain, FaChartBar, FaCog, FaFileAlt, FaInfinity, FaMicrochip, FaPlay, FaStore, FaTh, FaUserEdit } from "react-icons/fa";
 import { createClientComponentClient } from "@/lib/platformClient";
 import TopNav from "@/components/TopNav";
 
@@ -187,9 +187,9 @@ const selfRegulatedFeatures = [
     icon: FaBrain,
   },
   {
-    title: "Smart Context",
-    body: "ChipLoop's token-aware context layer ranks relevant logs, reports, artifacts, and files before calling the model.",
-    icon: FaCompressAlt,
+    title: "Smart Context + Agent Heatmap",
+    body: "ChipLoop ranks the right evidence before model calls, then shows per-agent input/output tokens so teams can see cost drivers and optimize workflows.",
+    icon: FaChartBar,
   },
   {
     title: "Evidence Stays Connected",
@@ -405,7 +405,7 @@ function LandingPageContent() {
                 ChipLoop can continue the journey and keep AI context focused.
               </h2>
               <p className={`${sectionBodyClass} mx-auto`}>
-                HEM Automatic Runs moves from one passed stage to the next selected stage. Smart Context, ChipLoop&apos;s tokenmaxxing layer, reduces unnecessary tokens by selecting the evidence that matters before the model answers.
+                HEM Automatic Runs moves from one passed stage to the next selected stage. Smart Context, ChipLoop&apos;s tokenmaxxing layer, selects the evidence that matters, while Agent Heatmap shows where tokens were spent across agents.
               </p>
             </div>
             <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
