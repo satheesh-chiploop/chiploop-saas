@@ -1180,7 +1180,16 @@ export default function VerifyAppPage() {
                     <HemChildDashboardLinks logs={workflowRow?.logs} />
                   </div>
 
-                  <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" logs={workflowRow?.logs} />
+                  <WorkflowEvidenceDashboard
+                    workflowId={workflowId}
+                    status={workflowRow?.status}
+                    stage="verification"
+                    logs={workflowRow?.logs}
+                    linkedHeatmaps={[
+                      { label: "Verification Closure Analysis", workflowId: closureWorkflowId, status: closureRow?.status, logs: closureRow?.logs },
+                      { label: "Verification Closure Loop", workflowId: closureLoopWorkflowId, status: closureLoopRow?.status, logs: closureLoopRow?.logs },
+                    ]}
+                  />
 
                   {closureWorkflowId ? (
                     <div className="rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-4 text-sm text-slate-300">

@@ -12,6 +12,12 @@ type Props = {
   status?: string | null;
   stage: Stage;
   logs?: string | null;
+  linkedHeatmaps?: Array<{
+    label: string;
+    workflowId: string | null;
+    status?: string | null;
+    logs?: string | null;
+  }>;
 };
 
 type WorkflowLogRow = {
@@ -535,11 +541,13 @@ function ClosureTrend({ title, chart, metrics }: { title: string; chart: JsonMap
 }
 
 function TokenHeatmap({
+  label = "Agent Token Heatmap",
   usage,
   loading,
   error,
   fallbackAgentNames,
 }: {
+  label?: string;
   usage: TokenHeatmapResponse | null;
   loading: boolean;
   error: string | null;
@@ -577,7 +585,7 @@ function TokenHeatmap({
         className="mt-5 flex w-full flex-wrap items-center justify-between gap-3 rounded-lg border border-cyan-400/25 bg-slate-950/55 px-4 py-3 text-left transition hover:border-cyan-300/60 hover:bg-cyan-950/15"
       >
         <span>
-          <span className="block text-sm font-bold text-white">Agent Token Heatmap</span>
+          <span className="block text-sm font-bold text-white">{label}</span>
           <span className="mt-1 block text-xs text-slate-400">{compactLabel}</span>
         </span>
         <span className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-bold text-cyan-200">
@@ -591,7 +599,7 @@ function TokenHeatmap({
       <div className="mt-5 rounded-xl border border-cyan-400/25 bg-slate-950/70 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-sm font-bold text-white">Agent Token Heatmap</div>
+            <div className="text-sm font-bold text-white">{label}</div>
             <div className="mt-1 text-xs text-slate-400">
               This workflow has agent execution evidence, but model-token accounting was not recorded per agent for this run.
             </div>
@@ -646,7 +654,7 @@ function TokenHeatmap({
     <div className="mt-5 rounded-xl border border-cyan-400/25 bg-slate-950/70 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-bold text-white">Agent Token Heatmap</div>
+          <div className="text-sm font-bold text-white">{label}</div>
           <div className="mt-1 text-xs text-slate-400">Input and output tokens grouped by agent for this workflow run.</div>
         </div>
         <div className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-bold text-cyan-200">
@@ -740,19 +748,92 @@ function tokenResponseHasUsefulUsage(usage: TokenHeatmapResponse | null): boolea
   );
 }
 
-export default function WorkflowEvidenceDashboard({ workflowId, status, stage, logs }: Props) {
+function TokenHeatmapLoader({
+  label,
+  workflowId,
+  status,
+  logs,
+}: {
+  label: string;
+  workflowId: string | null;
+  status?: string | null;
+  logs?: string | null;
+}) {
+  const [usage, setUsage] = useState<TokenHeatmapResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fetchedLogs, setFetchedLogs] = useState<string | null>(null);
+  const effectiveLogs = logs ?? fetchedLogs;
+  const fallbackAgentNames = useMemo(() => extractParticipatingAgentNames(effectiveLogs), [effectiveLogs]);
+
+  useEffect(() => {
+    setFetchedLogs(null);
+    if (!workflowId || logs !== undefined) return;
+    let active = true;
+    const supabase = createClientComponentClient();
+    supabase
+      .from("workflows")
+      .select("logs")
+      .eq("id", workflowId)
+      .single()
+      .then(({ data, error }) => {
+        if (!active || error) return;
+        setFetchedLogs((data as WorkflowLogRow | null)?.logs || null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [workflowId, logs]);
+
+  useEffect(() => {
+    setUsage(null);
+    setError(null);
+    setLoading(false);
+    if (!workflowId) return;
+    let active = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const loadTokenUsage = (attempt = 0) => {
+      setLoading(true);
+      apiGet<TokenHeatmapResponse>(`/apps/dashboard/token_heatmap/${encodeURIComponent(workflowId)}`)
+        .then((data) => {
+          if (!active) return;
+          setUsage(data);
+          setError(null);
+          if (!tokenResponseHasUsefulUsage(data) && attempt < 12) {
+            timer = setTimeout(() => loadTokenUsage(attempt + 1), 2500);
+          }
+        })
+        .catch((reason: unknown) => {
+          if (!active) return;
+          setError(reason instanceof Error ? reason.message : String(reason));
+          if (attempt < 4) {
+            timer = setTimeout(() => loadTokenUsage(attempt + 1), 2500);
+          }
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+    };
+    loadTokenUsage(0);
+    return () => {
+      active = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [workflowId, status]);
+
+  if (!workflowId) return null;
+  return <TokenHeatmap label={label} usage={usage} loading={loading} error={error} fallbackAgentNames={fallbackAgentNames} />;
+}
+
+export default function WorkflowEvidenceDashboard({ workflowId, status, stage, logs, linkedHeatmaps = [] }: Props) {
   const [evidence, setEvidence] = useState<Record<string, JsonMap | null>>({});
   const [error, setError] = useState<string | null>(null);
   const [artifactsLoaded, setArtifactsLoaded] = useState(false);
-  const [tokenUsage, setTokenUsage] = useState<TokenHeatmapResponse | null>(null);
-  const [tokenUsageLoading, setTokenUsageLoading] = useState(false);
-  const [tokenUsageError, setTokenUsageError] = useState<string | null>(null);
   const [fetchedLogs, setFetchedLogs] = useState<string | null>(null);
   const effectiveLogs = logs ?? fetchedLogs;
   const flow = useMemo(() => displayedFlow(stage), [stage]);
   const stageIndex = flow.findIndex((item) => item.id === stage);
   const agentCount = useMemo(() => countParticipatingAgents(effectiveLogs), [effectiveLogs]);
-  const fallbackAgentNames = useMemo(() => extractParticipatingAgentNames(effectiveLogs), [effectiveLogs]);
   const resultsReady = hasTerminalEvidence(status, stage, effectiveLogs);
 
   useEffect(() => {
@@ -996,42 +1077,6 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       if (timer) clearTimeout(timer);
     };
   }, [workflowId, stage, resultsReady]);
-
-  useEffect(() => {
-    setTokenUsage(null);
-    setTokenUsageError(null);
-    setTokenUsageLoading(false);
-    if (!workflowId) return;
-    let active = true;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const loadTokenUsage = (attempt = 0) => {
-      setTokenUsageLoading(true);
-      apiGet<TokenHeatmapResponse>(`/apps/dashboard/token_heatmap/${encodeURIComponent(workflowId)}`)
-        .then((data) => {
-          if (!active) return;
-          setTokenUsage(data);
-          setTokenUsageError(null);
-          if (!tokenResponseHasUsefulUsage(data) && attempt < 12) {
-            timer = setTimeout(() => loadTokenUsage(attempt + 1), 2500);
-          }
-        })
-        .catch((reason: unknown) => {
-          if (!active) return;
-          setTokenUsageError(reason instanceof Error ? reason.message : String(reason));
-          if (attempt < 4) {
-            timer = setTimeout(() => loadTokenUsage(attempt + 1), 2500);
-          }
-        })
-        .finally(() => {
-          if (active) setTokenUsageLoading(false);
-        });
-    };
-    loadTokenUsage(0);
-    return () => {
-      active = false;
-      if (timer) clearTimeout(timer);
-    };
-  }, [workflowId, status]);
 
   const content = useMemo(() => {
     if (!workflowId || !resultsReady) {
@@ -2020,7 +2065,18 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           ))}
         </div>
       </div>
-      <TokenHeatmap usage={tokenUsage} loading={tokenUsageLoading} error={tokenUsageError} fallbackAgentNames={fallbackAgentNames} />
+      <TokenHeatmapLoader label="Agent Heatmap - Current Workflow" workflowId={workflowId} status={status} logs={effectiveLogs} />
+      {linkedHeatmaps
+        .filter((item) => item.workflowId && item.workflowId !== workflowId)
+        .map((item) => (
+          <TokenHeatmapLoader
+            key={`${item.label}-${item.workflowId}`}
+            label={`Agent Heatmap - ${item.label}`}
+            workflowId={item.workflowId}
+            status={item.status}
+            logs={item.logs}
+          />
+        ))}
       {content}
     </section>
   );

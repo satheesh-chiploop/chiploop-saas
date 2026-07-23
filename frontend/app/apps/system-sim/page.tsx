@@ -803,7 +803,16 @@ export default function SystemSimAppPage() {
                     Run Closure Loop
                   </button>
                   <div className="mt-4">
-                    <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" logs={workflowRow?.logs} />
+                    <WorkflowEvidenceDashboard
+                      workflowId={workflowId}
+                      status={workflowRow?.status}
+                      stage="verification"
+                      logs={workflowRow?.logs}
+                      linkedHeatmaps={[
+                        { label: "System Sim Closure Analysis", workflowId: closureWorkflowId, status: closureRow?.status, logs: closureRow?.logs },
+                        { label: "System Sim Closure Loop", workflowId: closureLoopWorkflowId, status: closureLoopRow?.status, logs: closureLoopRow?.logs },
+                      ]}
+                    />
                   </div>
                   {closureWorkflowId ? (
                     <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/15 p-3">
@@ -959,7 +968,16 @@ export default function SystemSimAppPage() {
                 </button>
               </div>
               <div className="mt-4">
-                <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="verification" logs={workflowRow?.logs} />
+                <WorkflowEvidenceDashboard
+                  workflowId={workflowId}
+                  status={workflowRow?.status}
+                  stage="verification"
+                  logs={workflowRow?.logs}
+                  linkedHeatmaps={[
+                    { label: "System Sim Closure Analysis", workflowId: closureWorkflowId, status: closureRow?.status, logs: closureRow?.logs },
+                    { label: "System Sim Closure Loop", workflowId: closureLoopWorkflowId, status: closureLoopRow?.status, logs: closureLoopRow?.logs },
+                  ]}
+                />
               </div>
               <HemChildDashboardLinks logs={workflowRow?.logs} />
               {closureWorkflowId ? (
