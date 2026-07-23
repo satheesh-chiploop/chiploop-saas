@@ -575,7 +575,7 @@ function TokenHeatmap({
   const compactLabel = hasUsefulTokenUsage
     ? `${formatCompactNumber(compactTotalTokens)} tokens across ${formatCompactNumber(agentCount)} agent${agentCount === 1 ? "" : "s"}`
     : agentCount
-      ? `${formatCompactNumber(agentCount)} agent${agentCount === 1 ? "" : "s"} tracked; token accounting pending`
+      ? `${formatCompactNumber(agentCount)} agent${agentCount === 1 ? "" : "s"} tracked; no model tokens recorded`
       : "Open token and agent accounting";
   if (!expanded) {
     return (
@@ -601,7 +601,7 @@ function TokenHeatmap({
           <div>
             <div className="text-sm font-bold text-white">{label}</div>
             <div className="mt-1 text-xs text-slate-400">
-              This workflow has agent execution evidence, but model-token accounting was not recorded per agent for this run.
+              This workflow has agent execution evidence, but no model-token rows were recorded for this run.
             </div>
           </div>
           <div className="rounded-full border border-cyan-400/30 px-3 py-1 text-xs font-bold text-cyan-200">
@@ -617,7 +617,7 @@ function TokenHeatmap({
         </div>
 
         <div className="mt-4 rounded-lg border border-amber-400/25 bg-amber-950/15 p-3 text-sm leading-6 text-amber-100">
-          Token bars will populate when model usage events are tied to this workflow. For this run, the chart below shows the agent execution map with token accounting pending.
+          No token usage events were found for this workflow. The chart below shows the agent execution map; these steps were tool-only, skipped model calls, or did not report usage for this run.
         </div>
 
         <div className="mt-5 space-y-3">
@@ -625,12 +625,12 @@ function TokenHeatmap({
             <div key={`${name}-${index}`} className="rounded-lg border border-slate-800 bg-black/25 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="break-words text-sm font-bold text-slate-100">{name}</div>
-                <div className="text-xs font-semibold text-slate-500">token accounting pending</div>
+                <div className="text-xs font-semibold text-slate-500">no model tokens recorded</div>
               </div>
               <div className="mt-3 h-4 overflow-hidden rounded-full bg-slate-900">
                 <div className="h-full rounded-full bg-slate-700/80" style={{ width: "100%" }} />
               </div>
-              <div className="mt-2 text-xs text-slate-500">Input/output tokens were not attributed to this agent in `model_usage_events`.</div>
+              <div className="mt-2 text-xs text-slate-500">Input/output tokens were not attributed to this agent for this workflow.</div>
             </div>
           ))}
         </div>
