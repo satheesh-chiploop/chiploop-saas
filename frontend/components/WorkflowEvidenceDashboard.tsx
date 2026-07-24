@@ -372,13 +372,27 @@ function extractParticipatingAgentNames(logs: string | null | undefined): string
       .replace(/^[^\w]+/u, "")
       .replace(/\s+/g, " ")
       .trim();
+  const canonicalAgentName = (value: string) => {
+    const normalized = normalizeAgentName(value);
+    const lower = normalized.toLowerCase();
+    if (lower.includes("fpga") && lower.includes("rtl") && lower.includes("handoff")) return "FPGA RTL Handoff Ingest Agent";
+    if (lower.includes("fpga") && lower.includes("constraint")) return "FPGA Constraint Setup Agent";
+    if (lower.includes("fpga") && lower.includes("yosys")) return "FPGA Yosys Synthesis Agent";
+    if (lower.includes("fpga") && lower.includes("synthesis closure")) return "FPGA Synthesis Closure Agent";
+    if ((lower.includes("fpga") || lower.startsWith("pnr ")) && (lower.includes("nextpnr") || lower.includes("place") || lower.includes("route"))) return "FPGA nextpnr Place & Route Agent";
+    if (lower.includes("fpga") && lower.includes("timing") && lower.includes("drc")) return "FPGA Timing & DRC Agent";
+    if (lower.includes("fpga") && lower.includes("timing closure")) return "FPGA Timing Closure Agent";
+    if (lower.includes("fpga") && lower.includes("bitstream")) return "FPGA Bitstream Handoff Agent";
+    if (lower.includes("fpga") && lower.includes("dashboard")) return "FPGA Dashboard Agent";
+    return normalized;
+  };
   for (const rawLine of logs.split("\n")) {
     const line = rawLine.trim();
     const running = line.match(/Running\s+(.+?\sAgent)\b/i);
     const finished = line.match(/^(.+?\sAgent)\s+(?:done|failed)\b/i);
     const name = running?.[1] || finished?.[1];
     if (name) {
-      const normalized = normalizeAgentName(name);
+      const normalized = canonicalAgentName(name);
       if (normalized) agents.add(normalized);
     }
   }
@@ -1500,6 +1514,16 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const target = record(firstPresent(dashboard.target, handoff.target, constraints.target, synth.target, pnr.target, timing.target, bitstream.target));
       const smartContext = record(dashboard.smart_context);
       const hem = record(dashboard.hem);
+      const utilization = record(dashboard.utilization);
+      const timingSummary = record(dashboard.timing_summary);
+      const cellsUsed = firstNumber(utilization.logical_cells_used, pnr.logical_cells_used, synth.logical_cells_used);
+      const cellsAvailable = firstNumber(utilization.logical_cells_available, pnr.logical_cells_available, synth.logical_cells_available, record(target.resources).logic_cells);
+      const utilizationPct = firstPresent(utilization.logic_utilization_percent, pnr.logic_utilization_percent, synth.logic_utilization_percent);
+      const ffCount = metricValue(utilization.flip_flops, synth.flip_flops);
+      const comboCount = metricValue(utilization.combinational_cells, synth.combinational_cells);
+      const wns = metricValue(timingSummary.wns_ns, timing.wns_ns);
+      const tns = metricValue(timingSummary.tns_ns, timing.tns_ns);
+      const timingViolations = metricValue(timingSummary.timing_violation_count, timing.timing_violation_count);
       const toolSummary = {
         used: [
           firstString(synth.tool),
@@ -1520,6 +1544,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       return (
         <div className="mt-5 space-y-5">
           <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
+          <div className="grid gap-3 lg:grid-cols-3">
+            <Bar label="Logical cells used" value={cellsUsed} total={Math.max(cellsAvailable || cellsUsed || 1, 1)} color="bg-cyan-500" />
+            <Bar label="Flip-flops" value={typeof ffCount === "number" ? ffCount : 0} total={Math.max(cellsUsed || 1, 1)} color="bg-violet-500" />
+            <Bar label="Combinational / LUT cells" value={typeof comboCount === "number" ? comboCount : 0} total={Math.max(cellsUsed || 1, 1)} color="bg-emerald-500" />
+          </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Stat title="Board" value={firstString(target.board, "icebreaker")} />
             <Stat title="Family" value={firstString(target.family, "ice40")} />
@@ -1527,7 +1556,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Package" value={firstString(target.package, "not selected")} />
             <Stat title="Top Module" value={firstString(target.top_module, handoff.top_module, "not inferred")} />
             <Stat title="RTL Files" value={firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length)} />
+            <Stat title="Logic Cells" value={cellsAvailable ? `${formatNumber(cellsUsed)} / ${formatNumber(cellsAvailable)}` : metricValue(cellsUsed)} />
+            <Stat title="Utilization" value={typeof utilizationPct === "number" ? `${formatNumber(utilizationPct)}%` : metricValue(utilizationPct)} />
+            <Stat title="Flip-Flops" value={ffCount} />
+            <Stat title="Combinational Cells" value={comboCount} />
             <Stat title="Max Frequency" value={maxFrequency} />
+            <Stat title="WNS" value={wns} />
+            <Stat title="TNS" value={tns} />
+            <Stat title="Timing Violations" value={timingViolations} />
             <Stat title="Smart Context" value={smartContext.enabled === true ? firstString(smartContext.mode, "smart") : "full"} />
             <Stat title="HEM" value={hem.enabled === true ? firstString(hem.mode, "fixed") : "off"} />
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
