@@ -1571,7 +1571,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthCellTypeSum = Object.values(synthCellTypes).reduce((sum, value) => sum + (typeof value === "number" && Number.isFinite(value) ? value : 0), 0);
       const carryCount = metricValue(synthesisEstimate.carry_cells, synth.carry_cells, synthCellTypes.SB_CARRY);
       const totalMappedCells = metricValue(synthesisEstimate.total_mapped_cells, synth.total_mapped_cells, synth.fabric_mapped_cells, synthCellTypeSum || undefined);
-      const wns = metricWithUnit("ns", timingSummary.wns_ns, routedResult.wns_ns, timing.wns_ns, pnr.wns_ns);
+      const targetFrequencyMhz = firstNumber(timingSummary.target_frequency_mhz, timing.target_frequency_mhz, target.default_frequency_mhz);
+      const pnrFrequencyMhz = firstNumber(routedResult.max_frequency_mhz, timing.max_frequency_mhz, pnr.max_frequency_mhz, pnr.fmax_mhz);
+      const calculatedWnsNs = targetFrequencyMhz > 0 && pnrFrequencyMhz > 0
+        ? Number(((1000 / targetFrequencyMhz) - (1000 / pnrFrequencyMhz)).toFixed(2))
+        : undefined;
+      const wns = metricWithUnit("ns", timingSummary.wns_ns, routedResult.wns_ns, timing.wns_ns, pnr.wns_ns, calculatedWnsNs);
       const tns = metricWithUnit("ns", timingSummary.tns_ns, routedResult.tns_ns, timing.tns_ns, pnr.tns_ns);
       const timingViolations = metricValue(timingSummary.timing_violation_count, routedResult.timing_violation_count, timing.timing_violation_count, pnr.timing_violation_count);
       const toolSummary = {
@@ -1597,6 +1602,21 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const pnrStatus = firstString(pnr.status) || (fileLabel(pnr.asc, pnr.asc_path) ? "completed" : "");
       const timingStatus = firstString(timing.status) || (firstPresent(timingSummary.timing_met, routedResult.timing_met, timingViolations) !== undefined ? "completed" : "");
       const bitstreamStatus = firstString(bitstream.status) || (bitstreamPath !== "not generated" ? "completed" : "");
+      const timingIsClean = firstPresent(timingSummary.timing_met, routedResult.timing_met, timing.timing_met, pnr.timing_met) === true
+        || timingViolations === 0
+        || timingViolations === "0";
+      const synthClosureActions = array(synthClosure.actions).map(String).join(" ");
+      const synthClosureStatus = firstString(synthClosure.status) || (firstString(synth.status) === "completed" ? "not needed" : "");
+      const synthClosureDetail = synthClosureActions
+        || (firstString(synthClosure.status) ? "closure plan available" : "User disabled; synthesis completed cleanly.");
+      const timingClosureActions = array(timingClosure.actions).map(String).join(" ");
+      const timingClosureStatus = firstString(timingClosure.status) || (timingIsClean ? "not needed" : "");
+      const timingClosureDetail = timingClosureActions
+        || (timingIsClean ? "User disabled; no timing violations found." : "closure plan not requested");
+      const bitstreamCardStatus = bitstreamStatus || (pnrStatus === "completed" ? "user disabled" : "");
+      const bitstreamCardDetail = bitstreamPath !== "not generated"
+        ? bitstreamPath
+        : (pnrStatus === "completed" ? "User disabled bitstream generation." : "not generated");
       return (
         <div className="mt-5 space-y-5">
           <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
@@ -1631,11 +1651,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={fileLabel(constraints.pcf, constraints.pcf_path) || "PCF not reported"} />
             <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={fileLabel(synth.netlist_json, synth.json_netlist) || firstString(synth.reason)} />
-            <CheckCard title="Synthesis Closure" status={statusLabel(synthClosure.status)} detail={array(synthClosure.actions).map(String).join(" ") || "closure plan not requested"} />
+            <CheckCard title="Synthesis Closure" status={statusLabel(synthClosureStatus)} detail={synthClosureDetail} />
             <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={fileLabel(pnr.asc, pnr.asc_path) || firstString(pnr.reason)} />
             <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={fileLabel(timing.report, timing.report_path, record(timing.icetime).log) || "timing summary available"} />
-            <CheckCard title="Timing Closure" status={statusLabel(timingClosure.status)} detail={array(timingClosure.actions).map(String).join(" ") || "closure plan not requested"} />
-            <CheckCard title="Bitstream" status={statusLabel(bitstreamStatus)} detail={bitstreamPath} />
+            <CheckCard title="Timing Closure" status={statusLabel(timingClosureStatus)} detail={timingClosureDetail} />
+            <CheckCard title="Bitstream" status={statusLabel(bitstreamCardStatus)} detail={bitstreamCardDetail} />
             <CheckCard title="Programming" status="handoff" detail={programCommand} />
           </div>
         </div>
