@@ -30,6 +30,8 @@ type Props = {
   runPath: string;
   dashboardStage: "rtl_review" | "constraint_review" | "timing_debug" | "fpga";
   fields: FieldKind[];
+  defaultSourceMode?: "from_arch2rtl" | "paste" | "repo_path" | "generate_arch2rtl";
+  sourceModeLabel?: string;
 };
 
 function parseLogLines(logs: string | null | undefined): string[] {
@@ -37,7 +39,7 @@ function parseLogLines(logs: string | null | undefined): string[] {
   return logs.split("\n").map((line) => line.trimEnd()).filter(Boolean);
 }
 
-export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPath, dashboardStage, fields }: Props) {
+export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPath, dashboardStage, fields, defaultSourceMode, sourceModeLabel }: Props) {
   const router = useRouter();
   const logsRef = useRef<HTMLDivElement | null>(null);
 
@@ -50,9 +52,10 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [runId, setRunId] = useState<string | null>(null);
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
 
-  const [sourceMode, setSourceMode] = useState<"from_arch2rtl" | "paste" | "repo_path">("from_arch2rtl");
+  const [sourceMode, setSourceMode] = useState<"from_arch2rtl" | "paste" | "repo_path" | "generate_arch2rtl">(defaultSourceMode || "from_arch2rtl");
   const [sourceWorkflowId, setSourceWorkflowId] = useState("");
   const [repoPath, setRepoPath] = useState("");
+  const [specText, setSpecText] = useState("");
   const [rtlText, setRtlText] = useState("");
   const [sdcText, setSdcText] = useState("");
   const [timingText, setTimingText] = useState("");
@@ -108,9 +111,10 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     if (!raw) return;
     try {
       const prefill = JSON.parse(raw) as Partial<{
-        rtlSourceMode: "from_arch2rtl" | "paste" | "repo_path";
+        rtlSourceMode: "from_arch2rtl" | "paste" | "repo_path" | "generate_arch2rtl";
         sourceWorkflowId: string;
         repoPath: string;
+        specText: string;
         rtlText: string;
         board: string;
         topModule: string;
@@ -123,6 +127,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
       if (prefill.rtlSourceMode) setSourceMode(prefill.rtlSourceMode);
       if (prefill.sourceWorkflowId) setSourceWorkflowId(prefill.sourceWorkflowId);
       if (prefill.repoPath) setRepoPath(prefill.repoPath);
+      if (prefill.specText) setSpecText(prefill.specText);
       if (prefill.rtlText) setRtlText(prefill.rtlText);
       if (prefill.board) setBoard(prefill.board);
       if (prefill.topModule) setTopModule(prefill.topModule);
@@ -175,9 +180,10 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     if (running) return false;
     if (fields.includes("timing")) return Boolean(sourceWorkflowId.trim() || timingText.trim());
     if (sourceMode === "from_arch2rtl") return Boolean(sourceWorkflowId.trim());
+    if (sourceMode === "generate_arch2rtl") return Boolean(specText.trim());
     if (sourceMode === "repo_path") return Boolean(repoPath.trim());
     return Boolean(rtlText.trim());
-  }, [fields, running, sourceMode, sourceWorkflowId, repoPath, rtlText, timingText]);
+  }, [fields, running, sourceMode, sourceWorkflowId, repoPath, specText, rtlText, timingText]);
 
   async function runNow() {
     setErr(null);
@@ -189,6 +195,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         source_arch2rtl_workflow_id: sourceMode === "from_arch2rtl" ? sourceWorkflowId.trim() : undefined,
         source_workflow_id: sourceWorkflowId.trim() || undefined,
         repo_path: sourceMode === "repo_path" ? repoPath.trim() : undefined,
+        spec_text: sourceMode === "generate_arch2rtl" ? specText : undefined,
         rtl_text: sourceMode === "paste" ? rtlText : undefined,
         pasted_rtl_files: sourceMode === "paste" && rtlText.trim() ? [{ path: "rtl/review_input.sv", content: rtlText }] : undefined,
         constraints_sdc: sdcText.trim() || undefined,
@@ -197,7 +204,6 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         stage,
         review_depth: reviewDepth,
         board: fields.includes("fpga") ? board : undefined,
-        family: fields.includes("fpga") ? "ice40" : undefined,
         top_module: fields.includes("fpga") && topModule.trim() ? topModule.trim() : undefined,
         pcf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
         notes: notes.trim() || undefined,
@@ -270,20 +276,43 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                     <span className="text-sm text-slate-300">Source</span>
                     <select value={sourceMode} onChange={(e) => setSourceMode(e.target.value as any)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white">
                       <option value="from_arch2rtl">Prior workflow</option>
+                      {fields.includes("fpga") ? <option value="generate_arch2rtl">{sourceModeLabel || "Generate RTL from design intent"}</option> : null}
                       <option value="paste">Paste RTL</option>
                       <option value="repo_path">Repo/path</option>
                     </select>
                   </label>
-                  <label className="block md:col-span-2">
-                    <span className="text-sm text-slate-300">{sourceMode === "repo_path" ? "Repo/path" : "Source workflow ID"}</span>
-                    <input
-                      value={sourceMode === "repo_path" ? repoPath : sourceWorkflowId}
-                      onChange={(e) => (sourceMode === "repo_path" ? setRepoPath(e.target.value) : setSourceWorkflowId(e.target.value))}
-                      className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white"
-                      placeholder={sourceMode === "repo_path" ? "C:/path/to/repo or /repo/path" : "Workflow ID"}
-                    />
-                  </label>
+                  {sourceMode !== "generate_arch2rtl" ? (
+                    <label className="block md:col-span-2">
+                      <span className="text-sm text-slate-300">{sourceMode === "repo_path" ? "Repo/path" : "Source workflow ID"}</span>
+                      <input
+                        value={sourceMode === "repo_path" ? repoPath : sourceWorkflowId}
+                        onChange={(e) => (sourceMode === "repo_path" ? setRepoPath(e.target.value) : setSourceWorkflowId(e.target.value))}
+                        className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white"
+                        placeholder={sourceMode === "repo_path" ? "C:/path/to/repo or /repo/path" : "Workflow ID"}
+                      />
+                    </label>
+                  ) : (
+                    <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/10 px-4 py-3 text-sm leading-6 text-cyan-100 md:col-span-2">
+                      ChipLoop will create RTL first, then continue through FPGA implementation for the selected board.
+                    </div>
+                  )}
                 </div>
+              ) : null}
+
+              {fields.includes("fpga") && sourceMode === "generate_arch2rtl" ? (
+                <SpecTextBox
+                  label="Design intent"
+                  value={specText}
+                  onChange={setSpecText}
+                  rows={9}
+                  voiceTitle="FPGA Design Intent Voice Input"
+                  voiceLoopType="fpga"
+                  voiceTarget="FPGA prototype design intent for Arch2RTL generation"
+                  uploadLabel="Upload spec"
+                  uploadHelper="Upload a text, Markdown, or small spec file that describes the FPGA prototype."
+                  placeholder="Describe the block you want ChipLoop to generate as RTL before FPGA prototyping."
+                  textareaClassName="w-full resize-y bg-transparent p-1 text-sm text-slate-100 outline-none"
+                />
               ) : null}
 
               {fields.includes("fpga") && (fields.includes("rtl") || sourceMode === "paste") ? (
@@ -328,6 +357,8 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                       <span className="text-sm text-slate-300">Board</span>
                       <select value={board} onChange={(e) => setBoard(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white">
                         <option value="icebreaker">Lattice iCEBreaker</option>
+                        <option value="ice40_hx8k_breakout">iCE40 HX8K Breakout</option>
+                        <option value="ulx3s_ecp5_45f">ULX3S ECP5-45F</option>
                         <option value="upduino_v3">UPduino v3</option>
                         <option value="icestick">Lattice iCEstick</option>
                         <option value="custom_ice40">Custom iCE40</option>
@@ -368,15 +399,15 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
               {fields.includes("fpga") ? (
                 <div className="space-y-4">
                   <SpecTextBox
-                    label="Pin constraints PCF"
+                    label="Pin constraints PCF / LPF"
                     value={pcfText}
                     onChange={setPcfText}
                     rows={7}
                     voiceTitle="FPGA Constraint Voice Input"
                     voiceLoopType="fpga"
-                    voiceTarget="PCF pin constraints or board pin mapping"
-                    uploadLabel="Upload PCF"
-                    uploadHelper="Upload PCF constraints, board pin notes, or implementation constraints."
+                    voiceTarget="PCF or LPF pin constraints and board pin mapping"
+                    uploadLabel="Upload constraints"
+                    uploadHelper="Upload PCF/LPF constraints, board pin notes, or implementation constraints."
                     placeholder={'set_io clk 35\nset_io reset_n 10\nset_io led 99'}
                     textareaClassName="w-full resize-y bg-transparent p-1 font-mono text-sm text-slate-100 outline-none"
                   />
