@@ -1099,13 +1099,17 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     };
     let timer: ReturnType<typeof setTimeout> | null = null;
     const loadArtifacts = (attempt: number) => {
-      Promise.all((files[stage] || []).map(async (filename) => [filename.split("/").pop() || filename, await artifact(workflowId, filename)] as const))
+      Promise.all((files[stage] || []).map(async (filename) => [filename, await artifact(workflowId, filename)] as const))
         .then((entries) => {
         if (!active) return;
         const merged: Record<string, JsonMap | null> = {};
-        for (const [key, value] of entries) {
-          if (Object.keys(record(value)).length || !(key in merged)) {
-            merged[key] = value;
+        for (const [filename, value] of entries) {
+          const basename = filename.split("/").pop() || filename;
+          if (Object.keys(record(value)).length || !(filename in merged)) {
+            merged[filename] = value;
+          }
+          if (Object.keys(record(value)).length || !(basename in merged)) {
+            merged[basename] = value;
           }
         }
         const hasEvidence = stageEvidenceReady(stage, merged);
@@ -1512,15 +1516,16 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     }
 
     if (stage === "fpga") {
-      const dashboard = record(evidence["fpga_dashboard.json"]);
-      const handoff = record(evidence["fpga_handoff_ingest.json"]);
-      const constraints = record(evidence["fpga_constraints_summary.json"]);
-      const synth = record(firstPresent(evidence["fpga_synthesis_summary.json"], dashboard.synthesis));
-      const pnr = record(firstPresent(evidence["fpga_place_route_summary.json"], dashboard.place_route));
-      const timing = record(firstPresent(evidence["fpga_timing_drc_summary.json"], dashboard.timing_drc));
-      const synthClosure = record(firstPresent(evidence["fpga_synthesis_closure_plan.json"], record(dashboard.synthesis_closure).plan, dashboard.synthesis_closure));
-      const timingClosure = record(firstPresent(evidence["fpga_timing_closure_plan.json"], record(dashboard.timing_closure).plan, dashboard.timing_closure));
-      const bitstream = record(firstPresent(evidence["fpga_bitstream_summary.json"], dashboard.bitstream));
+      const ev = (...keys: string[]) => firstPresent(...keys.map((key) => evidence[key]));
+      const dashboard = record(ev("fpga_dashboard.json", "fpga/fpga_dashboard.json"));
+      const handoff = record(ev("fpga_handoff_ingest.json", "fpga/handoff/fpga_handoff_ingest.json"));
+      const constraints = record(ev("fpga_constraints_summary.json", "fpga/constraints/fpga_constraints_summary.json"));
+      const synth = record(firstPresent(ev("fpga_synthesis_summary.json", "fpga/synth/fpga_synthesis_summary.json"), dashboard.synthesis));
+      const pnr = record(firstPresent(ev("fpga_place_route_summary.json", "fpga/pnr/fpga_place_route_summary.json"), dashboard.place_route));
+      const timing = record(firstPresent(ev("fpga_timing_drc_summary.json", "fpga/reports/fpga_timing_drc_summary.json"), dashboard.timing_drc));
+      const synthClosure = record(firstPresent(ev("fpga_synthesis_closure_plan.json", "fpga/closure/fpga_synthesis_closure_plan.json"), record(dashboard.synthesis_closure).plan, dashboard.synthesis_closure));
+      const timingClosure = record(firstPresent(ev("fpga_timing_closure_plan.json", "fpga/closure/fpga_timing_closure_plan.json"), record(dashboard.timing_closure).plan, dashboard.timing_closure));
+      const bitstream = record(firstPresent(ev("fpga_bitstream_summary.json", "fpga/bitstream/fpga_bitstream_summary.json"), dashboard.bitstream));
       const target = record(firstPresent(dashboard.target, handoff.target, constraints.target, synth.target, pnr.target, timing.target, bitstream.target));
       const smartContext = record(dashboard.smart_context);
       const hem = record(dashboard.hem);
