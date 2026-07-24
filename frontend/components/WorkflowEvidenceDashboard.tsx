@@ -1562,8 +1562,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthUtilizationPct = typeof synthCellsUsed === "number" && typeof synthCellsAvailable === "number" && synthCellsAvailable > 0
         ? Number(((synthCellsUsed / synthCellsAvailable) * 100).toFixed(3))
         : firstPresent(synthesisEstimate.logic_utilization_percent, synth.logic_utilization_percent);
-      const routedCellsUsed = firstNumber(routedResult.logical_cells_used, pnr.logical_cells_used, utilization.logical_cells_used);
-      const routedCellsAvailable = firstNumber(routedResult.logical_cells_available, pnr.logical_cells_available, utilization.logical_cells_available, synthCellsAvailable);
+      const routedCellsUsedRaw = firstPresent(routedResult.logical_cells_used, pnr.logical_cells_used, utilization.logical_cells_used);
+      const routedCellsAvailableRaw = firstPresent(routedResult.logical_cells_available, pnr.logical_cells_available, utilization.logical_cells_available);
+      const routedCellsUsed = typeof routedCellsUsedRaw === "number" && Number.isFinite(routedCellsUsedRaw) ? routedCellsUsedRaw : undefined;
+      const routedCellsAvailable = typeof routedCellsAvailableRaw === "number" && Number.isFinite(routedCellsAvailableRaw) ? routedCellsAvailableRaw : undefined;
       const routedUtilizationPct = firstPresent(routedResult.logic_utilization_percent, pnr.logic_utilization_percent, utilization.logic_utilization_percent);
       const ffCount = metricValue(synthesisEstimate.flip_flops, utilization.flip_flops, synth.flip_flops);
       const comboCount = metricValue(synthesisEstimate.combinational_cells, utilization.combinational_cells, synth.combinational_cells);
@@ -1596,12 +1598,15 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         pnr.fmax_mhz,
       );
       const bitstreamPath = fileLabel(bitstream.bitstream, bitstream.bitstream_path) || "not generated";
+      const fpgaLogs = logs || "";
+      const pnrDoneFromLogs = /FPGA\s+(?:nextpnr|place\s*&?\s*route).*done|fpga_place_route_summary\.json/i.test(fpgaLogs);
+      const bitstreamDoneFromLogs = /FPGA\s+Bitstream.*done|fpga_bitstream_summary\.json/i.test(fpgaLogs);
       const programCommand = firstString(bitstream.programming_command, bitstream.program_command)
         ? "openFPGALoader command available"
-        : "available after bitstream generation";
-      const pnrStatus = firstString(pnr.status) || (fileLabel(pnr.asc, pnr.asc_path) ? "completed" : "");
+        : (bitstreamDoneFromLogs ? "openFPGALoader command available after artifact sync" : "available after bitstream generation");
+      const pnrStatus = firstString(pnr.status) || (fileLabel(pnr.asc, pnr.asc_path) || pnrDoneFromLogs || firstString(timing.status) === "completed" ? "completed" : "");
       const timingStatus = firstString(timing.status) || (firstPresent(timingSummary.timing_met, routedResult.timing_met, timingViolations) !== undefined ? "completed" : "");
-      const bitstreamStatus = firstString(bitstream.status) || (bitstreamPath !== "not generated" ? "completed" : "");
+      const bitstreamStatus = firstString(bitstream.status) || (bitstreamPath !== "not generated" || bitstreamDoneFromLogs ? "completed" : "");
       const timingIsClean = firstPresent(timingSummary.timing_met, routedResult.timing_met, timing.timing_met, pnr.timing_met) === true
         || timingViolations === 0
         || timingViolations === "0";
@@ -1616,7 +1621,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const bitstreamCardStatus = bitstreamStatus || (pnrStatus === "completed" ? "user disabled" : "");
       const bitstreamCardDetail = bitstreamPath !== "not generated"
         ? bitstreamPath
-        : (pnrStatus === "completed" ? "User disabled bitstream generation." : "not generated");
+        : (bitstreamDoneFromLogs ? "generated; bitstream artifact is syncing" : (pnrStatus === "completed" ? "User disabled bitstream generation." : "not generated"));
+      const routedCellsDisplay = typeof routedCellsUsed === "number" && typeof routedCellsAvailable === "number"
+        ? `${formatNumber(routedCellsUsed)} / ${formatNumber(routedCellsAvailable)}`
+        : metricValue(routedCellsUsed);
+      const pnrDetail = fileLabel(pnr.asc, pnr.asc_path)
+        || firstString(pnr.reason)
+        || (pnrStatus === "completed" ? "route summary available through timing report" : "");
       return (
         <div className="mt-5 space-y-5">
           <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
@@ -1638,7 +1649,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Yosys LUT4 Cells" value={lut4Count} />
             <Stat title="Yosys Carry Cells" value={carryCount} />
             <Stat title="Yosys Total Cells" value={totalMappedCells} />
-            <Stat title="Routed Logic Cells" value={routedCellsAvailable ? `${formatNumber(routedCellsUsed)} / ${formatNumber(routedCellsAvailable)}` : metricValue(routedCellsUsed)} />
+            <Stat title="Routed Logic Cells" value={routedCellsDisplay} />
             <Stat title="Routed Utilization" value={typeof routedUtilizationPct === "number" ? `${formatNumber(routedUtilizationPct)}%` : metricValue(routedUtilizationPct)} />
             <Stat title="Routed Max Frequency" value={maxFrequency} />
             <Stat title="WNS" value={wns} />
@@ -1652,7 +1663,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={fileLabel(constraints.pcf, constraints.pcf_path) || "PCF not reported"} />
             <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={fileLabel(synth.netlist_json, synth.json_netlist) || firstString(synth.reason)} />
             <CheckCard title="Synthesis Closure" status={statusLabel(synthClosureStatus)} detail={synthClosureDetail} />
-            <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={fileLabel(pnr.asc, pnr.asc_path) || firstString(pnr.reason)} />
+            <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={pnrDetail} />
             <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={fileLabel(timing.report, timing.report_path, record(timing.icetime).log) || "timing summary available"} />
             <CheckCard title="Timing Closure" status={statusLabel(timingClosureStatus)} detail={timingClosureDetail} />
             <CheckCard title="Bitstream" status={statusLabel(bitstreamCardStatus)} detail={bitstreamCardDetail} />
@@ -2244,7 +2255,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ) : null}
       </div>
     );
-  }, [agentCount, artifactsLoaded, evidence, error, resultsReady, stage, status, workflowId]);
+  }, [agentCount, artifactsLoaded, evidence, error, logs, resultsReady, stage, status, workflowId]);
 
   return (
     <section className="w-full rounded-lg border border-slate-800 bg-slate-950/45 p-5">
