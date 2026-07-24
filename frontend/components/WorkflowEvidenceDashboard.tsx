@@ -151,6 +151,13 @@ function metricWithUnit(unit: string, ...values: unknown[]): string | number {
   return "not produced";
 }
 
+function fileLabel(...values: unknown[]): string {
+  const value = firstString(...values);
+  if (!value) return "";
+  const normalized = value.replaceAll("\\", "/");
+  return normalized.split("/").pop() || normalized;
+}
+
 function signedMetric(...values: unknown[]): string | number {
   const value = firstPresent(...values);
   if (typeof value === "number" && Number.isFinite(value)) return formatNumber(value);
@@ -1520,12 +1527,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const dashboard = record(ev("fpga_dashboard.json", "fpga/fpga_dashboard.json"));
       const handoff = record(ev("fpga_handoff_ingest.json", "fpga/handoff/fpga_handoff_ingest.json"));
       const constraints = record(ev("fpga_constraints_summary.json", "fpga/constraints/fpga_constraints_summary.json"));
-      const synth = record(firstPresent(ev("fpga_synthesis_summary.json", "fpga/synth/fpga_synthesis_summary.json"), dashboard.synthesis));
-      const pnr = record(firstPresent(ev("fpga_place_route_summary.json", "fpga/pnr/fpga_place_route_summary.json"), dashboard.place_route));
-      const timing = record(firstPresent(ev("fpga_timing_drc_summary.json", "fpga/reports/fpga_timing_drc_summary.json"), dashboard.timing_drc));
-      const synthClosure = record(firstPresent(ev("fpga_synthesis_closure_plan.json", "fpga/closure/fpga_synthesis_closure_plan.json"), record(dashboard.synthesis_closure).plan, dashboard.synthesis_closure));
-      const timingClosure = record(firstPresent(ev("fpga_timing_closure_plan.json", "fpga/closure/fpga_timing_closure_plan.json"), record(dashboard.timing_closure).plan, dashboard.timing_closure));
-      const bitstream = record(firstPresent(ev("fpga_bitstream_summary.json", "fpga/bitstream/fpga_bitstream_summary.json"), dashboard.bitstream));
+      const synth = record(firstPresent(dashboard.synthesis, ev("fpga_synthesis_summary.json", "fpga/synth/fpga_synthesis_summary.json")));
+      const pnr = record(firstPresent(dashboard.place_route, ev("fpga_place_route_summary.json", "fpga/pnr/fpga_place_route_summary.json")));
+      const timing = record(firstPresent(dashboard.timing_drc, ev("fpga_timing_drc_summary.json", "fpga/reports/fpga_timing_drc_summary.json")));
+      const synthClosureDashboard = record(dashboard.synthesis_closure);
+      const timingClosureDashboard = record(dashboard.timing_closure);
+      const synthClosure = record(firstPresent(synthClosureDashboard.plan, synthClosureDashboard, ev("fpga_synthesis_closure_plan.json", "fpga/closure/fpga_synthesis_closure_plan.json")));
+      const timingClosure = record(firstPresent(timingClosureDashboard.plan, timingClosureDashboard, ev("fpga_timing_closure_plan.json", "fpga/closure/fpga_timing_closure_plan.json")));
+      const bitstream = record(firstPresent(dashboard.bitstream, ev("fpga_bitstream_summary.json", "fpga/bitstream/fpga_bitstream_summary.json")));
       const target = record(firstPresent(dashboard.target, handoff.target, constraints.target, synth.target, pnr.target, timing.target, bitstream.target));
       const smartContext = record(dashboard.smart_context);
       const hem = record(dashboard.hem);
@@ -1571,8 +1580,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         pnr.max_frequency_mhz,
         pnr.fmax_mhz,
       );
-      const bitstreamPath = firstString(bitstream.bitstream, bitstream.bitstream_path, "not generated");
-      const programCommand = firstString(bitstream.programming_command, bitstream.program_command, "available after bitstream generation");
+      const bitstreamPath = fileLabel(bitstream.bitstream, bitstream.bitstream_path) || "not generated";
+      const programCommand = firstString(bitstream.programming_command, bitstream.program_command)
+        ? "openFPGALoader command available"
+        : "available after bitstream generation";
+      const pnrStatus = firstString(pnr.status) || (fileLabel(pnr.asc, pnr.asc_path) ? "completed" : "");
+      const timingStatus = firstString(timing.status) || (firstPresent(timingSummary.timing_met, routedResult.timing_met, timingViolations) !== undefined ? "completed" : "");
+      const bitstreamStatus = firstString(bitstream.status) || (bitstreamPath !== "not generated" ? "completed" : "");
       return (
         <div className="mt-5 space-y-5">
           <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
@@ -1605,13 +1619,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={firstString(constraints.pcf, constraints.pcf_path, "PCF not reported")} />
-            <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={firstString(synth.netlist_json, synth.json_netlist, synth.reason)} />
+            <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={fileLabel(constraints.pcf, constraints.pcf_path) || "PCF not reported"} />
+            <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={fileLabel(synth.netlist_json, synth.json_netlist) || firstString(synth.reason)} />
             <CheckCard title="Synthesis Closure" status={statusLabel(synthClosure.status)} detail={array(synthClosure.actions).map(String).join(" ") || "closure plan not requested"} />
-            <CheckCard title="Place & Route" status={statusLabel(pnr.status)} detail={firstString(pnr.asc, pnr.asc_path, pnr.reason)} />
-            <CheckCard title="Timing / DRC" status={statusLabel(timing.status)} detail={firstString(timing.report, timing.report_path, record(timing.icetime).log, "see timing report")} />
+            <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={fileLabel(pnr.asc, pnr.asc_path) || firstString(pnr.reason)} />
+            <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={fileLabel(timing.report, timing.report_path, record(timing.icetime).log) || "timing summary available"} />
             <CheckCard title="Timing Closure" status={statusLabel(timingClosure.status)} detail={array(timingClosure.actions).map(String).join(" ") || "closure plan not requested"} />
-            <CheckCard title="Bitstream" status={statusLabel(bitstream.status)} detail={bitstreamPath} />
+            <CheckCard title="Bitstream" status={statusLabel(bitstreamStatus)} detail={bitstreamPath} />
             <CheckCard title="Programming" status="handoff" detail={programCommand} />
           </div>
         </div>
