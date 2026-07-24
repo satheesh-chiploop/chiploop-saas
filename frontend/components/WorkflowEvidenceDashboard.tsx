@@ -141,6 +141,16 @@ function metricValue(...values: unknown[]): string | number {
   return "not produced";
 }
 
+function metricWithUnit(unit: string, ...values: unknown[]): string | number {
+  const value = firstPresent(...values);
+  if (typeof value === "number" && Number.isFinite(value)) return `${formatNumber(value)} ${unit}`;
+  if (typeof value === "string" && value.trim()) {
+    const text = value.trim();
+    return text.toLowerCase().includes(unit.toLowerCase()) ? text : `${text} ${unit}`;
+  }
+  return "not produced";
+}
+
 function signedMetric(...values: unknown[]): string | number {
   const value = firstPresent(...values);
   if (typeof value === "number" && Number.isFinite(value)) return formatNumber(value);
@@ -1505,12 +1515,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const dashboard = record(evidence["fpga_dashboard.json"]);
       const handoff = record(evidence["fpga_handoff_ingest.json"]);
       const constraints = record(evidence["fpga_constraints_summary.json"]);
-      const synth = record(evidence["fpga_synthesis_summary.json"]);
-      const pnr = record(evidence["fpga_place_route_summary.json"]);
-      const timing = record(evidence["fpga_timing_drc_summary.json"]);
-      const synthClosure = record(evidence["fpga_synthesis_closure_plan.json"]);
-      const timingClosure = record(evidence["fpga_timing_closure_plan.json"]);
-      const bitstream = record(evidence["fpga_bitstream_summary.json"]);
+      const synth = record(firstPresent(evidence["fpga_synthesis_summary.json"], dashboard.synthesis));
+      const pnr = record(firstPresent(evidence["fpga_place_route_summary.json"], dashboard.place_route));
+      const timing = record(firstPresent(evidence["fpga_timing_drc_summary.json"], dashboard.timing_drc));
+      const synthClosure = record(firstPresent(evidence["fpga_synthesis_closure_plan.json"], record(dashboard.synthesis_closure).plan, dashboard.synthesis_closure));
+      const timingClosure = record(firstPresent(evidence["fpga_timing_closure_plan.json"], record(dashboard.timing_closure).plan, dashboard.timing_closure));
+      const bitstream = record(firstPresent(evidence["fpga_bitstream_summary.json"], dashboard.bitstream));
       const target = record(firstPresent(dashboard.target, handoff.target, constraints.target, synth.target, pnr.target, timing.target, bitstream.target));
       const smartContext = record(dashboard.smart_context);
       const hem = record(dashboard.hem);
@@ -1518,19 +1528,27 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const timingSummary = record(dashboard.timing_summary);
       const synthesisEstimate = record(dashboard.synthesis_estimate);
       const routedResult = record(dashboard.routed_result);
-      const synthCellsUsed = firstNumber(synthesisEstimate.logical_cells_used, synth.logical_cells_used);
+      const synthCellTypes = record(synth.cell_type_counts);
+      const yosysLut4Numeric = firstNumber(synthesisEstimate.lut4_cells, utilization.lut4_cells, synth.lut4_cells, synthCellTypes.SB_LUT4);
+      const yosysFfNumeric = firstNumber(synthesisEstimate.flip_flops, utilization.flip_flops, synth.flip_flops);
+      const synthCellsUsed = typeof yosysLut4Numeric === "number" && typeof yosysFfNumeric === "number"
+        ? yosysLut4Numeric + yosysFfNumeric
+        : firstNumber(synthesisEstimate.logical_cells_used, synth.logical_cells_used);
       const synthCellsAvailable = firstNumber(synthesisEstimate.logical_cells_available, synth.logical_cells_available, record(target.resources).logic_cells);
-      const synthUtilizationPct = firstPresent(synthesisEstimate.logic_utilization_percent, synth.logic_utilization_percent);
+      const synthUtilizationPct = typeof synthCellsUsed === "number" && typeof synthCellsAvailable === "number" && synthCellsAvailable > 0
+        ? Number(((synthCellsUsed / synthCellsAvailable) * 100).toFixed(3))
+        : firstPresent(synthesisEstimate.logic_utilization_percent, synth.logic_utilization_percent);
       const routedCellsUsed = firstNumber(routedResult.logical_cells_used, pnr.logical_cells_used, utilization.logical_cells_used);
       const routedCellsAvailable = firstNumber(routedResult.logical_cells_available, pnr.logical_cells_available, utilization.logical_cells_available, synthCellsAvailable);
       const routedUtilizationPct = firstPresent(routedResult.logic_utilization_percent, pnr.logic_utilization_percent, utilization.logic_utilization_percent);
       const ffCount = metricValue(synthesisEstimate.flip_flops, utilization.flip_flops, synth.flip_flops);
       const comboCount = metricValue(synthesisEstimate.combinational_cells, utilization.combinational_cells, synth.combinational_cells);
       const lut4Count = metricValue(synthesisEstimate.lut4_cells, utilization.lut4_cells, synth.lut4_cells);
-      const carryCount = metricValue(synthesisEstimate.carry_cells, record(synth.cell_type_counts).SB_CARRY);
-      const totalMappedCells = metricValue(synthesisEstimate.total_mapped_cells);
-      const wns = metricValue(timingSummary.wns_ns, routedResult.wns_ns, timing.wns_ns, pnr.wns_ns);
-      const tns = metricValue(timingSummary.tns_ns, routedResult.tns_ns, timing.tns_ns, pnr.tns_ns);
+      const synthCellTypeSum = Object.values(synthCellTypes).reduce((sum, value) => sum + (typeof value === "number" && Number.isFinite(value) ? value : 0), 0);
+      const carryCount = metricValue(synthesisEstimate.carry_cells, synth.carry_cells, synthCellTypes.SB_CARRY);
+      const totalMappedCells = metricValue(synthesisEstimate.total_mapped_cells, synth.total_mapped_cells, synth.fabric_mapped_cells, synthCellTypeSum || undefined);
+      const wns = metricWithUnit("ns", timingSummary.wns_ns, routedResult.wns_ns, timing.wns_ns, pnr.wns_ns);
+      const tns = metricWithUnit("ns", timingSummary.tns_ns, routedResult.tns_ns, timing.tns_ns, pnr.tns_ns);
       const timingViolations = metricValue(timingSummary.timing_violation_count, routedResult.timing_violation_count, timing.timing_violation_count, pnr.timing_violation_count);
       const toolSummary = {
         used: [
@@ -1541,14 +1559,15 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ].filter(Boolean),
         defaultTool: "Yosys + nextpnr + IceStorm",
       };
-      const maxFrequency = metricValue(
+      const maxFrequency = metricWithUnit(
+        "MHz",
         routedResult.max_frequency_mhz,
         timing.max_frequency_mhz,
         pnr.max_frequency_mhz,
         pnr.fmax_mhz,
       );
       const bitstreamPath = firstString(bitstream.bitstream, bitstream.bitstream_path, "not generated");
-      const programCommand = firstString(bitstream.program_command, "available after bitstream generation");
+      const programCommand = firstString(bitstream.programming_command, bitstream.program_command, "available after bitstream generation");
       return (
         <div className="mt-5 space-y-5">
           <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
@@ -1585,7 +1604,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={firstString(synth.netlist_json, synth.json_netlist, synth.reason)} />
             <CheckCard title="Synthesis Closure" status={statusLabel(synthClosure.status)} detail={array(synthClosure.actions).map(String).join(" ") || "closure plan not requested"} />
             <CheckCard title="Place & Route" status={statusLabel(pnr.status)} detail={firstString(pnr.asc, pnr.asc_path, pnr.reason)} />
-            <CheckCard title="Timing / DRC" status={statusLabel(timing.status)} detail={firstString(timing.summary, timing.reason, "see timing report")} />
+            <CheckCard title="Timing / DRC" status={statusLabel(timing.status)} detail={firstString(timing.report, timing.report_path, record(timing.icetime).log, "see timing report")} />
             <CheckCard title="Timing Closure" status={statusLabel(timingClosure.status)} detail={array(timingClosure.actions).map(String).join(" ") || "closure plan not requested"} />
             <CheckCard title="Bitstream" status={statusLabel(bitstream.status)} detail={bitstreamPath} />
             <CheckCard title="Programming" status="handoff" detail={programCommand} />
