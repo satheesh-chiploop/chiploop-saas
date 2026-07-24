@@ -461,6 +461,21 @@ function stageEvidenceReady(stage: Stage, evidence: Record<string, JsonMap | nul
   if (stage === "product") {
     return has("system_product_dashboard_manifest.json") || has("system_product_package.json");
   }
+  if (stage === "fpga") {
+    const dashboard = record(evidence["fpga_dashboard.json"] || evidence["fpga/fpga_dashboard.json"]);
+    const hasRoutedSummary = Object.keys(record(dashboard.routed_result)).length > 0
+      || Object.keys(record(dashboard.place_route)).length > 0
+      || has("fpga_place_route_summary.json")
+      || has("fpga/pnr/fpga_place_route_summary.json");
+    const hasTimingSummary = Object.keys(record(dashboard.timing_summary)).length > 0
+      || Object.keys(record(dashboard.timing_drc)).length > 0
+      || has("fpga_timing_drc_summary.json")
+      || has("fpga/reports/fpga_timing_drc_summary.json");
+    const hasBitstreamSummary = Object.keys(record(dashboard.bitstream)).length > 0
+      || has("fpga_bitstream_summary.json")
+      || has("fpga/bitstream/fpga_bitstream_summary.json");
+    return hasRoutedSummary && hasTimingSummary && hasBitstreamSummary;
+  }
   return Object.values(evidence).some((value) => Object.keys(record(value)).length > 0);
 }
 
@@ -1132,7 +1147,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         const hasEvidence = stageEvidenceReady(stage, merged);
         setEvidence(merged);
         setArtifactsLoaded(hasEvidence);
-        if (!hasEvidence && attempt < 12) {
+        const maxAttempts = stage === "fpga" ? 24 : 12;
+        if (!hasEvidence && attempt < maxAttempts) {
           timer = setTimeout(() => loadArtifacts(attempt + 1), 2500);
         }
         })
@@ -1606,7 +1622,23 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ? `Download ${bitstreamFileName} and program the board locally.`
         : (bitstreamDoneFromLogs ? "Download the bitstream and program the board locally." : "available after bitstream generation");
       const pnrStatus = firstString(pnr.status) || (fileLabel(pnr.asc, pnr.asc_path) || pnrDoneFromLogs || firstString(timing.status) === "completed" ? "completed" : "");
-      const timingStatus = firstString(timing.status) || (firstPresent(timingSummary.timing_met, routedResult.timing_met, timingViolations) !== undefined ? "completed" : "");
+      const timingEvidenceSignal = firstPresent(
+        timingSummary.timing_met,
+        routedResult.timing_met,
+        timing.timing_met,
+        pnr.timing_met,
+        timingSummary.wns_ns,
+        routedResult.wns_ns,
+        timing.wns_ns,
+        timingSummary.tns_ns,
+        routedResult.tns_ns,
+        timing.tns_ns,
+        timingSummary.timing_violation_count,
+        routedResult.timing_violation_count,
+        timing.timing_violation_count,
+        pnr.timing_violation_count,
+      );
+      const timingStatus = firstString(timing.status) || (timingEvidenceSignal !== undefined ? "completed" : "");
       const bitstreamStatus = firstString(bitstream.status) || (bitstreamPath !== "not generated" || bitstreamDoneFromLogs ? "completed" : "");
       const timingIsClean = firstPresent(timingSummary.timing_met, routedResult.timing_met, timing.timing_met, pnr.timing_met) === true
         || timingViolations === 0
