@@ -1601,9 +1601,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const fpgaLogs = logs || "";
       const pnrDoneFromLogs = /FPGA\s+(?:nextpnr|place\s*&?\s*route).*done|fpga_place_route_summary\.json/i.test(fpgaLogs);
       const bitstreamDoneFromLogs = /FPGA\s+Bitstream.*done|fpga_bitstream_summary\.json/i.test(fpgaLogs);
+      const bitstreamFileName = bitstreamPath !== "not generated" ? bitstreamPath : "generated bitstream";
       const programCommand = firstString(bitstream.programming_command, bitstream.program_command)
-        ? "openFPGALoader command available"
-        : (bitstreamDoneFromLogs ? "openFPGALoader command available after artifact sync" : "available after bitstream generation");
+        ? `Download ${bitstreamFileName} and program the board locally.`
+        : (bitstreamDoneFromLogs ? "Download the bitstream and program the board locally." : "available after bitstream generation");
       const pnrStatus = firstString(pnr.status) || (fileLabel(pnr.asc, pnr.asc_path) || pnrDoneFromLogs || firstString(timing.status) === "completed" ? "completed" : "");
       const timingStatus = firstString(timing.status) || (firstPresent(timingSummary.timing_met, routedResult.timing_met, timingViolations) !== undefined ? "completed" : "");
       const bitstreamStatus = firstString(bitstream.status) || (bitstreamPath !== "not generated" || bitstreamDoneFromLogs ? "completed" : "");
@@ -1667,7 +1668,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={fileLabel(timing.report, timing.report_path, record(timing.icetime).log) || "timing summary available"} />
             <CheckCard title="Timing Closure" status={statusLabel(timingClosureStatus)} detail={timingClosureDetail} />
             <CheckCard title="Bitstream" status={statusLabel(bitstreamCardStatus)} detail={bitstreamCardDetail} />
-            <CheckCard title="Programming" status="handoff" detail={programCommand} />
+            <CheckCard title="Programming" status={bitstreamStatus ? "ready locally" : "handoff"} detail={programCommand} />
           </div>
         </div>
       );
