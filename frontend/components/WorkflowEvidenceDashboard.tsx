@@ -1554,6 +1554,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const handoff = record(ev("fpga_handoff_ingest.json", "fpga/handoff/fpga_handoff_ingest.json"));
       const constraints = record(ev("fpga_constraints_summary.json", "fpga/constraints/fpga_constraints_summary.json"));
       const synth = record(firstPresent(dashboard.synthesis, ev("fpga_synthesis_summary.json", "fpga/synth/fpga_synthesis_summary.json")));
+      const rtlQuality = record(firstPresent(dashboard.rtl_quality, ev("fpga_rtl_quality_summary.json", "fpga/quality/fpga_rtl_quality_summary.json")));
+      const rtlQualityPass1 = record(rtlQuality.pass1);
+      const rtlQualityPass2 = record(rtlQuality.pass2);
+      const rtlQualityRepair = record(rtlQuality.repair);
       const pnr = record(firstPresent(dashboard.place_route, ev("fpga_place_route_summary.json", "fpga/pnr/fpga_place_route_summary.json")));
       const timing = record(firstPresent(dashboard.timing_drc, ev("fpga_timing_drc_summary.json", "fpga/reports/fpga_timing_drc_summary.json")));
       const synthClosureDashboard = record(dashboard.synthesis_closure);
@@ -1676,6 +1680,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Package" value={firstString(target.package, "not selected")} />
             <Stat title="Top Module" value={firstString(target.top_module, handoff.top_module, "not inferred")} />
             <Stat title="RTL Files" value={firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length)} />
+            <Stat title="RTL Quality" value={statusLabel(rtlQuality.status)} />
+            <Stat title="Lint Pass1" value={statusLabel(rtlQualityPass1.status)} />
+            <Stat title="Lint Pass2" value={statusLabel(rtlQualityPass2.status)} />
             <Stat title="Yosys Logic Cells" value={synthCellsAvailable ? `${formatNumber(synthCellsUsed)} / ${formatNumber(synthCellsAvailable)}` : metricValue(synthCellsUsed)} />
             <Stat title="Yosys Utilization" value={typeof synthUtilizationPct === "number" ? `${formatNumber(synthUtilizationPct)}%` : metricValue(synthUtilizationPct)} />
             <Stat title="Yosys Flip-Flops" value={ffCount} />
@@ -1693,7 +1700,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={fileLabel(constraints.pcf, constraints.pcf_path) || "PCF not reported"} />
+            <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={fileLabel(constraints.constraint_path, constraints.pcf, constraints.pcf_path, constraints.lpf_path) || "constraints not reported"} />
+            <CheckCard
+              title="RTL Quality Gate"
+              status={statusLabel(rtlQuality.status)}
+              detail={`pass1 ${statusLabel(rtlQualityPass1.status)}, repair ${rtlQualityRepair.enabled === false ? "disabled" : rtlQualityRepair.applied ? "applied" : "enabled/no fix needed"}, pass2 ${statusLabel(rtlQualityPass2.status)}`}
+            />
             <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={fileLabel(synth.netlist_json, synth.json_netlist) || firstString(synth.reason)} />
             <CheckCard title="Synthesis Closure" status={statusLabel(synthClosureStatus)} detail={synthClosureDetail} />
             <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={pnrDetail} />

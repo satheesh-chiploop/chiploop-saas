@@ -66,6 +66,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [board, setBoard] = useState("icebreaker");
   const [topModule, setTopModule] = useState("");
   const [pcfText, setPcfText] = useState("");
+  const [runFpgaRtlRepairLoop, setRunFpgaRtlRepairLoop] = useState(true);
   const [runFpgaSynthesisClosureLoop, setRunFpgaSynthesisClosureLoop] = useState(false);
   const [maxFpgaSynthesisClosureIterations, setMaxFpgaSynthesisClosureIterations] = useState("1");
   const [runFpgaTimingClosureLoop, setRunFpgaTimingClosureLoop] = useState(true);
@@ -120,6 +121,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         topModule: string;
         targetFrequency: string;
         pcfText: string;
+        runFpgaRtlRepairLoop: boolean;
         notes: string;
         hemEnabled: boolean;
         hemMode: "fixed" | "adaptive";
@@ -133,6 +135,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
       if (prefill.topModule) setTopModule(prefill.topModule);
       if (prefill.targetFrequency) setTargetFrequency(prefill.targetFrequency);
       if (prefill.pcfText) setPcfText(prefill.pcfText);
+      if (typeof prefill.runFpgaRtlRepairLoop === "boolean") setRunFpgaRtlRepairLoop(prefill.runFpgaRtlRepairLoop);
       if (prefill.notes) setNotes(prefill.notes);
       if (typeof prefill.hemEnabled === "boolean") setHemEnabled(prefill.hemEnabled);
       if (prefill.hemMode) setHemMode(prefill.hemMode);
@@ -207,6 +210,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         top_module: fields.includes("fpga") && topModule.trim() ? topModule.trim() : undefined,
         pcf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
         notes: notes.trim() || undefined,
+        run_fpga_rtl_repair_loop: fields.includes("fpga") ? runFpgaRtlRepairLoop : undefined,
         run_fpga_synthesis_closure_loop: fields.includes("fpga") ? runFpgaSynthesisClosureLoop : undefined,
         max_fpga_synthesis_closure_iterations: fields.includes("fpga") ? Number(maxFpgaSynthesisClosureIterations || 1) : undefined,
         run_fpga_timing_closure_loop: fields.includes("fpga") ? runFpgaTimingClosureLoop : undefined,
@@ -416,6 +420,13 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                   <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/10 p-4">
                     <div className="text-sm font-bold text-cyan-200">FPGA closure and intelligence</div>
                     <div className="mt-3 grid gap-3 md:grid-cols-2">
+                      <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-200">
+                        <input type="checkbox" checked={runFpgaRtlRepairLoop} onChange={(e) => setRunFpgaRtlRepairLoop(e.target.checked)} className="mt-1" />
+                        <span>
+                          <span className="block font-semibold text-white">RTL pass1/pass2 repair loop</span>
+                          <span className="text-slate-400">Run compile/lint pass1, apply safe repair when needed, then run pass2 before FPGA synthesis.</span>
+                        </span>
+                      </label>
                       <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-200">
                         <input type="checkbox" checked={runFpgaSynthesisClosureLoop} onChange={(e) => setRunFpgaSynthesisClosureLoop(e.target.checked)} className="mt-1" />
                         <span>

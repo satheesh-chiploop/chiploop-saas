@@ -11,8 +11,7 @@ import {
   FPGA_BITSTREAM_PREFILL_KEY,
   IMAGE_DMA_PIPELINE_ARCH2RTL_SPEC,
   MBIST_SRAM_ARCH2RTL_SPEC,
-  PWM_FPGA_ICEBREAKER_PCF,
-  PWM_FPGA_RTL_TEXT,
+  PWM_FPGA_DESIGN_INTENT,
   PWM_FULL_STACK_ARCH2RTL_SPEC,
   SAFETY_FAULT_MANAGER_ARCH2RTL_SPEC,
   SECURE_BOOT_ARCH2RTL_SPEC,
@@ -766,16 +765,17 @@ export default function AppsHomePage() {
 
   function startPwmFpgaPrototypeDemo() {
     window.localStorage.setItem(FPGA_BITSTREAM_PREFILL_KEY, JSON.stringify({
-      rtlSourceMode: "paste",
-      rtlText: PWM_FPGA_RTL_TEXT,
+      rtlSourceMode: "generate_arch2rtl",
+      specText: PWM_FPGA_DESIGN_INTENT,
       board: "icebreaker",
       topModule: "pwm_fpga_demo",
       targetFrequency: "12",
-      pcfText: PWM_FPGA_ICEBREAKER_PCF,
-      notes: "Reference journey: PWM RTL generation to FPGA synthesis, place-and-route, timing, and bitstream handoff.",
+      pcfText: "",
+      runFpgaRtlRepairLoop: true,
+      notes: "Reference journey: PWM FPGA design intent to FPGA2RTL, lint pass1/pass2 repair, board constraints, synthesis, place-and-route, timing, and bitstream handoff.",
     }));
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "pwm_fpga_prototype" }));
-    go("/apps/fpga-bitstream?guided=1&pwm_fpga=1");
+    go("/apps/fpga2rtl?guided=1&pwm_fpga=1");
   }
 
   function startUartPacketDemo() {
@@ -1102,17 +1102,17 @@ export default function AppsHomePage() {
       key: "fpga-prototype",
       exploreTitle: "Explore FPGA Prototype",
       segment: "FPGA / Board Bring-up",
-      title: "PWM RTL to iCE40 Bitstream: generate, constrain, synthesize, place, route, time, and package",
-      copy: "A board-oriented reference journey for proving a PWM RTL block on FPGA hardware before moving deeper into ASIC implementation. Start from predefined PWM RTL and iCEBreaker constraints, then generate synthesis, place-and-route, timing, and bitstream handoff evidence.",
+      title: "PWM FPGA2RTL to Bitstream: intent, lint, constrain, synthesize, place, route, time, and package",
+      copy: "A board-oriented reference journey for proving a PWM idea on FPGA hardware before moving deeper into ASIC implementation. Start from design intent, generate FPGA-ready RTL, run lint pass1/pass2 repair, create board-specific PCF/LPF constraints, then generate synthesis, place-and-route, timing, and bitstream handoff evidence.",
       button: "Start PWM FPGA Journey",
       onClick: startPwmFpgaPrototypeDemo,
-      stages: ["PWM RTL", "Board Constraints", "Yosys Synthesis", "nextpnr P&R", "Timing Check", "Bitstream"],
+      stages: ["Design Intent", "FPGA2RTL", "RTL Quality", "Board Constraints", "Yosys Synthesis", "nextpnr P&R", "Timing", "Bitstream"],
     },
   ];
 
   const catalogButtons: Array<{ view: CatalogView; title: string; body: string; count?: number }> = [
     { view: "digital", title: "Explore Digital apps", body: "RTL, DQA, verify, synthesis, tapeout, and handoff apps.", count: apps.filter((app) => app.loop_type === "digital").length },
-    { view: "fpga", title: "Explore FPGA apps", body: "RTL handoff, iCE40 synthesis, place-and-route, timing, and bitstream handoff.", count: apps.filter((app) => app.loop_type === "fpga").length },
+    { view: "fpga", title: "Explore FPGA apps", body: "FPGA2RTL, RTL quality, iCE40/ECP5 synthesis, place-and-route, timing, and bitstream handoff.", count: apps.filter((app) => app.loop_type === "fpga").length },
     { view: "system", title: "Explore System apps", body: "System RTL, simulation, synthesis, PD, firmware, software, validation, and product builder.", count: apps.filter((app) => app.loop_type === "system").length },
     { view: "analog", title: "Explore Analog apps", body: "Analog spec, netlist, model, validation, correlation, iteration, and abstracts.", count: apps.filter((app) => app.loop_type === "analog").length },
     { view: "embedded", title: "Explore Embedded apps", body: "HAL, drivers, boot, diagnostics, log analysis, co-sim, and firmware run.", count: apps.filter((app) => app.loop_type === "embedded").length },
