@@ -1516,14 +1516,22 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const hem = record(dashboard.hem);
       const utilization = record(dashboard.utilization);
       const timingSummary = record(dashboard.timing_summary);
-      const cellsUsed = firstNumber(utilization.logical_cells_used, pnr.logical_cells_used, synth.logical_cells_used);
-      const cellsAvailable = firstNumber(utilization.logical_cells_available, pnr.logical_cells_available, synth.logical_cells_available, record(target.resources).logic_cells);
-      const utilizationPct = firstPresent(utilization.logic_utilization_percent, pnr.logic_utilization_percent, synth.logic_utilization_percent);
-      const ffCount = metricValue(utilization.flip_flops, synth.flip_flops);
-      const comboCount = metricValue(utilization.combinational_cells, synth.combinational_cells);
-      const wns = metricValue(timingSummary.wns_ns, timing.wns_ns);
-      const tns = metricValue(timingSummary.tns_ns, timing.tns_ns);
-      const timingViolations = metricValue(timingSummary.timing_violation_count, timing.timing_violation_count);
+      const synthesisEstimate = record(dashboard.synthesis_estimate);
+      const routedResult = record(dashboard.routed_result);
+      const synthCellsUsed = firstNumber(synthesisEstimate.logical_cells_used, synth.logical_cells_used);
+      const synthCellsAvailable = firstNumber(synthesisEstimate.logical_cells_available, synth.logical_cells_available, record(target.resources).logic_cells);
+      const synthUtilizationPct = firstPresent(synthesisEstimate.logic_utilization_percent, synth.logic_utilization_percent);
+      const routedCellsUsed = firstNumber(routedResult.logical_cells_used, pnr.logical_cells_used, utilization.logical_cells_used);
+      const routedCellsAvailable = firstNumber(routedResult.logical_cells_available, pnr.logical_cells_available, utilization.logical_cells_available, synthCellsAvailable);
+      const routedUtilizationPct = firstPresent(routedResult.logic_utilization_percent, pnr.logic_utilization_percent, utilization.logic_utilization_percent);
+      const ffCount = metricValue(synthesisEstimate.flip_flops, utilization.flip_flops, synth.flip_flops);
+      const comboCount = metricValue(synthesisEstimate.combinational_cells, utilization.combinational_cells, synth.combinational_cells);
+      const lut4Count = metricValue(synthesisEstimate.lut4_cells, utilization.lut4_cells, synth.lut4_cells);
+      const carryCount = metricValue(synthesisEstimate.carry_cells, record(synth.cell_type_counts).SB_CARRY);
+      const totalMappedCells = metricValue(synthesisEstimate.total_mapped_cells);
+      const wns = metricValue(timingSummary.wns_ns, routedResult.wns_ns, timing.wns_ns, pnr.wns_ns);
+      const tns = metricValue(timingSummary.tns_ns, routedResult.tns_ns, timing.tns_ns, pnr.tns_ns);
+      const timingViolations = metricValue(timingSummary.timing_violation_count, routedResult.timing_violation_count, timing.timing_violation_count, pnr.timing_violation_count);
       const toolSummary = {
         used: [
           firstString(synth.tool),
@@ -1534,10 +1542,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         defaultTool: "Yosys + nextpnr + IceStorm",
       };
       const maxFrequency = metricValue(
+        routedResult.max_frequency_mhz,
+        timing.max_frequency_mhz,
         pnr.max_frequency_mhz,
         pnr.fmax_mhz,
-        timing.max_frequency_mhz,
-        target.target_frequency_mhz,
       );
       const bitstreamPath = firstString(bitstream.bitstream, bitstream.bitstream_path, "not generated");
       const programCommand = firstString(bitstream.program_command, "available after bitstream generation");
@@ -1545,9 +1553,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         <div className="mt-5 space-y-5">
           <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
           <div className="grid gap-3 lg:grid-cols-3">
-            <Bar label="Logical cells used" value={cellsUsed} total={Math.max(cellsAvailable || cellsUsed || 1, 1)} color="bg-cyan-500" />
-            <Bar label="Flip-flops" value={typeof ffCount === "number" ? ffCount : 0} total={Math.max(cellsUsed || 1, 1)} color="bg-violet-500" />
-            <Bar label="Combinational / LUT cells" value={typeof comboCount === "number" ? comboCount : 0} total={Math.max(cellsUsed || 1, 1)} color="bg-emerald-500" />
+            <Bar label="Yosys logic cells" value={synthCellsUsed} total={Math.max(synthCellsAvailable || synthCellsUsed || 1, 1)} color="bg-cyan-500" />
+            <Bar label="Yosys flip-flops" value={typeof ffCount === "number" ? ffCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-violet-500" />
+            <Bar label="Yosys comb / LUT cells" value={typeof comboCount === "number" ? comboCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-emerald-500" />
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Stat title="Board" value={firstString(target.board, "icebreaker")} />
@@ -1556,11 +1564,15 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Package" value={firstString(target.package, "not selected")} />
             <Stat title="Top Module" value={firstString(target.top_module, handoff.top_module, "not inferred")} />
             <Stat title="RTL Files" value={firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length)} />
-            <Stat title="Logic Cells" value={cellsAvailable ? `${formatNumber(cellsUsed)} / ${formatNumber(cellsAvailable)}` : metricValue(cellsUsed)} />
-            <Stat title="Utilization" value={typeof utilizationPct === "number" ? `${formatNumber(utilizationPct)}%` : metricValue(utilizationPct)} />
-            <Stat title="Flip-Flops" value={ffCount} />
-            <Stat title="Combinational Cells" value={comboCount} />
-            <Stat title="Max Frequency" value={maxFrequency} />
+            <Stat title="Yosys Logic Cells" value={synthCellsAvailable ? `${formatNumber(synthCellsUsed)} / ${formatNumber(synthCellsAvailable)}` : metricValue(synthCellsUsed)} />
+            <Stat title="Yosys Utilization" value={typeof synthUtilizationPct === "number" ? `${formatNumber(synthUtilizationPct)}%` : metricValue(synthUtilizationPct)} />
+            <Stat title="Yosys Flip-Flops" value={ffCount} />
+            <Stat title="Yosys LUT4 Cells" value={lut4Count} />
+            <Stat title="Yosys Carry Cells" value={carryCount} />
+            <Stat title="Yosys Total Cells" value={totalMappedCells} />
+            <Stat title="Routed Logic Cells" value={routedCellsAvailable ? `${formatNumber(routedCellsUsed)} / ${formatNumber(routedCellsAvailable)}` : metricValue(routedCellsUsed)} />
+            <Stat title="Routed Utilization" value={typeof routedUtilizationPct === "number" ? `${formatNumber(routedUtilizationPct)}%` : metricValue(routedUtilizationPct)} />
+            <Stat title="Routed Max Frequency" value={maxFrequency} />
             <Stat title="WNS" value={wns} />
             <Stat title="TNS" value={tns} />
             <Stat title="Timing Violations" value={timingViolations} />
