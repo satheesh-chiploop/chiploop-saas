@@ -21,17 +21,18 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
-type FieldKind = "source" | "rtl" | "sdc" | "timing" | "frequency" | "stage" | "depth" | "notes" | "fpga";
+type FieldKind = "source" | "rtl" | "sdc" | "timing" | "frequency" | "stage" | "depth" | "notes" | "fpga" | "verify";
 
 type Props = {
   slug: string;
   title: string;
   subtitle: string;
   runPath: string;
-  dashboardStage: "rtl_review" | "constraint_review" | "timing_debug" | "fpga";
+  dashboardStage: "rtl_review" | "constraint_review" | "timing_debug" | "fpga" | "verification";
   fields: FieldKind[];
   defaultSourceMode?: "from_arch2rtl" | "paste" | "repo_path" | "generate_arch2rtl";
   sourceModeLabel?: string;
+  closureRunPath?: string;
 };
 
 function parseLogLines(logs: string | null | undefined): string[] {
@@ -39,7 +40,7 @@ function parseLogLines(logs: string | null | undefined): string[] {
   return logs.split("\n").map((line) => line.trimEnd()).filter(Boolean);
 }
 
-export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPath, dashboardStage, fields, defaultSourceMode, sourceModeLabel }: Props) {
+export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPath, dashboardStage, fields, defaultSourceMode, sourceModeLabel, closureRunPath }: Props) {
   const router = useRouter();
   const logsRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,6 +52,10 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [workflowId, setWorkflowId] = useState<string | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
+  const [closureWorkflowId, setClosureWorkflowId] = useState<string | null>(null);
+  const [closureRunId, setClosureRunId] = useState<string | null>(null);
+  const [closureRow, setClosureRow] = useState<WorkflowRow | null>(null);
+  const closureStartedRef = useRef(false);
 
   const [sourceMode, setSourceMode] = useState<"from_arch2rtl" | "paste" | "repo_path" | "generate_arch2rtl">(defaultSourceMode || "from_arch2rtl");
   const [sourceWorkflowId, setSourceWorkflowId] = useState("");
@@ -77,6 +82,18 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [contextMode, setContextMode] = useState<"smart" | "full">("smart");
   const [hemEnabled, setHemEnabled] = useState(false);
   const [hemMode, setHemMode] = useState<"fixed" | "adaptive">("fixed");
+  const [runFpgaVerification, setRunFpgaVerification] = useState(true);
+  const [testIntent, setTestIntent] = useState("Run smoke verification for the FPGA RTL before synthesis. Check reset behavior, basic functional behavior, assertions, and coverage readiness.");
+  const [verificationPlan, setVerificationPlan] = useState("");
+  const [randomVsDirected, setRandomVsDirected] = useState<"random" | "directed" | "both">("both");
+  const [coverageTargets, setCoverageTargets] = useState("");
+  const [simulatorType, setSimulatorType] = useState("verilator");
+  const [seedCount, setSeedCount] = useState("10");
+  const [enableFormal, setEnableFormal] = useState(false);
+  const [enableGoldenModel, setEnableGoldenModel] = useState(false);
+  const [enableFailureDebug, setEnableFailureDebug] = useState(false);
+  const [runVerificationClosureLoop, setRunVerificationClosureLoop] = useState(false);
+  const [maxVerificationClosureIterations, setMaxVerificationClosureIterations] = useState("1");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
 
@@ -172,6 +189,39 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     };
   }, [workflowId]);
 
+  useEffect(() => {
+    if (!closureWorkflowId) return;
+    let isActive = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from("workflows")
+        .select("id,status,phase,logs,updated_at")
+        .eq("id", closureWorkflowId)
+        .single();
+      if (isActive && !error && data) setClosureRow(data as any);
+    })();
+
+    const channel = supabase
+      .channel(`wf-${closureWorkflowId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "workflows", filter: `id=eq.${closureWorkflowId}` }, (payload) => {
+        const row = payload.new as any;
+        setClosureRow({ id: row.id, status: row.status, phase: row.phase, logs: row.logs, updated_at: row.updated_at });
+      })
+      .subscribe();
+
+    return () => {
+      isActive = false;
+      supabase.removeChannel(channel);
+    };
+  }, [closureWorkflowId]);
+
+  useEffect(() => {
+    if (!closureRunPath || !fields.includes("verify") || !runVerificationClosureLoop || closureStartedRef.current) return;
+    if (!workflowId || workflowRow?.status !== "completed") return;
+    closureStartedRef.current = true;
+    void runClosureLoop();
+  }, [closureRunPath, fields, runVerificationClosureLoop, workflowId, workflowRow?.status]);
+
   function authHeaders(): HeadersInit {
     const headers: Record<string, string> = {};
     if (sessionUserId) headers["x-user-id"] = sessionUserId;
@@ -181,16 +231,57 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
 
   const canRun = useMemo(() => {
     if (running) return false;
+    const integratedFpgaVerify = fields.includes("fpga") && fields.includes("verify");
+    if (fields.includes("verify") && (!integratedFpgaVerify || runFpgaVerification) && !testIntent.trim()) return false;
     if (fields.includes("timing")) return Boolean(sourceWorkflowId.trim() || timingText.trim());
     if (sourceMode === "from_arch2rtl") return Boolean(sourceWorkflowId.trim());
     if (sourceMode === "generate_arch2rtl") return Boolean(specText.trim());
     if (sourceMode === "repo_path") return Boolean(repoPath.trim());
     return Boolean(rtlText.trim());
-  }, [fields, running, sourceMode, sourceWorkflowId, repoPath, specText, rtlText, timingText]);
+  }, [fields, running, sourceMode, sourceWorkflowId, repoPath, specText, rtlText, timingText, testIntent, runFpgaVerification]);
+
+  async function runClosureLoop() {
+    if (!workflowId || !closureRunPath) return;
+    try {
+      const body: Record<string, any> = {
+        source_verify_workflow_id: workflowId,
+        coverage_targets: coverageTargets.trim() || undefined,
+        seed_count: Number(seedCount || 1),
+        seed_budget: Number(seedCount || 1),
+        max_iterations: Number(maxVerificationClosureIterations || 1),
+        rerun_mode: "coverage_targeted",
+        random_vs_directed: randomVsDirected,
+        enable_failure_debug: enableFailureDebug,
+        toolchain: {
+          simulator: simulatorType || "verilator",
+          formal: enableFormal ? "symbiyosys" : "none",
+          golden_model: enableGoldenModel ? "enabled" : "none",
+        },
+      };
+      const resp = await fetch(`${API_BASE}${closureRunPath}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) {
+        const text = await resp.text().catch(() => "");
+        throw new Error(`${resp.status} ${resp.statusText}${text ? ` - ${text}` : ""}`);
+      }
+      const out = await resp.json();
+      setClosureWorkflowId(out.workflow_id);
+      setClosureRunId(out.run_id);
+    } catch (e: any) {
+      setErr(e?.message || String(e));
+    }
+  }
 
   async function runNow() {
     setErr(null);
     setRunning(true);
+    closureStartedRef.current = false;
+    setClosureWorkflowId(null);
+    setClosureRunId(null);
+    setClosureRow(null);
     try {
       const body: Record<string, any> = {
         rtl_source_mode: sourceMode,
@@ -222,6 +313,27 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         context_mode: fields.includes("fpga") ? contextMode : undefined,
         hem_enabled: fields.includes("fpga") ? hemEnabled : undefined,
         hem_mode: fields.includes("fpga") ? hemMode : undefined,
+        run_fpga_verification: fields.includes("fpga") && fields.includes("verify") ? runFpgaVerification : undefined,
+        run_fpga_verification_closure_loop: fields.includes("fpga") && fields.includes("verify") ? runVerificationClosureLoop : undefined,
+        max_fpga_verification_closure_iterations: fields.includes("fpga") && fields.includes("verify") ? Number(maxVerificationClosureIterations || 1) : undefined,
+        test_intent: fields.includes("verify") ? testIntent.trim() : undefined,
+        verification_plan: fields.includes("verify") && verificationPlan.trim() ? verificationPlan : undefined,
+        random_vs_directed: fields.includes("verify") ? randomVsDirected : undefined,
+        coverage_targets: fields.includes("verify") && coverageTargets.trim() ? coverageTargets : undefined,
+        simulator_type: fields.includes("verify") ? simulatorType : undefined,
+        seed_count: fields.includes("verify") ? Number(seedCount || 1) : undefined,
+        run_closure_analysis: fields.includes("verify") ? runVerificationClosureLoop || enableFailureDebug : undefined,
+        enable_failure_debug: fields.includes("verify") ? enableFailureDebug : undefined,
+        failure_debug_options: fields.includes("verify") ? { enabled: enableFailureDebug, rerun_failing_tests: true } : undefined,
+        toolchain: fields.includes("verify") ? {
+          simulator: simulatorType || "verilator",
+          formal: enableFormal ? "symbiyosys" : "none",
+          golden_model: enableGoldenModel ? "enabled" : "none",
+        } : undefined,
+        toggles: fields.includes("verify") ? {
+          enable_formal: enableFormal,
+          enable_golden_model: enableGoldenModel,
+        } : undefined,
       };
       const resp = await fetch(`${API_BASE}${runPath}`, {
         method: "POST",
@@ -476,6 +588,65 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                 </div>
               ) : null}
 
+              {fields.includes("verify") ? (
+                <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/10 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="text-sm font-bold text-cyan-200">FPGA verification</div>
+                    {fields.includes("fpga") ? (
+                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+                        <input type="checkbox" checked={runFpgaVerification} onChange={(e) => setRunFpgaVerification(e.target.checked)} />
+                        Run before synthesis
+                      </label>
+                    ) : null}
+                  </div>
+                  <div className="mt-3 grid gap-3 md:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm text-slate-300">Test intent</span>
+                      <textarea value={testIntent} onChange={(e) => setTestIntent(e.target.value)} rows={5} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Describe smoke tests, directed tests, assertions, and coverage goals." />
+                    </label>
+                    <label className="block">
+                      <span className="text-sm text-slate-300">Verification plan</span>
+                      <textarea value={verificationPlan} onChange={(e) => setVerificationPlan(e.target.value)} rows={5} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Optional plan. Leave blank to generate from source context." />
+                    </label>
+                  </div>
+                  <div className="mt-3 grid gap-3 md:grid-cols-4">
+                    <label className="block">
+                      <span className="text-xs uppercase tracking-wide text-slate-400">Stimulus</span>
+                      <select value={randomVsDirected} onChange={(e) => setRandomVsDirected(e.target.value as any)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
+                        <option value="both">Both</option>
+                        <option value="directed">Directed</option>
+                        <option value="random">Random</option>
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-xs uppercase tracking-wide text-slate-400">Simulator</span>
+                      <select value={simulatorType} onChange={(e) => setSimulatorType(e.target.value)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
+                        <option value="verilator">Verilator</option>
+                        <option value="icarus">Icarus</option>
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-xs uppercase tracking-wide text-slate-400">Seeds</span>
+                      <input value={seedCount} onChange={(e) => setSeedCount(e.target.value)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50" />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs uppercase tracking-wide text-slate-400">Closure tries</span>
+                      <input value={maxVerificationClosureIterations} onChange={(e) => setMaxVerificationClosureIterations(e.target.value)} disabled={!runFpgaVerification || !runVerificationClosureLoop} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50" />
+                    </label>
+                  </div>
+                  <label className="mt-3 block">
+                    <span className="text-sm text-slate-300">Coverage targets</span>
+                    <textarea value={coverageTargets} onChange={(e) => setCoverageTargets(e.target.value)} rows={3} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Optional functional/code coverage goals." />
+                  </label>
+                  <div className="mt-3 grid gap-3 md:grid-cols-4">
+                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableFormal} onChange={(e) => setEnableFormal(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Formal verification</label>
+                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableGoldenModel} onChange={(e) => setEnableGoldenModel(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Golden model</label>
+                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableFailureDebug} onChange={(e) => setEnableFailureDebug(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Failure debug</label>
+                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={runVerificationClosureLoop} onChange={(e) => setRunVerificationClosureLoop(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Closure loop</label>
+                  </div>
+                </div>
+              ) : null}
+
               {fields.includes("notes") ? (
                 <label className="block">
                   <span className="text-sm text-slate-300">Notes</span>
@@ -512,7 +683,21 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
 
         {workflowId ? (
           <section className="mt-6 space-y-6">
-            <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage={dashboardStage} logs={workflowRow?.logs} />
+            <WorkflowEvidenceDashboard
+              workflowId={workflowId}
+              status={workflowRow?.status}
+              stage={dashboardStage}
+              logs={workflowRow?.logs}
+              linkedHeatmaps={closureWorkflowId ? [{ label: "FPGA Verification Closure Loop", workflowId: closureWorkflowId, status: closureRow?.status, logs: closureRow?.logs }] : undefined}
+            />
+            {closureWorkflowId ? (
+              <div className="rounded-2xl border border-violet-500/30 bg-violet-950/15 p-4 text-sm text-slate-300">
+                <div className="font-semibold text-violet-200">FPGA Verification Closure Loop</div>
+                <div className="mt-2">workflow_id: <span className="break-all text-slate-100">{closureWorkflowId}</span></div>
+                <div>run_id: <span className="break-all text-slate-100">{closureRunId}</span></div>
+                <div>status: <span className="text-slate-100">{closureRow?.status || "queued"}</span></div>
+              </div>
+            ) : null}
             <AskThisRunPanel workflowId={workflowId} />
           </section>
         ) : null}

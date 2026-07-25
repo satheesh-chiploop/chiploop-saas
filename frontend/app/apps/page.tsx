@@ -329,7 +329,7 @@ export default function AppsHomePage() {
     {
       slug: "fpga-bitstream",
       title: "FPGA RTL to Bitstream",
-      subtitle: "Run FPGA synthesis, place-and-route, timing, and bitstream handoff",
+      subtitle: "Run FPGA verification, synthesis, place-and-route, timing, and bitstream handoff",
       loop_type: "fpga",
       status: "New",
       nudge: "Prototype",
@@ -338,11 +338,20 @@ export default function AppsHomePage() {
     {
       slug: "fpga2rtl",
       title: "FPGA2RTL",
-      subtitle: "Generate FPGA-ready RTL and board-specific PCF/LPF constraints from design intent",
+      subtitle: "Generate FPGA-ready RTL, verify it, and create board-specific PCF/LPF constraints from design intent",
       loop_type: "fpga",
       status: "New",
       nudge: "Design intent",
       promise: "Start FPGA prototyping even when RTL is not available",
+    },
+    {
+      slug: "fpga-verify",
+      title: "FPGA Verify",
+      subtitle: "Run testbench, assertions, simulation, coverage, and closure for FPGA RTL",
+      loop_type: "fpga",
+      status: "New",
+      nudge: "Verify",
+      promise: "Check FPGA-ready RTL before implementation and bitstream handoff",
     },
     {
       slug: "verify",
@@ -772,7 +781,7 @@ export default function AppsHomePage() {
       targetFrequency: "12",
       pcfText: "",
       runFpgaRtlRepairLoop: true,
-      notes: "Reference journey: PWM FPGA design intent to FPGA2RTL, lint pass1/pass2 repair, board constraints, synthesis, place-and-route, timing, and bitstream handoff.",
+      notes: "Reference journey: PWM FPGA design intent to FPGA2RTL, lint pass1/pass2 repair, verification, board constraints, synthesis, place-and-route, timing, and bitstream handoff.",
     }));
     window.localStorage.setItem(DESIGN_CHAIN_CONTEXT_KEY, JSON.stringify({ demoKind: "pwm_fpga_prototype" }));
     go("/apps/fpga2rtl?guided=1&pwm_fpga=1");
@@ -977,6 +986,7 @@ export default function AppsHomePage() {
       "timing-debug": "/apps/timing-debug",
       "fpga2rtl": "/apps/fpga2rtl",
       "fpga-bitstream": "/apps/fpga-bitstream",
+      "fpga-verify": "/apps/fpga-verify",
       "integrate": "/apps/integrate",
       "dqa": "/apps/dqa",
       "verify": "/apps/verify",
@@ -1102,17 +1112,17 @@ export default function AppsHomePage() {
       key: "fpga-prototype",
       exploreTitle: "Explore FPGA Prototype",
       segment: "FPGA / Board Bring-up",
-      title: "PWM FPGA2RTL to Bitstream: intent, lint, constrain, synthesize, place, route, time, and package",
-      copy: "A board-oriented reference journey for proving a PWM idea on FPGA hardware before moving deeper into ASIC implementation. Start from design intent, generate FPGA-ready RTL, run lint pass1/pass2 repair, create board-specific PCF/LPF constraints, then generate synthesis, place-and-route, timing, and bitstream handoff evidence.",
+      title: "PWM FPGA2RTL to Bitstream: intent, lint, verify, synthesize, place, route, time, and package",
+      copy: "A board-oriented reference journey for proving a PWM idea on FPGA hardware before moving deeper into ASIC implementation. Start from design intent, generate FPGA-ready RTL, run lint pass1/pass2 repair, verify RTL behavior, create board-specific PCF/LPF constraints, then generate synthesis, place-and-route, timing, and bitstream handoff evidence.",
       button: "Start PWM FPGA Journey",
       onClick: startPwmFpgaPrototypeDemo,
-      stages: ["Design Intent", "FPGA2RTL", "RTL Quality", "Board Constraints", "Yosys Synthesis", "nextpnr P&R", "Timing", "Bitstream"],
+      stages: ["Design Intent", "FPGA2RTL", "RTL Quality", "Verification", "Board Constraints", "Yosys Synthesis", "nextpnr P&R", "Timing", "Bitstream"],
     },
   ];
 
   const catalogButtons: Array<{ view: CatalogView; title: string; body: string; count?: number }> = [
     { view: "digital", title: "Explore Digital apps", body: "RTL, DQA, verify, synthesis, tapeout, and handoff apps.", count: apps.filter((app) => app.loop_type === "digital").length },
-    { view: "fpga", title: "Explore FPGA apps", body: "FPGA2RTL, RTL quality, iCE40/ECP5 synthesis, place-and-route, timing, and bitstream handoff.", count: apps.filter((app) => app.loop_type === "fpga").length },
+    { view: "fpga", title: "Explore FPGA apps", body: "FPGA2RTL, RTL quality, iCE40/ECP5 (Lattice FPGA families) synthesis, place-and-route, timing, and bitstream handoff.", count: apps.filter((app) => app.loop_type === "fpga").length },
     { view: "system", title: "Explore System apps", body: "System RTL, simulation, synthesis, PD, firmware, software, validation, and product builder.", count: apps.filter((app) => app.loop_type === "system").length },
     { view: "analog", title: "Explore Analog apps", body: "Analog spec, netlist, model, validation, correlation, iteration, and abstracts.", count: apps.filter((app) => app.loop_type === "analog").length },
     { view: "embedded", title: "Explore Embedded apps", body: "HAL, drivers, boot, diagnostics, log analysis, co-sim, and firmware run.", count: apps.filter((app) => app.loop_type === "embedded").length },

@@ -5,10 +5,10 @@ export default function FpgaBitstreamPage() {
     <DigitalReviewAppTemplate
       slug="fpga-bitstream"
       title="FPGA RTL to Bitstream"
-      subtitle="Prototype existing RTL on iCE40 or ECP5 FPGA targets using open-source synthesis, place-and-route, timing, and bitstream handoff."
+      subtitle="Prototype existing RTL on iCE40/ECP5 (Lattice FPGA families) targets using verification, open-source synthesis, place-and-route, timing, and bitstream handoff."
       runPath="/apps/fpga/bitstream/run"
       dashboardStage="fpga"
-      fields={["source", "rtl", "fpga", "frequency", "notes"]}
+      fields={["source", "rtl", "fpga", "verify", "frequency", "notes"]}
     />
   );
 }

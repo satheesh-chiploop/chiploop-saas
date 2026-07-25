@@ -1631,6 +1631,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const programCommand = firstString(bitstream.programming_command, bitstream.program_command)
         ? `Download ${bitstreamFileName} and program the board locally.`
         : (bitstreamDoneFromLogs ? "Download the bitstream and program the board locally." : "available after bitstream generation");
+      const programmingReady = bitstreamArtifactProduced || Boolean(firstString(bitstream.programming_command, bitstream.program_command));
       const pnrStatus = pnrArtifactProduced
         ? firstString(pnr.status, "completed")
         : firstString(pnr.status) || (pnrDoneFromLogs || firstString(timing.status) === "completed" ? "completed" : "");
@@ -1730,7 +1731,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={timingDetail} />
             <CheckCard title="Timing Closure" status={statusLabel(timingClosureStatus)} detail={timingClosureDetail} />
             <CheckCard title="Bitstream" status={statusLabel(bitstreamCardStatus)} detail={bitstreamCardDetail} />
-            <CheckCard title="Programming" status={bitstreamStatus ? "ready locally" : "handoff"} detail={programCommand} />
+            <CheckCard title="Programming" status={programmingReady ? "ready locally" : "handoff"} detail={programCommand} />
           </div>
         </div>
       );

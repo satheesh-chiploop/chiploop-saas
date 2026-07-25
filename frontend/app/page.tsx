@@ -90,8 +90,8 @@ const paths = [
 
 const platformStats = [
   ["207+", "Agents", "text-cyan-300"],
-  ["44+", "Apps", "text-emerald-300"],
-  ["15+", "Workflow Templates", "text-violet-300"],
+  ["45+", "Apps", "text-emerald-300"],
+  ["17+", "Workflow Templates", "text-violet-300"],
   ["9+", "Reference Journeys", "text-amber-300"],
   ["5+", "Product Journeys", "text-pink-300"],
   ["SDK + CLI + Studio", "Developer Access", "text-slate-100"],
@@ -112,7 +112,7 @@ const subscriptionLoops = [
   },
   {
     name: "FPGA Prototyping",
-    body: "RTL handoff, iCE40 synthesis, place-and-route, timing checks, bitstream packaging, and board programming handoff.",
+    body: "RTL handoff, iCE40/ECP5 (Lattice FPGA families) synthesis, place-and-route, timing checks, bitstream packaging, and board programming handoff.",
     border: "border-lime-300/55",
     hover: "hover:border-lime-300 hover:shadow-lime-950/35",
   },
@@ -140,6 +140,7 @@ const agentSegments = [
   { key: "system", label: "System", color: "#a78bfa" },
   { key: "analog", label: "Analog", color: "#fb7185" },
   { key: "digital", label: "Digital", color: "#22d3ee" },
+  { key: "fpga", label: "FPGA prototype", color: "#bef264" },
   { key: "firmware", label: "Firmware", color: "#34d399" },
   { key: "software", label: "Software + validation + co-sim", color: "#fbbf24" },
   { key: "product", label: "Product demo", color: "#f472b6" },
@@ -149,22 +150,27 @@ const workflowAgentChart = [
   {
     label: "Digital IP Product",
     example: "PWM to demo",
-    agents: { system: 6, analog: 0, digital: 39, firmware: 10, software: 12, product: 6 },
+    agents: { system: 6, analog: 0, digital: 39, fpga: 0, firmware: 10, software: 12, product: 6 },
+  },
+  {
+    label: "FPGA Prototype",
+    example: "PWM to bitstream",
+    agents: { system: 4, analog: 0, digital: 14, fpga: 18, firmware: 0, software: 0, product: 3 },
   },
   {
     label: "Mixed-Signal IP Product",
     example: "Temp Monitor SoC",
-    agents: { system: 12, analog: 18, digital: 38, firmware: 10, software: 12, product: 8 },
+    agents: { system: 12, analog: 18, digital: 38, fpga: 0, firmware: 10, software: 12, product: 8 },
   },
   {
     label: "Digital IP + Tapeout",
     example: "RTL to GDS/signoff",
-    agents: { system: 5, analog: 0, digital: 76, firmware: 0, software: 0, product: 7 },
+    agents: { system: 5, analog: 0, digital: 76, fpga: 0, firmware: 0, software: 0, product: 7 },
   },
   {
     label: "Mixed-Signal Product + Tapeout",
     example: "SoC to demo + GDS",
-    agents: { system: 16, analog: 22, digital: 51, firmware: 12, software: 14, product: 8 },
+    agents: { system: 16, analog: 22, digital: 51, fpga: 0, firmware: 12, software: 14, product: 8 },
   },
 ];
 
@@ -474,7 +480,7 @@ function LandingPageContent() {
                       style={{ bottom: `${(tick / workflowAgentMax) * 100}%` }}
                     />
                   ))}
-                  <div className="relative grid h-full grid-cols-4 items-end gap-3 sm:gap-5">
+                  <div className="relative grid h-full items-end gap-3 sm:gap-5" style={{ gridTemplateColumns: `repeat(${workflowAgentChart.length}, minmax(0, 1fr))` }}>
                     {workflowAgentChart.map((item) => {
                       const totalAgents = agentSegments.reduce((sum, segment) => sum + item.agents[segment.key as keyof typeof item.agents], 0);
                       const barHeight = Math.max((totalAgents / workflowAgentMax) * workflowAgentPlotHeight, 8);
@@ -511,7 +517,7 @@ function LandingPageContent() {
                     })}
                   </div>
                 </div>
-                <div className="mt-3 grid grid-cols-4 gap-3 px-1 text-center sm:gap-5">
+                <div className="mt-3 grid gap-3 px-1 text-center sm:gap-5" style={{ gridTemplateColumns: `repeat(${workflowAgentChart.length}, minmax(0, 1fr))` }}>
                   {workflowAgentChart.map((item) => (
                     <div key={item.label} className="min-h-20">
                       <div className="text-xs font-semibold leading-4 text-slate-100">{item.label}</div>

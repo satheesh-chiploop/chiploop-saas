@@ -29,10 +29,10 @@ const loops = [
   {
     name: "FPGA Prototyping",
     short: "Move RTL onto real FPGA boards with synthesis, place-and-route, timing, and bitstream handoff.",
-    core: "RTL ingest, iCE40 synthesis, place-and-route, timing, bitstream",
-    advanced: "Board presets, IP packaging, hardware bring-up, vendor flows",
+    core: "FPGA2RTL, RTL quality, iCE40/ECP5 (Lattice FPGA families) synthesis, place-and-route, timing, bitstream",
+    advanced: "FPGA Verify, verification closure, timing closure, board presets, hardware bring-up",
     href: "/apps?loop=fpga",
-    metrics: { agents: 9, apps: 1, workflows: 1, journeys: 1 },
+    metrics: { agents: 18, apps: 3, workflows: 4, journeys: 1 },
     border: "border-lime-300/55",
     hover: "hover:border-lime-300 hover:shadow-lime-950/35",
   },
