@@ -1553,18 +1553,18 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const dashboard = record(ev("fpga_dashboard.json", "fpga/fpga_dashboard.json"));
       const handoff = record(ev("fpga_handoff_ingest.json", "fpga/handoff/fpga_handoff_ingest.json"));
       const constraints = record(ev("fpga_constraints_summary.json", "fpga/constraints/fpga_constraints_summary.json"));
-      const synth = record(firstPresent(dashboard.synthesis, ev("fpga_synthesis_summary.json", "fpga/synth/fpga_synthesis_summary.json")));
-      const rtlQuality = record(firstPresent(dashboard.rtl_quality, ev("fpga_rtl_quality_summary.json", "fpga/quality/fpga_rtl_quality_summary.json")));
+      const synth = record(firstPresent(ev("fpga_synthesis_summary.json", "fpga/synth/fpga_synthesis_summary.json"), dashboard.synthesis));
+      const rtlQuality = record(firstPresent(ev("fpga_rtl_quality_summary.json", "fpga/quality/fpga_rtl_quality_summary.json"), dashboard.rtl_quality));
       const rtlQualityPass1 = record(rtlQuality.pass1);
       const rtlQualityPass2 = record(rtlQuality.pass2);
       const rtlQualityRepair = record(rtlQuality.repair);
-      const pnr = record(firstPresent(dashboard.place_route, ev("fpga_place_route_summary.json", "fpga/pnr/fpga_place_route_summary.json")));
-      const timing = record(firstPresent(dashboard.timing_drc, ev("fpga_timing_drc_summary.json", "fpga/reports/fpga_timing_drc_summary.json")));
+      const pnr = record(firstPresent(ev("fpga_place_route_summary.json", "fpga/pnr/fpga_place_route_summary.json"), dashboard.place_route));
+      const timing = record(firstPresent(ev("fpga_timing_drc_summary.json", "fpga/reports/fpga_timing_drc_summary.json"), dashboard.timing_drc));
       const synthClosureDashboard = record(dashboard.synthesis_closure);
       const timingClosureDashboard = record(dashboard.timing_closure);
       const synthClosure = record(firstPresent(synthClosureDashboard.plan, synthClosureDashboard, ev("fpga_synthesis_closure_plan.json", "fpga/closure/fpga_synthesis_closure_plan.json")));
       const timingClosure = record(firstPresent(timingClosureDashboard.plan, timingClosureDashboard, ev("fpga_timing_closure_plan.json", "fpga/closure/fpga_timing_closure_plan.json")));
-      const bitstream = record(firstPresent(dashboard.bitstream, ev("fpga_bitstream_summary.json", "fpga/bitstream/fpga_bitstream_summary.json")));
+      const bitstream = record(firstPresent(ev("fpga_bitstream_summary.json", "fpga/bitstream/fpga_bitstream_summary.json"), dashboard.bitstream));
       const target = record(firstPresent(dashboard.target, handoff.target, constraints.target, synth.target, pnr.target, timing.target, bitstream.target));
       const smartContext = record(dashboard.smart_context);
       const hem = record(dashboard.hem);
@@ -1617,7 +1617,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         pnr.max_frequency_mhz,
         pnr.fmax_mhz,
       );
-      const bitstreamPath = fileLabel(bitstream.bitstream, bitstream.bitstream_path) || "not generated";
+      const successfulStatuses = new Set(["completed", "pass", "ok", "clean", "warning"]);
+      const statusText = (value: unknown) => firstString(value).toLowerCase();
+      const producedByStatus = (summary: JsonMap) => successfulStatuses.has(statusText(summary.status));
+      const pnrArtifactProduced = pnr.artifact_produced === true || producedByStatus(pnr);
+      const bitstreamArtifactProduced = bitstream.artifact_produced === true || producedByStatus(bitstream);
+      const pnrArtifactLabel = pnrArtifactProduced ? fileLabel(pnr.asc, pnr.asc_path, pnr.routed_config, pnr.pnr_output) : "";
+      const bitstreamPath = bitstreamArtifactProduced ? fileLabel(bitstream.bitstream, bitstream.bitstream_path) : "not generated";
       const fpgaLogs = logs || "";
       const pnrDoneFromLogs = /FPGA\s+(?:nextpnr|place\s*&?\s*route).*done|fpga_place_route_summary\.json/i.test(fpgaLogs);
       const bitstreamDoneFromLogs = /FPGA\s+Bitstream.*done|fpga_bitstream_summary\.json/i.test(fpgaLogs);
@@ -1625,7 +1631,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const programCommand = firstString(bitstream.programming_command, bitstream.program_command)
         ? `Download ${bitstreamFileName} and program the board locally.`
         : (bitstreamDoneFromLogs ? "Download the bitstream and program the board locally." : "available after bitstream generation");
-      const pnrStatus = firstString(pnr.status) || (fileLabel(pnr.asc, pnr.asc_path) || pnrDoneFromLogs || firstString(timing.status) === "completed" ? "completed" : "");
+      const pnrStatus = pnrArtifactProduced
+        ? firstString(pnr.status, "completed")
+        : firstString(pnr.status) || (pnrDoneFromLogs || firstString(timing.status) === "completed" ? "completed" : "");
       const timingEvidenceSignal = firstPresent(
         timingSummary.timing_met,
         routedResult.timing_met,
@@ -1643,7 +1651,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         pnr.timing_violation_count,
       );
       const timingStatus = firstString(timing.status) || (timingEvidenceSignal !== undefined ? "completed" : "");
-      const bitstreamStatus = firstString(bitstream.status) || (bitstreamPath !== "not generated" || bitstreamDoneFromLogs ? "completed" : "");
+      const bitstreamStatus = bitstreamArtifactProduced
+        ? firstString(bitstream.status, "completed")
+        : firstString(bitstream.status) || (bitstreamDoneFromLogs ? "completed" : "");
       const timingIsClean = firstPresent(timingSummary.timing_met, routedResult.timing_met, timing.timing_met, pnr.timing_met) === true
         || timingViolations === 0
         || timingViolations === "0";
@@ -1658,13 +1668,21 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const bitstreamCardStatus = bitstreamStatus || (pnrStatus === "completed" ? "user disabled" : "");
       const bitstreamCardDetail = bitstreamPath !== "not generated"
         ? bitstreamPath
-        : (bitstreamDoneFromLogs ? "generated; bitstream artifact is syncing" : (pnrStatus === "completed" ? "User disabled bitstream generation." : "not generated"));
+        : (firstString(bitstream.error, bitstream.reason) || (bitstreamDoneFromLogs ? "generated; bitstream artifact is syncing" : (pnrStatus === "completed" ? "User disabled bitstream generation." : "not generated")));
       const routedCellsDisplay = typeof routedCellsUsed === "number" && typeof routedCellsAvailable === "number"
         ? `${formatNumber(routedCellsUsed)} / ${formatNumber(routedCellsAvailable)}`
         : metricValue(routedCellsUsed);
-      const pnrDetail = fileLabel(pnr.asc, pnr.asc_path)
+      const pnrDetail = pnrArtifactLabel
         || firstString(pnr.reason)
+        || firstString(pnr.error)
+        || firstString(record(pnr.command).stdout_tail)
         || (pnrStatus === "completed" ? "route summary available through timing report" : "");
+      const rtlQualityStatus = firstString(rtlQuality.status) || (Object.keys(rtlQuality).length ? "recorded" : "not recorded");
+      const rtlQualityPass1Status = firstString(rtlQualityPass1.status) || "not recorded";
+      const rtlQualityPass2Status = firstString(rtlQualityPass2.status) || "not recorded";
+      const timingDetail = fileLabel(timing.report, timing.report_path, record(timing.icetime).log)
+        || firstString(timing.error)
+        || "timing summary available";
       return (
         <div className="mt-5 space-y-5">
           <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
@@ -1680,9 +1698,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Package" value={firstString(target.package, "not selected")} />
             <Stat title="Top Module" value={firstString(target.top_module, handoff.top_module, "not inferred")} />
             <Stat title="RTL Files" value={firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length)} />
-            <Stat title="RTL Quality" value={statusLabel(rtlQuality.status)} />
-            <Stat title="Lint Pass1" value={statusLabel(rtlQualityPass1.status)} />
-            <Stat title="Lint Pass2" value={statusLabel(rtlQualityPass2.status)} />
+            <Stat title="RTL Quality" value={statusLabel(rtlQualityStatus)} />
+            <Stat title="Lint Pass1" value={statusLabel(rtlQualityPass1Status)} />
+            <Stat title="Lint Pass2" value={statusLabel(rtlQualityPass2Status)} />
             <Stat title="Yosys Logic Cells" value={synthCellsAvailable ? `${formatNumber(synthCellsUsed)} / ${formatNumber(synthCellsAvailable)}` : metricValue(synthCellsUsed)} />
             <Stat title="Yosys Utilization" value={typeof synthUtilizationPct === "number" ? `${formatNumber(synthUtilizationPct)}%` : metricValue(synthUtilizationPct)} />
             <Stat title="Yosys Flip-Flops" value={ffCount} />
@@ -1703,13 +1721,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={fileLabel(constraints.constraint_path, constraints.pcf, constraints.pcf_path, constraints.lpf_path) || "constraints not reported"} />
             <CheckCard
               title="RTL Quality Gate"
-              status={statusLabel(rtlQuality.status)}
-              detail={`pass1 ${statusLabel(rtlQualityPass1.status)}, repair ${rtlQualityRepair.enabled === false ? "disabled" : rtlQualityRepair.applied ? "applied" : "enabled/no fix needed"}, pass2 ${statusLabel(rtlQualityPass2.status)}`}
+              status={statusLabel(rtlQualityStatus)}
+              detail={`pass1 ${statusLabel(rtlQualityPass1Status)}, repair ${rtlQualityRepair.enabled === false ? "disabled" : rtlQualityRepair.applied ? "applied" : "enabled/no fix needed"}, pass2 ${statusLabel(rtlQualityPass2Status)}`}
             />
             <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={fileLabel(synth.netlist_json, synth.json_netlist) || firstString(synth.reason)} />
             <CheckCard title="Synthesis Closure" status={statusLabel(synthClosureStatus)} detail={synthClosureDetail} />
             <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={pnrDetail} />
-            <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={fileLabel(timing.report, timing.report_path, record(timing.icetime).log) || "timing summary available"} />
+            <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={timingDetail} />
             <CheckCard title="Timing Closure" status={statusLabel(timingClosureStatus)} detail={timingClosureDetail} />
             <CheckCard title="Bitstream" status={statusLabel(bitstreamCardStatus)} detail={bitstreamCardDetail} />
             <CheckCard title="Programming" status={bitstreamStatus ? "ready locally" : "handoff"} detail={programCommand} />
