@@ -1673,6 +1673,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const routedCellsDisplay = typeof routedCellsUsed === "number" && typeof routedCellsAvailable === "number"
         ? `${formatNumber(routedCellsUsed)} / ${formatNumber(routedCellsAvailable)}`
         : metricValue(routedCellsUsed);
+      const constraintsDetail = [
+        fileLabel(constraints.constraint_path, constraints.pcf, constraints.pcf_path, constraints.lpf_path) || "constraints not reported",
+        firstString(constraints.error),
+        firstString(constraints.routing_note),
+      ].filter(Boolean).join(" | ");
       const pnrDetail = pnrArtifactLabel
         || firstString(pnr.reason)
         || firstString(pnr.error)
@@ -1719,7 +1724,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={fileLabel(constraints.constraint_path, constraints.pcf, constraints.pcf_path, constraints.lpf_path) || "constraints not reported"} />
+            <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={constraintsDetail} />
             <CheckCard
               title="RTL Quality Gate"
               status={statusLabel(rtlQualityStatus)}
