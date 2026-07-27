@@ -9,6 +9,7 @@ import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import { FPGA_BITSTREAM_PREFILL_KEY } from "@/lib/pwmFullStackDemo";
 import SpecTextBox from "@/components/SpecTextBox";
+import { FiCheck, FiClock, FiCopy, FiLoader, FiX } from "react-icons/fi";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -82,7 +83,11 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [testIntent, setTestIntent] = useState("Run smoke verification for the FPGA RTL before synthesis. Check reset behavior, basic functional behavior, assertions, and coverage readiness.");
   const [verificationPlan, setVerificationPlan] = useState("");
   const [randomVsDirected, setRandomVsDirected] = useState<"random" | "directed" | "both">("both");
-  const [coverageTargets, setCoverageTargets] = useState("");
+  const [functionalCoverageTarget, setFunctionalCoverageTarget] = useState("90");
+  const [lineCoverageTarget, setLineCoverageTarget] = useState("90");
+  const [branchCoverageTarget, setBranchCoverageTarget] = useState("80");
+  const [toggleCoverageTarget, setToggleCoverageTarget] = useState("80");
+  const [conditionCoverageTarget, setConditionCoverageTarget] = useState("80");
   const [simulatorType, setSimulatorType] = useState("verilator");
   const [seedCount, setSeedCount] = useState("10");
   const [enableFormal, setEnableFormal] = useState(fpgaMode === "formal");
@@ -94,6 +99,19 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [maxVerificationClosureIterations, setMaxVerificationClosureIterations] = useState("1");
 
   const logLines = useMemo(() => parseLogLines(workflowRow?.logs), [workflowRow?.logs]);
+  const coverageTargets = useMemo(() => [
+    `${functionalCoverageTarget || "90"}% functional`,
+    `${lineCoverageTarget || "90"}% line`,
+    `${branchCoverageTarget || "80"}% branch`,
+    `${toggleCoverageTarget || "80"}% toggle`,
+    `${conditionCoverageTarget || "80"}% condition`,
+  ].join(", "), [
+    functionalCoverageTarget,
+    lineCoverageTarget,
+    branchCoverageTarget,
+    toggleCoverageTarget,
+    conditionCoverageTarget,
+  ]);
 
   useEffect(() => {
     if (!logsRef.current) return;
@@ -592,16 +610,33 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                   </div>
                   {fpgaMode !== "formal" ? (
                     <>
-                      <div className="mt-3 grid gap-3 md:grid-cols-2">
-                        <label className="block">
-                          <span className="text-sm text-slate-300">Test intent</span>
-                          <textarea value={testIntent} onChange={(e) => setTestIntent(e.target.value)} rows={5} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Describe smoke tests, directed tests, assertions, and coverage goals." />
-                        </label>
-                        <label className="block">
-                          <span className="text-sm text-slate-300">Verification plan</span>
-                          <textarea value={verificationPlan} onChange={(e) => setVerificationPlan(e.target.value)} rows={5} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Optional plan. Leave blank to generate from source context." />
-                        </label>
-                      </div>
+                      <fieldset disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-3 grid gap-3 disabled:opacity-50 md:grid-cols-2">
+                        <SpecTextBox
+                          label="Test intent"
+                          value={testIntent}
+                          onChange={setTestIntent}
+                          rows={5}
+                          required
+                          voiceTitle="FPGA Test Intent Voice Input"
+                          voiceLoopType="fpga"
+                          voiceTarget="FPGA verification test intent, scenarios, assertions, and expected behavior"
+                          uploadLabel="Upload test intent"
+                          uploadHelper="Upload a text, Markdown, JSON, or YAML test-intent document. Choose Replace or Append before applying it."
+                          placeholder="Describe smoke tests, directed tests, assertions, and expected behavior."
+                        />
+                        <SpecTextBox
+                          label="Verification plan"
+                          value={verificationPlan}
+                          onChange={setVerificationPlan}
+                          rows={5}
+                          voiceTitle="FPGA Verification Plan Voice Input"
+                          voiceLoopType="fpga"
+                          voiceTarget="FPGA verification plan, test strategy, checkers, assertions, and closure approach"
+                          uploadLabel="Upload verification plan"
+                          uploadHelper="Upload a reviewer-authored verification plan. Choose Replace or Append before applying it."
+                          placeholder="Optional plan. Leave blank for ChipLoop to generate it from the design and test intent."
+                        />
+                      </fieldset>
                       <div className="mt-3 grid gap-3 md:grid-cols-4">
                         <label className="block">
                           <span className="text-xs uppercase tracking-wide text-slate-400">Stimulus</span>
@@ -627,10 +662,37 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                           <input value={maxVerificationClosureIterations} onChange={(e) => setMaxVerificationClosureIterations(e.target.value)} disabled={!runFpgaVerification || !runVerificationClosureLoop} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50" />
                         </label>
                       </div>
-                      <label className="mt-3 block">
-                        <span className="text-sm text-slate-300">Coverage targets</span>
-                        <textarea value={coverageTargets} onChange={(e) => setCoverageTargets(e.target.value)} rows={3} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Optional functional/code coverage goals." />
-                      </label>
+                      <fieldset disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-4 rounded-xl border border-slate-800 bg-black/20 p-3 disabled:opacity-50">
+                        <legend className="px-1 text-sm font-semibold text-slate-200">Coverage targets</legend>
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                          {[
+                            ["Functional", functionalCoverageTarget, setFunctionalCoverageTarget],
+                            ["Line", lineCoverageTarget, setLineCoverageTarget],
+                            ["Branch", branchCoverageTarget, setBranchCoverageTarget],
+                            ["Toggle", toggleCoverageTarget, setToggleCoverageTarget],
+                            ["Condition", conditionCoverageTarget, setConditionCoverageTarget],
+                          ].map(([label, value, setter]) => (
+                            <label key={String(label)} className="block">
+                              <span className="text-xs uppercase tracking-wide text-slate-400">{String(label)}</span>
+                              <div className="mt-1 flex items-center rounded-lg border border-slate-700 bg-black/40 focus-within:border-cyan-400/70">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  step="1"
+                                  inputMode="decimal"
+                                  value={String(value)}
+                                  onChange={(event) => (setter as (next: string) => void)(event.target.value)}
+                                  className="min-w-0 flex-1 bg-transparent px-3 py-2 text-white outline-none"
+                                  aria-label={`${String(label)} coverage target percentage`}
+                                />
+                                <span className="pr-3 text-sm text-slate-500">%</span>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                        <div className="mt-2 text-xs text-slate-500">ChipLoop uses these thresholds for coverage-gap analysis and closure decisions.</div>
+                      </fieldset>
                     </>
                   ) : null}
                   <div className="mt-3 grid gap-3 md:grid-cols-3">
@@ -684,13 +746,23 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   {workflowId ? (
-                    <button type="button" onClick={() => navigator.clipboard?.writeText(workflowId)} className="rounded-lg border border-slate-700 bg-black/25 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-cyan-400/60 hover:text-cyan-100">
-                      Copy ID
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard?.writeText(workflowId)}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700 bg-black/25 text-slate-300 transition hover:border-cyan-400/60 hover:text-cyan-100"
+                      title="Copy workflow ID"
+                      aria-label="Copy workflow ID"
+                    >
+                      <FiCopy aria-hidden="true" className="h-4 w-4" />
                     </button>
                   ) : null}
-                  <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-black/30 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-200">
-                    <span className={`h-2 w-2 rounded-full ${running ? "animate-pulse bg-cyan-300" : workflowRow?.status === "failed" ? "bg-rose-400" : workflowRow?.status === "completed" ? "bg-emerald-400" : "bg-slate-500"}`} />
-                    {workflowRow?.status || (running ? "running" : "idle")}
+                  <div
+                    className={`inline-flex h-9 w-9 items-center justify-center rounded-full border bg-black/30 ${running ? "border-cyan-400/60 text-cyan-300" : workflowRow?.status === "failed" ? "border-rose-500/60 text-rose-400" : workflowRow?.status === "completed" ? "border-emerald-500/60 text-emerald-400" : "border-slate-700 text-slate-500"}`}
+                    title={workflowRow?.status || (running ? "Running" : "Idle")}
+                    role="status"
+                    aria-label={`Workflow status: ${workflowRow?.status || (running ? "running" : "idle")}`}
+                  >
+                    {running ? <FiLoader aria-hidden="true" className="h-4 w-4 animate-spin" /> : workflowRow?.status === "failed" ? <FiX aria-hidden="true" className="h-4 w-4" /> : workflowRow?.status === "completed" ? <FiCheck aria-hidden="true" className="h-4 w-4" /> : <FiClock aria-hidden="true" className="h-4 w-4" />}
                   </div>
                 </div>
               </div>
