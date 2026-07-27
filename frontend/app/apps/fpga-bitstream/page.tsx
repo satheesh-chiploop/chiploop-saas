@@ -9,6 +9,7 @@ export default function FpgaBitstreamPage() {
       runPath="/apps/fpga/bitstream/run"
       dashboardStage="fpga"
       fields={["source", "rtl", "fpga", "verify", "frequency", "notes"]}
+      fpgaMode="bitstream"
     />
   );
 }

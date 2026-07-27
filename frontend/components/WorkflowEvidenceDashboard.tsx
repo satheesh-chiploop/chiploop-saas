@@ -1566,6 +1566,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const timingClosure = record(firstPresent(timingClosureDashboard.plan, timingClosureDashboard, ev("fpga_timing_closure_plan.json", "fpga/closure/fpga_timing_closure_plan.json")));
       const bitstream = record(firstPresent(ev("fpga_bitstream_summary.json", "fpga/bitstream/fpga_bitstream_summary.json"), dashboard.bitstream));
       const target = record(firstPresent(dashboard.target, handoff.target, constraints.target, synth.target, pnr.target, timing.target, bitstream.target));
+      const verifySummary = record(ev("simulation_summary_coverage.json", "vv/tb/reports/simulation_summary_coverage.json"));
+      const verifySimulation = record(verifySummary.simulation);
+      const verifyCoverage = record(verifySummary.coverage);
+      const verifyCodeCoverage = record(firstPresent(verifyCoverage.code, ev("code_coverage_summary.json", "vv/tb/reports/code_coverage_summary.json")));
+      const verifyFormal = record(verifySummary.formal);
+      const verifyToolchain = record(verifySummary.toolchain);
       const smartContext = record(dashboard.smart_context);
       const hem = record(dashboard.hem);
       const utilization = record(dashboard.utilization);
@@ -1582,14 +1588,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthUtilizationPct = typeof synthCellsUsed === "number" && typeof synthCellsAvailable === "number" && synthCellsAvailable > 0
         ? Number(((synthCellsUsed / synthCellsAvailable) * 100).toFixed(3))
         : firstPresent(synthesisEstimate.logic_utilization_percent, synth.logic_utilization_percent);
-      const routedCellsUsedRaw = firstPresent(routedResult.logical_cells_used, pnr.logical_cells_used, utilization.logical_cells_used);
-      const routedCellsAvailableRaw = firstPresent(routedResult.logical_cells_available, pnr.logical_cells_available, utilization.logical_cells_available);
+      const routedCellsUsedRaw = firstPresent(routedResult.logical_cells_used, pnr.logical_cells_used);
+      const routedCellsAvailableRaw = firstPresent(routedResult.logical_cells_available, pnr.logical_cells_available);
       const routedCellsUsed = typeof routedCellsUsedRaw === "number" && Number.isFinite(routedCellsUsedRaw) ? routedCellsUsedRaw : undefined;
       const routedCellsAvailable = typeof routedCellsAvailableRaw === "number" && Number.isFinite(routedCellsAvailableRaw) ? routedCellsAvailableRaw : undefined;
-      const routedUtilizationPct = firstPresent(routedResult.logic_utilization_percent, pnr.logic_utilization_percent, utilization.logic_utilization_percent);
-      const ffCount = metricValue(synthesisEstimate.flip_flops, utilization.flip_flops, synth.flip_flops);
-      const comboCount = metricValue(synthesisEstimate.combinational_cells, utilization.combinational_cells, synth.combinational_cells);
-      const lut4Count = metricValue(synthesisEstimate.lut4_cells, utilization.lut4_cells, synth.lut4_cells);
+      const routedUtilizationPct = firstPresent(routedResult.logic_utilization_percent, pnr.logic_utilization_percent);
+      const ffCount = metricValue(synthesisEstimate.flip_flops, synth.flip_flops);
+      const comboCount = metricValue(synthesisEstimate.combinational_cells, synth.combinational_cells);
+      const lut4Count = metricValue(synthesisEstimate.lut4_cells, synth.lut4_cells);
       const synthCellTypeSum = Object.values(synthCellTypes).reduce((sum, value) => sum + (typeof value === "number" && Number.isFinite(value) ? value : 0), 0);
       const carryCount = metricValue(synthesisEstimate.carry_cells, synth.carry_cells, synthCellTypes.SB_CARRY);
       const totalMappedCells = metricValue(synthesisEstimate.total_mapped_cells, synth.total_mapped_cells, synth.fabric_mapped_cells, synthCellTypeSum || undefined);
@@ -1601,14 +1607,32 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const wns = metricWithUnit("ns", timingSummary.wns_ns, routedResult.wns_ns, timing.wns_ns, pnr.wns_ns, calculatedWnsNs);
       const tns = metricWithUnit("ns", timingSummary.tns_ns, routedResult.tns_ns, timing.tns_ns, pnr.tns_ns);
       const timingViolations = metricValue(timingSummary.timing_violation_count, routedResult.timing_violation_count, timing.timing_violation_count, pnr.timing_violation_count);
+      const family = firstString(target.family).toLowerCase();
+      const vendor = firstString(target.vendor);
+      const vendorLabel = vendor ? vendor.charAt(0).toUpperCase() + vendor.slice(1) : "Lattice";
+      const boardDisplay = `${vendorLabel} ${firstString(target.board, "icebreaker")}`;
+      const pnrTool = firstString(record(pnr.command).cmd && array(record(pnr.command).cmd)[0], target.nextpnr_tool, family === "ecp5" ? "nextpnr-ecp5" : "nextpnr-ice40");
+      const bitstreamTool = firstString(record(bitstream.command).cmd && array(record(bitstream.command).cmd)[0], target.bitstream_tool, family === "ecp5" ? "ecppack" : "icepack");
+      const lintToolNames = Array.from(new Set([
+        ...Object.keys(record(rtlQualityPass1.tools)),
+        ...Object.keys(record(rtlQualityPass2.tools)),
+      ])).filter(Boolean);
+      const simulatorTool = firstString(verifyToolchain.simulator);
+      const coverageTool = firstString(verifyToolchain.code_coverage, verifyCodeCoverage.tool);
+      const formalTool = firstString(verifyToolchain.formal, "none");
       const toolSummary = {
         used: [
-          firstString(synth.tool),
-          firstString(pnr.tool),
-          firstString(timing.tool),
-          firstString(bitstream.tool),
+          ...lintToolNames,
+          simulatorTool,
+          coverageTool,
+          formalTool !== "none" ? formalTool : "",
+          "yosys",
+          pnrTool,
+          bitstreamTool,
         ].filter(Boolean),
-        defaultTool: "Yosys + nextpnr + IceStorm",
+        defaultTool: family === "ecp5"
+          ? "Yosys + nextpnr-ecp5 + ecppack"
+          : "Yosys + nextpnr-ice40 + IceStorm",
       };
       const maxFrequency = metricWithUnit(
         "MHz",
@@ -1673,6 +1697,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const routedCellsDisplay = typeof routedCellsUsed === "number" && typeof routedCellsAvailable === "number"
         ? `${formatNumber(routedCellsUsed)} / ${formatNumber(routedCellsAvailable)}`
         : metricValue(routedCellsUsed);
+      const routedUtilizationSource = firstString(routedResult.utilization_source, pnr.utilization_source);
+      const routedResource = firstString(routedResult.routed_resource, pnr.routed_resource);
+      const routedUtilizationDetail = routedUtilizationSource === "nextpnr_report"
+        ? `from nextpnr report${routedResource ? ` (${routedResource})` : ""}`
+        : (pnrStatus === "completed" ? "nextpnr report missing; rerun with updated backend" : "");
       const constraintsDetail = [
         fileLabel(constraints.constraint_path, constraints.pcf, constraints.pcf_path, constraints.lpf_path) || "constraints not reported",
         firstString(constraints.error),
@@ -1686,6 +1715,16 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const rtlQualityStatus = firstString(rtlQuality.status) || (Object.keys(rtlQuality).length ? "recorded" : "not recorded");
       const rtlQualityPass1Status = firstString(rtlQualityPass1.status) || "not recorded";
       const rtlQualityPass2Status = firstString(rtlQualityPass2.status) || "not recorded";
+      const verificationRuns = firstNumber(verifySimulation.total);
+      const verificationPassed = firstNumber(verifySimulation.pass);
+      const verificationFailed = firstNumber(verifySimulation.fail);
+      const verificationStatus = verificationRuns > 0 ? (verificationFailed > 0 ? "fail" : "pass") : "not run";
+      const verificationDetail = verificationRuns > 0 ? `${verificationPassed}/${verificationRuns} simulations passed` : "simulation summary not reported";
+      const functionalCoverage = pct(firstPresent(verifyCoverage.functional_coverage_pct, record(verifyCoverage.functional).coverage_pct));
+      const codeLineCoverage = pctWithStatus(verifyCodeCoverage.line_coverage_pct, verifyCodeCoverage.status);
+      const codeToggleCoverage = pctWithStatus(verifyCodeCoverage.toggle_coverage_pct, verifyCodeCoverage.toggle_source || verifyCodeCoverage.status);
+      const formalStatus = statusLabel(firstString(verifyFormal.status, "not_enabled"));
+      const lintToolsDetail = lintToolNames.length ? lintToolNames.join(" + ") : "lint tools not reported";
       const timingDetail = fileLabel(timing.report, timing.report_path, record(timing.icetime).log)
         || firstString(timing.error)
         || "timing summary available";
@@ -1698,7 +1737,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Bar label="Yosys comb / LUT cells" value={typeof comboCount === "number" ? comboCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-emerald-500" />
           </div>
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <Stat title="Board" value={firstString(target.board, "icebreaker")} />
+            <Stat title="Board" value={boardDisplay} />
             <Stat title="Family" value={firstString(target.family, "ice40")} />
             <Stat title="Device" value={firstString(target.device, "not selected")} />
             <Stat title="Package" value={firstString(target.package, "not selected")} />
@@ -1719,6 +1758,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="WNS" value={wns} />
             <Stat title="TNS" value={tns} />
             <Stat title="Timing Violations" value={timingViolations} />
+            <Stat title="Verification" value={verificationStatus} />
+            <Stat title="Functional Coverage" value={functionalCoverage} />
+            <Stat title="Code Line Coverage" value={codeLineCoverage} />
+            <Stat title="Code Toggle Coverage" value={codeToggleCoverage} />
+            <Stat title="Formal Verification" value={formalStatus} />
             <Stat title="Smart Context" value={smartContext.enabled === true ? firstString(smartContext.mode, "smart") : "full"} />
             <Stat title="HEM" value={hem.enabled === true ? firstString(hem.mode, "fixed") : "off"} />
             {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
@@ -1728,14 +1772,17 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <CheckCard
               title="RTL Quality Gate"
               status={statusLabel(rtlQualityStatus)}
-              detail={`pass1 ${statusLabel(rtlQualityPass1Status)}, repair ${rtlQualityRepair.enabled === false ? "disabled" : rtlQualityRepair.applied ? "applied" : "enabled/no fix needed"}, pass2 ${statusLabel(rtlQualityPass2Status)}`}
+              detail={`pass1 ${statusLabel(rtlQualityPass1Status)}, repair ${rtlQualityRepair.enabled === false ? "disabled" : rtlQualityRepair.applied ? "applied" : "enabled/no fix needed"}, pass2 ${statusLabel(rtlQualityPass2Status)}, tools ${lintToolsDetail}`}
             />
             <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={fileLabel(synth.netlist_json, synth.json_netlist) || firstString(synth.reason)} />
             <CheckCard title="Synthesis Closure" status={statusLabel(synthClosureStatus)} detail={synthClosureDetail} />
-            <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={pnrDetail} />
-            <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={timingDetail} />
+            <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={[pnrTool, pnrDetail, routedUtilizationDetail].filter(Boolean).join(" | ")} />
+            <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={[firstString(timing.timing_source, pnrTool), timingDetail].filter(Boolean).join(" | ")} />
             <CheckCard title="Timing Closure" status={statusLabel(timingClosureStatus)} detail={timingClosureDetail} />
-            <CheckCard title="Bitstream" status={statusLabel(bitstreamCardStatus)} detail={bitstreamCardDetail} />
+            <CheckCard title="Verification" status={statusLabel(verificationStatus)} detail={`${verificationDetail}${simulatorTool ? ` | ${simulatorTool}` : ""}`} />
+            <CheckCard title="Coverage" status={functionalCoverage} detail={`line ${codeLineCoverage}, toggle ${codeToggleCoverage}${coverageTool ? ` | ${coverageTool}` : ""}`} />
+            <CheckCard title="Formal Verification" status={formalStatus} detail={formalTool !== "none" ? formalTool : "not enabled"} />
+            <CheckCard title="Bitstream" status={statusLabel(bitstreamCardStatus)} detail={[bitstreamTool, bitstreamCardDetail].filter(Boolean).join(" | ")} />
             <CheckCard title="Programming" status={programmingReady ? "ready locally" : "handoff"} detail={programCommand} />
           </div>
         </div>

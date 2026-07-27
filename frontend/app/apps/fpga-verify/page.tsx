@@ -11,6 +11,7 @@ export default function FpgaVerifyPage() {
       dashboardStage="verification"
       fields={["source", "rtl", "verify", "notes"]}
       defaultSourceMode="from_arch2rtl"
+      fpgaMode="verify"
     />
   );
 }

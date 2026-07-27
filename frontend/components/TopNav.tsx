@@ -165,7 +165,7 @@ export default function TopNav({
           <span className={`hidden ${handwrittenNavFont} leading-none min-[380px]:inline`}>ChipLoop</span>
         </button>
 
-        <div className="flex min-w-0 flex-1 items-center justify-start gap-8 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-12 sm:pb-0 xl:gap-14 2xl:gap-16">
+        <div className="flex min-w-0 flex-1 items-center justify-start gap-5 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-6 sm:pb-0 xl:gap-7 2xl:gap-8">
           {showPlanBadge ? <PlanCreditBadge /> : null}
           {links.filter((link) => link.show).map((link) => (
             <button

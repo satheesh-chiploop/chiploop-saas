@@ -33,6 +33,7 @@ type Props = {
   defaultSourceMode?: "from_arch2rtl" | "paste" | "repo_path" | "generate_arch2rtl";
   sourceModeLabel?: string;
   closureRunPath?: string;
+  fpgaMode?: "bitstream" | "fpga2rtl" | "verify" | "formal" | "synthesis" | "implementation";
 };
 
 function parseLogLines(logs: string | null | undefined): string[] {
@@ -40,7 +41,7 @@ function parseLogLines(logs: string | null | undefined): string[] {
   return logs.split("\n").map((line) => line.trimEnd()).filter(Boolean);
 }
 
-export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPath, dashboardStage, fields, defaultSourceMode, sourceModeLabel, closureRunPath }: Props) {
+export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPath, dashboardStage, fields, defaultSourceMode, sourceModeLabel, closureRunPath, fpgaMode }: Props) {
   const router = useRouter();
   const logsRef = useRef<HTMLDivElement | null>(null);
 
@@ -89,7 +90,9 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [coverageTargets, setCoverageTargets] = useState("");
   const [simulatorType, setSimulatorType] = useState("verilator");
   const [seedCount, setSeedCount] = useState("10");
-  const [enableFormal, setEnableFormal] = useState(false);
+  const [enableFormal, setEnableFormal] = useState(fpgaMode === "formal");
+  const [formalTool, setFormalTool] = useState<"none" | "symbiyosys">("symbiyosys");
+  const [formalSolver, setFormalSolver] = useState<"z3" | "boolector">("z3");
   const [enableGoldenModel, setEnableGoldenModel] = useState(false);
   const [enableFailureDebug, setEnableFailureDebug] = useState(false);
   const [runVerificationClosureLoop, setRunVerificationClosureLoop] = useState(false);
@@ -231,6 +234,12 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
 
   const canRun = useMemo(() => {
     if (running) return false;
+    if (fpgaMode === "formal") {
+      if (sourceMode === "from_arch2rtl") return Boolean(sourceWorkflowId.trim());
+      if (sourceMode === "generate_arch2rtl") return Boolean(specText.trim());
+      if (sourceMode === "repo_path") return Boolean(repoPath.trim());
+      return Boolean(rtlText.trim());
+    }
     const integratedFpgaVerify = fields.includes("fpga") && fields.includes("verify");
     if (fields.includes("verify") && (!integratedFpgaVerify || runFpgaVerification) && !testIntent.trim()) return false;
     if (fields.includes("timing")) return Boolean(sourceWorkflowId.trim() || timingText.trim());
@@ -238,7 +247,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     if (sourceMode === "generate_arch2rtl") return Boolean(specText.trim());
     if (sourceMode === "repo_path") return Boolean(repoPath.trim());
     return Boolean(rtlText.trim());
-  }, [fields, running, sourceMode, sourceWorkflowId, repoPath, specText, rtlText, timingText, testIntent, runFpgaVerification]);
+  }, [fields, fpgaMode, running, sourceMode, sourceWorkflowId, repoPath, specText, rtlText, timingText, testIntent, runFpgaVerification]);
 
   async function runClosureLoop() {
     if (!workflowId || !closureRunPath) return;
@@ -254,7 +263,8 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         enable_failure_debug: enableFailureDebug,
         toolchain: {
           simulator: simulatorType || "verilator",
-          formal: enableFormal ? "symbiyosys" : "none",
+          formal: enableFormal ? formalTool : "none",
+          formal_solver: formalSolver,
           golden_model: enableGoldenModel ? "enabled" : "none",
         },
       };
@@ -327,7 +337,8 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         failure_debug_options: fields.includes("verify") ? { enabled: enableFailureDebug, rerun_failing_tests: true } : undefined,
         toolchain: fields.includes("verify") ? {
           simulator: simulatorType || "verilator",
-          formal: enableFormal ? "symbiyosys" : "none",
+          formal: enableFormal ? formalTool : "none",
+          formal_solver: formalSolver,
           golden_model: enableGoldenModel ? "enabled" : "none",
         } : undefined,
         toggles: fields.includes("verify") ? {
@@ -380,7 +391,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         </div>
 
         <section className="mt-6 rounded-2xl border border-cyan-500/40 bg-slate-950/80 p-6 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]">
-          <div className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">{fields.includes("fpga") ? "FPGA Loop" : "Digital Loop"}</div>
+          <div className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">{fields.includes("fpga") || fpgaMode ? "FPGA Loop" : "Digital Loop"}</div>
           <h1 className="mt-2 text-3xl font-black text-white md:text-4xl">{title}</h1>
           <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">{subtitle}</p>
 
@@ -472,11 +483,13 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                     <label className="block">
                       <span className="text-sm text-slate-300">Board</span>
                       <select value={board} onChange={(e) => setBoard(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white">
-                        <option value="icebreaker">Lattice iCEBreaker</option>
-                        <option value="ice40_hx8k_breakout">iCE40 HX8K Breakout</option>
+                        <option value="icebreaker">Lattice iCEBreaker (iCE40 UP5K)</option>
+                        <option value="upduino_v3">Lattice UPduino v3 (iCE40 UP5K)</option>
+                        <option value="icestick">Lattice iCEstick (iCE40 HX1K)</option>
+                        <option value="ice40_hx8k_breakout">Lattice iCE40 HX8K Breakout</option>
                         <option value="ulx3s_ecp5_45f">ULX3S ECP5-45F</option>
-                        <option value="upduino_v3">UPduino v3</option>
-                        <option value="icestick">Lattice iCEstick</option>
+                        <option value="orangecrab_ecp5_85f">OrangeCrab ECP5-85F</option>
+                        <option value="colorlight_5a_75b">Colorlight 5A-75B ECP5-25F</option>
                         <option value="custom_ice40">Custom iCE40</option>
                       </select>
                     </label>
@@ -546,23 +559,23 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                           <span className="text-slate-400">Retry synthesis with safe settings when Yosys reports fixable issues.</span>
                         </span>
                       </label>
-                      <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-200">
+                      {fpgaMode !== "synthesis" ? <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-200">
                         <input type="checkbox" checked={runFpgaTimingClosureLoop} onChange={(e) => setRunFpgaTimingClosureLoop(e.target.checked)} className="mt-1" />
                         <span>
                           <span className="block font-semibold text-white">Timing closure loop</span>
                           <span className="text-slate-400">Rerun implementation with nextpnr seed exploration when timing misses.</span>
                         </span>
-                      </label>
+                      </label> : null}
                     </div>
                     <div className="mt-3 grid gap-3 md:grid-cols-4">
                       <label className="block">
                         <span className="text-xs uppercase tracking-wide text-slate-400">Synth tries</span>
                         <input value={maxFpgaSynthesisClosureIterations} onChange={(e) => setMaxFpgaSynthesisClosureIterations(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white" />
                       </label>
-                      <label className="block">
+                      {fpgaMode !== "synthesis" ? <label className="block">
                         <span className="text-xs uppercase tracking-wide text-slate-400">Timing tries</span>
                         <input value={maxFpgaTimingClosureIterations} onChange={(e) => setMaxFpgaTimingClosureIterations(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white" />
-                      </label>
+                      </label> : null}
                       <label className="block">
                         <span className="text-xs uppercase tracking-wide text-slate-400">Context</span>
                         <select value={contextMode} onChange={(e) => setContextMode(e.target.value as "smart" | "full")} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white">
@@ -580,8 +593,8 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                     </div>
                     <div className="mt-3 grid gap-3 md:grid-cols-4">
                       <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowYosysFlatten} onChange={(e) => setAllowYosysFlatten(e.target.checked)} /> Allow Yosys flatten</label>
-                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowNextpnrSeedSweep} onChange={(e) => setAllowNextpnrSeedSweep(e.target.checked)} /> Seed sweep</label>
-                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowFrequencyRelaxation} onChange={(e) => setAllowFrequencyRelaxation(e.target.checked)} /> Suggest relaxed clock</label>
+                      {fpgaMode !== "synthesis" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowNextpnrSeedSweep} onChange={(e) => setAllowNextpnrSeedSweep(e.target.checked)} /> Seed sweep</label> : null}
+                      {fpgaMode !== "synthesis" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowFrequencyRelaxation} onChange={(e) => setAllowFrequencyRelaxation(e.target.checked)} /> Suggest relaxed clock</label> : null}
                       <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={hemEnabled} onChange={(e) => setHemEnabled(e.target.checked)} /> HEM run memory</label>
                     </div>
                   </div>
@@ -591,7 +604,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
               {fields.includes("verify") ? (
                 <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/10 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="text-sm font-bold text-cyan-200">FPGA verification</div>
+                    <div className="text-sm font-bold text-cyan-200">{fpgaMode === "formal" ? "FPGA formal verification" : "FPGA verification"}</div>
                     {fields.includes("fpga") ? (
                       <label className="flex items-center gap-2 text-sm font-semibold text-slate-200">
                         <input type="checkbox" checked={runFpgaVerification} onChange={(e) => setRunFpgaVerification(e.target.checked)} />
@@ -599,50 +612,69 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                       </label>
                     ) : null}
                   </div>
-                  <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  {fpgaMode !== "formal" ? (
+                    <>
+                      <div className="mt-3 grid gap-3 md:grid-cols-2">
+                        <label className="block">
+                          <span className="text-sm text-slate-300">Test intent</span>
+                          <textarea value={testIntent} onChange={(e) => setTestIntent(e.target.value)} rows={5} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Describe smoke tests, directed tests, assertions, and coverage goals." />
+                        </label>
+                        <label className="block">
+                          <span className="text-sm text-slate-300">Verification plan</span>
+                          <textarea value={verificationPlan} onChange={(e) => setVerificationPlan(e.target.value)} rows={5} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Optional plan. Leave blank to generate from source context." />
+                        </label>
+                      </div>
+                      <div className="mt-3 grid gap-3 md:grid-cols-4">
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-wide text-slate-400">Stimulus</span>
+                          <select value={randomVsDirected} onChange={(e) => setRandomVsDirected(e.target.value as any)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
+                            <option value="both">Both</option>
+                            <option value="directed">Directed</option>
+                            <option value="random">Random</option>
+                          </select>
+                        </label>
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-wide text-slate-400">Simulator</span>
+                          <select value={simulatorType} onChange={(e) => setSimulatorType(e.target.value)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
+                            <option value="verilator">Verilator</option>
+                            <option value="icarus">Icarus</option>
+                          </select>
+                        </label>
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-wide text-slate-400">Seeds</span>
+                          <input value={seedCount} onChange={(e) => setSeedCount(e.target.value)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50" />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs uppercase tracking-wide text-slate-400">Closure tries</span>
+                          <input value={maxVerificationClosureIterations} onChange={(e) => setMaxVerificationClosureIterations(e.target.value)} disabled={!runFpgaVerification || !runVerificationClosureLoop} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50" />
+                        </label>
+                      </div>
+                      <label className="mt-3 block">
+                        <span className="text-sm text-slate-300">Coverage targets</span>
+                        <textarea value={coverageTargets} onChange={(e) => setCoverageTargets(e.target.value)} rows={3} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Optional functional/code coverage goals." />
+                      </label>
+                    </>
+                  ) : null}
+                  <div className="mt-3 grid gap-3 md:grid-cols-3">
                     <label className="block">
-                      <span className="text-sm text-slate-300">Test intent</span>
-                      <textarea value={testIntent} onChange={(e) => setTestIntent(e.target.value)} rows={5} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Describe smoke tests, directed tests, assertions, and coverage goals." />
-                    </label>
-                    <label className="block">
-                      <span className="text-sm text-slate-300">Verification plan</span>
-                      <textarea value={verificationPlan} onChange={(e) => setVerificationPlan(e.target.value)} rows={5} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Optional plan. Leave blank to generate from source context." />
-                    </label>
-                  </div>
-                  <div className="mt-3 grid gap-3 md:grid-cols-4">
-                    <label className="block">
-                      <span className="text-xs uppercase tracking-wide text-slate-400">Stimulus</span>
-                      <select value={randomVsDirected} onChange={(e) => setRandomVsDirected(e.target.value as any)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
-                        <option value="both">Both</option>
-                        <option value="directed">Directed</option>
-                        <option value="random">Random</option>
+                      <span className="text-xs uppercase tracking-wide text-slate-400">Formal tool</span>
+                      <select value={enableFormal ? formalTool : "none"} onChange={(e) => { const value = e.target.value as "none" | "symbiyosys"; setEnableFormal(value !== "none"); if (value !== "none") setFormalTool(value); }} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
+                        <option value="none">Disabled</option>
+                        <option value="symbiyosys">SymbiYosys (sby)</option>
                       </select>
                     </label>
                     <label className="block">
-                      <span className="text-xs uppercase tracking-wide text-slate-400">Simulator</span>
-                      <select value={simulatorType} onChange={(e) => setSimulatorType(e.target.value)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
-                        <option value="verilator">Verilator</option>
-                        <option value="icarus">Icarus</option>
+                      <span className="text-xs uppercase tracking-wide text-slate-400">Formal solver</span>
+                      <select value={formalSolver} onChange={(e) => setFormalSolver(e.target.value as "z3" | "boolector")} disabled={!enableFormal || (fields.includes("fpga") && !runFpgaVerification)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
+                        <option value="z3">Z3</option>
+                        <option value="boolector">Boolector</option>
                       </select>
                     </label>
-                    <label className="block">
-                      <span className="text-xs uppercase tracking-wide text-slate-400">Seeds</span>
-                      <input value={seedCount} onChange={(e) => setSeedCount(e.target.value)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50" />
-                    </label>
-                    <label className="block">
-                      <span className="text-xs uppercase tracking-wide text-slate-400">Closure tries</span>
-                      <input value={maxVerificationClosureIterations} onChange={(e) => setMaxVerificationClosureIterations(e.target.value)} disabled={!runFpgaVerification || !runVerificationClosureLoop} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50" />
-                    </label>
                   </div>
-                  <label className="mt-3 block">
-                    <span className="text-sm text-slate-300">Coverage targets</span>
-                    <textarea value={coverageTargets} onChange={(e) => setCoverageTargets(e.target.value)} rows={3} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-sm text-white disabled:opacity-50" placeholder="Optional functional/code coverage goals." />
-                  </label>
                   <div className="mt-3 grid gap-3 md:grid-cols-4">
-                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableFormal} onChange={(e) => setEnableFormal(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Formal verification</label>
-                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableGoldenModel} onChange={(e) => setEnableGoldenModel(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Golden model</label>
-                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableFailureDebug} onChange={(e) => setEnableFailureDebug(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Failure debug</label>
-                    <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={runVerificationClosureLoop} onChange={(e) => setRunVerificationClosureLoop(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Closure loop</label>
+                    {fpgaMode !== "formal" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableGoldenModel} onChange={(e) => setEnableGoldenModel(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Golden model</label> : null}
+                    {fpgaMode !== "formal" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableFailureDebug} onChange={(e) => setEnableFailureDebug(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Failure debug</label> : null}
+                    {fpgaMode !== "formal" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={runVerificationClosureLoop} onChange={(e) => setRunVerificationClosureLoop(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Closure loop</label> : null}
                   </div>
                 </div>
               ) : null}

@@ -11,6 +11,7 @@ export default function FPGA2RTLPage() {
       fields={["source", "fpga", "verify", "frequency", "notes"]}
       defaultSourceMode="generate_arch2rtl"
       sourceModeLabel="FPGA2RTL from design intent"
+      fpgaMode="fpga2rtl"
     />
   );
 }
