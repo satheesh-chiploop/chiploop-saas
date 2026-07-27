@@ -728,11 +728,11 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
 
               {err ? <div className="rounded-xl border border-rose-500/40 bg-rose-950/40 p-3 text-sm text-rose-200">{err}</div> : null}
 
-              <div className="flex flex-col gap-3 rounded-2xl border border-cyan-400/25 bg-gradient-to-r from-cyan-950/35 via-slate-950/70 to-violet-950/25 p-4 shadow-[0_18px_60px_rgba(8,145,178,0.08)] sm:flex-row sm:items-center">
-                <button disabled={!canRun} onClick={runNow} className="min-h-12 flex-1 rounded-xl bg-gradient-to-r from-cyan-300 to-cyan-400 px-6 py-3 text-base font-black text-slate-950 shadow-[0_10px_35px_rgba(34,211,238,0.22)] transition hover:from-cyan-200 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-50">
-                  {running ? `Running ${title}...` : `Run ${title}`}
+              <div className="flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-cyan-400/25 bg-gradient-to-r from-cyan-950/35 via-slate-950/70 to-violet-950/25 p-4 shadow-[0_18px_60px_rgba(8,145,178,0.08)]">
+                <button disabled={!canRun} onClick={runNow} className="min-h-11 w-36 rounded-xl bg-gradient-to-r from-cyan-300 to-cyan-400 px-5 py-2.5 text-sm font-black text-slate-950 shadow-[0_10px_35px_rgba(34,211,238,0.22)] transition hover:from-cyan-200 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-50">
+                  {running ? "Running..." : "Run"}
                 </button>
-                <button disabled={!workflowId} onClick={downloadZip} className="min-h-12 rounded-xl border border-slate-700 bg-black/30 px-5 py-3 font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-cyan-100 disabled:opacity-50 sm:min-w-44">
+                <button disabled={!workflowId} onClick={downloadZip} className="min-h-11 w-36 rounded-xl border border-slate-700 bg-black/30 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-cyan-100 disabled:opacity-50">
                   Download ZIP
                 </button>
               </div>

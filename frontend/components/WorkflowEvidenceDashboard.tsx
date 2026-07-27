@@ -1579,8 +1579,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const verifySimulation = record(verifySummary.simulation);
       const verifyCoverage = record(verifySummary.coverage);
       const verifyCodeCoverage = record(firstPresent(verifyCoverage.code, ev("code_coverage_summary.json", "vv/tb/reports/code_coverage_summary.json")));
-      const verifyFormal = record(firstPresent(verifySummary.formal, ev("formal_report.json", "vv/formal/formal_report.json")));
-      const verifyToolchain = record(verifySummary.toolchain);
+      const verifyFormal = record(firstPresent(ev("formal_report.json", "vv/formal/formal_report.json"), verifySummary.formal));
+      const verifyToolchain = record(firstPresent(verifyFormal.toolchain, verifySummary.toolchain));
       const smartContext = record(dashboard.smart_context);
       const hem = record(dashboard.hem);
       const utilization = record(dashboard.utilization);
@@ -1588,6 +1588,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthesisEstimate = record(dashboard.synthesis_estimate);
       const routedResult = record(dashboard.routed_result);
       const synthCellTypes = record(synth.cell_type_counts);
+      const synthToolEffort = record(synth.tool_effort);
+      const pnrToolEffort = record(pnr.tool_effort);
+      const toolEffortMode = firstString(pnrToolEffort.mode, synthToolEffort.mode, timingClosure.closure_mode, "balanced");
+      const effectiveToolKnobs = [
+        ...array(synthToolEffort.effective_options),
+        ...array(pnrToolEffort.effective_args),
+      ].map(String);
       const yosysLut4Numeric = firstNumber(synthesisEstimate.lut4_cells, utilization.lut4_cells, synth.lut4_cells, synthCellTypes.SB_LUT4);
       const yosysFfNumeric = firstNumber(synthesisEstimate.flip_flops, utilization.flip_flops, synth.flip_flops);
       const synthCellsUsed = typeof yosysLut4Numeric === "number" && typeof yosysFfNumeric === "number"
@@ -1602,7 +1609,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const routedCellsAvailableRaw = firstPresent(routedResult.logical_cells_available, pnr.logical_cells_available);
       const routedCellsUsed = typeof routedCellsUsedRaw === "number" && Number.isFinite(routedCellsUsedRaw) ? routedCellsUsedRaw : undefined;
       const routedCellsAvailable = typeof routedCellsAvailableRaw === "number" && Number.isFinite(routedCellsAvailableRaw) ? routedCellsAvailableRaw : undefined;
-      const routedUtilizationPct = firstPresent(routedResult.logic_utilization_percent, pnr.logic_utilization_percent);
+      const routedUtilizationPct = firstPresent(
+        routedResult.logic_utilization_percent,
+        pnr.logic_utilization_percent,
+        typeof routedCellsUsed === "number" && typeof routedCellsAvailable === "number" && routedCellsAvailable > 0
+          ? Number(((routedCellsUsed / routedCellsAvailable) * 100).toFixed(3))
+          : undefined,
+      );
       const ffCount = metricValue(synthesisEstimate.flip_flops, synth.flip_flops);
       const comboCount = metricValue(synthesisEstimate.combinational_cells, synth.combinational_cells);
       const lut4Count = metricValue(synthesisEstimate.lut4_cells, synth.lut4_cells);
@@ -1756,7 +1769,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const functionalCoverage = pct(firstPresent(verifyCoverage.functional_coverage_pct, record(verifyCoverage.functional).coverage_pct));
       const codeLineCoverage = pctWithStatus(verifyCodeCoverage.line_coverage_pct, verifyCodeCoverage.status);
       const codeBranchCoverage = pctWithStatus(verifyCodeCoverage.branch_coverage_pct, verifyCodeCoverage.status);
-      const fpgaAgentCount = typeof dashboard.agent_count === "number" ? dashboard.agent_count : agentCount;
+      const dashboardAgentCount = typeof dashboard.agent_count === "number" ? dashboard.agent_count : 0;
+      const participatingAgentCount = array(dashboard.participating_agents).length;
+      const fpgaAgentCount = Math.max(dashboardAgentCount, participatingAgentCount, agentCount || 0);
       const codeToggleCoverage = pctWithStatus(verifyCodeCoverage.toggle_coverage_pct, verifyCodeCoverage.toggle_source || verifyCodeCoverage.status);
       const formalStatus = statusLabel(firstString(verifyFormal.status, "not_enabled"));
       const lintToolsDetail = lintToolNames.length ? lintToolNames.join(" + ") : "lint tools not reported";
@@ -1787,8 +1802,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               </div>
             </summary>
             <div className="mt-4 grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-2 xl:grid-cols-4">
-              <Stat title="Winning Seed" value={closureSeed ?? "not locked"} />
+              <Stat title="Winning Seed" value={closureSeed ?? (implementationLock.status === "locked" ? "default (locked)" : "not locked")} />
               <Stat title="Strategy" value={closureStrategy} />
+              <Stat title="Tool Effort" value={toolEffortMode} />
               <Stat title="Attempts" value={closureAttempts || "not run"} />
               <Stat title="Configuration Lock" value={firstString(implementationLock.status, "not locked")} />
               <Stat title="RTL Repair" value={closureRepairUsed ? "used and accepted" : timingRtlRepair.attempted ? "attempted, not used" : "not used"} />
@@ -1796,7 +1812,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <Stat title="After Repair" value={afterRepairFrequency ? `${formatNumber(afterRepairFrequency)} MHz` : "n/a"} />
               <Stat title="Achievable Clock" value={closureRecommendation ? `${formatNumber(closureRecommendation)} MHz recommended` : closureComplete ? "target met" : "not available"} />
             </div>
-            <div className="mt-3 text-xs text-slate-500">{timingClosureDetail}{implementationLock.winning_pnr_sha256 ? ` | locked artifact ${String(implementationLock.winning_pnr_sha256).slice(0, 12)}` : ""}</div>
+            <div className="mt-3 text-xs text-slate-500">{timingClosureDetail}{effectiveToolKnobs.length ? ` | effective knobs ${effectiveToolKnobs.join(" ")}` : " | tool defaults retained after capability check"}{implementationLock.winning_pnr_sha256 ? ` | locked artifact ${String(implementationLock.winning_pnr_sha256).slice(0, 12)}` : ""}</div>
           </details>
 
           <details className="rounded-2xl border border-slate-800 bg-slate-950/35 px-4 py-3">
