@@ -8,7 +8,7 @@ export default function FpgaImplementationPage() {
       subtitle="Run FPGA synthesis, place-and-route, timing/DRC, closure, and implementation dashboard evidence."
       runPath="/apps/fpga/implementation/run"
       dashboardStage="fpga"
-      fields={["source", "rtl", "fpga", "frequency", "notes"]}
+      fields={["source", "rtl", "fpga", "verify", "frequency", "notes"]}
       defaultSourceMode="from_arch2rtl"
       fpgaMode="implementation"
     />

@@ -1055,8 +1055,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "fpga/closure/fpga_timing_closure_plan.json",
         "fpga_timing_closure_chart.json",
         "fpga/closure/fpga_timing_closure_chart.json",
+        "fpga/closure/winning/fpga_implementation_lock.json",
+        "fpga/closure/rtl_repair/fpga_timing_rtl_repair.json",
         "fpga_bitstream_summary.json",
         "fpga/bitstream/fpga_bitstream_summary.json",
+        "vv/tb/reports/simulation_summary_coverage.json",
+        "vv/tb/reports/functional_coverage_summary.json",
+        "vv/tb/reports/code_coverage_summary.json",
+        "vv/formal/formal_report.json",
       ],
       verification: ["simulation_summary_coverage.json", "formal_report.json", "system_sim_dashboard.json"],
       embedded: [
@@ -1564,13 +1570,16 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const timingClosureDashboard = record(dashboard.timing_closure);
       const synthClosure = record(firstPresent(synthClosureDashboard.plan, synthClosureDashboard, ev("fpga_synthesis_closure_plan.json", "fpga/closure/fpga_synthesis_closure_plan.json")));
       const timingClosure = record(firstPresent(timingClosureDashboard.plan, timingClosureDashboard, ev("fpga_timing_closure_plan.json", "fpga/closure/fpga_timing_closure_plan.json")));
+      const implementationLock = record(firstPresent(timingClosureDashboard.implementation_lock, ev("fpga_implementation_lock.json", "fpga/closure/winning/fpga_implementation_lock.json")));
+      const timingRtlRepair = record(firstPresent(dashboard.timing_rtl_repair, ev("fpga_timing_rtl_repair.json", "fpga/closure/rtl_repair/fpga_timing_rtl_repair.json")));
+      const timingHistory = array(record(timingClosureDashboard.chart).iterations);
       const bitstream = record(firstPresent(ev("fpga_bitstream_summary.json", "fpga/bitstream/fpga_bitstream_summary.json"), dashboard.bitstream));
       const target = record(firstPresent(dashboard.target, handoff.target, constraints.target, synth.target, pnr.target, timing.target, bitstream.target));
-      const verifySummary = record(ev("simulation_summary_coverage.json", "vv/tb/reports/simulation_summary_coverage.json"));
+      const verifySummary = record(firstPresent(ev("simulation_summary_coverage.json", "vv/tb/reports/simulation_summary_coverage.json"), dashboard.verification));
       const verifySimulation = record(verifySummary.simulation);
       const verifyCoverage = record(verifySummary.coverage);
       const verifyCodeCoverage = record(firstPresent(verifyCoverage.code, ev("code_coverage_summary.json", "vv/tb/reports/code_coverage_summary.json")));
-      const verifyFormal = record(verifySummary.formal);
+      const verifyFormal = record(firstPresent(verifySummary.formal, ev("formal_report.json", "vv/formal/formal_report.json")));
       const verifyToolchain = record(verifySummary.toolchain);
       const smartContext = record(dashboard.smart_context);
       const hem = record(dashboard.hem);
@@ -1589,6 +1598,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ? Number(((synthCellsUsed / synthCellsAvailable) * 100).toFixed(3))
         : firstPresent(synthesisEstimate.logic_utilization_percent, synth.logic_utilization_percent);
       const routedCellsUsedRaw = firstPresent(routedResult.logical_cells_used, pnr.logical_cells_used);
+      const routedLut4Count = metricValue(routedResult.routed_lut4_cells, pnr.routed_lut4_cells);
       const routedCellsAvailableRaw = firstPresent(routedResult.logical_cells_available, pnr.logical_cells_available);
       const routedCellsUsed = typeof routedCellsUsedRaw === "number" && Number.isFinite(routedCellsUsedRaw) ? routedCellsUsedRaw : undefined;
       const routedCellsAvailable = typeof routedCellsAvailableRaw === "number" && Number.isFinite(routedCellsAvailableRaw) ? routedCellsAvailableRaw : undefined;
@@ -1596,7 +1606,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const ffCount = metricValue(synthesisEstimate.flip_flops, synth.flip_flops);
       const comboCount = metricValue(synthesisEstimate.combinational_cells, synth.combinational_cells);
       const lut4Count = metricValue(synthesisEstimate.lut4_cells, synth.lut4_cells);
-      const synthCellTypeSum = Object.values(synthCellTypes).reduce((sum, value) => sum + (typeof value === "number" && Number.isFinite(value) ? value : 0), 0);
+      const synthCellTypeSum = Object.values(synthCellTypes).reduce<number>((sum, value) => sum + (typeof value === "number" && Number.isFinite(value) ? value : 0), 0);
       const carryCount = metricValue(synthesisEstimate.carry_cells, synth.carry_cells, synthCellTypes.SB_CARRY);
       const totalMappedCells = metricValue(synthesisEstimate.total_mapped_cells, synth.total_mapped_cells, synth.fabric_mapped_cells, synthCellTypeSum || undefined);
       const targetFrequencyMhz = firstNumber(timingSummary.target_frequency_mhz, timing.target_frequency_mhz, target.default_frequency_mhz);
@@ -1689,7 +1699,30 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const timingClosureActions = array(timingClosure.actions).map(String).join(" ");
       const timingClosureStatus = firstString(timingClosure.status) || (timingIsClean ? "not needed" : "");
       const timingClosureDetail = timingClosureActions
-        || (timingIsClean ? "User disabled; no timing violations found." : "closure plan not requested");
+        || (timingIsClean ? "No timing violations found." : "closure plan not requested");
+      const closureHasEvidence = Object.keys(timingClosure).length > 0 || Object.keys(implementationLock).length > 0 || timingHistory.length > 0;
+      const closureComplete = timingClosure.closure_complete === true || implementationLock.timing_met === true;
+      const closureStatusText = firstString(timingClosure.status, implementationLock.status).toLowerCase();
+      const closureFailed = closureHasEvidence && (
+        timingClosure.closure_complete === false
+        || ["failed", "repair_recommended", "timing_failed"].includes(closureStatusText)
+      );
+      const closureSeedRaw = firstPresent(implementationLock.selected_seed, timingClosure.selected_seed);
+      const closureSeed = typeof closureSeedRaw === "number" || typeof closureSeedRaw === "string" ? closureSeedRaw : undefined;
+      const closureStrategy = firstString(implementationLock.synthesis_strategy, timingClosure.selected_synthesis_strategy, "baseline");
+      const closureAchieved = firstNumber(implementationLock.achieved_frequency_mhz, timingClosure.selected_max_frequency_mhz, timingClosure.observed_max_frequency_mhz);
+      const closureRepairUsed = implementationLock.rtl_repair_used === true || timingRtlRepair.accepted === true;
+      const closureRepairEnabled = timingClosure.rtl_repair_enabled === true || timingRtlRepair.enabled === true;
+      const closureRecommendation = firstNumber(timingClosure.recommended_achievable_frequency_mhz);
+      const beforeRepairFrequency = firstNumber(timingRtlRepair.before_max_frequency_mhz);
+      const afterRepairFrequency = firstNumber(timingRtlRepair.after_max_frequency_mhz);
+      const closureAttempts = timingHistory.length || (closureHasEvidence ? firstNumber(timingClosure.iteration) + 1 : 0);
+      const timingMetSignal = firstPresent(timingSummary.timing_met, routedResult.timing_met, timing.timing_met, pnr.timing_met);
+      const timingVerdict = timingMetSignal === true || timingIsClean
+        ? "pass"
+        : timingMetSignal === false
+          ? "fail"
+          : statusLabel(timingStatus || "not run");
       const bitstreamCardStatus = bitstreamStatus || (pnrStatus === "completed" ? "user disabled" : "");
       const bitstreamCardDetail = bitstreamPath !== "not generated"
         ? bitstreamPath
@@ -1722,6 +1755,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const verificationDetail = verificationRuns > 0 ? `${verificationPassed}/${verificationRuns} simulations passed` : "simulation summary not reported";
       const functionalCoverage = pct(firstPresent(verifyCoverage.functional_coverage_pct, record(verifyCoverage.functional).coverage_pct));
       const codeLineCoverage = pctWithStatus(verifyCodeCoverage.line_coverage_pct, verifyCodeCoverage.status);
+      const codeBranchCoverage = pctWithStatus(verifyCodeCoverage.branch_coverage_pct, verifyCodeCoverage.status);
+      const fpgaAgentCount = typeof dashboard.agent_count === "number" ? dashboard.agent_count : agentCount;
       const codeToggleCoverage = pctWithStatus(verifyCodeCoverage.toggle_coverage_pct, verifyCodeCoverage.toggle_source || verifyCodeCoverage.status);
       const formalStatus = statusLabel(firstString(verifyFormal.status, "not_enabled"));
       const lintToolsDetail = lintToolNames.length ? lintToolNames.join(" + ") : "lint tools not reported";
@@ -1729,62 +1764,95 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         || firstString(timing.error)
         || "timing summary available";
       return (
-        <div className="mt-5 space-y-5">
-          <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
-          <div className="grid gap-3 lg:grid-cols-3">
-            <Bar label="Yosys logic cells" value={synthCellsUsed} total={Math.max(synthCellsAvailable || synthCellsUsed || 1, 1)} color="bg-cyan-500" />
-            <Bar label="Yosys flip-flops" value={typeof ffCount === "number" ? ffCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-violet-500" />
-            <Bar label="Yosys comb / LUT cells" value={typeof comboCount === "number" ? comboCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-emerald-500" />
-          </div>
-          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-5 space-y-4">
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Stat title="Board" value={boardDisplay} />
-            <Stat title="Family" value={firstString(target.family, "ice40")} />
-            <Stat title="Device" value={firstString(target.device, "not selected")} />
-            <Stat title="Package" value={firstString(target.package, "not selected")} />
             <Stat title="Top Module" value={firstString(target.top_module, handoff.top_module, "not inferred")} />
-            <Stat title="RTL Files" value={firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length)} />
-            <Stat title="RTL Quality" value={statusLabel(rtlQualityStatus)} />
-            <Stat title="Lint Pass1" value={statusLabel(rtlQualityPass1Status)} />
-            <Stat title="Lint Pass2" value={statusLabel(rtlQualityPass2Status)} />
-            <Stat title="Yosys Logic Cells" value={synthCellsAvailable ? `${formatNumber(synthCellsUsed)} / ${formatNumber(synthCellsAvailable)}` : metricValue(synthCellsUsed)} />
-            <Stat title="Yosys Utilization" value={typeof synthUtilizationPct === "number" ? `${formatNumber(synthUtilizationPct)}%` : metricValue(synthUtilizationPct)} />
-            <Stat title="Yosys Flip-Flops" value={ffCount} />
-            <Stat title="Yosys LUT4 Cells" value={lut4Count} />
-            <Stat title="Yosys Carry Cells" value={carryCount} />
-            <Stat title="Yosys Total Cells" value={totalMappedCells} />
-            <Stat title="Routed Logic Cells" value={routedCellsDisplay} />
+            <Stat title="Target Clock" value={targetFrequencyMhz ? `${formatNumber(targetFrequencyMhz)} MHz` : "not specified"} />
+            <Stat title="Achieved Clock" value={maxFrequency} />
             <Stat title="Routed Utilization" value={typeof routedUtilizationPct === "number" ? `${formatNumber(routedUtilizationPct)}%` : metricValue(routedUtilizationPct)} />
-            <Stat title="Routed Max Frequency" value={maxFrequency} />
-            <Stat title="WNS" value={wns} />
-            <Stat title="TNS" value={tns} />
-            <Stat title="Timing Violations" value={timingViolations} />
+            <Stat title="Timing" value={timingVerdict} />
             <Stat title="Verification" value={verificationStatus} />
-            <Stat title="Functional Coverage" value={functionalCoverage} />
-            <Stat title="Code Line Coverage" value={codeLineCoverage} />
-            <Stat title="Code Toggle Coverage" value={codeToggleCoverage} />
-            <Stat title="Formal Verification" value={formalStatus} />
-            <Stat title="Smart Context" value={smartContext.enabled === true ? firstString(smartContext.mode, "smart") : "full"} />
-            <Stat title="HEM" value={hem.enabled === true ? firstString(hem.mode, "fixed") : "off"} />
-            {agentCount !== null ? <Stat title="Agents Participated" value={agentCount} /> : null}
+            <Stat title="Bitstream" value={statusLabel(bitstreamCardStatus || "not generated")} />
           </div>
-          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={constraintsDetail} />
-            <CheckCard
-              title="RTL Quality Gate"
-              status={statusLabel(rtlQualityStatus)}
-              detail={`pass1 ${statusLabel(rtlQualityPass1Status)}, repair ${rtlQualityRepair.enabled === false ? "disabled" : rtlQualityRepair.applied ? "applied" : "enabled/no fix needed"}, pass2 ${statusLabel(rtlQualityPass2Status)}, tools ${lintToolsDetail}`}
-            />
-            <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={fileLabel(synth.netlist_json, synth.json_netlist) || firstString(synth.reason)} />
-            <CheckCard title="Synthesis Closure" status={statusLabel(synthClosureStatus)} detail={synthClosureDetail} />
-            <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={[pnrTool, pnrDetail, routedUtilizationDetail].filter(Boolean).join(" | ")} />
-            <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={[firstString(timing.timing_source, pnrTool), timingDetail].filter(Boolean).join(" | ")} />
-            <CheckCard title="Timing Closure" status={statusLabel(timingClosureStatus)} detail={timingClosureDetail} />
-            <CheckCard title="Verification" status={statusLabel(verificationStatus)} detail={`${verificationDetail}${simulatorTool ? ` | ${simulatorTool}` : ""}`} />
-            <CheckCard title="Coverage" status={functionalCoverage} detail={`line ${codeLineCoverage}, toggle ${codeToggleCoverage}${coverageTool ? ` | ${coverageTool}` : ""}`} />
-            <CheckCard title="Formal Verification" status={formalStatus} detail={formalTool !== "none" ? formalTool : "not enabled"} />
-            <CheckCard title="Bitstream" status={statusLabel(bitstreamCardStatus)} detail={[bitstreamTool, bitstreamCardDetail].filter(Boolean).join(" | ")} />
-            <CheckCard title="Programming" status={programmingReady ? "ready locally" : "handoff"} detail={programCommand} />
-          </div>
+
+          <details open={closureFailed} className="rounded-2xl border border-cyan-500/25 bg-slate-950/45 px-4 py-3">
+            <summary className="cursor-pointer">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">Timing closure</div>
+                  <div className="mt-1 text-sm text-slate-300">{closureHasEvidence ? statusLabel(timingClosureStatus) : "not run"} | {closureAchieved ? `${formatNumber(closureAchieved)} MHz` : "frequency unavailable"}{closureSeed !== undefined ? ` | seed ${String(closureSeed)}` : ""}</div>
+                </div>
+                <div className="text-xs text-slate-400">RTL repair {closureRepairUsed ? "used" : closureRepairEnabled ? "not used" : "disabled"} | View details</div>
+              </div>
+            </summary>
+            <div className="mt-4 grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-2 xl:grid-cols-4">
+              <Stat title="Winning Seed" value={closureSeed ?? "not locked"} />
+              <Stat title="Strategy" value={closureStrategy} />
+              <Stat title="Attempts" value={closureAttempts || "not run"} />
+              <Stat title="Configuration Lock" value={firstString(implementationLock.status, "not locked")} />
+              <Stat title="RTL Repair" value={closureRepairUsed ? "used and accepted" : timingRtlRepair.attempted ? "attempted, not used" : "not used"} />
+              <Stat title="Before Repair" value={beforeRepairFrequency ? `${formatNumber(beforeRepairFrequency)} MHz` : "n/a"} />
+              <Stat title="After Repair" value={afterRepairFrequency ? `${formatNumber(afterRepairFrequency)} MHz` : "n/a"} />
+              <Stat title="Achievable Clock" value={closureRecommendation ? `${formatNumber(closureRecommendation)} MHz recommended` : closureComplete ? "target met" : "not available"} />
+            </div>
+            <div className="mt-3 text-xs text-slate-500">{timingClosureDetail}{implementationLock.winning_pnr_sha256 ? ` | locked artifact ${String(implementationLock.winning_pnr_sha256).slice(0, 12)}` : ""}</div>
+          </details>
+
+          <details className="rounded-2xl border border-slate-800 bg-slate-950/35 px-4 py-3">
+            <summary className="cursor-pointer text-sm font-semibold text-slate-200">Implementation metrics <span className="ml-2 text-xs font-normal text-slate-500">Synthesis, routing, timing, coverage, and tools</span></summary>
+            <div className="mt-4 space-y-4 border-t border-slate-800 pt-4">
+              <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
+              <div className="grid gap-3 lg:grid-cols-3">
+                <Bar label="Yosys logic cells" value={synthCellsUsed} total={Math.max(synthCellsAvailable || synthCellsUsed || 1, 1)} color="bg-cyan-500" />
+                <Bar label="Yosys flip-flops" value={typeof ffCount === "number" ? ffCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-violet-500" />
+                <Bar label="Yosys comb / LUT cells" value={typeof comboCount === "number" ? comboCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-emerald-500" />
+              </div>
+              <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <Stat title="Family" value={firstString(target.family, "ice40")} />
+                <Stat title="Device" value={firstString(target.device, "not selected")} />
+                <Stat title="Package" value={firstString(target.package, "not selected")} />
+                <Stat title="RTL Files" value={firstNumber(handoff.rtl_file_count, array(handoff.rtl_files).length)} />
+                <Stat title="RTL Quality" value={statusLabel(rtlQualityStatus)} />
+                <Stat title="Lint Pass1" value={statusLabel(rtlQualityPass1Status)} />
+                <Stat title="Lint Pass2" value={statusLabel(rtlQualityPass2Status)} />
+                <Stat title="Yosys Logic Cells" value={synthCellsAvailable ? `${formatNumber(synthCellsUsed)} / ${formatNumber(synthCellsAvailable)}` : metricValue(synthCellsUsed)} />
+                <Stat title="Yosys Utilization" value={typeof synthUtilizationPct === "number" ? `${formatNumber(synthUtilizationPct)}%` : metricValue(synthUtilizationPct)} />
+                <Stat title="Yosys Flip-Flops" value={ffCount} />
+                <Stat title="Yosys LUT4 Cells" value={lut4Count} />
+                <Stat title="Yosys Carry Cells" value={carryCount} />
+                <Stat title="Yosys Total Cells" value={totalMappedCells} />
+                <Stat title="Routed Logic Cells" value={routedCellsDisplay} />
+                <Stat title="Routed LUT4 Cells" value={routedLut4Count} />
+                <Stat title="WNS" value={wns} />
+                <Stat title="TNS" value={tns} />
+                <Stat title="Timing Violations" value={timingViolations} />
+                <Stat title="Functional Coverage" value={functionalCoverage} />
+                <Stat title="Code Line Coverage" value={codeLineCoverage} />
+                <Stat title="Code Branch Coverage" value={codeBranchCoverage} />
+                <Stat title="Code Toggle Coverage" value={codeToggleCoverage} />
+                <Stat title="Formal Verification" value={formalStatus} />
+              </div>
+            </div>
+          </details>
+
+          <details className="rounded-2xl border border-slate-800 bg-slate-950/35 px-4 py-3">
+            <summary className="cursor-pointer text-sm font-semibold text-slate-200">Workflow evidence <span className="ml-2 text-xs font-normal text-slate-500">Checks, artifacts, programming, and run metadata</span></summary>
+            <div className="mt-4 grid min-w-0 grid-cols-1 gap-3 border-t border-slate-800 pt-4 sm:grid-cols-2 xl:grid-cols-4">
+              <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={constraintsDetail} />
+              <CheckCard title="RTL Quality Gate" status={statusLabel(rtlQualityStatus)} detail={`pass1 ${statusLabel(rtlQualityPass1Status)}, repair ${rtlQualityRepair.enabled === false ? "disabled" : rtlQualityRepair.applied ? "applied" : "enabled/no fix needed"}, pass2 ${statusLabel(rtlQualityPass2Status)}, tools ${lintToolsDetail}`} />
+              <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={fileLabel(synth.netlist_json, synth.json_netlist) || firstString(synth.reason)} />
+              <CheckCard title="Synthesis Closure" status={statusLabel(synthClosureStatus)} detail={synthClosureDetail} />
+              <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={[pnrTool, pnrDetail, routedUtilizationDetail].filter(Boolean).join(" | ")} />
+              <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={[firstString(timing.timing_source, pnrTool), timingDetail].filter(Boolean).join(" | ")} />
+              <CheckCard title="Verification" status={statusLabel(verificationStatus)} detail={`${verificationDetail}${simulatorTool ? ` | ${simulatorTool}` : ""}`} />
+              <CheckCard title="Coverage" status={functionalCoverage} detail={`line ${codeLineCoverage}, branch ${codeBranchCoverage}, toggle ${codeToggleCoverage}${coverageTool ? ` | ${coverageTool}` : ""}`} />
+              <CheckCard title="Formal Verification" status={formalStatus} detail={formalTool !== "none" ? formalTool : "not enabled"} />
+              <CheckCard title="Bitstream" status={statusLabel(bitstreamCardStatus)} detail={[bitstreamTool, bitstreamCardDetail].filter(Boolean).join(" | ")} />
+              <CheckCard title="Programming" status={programmingReady ? "ready locally" : "handoff"} detail={programCommand} />
+              <CheckCard title="Run Intelligence" status={`${fpgaAgentCount ?? 0} agents`} detail={`context ${smartContext.enabled === true ? firstString(smartContext.mode, "smart") : "full"}, memory ${hem.enabled === true ? firstString(hem.mode, "fixed") : "off"}`} />
+            </div>
+          </details>
         </div>
       );
     }

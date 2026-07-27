@@ -72,14 +72,9 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [board, setBoard] = useState("icebreaker");
   const [topModule, setTopModule] = useState("");
   const [pcfText, setPcfText] = useState("");
-  const [runFpgaRtlRepairLoop, setRunFpgaRtlRepairLoop] = useState(true);
-  const [runFpgaSynthesisClosureLoop, setRunFpgaSynthesisClosureLoop] = useState(false);
-  const [maxFpgaSynthesisClosureIterations, setMaxFpgaSynthesisClosureIterations] = useState("1");
   const [runFpgaTimingClosureLoop, setRunFpgaTimingClosureLoop] = useState(true);
-  const [maxFpgaTimingClosureIterations, setMaxFpgaTimingClosureIterations] = useState("3");
-  const [allowYosysFlatten, setAllowYosysFlatten] = useState(true);
-  const [allowNextpnrSeedSweep, setAllowNextpnrSeedSweep] = useState(true);
-  const [allowFrequencyRelaxation, setAllowFrequencyRelaxation] = useState(false);
+  const [fpgaClosureMode, setFpgaClosureMode] = useState<"balanced" | "advanced">("balanced");
+  const [allowAutomaticRtlTimingRepair, setAllowAutomaticRtlTimingRepair] = useState(false);
   const [contextMode, setContextMode] = useState<"smart" | "full">("smart");
   const [hemEnabled, setHemEnabled] = useState(false);
   const [hemMode, setHemMode] = useState<"fixed" | "adaptive">("fixed");
@@ -141,7 +136,6 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         topModule: string;
         targetFrequency: string;
         pcfText: string;
-        runFpgaRtlRepairLoop: boolean;
         notes: string;
         hemEnabled: boolean;
         hemMode: "fixed" | "adaptive";
@@ -155,7 +149,6 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
       if (prefill.topModule) setTopModule(prefill.topModule);
       if (prefill.targetFrequency) setTargetFrequency(prefill.targetFrequency);
       if (prefill.pcfText) setPcfText(prefill.pcfText);
-      if (typeof prefill.runFpgaRtlRepairLoop === "boolean") setRunFpgaRtlRepairLoop(prefill.runFpgaRtlRepairLoop);
       if (prefill.notes) setNotes(prefill.notes);
       if (typeof prefill.hemEnabled === "boolean") setHemEnabled(prefill.hemEnabled);
       if (prefill.hemMode) setHemMode(prefill.hemMode);
@@ -311,14 +304,16 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         top_module: fields.includes("fpga") && topModule.trim() ? topModule.trim() : undefined,
         pcf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
         notes: notes.trim() || undefined,
-        run_fpga_rtl_repair_loop: fields.includes("fpga") ? runFpgaRtlRepairLoop : undefined,
-        run_fpga_synthesis_closure_loop: fields.includes("fpga") ? runFpgaSynthesisClosureLoop : undefined,
-        max_fpga_synthesis_closure_iterations: fields.includes("fpga") ? Number(maxFpgaSynthesisClosureIterations || 1) : undefined,
-        run_fpga_timing_closure_loop: fields.includes("fpga") ? runFpgaTimingClosureLoop : undefined,
-        max_fpga_timing_closure_iterations: fields.includes("fpga") ? Number(maxFpgaTimingClosureIterations || 1) : undefined,
-        allow_yosys_flatten: fields.includes("fpga") ? allowYosysFlatten : undefined,
-        allow_nextpnr_seed_sweep: fields.includes("fpga") ? allowNextpnrSeedSweep : undefined,
-        allow_frequency_relaxation: fields.includes("fpga") ? allowFrequencyRelaxation : undefined,
+        run_fpga_rtl_repair_loop: fields.includes("fpga") ? true : undefined,
+        run_fpga_synthesis_closure_loop: fields.includes("fpga") ? runFpgaTimingClosureLoop : undefined,
+        max_fpga_synthesis_closure_iterations: fields.includes("fpga") ? (fpgaClosureMode === "advanced" ? 3 : 2) : undefined,
+        run_fpga_timing_closure_loop: fields.includes("fpga") ? fpgaMode !== "synthesis" && runFpgaTimingClosureLoop : undefined,
+        max_fpga_timing_closure_iterations: fields.includes("fpga") ? (fpgaClosureMode === "advanced" ? 12 : 6) : undefined,
+        fpga_closure_mode: fields.includes("fpga") ? fpgaClosureMode : undefined,
+        allow_automatic_rtl_timing_repair: fields.includes("fpga") ? fpgaMode !== "synthesis" && allowAutomaticRtlTimingRepair : undefined,
+        allow_yosys_flatten: fields.includes("fpga") ? true : undefined,
+        allow_nextpnr_seed_sweep: fields.includes("fpga") ? true : undefined,
+        allow_frequency_relaxation: fields.includes("fpga") ? true : undefined,
         smart_context_enabled: fields.includes("fpga") ? contextMode === "smart" : undefined,
         context_mode: fields.includes("fpga") ? contextMode : undefined,
         hem_enabled: fields.includes("fpga") ? hemEnabled : undefined,
@@ -380,7 +375,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 text-white">
-      <div className="mx-auto max-w-[1440px] px-6 py-10">
+      <div className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <div className="flex items-center justify-between gap-3">
           <button onClick={() => router.push("/apps")} className="rounded-xl border border-slate-700 px-4 py-2 text-slate-200 hover:border-cyan-400">
             Back to Apps
@@ -395,7 +390,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
           <h1 className="mt-2 text-3xl font-black text-white md:text-4xl">{title}</h1>
           <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">{subtitle}</p>
 
-          <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_420px]">
+          <div className="mt-6 space-y-5">
             <div className="space-y-4">
               {fields.includes("source") ? (
                 <div className="grid gap-3 md:grid-cols-3">
@@ -543,60 +538,43 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                   <span className="block text-xs text-amber-200">Use real board pin names before programming hardware. Blank PCF creates a starter file only.</span>
 
                   <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/10 p-4">
-                    <div className="text-sm font-bold text-cyan-200">FPGA closure and intelligence</div>
-                    <div className="mt-3 grid gap-3 md:grid-cols-2">
-                      <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-200">
-                        <input type="checkbox" checked={runFpgaRtlRepairLoop} onChange={(e) => setRunFpgaRtlRepairLoop(e.target.checked)} className="mt-1" />
-                        <span>
-                          <span className="block font-semibold text-white">RTL pass1/pass2 repair loop</span>
-                          <span className="text-slate-400">Run compile/lint pass1, apply safe repair when needed, then run pass2 before FPGA synthesis.</span>
-                        </span>
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-bold text-cyan-200">{fpgaMode === "synthesis" ? "Synthesis closure" : "Timing closure"}</div>
+                        <div className="mt-1 text-xs text-slate-400">{fpgaMode === "synthesis" ? "ChipLoop automatically explores safe Yosys synthesis strategies." : "ChipLoop automatically explores seeds and safe synthesis strategies, then locks the winning implementation."}</div>
+                      </div>
+                      <label className="flex items-center gap-2 text-sm font-semibold text-white">
+                        <input type="checkbox" checked={runFpgaTimingClosureLoop} onChange={(e) => setRunFpgaTimingClosureLoop(e.target.checked)} />
+                        Enable
                       </label>
-                      <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-200">
-                        <input type="checkbox" checked={runFpgaSynthesisClosureLoop} onChange={(e) => setRunFpgaSynthesisClosureLoop(e.target.checked)} className="mt-1" />
-                        <span>
-                          <span className="block font-semibold text-white">Synthesis closure loop</span>
-                          <span className="text-slate-400">Retry synthesis with safe settings when Yosys reports fixable issues.</span>
-                        </span>
+                    </div>
+                    <div className="mt-4 grid gap-3 md:grid-cols-2">
+                      <label className="block">
+                        <span className="text-xs uppercase tracking-wide text-slate-400">Closure mode</span>
+                        <select value={fpgaClosureMode} onChange={(e) => setFpgaClosureMode(e.target.value as "balanced" | "advanced")} disabled={!runFpgaTimingClosureLoop} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
+                          <option value="balanced">Balanced</option>
+                          <option value="advanced">Advanced</option>
+                        </select>
+                        <span className="mt-1 block text-xs text-slate-500">{fpgaClosureMode === "advanced" ? "Wider implementation search for difficult paths." : "Good closure coverage with moderate runtime."}</span>
                       </label>
                       {fpgaMode !== "synthesis" ? <label className="flex items-start gap-3 rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-200">
-                        <input type="checkbox" checked={runFpgaTimingClosureLoop} onChange={(e) => setRunFpgaTimingClosureLoop(e.target.checked)} className="mt-1" />
+                        <input type="checkbox" checked={allowAutomaticRtlTimingRepair} onChange={(e) => setAllowAutomaticRtlTimingRepair(e.target.checked)} disabled={!runFpgaTimingClosureLoop} className="mt-1 disabled:opacity-50" />
                         <span>
-                          <span className="block font-semibold text-white">Timing closure loop</span>
-                          <span className="text-slate-400">Rerun implementation with nextpnr seed exploration when timing misses.</span>
+                          <span className="block font-semibold text-white">Automatic RTL timing repair</span>
+                          <span className="text-slate-400">Off by default. If used, ChipLoop reruns verification and reports before-versus-after timing.</span>
                         </span>
-                      </label> : null}
+                      </label> : <div className="rounded-xl border border-slate-800 bg-black/30 p-3 text-sm text-slate-400">RTL timing repair becomes available in FPGA Implementation and Bitstream, after place-and-route timing evidence exists.</div>}
                     </div>
-                    <div className="mt-3 grid gap-3 md:grid-cols-4">
-                      <label className="block">
-                        <span className="text-xs uppercase tracking-wide text-slate-400">Synth tries</span>
-                        <input value={maxFpgaSynthesisClosureIterations} onChange={(e) => setMaxFpgaSynthesisClosureIterations(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white" />
-                      </label>
-                      {fpgaMode !== "synthesis" ? <label className="block">
-                        <span className="text-xs uppercase tracking-wide text-slate-400">Timing tries</span>
-                        <input value={maxFpgaTimingClosureIterations} onChange={(e) => setMaxFpgaTimingClosureIterations(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white" />
-                      </label> : null}
-                      <label className="block">
-                        <span className="text-xs uppercase tracking-wide text-slate-400">Context</span>
-                        <select value={contextMode} onChange={(e) => setContextMode(e.target.value as "smart" | "full")} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white">
-                          <option value="smart">Smart</option>
-                          <option value="full">Full</option>
-                        </select>
-                      </label>
-                      <label className="block">
-                        <span className="text-xs uppercase tracking-wide text-slate-400">HEM mode</span>
-                        <select value={hemMode} onChange={(e) => setHemMode(e.target.value as "fixed" | "adaptive")} disabled={!hemEnabled} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50">
-                          <option value="fixed">Fixed</option>
-                          <option value="adaptive">Adaptive</option>
-                        </select>
-                      </label>
-                    </div>
-                    <div className="mt-3 grid gap-3 md:grid-cols-4">
-                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowYosysFlatten} onChange={(e) => setAllowYosysFlatten(e.target.checked)} /> Allow Yosys flatten</label>
-                      {fpgaMode !== "synthesis" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowNextpnrSeedSweep} onChange={(e) => setAllowNextpnrSeedSweep(e.target.checked)} /> Seed sweep</label> : null}
-                      {fpgaMode !== "synthesis" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={allowFrequencyRelaxation} onChange={(e) => setAllowFrequencyRelaxation(e.target.checked)} /> Suggest relaxed clock</label> : null}
-                      <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={hemEnabled} onChange={(e) => setHemEnabled(e.target.checked)} /> HEM run memory</label>
-                    </div>
+                    <details className="mt-3 rounded-xl border border-slate-800 bg-black/20 px-3 py-2">
+                      <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wide text-slate-400">Run intelligence</summary>
+                      <div className="mt-3 grid gap-3 md:grid-cols-2">
+                        <label className="block">
+                          <span className="text-xs text-slate-400">Context</span>
+                          <select value={contextMode} onChange={(e) => setContextMode(e.target.value as "smart" | "full")} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white"><option value="smart">Smart</option><option value="full">Full</option></select>
+                        </label>
+                        <label className="flex items-center gap-2 self-end pb-2 text-sm text-slate-300"><input type="checkbox" checked={hemEnabled} onChange={(e) => setHemEnabled(e.target.checked)} /> Remember run context</label>
+                      </div>
+                    </details>
                   </div>
                 </div>
               ) : null}
@@ -688,26 +666,40 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
 
               {err ? <div className="rounded-xl border border-rose-500/40 bg-rose-950/40 p-3 text-sm text-rose-200">{err}</div> : null}
 
-              <div className="flex flex-wrap gap-3">
-                <button disabled={!canRun} onClick={runNow} className="rounded-xl bg-cyan-400 px-5 py-3 font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50">
-                  {running ? "Running..." : `Run ${title}`}
+              <div className="flex flex-col gap-3 rounded-2xl border border-cyan-400/25 bg-gradient-to-r from-cyan-950/35 via-slate-950/70 to-violet-950/25 p-4 shadow-[0_18px_60px_rgba(8,145,178,0.08)] sm:flex-row sm:items-center">
+                <button disabled={!canRun} onClick={runNow} className="min-h-12 flex-1 rounded-xl bg-gradient-to-r from-cyan-300 to-cyan-400 px-6 py-3 text-base font-black text-slate-950 shadow-[0_10px_35px_rgba(34,211,238,0.22)] transition hover:from-cyan-200 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-50">
+                  {running ? `Running ${title}...` : `Run ${title}`}
                 </button>
-                <button disabled={!workflowId} onClick={downloadZip} className="rounded-xl border border-slate-700 px-5 py-3 font-semibold text-slate-200 disabled:opacity-50">
+                <button disabled={!workflowId} onClick={downloadZip} className="min-h-12 rounded-xl border border-slate-700 bg-black/30 px-5 py-3 font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-cyan-100 disabled:opacity-50 sm:min-w-44">
                   Download ZIP
                 </button>
               </div>
             </div>
 
-            <aside className="rounded-xl border border-slate-800 bg-black/30 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm text-slate-400">Workflow</div>
-                  <div className="mt-1 break-all text-sm text-cyan-200">{workflowId || "Not started"}</div>
+            <aside className="overflow-hidden rounded-2xl border border-slate-700/80 bg-black/35 shadow-[0_20px_70px_rgba(0,0,0,0.28)]">
+              <div className="flex flex-col gap-4 border-b border-slate-800 bg-gradient-to-r from-slate-900/90 via-slate-950/90 to-cyan-950/20 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">Workflow ID</div>
+                  <div className="mt-2 break-all font-mono text-sm text-slate-100 sm:text-base">{workflowId || "Created after you start the run"}</div>
                 </div>
-                <div className="rounded-full border border-slate-700 px-3 py-1 text-xs uppercase text-slate-300">{workflowRow?.status || "idle"}</div>
+                <div className="flex shrink-0 items-center gap-3">
+                  {workflowId ? (
+                    <button type="button" onClick={() => navigator.clipboard?.writeText(workflowId)} className="rounded-lg border border-slate-700 bg-black/25 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-cyan-400/60 hover:text-cyan-100">
+                      Copy ID
+                    </button>
+                  ) : null}
+                  <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-black/30 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-200">
+                    <span className={`h-2 w-2 rounded-full ${running ? "animate-pulse bg-cyan-300" : workflowRow?.status === "failed" ? "bg-rose-400" : workflowRow?.status === "completed" ? "bg-emerald-400" : "bg-slate-500"}`} />
+                    {workflowRow?.status || (running ? "running" : "idle")}
+                  </div>
+                </div>
               </div>
-              <div ref={logsRef} className="mt-4 h-[420px] overflow-auto rounded-lg bg-black/50 p-3 font-mono text-xs text-slate-300">
-                {logLines.length ? logLines.map((line, idx) => <div key={`${idx}-${line}`}>{line}</div>) : <div className="text-slate-500">Logs will appear here.</div>}
+              <div className="flex items-center justify-between border-b border-slate-900 bg-black/45 px-4 py-3 sm:px-5">
+                <div className="text-sm font-bold text-white">Run log</div>
+                <div className="text-xs text-slate-500">{logLines.length ? `${logLines.length} lines` : "Waiting to start"}</div>
+              </div>
+              <div ref={logsRef} className="h-[280px] overflow-auto bg-[#03070d] p-4 font-mono text-xs leading-6 text-slate-300 sm:h-[360px] sm:p-5 lg:h-[440px]">
+                {logLines.length ? logLines.map((line, idx) => <div className="border-b border-slate-900/60 py-0.5 last:border-0" key={`${idx}-${line}`}>{line}</div>) : <div className="flex h-full items-center justify-center text-center text-slate-500">Run activity will appear here after you start {title}.</div>}
               </div>
             </aside>
           </div>
