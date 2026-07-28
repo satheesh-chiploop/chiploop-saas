@@ -164,11 +164,6 @@ const workflowAgentChart = [
     agents: { system: 4, analog: 0, digital: 14, fpga: 18, firmware: 0, software: 0, product: 3 },
   },
   {
-    label: "FPGA Target Explorer",
-    example: "MiniRV board sweep",
-    agents: { system: 0, analog: 0, digital: 0, fpga: 2, firmware: 0, software: 0, product: 0 },
-  },
-  {
     label: "Mixed-Signal IP Product",
     example: "Temp Monitor SoC",
     agents: { system: 12, analog: 18, digital: 38, fpga: 0, firmware: 10, software: 12, product: 8 },
@@ -185,9 +180,9 @@ const workflowAgentChart = [
   },
 ];
 
-const workflowAgentMax = 130;
+const workflowAgentMax = 140;
 const workflowAgentPlotHeight = 288;
-const workflowAgentTicks = [130, 100, 50, 0];
+const workflowAgentTicks = [140, 100, 50, 0];
 
 const marketplaceFlow = [
   ["Agents", "Specialized AI and tool agents for chip tasks"],
