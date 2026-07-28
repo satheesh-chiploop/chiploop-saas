@@ -22,7 +22,7 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
-type FieldKind = "source" | "rtl" | "sdc" | "timing" | "frequency" | "stage" | "depth" | "notes" | "fpga" | "verify" | "recommendation";
+type FieldKind = "source" | "intent" | "rtl" | "sdc" | "timing" | "frequency" | "stage" | "depth" | "notes" | "fpga" | "verify" | "recommendation";
 
 type Props = {
   slug: string;
@@ -64,11 +64,22 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [sourceWorkflowId, setSourceWorkflowId] = useState("");
   const [repoPath, setRepoPath] = useState("");
   const [specText, setSpecText] = useState("");
+  const [designIntent, setDesignIntent] = useState("");
   const [rtlText, setRtlText] = useState("");
   const [sdcText, setSdcText] = useState("");
   const [timingText, setTimingText] = useState("");
   const [targetFrequency, setTargetFrequency] = useState(fpgaMode === "target-explorer" ? "75" : "100");
   const [recommendationProfile, setRecommendationProfile] = useState("best_overall");
+  const explorerBoards = [
+    { key: "icestick", label: "iCEstick", detail: "iCE40 HX1K / 1,280 cells" },
+    { key: "icebreaker", label: "iCEBreaker", detail: "iCE40 UP5K / 5,280 cells" },
+    { key: "upduino_v3", label: "UPduino v3", detail: "iCE40 UP5K / 5,280 cells" },
+    { key: "ice40_hx8k_breakout", label: "iCE40 HX8K Breakout", detail: "iCE40 HX8K / 7,680 cells" },
+    { key: "colorlight_5a_75b", label: "Colorlight 5A-75B", detail: "ECP5-25F / 24K cells" },
+    { key: "ulx3s_ecp5_45f", label: "ULX3S", detail: "ECP5-45F / 44K cells" },
+    { key: "orangecrab_ecp5_85f", label: "OrangeCrab", detail: "ECP5-85F / 84K cells" },
+  ];
+  const [candidateBoards, setCandidateBoards] = useState<string[]>(explorerBoards.map((item) => item.key));
   const [stage, setStage] = useState("auto");
   const [reviewDepth, setReviewDepth] = useState("standard");
   const [notes, setNotes] = useState("");
@@ -141,7 +152,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
       setSourceMode("paste");
       setRtlText(referenceRtl.rtl);
       setTopModule(referenceRtl.topModule);
-      if (referenceRtl.notes) setNotes(referenceRtl.notes);
+      if (referenceRtl.notes) { setNotes(referenceRtl.notes); setDesignIntent(referenceRtl.notes); }
     }
     const source = params.get("from_workflow_id") || params.get("source_workflow_id") || "";
     if (source) {
@@ -253,6 +264,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
 
   const canRun = useMemo(() => {
     if (running) return false;
+    if (fpgaMode === "target-explorer" && (!candidateBoards.length || !designIntent.trim())) return false;
     if (fpgaMode === "formal") {
       if (sourceMode === "from_arch2rtl") return Boolean(sourceWorkflowId.trim());
       if (sourceMode === "generate_arch2rtl") return Boolean(specText.trim());
@@ -266,7 +278,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     if (sourceMode === "generate_arch2rtl") return Boolean(specText.trim());
     if (sourceMode === "repo_path") return Boolean(repoPath.trim());
     return Boolean(rtlText.trim());
-  }, [fields, fpgaMode, running, sourceMode, sourceWorkflowId, repoPath, specText, rtlText, timingText, testIntent, runFpgaVerification]);
+  }, [fields, fpgaMode, running, sourceMode, sourceWorkflowId, repoPath, specText, rtlText, timingText, testIntent, runFpgaVerification, candidateBoards.length, designIntent]);
 
   async function runClosureLoop() {
     if (!workflowId || !closureRunPath) return;
@@ -318,13 +330,14 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         source_arch2rtl_workflow_id: sourceMode === "from_arch2rtl" ? sourceWorkflowId.trim() : undefined,
         source_workflow_id: sourceWorkflowId.trim() || undefined,
         repo_path: sourceMode === "repo_path" ? repoPath.trim() : undefined,
-        spec_text: sourceMode === "generate_arch2rtl" ? specText : undefined,
+        spec_text: sourceMode === "generate_arch2rtl" ? specText : fields.includes("intent") ? designIntent.trim() : undefined,
         rtl_text: sourceMode === "paste" ? rtlText : undefined,
         pasted_rtl_files: sourceMode === "paste" && rtlText.trim() ? [{ path: "rtl/review_input.sv", content: rtlText }] : undefined,
         constraints_sdc: sdcText.trim() || undefined,
         timing_report_text: timingText.trim() || undefined,
         target_frequency_mhz: targetFrequency ? Number(targetFrequency) : undefined,
         recommendation_profile: fields.includes("recommendation") ? recommendationProfile : undefined,
+        candidate_boards: fpgaMode === "target-explorer" ? candidateBoards : undefined,
         stage,
         review_depth: reviewDepth,
         board: fields.includes("fpga") ? board : undefined,
@@ -419,7 +432,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
           {referenceRtl ? (
             <button
               type="button"
-              onClick={() => { setSourceMode("paste"); setRtlText(referenceRtl.rtl); setTopModule(referenceRtl.topModule); if (referenceRtl.notes) setNotes(referenceRtl.notes); }}
+              onClick={() => { setSourceMode("paste"); setRtlText(referenceRtl.rtl); setTopModule(referenceRtl.topModule); if (referenceRtl.notes) { setNotes(referenceRtl.notes); setDesignIntent(referenceRtl.notes); } }}
               className="mt-4 rounded-xl border border-violet-400/50 bg-violet-500/10 px-4 py-2 text-sm font-semibold text-violet-100 hover:border-violet-300"
             >
               {referenceRtl.label}
@@ -457,6 +470,22 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                 </div>
               ) : null}
 
+              {fields.includes("intent") ? (
+                <SpecTextBox
+                  label="Design intent"
+                  value={designIntent}
+                  onChange={setDesignIntent}
+                  rows={6}
+                  required
+                  voiceTitle="FPGA Explorer Design Intent Voice Input"
+                  voiceLoopType="fpga"
+                  voiceTarget="FPGA target exploration design intent, interfaces, workload, and implementation priorities"
+                  uploadLabel="Upload design intent"
+                  uploadHelper="Upload a text, Markdown, JSON, or YAML design-intent document. Choose Replace or Append before applying it."
+                  placeholder="Describe what the RTL implements, its interfaces, workload, and important implementation priorities."
+                />
+              ) : null}
+
               {fields.includes("fpga") && sourceMode === "generate_arch2rtl" ? (
                 <SpecTextBox
                   label="Design intent"
@@ -473,7 +502,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                 />
               ) : null}
 
-              {fields.includes("fpga") && (fields.includes("rtl") || sourceMode === "paste") ? (
+              {(fields.includes("fpga") || fpgaMode === "target-explorer") && (fields.includes("rtl") || sourceMode === "paste") ? (
                 <SpecTextBox
                   label="RTL / FPGA source"
                   value={rtlText}
@@ -509,7 +538,35 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
               ) : null}
 
               <div className="grid gap-3 md:grid-cols-3">
-                {fields.includes("fpga") ? (
+                {fpgaMode === "target-explorer" ? (
+                  <div className="md:col-span-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <div className="text-sm font-semibold text-slate-200">Boards and devices to explore *</div>
+                        <div className="mt-1 text-xs text-slate-500">Only selected targets run synthesis and place-and-route.</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => setCandidateBoards(explorerBoards.map((item) => item.key))} className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/60">Select all</button>
+                        <button type="button" onClick={() => setCandidateBoards([])} className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/60">Clear</button>
+                      </div>
+                    </div>
+                    <div className="mt-3 max-h-56 overflow-y-auto rounded-xl border border-slate-800 bg-black/25 p-2">
+                      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                        {explorerBoards.map((item) => {
+                          const selected = candidateBoards.includes(item.key);
+                          return (
+                            <label key={item.key} className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${selected ? "border-cyan-400/50 bg-cyan-500/10" : "border-slate-800 bg-black/20 hover:border-slate-700"}`}>
+                              <input type="checkbox" checked={selected} onChange={() => setCandidateBoards((current) => selected ? current.filter((key) => key !== item.key) : [...current, item.key])} className="mt-1" />
+                              <span><span className="block text-sm font-semibold text-slate-100">{item.label}</span><span className="mt-0.5 block text-xs text-slate-500">{item.detail}</span></span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className={`mt-2 text-xs ${candidateBoards.length ? "text-cyan-300" : "text-rose-300"}`}>{candidateBoards.length ? `${candidateBoards.length} target${candidateBoards.length === 1 ? "" : "s"} selected` : "Select at least one target."}</div>
+                  </div>
+                ) : null}
+                {fields.includes("fpga") && fpgaMode !== "target-explorer" ? (
                   <>
                     <label className="block">
                       <span className="text-sm text-slate-300">Board</span>
@@ -529,6 +586,12 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                       <input value={topModule} onChange={(e) => setTopModule(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white" placeholder="auto-detect if blank" />
                     </label>
                   </>
+                ) : null}
+                {fpgaMode === "target-explorer" ? (
+                  <label className="block">
+                    <span className="text-sm text-slate-300">Top module</span>
+                    <input value={topModule} onChange={(e) => setTopModule(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white" placeholder="auto-detect if blank" />
+                  </label>
                 ) : null}
                 {fields.includes("frequency") ? (
                   <label className="block">
@@ -754,6 +817,12 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                     {fpgaMode !== "formal" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableGoldenModel} onChange={(e) => setEnableGoldenModel(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Golden model</label> : null}
                     {fpgaMode !== "formal" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableFailureDebug} onChange={(e) => setEnableFailureDebug(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Failure debug</label> : null}
                   </div>
+                </div>
+              ) : null}
+
+              {fpgaMode === "target-explorer" ? (
+                <div className="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-3 text-sm text-emerald-100">
+                  Before exploration, ChipLoop ingests the RTL and runs the FPGA lint/compile quality gate. A failing available lint tool blocks synthesis; tool-unavailable evidence is reported explicitly.
                 </div>
               ) : null}
 
