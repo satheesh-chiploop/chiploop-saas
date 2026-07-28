@@ -7,6 +7,23 @@ import TopNav from "@/components/TopNav";
 import { loopOverviews } from "@/lib/loopOverview";
 
 type DetailView = "workflow" | "apps" | "agents";
+type LoopMetric = { label: string; value: number; color: string };
+
+const catalogMetrics: Record<string, LoopMetric[]> = {
+  digital: [{ label: "Agents", value: 47, color: "bg-cyan-300" }, { label: "Workflows", value: 6, color: "bg-violet-400" }, { label: "Apps", value: 9, color: "bg-emerald-300" }, { label: "Product journeys", value: 2, color: "bg-pink-400" }, { label: "Reference journeys", value: 5, color: "bg-amber-300" }],
+  "digital-implementation": [{ label: "Agents", value: 41, color: "bg-cyan-300" }, { label: "Workflows", value: 6, color: "bg-violet-400" }, { label: "Apps", value: 8, color: "bg-emerald-300" }, { label: "Product journeys", value: 2, color: "bg-pink-400" }, { label: "Reference journeys", value: 3, color: "bg-amber-300" }],
+  fpga: [{ label: "Agents", value: 18, color: "bg-cyan-300" }, { label: "Workflows", value: 4, color: "bg-violet-400" }, { label: "Apps", value: 7, color: "bg-emerald-300" }, { label: "Product journeys", value: 1, color: "bg-pink-400" }, { label: "Reference journeys", value: 2, color: "bg-amber-300" }],
+  analog: [{ label: "Agents", value: 22, color: "bg-cyan-300" }, { label: "Workflows", value: 4, color: "bg-violet-400" }, { label: "Apps", value: 8, color: "bg-emerald-300" }, { label: "Product journeys", value: 1, color: "bg-pink-400" }, { label: "Reference journeys", value: 1, color: "bg-amber-300" }],
+  "mixed-signal": [{ label: "Agents", value: 77, color: "bg-cyan-300" }, { label: "Workflows", value: 6, color: "bg-violet-400" }, { label: "Apps", value: 13, color: "bg-emerald-300" }, { label: "Product journeys", value: 2, color: "bg-pink-400" }, { label: "Reference journeys", value: 2, color: "bg-amber-300" }],
+  firmware: [{ label: "Agents", value: 62, color: "bg-cyan-300" }, { label: "Workflows", value: 4, color: "bg-violet-400" }, { label: "Apps", value: 11, color: "bg-emerald-300" }, { label: "Product journeys", value: 3, color: "bg-pink-400" }, { label: "Reference journeys", value: 5, color: "bg-amber-300" }],
+  validation: [{ label: "Agents", value: 17, color: "bg-cyan-300" }, { label: "Workflows", value: 2, color: "bg-violet-400" }, { label: "Apps", value: 5, color: "bg-emerald-300" }, { label: "Product journeys", value: 3, color: "bg-pink-400" }, { label: "Reference journeys", value: 4, color: "bg-amber-300" }],
+};
+
+const miniRvSeedSweep = [
+  { seed: "Seed 1", achieved: 32.38 },
+  { seed: "Seed 2", achieved: 31.12 },
+  { seed: "Seed 3", achieved: 29.62 },
+];
 
 export default function LoopOverviewPage() {
   const params = useParams<{ loopSlug: string }>();
@@ -14,13 +31,14 @@ export default function LoopOverviewPage() {
   const [detailView, setDetailView] = useState<DetailView>("workflow");
   const loop = useMemo(() => loopOverviews[params.loopSlug], [params.loopSlug]);
   if (!loop) notFound();
+  const metrics = catalogMetrics[params.loopSlug] || [];
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       <TopNav current="loops" showMarketplace showSettings={false} />
       <section className="border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.12),transparent_36%),linear-gradient(180deg,#020617_0%,#0f172a_64%,#020617_100%)] px-4 py-10 sm:px-6 sm:py-14">
         <div className="mx-auto max-w-6xl">
-          <button onClick={() => router.push("/loops")} className="text-sm font-semibold text-slate-400 hover:text-cyan-200">← All design loops</button>
+          <button onClick={() => router.push("/loops")} className="text-sm font-semibold text-slate-400 hover:text-cyan-200">&larr; All design loops</button>
           <div className="mt-8 grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
               <p className={`text-xs font-bold uppercase tracking-[0.18em] ${loop.accentText}`}>{loop.eyebrow}</p>
@@ -47,6 +65,23 @@ export default function LoopOverviewPage() {
         </div>
       </section>
 
+
+      <section className="border-b border-slate-800 bg-slate-900/25 px-4 py-8 sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div><p className={`text-xs font-bold uppercase tracking-[0.18em] ${loop.accentText}`}>Loop at a glance</p><h2 className="mt-2 text-2xl font-extrabold">Connected capability, kept simple</h2></div>
+            <p className="text-xs text-slate-500">Current prebuilt catalog snapshot</p>
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+            {metrics.map((metric) => (
+              <div key={metric.label} className="rounded-xl border border-slate-800 bg-slate-950/75 p-4">
+                <div className="flex items-end justify-between gap-2"><span className="text-2xl font-extrabold text-white">{metric.value}</span><span className={`h-2.5 w-2.5 rounded-full ${metric.color}`} /></div>
+                <div className="mt-2 text-xs font-semibold text-slate-400">{metric.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       <section className="px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <div className="text-center"><p className={`text-xs font-bold uppercase tracking-[0.18em] ${loop.accentText}`}>What happens</p><h2 className="mt-2 text-3xl font-extrabold">A clear path from input to result</h2></div>
@@ -60,13 +95,32 @@ export default function LoopOverviewPage() {
               ))}
             </div>
           </div>
+
+          {params.loopSlug === "fpga" ? (
+            <div className="mt-8 rounded-xl border border-lime-300/35 bg-slate-900/70 p-5 sm:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-lime-200">MiniRV FPGA Explorer</p><h2 className="mt-2 text-2xl font-extrabold">Real reference seed sweep</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">Lattice iCE40 HX8K Breakout, 75 MHz target. This saved run used 5,572 of 7,680 logic cells; other boards in the interrupted run did not produce comparable reports.</p></div>
+                <button onClick={() => router.push("/apps/fpga-target-explorer?reference=minirv")} className="rounded-lg bg-lime-300 px-4 py-2 text-sm font-extrabold text-slate-950 hover:bg-lime-200">Run MiniRV Explorer</button>
+              </div>
+              <div className="mt-6 space-y-3">
+                {miniRvSeedSweep.map((result) => (
+                  <div key={result.seed} className="grid grid-cols-[64px_1fr_72px] items-center gap-3 text-xs">
+                    <span className="font-bold text-slate-300">{result.seed}</span>
+                    <div className="relative h-7 overflow-hidden rounded-md bg-slate-950"><div className="absolute inset-y-0 left-0 bg-lime-300/75" style={{ width: `${(result.achieved / 75) * 100}%` }} /><div className="absolute inset-y-0 right-0 border-l border-dashed border-amber-300/70" title="75 MHz target" /></div>
+                    <span className="text-right font-extrabold text-white">{result.achieved} MHz</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500"><span>0 MHz</span><span className="text-amber-200">Target 75 MHz</span></div>
+            </div>
+          ) : null}
           <div className="mt-8 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
               <div className="flex items-center gap-3"><FaMicrochip className={`h-5 w-5 ${loop.accentText}`} /><h2 className="text-xl font-extrabold">What you receive</h2></div>
               <div className="mt-5 space-y-3">{loop.outcomes.map((outcome) => <div key={outcome} className="flex items-center gap-3 text-sm text-slate-300"><span className={`h-2 w-2 rounded-full ${loop.accent}`} />{outcome}</div>)}</div>
             </div>
             <button onClick={() => router.push(loop.reference.href)} className={`group rounded-xl border ${loop.accentBorder} bg-slate-900/70 p-5 text-left hover:bg-slate-900`}>
-              <div className="flex flex-wrap items-start justify-between gap-3"><div><div className={`text-xs font-bold uppercase ${loop.accentText}`}>Reference journey</div><h2 className="mt-2 text-xl font-extrabold">{loop.reference.title}</h2><p className="mt-2 text-sm leading-6 text-slate-400">{loop.reference.description}</p></div><span className="text-sm font-bold text-slate-300 group-hover:text-white">View journey →</span></div>
+              <div className="flex flex-wrap items-start justify-between gap-3"><div><div className={`text-xs font-bold uppercase ${loop.accentText}`}>Reference journey</div><h2 className="mt-2 text-xl font-extrabold">{loop.reference.title}</h2><p className="mt-2 text-sm leading-6 text-slate-400">{loop.reference.description}</p></div><span className="text-sm font-bold text-slate-300 group-hover:text-white">View journey &rarr;</span></div>
               <div className="mt-5 grid grid-cols-4 gap-3">{loop.reference.results.map((result) => <div key={result.label}><div className="flex h-16 items-end rounded-md bg-slate-950/80 px-2"><div className={`w-full rounded-t-sm ${loop.accent}`} style={{ height: `${result.value}%` }} /></div><div className="mt-2 text-center text-[11px] font-semibold text-slate-400">{result.label}</div></div>)}</div>
             </button>
           </div>
@@ -80,6 +134,8 @@ export default function LoopOverviewPage() {
         </div>
       </section>
 
+
+
       <section className="px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <details className="group rounded-xl border border-slate-800 bg-slate-900/55">
@@ -88,8 +144,8 @@ export default function LoopOverviewPage() {
               <div className="flex flex-wrap gap-2" role="tablist">
                 {(["workflow", "apps", "agents"] as DetailView[]).map((view) => <button key={view} role="tab" aria-selected={detailView === view} onClick={() => setDetailView(view)} className={`rounded-lg px-4 py-2 text-sm font-bold capitalize ${detailView === view ? `${loop.accent} text-slate-950` : "border border-slate-700 text-slate-300"}`}>{view}</button>)}
               </div>
-              {detailView === "workflow" ? <div className="mt-5 rounded-xl border border-slate-800 bg-slate-950/70 p-5"><h3 className="font-extrabold">The workflow</h3><p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">{loop.workflow}</p><div className="mt-5 flex flex-wrap items-center gap-2">{loop.stages.map((stage, index) => <div key={stage.label} className="flex items-center gap-2"><span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-bold">{stage.label}</span>{index < loop.stages.length - 1 ? <span className="text-slate-600">→</span> : null}</div>)}</div></div> : null}
-              {detailView === "apps" ? <div className="mt-5 grid gap-3 md:grid-cols-3">{loop.apps.map((app) => <button key={app.name} onClick={() => router.push(app.href)} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 text-left hover:border-cyan-400/50"><h3 className="font-extrabold">{app.name}</h3><p className="mt-2 text-sm leading-6 text-slate-400">{app.description}</p><div className={`mt-3 text-xs font-bold uppercase ${loop.accentText}`}>Open app →</div></button>)}</div> : null}
+              {detailView === "workflow" ? <div className="mt-5 rounded-xl border border-slate-800 bg-slate-950/70 p-5"><h3 className="font-extrabold">The workflow</h3><p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">{loop.workflow}</p><div className="mt-5 flex flex-wrap items-center gap-2">{loop.stages.map((stage, index) => <div key={stage.label} className="flex items-center gap-2"><span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-bold">{stage.label}</span>{index < loop.stages.length - 1 ? <span className="text-slate-600">&rarr;</span> : null}</div>)}</div></div> : null}
+              {detailView === "apps" ? <div className="mt-5 grid gap-3 md:grid-cols-3">{loop.apps.map((app) => <button key={app.name} onClick={() => router.push(app.href)} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 text-left hover:border-cyan-400/50"><h3 className="font-extrabold">{app.name}</h3><p className="mt-2 text-sm leading-6 text-slate-400">{app.description}</p><div className={`mt-3 text-xs font-bold uppercase ${loop.accentText}`}>Open app &rarr;</div></button>)}</div> : null}
               {detailView === "agents" ? <div className="mt-5 grid gap-3 md:grid-cols-3">{loop.agentGroups.map((agent) => <div key={agent.name} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4"><h3 className="font-extrabold">{agent.name}</h3><p className="mt-2 text-sm leading-6 text-slate-400">{agent.description}</p></div>)}</div> : null}
             </div>
           </details>

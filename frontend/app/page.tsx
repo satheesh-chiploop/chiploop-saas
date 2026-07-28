@@ -349,14 +349,10 @@ function LandingPageContent() {
           </div>
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6">
             {subscriptionLoops.map((loop) => (
-              <button type="button" onClick={() => goTo(loop.href)} key={loop.name} className={`rounded-xl border-2 ${loop.border} bg-slate-950/70 p-4 text-left shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
-                <h3 className={cardTitleClass}>{loop.name}</h3>
+              <button type="button" onClick={() => goTo(loop.href)} key={loop.name} className={`relative rounded-xl border-2 ${loop.border} bg-slate-950/70 p-4 text-left shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
+                <span aria-hidden="true" className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-sm font-bold text-cyan-200">&#8599;</span>
+                <h3 className={`${cardTitleClass} pr-8`}>{loop.name}</h3>
                 <p className={`${cardBodyClass} min-h-32`}>{loop.body}</p>
-                {loop.name === "FPGA Prototyping" ? (
-                  <span className="mt-3 inline-flex items-center gap-2 rounded-lg border border-lime-400/45 bg-lime-400/10 px-3 py-2 text-xs font-bold text-lime-100">
-                    Explore FPGA boards <span aria-hidden="true">&rarr;</span>
-                  </span>
-                ) : null}
               </button>
             ))}
           </div>
