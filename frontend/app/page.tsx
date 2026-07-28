@@ -100,36 +100,42 @@ const platformStats = [
 const subscriptionLoops = [
   {
     name: "Digital Design",
+    href: "/loops/digital",
     body: "Design intent, architecture-to-RTL, RTL quality, verification setup, and handoff.",
     border: "border-cyan-400/55",
     hover: "hover:border-cyan-300 hover:shadow-cyan-950/35",
   },
   {
     name: "Digital Implementation",
+    href: "/loops/digital-implementation",
     body: "Synthesis, constraints, timing/power/area reports, DFT/MBIST, RTL-to-GDS, signoff, and tapeout handoff.",
     border: "border-violet-400/55",
     hover: "hover:border-violet-300 hover:shadow-violet-950/35",
   },
   {
     name: "FPGA Prototyping",
+    href: "/loops/fpga",
     body: "Target and board exploration, RTL handoff, iCE40/ECP5 synthesis, place-and-route closure, timing evidence, bitstream packaging, and programming handoff.",
     border: "border-lime-300/55",
     hover: "hover:border-lime-300 hover:shadow-lime-950/35",
   },
   {
     name: "Mixed Signal",
+    href: "/loops/mixed-signal",
     body: "System and mixed-signal integration across digital RTL, analog models, SoC intent, simulation, and synthesis.",
     border: "border-rose-400/55",
     hover: "hover:border-rose-300 hover:shadow-rose-950/35",
   },
   {
     name: "Firmware/Software",
+    href: "/loops/firmware",
     body: "Register extraction, HAL, drivers, boot/diagnostics, firmware builds, software services, co-simulation, and demos.",
     border: "border-emerald-400/55",
     hover: "hover:border-emerald-300 hover:shadow-emerald-950/35",
   },
   {
     name: "Validation",
+    href: "/loops/validation",
     body: "Validation plans, bench/instrument setup, connectivity, preflight, execution analytics, and reports.",
     border: "border-amber-300/55",
     hover: "hover:border-amber-300 hover:shadow-amber-950/35",
@@ -343,19 +349,15 @@ function LandingPageContent() {
           </div>
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6">
             {subscriptionLoops.map((loop) => (
-              <article key={loop.name} className={`rounded-xl border-2 ${loop.border} bg-slate-950/70 p-4 shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
+              <button type="button" onClick={() => goTo(loop.href)} key={loop.name} className={`rounded-xl border-2 ${loop.border} bg-slate-950/70 p-4 text-left shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
                 <h3 className={cardTitleClass}>{loop.name}</h3>
                 <p className={`${cardBodyClass} min-h-32`}>{loop.body}</p>
                 {loop.name === "FPGA Prototyping" ? (
-                  <button
-                    type="button"
-                    onClick={() => goTo("/apps/fpga-target-explorer?reference=minirv")}
-                    className="mt-3 inline-flex items-center gap-2 rounded-lg border border-lime-400/45 bg-lime-400/10 px-3 py-2 text-xs font-bold text-lime-100 transition hover:border-lime-300 hover:bg-lime-400/15"
-                  >
+                  <span className="mt-3 inline-flex items-center gap-2 rounded-lg border border-lime-400/45 bg-lime-400/10 px-3 py-2 text-xs font-bold text-lime-100">
                     Explore FPGA boards <span aria-hidden="true">&rarr;</span>
-                  </button>
+                  </span>
                 ) : null}
-              </article>
+              </button>
             ))}
           </div>
           <div className="mt-7 text-center">
