@@ -183,18 +183,6 @@ const workflowAgentMax = 130;
 const workflowAgentPlotHeight = 288;
 const workflowAgentTicks = [130, 100, 50, 0];
 
-const fpgaTargetCapacityChart = [
-  { board: "iCEstick HX1K", logicCells: 1280 },
-  { board: "iCEBreaker UP5K", logicCells: 5280 },
-  { board: "UPduino v3 UP5K", logicCells: 5280 },
-  { board: "iCE40 HX8K", logicCells: 7680 },
-  { board: "Colorlight ECP5-25F", logicCells: 24000 },
-  { board: "ULX3S ECP5-45F", logicCells: 44000 },
-  { board: "OrangeCrab ECP5-85F", logicCells: 84000 },
-];
-const fpgaTargetCapacityMax = Math.max(...fpgaTargetCapacityChart.map((item) => item.logicCells));
-const minirvMeasuredLut4 = 4916;
-
 const marketplaceFlow = [
   ["Agents", "Specialized AI and tool agents for chip tasks"],
   ["Workflows", "Reusable execution flows with saved context"],
@@ -358,6 +346,15 @@ function LandingPageContent() {
               <article key={loop.name} className={`rounded-xl border-2 ${loop.border} bg-slate-950/70 p-4 shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
                 <h3 className={cardTitleClass}>{loop.name}</h3>
                 <p className={`${cardBodyClass} min-h-32`}>{loop.body}</p>
+                {loop.name === "FPGA Prototyping" ? (
+                  <button
+                    type="button"
+                    onClick={() => goTo("/apps/fpga-target-explorer?reference=minirv")}
+                    className="mt-3 inline-flex items-center gap-2 rounded-lg border border-lime-400/45 bg-lime-400/10 px-3 py-2 text-xs font-bold text-lime-100 transition hover:border-lime-300 hover:bg-lime-400/15"
+                  >
+                    Explore FPGA boards <span aria-hidden="true">&rarr;</span>
+                  </button>
+                ) : null}
               </article>
             ))}
           </div>
@@ -367,61 +364,6 @@ function LandingPageContent() {
             </button>
           </div>
         </div>
-        </div>
-      </section>
-
-      <section className="w-full border-y border-slate-800 bg-slate-950/80 px-4 py-10 sm:px-6 sm:py-14">
-        <div className={landingShellClass}>
-          <div className="grid gap-8 rounded-2xl border border-lime-400/25 bg-[radial-gradient(circle_at_100%_0%,rgba(190,242,100,0.12),transparent_32%),rgba(15,23,42,0.72)] p-5 sm:p-8 xl:grid-cols-[0.8fr_1.2fr]">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-lime-300">FPGA Target Explorer</p>
-              <h2 className="mt-3 text-2xl font-extrabold leading-tight text-white sm:text-3xl">Choose the target before committing to a board.</h2>
-              <p className="mt-4 text-base leading-7 text-slate-300">Sweep one fixed RTL design across supported iCE40 and ECP5 targets. ChipLoop compares timing and utilization, applies synthesis/P&amp;R closure only to misses, and generates Best Overall, Performance, Low-Cost, and Growth recommendations.</p>
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                {[
-                  ["7", "Supported boards"],
-                  ["6", "Unique FPGA targets"],
-                  ["4", "Recommendation profiles"],
-                  ["3 + 3", "Baseline + closure seeds"],
-                ].map(([value, label]) => (
-                  <div key={label} className="rounded-xl border border-slate-800 bg-black/25 p-3">
-                    <div className="text-xl font-black text-lime-300">{value}</div>
-                    <div className="mt-1 text-xs uppercase tracking-wide text-slate-500">{label}</div>
-                  </div>
-                ))}
-              </div>
-              <button onClick={() => goTo("/apps/fpga-target-explorer?reference=minirv")} className="mt-6 rounded-xl border border-lime-400/50 bg-lime-400/10 px-5 py-3 text-sm font-bold text-lime-100 transition hover:border-lime-300 hover:bg-lime-400/15">
-                Explore MiniRV FPGA Targets
-              </button>
-            </div>
-            <div className="rounded-xl border border-slate-800 bg-black/30 p-4 sm:p-5">
-              <div className="flex flex-wrap items-end justify-between gap-2">
-                <div>
-                  <div className="text-sm font-bold text-white">Logic capacity by supported board</div>
-                  <div className="mt-1 text-xs text-slate-500">Registry capacity compared with the MiniRV reference synthesis estimate</div>
-                </div>
-                <div className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-200">MiniRV: {minirvMeasuredLut4.toLocaleString()} LUT4</div>
-              </div>
-              <div className="mt-5 space-y-3">
-                {fpgaTargetCapacityChart.map((item) => {
-                  const width = Math.max((item.logicCells / fpgaTargetCapacityMax) * 100, 2);
-                  const capacityFit = item.logicCells >= minirvMeasuredLut4;
-                  return (
-                    <div key={item.board}>
-                      <div className="mb-1 flex items-center justify-between gap-3 text-xs">
-                        <span className="truncate text-slate-300">{item.board}</span>
-                        <span className={capacityFit ? "shrink-0 text-emerald-300" : "shrink-0 text-amber-300"}>{item.logicCells.toLocaleString()} cells · {capacityFit ? "capacity candidate" : "too small"}</span>
-                      </div>
-                      <div className="h-2.5 overflow-hidden rounded-full bg-slate-900">
-                        <div className={capacityFit ? "h-full rounded-full bg-gradient-to-r from-cyan-500 to-lime-400" : "h-full rounded-full bg-amber-500/70"} style={{ width: `${width}%` }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="mt-4 text-xs leading-5 text-slate-500">Capacity is a fast feasibility indicator, not a board recommendation. Target timing, routing, I/O compatibility, resource packing, and closure results determine the final ranking.</p>
-            </div>
-          </div>
         </div>
       </section>
 

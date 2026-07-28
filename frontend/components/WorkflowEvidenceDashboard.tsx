@@ -1751,9 +1751,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const family = firstString(target.family).toLowerCase();
       const vendor = firstString(target.vendor);
       const vendorLabel = vendor ? vendor.charAt(0).toUpperCase() + vendor.slice(1) : "Lattice";
-      const boardDisplay = `${vendorLabel} ${firstString(target.board, "icebreaker")}`;
-      const pnrTool = firstString(record(pnr.command).cmd && array(record(pnr.command).cmd)[0], target.nextpnr_tool, family === "ecp5" ? "nextpnr-ecp5" : "nextpnr-ice40");
-      const bitstreamTool = firstString(record(bitstream.command).cmd && array(record(bitstream.command).cmd)[0], target.bitstream_tool, family === "ecp5" ? "ecppack" : "icepack");
+      const rawBoardLabel = firstString(target.label, target.board_label, target.board, "Lattice iCEBreaker");
+      const boardDisplay = rawBoardLabel.toLowerCase().startsWith(vendorLabel.toLowerCase()) ? rawBoardLabel : `${vendorLabel} ${rawBoardLabel}`;
+      const fallbackPnrTool = family === "ecp5" ? "nextpnr-ecp5" : family === "nexus" ? "nextpnr-nexus" : family === "gowin" ? "nextpnr-himbaechel-gowin" : "nextpnr-ice40";
+      const fallbackBitstreamTool = family === "ecp5" ? "ecppack" : family === "nexus" ? "prjoxide" : family === "gowin" ? "gowin_pack" : "icepack";
+      const pnrTool = firstString(record(pnr.command).cmd && array(record(pnr.command).cmd)[0], target.nextpnr_tool, fallbackPnrTool);
+      const bitstreamTool = firstString(record(bitstream.command).cmd && array(record(bitstream.command).cmd)[0], target.bitstream_tool, fallbackBitstreamTool);
       const lintToolNames = Array.from(new Set([
         ...Object.keys(record(rtlQualityPass1.tools)),
         ...Object.keys(record(rtlQualityPass2.tools)),

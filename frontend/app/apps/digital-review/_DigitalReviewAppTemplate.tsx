@@ -8,6 +8,7 @@ import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 import { FPGA_BITSTREAM_PREFILL_KEY } from "@/lib/pwmFullStackDemo";
+import { FPGA_RUNNABLE_TARGET_OPTIONS, FPGA_TARGET_OPTIONS } from "@/lib/fpgaTargets";
 import SpecTextBox from "@/components/SpecTextBox";
 import { FiCheck, FiClock, FiCopy, FiLoader, FiX } from "react-icons/fi";
 
@@ -70,16 +71,11 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [timingText, setTimingText] = useState("");
   const [targetFrequency, setTargetFrequency] = useState(fpgaMode === "target-explorer" ? "75" : "100");
   const [recommendationProfile, setRecommendationProfile] = useState("best_overall");
-  const explorerBoards = [
-    { key: "icestick", label: "iCEstick", detail: "iCE40 HX1K / 1,280 cells" },
-    { key: "icebreaker", label: "iCEBreaker", detail: "iCE40 UP5K / 5,280 cells" },
-    { key: "upduino_v3", label: "UPduino v3", detail: "iCE40 UP5K / 5,280 cells" },
-    { key: "ice40_hx8k_breakout", label: "iCE40 HX8K Breakout", detail: "iCE40 HX8K / 7,680 cells" },
-    { key: "colorlight_5a_75b", label: "Colorlight 5A-75B", detail: "ECP5-25F / 24K cells" },
-    { key: "ulx3s_ecp5_45f", label: "ULX3S", detail: "ECP5-45F / 44K cells" },
-    { key: "orangecrab_ecp5_85f", label: "OrangeCrab", detail: "ECP5-85F / 84K cells" },
-  ];
-  const [candidateBoards, setCandidateBoards] = useState<string[]>(explorerBoards.map((item) => item.key));
+  const explorerBoards = FPGA_TARGET_OPTIONS;
+  const defaultExplorerBoards = FPGA_RUNNABLE_TARGET_OPTIONS.filter((item) => item.tier !== "experimental");
+  const [candidateBoards, setCandidateBoards] = useState<string[]>(defaultExplorerBoards.map((item) => item.key));
+  const [explorerBaselineSeedCount, setExplorerBaselineSeedCount] = useState("1");
+  const [explorerClosureSeedCount, setExplorerClosureSeedCount] = useState("1");
   const [stage, setStage] = useState("auto");
   const [reviewDepth, setReviewDepth] = useState("standard");
   const [notes, setNotes] = useState("");
@@ -338,11 +334,15 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         target_frequency_mhz: targetFrequency ? Number(targetFrequency) : undefined,
         recommendation_profile: fields.includes("recommendation") ? recommendationProfile : undefined,
         candidate_boards: fpgaMode === "target-explorer" ? candidateBoards : undefined,
+        baseline_seed_count: fpgaMode === "target-explorer" ? Number(explorerBaselineSeedCount || 1) : undefined,
+        closure_seed_count: fpgaMode === "target-explorer" ? Number(explorerClosureSeedCount || 1) : undefined,
         stage,
         review_depth: reviewDepth,
         board: fields.includes("fpga") ? board : undefined,
         top_module: (fields.includes("fpga") || fpgaMode === "target-explorer") && topModule.trim() ? topModule.trim() : undefined,
         pcf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
+        lpf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
+        cst_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
         notes: notes.trim() || undefined,
         run_fpga_rtl_repair_loop: fields.includes("fpga") ? true : undefined,
         run_fpga_synthesis_closure_loop: fields.includes("fpga") ? runFpgaTimingClosureLoop : undefined,
@@ -546,7 +546,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                         <div className="mt-1 text-xs text-slate-500">Only selected targets run synthesis and place-and-route.</div>
                       </div>
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setCandidateBoards(explorerBoards.map((item) => item.key))} className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/60">Select all</button>
+                        <button type="button" onClick={() => setCandidateBoards(FPGA_RUNNABLE_TARGET_OPTIONS.map((item) => item.key))} className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/60">Select runnable</button>
                         <button type="button" onClick={() => setCandidateBoards([])} className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/60">Clear</button>
                       </div>
                     </div>
@@ -555,9 +555,9 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                         {explorerBoards.map((item) => {
                           const selected = candidateBoards.includes(item.key);
                           return (
-                            <label key={item.key} className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition ${selected ? "border-cyan-400/50 bg-cyan-500/10" : "border-slate-800 bg-black/20 hover:border-slate-700"}`}>
-                              <input type="checkbox" checked={selected} onChange={() => setCandidateBoards((current) => selected ? current.filter((key) => key !== item.key) : [...current, item.key])} className="mt-1" />
-                              <span><span className="block text-sm font-semibold text-slate-100">{item.label}</span><span className="mt-0.5 block text-xs text-slate-500">{item.detail}</span></span>
+                            <label key={item.key} title={item.reason} className={`flex items-start gap-3 rounded-lg border p-3 transition ${item.tier === "unavailable" ? "cursor-not-allowed border-slate-900 opacity-50" : selected ? "cursor-pointer border-cyan-400/50 bg-cyan-500/10" : "cursor-pointer border-slate-800 bg-black/20 hover:border-slate-700"}`}>
+                              <input type="checkbox" disabled={item.tier === "unavailable"} checked={selected} onChange={() => setCandidateBoards((current) => selected ? current.filter((key) => key !== item.key) : [...current, item.key])} className="mt-1" />
+                              <span><span className="block text-sm font-semibold text-slate-100">{item.label}</span><span className="mt-0.5 block text-xs text-slate-500">{item.detail}</span><span className="mt-1 block text-[11px] text-slate-600">{item.segments} · {item.tier}</span></span>
                             </label>
                           );
                         })}
@@ -571,14 +571,9 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                     <label className="block">
                       <span className="text-sm text-slate-300">Board</span>
                       <select value={board} onChange={(e) => setBoard(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white">
-                        <option value="icebreaker">Lattice iCEBreaker (iCE40 UP5K)</option>
-                        <option value="upduino_v3">Lattice UPduino v3 (iCE40 UP5K)</option>
-                        <option value="icestick">Lattice iCEstick (iCE40 HX1K)</option>
-                        <option value="ice40_hx8k_breakout">Lattice iCE40 HX8K Breakout</option>
-                        <option value="ulx3s_ecp5_45f">ULX3S ECP5-45F</option>
-                        <option value="orangecrab_ecp5_85f">OrangeCrab ECP5-85F</option>
-                        <option value="colorlight_5a_75b">Colorlight 5A-75B ECP5-25F</option>
-                        <option value="custom_ice40">Custom iCE40</option>
+                        {FPGA_TARGET_OPTIONS.map((item) => (
+                          <option key={item.key} value={item.key} disabled={item.tier === "unavailable"}>{item.label} — {item.family} ({item.tier})</option>
+                        ))}
                       </select>
                     </label>
                     <label className="block">
@@ -598,6 +593,20 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                     <span className="text-sm text-slate-300">Target MHz</span>
                     <input value={targetFrequency} onChange={(e) => setTargetFrequency(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white" />
                   </label>
+                ) : null}
+                {fpgaMode === "target-explorer" ? (
+                  <>
+                    <label className="block">
+                      <span className="text-sm text-slate-300">Baseline seeds</span>
+                      <input type="number" min="1" max="10" step="1" value={explorerBaselineSeedCount} onChange={(e) => setExplorerBaselineSeedCount(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white" />
+                      <span className="mt-1 block text-xs text-slate-500">Default 1. Runs for every unique selected device.</span>
+                    </label>
+                    <label className="block">
+                      <span className="text-sm text-slate-300">Closure seeds</span>
+                      <input type="number" min="1" max="10" step="1" value={explorerClosureSeedCount} onChange={(e) => setExplorerClosureSeedCount(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white" />
+                      <span className="mt-1 block text-xs text-slate-500">Default 1. Used only after a routed timing miss.</span>
+                    </label>
+                  </>
                 ) : null}
                 {fields.includes("recommendation") ? (
                   <label className="block">
@@ -634,15 +643,15 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
               {fields.includes("fpga") ? (
                 <div className="space-y-4">
                   <SpecTextBox
-                    label="Pin constraints PCF / LPF"
+                    label="Pin constraints PCF / LPF / CST"
                     value={pcfText}
                     onChange={setPcfText}
                     rows={7}
                     voiceTitle="FPGA Constraint Voice Input"
                     voiceLoopType="fpga"
-                    voiceTarget="PCF or LPF pin constraints and board pin mapping"
+                    voiceTarget="PCF, LPF, or CST pin constraints and board pin mapping"
                     uploadLabel="Upload constraints"
-                    uploadHelper="Upload PCF/LPF constraints, board pin notes, or implementation constraints."
+                    uploadHelper="Upload Lattice PCF/LPF or Gowin CST constraints and board pin notes."
                     placeholder={'set_io clk 35\nset_io reset_n 10\nset_io led 99'}
                     textareaClassName="w-full resize-y bg-transparent p-1 font-mono text-sm text-slate-100 outline-none"
                   />
