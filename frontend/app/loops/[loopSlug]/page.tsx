@@ -121,7 +121,7 @@ export default function LoopOverviewPage() {
             </div>
             <button onClick={() => router.push(loop.reference.href)} className={`group rounded-xl border ${loop.accentBorder} bg-slate-900/70 p-5 text-left hover:bg-slate-900`}>
               <div className="flex flex-wrap items-start justify-between gap-3"><div><div className={`text-xs font-bold uppercase ${loop.accentText}`}>Reference journey</div><h2 className="mt-2 text-xl font-extrabold">{loop.reference.title}</h2><p className="mt-2 text-sm leading-6 text-slate-400">{loop.reference.description}</p></div><span className="text-sm font-bold text-slate-300 group-hover:text-white">View journey &rarr;</span></div>
-              <div className="mt-5 grid grid-cols-4 gap-3">{loop.reference.results.map((result) => <div key={result.label}><div className="flex h-16 items-end rounded-md bg-slate-950/80 px-2"><div className={`w-full rounded-t-sm ${loop.accent}`} style={{ height: `${result.value}%` }} /></div><div className="mt-2 text-center text-[11px] font-semibold text-slate-400">{result.label}</div></div>)}</div>
+              <div className="mt-5 flex flex-wrap items-center gap-2">{loop.reference.results.map((result, index) => <div key={result.label} className="flex items-center gap-2"><span className={`rounded-full border ${loop.accentBorder} bg-slate-950/80 px-3 py-2 text-xs font-bold text-slate-200`}>{result.label}</span>{index < loop.reference.results.length - 1 ? <FaArrowRight className={`h-3 w-3 shrink-0 ${loop.accentText}`} aria-hidden="true" /> : null}</div>)}</div>
             </button>
           </div>
         </div>
