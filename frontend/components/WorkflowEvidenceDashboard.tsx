@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ApiClientError, apiGet } from "@/lib/apiClient";
 import { createClientComponentClient } from "@/lib/platformClient";
 
-type Stage = "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "fpga" | "verification" | "embedded" | "software" | "validation" | "product";
+type Stage = "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "fpga" | "fpga_target_explorer" | "verification" | "embedded" | "software" | "validation" | "product";
 type JsonMap = Record<string, unknown>;
 
 type Props = {
@@ -1036,6 +1036,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "digital/signoff_closure/signoff_closure_chart.json",
         "executive_summary.json",
       ],
+      fpga_target_explorer: [
+        "fpga_target_explorer.json",
+        "fpga/target_explorer/fpga_target_explorer.json",
+        "fpga_handoff_ingest.json",
+        "fpga/handoff/fpga_handoff_ingest.json",
+      ],
       fpga: [
         "fpga_dashboard.json",
         "fpga/fpga_dashboard.json",
@@ -1554,6 +1560,101 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       );
     }
 
+    if (stage === "fpga_target_explorer") {
+      const ev = (...keys: string[]) => firstPresent(...keys.map((key) => evidence[key]));
+      const explorer = record(ev("fpga_target_explorer.json", "fpga/target_explorer/fpga_target_explorer.json"));
+      const results = array(explorer.results).map(record);
+      const recommendations = record(explorer.recommendations);
+      const targetMhz = firstNumber(explorer.target_frequency_mhz);
+      const maxFmax = Math.max(...results.map((item) => firstNumber(item.best_frequency_mhz) || 0), targetMhz || 1);
+      const recommendationItems = [
+        ["Best Overall", recommendations.best_overall, "Balanced timing reliability, headroom, performance, and target size."],
+        ["Best Performance", recommendations.best_performance, "Highest robust median implementation frequency."],
+        ["Best Low-Cost Variant", recommendations.best_low_cost, "Smallest viable FPGA capacity proxy; live pricing is not assumed."],
+        ["Best for Growth", recommendations.best_for_growth, "Largest remaining logic capacity after implementation."],
+      ];
+      const resultFor = (board: unknown) => results.find((item) => firstString(item.board) === firstString(board));
+      const continueToPrototype = (board: string) => {
+        if (typeof window === "undefined") return;
+        window.localStorage.setItem("chiploop_fpga_bitstream_prefill", JSON.stringify({
+          rtlSourceMode: "from_arch2rtl",
+          sourceWorkflowId: workflowId,
+          board,
+          targetFrequency: String(targetMhz || 75),
+          notes: `Selected by FPGA Target Explorer workflow ${workflowId}.`,
+        }));
+        window.location.href = "/apps/fpga-bitstream";
+      };
+      return (
+        <div className="mt-5 space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Stat title="Target Frequency" value={targetMhz ? `${formatNumber(targetMhz)} MHz` : "not specified"} />
+            <Stat title="Candidates" value={firstNumber(explorer.candidate_count)} />
+            <Stat title="Unique Implementations" value={firstNumber(explorer.unique_implementation_count)} />
+            <Stat title="Primary Recommendation" value={firstString(explorer.selected_recommendation, "not available")} />
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {recommendationItems.map(([label, board, description]) => {
+              const result = resultFor(board);
+              const boardKey = firstString(board);
+              return (
+                <div key={String(label)} className="rounded-2xl border border-cyan-500/25 bg-slate-950/45 p-4">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">{String(label)}</div>
+                  <div className="mt-2 text-lg font-bold text-white">{firstString(result?.label, boardKey, "Unavailable")}</div>
+                  <div className="mt-1 text-sm text-slate-300">{result ? `${formatNumber(firstNumber(result.best_frequency_mhz))} MHz best | ${formatNumber(firstNumber(result.resource_headroom_percent))}% headroom` : "No viable target"}</div>
+                  <div className="mt-2 text-xs leading-5 text-slate-500">{String(description)}</div>
+                  {boardKey ? <button type="button" onClick={() => continueToPrototype(boardKey)} className="mt-3 w-full rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-sm font-semibold text-cyan-100 hover:border-cyan-300">Continue with this board</button> : null}
+                </div>
+              );
+            })}
+          </div>
+
+          <section className="rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+            <div className="text-sm font-semibold text-slate-200">Achieved frequency by target</div>
+            <div className="mt-4 space-y-3">
+              {results.map((item) => {
+                const fmax = firstNumber(item.best_frequency_mhz) || 0;
+                return <Bar key={firstString(item.board)} label={`${firstString(item.label, item.board)}${item.target_met === true ? " - target met" : " - target missed"}`} value={fmax} total={maxFmax} color={item.target_met === true ? "bg-emerald-500" : "bg-amber-500"} />;
+              })}
+            </div>
+          </section>
+
+          <section className="space-y-2">
+            {results.map((item) => {
+              const runs = array(item.pnr_runs).map(record);
+              const relaxation = record(item.frequency_relaxation);
+              return (
+                <details key={firstString(item.board)} className="rounded-2xl border border-slate-800 bg-slate-950/35 px-4 py-3">
+                  <summary className="cursor-pointer">
+                    <div className="inline-flex w-[calc(100%_-_1rem)] flex-wrap items-center justify-between gap-3 align-middle">
+                      <div><span className="font-semibold text-white">{firstString(item.label, item.board)}</span><span className="ml-2 text-xs text-slate-500">{firstString(item.family)} {firstString(item.device)} / {firstString(item.package)}</span></div>
+                      <div className={item.target_met === true ? "text-sm font-semibold text-emerald-300" : "text-sm font-semibold text-amber-300"}>{item.target_met === true ? "Target met" : "Target missed"}</div>
+                    </div>
+                  </summary>
+                  <div className="mt-4 grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <Stat title="Best Fmax" value={item.best_frequency_mhz ? `${formatNumber(firstNumber(item.best_frequency_mhz))} MHz` : "failed"} />
+                    <Stat title="Median Fmax" value={item.median_frequency_mhz ? `${formatNumber(firstNumber(item.median_frequency_mhz))} MHz` : "failed"} />
+                    <Stat title="Worst Fmax" value={item.worst_frequency_mhz ? `${formatNumber(firstNumber(item.worst_frequency_mhz))} MHz` : "failed"} />
+                    <Stat title="Timing Pass Rate" value={`${formatNumber(firstNumber(item.timing_pass_rate) * 100)}%`} />
+                    <Stat title="Logic Utilization" value={item.logic_utilization_percent !== undefined ? `${formatNumber(firstNumber(item.logic_utilization_percent))}%` : "unavailable"} />
+                    <Stat title="Resource Headroom" value={item.resource_headroom_percent !== undefined ? `${formatNumber(firstNumber(item.resource_headroom_percent))}%` : "unavailable"} />
+                    <Stat title="Winning Seed" value={firstPresent(item.winning_seed, "not available")} />
+                    <Stat title="Closure" value={item.closure_used === true ? "used" : "not needed"} />
+                    <Stat title="Relaxed Frequency" value={relaxation.recommended_mhz ? `${formatNumber(firstNumber(relaxation.recommended_mhz))} MHz` : "not applicable"} />
+                    <Stat title="P&R Attempts" value={runs.length} />
+                    <Stat title="Board Input Clock" value={item.board_input_frequency_mhz ? `${formatNumber(firstNumber(item.board_input_frequency_mhz))} MHz` : "unavailable"} />
+                    <Stat title="Implementation Reuse" value={firstString(item.reused_implementation_from, "unique target")} />
+                  </div>
+                  <div className="mt-3 text-xs leading-5 text-slate-500">{firstString(item.constraint_scope)}</div>
+                </details>
+              );
+            })}
+          </section>
+        </div>
+      );
+    }
+
     if (stage === "fpga") {
       const ev = (...keys: string[]) => firstPresent(...keys.map((key) => evidence[key]));
       const dashboard = record(ev("fpga_dashboard.json", "fpga/fpga_dashboard.json"));
@@ -1604,9 +1705,17 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthUtilizationPct = typeof synthCellsUsed === "number" && typeof synthCellsAvailable === "number" && synthCellsAvailable > 0
         ? Number(((synthCellsUsed / synthCellsAvailable) * 100).toFixed(3))
         : firstPresent(synthesisEstimate.logic_utilization_percent, synth.logic_utilization_percent);
-      const routedCellsUsedRaw = firstPresent(routedResult.logical_cells_used, pnr.logical_cells_used);
-      const routedLut4Count = metricValue(routedResult.routed_lut4_cells, pnr.routed_lut4_cells);
-      const routedCellsAvailableRaw = firstPresent(routedResult.logical_cells_available, pnr.logical_cells_available);
+      const routedLut4Numeric = firstNumber(routedResult.routed_lut4_cells, pnr.routed_lut4_cells);
+      const routedFfNumeric = firstNumber(routedResult.routed_flip_flops, pnr.routed_flip_flops);
+      const routedCellsUsedRaw = firstPresent(
+        routedResult.logical_cells_used,
+        pnr.logical_cells_used,
+        routedLut4Numeric !== undefined || routedFfNumeric !== undefined
+          ? Math.max(routedLut4Numeric || 0, routedFfNumeric || 0)
+          : undefined,
+      );
+      const routedLut4Count = metricValue(routedLut4Numeric);
+      const routedCellsAvailableRaw = firstPresent(routedResult.logical_cells_available, pnr.logical_cells_available, synthCellsAvailable);
       const routedCellsUsed = typeof routedCellsUsedRaw === "number" && Number.isFinite(routedCellsUsedRaw) ? routedCellsUsedRaw : undefined;
       const routedCellsAvailable = typeof routedCellsAvailableRaw === "number" && Number.isFinite(routedCellsAvailableRaw) ? routedCellsAvailableRaw : undefined;
       const routedUtilizationPct = firstPresent(
@@ -1622,7 +1731,16 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthCellTypeSum = Object.values(synthCellTypes).reduce<number>((sum, value) => sum + (typeof value === "number" && Number.isFinite(value) ? value : 0), 0);
       const carryCount = metricValue(synthesisEstimate.carry_cells, synth.carry_cells, synthCellTypes.SB_CARRY);
       const totalMappedCells = metricValue(synthesisEstimate.total_mapped_cells, synth.total_mapped_cells, synth.fabric_mapped_cells, synthCellTypeSum || undefined);
-      const targetFrequencyMhz = firstNumber(timingSummary.target_frequency_mhz, timing.target_frequency_mhz, target.default_frequency_mhz);
+      const targetFrequencyMhz = firstNumber(
+        timingSummary.target_frequency_mhz,
+        timingClosure.target_frequency_mhz,
+        implementationLock.target_frequency_mhz,
+        timing.target_frequency_mhz,
+        constraints.target_frequency_mhz,
+        target.target_frequency_mhz,
+        target.default_frequency_mhz,
+      );
+      const boardInputFrequencyMhz = firstNumber(target.default_frequency_mhz);
       const pnrFrequencyMhz = firstNumber(routedResult.max_frequency_mhz, timing.max_frequency_mhz, pnr.max_frequency_mhz, pnr.fmax_mhz);
       const calculatedWnsNs = targetFrequencyMhz > 0 && pnrFrequencyMhz > 0
         ? Number(((1000 / targetFrequencyMhz) - (1000 / pnrFrequencyMhz)).toFixed(2))
@@ -1783,8 +1901,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Stat title="Board" value={boardDisplay} />
             <Stat title="Top Module" value={firstString(target.top_module, handoff.top_module, "not inferred")} />
-            <Stat title="Target Clock" value={targetFrequencyMhz ? `${formatNumber(targetFrequencyMhz)} MHz` : "not specified"} />
-            <Stat title="Achieved Clock" value={maxFrequency} />
+            <Stat title="Board Input Clock" value={boardInputFrequencyMhz ? `${formatNumber(boardInputFrequencyMhz)} MHz` : "not reported"} />
+            <Stat title="Implementation Target" value={targetFrequencyMhz ? `${formatNumber(targetFrequencyMhz)} MHz` : "not specified"} />
+            <Stat title="Achieved Fmax" value={maxFrequency} />
             <Stat title="Routed Utilization" value={typeof routedUtilizationPct === "number" ? `${formatNumber(routedUtilizationPct)}%` : metricValue(routedUtilizationPct)} />
             <Stat title="Timing" value={timingVerdict} />
             <Stat title="Verification" value={verificationStatus} />
@@ -1839,7 +1958,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
                 <Stat title="Yosys Carry Cells" value={carryCount} />
                 <Stat title="Yosys Total Cells" value={totalMappedCells} />
                 <Stat title="Routed Logic Cells" value={routedCellsDisplay} />
+                <Stat title="Routing Utilization" value={typeof routedUtilizationPct === "number" ? `${formatNumber(routedUtilizationPct)}%` : metricValue(routedUtilizationPct)} />
                 <Stat title="Routed LUT4 Cells" value={routedLut4Count} />
+                <Stat title="Simulation Total" value={verificationRuns || (verificationStatus === "not run" ? "not run" : 0)} />
+                <Stat title="Simulation Passed" value={verificationRuns > 0 ? verificationPassed : "not run"} />
+                <Stat title="Simulation Failed" value={verificationRuns > 0 ? verificationFailed : "not run"} />
                 <Stat title="WNS" value={wns} />
                 <Stat title="TNS" value={tns} />
                 <Stat title="Timing Violations" value={timingViolations} />

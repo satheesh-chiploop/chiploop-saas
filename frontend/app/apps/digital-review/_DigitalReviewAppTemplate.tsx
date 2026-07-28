@@ -22,19 +22,20 @@ type WorkflowRow = {
   updated_at?: string | null;
 };
 
-type FieldKind = "source" | "rtl" | "sdc" | "timing" | "frequency" | "stage" | "depth" | "notes" | "fpga" | "verify";
+type FieldKind = "source" | "rtl" | "sdc" | "timing" | "frequency" | "stage" | "depth" | "notes" | "fpga" | "verify" | "recommendation";
 
 type Props = {
   slug: string;
   title: string;
   subtitle: string;
   runPath: string;
-  dashboardStage: "rtl_review" | "constraint_review" | "timing_debug" | "fpga" | "verification";
+  dashboardStage: "rtl_review" | "constraint_review" | "timing_debug" | "fpga" | "fpga_target_explorer" | "verification";
   fields: FieldKind[];
   defaultSourceMode?: "from_arch2rtl" | "paste" | "repo_path" | "generate_arch2rtl";
   sourceModeLabel?: string;
   closureRunPath?: string;
-  fpgaMode?: "bitstream" | "fpga2rtl" | "verify" | "formal" | "synthesis" | "implementation";
+  fpgaMode?: "bitstream" | "fpga2rtl" | "verify" | "formal" | "synthesis" | "implementation" | "target-explorer";
+  referenceRtl?: { label: string; rtl: string; topModule: string; notes?: string };
 };
 
 function parseLogLines(logs: string | null | undefined): string[] {
@@ -42,7 +43,7 @@ function parseLogLines(logs: string | null | undefined): string[] {
   return logs.split("\n").map((line) => line.trimEnd()).filter(Boolean);
 }
 
-export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPath, dashboardStage, fields, defaultSourceMode, sourceModeLabel, closureRunPath, fpgaMode }: Props) {
+export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPath, dashboardStage, fields, defaultSourceMode, sourceModeLabel, closureRunPath, fpgaMode, referenceRtl }: Props) {
   const router = useRouter();
   const logsRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,7 +67,8 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [rtlText, setRtlText] = useState("");
   const [sdcText, setSdcText] = useState("");
   const [timingText, setTimingText] = useState("");
-  const [targetFrequency, setTargetFrequency] = useState("100");
+  const [targetFrequency, setTargetFrequency] = useState(fpgaMode === "target-explorer" ? "75" : "100");
+  const [recommendationProfile, setRecommendationProfile] = useState("best_overall");
   const [stage, setStage] = useState("auto");
   const [reviewDepth, setReviewDepth] = useState("standard");
   const [notes, setNotes] = useState("");
@@ -135,6 +137,12 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   useEffect(() => {
     if (loading || typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
+    if (params.get("reference") && referenceRtl) {
+      setSourceMode("paste");
+      setRtlText(referenceRtl.rtl);
+      setTopModule(referenceRtl.topModule);
+      if (referenceRtl.notes) setNotes(referenceRtl.notes);
+    }
     const source = params.get("from_workflow_id") || params.get("source_workflow_id") || "";
     if (source) {
       setSourceMode("from_arch2rtl");
@@ -175,7 +183,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     } finally {
       window.localStorage.removeItem(FPGA_BITSTREAM_PREFILL_KEY);
     }
-  }, [loading]);
+  }, [loading, referenceRtl]);
 
   useEffect(() => {
     if (!workflowId) return;
@@ -316,10 +324,11 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         constraints_sdc: sdcText.trim() || undefined,
         timing_report_text: timingText.trim() || undefined,
         target_frequency_mhz: targetFrequency ? Number(targetFrequency) : undefined,
+        recommendation_profile: fields.includes("recommendation") ? recommendationProfile : undefined,
         stage,
         review_depth: reviewDepth,
         board: fields.includes("fpga") ? board : undefined,
-        top_module: fields.includes("fpga") && topModule.trim() ? topModule.trim() : undefined,
+        top_module: (fields.includes("fpga") || fpgaMode === "target-explorer") && topModule.trim() ? topModule.trim() : undefined,
         pcf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
         notes: notes.trim() || undefined,
         run_fpga_rtl_repair_loop: fields.includes("fpga") ? true : undefined,
@@ -407,6 +416,15 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
           <div className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">{fields.includes("fpga") || fpgaMode ? "FPGA Loop" : "Digital Loop"}</div>
           <h1 className="mt-2 text-3xl font-black text-white md:text-4xl">{title}</h1>
           <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">{subtitle}</p>
+          {referenceRtl ? (
+            <button
+              type="button"
+              onClick={() => { setSourceMode("paste"); setRtlText(referenceRtl.rtl); setTopModule(referenceRtl.topModule); if (referenceRtl.notes) setNotes(referenceRtl.notes); }}
+              className="mt-4 rounded-xl border border-violet-400/50 bg-violet-500/10 px-4 py-2 text-sm font-semibold text-violet-100 hover:border-violet-300"
+            >
+              {referenceRtl.label}
+            </button>
+          ) : null}
 
           <div className="mt-6 space-y-5">
             <div className="space-y-4">
@@ -518,6 +536,18 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                     <input value={targetFrequency} onChange={(e) => setTargetFrequency(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white" />
                   </label>
                 ) : null}
+                {fields.includes("recommendation") ? (
+                  <label className="block">
+                    <span className="text-sm text-slate-300">Primary recommendation</span>
+                    <select value={recommendationProfile} onChange={(e) => setRecommendationProfile(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white">
+                      <option value="best_overall">Best overall</option>
+                      <option value="best_performance">Best performance</option>
+                      <option value="best_low_cost">Best low-cost variant</option>
+                      <option value="best_for_growth">Best for growth</option>
+                    </select>
+                    <span className="mt-1 block text-xs text-slate-500">All four recommendations are still generated and selectable after the run.</span>
+                  </label>
+                ) : null}
                 {fields.includes("stage") ? (
                   <label className="block">
                     <span className="text-sm text-slate-300">Stage</span>
@@ -599,13 +629,22 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
 
               {fields.includes("verify") ? (
                 <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/10 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="text-sm font-bold text-cyan-200">{fpgaMode === "formal" ? "FPGA formal verification" : "FPGA verification"}</div>
-                    {fields.includes("fpga") ? (
-                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-200">
-                        <input type="checkbox" checked={runFpgaVerification} onChange={(e) => setRunFpgaVerification(e.target.checked)} />
-                        Run before synthesis
-                      </label>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-bold text-cyan-200">{fpgaMode === "formal" ? "FPGA formal verification" : "FPGA verification"}</div>
+                      {fpgaMode !== "formal" ? <div className="mt-1 text-xs text-slate-400">Run simulation and coverage before implementation; optionally iterate on failures and coverage gaps.</div> : null}
+                    </div>
+                    {fpgaMode !== "formal" ? (
+                      <div className="flex flex-wrap items-center gap-4 rounded-xl border border-slate-800 bg-black/25 px-3 py-2">
+                        <label className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+                          <input type="checkbox" checked={runFpgaVerification} onChange={(e) => setRunFpgaVerification(e.target.checked)} />
+                          Enable verification
+                        </label>
+                        <label className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+                          <input type="checkbox" checked={runVerificationClosureLoop} onChange={(e) => setRunVerificationClosureLoop(e.target.checked)} disabled={!runFpgaVerification} className="disabled:opacity-50" />
+                          Enable verification closure
+                        </label>
+                      </div>
                     ) : null}
                   </div>
                   {fpgaMode !== "formal" ? (
@@ -658,7 +697,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                           <input value={seedCount} onChange={(e) => setSeedCount(e.target.value)} disabled={fields.includes("fpga") && !runFpgaVerification} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50" />
                         </label>
                         <label className="block">
-                          <span className="text-xs uppercase tracking-wide text-slate-400">Closure tries</span>
+                          <span className="text-xs uppercase tracking-wide text-slate-400">Verification closure tries</span>
                           <input value={maxVerificationClosureIterations} onChange={(e) => setMaxVerificationClosureIterations(e.target.value)} disabled={!runFpgaVerification || !runVerificationClosureLoop} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-white disabled:opacity-50" />
                         </label>
                       </div>
@@ -714,7 +753,6 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                   <div className="mt-3 grid gap-3 md:grid-cols-4">
                     {fpgaMode !== "formal" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableGoldenModel} onChange={(e) => setEnableGoldenModel(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Golden model</label> : null}
                     {fpgaMode !== "formal" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={enableFailureDebug} onChange={(e) => setEnableFailureDebug(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Failure debug</label> : null}
-                    {fpgaMode !== "formal" ? <label className="flex items-center gap-2 text-sm text-slate-300"><input type="checkbox" checked={runVerificationClosureLoop} onChange={(e) => setRunVerificationClosureLoop(e.target.checked)} disabled={fields.includes("fpga") && !runFpgaVerification} /> Closure loop</label> : null}
                   </div>
                 </div>
               ) : null}
@@ -743,6 +781,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                 <div className="min-w-0">
                   <div className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">Workflow ID</div>
                   <div className="mt-2 break-all font-mono text-sm text-slate-100 sm:text-base">{workflowId || "Created after you start the run"}</div>
+                  {runId ? <div className="mt-2 break-all font-mono text-xs text-slate-500">Run ID: {runId}</div> : null}
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   {workflowId ? (

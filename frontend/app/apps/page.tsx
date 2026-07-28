@@ -327,6 +327,15 @@ export default function AppsHomePage() {
       promise: "Catch issues before tape-in",
     },
     {
+      slug: "fpga-target-explorer",
+      title: "FPGA Target Explorer",
+      subtitle: "Sweep one RTL design across supported FPGA targets and choose the right board",
+      loop_type: "fpga",
+      status: "New",
+      nudge: "Board selection",
+      promise: "Compare timing, utilization, headroom, and four purchase-oriented recommendations",
+    },
+    {
       slug: "fpga-bitstream",
       title: "FPGA RTL to Bitstream",
       subtitle: "Run FPGA verification, synthesis, place-and-route, timing, and bitstream handoff",
@@ -1138,6 +1147,16 @@ export default function AppsHomePage() {
       copy: "A safety reference journey with watchdog timeout, heartbeat service, fault masks, escalation policy, reset request, firmware diagnostics, validation, and dashboard.",
       button: "Start Safety Journey",
       onClick: startSafetyFaultDemo,
+    },
+    {
+      key: "minirv-fpga-target-explorer",
+      exploreTitle: "Explore MiniRV FPGA Targets",
+      segment: "FPGA / Board Selection",
+      title: "MiniRV Edge Controller: choose the right FPGA before prototyping",
+      copy: "Compare a substantial 32-bit edge controller with a dual-read register bank, ALU, multiplier, UART, timer, interrupts, and four PWM channels across supported iCE40 and ECP5 targets at 75 MHz.",
+      button: "Start MiniRV Target Explorer",
+      onClick: () => router.push("/apps/fpga-target-explorer?reference=minirv"),
+      stages: ["Fixed RTL", "Family Synthesis", "Board P&R Sweep", "Miss-only Closure", "Comparison", "Continue to FPGA Prototyping"],
     },
     {
       key: "fpga-prototype",
