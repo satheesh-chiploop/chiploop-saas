@@ -488,11 +488,11 @@ function Stat({ title, value }: { title: string; value: string | number }) {
   );
 }
 
-function ToolStrip({ used, defaultTool }: { used: string[]; defaultTool: string }) {
+function ToolStrip({ used, defaultTool, label = "Tools Used" }: { used: string[]; defaultTool: string; label?: string }) {
   return (
     <div className="rounded-lg border border-slate-800 bg-black/30 p-3">
       <div className="min-w-0">
-        <div className="text-xs text-slate-400">Tools Used</div>
+        <div className="text-xs text-slate-400">{label}</div>
         <div className="mt-1 break-words text-base font-semibold leading-snug text-slate-100">{defaultTool}</div>
         <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
           {used.map((tool) => (
@@ -1511,7 +1511,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       );
       return (
         <div className="mt-5 space-y-5">
-          <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
+          <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} label="Toolchain (planned and detected)" />
           <div className="grid gap-3 sm:grid-cols-1">
             <Bar label="RTL files imported" value={rtlFiles} total={Math.max(rtlFiles, 1)} color="bg-cyan-500" />
           </div>
@@ -1696,12 +1696,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ...array(synthToolEffort.effective_options),
         ...array(pnrToolEffort.effective_args),
       ].map(String);
-      const yosysLut4Numeric = firstNumber(synthesisEstimate.lut4_cells, utilization.lut4_cells, synth.lut4_cells, synthCellTypes.SB_LUT4);
-      const yosysFfNumeric = firstNumber(synthesisEstimate.flip_flops, utilization.flip_flops, synth.flip_flops);
+      const finiteNumber = (...values: unknown[]): number | undefined => values.find((value): value is number => typeof value === "number" && Number.isFinite(value));
+      const yosysLut4Numeric = finiteNumber(synthesisEstimate.lut4_cells, utilization.lut4_cells, synth.lut4_cells, synthCellTypes.SB_LUT4);
+      const yosysFfNumeric = finiteNumber(synthesisEstimate.flip_flops, utilization.flip_flops, synth.flip_flops);
       const synthCellsUsed = typeof yosysLut4Numeric === "number" && typeof yosysFfNumeric === "number"
         ? yosysLut4Numeric + yosysFfNumeric
         : firstNumber(synthesisEstimate.logical_cells_used, synth.logical_cells_used);
-      const synthCellsAvailable = firstNumber(synthesisEstimate.logical_cells_available, synth.logical_cells_available, record(target.resources).logic_cells);
+      const synthCellsAvailable = finiteNumber(synthesisEstimate.logical_cells_available, synth.logical_cells_available, record(target.resources).logic_cells);
       const synthUtilizationPct = typeof synthCellsUsed === "number" && typeof synthCellsAvailable === "number" && synthCellsAvailable > 0
         ? Number(((synthCellsUsed / synthCellsAvailable) * 100).toFixed(3))
         : firstPresent(synthesisEstimate.logic_utilization_percent, synth.logic_utilization_percent);
@@ -1777,7 +1778,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ].filter(Boolean),
         defaultTool: family === "ecp5"
           ? "Yosys + nextpnr-ecp5 + ecppack"
-          : "Yosys + nextpnr-ice40 + IceStorm",
+          : family === "nexus"
+            ? "Yosys + nextpnr-nexus + prjoxide"
+            : family === "gowin"
+              ? "Yosys + nextpnr-himbaechel + gowin_pack"
+              : "Yosys + nextpnr-ice40 + IceStorm",
       };
       const maxFrequency = metricWithUnit(
         "MHz",
@@ -1820,6 +1825,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         timing.timing_violation_count,
         pnr.timing_violation_count,
       );
+      const synthesisBlocked = firstString(synth.status) === "failed" || (firstString(pnr.status) === "blocked" && firstString(pnr.error).toLowerCase().includes("yosys json"));
       const implementationUnavailable = firstString(pnr.failure_kind) === "tool_unavailable"
         || firstString(record(pnr.command).status) === "tool_unavailable"
         || ["implementation_unavailable", "tool_unavailable"].includes(firstString(timingClosure.status, implementationLock.status));
@@ -1843,7 +1849,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const closureStatusText = firstString(timingClosure.status, implementationLock.status).toLowerCase();
       const closureFailed = closureHasEvidence && (
         timingClosure.closure_complete === false
-        || ["failed", "repair_recommended", "timing_failed", "implementation_unavailable", "tool_unavailable"].includes(closureStatusText)
+        || ["failed", "repair_recommended", "timing_failed", "implementation_unavailable", "tool_unavailable", "upstream_failed"].includes(closureStatusText)
       );
       const closureSeedRaw = firstPresent(implementationLock.selected_seed, timingClosure.selected_seed);
       const closureSeed = typeof closureSeedRaw === "number" || typeof closureSeedRaw === "string" ? closureSeedRaw : undefined;
@@ -1854,9 +1860,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const closureRecommendation = firstNumber(timingClosure.recommended_achievable_frequency_mhz);
       const beforeRepairFrequency = firstNumber(timingRtlRepair.before_max_frequency_mhz);
       const afterRepairFrequency = firstNumber(timingRtlRepair.after_max_frequency_mhz);
-      const closureAttempts = timingHistory.length || (closureHasEvidence ? firstNumber(timingClosure.iteration) + 1 : 0);
+      const closureAttempts = synthesisBlocked ? 0 : timingHistory.length || (closureHasEvidence ? firstNumber(timingClosure.iteration) + 1 : 0);
       const timingMetSignal = firstPresent(timingSummary.timing_met, routedResult.timing_met, timing.timing_met, pnr.timing_met);
-      const timingVerdict = implementationUnavailable
+      const timingVerdict = synthesisBlocked
+        ? "blocked by synthesis"
+        : implementationUnavailable
         ? "implementation unavailable"
         : timingMetSignal === true || timingIsClean
           ? "pass"
@@ -1888,19 +1896,20 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const rtlQualityStatus = firstString(rtlQuality.status) || (Object.keys(rtlQuality).length ? "recorded" : "not recorded");
       const rtlQualityPass1Status = firstString(rtlQualityPass1.status) || "not recorded";
       const rtlQualityPass2Status = firstString(rtlQualityPass2.status) || "not recorded";
+      const verificationDisabled = firstString(verifySummary.status, verifySimulation.status, verifyCoverage.status) === "disabled" || /verification.*(?:disabled|skipped)|(?:disabled|skipped).*verification/i.test(fpgaLogs);
       const verificationRuns = firstNumber(verifySimulation.total);
       const verificationPassed = firstNumber(verifySimulation.pass);
       const verificationFailed = firstNumber(verifySimulation.fail);
-      const verificationStatus = verificationRuns > 0 ? (verificationFailed > 0 ? "fail" : "pass") : "not run";
-      const verificationDetail = verificationRuns > 0 ? `${verificationPassed}/${verificationRuns} simulations passed` : "simulation summary not reported";
-      const functionalCoverage = pct(firstPresent(verifyCoverage.functional_coverage_pct, record(verifyCoverage.functional).coverage_pct));
-      const codeLineCoverage = pctWithStatus(verifyCodeCoverage.line_coverage_pct, verifyCodeCoverage.status);
-      const codeBranchCoverage = pctWithStatus(verifyCodeCoverage.branch_coverage_pct, verifyCodeCoverage.status);
+      const verificationStatus = verificationDisabled ? "disabled by user" : verificationRuns > 0 ? (verificationFailed > 0 ? "fail" : "pass") : "not run";
+      const verificationDetail = verificationDisabled ? "User disabled verification for this run." : verificationRuns > 0 ? `${verificationPassed}/${verificationRuns} simulations passed` : "simulation summary not reported";
+      const functionalCoverage = verificationDisabled ? "disabled" : pct(firstPresent(verifyCoverage.functional_coverage_pct, record(verifyCoverage.functional).coverage_pct));
+      const codeLineCoverage = verificationDisabled ? "disabled" : pctWithStatus(verifyCodeCoverage.line_coverage_pct, verifyCodeCoverage.status);
+      const codeBranchCoverage = verificationDisabled ? "disabled" : pctWithStatus(verifyCodeCoverage.branch_coverage_pct, verifyCodeCoverage.status);
       const dashboardAgentCount = typeof dashboard.agent_count === "number" ? dashboard.agent_count : 0;
       const participatingAgentCount = array(dashboard.participating_agents).length;
       const fpgaAgentCount = Math.max(dashboardAgentCount, participatingAgentCount, agentCount || 0);
-      const codeToggleCoverage = pctWithStatus(verifyCodeCoverage.toggle_coverage_pct, verifyCodeCoverage.toggle_source || verifyCodeCoverage.status);
-      const formalStatus = statusLabel(firstString(verifyFormal.status, "not_enabled"));
+      const codeToggleCoverage = verificationDisabled ? "disabled" : pctWithStatus(verifyCodeCoverage.toggle_coverage_pct, verifyCodeCoverage.toggle_source || verifyCodeCoverage.status);
+      const formalStatus = verificationDisabled ? "disabled" : statusLabel(firstString(verifyFormal.status, "not_enabled"));
       const lintToolsDetail = lintToolNames.length ? lintToolNames.join(" + ") : "lint tools not reported";
       const timingDetail = fileLabel(timing.report, timing.report_path, record(timing.icetime).log)
         || firstString(timing.error)
@@ -1930,11 +1939,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               </div>
             </summary>
             <div className="mt-4 grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-2 xl:grid-cols-4">
-              <Stat title="Winning Seed" value={closureSeed ?? (implementationLock.status === "locked" ? "default (locked)" : "not locked")} />
+              <Stat title="Winning Seed" value={synthesisBlocked ? "not attempted" : closureSeed ?? (implementationLock.status === "locked" ? "default (locked)" : "not locked")} />
               <Stat title="Strategy" value={closureStrategy} />
               <Stat title="Tool Effort" value={toolEffortMode} />
               <Stat title="Attempts" value={closureAttempts || "not run"} />
-              <Stat title="Configuration Lock" value={firstString(implementationLock.status, "not locked")} />
+              <Stat title="Configuration Lock" value={synthesisBlocked ? "not available" : firstString(implementationLock.status, "not locked")} />
               <Stat title="RTL Repair" value={closureRepairUsed ? "used and accepted" : timingRtlRepair.attempted ? "attempted, not used" : "not used"} />
               <Stat title="Before Repair" value={beforeRepairFrequency ? `${formatNumber(beforeRepairFrequency)} MHz` : "n/a"} />
               <Stat title="After Repair" value={afterRepairFrequency ? `${formatNumber(afterRepairFrequency)} MHz` : "n/a"} />
@@ -1946,12 +1955,16 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           <details className="rounded-2xl border border-slate-800 bg-slate-950/35 px-4 py-3">
             <summary className="cursor-pointer text-sm font-semibold text-slate-200">Implementation metrics <span className="ml-2 text-xs font-normal text-slate-500">Synthesis, routing, timing, coverage, and tools</span></summary>
             <div className="mt-4 space-y-4 border-t border-slate-800 pt-4">
-              <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} />
-              <div className="grid gap-3 lg:grid-cols-3">
-                <Bar label="Yosys logic cells" value={synthCellsUsed} total={Math.max(synthCellsAvailable || synthCellsUsed || 1, 1)} color="bg-cyan-500" />
-                <Bar label="Yosys flip-flops" value={typeof ffCount === "number" ? ffCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-violet-500" />
-                <Bar label="Yosys comb / LUT cells" value={typeof comboCount === "number" ? comboCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-emerald-500" />
-              </div>
+              <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} label="Toolchain (planned and detected)" />
+              {firstString(synth.status) === "completed" ? (
+                <div className="grid gap-3 lg:grid-cols-3">
+                  <Bar label="Yosys logic cells" value={synthCellsUsed} total={Math.max(synthCellsAvailable || synthCellsUsed || 1, 1)} color="bg-cyan-500" />
+                  <Bar label="Yosys flip-flops" value={typeof ffCount === "number" ? ffCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-violet-500" />
+                  <Bar label="Yosys comb / LUT cells" value={typeof comboCount === "number" ? comboCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-emerald-500" />
+                </div>
+              ) : (
+                <div className="rounded-lg border border-rose-500/25 bg-rose-500/5 px-3 py-2 text-sm text-rose-200">Synthesis metrics unavailable because Yosys did not produce a netlist.</div>
+              )}
               <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <Stat title="Family" value={firstString(target.family, "ice40")} />
                 <Stat title="Device" value={firstString(target.device, "not selected")} />
@@ -1960,7 +1973,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
                 <Stat title="RTL Quality" value={statusLabel(rtlQualityStatus)} />
                 <Stat title="Lint Pass1" value={statusLabel(rtlQualityPass1Status)} />
                 <Stat title="Lint Pass2" value={statusLabel(rtlQualityPass2Status)} />
-                <Stat title="Yosys Logic Cells" value={synthCellsAvailable ? `${formatNumber(synthCellsUsed)} / ${formatNumber(synthCellsAvailable)}` : metricValue(synthCellsUsed)} />
+                <Stat title="Yosys Logic Cells" value={typeof synthCellsUsed === "number" && synthCellsAvailable ? `${formatNumber(synthCellsUsed)} / ${formatNumber(synthCellsAvailable)}` : metricValue(synthCellsUsed)} />
                 <Stat title="Yosys Utilization" value={typeof synthUtilizationPct === "number" ? `${formatNumber(synthUtilizationPct)}%` : metricValue(synthUtilizationPct)} />
                 <Stat title="Yosys Flip-Flops" value={ffCount} />
                 <Stat title="Yosys LUT4 Cells" value={lut4Count} />
@@ -1969,9 +1982,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
                 <Stat title="Routed Logic Cells" value={routedCellsDisplay} />
                 <Stat title="Routing Utilization" value={typeof routedUtilizationPct === "number" ? `${formatNumber(routedUtilizationPct)}%` : metricValue(routedUtilizationPct)} />
                 <Stat title="Routed LUT4 Cells" value={routedLut4Count} />
-                <Stat title="Simulation Total" value={verificationRuns || (verificationStatus === "not run" ? "not run" : 0)} />
-                <Stat title="Simulation Passed" value={verificationRuns > 0 ? verificationPassed : "not run"} />
-                <Stat title="Simulation Failed" value={verificationRuns > 0 ? verificationFailed : "not run"} />
+                <Stat title="Simulation Total" value={verificationDisabled ? "disabled" : verificationRuns || "not run"} />
+                <Stat title="Simulation Passed" value={verificationDisabled ? "disabled" : verificationRuns > 0 ? verificationPassed : "not run"} />
+                <Stat title="Simulation Failed" value={verificationDisabled ? "disabled" : verificationRuns > 0 ? verificationFailed : "not run"} />
                 <Stat title="WNS" value={wns} />
                 <Stat title="TNS" value={tns} />
                 <Stat title="Timing Violations" value={timingViolations} />
