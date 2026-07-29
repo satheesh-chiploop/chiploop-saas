@@ -1565,6 +1565,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const explorer = record(ev("fpga_target_explorer.json", "fpga/target_explorer/fpga_target_explorer.json"));
       const results = array(explorer.results).map(record);
       const recommendations = record(explorer.recommendations);
+      const recommendationDetails = record(explorer.recommendation_details);
+      const continuation = record(explorer.continuation);
       const targetMhz = firstNumber(explorer.target_frequency_mhz);
       const maxFmax = Math.max(...results.map((item) => firstNumber(item.best_frequency_mhz) || 0), targetMhz || 1);
       const recommendationItems = [
@@ -1574,14 +1576,28 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ["Best for Growth", recommendations.best_for_growth, "Largest remaining logic capacity after implementation."],
       ];
       const resultFor = (board: unknown) => results.find((item) => firstString(item.board) === firstString(board));
-      const continueToPrototype = (board: string) => {
+      const continueToPrototype = (board: string, result: JsonMap) => {
         if (typeof window === "undefined") return;
+        const winningRun = record(result.winning_run);
+        const synthesisRuns = array(result.synthesis_runs).map(record);
+        const winningSynthesis = synthesisRuns.find((run) => firstString(run.netlist) === firstString(winningRun.netlist));
+        const winningConfiguration = {
+          seed: firstPresent(winningRun.seed, result.winning_seed),
+          synthesisStrategy: firstString(winningRun.synthesis_strategy, winningSynthesis?.strategy, "baseline"),
+          toolEffort: firstString(winningRun.effort, "balanced"),
+          achievedFrequencyMhz: firstNumber(result.best_frequency_mhz),
+          timingMarginPercent: firstNumber(result.timing_margin_percent),
+        };
         window.localStorage.setItem("chiploop_fpga_bitstream_prefill", JSON.stringify({
           rtlSourceMode: "from_arch2rtl",
           sourceWorkflowId: workflowId,
+          explorerSourceWorkflowId: workflowId,
+          explorerWinningConfiguration: winningConfiguration,
+          fpgaClosureMode: winningConfiguration.toolEffort === "advanced" ? "advanced" : "balanced",
           board,
+          topModule: firstString(continuation.top_module, explorer.top_module),
           targetFrequency: String(targetMhz || 75),
-          notes: `Selected by FPGA Target Explorer workflow ${workflowId}.`,
+          notes: `Started from FPGA Target Explorer workflow ${workflowId}. Winning seed ${String(winningConfiguration.seed ?? "not required")}; Explorer Fmax ${formatNumber(winningConfiguration.achievedFrequencyMhz)} MHz. FPGA Prototyping will rerun verification and implementation.`,
         }));
         window.location.href = "/apps/fpga-bitstream";
       };
@@ -1598,13 +1614,16 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {recommendationItems.map(([label, board, description]) => {
               const result = resultFor(board);
               const boardKey = firstString(board);
+              const detailKey = firstString(label).toLowerCase().replaceAll(" ", "_").replace("low-cost_variant", "low_cost");
+              const detail = record(recommendationDetails[detailKey]);
               return (
                 <div key={String(label)} className="rounded-2xl border border-cyan-500/25 bg-slate-950/45 p-4">
                   <div className="text-xs font-semibold uppercase tracking-wide text-cyan-300">{String(label)}</div>
                   <div className="mt-2 text-lg font-bold text-white">{firstString(result?.label, boardKey, "Unavailable")}</div>
-                  <div className="mt-1 text-sm text-slate-300">{result ? `${formatNumber(firstNumber(result.best_frequency_mhz))} MHz best | ${formatNumber(firstNumber(result.resource_headroom_percent))}% headroom` : "No viable target"}</div>
-                  <div className="mt-2 text-xs leading-5 text-slate-500">{String(description)}</div>
-                  {boardKey ? <button type="button" onClick={() => continueToPrototype(boardKey)} className="mt-3 w-full rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-sm font-semibold text-cyan-100 hover:border-cyan-300">Continue with this board</button> : null}
+                  <div className="mt-1 text-sm text-slate-300">{result ? `${formatNumber(firstNumber(result.best_frequency_mhz))} MHz | ${firstNumber(result.timing_margin_percent) >= 0 ? "+" : ""}${formatNumber(firstNumber(result.timing_margin_percent))}% timing margin | ${formatNumber(firstNumber(result.resource_headroom_percent))}% headroom` : "No viable target"}</div>
+                  <div className="mt-2 text-xs leading-5 text-slate-400">{firstString(detail.why, description)}</div>
+                  {result ? <div className="mt-2 text-[11px] text-slate-500">Toolchain {firstString(result.toolchain_confidence, "qualified")} · board pins verified during FPGA Prototyping</div> : null}
+                  {boardKey ? <button type="button" onClick={() => continueToPrototype(boardKey, result || {})} className="mt-3 w-full rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-sm font-semibold text-cyan-100 hover:border-cyan-300">Continue with this board</button> : null}
                 </div>
               );
             })}
@@ -1802,7 +1821,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const pnrDoneFromLogs = /FPGA\s+(?:nextpnr|place\s*&?\s*route).*done|fpga_place_route_summary\.json/i.test(fpgaLogs);
       const bitstreamDoneFromLogs = /FPGA\s+Bitstream.*done|fpga_bitstream_summary\.json/i.test(fpgaLogs);
       const bitstreamFileName = bitstreamPath !== "not generated" ? bitstreamPath : "generated bitstream";
-      const programCommand = firstString(bitstream.programming_command, bitstream.program_command)
+      const hardwareLaunch = record(bitstream.hardware_launch);
+      const exactProgrammingCommand = firstString(hardwareLaunch.programming_command, bitstream.programming_command, bitstream.program_command);
+      const programCommand = exactProgrammingCommand
         ? `Download ${bitstreamFileName} and program the board locally.`
         : (bitstreamDoneFromLogs ? "Download the bitstream and program the board locally." : "available after bitstream generation");
       const programmingReady = bitstreamArtifactProduced || Boolean(firstString(bitstream.programming_command, bitstream.program_command));
@@ -1961,7 +1982,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <ToolStrip used={toolSummary.used} defaultTool={toolSummary.defaultTool} label="Toolchain (planned and detected)" />
               {firstString(synth.status) === "completed" ? (
                 <div className="grid gap-3 lg:grid-cols-3">
-                  <Bar label="Yosys logic cells" value={synthCellsUsed} total={Math.max(synthCellsAvailable || synthCellsUsed || 1, 1)} color="bg-cyan-500" />
+                  <Bar label="Yosys logic cells" value={synthCellsUsed || 0} total={Math.max(synthCellsAvailable || synthCellsUsed || 1, 1)} color="bg-cyan-500" />
                   <Bar label="Yosys flip-flops" value={typeof ffCount === "number" ? ffCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-violet-500" />
                   <Bar label="Yosys comb / LUT cells" value={typeof comboCount === "number" ? comboCount : 0} total={Math.max(synthCellsUsed || 1, 1)} color="bg-emerald-500" />
                 </div>
@@ -2000,6 +2021,17 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             </div>
           </details>
 
+          {programmingReady ? (
+            <section className="rounded-2xl border border-emerald-500/35 bg-emerald-950/10 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div><div className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">Ready for hardware test</div><h3 className="mt-1 text-lg font-bold text-white">{firstString(hardwareLaunch.board_label, target.label, "Your FPGA design")}</h3><p className="mt-1 text-sm text-slate-300">{firstString(hardwareLaunch.expected_behavior, "Program the board and confirm the expected design behavior.")}</p></div>
+                <button type="button" onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/workflow/${workflowId}/download_zip?full=1`, "_blank")} className="rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-sm font-semibold text-emerald-100 hover:border-emerald-300">Download run ZIP</button>
+              </div>
+              {exactProgrammingCommand ? <div className="mt-4 flex flex-col gap-2 rounded-xl border border-slate-700 bg-black/35 p-3 sm:flex-row sm:items-center sm:justify-between"><code className="break-all text-xs text-cyan-100">{exactProgrammingCommand}</code><button type="button" onClick={() => navigator.clipboard?.writeText(exactProgrammingCommand)} className="shrink-0 rounded-lg border border-cyan-500/40 px-3 py-1.5 text-xs font-semibold text-cyan-100">Copy command</button></div> : null}
+              <ol className="mt-4 grid gap-2 text-xs leading-5 text-slate-300 sm:grid-cols-2">{array(hardwareLaunch.connection_steps).map((step, index) => <li key={`${index}-${String(step)}`} className="rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2"><span className="mr-2 font-bold text-emerald-300">{index + 1}.</span>{String(step)}</li>)}</ol>
+              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-slate-500"><span>Artifact: {firstString(hardwareLaunch.bitstream_filename, bitstreamPath)}</span>{firstString(hardwareLaunch.bitstream_sha256) ? <span>SHA-256: {firstString(hardwareLaunch.bitstream_sha256).slice(0, 16)}…</span> : null}<span>Hardware status: awaiting confirmation</span></div>
+            </section>
+          ) : null}
           <details className="rounded-2xl border border-slate-800 bg-slate-950/35 px-4 py-3">
             <summary className="cursor-pointer text-sm font-semibold text-slate-200">Workflow evidence <span className="ml-2 text-xs font-normal text-slate-500">Checks, artifacts, programming, and run metadata</span></summary>
             <div className="mt-4 grid min-w-0 grid-cols-1 gap-3 border-t border-slate-800 pt-4 sm:grid-cols-2 xl:grid-cols-4">

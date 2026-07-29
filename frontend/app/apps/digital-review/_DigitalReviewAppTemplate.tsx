@@ -76,6 +76,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [candidateBoards, setCandidateBoards] = useState<string[]>(defaultExplorerBoards.map((item) => item.key));
   const [explorerBaselineSeedCount, setExplorerBaselineSeedCount] = useState("1");
   const [explorerClosureSeedCount, setExplorerClosureSeedCount] = useState("1");
+  const [explorerHandoff, setExplorerHandoff] = useState<Record<string, any> | null>(null);
   const [stage, setStage] = useState("auto");
   const [reviewDepth, setReviewDepth] = useState("standard");
   const [notes, setNotes] = useState("");
@@ -172,6 +173,9 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         notes: string;
         hemEnabled: boolean;
         hemMode: "fixed" | "adaptive";
+        explorerSourceWorkflowId: string;
+        explorerWinningConfiguration: Record<string, any>;
+        fpgaClosureMode: "balanced" | "advanced";
       }>;
       if (prefill.rtlSourceMode) setSourceMode(prefill.rtlSourceMode);
       if (prefill.sourceWorkflowId) setSourceWorkflowId(prefill.sourceWorkflowId);
@@ -183,6 +187,11 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
       if (prefill.targetFrequency) setTargetFrequency(prefill.targetFrequency);
       if (prefill.pcfText) setPcfText(prefill.pcfText);
       if (prefill.notes) setNotes(prefill.notes);
+      if (prefill.fpgaClosureMode) setFpgaClosureMode(prefill.fpgaClosureMode);
+      if (prefill.explorerSourceWorkflowId || prefill.explorerWinningConfiguration) setExplorerHandoff({
+        sourceWorkflowId: prefill.explorerSourceWorkflowId,
+        winningConfiguration: prefill.explorerWinningConfiguration,
+      });
       if (typeof prefill.hemEnabled === "boolean") setHemEnabled(prefill.hemEnabled);
       if (prefill.hemMode) setHemMode(prefill.hemMode);
     } catch {
@@ -336,6 +345,10 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         candidate_boards: fpgaMode === "target-explorer" ? candidateBoards : undefined,
         baseline_seed_count: fpgaMode === "target-explorer" ? Number(explorerBaselineSeedCount || 1) : undefined,
         closure_seed_count: fpgaMode === "target-explorer" ? Number(explorerClosureSeedCount || 1) : undefined,
+        parent_workflow_id: explorerHandoff?.sourceWorkflowId || undefined,
+        explorer_source_workflow_id: explorerHandoff?.sourceWorkflowId || undefined,
+        explorer_winning_configuration: explorerHandoff?.winningConfiguration || undefined,
+        fpga_nextpnr_seed: explorerHandoff?.winningConfiguration?.seed || undefined,
         stage,
         review_depth: reviewDepth,
         board: fields.includes("fpga") ? board : undefined,
