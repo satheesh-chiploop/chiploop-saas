@@ -1705,8 +1705,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthUtilizationPct = typeof synthCellsUsed === "number" && typeof synthCellsAvailable === "number" && synthCellsAvailable > 0
         ? Number(((synthCellsUsed / synthCellsAvailable) * 100).toFixed(3))
         : firstPresent(synthesisEstimate.logic_utilization_percent, synth.logic_utilization_percent);
-      const routedLut4Numeric = firstNumber(routedResult.routed_lut4_cells, pnr.routed_lut4_cells);
-      const routedFfNumeric = firstNumber(routedResult.routed_flip_flops, pnr.routed_flip_flops);
+      const routedLut4Raw = firstPresent(routedResult.routed_lut4_cells, pnr.routed_lut4_cells);
+      const routedFfRaw = firstPresent(routedResult.routed_flip_flops, pnr.routed_flip_flops);
+      const routedLut4Numeric = typeof routedLut4Raw === "number" && Number.isFinite(routedLut4Raw) ? routedLut4Raw : undefined;
+      const routedFfNumeric = typeof routedFfRaw === "number" && Number.isFinite(routedFfRaw) ? routedFfRaw : undefined;
       const routedCellsUsedRaw = firstPresent(
         routedResult.logical_cells_used,
         pnr.logical_cells_used,
@@ -1738,7 +1740,6 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         timing.target_frequency_mhz,
         constraints.target_frequency_mhz,
         target.target_frequency_mhz,
-        target.default_frequency_mhz,
       );
       const boardInputFrequencyMhz = firstNumber(target.default_frequency_mhz);
       const pnrFrequencyMhz = firstNumber(routedResult.max_frequency_mhz, timing.max_frequency_mhz, pnr.max_frequency_mhz, pnr.fmax_mhz);
@@ -1819,6 +1820,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         timing.timing_violation_count,
         pnr.timing_violation_count,
       );
+      const implementationUnavailable = firstString(pnr.failure_kind) === "tool_unavailable"
+        || firstString(record(pnr.command).status) === "tool_unavailable"
+        || ["implementation_unavailable", "tool_unavailable"].includes(firstString(timingClosure.status, implementationLock.status));
       const timingStatus = firstString(timing.status) || (timingEvidenceSignal !== undefined ? "completed" : "");
       const bitstreamStatus = bitstreamArtifactProduced
         ? firstString(bitstream.status, "completed")
@@ -1839,7 +1843,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const closureStatusText = firstString(timingClosure.status, implementationLock.status).toLowerCase();
       const closureFailed = closureHasEvidence && (
         timingClosure.closure_complete === false
-        || ["failed", "repair_recommended", "timing_failed"].includes(closureStatusText)
+        || ["failed", "repair_recommended", "timing_failed", "implementation_unavailable", "tool_unavailable"].includes(closureStatusText)
       );
       const closureSeedRaw = firstPresent(implementationLock.selected_seed, timingClosure.selected_seed);
       const closureSeed = typeof closureSeedRaw === "number" || typeof closureSeedRaw === "string" ? closureSeedRaw : undefined;
@@ -1852,8 +1856,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const afterRepairFrequency = firstNumber(timingRtlRepair.after_max_frequency_mhz);
       const closureAttempts = timingHistory.length || (closureHasEvidence ? firstNumber(timingClosure.iteration) + 1 : 0);
       const timingMetSignal = firstPresent(timingSummary.timing_met, routedResult.timing_met, timing.timing_met, pnr.timing_met);
-      const timingVerdict = timingMetSignal === true || timingIsClean
-        ? "pass"
+      const timingVerdict = implementationUnavailable
+        ? "implementation unavailable"
+        : timingMetSignal === true || timingIsClean
+          ? "pass"
         : timingMetSignal === false
           ? "fail"
           : statusLabel(timingStatus || "not run");
