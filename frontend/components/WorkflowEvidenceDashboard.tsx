@@ -1826,7 +1826,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         pnr.timing_violation_count,
       );
       const synthesisBlocked = firstString(synth.status) === "failed" || (firstString(pnr.status) === "blocked" && firstString(pnr.error).toLowerCase().includes("yosys json"));
-      const implementationUnavailable = firstString(pnr.failure_kind) === "tool_unavailable"
+      const implementationUnavailable = ["tool_unavailable", "toolchain_version_mismatch", "invalid_cli"].includes(firstString(pnr.failure_kind))
         || firstString(record(pnr.command).status) === "tool_unavailable"
         || ["implementation_unavailable", "tool_unavailable"].includes(firstString(timingClosure.status, implementationLock.status));
       const timingStatus = firstString(timing.status) || (timingEvidenceSignal !== undefined ? "completed" : "");
@@ -1940,7 +1940,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               </div>
             </summary>
             <div className="mt-4 grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-2 xl:grid-cols-4">
-              <Stat title="Winning Seed" value={synthesisBlocked ? "not attempted" : closureSeed ?? (implementationLock.status === "locked" ? "default (locked)" : "not locked")} />
+              <Stat title="Winning Seed" value={synthesisBlocked ? "not attempted" : implementationUnavailable ? "not available" : closureSeed ?? (implementationLock.status === "locked" ? "default (locked)" : "not locked")} />
               <Stat title="Strategy" value={closureStrategy} />
               <Stat title="Tool Effort" value={toolEffortMode} />
               <Stat title="Attempts" value={closureAttempts || "not run"} />
