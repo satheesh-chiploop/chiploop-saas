@@ -1,0 +1,35 @@
+{
+  "workflow_id": "b2896f02-891b-42bb-ba93-8e574f7bbf57",
+  "agent": "Digital DQA Summary Agent",
+  "status": "failed",
+  "blocking_issues": [
+    "yosys_synthesis_errors"
+  ],
+  "warning_count": 0,
+  "rtl_file_count": 1,
+  "reports": {
+    "rtl_lint": "/root/chiploop-backend/backend/workflows/b2896f02-891b-42bb-ba93-8e574f7bbf57/digital/rtl_lint_report.json",
+    "cdc": null,
+    "reset_integrity": null,
+    "synthesis_readiness": "/root/chiploop-backend/backend/workflows/b2896f02-891b-42bb-ba93-8e574f7bbf57/signoff/synthesis_readiness_findings.json"
+  },
+  "stages": {
+    "rtl_lint": {
+      "status": "pass",
+      "heuristic_issue_count": 0
+    },
+    "cdc": {
+      "status": "unavailable",
+      "findings": null
+    },
+    "reset_integrity": {
+      "status": "unavailable",
+      "findings": null
+    },
+    "synthesis_readiness": {
+      "status": "failed",
+      "score": 45,
+      "yosys_warning_count": 0
+    }
+  }
+}

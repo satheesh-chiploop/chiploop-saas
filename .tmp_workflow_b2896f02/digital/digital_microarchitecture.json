@@ -1,0 +1,53 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "module_name": "pwm_fpga_demo",
+  "microarchitecture_summary": {
+    "implementation_style": "Compact single-module synchronous RTL with one free-running 8-bit PWM carrier counter, one slow divider/tick generator, one 8-bit duty register, and one direction bit.",
+    "control_strategy": "On every clock, increment the PWM counter. Use a slow counter-derived update tick to advance the duty register by one step at a much lower rate. Reverse direction when the duty reaches 8'h00 or 8'hFF so the ramp reflects at the endpoints and repeats continuously.",
+    "state_strategy": "Maintain only the required internal state: an 8-bit PWM counter, a slow timing counter/divider sufficient to generate a visible update event, an 8-bit duty-cycle register, and a direction bit. No explicit FSM is required; the behavior is counter-driven and self-stabilizing.",
+    "output_strategy": "Drive led directly from the PWM compare result, asserting led when the PWM counter value is below the duty-cycle register and deasserting it otherwise."
+  },
+  "fsm_intent": {
+    "present": false,
+    "description": "No explicit FSM is intended. The design is implemented as simple synchronous counters plus boundary reflection logic for the duty-cycle ramp.",
+    "states": []
+  },
+  "datapath_intent": {
+    "inputs": [
+      "clk"
+    ],
+    "internal_storage": [
+      "8-bit free-running PWM counter clocked every cycle",
+      "slow divider/counter used to generate a periodic update tick",
+      "8-bit duty-cycle register",
+      "1-bit direction bit indicating ramp up or ramp down"
+    ],
+    "output_mapping": [
+      "led is driven by the comparison pwm_counter < duty_cycle_reg"
+    ]
+  },
+  "sequencing_notes": [
+    "The PWM counter increments continuously on each clk edge.",
+    "The slow counter increments on each clk edge and produces a periodic enable/update event.",
+    "On each update event, the duty-cycle register changes by one step in the current direction.",
+    "When the duty-cycle register reaches 8'hFF, direction is set to decrement on subsequent update events.",
+    "When the duty-cycle register reaches 8'h00, direction is set to increment on subsequent update events.",
+    "The breathing pattern repeats indefinitely through reflected ramping between the two endpoints."
+  ],
+  "timing_notes": [
+    "Single synchronous clock domain only.",
+    "Designed for a nominal 50 MHz clk input.",
+    "The slow update tick should be derived from a counter/divider large enough to make the brightness change visibly slow to the eye.",
+    "All state updates are synchronous and synthesizable for Yosys and nextpnr flows."
+  ],
+  "ownership_notes": [
+    "The top module owns all timing generation, PWM generation, ramp control, and LED drive logic.",
+    "No internal hierarchy is introduced.",
+    "No reset input is present; the logic is intended to be self-stabilizing through counting and supported power-up behavior where available."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "Interfaces remain exactly as defined in digital_spec_json."
+  ]
+}

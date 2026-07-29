@@ -1,0 +1,4 @@
+Digital Power Intent (UPF-Lite) Agent Report
+Spec mode: flat
+Top module: pwm_fpga_demo
+Domains: ['PD_TOP']

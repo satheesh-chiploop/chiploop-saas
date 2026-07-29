@@ -1,0 +1,11 @@
+{
+  "mode": "flat",
+  "top_module": "pwm_fpga_demo",
+  "expected_files": [
+    "pwm_fpga_demo.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 35634
+}
