@@ -1,0 +1,55 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "module_name": "pwm_fpga_demo",
+  "microarchitecture_summary": {
+    "implementation_style": "Single-module synchronous PWM LED demo with a free-running 8-bit PWM carrier, a slow divider/event generator, an 8-bit duty-cycle register, and a 1-bit direction flag; all state updates occur on the rising edge of clk and the LED is driven directly from a PWM compare.",
+    "control_strategy": "Use a slow counter as a terminal-count tick source to pace duty-cycle updates much more slowly than the PWM carrier. On each slow tick, adjust the duty-cycle register by +1 or -1 depending on the direction bit. Reverse direction when the configured upper or lower bound is reached. The PWM counter runs continuously and does not require a separate enable.",
+    "state_strategy": "Maintain three small pieces of sequential state: an 8-bit free-running PWM counter, an 8-bit slow counter/divider for update pacing, an 8-bit duty-cycle register for brightness, and a 1-bit direction flag for ramp direction. Startup is intended to be deterministic via FPGA power-up initialization or inferred initial values, starting from a low duty cycle and upward direction if initialization is used.",
+    "output_strategy": "Drive led combinationally from the PWM compare result so that led is high when the PWM counter is below the duty-cycle register and low otherwise, producing visible breathing/fading brightness."
+  },
+  "fsm_intent": {
+    "present": false,
+    "description": "No explicit FSM is required. The design uses simple counter-based sequencing with a direction bit and terminal-count update behavior rather than a multi-state controller.",
+    "states": []
+  },
+  "datapath_intent": {
+    "inputs": [
+      "clk"
+    ],
+    "internal_storage": [
+      "8-bit PWM counter that increments every clk cycle",
+      "8-bit slow counter/divider that generates a periodic update tick",
+      "8-bit duty-cycle register that changes only on slow update ticks",
+      "1-bit direction bit indicating ramp up versus ramp down"
+    ],
+    "output_mapping": [
+      "led is asserted when the 8-bit PWM counter value is less than the 8-bit duty-cycle register value, and deasserted otherwise."
+    ]
+  },
+  "sequencing_notes": [
+    "The PWM counter advances on every rising edge of clk.",
+    "The slow counter advances on every rising edge of clk and produces a terminal event or equivalent tick at a much lower rate than the PWM carrier.",
+    "The duty-cycle register updates only on the slow terminal event, not every clock cycle.",
+    "When direction indicates increasing, the duty-cycle register increments until the upper bound is reached, then direction flips to decreasing.",
+    "When direction indicates decreasing, the duty-cycle register decrements until the lower bound is reached, then direction flips to increasing.",
+    "No explicit reset port is used; deterministic startup relies on synthesizable initial values or FPGA power-up initialization where supported."
+  ],
+  "timing_notes": [
+    "All logic is in a single synchronous clock domain driven by clk.",
+    "The PWM carrier should be much faster than the duty-cycle update rate to avoid visible flicker.",
+    "The slow divider should be chosen so the breathing effect is visibly smooth and slow at the assumed board clock rate.",
+    "The compare path from PWM counter and duty-cycle register to led is intentionally simple for synthesis and timing closure in open-source Lattice FPGA flows."
+  ],
+  "ownership_notes": [
+    "Owns the full breathing PWM behavior within the top module pwm_fpga_demo.",
+    "Owns the free-running PWM counter, slow update pacing, duty-cycle ramping, and direction control.",
+    "Does not own any board-specific pin constraints or programming-interface signals.",
+    "Starter constraints are external to RTL and must be generated separately after board selection using PCF for iCE40 boards or LPF for ECP5 boards.",
+    "No additional modules, hidden interfaces, memories, vendor primitives, or ASIC-only constructs are part of the implementation intent."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "Interfaces remain exactly as defined in digital_spec_json."
+  ]
+}

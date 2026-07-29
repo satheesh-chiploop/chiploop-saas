@@ -1,0 +1,94 @@
+{
+  "agent": "FPGA nextpnr Place & Route Agent",
+  "artifact_produced": false,
+  "asc": null,
+  "closure_iteration": 0,
+  "command": {
+    "cmd": [
+      "/opt/chiploop-eda/bin/nextpnr-nexus",
+      "--device",
+      "LFD2NX-40-8BG256C",
+      "--json",
+      "/root/chiploop-backend/backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/fpga/synth/pwm_fpga_demo_nexus.json",
+      "--report",
+      "/root/chiploop-backend/backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/fpga/pnr/fpga_nextpnr_report.json",
+      "--fasm",
+      "/root/chiploop-backend/backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/fpga/pnr/pwm_fpga_demo.fasm",
+      "--pdc",
+      "/root/chiploop-backend/backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/fpga/constraints/pwm_fpga_demo.pdc",
+      "--freq",
+      "12.0"
+    ],
+    "error": null,
+    "executable": "/opt/chiploop-eda/bin/nextpnr-nexus",
+    "log": "/root/chiploop-backend/backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/fpga/pnr/nextpnr-nexus.log",
+    "ok": false,
+    "profile_id": "chiploop_saas_default",
+    "returncode": 255,
+    "status": "failed",
+    "stderr_tail": "ERROR: Provided database version 12 is newer than nextpnr version 11, please rebuild database/nextpnr.\n0 warnings, 1 error\n",
+    "stdout_tail": ""
+  },
+  "error": "nextpnr and its FPGA architecture database are incompatible; rebuild nextpnr against the installed database.",
+  "errors": 2,
+  "failure_kind": "toolchain_version_mismatch",
+  "max_frequency_mhz": null,
+  "output_format": "fasm",
+  "planned_pnr_output": "/root/chiploop-backend/backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/fpga/pnr/pwm_fpga_demo.fasm",
+  "pnr_output": null,
+  "report": null,
+  "routed_config": null,
+  "seed": null,
+  "status": "failed",
+  "target": {
+    "bitstream_ext": ".bit",
+    "bitstream_tool": "prjoxide",
+    "board": "certus_nx_versa_40",
+    "constraint_format": "pdc",
+    "default_frequency_mhz": 12.0,
+    "device": "LFD2NX-40-8BG256C",
+    "family": "nexus",
+    "label": "Lattice Certus-NX Versa (LFD2NX-40)",
+    "nextpnr_device_args": [
+      "--device",
+      "LFD2NX-40-8BG256C"
+    ],
+    "nextpnr_tool": "nextpnr-nexus",
+    "package": "BG256",
+    "pnr_output_ext": ".fasm",
+    "product_family": "Certus-NX",
+    "resources": {
+      "logic_cells": 39000
+    },
+    "segments": [
+      "industrial",
+      "general-purpose embedded",
+      "connectivity"
+    ],
+    "support_tier": "experimental",
+    "supported": true,
+    "vendor": "lattice",
+    "yosys_family": "lfd2nx"
+  },
+  "timing_driven": false,
+  "timing_met": null,
+  "timing_violation_count": null,
+  "tns_ns": null,
+  "tool_effort": {
+    "capability_checked": true,
+    "effective_args": [
+      "--freq",
+      "12.0"
+    ],
+    "goal": "balanced_timing",
+    "mode": "balanced",
+    "requested": [
+      "timing_driven",
+      "target_frequency",
+      "seed_exploration"
+    ],
+    "tool_version": null
+  },
+  "warnings": 1,
+  "wns_ns": null
+}

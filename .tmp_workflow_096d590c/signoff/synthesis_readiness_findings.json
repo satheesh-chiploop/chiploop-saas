@@ -1,0 +1,47 @@
+{
+  "type": "synthesis_readiness",
+  "version": "1.0",
+  "top_module": "pwm_fpga_demo",
+  "spec_path": "backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/spec/pwm_fpga_demo_spec.json",
+  "rtl_file_count": 1,
+  "score": 44,
+  "intent_findings": [
+    {
+      "type": "timing_intent",
+      "severity": "info",
+      "message": "No clocks found in spec. If synchronous, include clock intent (name + freq/period)."
+    },
+    {
+      "type": "perf_intent",
+      "severity": "info",
+      "message": "No performance/timing intent section found (latency/throughput/constraints)."
+    },
+    {
+      "type": "area_intent",
+      "severity": "info",
+      "message": "No area/gatecount intent found. Provide rough bounds if needed."
+    }
+  ],
+  "synthesizable_subset_findings": [
+    {
+      "file": "backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/rtl/pwm_fpga_demo.v",
+      "line": 40,
+      "pattern": "\\binitial\\b",
+      "message": "Use of initial blocks may be non-synthesizable (ASIC) or tool-dependent (FPGA).",
+      "snippet": "initial begin"
+    }
+  ],
+  "yosys": {
+    "available": true,
+    "errors": [
+      "ERROR: Can't open input file `backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/rtl/pwm_fpga_demo.v' for reading: No such file or directory"
+    ],
+    "warnings": [],
+    "log_path": "backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/synth/yosys_synth.log"
+  },
+  "tools_detected": {
+    "yosys": true,
+    "iverilog": true,
+    "verilator": true
+  }
+}

@@ -1841,11 +1841,13 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthClosureDetail = synthClosureActions
         || (firstString(synthClosure.status) ? "closure plan available" : "User disabled; synthesis completed cleanly.");
       const timingClosureActions = array(timingClosure.actions).map(String).join(" ");
-      const timingClosureStatus = synthesisBlocked ? "blocked by synthesis" : firstString(timingClosure.status) || (timingIsClean ? "not needed" : "");
+      const timingClosureStatus = synthesisBlocked ? "blocked by synthesis" : implementationUnavailable ? "implementation unavailable" : firstString(timingClosure.status) || (timingIsClean ? "not needed" : "");
       const timingClosureDetail = synthesisBlocked
         ? `Timing closure did not start because synthesis failed${firstString(synth.error) ? `: ${firstString(synth.error)}` : "."}`
-        : timingClosureActions || (timingIsClean ? "No timing violations found." : "closure plan not requested");
-      const closureHasEvidence = Object.keys(timingClosure).length > 0 || Object.keys(implementationLock).length > 0 || timingHistory.length > 0;
+        : implementationUnavailable
+          ? firstString(pnr.error, record(pnr.command).stderr_tail, "FPGA implementation tool unavailable.")
+          : timingClosureActions || (timingIsClean ? "No timing violations found." : "closure plan not requested");
+      const closureHasEvidence = implementationUnavailable || Object.keys(timingClosure).length > 0 || Object.keys(implementationLock).length > 0 || timingHistory.length > 0;
       const closureComplete = timingClosure.closure_complete === true || implementationLock.timing_met === true;
       const closureStatusText = firstString(timingClosure.status, implementationLock.status).toLowerCase();
       const closureFailed = closureHasEvidence && (

@@ -1,0 +1,39 @@
+{
+  "agent": "FPGA Timing & DRC Agent",
+  "error": "No routed place-and-route artifact available for timing analysis.",
+  "error_count": 2,
+  "max_frequency_mhz": null,
+  "status": "blocked",
+  "target": {
+    "bitstream_ext": ".bit",
+    "bitstream_tool": "prjoxide",
+    "board": "certus_nx_versa_40",
+    "constraint_format": "pdc",
+    "default_frequency_mhz": 12.0,
+    "device": "LFD2NX-40-8BG256C",
+    "family": "nexus",
+    "label": "Lattice Certus-NX Versa (LFD2NX-40)",
+    "nextpnr_device_args": [
+      "--device",
+      "LFD2NX-40-8BG256C"
+    ],
+    "nextpnr_tool": "nextpnr-nexus",
+    "package": "BG256",
+    "pnr_output_ext": ".fasm",
+    "product_family": "Certus-NX",
+    "resources": {
+      "logic_cells": 39000
+    },
+    "segments": [
+      "industrial",
+      "general-purpose embedded",
+      "connectivity"
+    ],
+    "support_tier": "experimental",
+    "supported": true,
+    "vendor": "lattice",
+    "yosys_family": "lfd2nx"
+  },
+  "timing_met": null,
+  "warning_count": 1
+}

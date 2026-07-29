@@ -1,0 +1,39 @@
+{
+  "agent": "FPGA Bitstream Handoff Agent",
+  "artifact_produced": false,
+  "bitstream": null,
+  "error": "No routed place-and-route artifact available for bitstream generation.",
+  "planned_bitstream": "/root/chiploop-backend/backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/fpga/bitstream/pwm_fpga_demo.bit",
+  "programming_command": null,
+  "status": "blocked",
+  "target": {
+    "bitstream_ext": ".bit",
+    "bitstream_tool": "prjoxide",
+    "board": "certus_nx_versa_40",
+    "constraint_format": "pdc",
+    "default_frequency_mhz": 12.0,
+    "device": "LFD2NX-40-8BG256C",
+    "family": "nexus",
+    "label": "Lattice Certus-NX Versa (LFD2NX-40)",
+    "nextpnr_device_args": [
+      "--device",
+      "LFD2NX-40-8BG256C"
+    ],
+    "nextpnr_tool": "nextpnr-nexus",
+    "package": "BG256",
+    "pnr_output_ext": ".fasm",
+    "product_family": "Certus-NX",
+    "resources": {
+      "logic_cells": 39000
+    },
+    "segments": [
+      "industrial",
+      "general-purpose embedded",
+      "connectivity"
+    ],
+    "support_tier": "experimental",
+    "supported": true,
+    "vendor": "lattice",
+    "yosys_family": "lfd2nx"
+  }
+}
