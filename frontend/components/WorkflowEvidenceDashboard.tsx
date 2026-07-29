@@ -1639,7 +1639,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
                     <Stat title="Timing Pass Rate" value={`${formatNumber(firstNumber(item.timing_pass_rate) * 100)}%`} />
                     <Stat title="Logic Utilization" value={item.logic_utilization_percent !== undefined ? `${formatNumber(firstNumber(item.logic_utilization_percent))}%` : "unavailable"} />
                     <Stat title="Resource Headroom" value={item.resource_headroom_percent !== undefined ? `${formatNumber(firstNumber(item.resource_headroom_percent))}%` : "unavailable"} />
-                    <Stat title="Winning Seed" value={firstPresent(item.winning_seed, "not available")} />
+                    <Stat title="Winning Seed" value={String(firstPresent(item.winning_seed, "not available"))} />
                     <Stat title="Closure" value={item.closure_used === true ? "used" : "not needed"} />
                     <Stat title="Relaxed Frequency" value={relaxation.recommended_mhz ? `${formatNumber(firstNumber(relaxation.recommended_mhz))} MHz` : "not applicable"} />
                     <Stat title="P&R Attempts" value={runs.length} />
@@ -1753,7 +1753,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const vendorLabel = vendor ? vendor.charAt(0).toUpperCase() + vendor.slice(1) : "Lattice";
       const rawBoardLabel = firstString(target.label, target.board_label, target.board, "Lattice iCEBreaker");
       const boardDisplay = rawBoardLabel.toLowerCase().startsWith(vendorLabel.toLowerCase()) ? rawBoardLabel : `${vendorLabel} ${rawBoardLabel}`;
-      const fallbackPnrTool = family === "ecp5" ? "nextpnr-ecp5" : family === "nexus" ? "nextpnr-nexus" : family === "gowin" ? "nextpnr-himbaechel-gowin" : "nextpnr-ice40";
+      const fallbackPnrTool = family === "ecp5" ? "nextpnr-ecp5" : family === "nexus" ? "nextpnr-nexus" : family === "gowin" ? "nextpnr-himbaechel" : "nextpnr-ice40";
       const fallbackBitstreamTool = family === "ecp5" ? "ecppack" : family === "nexus" ? "prjoxide" : family === "gowin" ? "gowin_pack" : "icepack";
       const pnrTool = firstString(record(pnr.command).cmd && array(record(pnr.command).cmd)[0], target.nextpnr_tool, fallbackPnrTool);
       const bitstreamTool = firstString(record(bitstream.command).cmd && array(record(bitstream.command).cmd)[0], target.bitstream_tool, fallbackBitstreamTool);

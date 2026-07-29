@@ -1026,7 +1026,6 @@ export default function AppsHomePage() {
       "fpga-formal": "/apps/fpga-formal",
       "fpga-synthesis": "/apps/fpga-synthesis",
       "fpga-implementation": "/apps/fpga-implementation",
-      "fpga-verify": "/apps/fpga-verify",
       "integrate": "/apps/integrate",
       "dqa": "/apps/dqa",
       "verify": "/apps/verify",
