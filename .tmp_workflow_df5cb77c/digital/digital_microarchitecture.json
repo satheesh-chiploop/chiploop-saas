@@ -1,0 +1,54 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "module_name": "pwm_fpga_demo",
+  "microarchitecture_summary": {
+    "implementation_style": "Single-module synthesizable RTL with one synchronous clock domain, using internal counters and registers to create a PWM breathing LED effect suitable for FPGA open-source flows.",
+    "control_strategy": "A slow counter acts as a clock-enable generator for brightness updates; the 8-bit duty register increments or decrements only on the slow tick, while an internal direction bit reverses at 8'h00 and 8'hFF. The PWM counter free-runs continuously and is compared against the duty register to determine led.",
+    "state_strategy": "Internal state consists of a slow divider counter, an 8-bit free-running PWM counter, an 8-bit duty-cycle register, and a single direction bit. Safe deterministic power-up values should be used where supported by the target flow so the design starts in a valid breathing sequence without an external reset.",
+    "output_strategy": "Drive led directly from the PWM compare result between the free-running 8-bit PWM counter and the current 8-bit duty-cycle register, active-high at the RTL level."
+  },
+  "fsm_intent": {
+    "present": false,
+    "description": "No explicit multi-state FSM is implied or required. The behavior is realized with simple counter and direction-bit updates on the clock edge.",
+    "states": []
+  },
+  "datapath_intent": {
+    "inputs": [
+      "clk"
+    ],
+    "internal_storage": [
+      "Slow divider counter used to generate a visible update tick.",
+      "8-bit PWM counter that increments every clk cycle.",
+      "8-bit duty-cycle register holding the current brightness level.",
+      "Direction bit indicating whether the duty cycle is ramping up or down."
+    ],
+    "output_mapping": [
+      "led is asserted when the PWM counter is below the duty-cycle register, forming a standard counter-versus-duty PWM waveform.",
+      "The slow divider counter produces a periodic step event used to update the duty register and direction bit; it does not create a derived clock."
+    ]
+  },
+  "sequencing_notes": [
+    "All sequential logic uses clk only; no derived clocks or asynchronous controls are introduced.",
+    "The PWM counter advances on every clock cycle.",
+    "The duty-cycle register updates only on slow tick events from the divider logic.",
+    "On each slow tick, the duty cycle increments when direction is up and decrements when direction is down.",
+    "Direction flips when the duty register reaches either endpoint, 8'hFF or 8'h00.",
+    "Initialization should be deterministic where supported, but the design must remain synthesizable even if explicit register initialization is not honored by a target."
+  ],
+  "timing_notes": [
+    "The slow divider width should be large enough to make the breathing effect visibly slow on a typical demo board clock.",
+    "The PWM counter is intended to run at the full board clock rate so the LED waveform flicker is minimized.",
+    "The compare path should remain a simple register-versus-counter comparison for easy synthesis and timing closure.",
+    "The design is intended for lint, Yosys synthesis, nextpnr place-and-route, and timing review without vendor primitives or special constraints inside RTL."
+  ],
+  "ownership_notes": [
+    "The top module pwm_fpga_demo owns all internal state and the complete LED breathing behavior.",
+    "Board-specific starter constraints are external to RTL and are generated separately after board selection.",
+    "Use PCF for iCE40 boards and LPF for ECP5 boards; constraints are demo bring-up only and require review before hardware programming."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "Interfaces remain exactly as defined in digital_spec_json."
+  ]
+}

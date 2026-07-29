@@ -1,0 +1,222 @@
+{
+  "agent": "FPGA nextpnr Place & Route Agent",
+  "artifact_produced": true,
+  "asc": null,
+  "closure_iteration": 0,
+  "command": {
+    "cmd": [
+      "/opt/chiploop-eda/bin/nextpnr-nexus",
+      "--device",
+      "LFD2NX-40-8BG256C",
+      "--json",
+      "/root/chiploop-backend/backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/fpga/synth/pwm_fpga_demo_nexus.json",
+      "--report",
+      "/root/chiploop-backend/backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/fpga/pnr/fpga_nextpnr_report.json",
+      "--fasm",
+      "/root/chiploop-backend/backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/fpga/pnr/pwm_fpga_demo.fasm",
+      "--pdc",
+      "/root/chiploop-backend/backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/fpga/constraints/pwm_fpga_demo.pdc",
+      "--freq",
+      "12.0"
+    ],
+    "error": null,
+    "executable": "/opt/chiploop-eda/bin/nextpnr-nexus",
+    "log": "/root/chiploop-backend/backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/fpga/pnr/nextpnr-nexus.log",
+    "ok": true,
+    "profile_id": "chiploop_saas_default",
+    "returncode": 0,
+    "status": "success",
+    "stderr_tail": "overuse=346 archfail=NA\nInfo:     iter=2 wires=1649 overused=145 overuse=154 archfail=NA\nInfo:     iter=3 wires=1628 overused=115 overuse=118 archfail=NA\nInfo:     iter=4 wires=1616 overused=99 overuse=99 archfail=NA\nInfo:     iter=5 wires=1610 overused=81 overuse=81 archfail=NA\nInfo:     iter=6 wires=1590 overused=47 overuse=47 archfail=NA\nInfo:     iter=7 wires=1582 overused=32 overuse=32 archfail=NA\nInfo:     iter=8 wires=1576 overused=22 overuse=22 archfail=NA\nInfo:     iter=9 wires=1574 overused=16 overuse=16 archfail=NA\nInfo:     iter=10 wires=1574 overused=16 overuse=16 archfail=NA\nInfo:     iter=11 wires=1570 overused=10 overuse=10 archfail=NA\nInfo:     iter=12 wires=1566 overused=7 overuse=7 archfail=NA\nInfo:     iter=13 wires=1568 overused=9 overuse=9 archfail=NA\nInfo:     iter=14 wires=1567 overused=9 overuse=9 archfail=NA\nInfo:     iter=15 wires=1565 overused=7 overuse=7 archfail=NA\nInfo:     iter=16 wires=1567 overused=10 overuse=10 archfail=NA\nInfo:     iter=17 wires=1565 overused=7 overuse=7 archfail=NA\nInfo:     iter=18 wires=1567 overused=10 overuse=10 archfail=NA\nInfo:     iter=19 wires=1563 overused=4 overuse=4 archfail=NA\nInfo:     iter=20 wires=1563 overused=4 overuse=4 archfail=NA\nInfo:     iter=21 wires=1563 overused=4 overuse=4 archfail=NA\nInfo:     iter=22 wires=1566 overused=6 overuse=6 archfail=NA\nInfo:     iter=23 wires=1565 overused=3 overuse=3 archfail=NA\nInfo:     iter=24 wires=1565 overused=3 overuse=3 archfail=NA\nInfo:     iter=25 wires=1565 overused=3 overuse=3 archfail=NA\nInfo:     iter=26 wires=1565 overused=3 overuse=3 archfail=NA\nInfo:     iter=27 wires=1564 overused=0 overuse=0 archfail=0\nInfo: Router2 time 1.25s\nInfo: Running router1 to check that route is legal...\n\nInfo: Routing..\nInfo: Setting up routing queue.\nInfo: Routing 0 arcs.\nInfo:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |\nInfo:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|\nInfo:          0 |        0          0 |    0     0 |         0|       0.00       0.00|\nInfo: Routing complete.\nInfo: Router1 time 0.00s\nInfo: Checksum: 0xc009da1d\n\nInfo: Critical path report for clock 'clk_IB_I_O$glb_clk' (posedge -> posedge):\nInfo:       type curr  total name\nInfo:   clk-to-q  0.34  0.34 Source slow_counter_FD1P3IX_Q_2.Q\nInfo:    routing  0.44  0.78 Net slow_counter[13] (81,20) -> (80,21)\nInfo:                          Sink slow_counter_LUT4_A_2.A\nInfo:                          Defined in:\nInfo:                               /root/chiploop-backend/backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/fpga/src/handoff/pwm_fpga_demo_ip_package/rtl/pwm_fpga_demo.v:9.12-9.24\nInfo:      logic  0.23  1.01 Source slow_counter_LUT4_A_2.F\nInfo:    routing  0.44  1.45 Net slow_counter_LUT4_A_2_Z (80,21) -> (81,21)\nInfo:                          Sink duty_cycle_FD1P3IX_Q_SP_LUT4_Z.B\nInfo:      logic  0.23  1.69 Source duty_cycle_FD1P3IX_Q_SP_LUT4_Z.F\nInfo:    routing  0.70  2.38 Net duty_cycle_FD1P3IX_Q_SP (81,21) -> (83,23)\nInfo:                          Sink duty_cycle_FD1P3IX_Q_4.CE\nInfo:      setup  0.21  2.60 Source duty_cycle_FD1P3IX_Q_4.CE\nInfo: 1.02 ns logic, 1.58 ns routing\n\nInfo: Max frequency for clock 'clk_IB_I_O$glb_clk': 384.76 MHz (PASS at 12.00 MHz)\n\nInfo: Slack histogram:\nInfo:  legend: * represents 1 endpoint(s)\nInfo:          + represents [1,1) endpoint(s)\nInfo: [ 80734,  80827) |* \nInfo: [ 80827,  80920) |*** \nInfo: [ 80920,  81013) |************************ \nInfo: [ 81013,  81106) |***** \nInfo: [ 81106,  81199) |* \nInfo: [ 81199,  81292) | \nInfo: [ 81292,  81385) | \nInfo: [ 81385,  81478) | \nInfo: [ 81478,  81571) | \nInfo: [ 81571,  81664) | \nInfo: [ 81664,  81757) |* \nInfo: [ 81757,  81850) |** \nInfo: [ 81850,  81943) |*** \nInfo: [ 81943,  82036) |**** \nInfo: [ 82036,  82129) |**** \nInfo: [ 82129,  82222) |****** \nInfo: [ 82222,  82315) |** \nInfo: [ 82315,  82408) | \nInfo: [ 82408,  82501) | \nInfo: [ 82501,  82594) |** \n\nInfo: Program finished normally.\n",
+    "stdout_tail": ""
+  },
+  "errors": 0,
+  "failure_kind": null,
+  "fmax": {
+    "clk_IB_I_O$glb_clk": {
+      "achieved": 384.76336669921875,
+      "constraint": 12
+    }
+  },
+  "max_frequency_mhz": 384.763,
+  "output_format": "fasm",
+  "planned_pnr_output": "/root/chiploop-backend/backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/fpga/pnr/pwm_fpga_demo.fasm",
+  "pnr_output": "/root/chiploop-backend/backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/fpga/pnr/pwm_fpga_demo.fasm",
+  "report": "/root/chiploop-backend/backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/fpga/pnr/fpga_nextpnr_report.json",
+  "routed_config": null,
+  "seed": null,
+  "status": "completed",
+  "target": {
+    "bitstream_ext": ".bit",
+    "bitstream_tool": "prjoxide",
+    "board": "certus_nx_versa_40",
+    "constraint_format": "pdc",
+    "default_frequency_mhz": 12.0,
+    "device": "LFD2NX-40-8BG256C",
+    "family": "nexus",
+    "label": "Lattice Certus-NX Versa (LFD2NX-40)",
+    "nextpnr_device_args": [
+      "--device",
+      "LFD2NX-40-8BG256C"
+    ],
+    "nextpnr_tool": "nextpnr-nexus",
+    "package": "BG256",
+    "pnr_output_ext": ".fasm",
+    "product_family": "Certus-NX",
+    "resources": {
+      "logic_cells": 39000
+    },
+    "segments": [
+      "industrial",
+      "general-purpose embedded",
+      "connectivity"
+    ],
+    "support_tier": "experimental",
+    "supported": true,
+    "vendor": "lattice",
+    "yosys_family": "lfd2nx"
+  },
+  "timing_driven": false,
+  "timing_met": true,
+  "timing_violation_count": 0,
+  "tns_ns": 0,
+  "tool_effort": {
+    "capability_checked": true,
+    "effective_args": [
+      "--freq",
+      "12.0"
+    ],
+    "goal": "balanced_timing",
+    "mode": "balanced",
+    "requested": [
+      "timing_driven",
+      "target_frequency",
+      "seed_exploration"
+    ],
+    "tool_version": null
+  },
+  "utilization": {
+    "ACC54_CORE": {
+      "available": 28,
+      "used": 0
+    },
+    "CONFIG_CLKRST_CORE": {
+      "available": 1,
+      "used": 0
+    },
+    "CONFIG_HSE_CORE": {
+      "available": 1,
+      "used": 0
+    },
+    "CONFIG_LMMI_CORE": {
+      "available": 1,
+      "used": 0
+    },
+    "CONFIG_MULTIBOOT_CORE": {
+      "available": 1,
+      "used": 0
+    },
+    "DCC": {
+      "available": 62,
+      "used": 1
+    },
+    "DCS": {
+      "available": 1,
+      "used": 0
+    },
+    "DDRDLL_CORE": {
+      "available": 2,
+      "used": 0
+    },
+    "DIFFIO18_CORE": {
+      "available": 37,
+      "used": 0
+    },
+    "DQSBUF_CORE": {
+      "available": 4,
+      "used": 0
+    },
+    "ECLKDIV_CORE": {
+      "available": 12,
+      "used": 0
+    },
+    "ECLKSYNC_CORE": {
+      "available": 12,
+      "used": 0
+    },
+    "IOLOGIC": {
+      "available": 74,
+      "used": 0
+    },
+    "LRAM_CORE": {
+      "available": 2,
+      "used": 0
+    },
+    "MULT18X36_CORE": {
+      "available": 28,
+      "used": 0
+    },
+    "MULT18_CORE": {
+      "available": 56,
+      "used": 0
+    },
+    "MULT36_CORE": {
+      "available": 14,
+      "used": 0
+    },
+    "MULT9_CORE": {
+      "available": 112,
+      "used": 0
+    },
+    "OSC_CORE": {
+      "available": 1,
+      "used": 0
+    },
+    "OXIDE_COMB": {
+      "available": 32256,
+      "used": 88
+    },
+    "OXIDE_EBR": {
+      "available": 84,
+      "used": 0
+    },
+    "OXIDE_FF": {
+      "available": 32256,
+      "used": 33
+    },
+    "PLL_CORE": {
+      "available": 3,
+      "used": 0
+    },
+    "PREADD9_CORE": {
+      "available": 112,
+      "used": 0
+    },
+    "RAMW": {
+      "available": 4032,
+      "used": 0
+    },
+    "REG18_CORE": {
+      "available": 112,
+      "used": 0
+    },
+    "SEIO18_CORE": {
+      "available": 74,
+      "used": 0
+    },
+    "SEIO33_CORE": {
+      "available": 111,
+      "used": 2
+    },
+    "SIOLOGIC": {
+      "available": 110,
+      "used": 0
+    },
+    "VCC_DRV": {
+      "available": 86,
+      "used": 1
+    }
+  },
+  "utilization_source": "nextpnr_report",
+  "warnings": 0,
+  "wns_ns": null
+}

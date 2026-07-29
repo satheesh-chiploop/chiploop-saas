@@ -1,0 +1,57 @@
+---BEGIN pwm_fpga_demo.v---
+module pwm_fpga_demo (
+    input clk,
+    output led
+);
+
+reg [7:0] pwm_counter;
+reg [7:0] duty_cycle;
+reg direction_up;
+reg [15:0] slow_counter;
+
+wire slow_tick;
+wire pwm_cmp;
+
+assign slow_tick = (slow_counter == 16'hFFFF);
+assign pwm_cmp = (pwm_counter < duty_cycle);
+assign led = pwm_cmp;
+
+always @(posedge clk) begin
+    pwm_counter <= pwm_counter + 8'h01;
+
+    if (slow_tick) begin
+        slow_counter <= 16'h0000;
+    end else begin
+        slow_counter <= slow_counter + 16'h0001;
+    end
+
+    if (slow_tick) begin
+        if (direction_up) begin
+            if (duty_cycle == 8'hFF) begin
+                duty_cycle <= 8'hFF;
+                direction_up <= 1'b0;
+            end else begin
+                duty_cycle <= duty_cycle + 8'h01;
+                direction_up <= 1'b1;
+            end
+        end else begin
+            if (duty_cycle == 8'h00) begin
+                duty_cycle <= 8'h00;
+                direction_up <= 1'b1;
+            end else begin
+                duty_cycle <= duty_cycle - 8'h01;
+                direction_up <= 1'b0;
+            end
+        end
+    end
+end
+
+initial begin
+    pwm_counter = 8'h00;
+    duty_cycle = 8'h00;
+    direction_up = 1'b1;
+    slow_counter = 16'h0000;
+end
+
+endmodule
+---END pwm_fpga_demo.v---

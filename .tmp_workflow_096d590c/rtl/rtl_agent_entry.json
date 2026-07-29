@@ -1,8 +1,0 @@
-{
-  "workflow_id": "096d590c-4522-4512-9780-c543ada0da2a",
-  "workflow_dir": "backend/workflows/096d590c-4522-4512-9780-c543ada0da2a",
-  "digital_spec_json": "backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/spec/pwm_fpga_demo_spec.json",
-  "spec_json": "backend/workflows/096d590c-4522-4512-9780-c543ada0da2a/spec/pwm_fpga_demo_spec.json",
-  "digital_spec_json_exists": true,
-  "spec_json_exists": true
-}

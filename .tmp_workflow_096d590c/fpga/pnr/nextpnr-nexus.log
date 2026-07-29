@@ -1,2 +1,0 @@
-ERROR: Provided database version 12 is newer than nextpnr version 11, please rebuild database/nextpnr.
-0 warnings, 1 error

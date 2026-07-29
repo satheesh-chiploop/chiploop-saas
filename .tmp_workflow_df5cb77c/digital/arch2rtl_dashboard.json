@@ -1,0 +1,383 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "pwm_fpga_demo",
+  "rtl_file_count": 1,
+  "module_count": 1,
+  "modules": [
+    {
+      "name": "pwm_fpga_demo",
+      "file": "backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/rtl/pwm_fpga_demo.v",
+      "input_count": 1,
+      "output_count": 1,
+      "inout_count": 0,
+      "input_port_count": 1,
+      "output_port_count": 1,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "led",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 1,
+    "output_count": 1,
+    "inout_count": 0,
+    "input_port_count": 1,
+    "output_port_count": 1,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "led",
+        "direction": "output",
+        "width": "1"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [],
+    "primary_clock": "clk",
+    "primary_reset": null
+  },
+  "storage": {
+    "flipflop_count": 33,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 4,
+    "latch_target_count": 0,
+    "sequential_blocks": 1,
+    "posedge_blocks": 1,
+    "negedge_blocks": 0,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "direction_up",
+      "duty_cycle",
+      "pwm_counter",
+      "slow_counter"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 0,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "clean",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 0,
+    "warning_count": 0,
+    "error_count": 0,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "pwm_fpga_demo",
+      "backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/rtl/pwm_fpga_demo.v"
+    ],
+    "stdout_tail": [
+      "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b",
+      "- Verilator: Built from 0.031 MB sources in 2 modules, into 0.015 MB in 3 C++ files needing 0.000 MB",
+      "- Verilator: Walltime 0.011 s (elab=0.001, cvt=0.004, bld=0.000); cpu 0.011 s on 1 threads; allocated 31.359 MB"
+    ],
+    "stderr_tail": [],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "pwm_fpga_demo",
+        "backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/rtl/pwm_fpga_demo.v"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stdout": "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b\n- Verilator: Built from 0.031 MB sources in 2 modules, into 0.015 MB in 3 C++ files needing 0.000 MB\n- Verilator: Walltime 0.011 s (elab=0.001, cvt=0.004, bld=0.000); cpu 0.011 s on 1 threads; allocated 31.359 MB\n",
+      "stderr": "",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-07-29T19:09:24.892231+00:00",
+      "ended_at": "2026-07-29T19:09:24.996143+00:00",
+      "elapsed_ms": 103
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 1,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "pwm_fpga_demo",
+          "file": "backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/rtl/pwm_fpga_demo.v",
+          "input_count": 1,
+          "output_count": 1,
+          "inout_count": 0,
+          "input_port_count": 1,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "led",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 1,
+        "output_count": 1,
+        "inout_count": 0,
+        "input_port_count": 1,
+        "output_port_count": 1,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "led",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 33,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 4,
+        "latch_target_count": 0,
+        "sequential_blocks": 1,
+        "posedge_blocks": 1,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "direction_up",
+          "duty_cycle",
+          "pwm_counter",
+          "slow_counter"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 1,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "pwm_fpga_demo",
+          "file": "backend/workflows/df5cb77c-2018-4f04-abd8-78a7002cbac6/handoff/pwm_fpga_demo_ip_package/rtl/pwm_fpga_demo.v",
+          "input_count": 1,
+          "output_count": 1,
+          "inout_count": 0,
+          "input_port_count": 1,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "led",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 1,
+        "output_count": 1,
+        "inout_count": 0,
+        "input_port_count": 1,
+        "output_port_count": 1,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "led",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 33,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 4,
+        "latch_target_count": 0,
+        "sequential_blocks": 1,
+        "posedge_blocks": 1,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "direction_up",
+          "duty_cycle",
+          "pwm_counter",
+          "slow_counter"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 0,
+    "registers": []
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}
