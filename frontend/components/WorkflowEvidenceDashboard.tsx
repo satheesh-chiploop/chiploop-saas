@@ -1701,7 +1701,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const yosysFfNumeric = finiteNumber(synthesisEstimate.flip_flops, utilization.flip_flops, synth.flip_flops);
       const synthCellsUsed = typeof yosysLut4Numeric === "number" && typeof yosysFfNumeric === "number"
         ? yosysLut4Numeric + yosysFfNumeric
-        : firstNumber(synthesisEstimate.logical_cells_used, synth.logical_cells_used);
+        : finiteNumber(synthesisEstimate.logical_cells_used, synth.logical_cells_used);
       const synthCellsAvailable = finiteNumber(synthesisEstimate.logical_cells_available, synth.logical_cells_available, record(target.resources).logic_cells);
       const synthUtilizationPct = typeof synthCellsUsed === "number" && typeof synthCellsAvailable === "number" && synthCellsAvailable > 0
         ? Number(((synthCellsUsed / synthCellsAvailable) * 100).toFixed(3))
@@ -1841,9 +1841,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthClosureDetail = synthClosureActions
         || (firstString(synthClosure.status) ? "closure plan available" : "User disabled; synthesis completed cleanly.");
       const timingClosureActions = array(timingClosure.actions).map(String).join(" ");
-      const timingClosureStatus = firstString(timingClosure.status) || (timingIsClean ? "not needed" : "");
-      const timingClosureDetail = timingClosureActions
-        || (timingIsClean ? "No timing violations found." : "closure plan not requested");
+      const timingClosureStatus = synthesisBlocked ? "blocked by synthesis" : firstString(timingClosure.status) || (timingIsClean ? "not needed" : "");
+      const timingClosureDetail = synthesisBlocked
+        ? `Timing closure did not start because synthesis failed${firstString(synth.error) ? `: ${firstString(synth.error)}` : "."}`
+        : timingClosureActions || (timingIsClean ? "No timing violations found." : "closure plan not requested");
       const closureHasEvidence = Object.keys(timingClosure).length > 0 || Object.keys(implementationLock).length > 0 || timingHistory.length > 0;
       const closureComplete = timingClosure.closure_complete === true || implementationLock.timing_met === true;
       const closureStatusText = firstString(timingClosure.status, implementationLock.status).toLowerCase();
