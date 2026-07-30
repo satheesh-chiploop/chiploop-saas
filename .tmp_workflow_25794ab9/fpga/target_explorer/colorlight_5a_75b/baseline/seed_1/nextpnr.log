@@ -1,0 +1,749 @@
+Info: Logic utilisation before packing:
+Info:     Total LUT4s:      3977/24288    16%
+Info:         logic LUTs:   3485/24288    14%
+Info:         carry LUTs:    492/24288     2%
+Info:           RAM LUTs:      0/ 3036     0%
+Info:          RAMW LUTs:      0/ 6072     0%
+
+Info:      Total DFFs:       799/24288     3%
+
+Info: Packing IOs..
+Info: Packing constants..
+Info: Packing carries...
+Info: Packing LUTs...
+Info: Packing LUT5-7s...
+Info: Packing FFs...
+Info:     132 FFs paired with LUTs.
+Info: Generating derived timing constraints...
+Info: Promoting globals...
+Info:     promoting clock net clk$TRELLIS_IO_IN to global network
+Info: Checksum: 0xccf11c12
+
+Info: Device utilisation:
+Info: 	          TRELLIS_IO:    82/  197    41%
+Info: 	                DCCA:     1/   56     1%
+Info: 	              DP16KD:     0/   56     0%
+Info: 	          MULT18X18D:     4/   28    14%
+Info: 	              ALU54B:     0/   14     0%
+Info: 	             EHXPLLL:     0/    2     0%
+Info: 	             EXTREFB:     0/    1     0%
+Info: 	                DCUA:     0/    1     0%
+Info: 	           PCSCLKDIV:     0/    2     0%
+Info: 	             IOLOGIC:     0/  128     0%
+Info: 	            SIOLOGIC:     0/   69     0%
+Info: 	                 GSR:     0/    1     0%
+Info: 	               JTAGG:     0/    1     0%
+Info: 	                OSCG:     0/    1     0%
+Info: 	               SEDGA:     0/    1     0%
+Info: 	                 DTR:     0/    1     0%
+Info: 	             USRMCLK:     0/    1     0%
+Info: 	             CLKDIVF:     0/    4     0%
+Info: 	           ECLKSYNCB:     0/   10     0%
+Info: 	             DLLDELD:     0/    8     0%
+Info: 	              DDRDLL:     0/    4     0%
+Info: 	             DQSBUFM:     0/    8     0%
+Info: 	     TRELLIS_ECLKBUF:     0/    8     0%
+Info: 	        ECLKBRIDGECS:     0/    2     0%
+Info: 	                DCSC:     0/    2     0%
+Info: 	          TRELLIS_FF:   799/24288     3%
+Info: 	        TRELLIS_COMB:  4069/24288    16%
+Info: 	        TRELLIS_RAMW:     0/ 3036     0%
+
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 3105 cells, random placement wirelen = 178577.
+Info:     at initial placer iter 0, wirelen = 5249
+Info:     at initial placer iter 1, wirelen = 5057
+Info:     at initial placer iter 2, wirelen = 4864
+Info:     at initial placer iter 3, wirelen = 4868
+Info: Running main analytical placer, max placement attempts per cell = 3069003.
+Info:     at iteration #1, type ALL: wirelen solved = 4859, spread = 30634, legal = 36312; time = 0.29s
+Info:     at iteration #2, type ALL: wirelen solved = 6976, spread = 27121, legal = 32006; time = 0.28s
+Info:     at iteration #3, type ALL: wirelen solved = 9405, spread = 25846, legal = 30642; time = 0.28s
+Info:     at iteration #4, type ALL: wirelen solved = 11310, spread = 24329, legal = 29195; time = 0.29s
+Info:     at iteration #5, type ALL: wirelen solved = 12220, spread = 22584, legal = 27997; time = 0.28s
+Info:     at iteration #6, type ALL: wirelen solved = 12974, spread = 21933, legal = 28031; time = 0.30s
+Info:     at iteration #7, type ALL: wirelen solved = 13641, spread = 21791, legal = 27400; time = 0.26s
+Info:     at iteration #8, type ALL: wirelen solved = 14136, spread = 22428, legal = 27257; time = 0.26s
+Info:     at iteration #9, type ALL: wirelen solved = 14860, spread = 22189, legal = 27375; time = 0.27s
+Info:     at iteration #10, type ALL: wirelen solved = 15120, spread = 23036, legal = 26927; time = 0.25s
+Info:     at iteration #11, type ALL: wirelen solved = 16426, spread = 21643, legal = 26382; time = 0.27s
+Info:     at iteration #12, type ALL: wirelen solved = 16280, spread = 21192, legal = 26215; time = 0.25s
+Info:     at iteration #13, type ALL: wirelen solved = 16165, spread = 20981, legal = 26323; time = 0.27s
+Info:     at iteration #14, type ALL: wirelen solved = 16380, spread = 20544, legal = 25764; time = 0.23s
+Info:     at iteration #15, type ALL: wirelen solved = 16388, spread = 20929, legal = 25970; time = 0.24s
+Info:     at iteration #16, type ALL: wirelen solved = 16549, spread = 20913, legal = 26115; time = 0.23s
+Info:     at iteration #17, type ALL: wirelen solved = 16911, spread = 20913, legal = 26056; time = 0.25s
+Info:     at iteration #18, type ALL: wirelen solved = 16978, spread = 20541, legal = 26406; time = 0.25s
+Info:     at iteration #19, type ALL: wirelen solved = 17042, spread = 20722, legal = 26593; time = 0.25s
+Info: HeAP Placer Time: 6.40s
+Info:   of which solving equations: 3.12s
+Info:   of which spreading cells: 0.30s
+Info:   of which strict legalisation: 2.03s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 1047, wirelen = 25764
+Info:   at iteration #5: temp = 0.000000, timing cost = 875, wirelen = 21602
+Info:   at iteration #10: temp = 0.000000, timing cost = 877, wirelen = 20681
+Info:   at iteration #15: temp = 0.000000, timing cost = 813, wirelen = 20136
+Info:   at iteration #20: temp = 0.000000, timing cost = 838, wirelen = 19806
+Info:   at iteration #25: temp = 0.000000, timing cost = 830, wirelen = 19665
+Info:   at iteration #30: temp = 0.000000, timing cost = 843, wirelen = 19618
+Info:   at iteration #33: temp = 0.000000, timing cost = 843, wirelen = 19605 
+Info: SA placement time 12.08s
+
+Info: Max frequency for clock '$glbnet$clk$TRELLIS_IO_IN': 42.19 MHz (PASS at 20.00 MHz)
+
+Info: Max delay <async>                           -> <async>                          : 28.58 ns
+Info: Max delay <async>                           -> posedge $glbnet$clk$TRELLIS_IO_IN: 29.27 ns
+Info: Max delay posedge $glbnet$clk$TRELLIS_IO_IN -> <async>                          : 27.96 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 2 endpoint(s)
+Info:          + represents [1,2) endpoint(s)
+Info: [ 26295,  27443) |**********************+
+Info: [ 27443,  28591) |***************************************+
+Info: [ 28591,  29739) |******************************************************+
+Info: [ 29739,  30887) |************************************************************ 
+Info: [ 30887,  32035) |***************+
+Info: [ 32035,  33183) |*****+
+Info: [ 33183,  34331) | 
+Info: [ 34331,  35479) |**+
+Info: [ 35479,  36627) |**************+
+Info: [ 36627,  37775) |**********************************+
+Info: [ 37775,  38923) |*************************************************+
+Info: [ 38923,  40071) |*******************************************************+
+Info: [ 40071,  41219) |****************************************************+
+Info: [ 41219,  42367) |*************************+
+Info: [ 42367,  43515) |****************+
+Info: [ 43515,  44663) |************+
+Info: [ 44663,  45811) |********************+
+Info: [ 45811,  46959) |**********************+
+Info: [ 46959,  48107) |*****+
+Info: [ 48107,  49255) |**+
+Info: Checksum: 0x55010fa8
+Info: Routing globals...
+Info:     routing clock net $glbnet$clk$TRELLIS_IO_IN using global 0
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 13631 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:       1000 |      190        809 |  190   809 |     13037|       0.51       0.51|
+Info:       2000 |      450       1549 |  260   740 |     12565|       0.29       0.81|
+Info:       3000 |      766       2233 |  316   684 |     12080|       0.33       1.13|
+Info:       4000 |     1098       2901 |  332   668 |     11739|       0.27       1.40|
+Info:       5000 |     1502       3497 |  404   596 |     11380|       0.31       1.70|
+Info:       6000 |     1899       4100 |  397   603 |     10939|       0.32       2.02|
+Info:       7000 |     2329       4670 |  430   570 |     10526|       0.30       2.32|
+Info:       8000 |     2760       5239 |  431   569 |     10117|       0.32       2.64|
+Info:       9000 |     3458       5541 |  698   302 |      9985|       0.54       3.18|
+Info:      10000 |     3848       6151 |  390   610 |      9631|       0.31       3.49|
+Info:      11000 |     4364       6635 |  516   484 |      9256|       0.37       3.86|
+Info:      12000 |     5122       6877 |  758   242 |      9243|       0.60       4.46|
+Info:      13000 |     5734       7265 |  612   388 |      9044|       0.49       4.95|
+Info:      14000 |     6273       7726 |  539   461 |      8725|       0.44       5.39|
+Info:      15000 |     6752       8247 |  479   521 |      8350|       0.37       5.75|
+Info:      16000 |     7075       8859 |  323   612 |      7979|       0.25       6.01|
+Info:      17000 |     7309       9580 |  234   721 |      7291|       0.18       6.19|
+Info:      18000 |     7515      10275 |  206   695 |      6653|       0.19       6.38|
+Info:      19000 |     7690      10915 |  175   640 |      5856|       0.14       6.51|
+Info:      20000 |     7913      11477 |  223   562 |      5100|       0.15       6.66|
+Info:      21000 |     8206      12094 |  293   617 |      4440|       0.20       6.86|
+Info:      22000 |     8394      12821 |  188   727 |      3653|       0.18       7.04|
+Info:      23000 |     8688      13512 |  294   691 |      3348|       0.34       7.38|
+Info:      24000 |     9023      14150 |  335   638 |      3087|       0.33       7.70|
+Info:      25000 |     9286      14846 |  263   696 |      2567|       0.33       8.03|
+Info:      26000 |     9567      15538 |  281   692 |      2087|       0.35       8.38|
+Info:      27000 |     9814      16259 |  247   721 |      1546|       0.36       8.74|
+Info:      28000 |    10146      16894 |  332   635 |      1156|       0.47       9.21|
+Info:      29000 |    10583      17444 |  437   550 |      1066|       0.43       9.64|
+Info:      30000 |    11028      17987 |  445   543 |       821|       0.42      10.06|
+Info:      31000 |    11390      18594 |  362   607 |       369|       0.45      10.51|
+Info:      32000 |    11790      19174 |  400   580 |        57|       0.53      11.04|
+Info:      32129 |    11833      19259 |   43    85 |         0|       0.11      11.15|
+Info: Routing complete.
+Info: Router1 time 11.15s
+Info: Checksum: 0x2bbf1e4e
+
+Info: Critical path report for clock '$glbnet$clk$TRELLIS_IO_IN' (posedge -> posedge):
+Info: curr total
+Info:  0.5  0.5  Source operand_a_TRELLIS_FF_Q_26.Q
+Info:  2.0  2.5    Net debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_2_S1[2] (9,26) -> (13,13)
+Info:                Sink full_product_CCU2C_S0_B0_CCU2C_S0_B0_MULT18X18D_P0.A5
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:17.14-17.23
+Info:  3.9  6.5  Source full_product_CCU2C_S0_B0_CCU2C_S0_B0_MULT18X18D_P0.P1
+Info:  1.6  8.1    Net full_product_CCU2C_S0_B0_CCU2C_S0_B0[1] (13,13) -> (11,12)
+Info:                Sink full_product_MULT18X18D_P0_P18_CCU2C_A0_8$CCU2_COMB1.B
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:32.22-32.23
+Info:  0.4  8.5  Source full_product_MULT18X18D_P0_P18_CCU2C_A0_8$CCU2_COMB1.FCO
+Info:  0.0  8.5    Net full_product_CCU2C_S0_B0_CCU2C_S0_6_COUT[2] (11,12) -> (11,12)
+Info:                Sink full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:38.23-38.25
+Info:  0.1  8.6  Source full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_COMB0.FCO
+Info:  0.0  8.6    Net full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_FCI_INT (11,12) -> (11,12)
+Info:                Sink full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_COMB1.FCI
+Info:  0.0  8.6  Source full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_COMB1.FCO
+Info:  0.0  8.6    Net full_product_CCU2C_S0_B0_CCU2C_S0_6_COUT[4] (11,12) -> (11,12)
+Info:                Sink full_product_MULT18X18D_P0_P18_CCU2C_A0_2$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:38.23-38.25
+Info:  0.4  9.0  Source full_product_MULT18X18D_P0_P18_CCU2C_A0_2$CCU2_COMB0.F
+Info:  1.3 10.3    Net full_product_CCU2C_S0_B0[4] (11,12) -> (11,11)
+Info:                Sink full_product_CCU2C_S0_2$CCU2_COMB0.B
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:34.26-34.27
+Info:  0.4 10.8  Source full_product_CCU2C_S0_2$CCU2_COMB0.FCO
+Info:  0.0 10.8    Net full_product_CCU2C_S0_2$CCU2_FCI_INT (11,11) -> (11,11)
+Info:                Sink full_product_CCU2C_S0_2$CCU2_COMB1.FCI
+Info:  0.0 10.8  Source full_product_CCU2C_S0_2$CCU2_COMB1.FCO
+Info:  0.0 10.8    Net full_product_CCU2C_S0_3_COUT[5] (11,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_1$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 10.8  Source full_product_CCU2C_S0_1$CCU2_COMB0.FCO
+Info:  0.0 10.8    Net full_product_CCU2C_S0_1$CCU2_FCI_INT (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_1$CCU2_COMB1.FCI
+Info:  0.0 10.8  Source full_product_CCU2C_S0_1$CCU2_COMB1.FCO
+Info:  0.0 10.8    Net full_product_CCU2C_S0_3_COUT[7] (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 10.9  Source full_product_CCU2C_S0$CCU2_COMB0.FCO
+Info:  0.0 10.9    Net full_product_CCU2C_S0$CCU2_FCI_INT (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0$CCU2_COMB1.FCI
+Info:  0.0 10.9  Source full_product_CCU2C_S0$CCU2_COMB1.FCO
+Info:  0.0 10.9    Net full_product_CCU2C_S0_3_COUT[9] (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_21$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.0  Source full_product_CCU2C_S0_21$CCU2_COMB0.FCO
+Info:  0.0 11.0    Net full_product_CCU2C_S0_21$CCU2_FCI_INT (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_21$CCU2_COMB1.FCI
+Info:  0.0 11.0  Source full_product_CCU2C_S0_21$CCU2_COMB1.FCO
+Info:  0.0 11.0    Net full_product_CCU2C_S0_3_COUT[11] (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_20$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.1  Source full_product_CCU2C_S0_20$CCU2_COMB0.FCO
+Info:  0.0 11.1    Net full_product_CCU2C_S0_20$CCU2_FCI_INT (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_20$CCU2_COMB1.FCI
+Info:  0.0 11.1  Source full_product_CCU2C_S0_20$CCU2_COMB1.FCO
+Info:  0.0 11.1    Net full_product_CCU2C_S0_3_COUT[13] (12,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_19$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.1  Source full_product_CCU2C_S0_19$CCU2_COMB0.FCO
+Info:  0.0 11.1    Net full_product_CCU2C_S0_19$CCU2_FCI_INT (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_19$CCU2_COMB1.FCI
+Info:  0.0 11.1  Source full_product_CCU2C_S0_19$CCU2_COMB1.FCO
+Info:  0.0 11.1    Net full_product_CCU2C_S0_3_COUT[15] (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_18$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.2  Source full_product_CCU2C_S0_18$CCU2_COMB0.FCO
+Info:  0.0 11.2    Net full_product_CCU2C_S0_18$CCU2_FCI_INT (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_18$CCU2_COMB1.FCI
+Info:  0.0 11.2  Source full_product_CCU2C_S0_18$CCU2_COMB1.FCO
+Info:  0.0 11.2    Net full_product_CCU2C_S0_3_COUT[17] (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_17$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.3  Source full_product_CCU2C_S0_17$CCU2_COMB0.FCO
+Info:  0.0 11.3    Net full_product_CCU2C_S0_17$CCU2_FCI_INT (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_17$CCU2_COMB1.FCI
+Info:  0.0 11.3  Source full_product_CCU2C_S0_17$CCU2_COMB1.FCO
+Info:  0.0 11.3    Net full_product_CCU2C_S0_3_COUT[19] (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_16$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.3  Source full_product_CCU2C_S0_16$CCU2_COMB0.FCO
+Info:  0.0 11.3    Net full_product_CCU2C_S0_16$CCU2_FCI_INT (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_16$CCU2_COMB1.FCI
+Info:  0.0 11.3  Source full_product_CCU2C_S0_16$CCU2_COMB1.FCO
+Info:  0.0 11.3    Net full_product_CCU2C_S0_3_COUT[21] (13,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_15$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.4  Source full_product_CCU2C_S0_15$CCU2_COMB0.FCO
+Info:  0.0 11.4    Net full_product_CCU2C_S0_15$CCU2_FCI_INT (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_15$CCU2_COMB1.FCI
+Info:  0.0 11.4  Source full_product_CCU2C_S0_15$CCU2_COMB1.FCO
+Info:  0.0 11.4    Net full_product_CCU2C_S0_3_COUT[23] (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_14$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.5  Source full_product_CCU2C_S0_14$CCU2_COMB0.FCO
+Info:  0.0 11.5    Net full_product_CCU2C_S0_14$CCU2_FCI_INT (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_14$CCU2_COMB1.FCI
+Info:  0.0 11.5  Source full_product_CCU2C_S0_14$CCU2_COMB1.FCO
+Info:  0.0 11.5    Net full_product_CCU2C_S0_3_COUT[25] (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_13$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.6  Source full_product_CCU2C_S0_13$CCU2_COMB0.FCO
+Info:  0.0 11.6    Net full_product_CCU2C_S0_13$CCU2_FCI_INT (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_13$CCU2_COMB1.FCI
+Info:  0.0 11.6  Source full_product_CCU2C_S0_13$CCU2_COMB1.FCO
+Info:  0.0 11.6    Net full_product_CCU2C_S0_3_COUT[27] (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_12$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.6  Source full_product_CCU2C_S0_12$CCU2_COMB0.FCO
+Info:  0.0 11.6    Net full_product_CCU2C_S0_12$CCU2_FCI_INT (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_12$CCU2_COMB1.FCI
+Info:  0.0 11.6  Source full_product_CCU2C_S0_12$CCU2_COMB1.FCO
+Info:  0.0 11.6    Net full_product_CCU2C_S0_3_COUT[29] (14,11) -> (15,11)
+Info:                Sink full_product_CCU2C_S0_10$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.7  Source full_product_CCU2C_S0_10$CCU2_COMB0.FCO
+Info:  0.0 11.7    Net full_product_CCU2C_S0_10$CCU2_FCI_INT (15,11) -> (15,11)
+Info:                Sink full_product_CCU2C_S0_10$CCU2_COMB1.FCI
+Info:  0.0 11.7  Source full_product_CCU2C_S0_10$CCU2_COMB1.FCO
+Info:  0.0 11.7    Net full_product_CCU2C_S0_3_COUT[31] (15,11) -> (15,11)
+Info:                Sink full_product_CCU2C_S0_9$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.8  Source full_product_CCU2C_S0_9$CCU2_COMB0.FCO
+Info:  0.0 11.8    Net full_product_CCU2C_S0_9$CCU2_FCI_INT (15,11) -> (15,11)
+Info:                Sink full_product_CCU2C_S0_9$CCU2_COMB1.FCI
+Info:  0.0 11.8  Source full_product_CCU2C_S0_9$CCU2_COMB1.FCO
+Info:  0.0 11.8    Net full_product_CCU2C_S0_3_COUT[33] (15,11) -> (15,11)
+Info:                Sink full_product_CCU2C_S0_8$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.4 12.2  Source full_product_CCU2C_S0_8$CCU2_COMB0.F
+Info:  0.9 13.1    Net debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_D0_PFUMX_Z_C0_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_4_S0[2] (15,11) -> (15,15)
+Info:                Sink debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.C
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.15-37.27
+Info:  0.4 13.5  Source debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.OFX
+Info:  0.0 13.5    Net debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1 (15,15) -> (15,15)
+Info:                Sink debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.FXB
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:157.54-157.56
+Info:  0.2 13.7  Source debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:  0.0 13.7    Net debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0 (15,15) -> (15,15)
+Info:                Sink debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.FXA
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:157.66-157.68
+Info:  0.2 14.0  Source debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:  0.8 14.8    Net debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_SD[3] (15,15) -> (17,15)
+Info:                Sink debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.D
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 15.0  Source debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.F
+Info:  0.0 15.0    Net debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT (17,15) -> (17,15)
+Info:                Sink debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.F1
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:141.30-141.32
+Info:  0.2 15.2  Source debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.OFX
+Info:  0.0 15.2    Net debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_D1 (17,15) -> (17,15)
+Info:                Sink debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.FXB
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:141.38-141.40
+Info:  0.2 15.4  Source debug_data_LUT4_Z_9_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:  1.1 16.5    Net debug_data_LUT4_Z_9_A_LUT4_Z_B[2] (17,15) -> (19,16)
+Info:                Sink debug_data_LUT4_Z_9_A_LUT4_Z.D
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 16.8  Source debug_data_LUT4_Z_9_A_LUT4_Z.F
+Info:  1.4 18.1    Net debug_data_LUT4_Z_9_A[1] (19,16) -> (19,29)
+Info:                Sink debug_data_LUT4_Z_9_A_LUT4_A.A
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 18.4  Source debug_data_LUT4_Z_9_A_LUT4_A.F
+Info:  1.3 19.6    Net debug_data_LUT4_Z_9_A_LUT4_A_Z (19,29) -> (23,30)
+Info:                Sink register_bank[14]_TRELLIS_FF_Q_11.M
+Info:  0.0 19.6  Setup register_bank[14]_TRELLIS_FF_Q_11.M
+Info: 9.3 ns logic, 10.3 ns routing
+
+Info: Critical path report for cross-domain path '<async>' -> '<async>':
+Info: curr total
+Info:  0.0  0.0  Source debug_addr_a[3]$tr_io.O
+Info:  4.4  4.4    Net debug_addr_a[3]$TRELLIS_IO_IN (72,8) -> (3,7)
+Info:                Sink debug_addr_a_LUT4_A_5.A
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:4.22-4.34
+Info:  0.2  4.6  Source debug_addr_a_LUT4_A_5.F
+Info:  4.2  8.8    Net debug_addr_a_LUT4_A_5_Z[0] (3,7) -> (22,29)
+Info:                Sink debug_data_LUT4_Z_12_C_PFUMX_Z_C0_LUT4_Z_4_A_LUT4_Z_2.A
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2  9.0  Source debug_data_LUT4_Z_12_C_PFUMX_Z_C0_LUT4_Z_4_A_LUT4_Z_2.F
+Info:  0.5  9.5    Net debug_data_LUT4_Z_12_C_PFUMX_Z_C0_LUT4_Z_4_A[1] (22,29) -> (22,28)
+Info:                Sink debug_data_LUT4_Z_12_C_PFUMX_Z_C0_LUT4_Z_4.B
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2  9.7  Source debug_data_LUT4_Z_12_C_PFUMX_Z_C0_LUT4_Z_4.F
+Info:  0.7 10.5    Net debug_data_LUT4_Z_12_C_PFUMX_Z_C0[0] (22,28) -> (21,27)
+Info:                Sink debug_data_LUT4_Z_12_C_PFUMX_Z_ALUT_LUT4_Z.A
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 10.7  Source debug_data_LUT4_Z_12_C_PFUMX_Z_ALUT_LUT4_Z.F
+Info:  0.0 10.7    Net debug_data_LUT4_Z_12_C_PFUMX_Z_ALUT (21,27) -> (21,27)
+Info:                Sink debug_data_LUT4_Z_12_C_PFUMX_Z_BLUT_LUT4_Z.F1
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:133.22-133.24
+Info:  0.2 10.9  Source debug_data_LUT4_Z_12_C_PFUMX_Z_BLUT_LUT4_Z.OFX
+Info:  1.3 12.2    Net debug_data_LUT4_Z_12_A[2] (21,27) -> (18,26)
+Info:                Sink debug_data_LUT4_Z_12.C
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 12.4  Source debug_data_LUT4_Z_12.F
+Info:  3.5 15.9    Net debug_data[17]$TRELLIS_IO_OUT (18,26) -> (72,26)
+Info:                Sink debug_data[17]$tr_io.I
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:11.22-11.32
+Info: 1.3 ns logic, 14.6 ns routing
+
+Info: Critical path report for cross-domain path '<async>' -> 'posedge $glbnet$clk$TRELLIS_IO_IN':
+Info: curr total
+Info:  0.0  0.0  Source debug_addr_a[3]$tr_io.O
+Info:  4.4  4.4    Net debug_addr_a[3]$TRELLIS_IO_IN (72,8) -> (3,7)
+Info:                Sink debug_addr_a_LUT4_A_8.D
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:4.22-4.34
+Info:  0.2  4.6  Source debug_addr_a_LUT4_A_8.F
+Info:  4.8  9.4    Net debug_addr_a_LUT4_A_9_Z[3] (3,7) -> (27,29)
+Info:                Sink debug_data_PFUMX_Z_1_BLUT_LUT4_Z_D_LUT4_Z_C_LUT4_Z_1_A_LUT4_Z.D
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2  9.6  Source debug_data_PFUMX_Z_1_BLUT_LUT4_Z_D_LUT4_Z_C_LUT4_Z_1_A_LUT4_Z.F
+Info:  0.5 10.1    Net debug_data_PFUMX_Z_1_BLUT_LUT4_Z_D_LUT4_Z_C_LUT4_Z_1_A[3] (27,29) -> (27,28)
+Info:                Sink debug_data_PFUMX_Z_1_BLUT_LUT4_Z_D_LUT4_Z_C_LUT4_Z_1.D
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 10.4  Source debug_data_PFUMX_Z_1_BLUT_LUT4_Z_D_LUT4_Z_C_LUT4_Z_1.F
+Info:  0.7 11.1    Net debug_data_PFUMX_Z_1_BLUT_LUT4_Z_D_LUT4_Z_C[0] (27,28) -> (27,27)
+Info:                Sink debug_data_PFUMX_Z_1_BLUT_LUT4_Z_D_LUT4_Z_C_LUT4_C.C
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 11.3  Source debug_data_PFUMX_Z_1_BLUT_LUT4_Z_D_LUT4_Z_C_LUT4_C.F
+Info:  3.0 14.3    Net debug_data_LUT4_Z_9_C_LUT4_C_Z_LUT4_Z_2_C[0] (27,27) -> (17,5)
+Info:                Sink debug_data_LUT4_Z_27_C_LUT4_B_Z_LUT4_Z_2.C
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 14.6  Source debug_data_LUT4_Z_27_C_LUT4_B_Z_LUT4_Z_2.F
+Info:  0.9 15.4    Net debug_data_LUT4_Z_27_C_LUT4_B_Z[26] (17,5) -> (15,5)
+Info:                Sink debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_6$CCU2_COMB0.A
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/techmap.v:200.24-200.25
+Info:  0.4 15.9  Source debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_6$CCU2_COMB0.FCO
+Info:  0.0 15.9    Net debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_6$CCU2_FCI_INT (15,5) -> (15,5)
+Info:                Sink debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_6$CCU2_COMB1.FCI
+Info:  0.0 15.9  Source debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_6$CCU2_COMB1.FCO
+Info:  0.0 15.9    Net debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_3_COUT[27] (15,5) -> (15,5)
+Info:                Sink debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_5$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 16.0  Source debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_5$CCU2_COMB0.FCO
+Info:  0.0 16.0    Net debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_5$CCU2_FCI_INT (15,5) -> (15,5)
+Info:                Sink debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_5$CCU2_COMB1.FCI
+Info:  0.4 16.4  Source debug_data_LUT4_Z_9_C_LUT4_C_2_Z_CCU2C_B0_5$CCU2_COMB1.F
+Info:  1.2 17.6    Net instruction_TRELLIS_FF_Q_DI[29] (15,5) -> (15,10)
+Info:                Sink instruction_TRELLIS_FF_Q_2.M
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:34.26-34.27
+Info:  0.0 17.6  Setup instruction_TRELLIS_FF_Q_2.M
+Info: 2.1 ns logic, 15.5 ns routing
+
+Info: Critical path report for cross-domain path 'posedge $glbnet$clk$TRELLIS_IO_IN' -> '<async>':
+Info: curr total
+Info:  0.5  0.5  Source operand_a_TRELLIS_FF_Q_26.Q
+Info:  2.0  2.5    Net debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_2_S1[2] (9,26) -> (13,13)
+Info:                Sink full_product_CCU2C_S0_B0_CCU2C_S0_B0_MULT18X18D_P0.A5
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:17.14-17.23
+Info:  3.9  6.5  Source full_product_CCU2C_S0_B0_CCU2C_S0_B0_MULT18X18D_P0.P1
+Info:  1.6  8.1    Net full_product_CCU2C_S0_B0_CCU2C_S0_B0[1] (13,13) -> (11,12)
+Info:                Sink full_product_MULT18X18D_P0_P18_CCU2C_A0_8$CCU2_COMB1.B
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:32.22-32.23
+Info:  0.4  8.5  Source full_product_MULT18X18D_P0_P18_CCU2C_A0_8$CCU2_COMB1.FCO
+Info:  0.0  8.5    Net full_product_CCU2C_S0_B0_CCU2C_S0_6_COUT[2] (11,12) -> (11,12)
+Info:                Sink full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:38.23-38.25
+Info:  0.1  8.6  Source full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_COMB0.FCO
+Info:  0.0  8.6    Net full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_FCI_INT (11,12) -> (11,12)
+Info:                Sink full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_COMB1.FCI
+Info:  0.0  8.6  Source full_product_MULT18X18D_P0_P18_CCU2C_A0_3$CCU2_COMB1.FCO
+Info:  0.0  8.6    Net full_product_CCU2C_S0_B0_CCU2C_S0_6_COUT[4] (11,12) -> (11,12)
+Info:                Sink full_product_MULT18X18D_P0_P18_CCU2C_A0_2$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:38.23-38.25
+Info:  0.4  9.0  Source full_product_MULT18X18D_P0_P18_CCU2C_A0_2$CCU2_COMB0.F
+Info:  1.3 10.3    Net full_product_CCU2C_S0_B0[4] (11,12) -> (11,11)
+Info:                Sink full_product_CCU2C_S0_2$CCU2_COMB0.B
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:34.26-34.27
+Info:  0.4 10.8  Source full_product_CCU2C_S0_2$CCU2_COMB0.FCO
+Info:  0.0 10.8    Net full_product_CCU2C_S0_2$CCU2_FCI_INT (11,11) -> (11,11)
+Info:                Sink full_product_CCU2C_S0_2$CCU2_COMB1.FCI
+Info:  0.0 10.8  Source full_product_CCU2C_S0_2$CCU2_COMB1.FCO
+Info:  0.0 10.8    Net full_product_CCU2C_S0_3_COUT[5] (11,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_1$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 10.8  Source full_product_CCU2C_S0_1$CCU2_COMB0.FCO
+Info:  0.0 10.8    Net full_product_CCU2C_S0_1$CCU2_FCI_INT (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_1$CCU2_COMB1.FCI
+Info:  0.0 10.8  Source full_product_CCU2C_S0_1$CCU2_COMB1.FCO
+Info:  0.0 10.8    Net full_product_CCU2C_S0_3_COUT[7] (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 10.9  Source full_product_CCU2C_S0$CCU2_COMB0.FCO
+Info:  0.0 10.9    Net full_product_CCU2C_S0$CCU2_FCI_INT (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0$CCU2_COMB1.FCI
+Info:  0.0 10.9  Source full_product_CCU2C_S0$CCU2_COMB1.FCO
+Info:  0.0 10.9    Net full_product_CCU2C_S0_3_COUT[9] (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_21$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.0  Source full_product_CCU2C_S0_21$CCU2_COMB0.FCO
+Info:  0.0 11.0    Net full_product_CCU2C_S0_21$CCU2_FCI_INT (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_21$CCU2_COMB1.FCI
+Info:  0.0 11.0  Source full_product_CCU2C_S0_21$CCU2_COMB1.FCO
+Info:  0.0 11.0    Net full_product_CCU2C_S0_3_COUT[11] (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_20$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.1  Source full_product_CCU2C_S0_20$CCU2_COMB0.FCO
+Info:  0.0 11.1    Net full_product_CCU2C_S0_20$CCU2_FCI_INT (12,11) -> (12,11)
+Info:                Sink full_product_CCU2C_S0_20$CCU2_COMB1.FCI
+Info:  0.0 11.1  Source full_product_CCU2C_S0_20$CCU2_COMB1.FCO
+Info:  0.0 11.1    Net full_product_CCU2C_S0_3_COUT[13] (12,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_19$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.1  Source full_product_CCU2C_S0_19$CCU2_COMB0.FCO
+Info:  0.0 11.1    Net full_product_CCU2C_S0_19$CCU2_FCI_INT (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_19$CCU2_COMB1.FCI
+Info:  0.0 11.1  Source full_product_CCU2C_S0_19$CCU2_COMB1.FCO
+Info:  0.0 11.1    Net full_product_CCU2C_S0_3_COUT[15] (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_18$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.2  Source full_product_CCU2C_S0_18$CCU2_COMB0.FCO
+Info:  0.0 11.2    Net full_product_CCU2C_S0_18$CCU2_FCI_INT (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_18$CCU2_COMB1.FCI
+Info:  0.0 11.2  Source full_product_CCU2C_S0_18$CCU2_COMB1.FCO
+Info:  0.0 11.2    Net full_product_CCU2C_S0_3_COUT[17] (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_17$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.3  Source full_product_CCU2C_S0_17$CCU2_COMB0.FCO
+Info:  0.0 11.3    Net full_product_CCU2C_S0_17$CCU2_FCI_INT (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_17$CCU2_COMB1.FCI
+Info:  0.0 11.3  Source full_product_CCU2C_S0_17$CCU2_COMB1.FCO
+Info:  0.0 11.3    Net full_product_CCU2C_S0_3_COUT[19] (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_16$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.3  Source full_product_CCU2C_S0_16$CCU2_COMB0.FCO
+Info:  0.0 11.3    Net full_product_CCU2C_S0_16$CCU2_FCI_INT (13,11) -> (13,11)
+Info:                Sink full_product_CCU2C_S0_16$CCU2_COMB1.FCI
+Info:  0.0 11.3  Source full_product_CCU2C_S0_16$CCU2_COMB1.FCO
+Info:  0.0 11.3    Net full_product_CCU2C_S0_3_COUT[21] (13,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_15$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.4  Source full_product_CCU2C_S0_15$CCU2_COMB0.FCO
+Info:  0.0 11.4    Net full_product_CCU2C_S0_15$CCU2_FCI_INT (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_15$CCU2_COMB1.FCI
+Info:  0.0 11.4  Source full_product_CCU2C_S0_15$CCU2_COMB1.FCO
+Info:  0.0 11.4    Net full_product_CCU2C_S0_3_COUT[23] (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_14$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.5  Source full_product_CCU2C_S0_14$CCU2_COMB0.FCO
+Info:  0.0 11.5    Net full_product_CCU2C_S0_14$CCU2_FCI_INT (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_14$CCU2_COMB1.FCI
+Info:  0.0 11.5  Source full_product_CCU2C_S0_14$CCU2_COMB1.FCO
+Info:  0.0 11.5    Net full_product_CCU2C_S0_3_COUT[25] (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_13$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.6  Source full_product_CCU2C_S0_13$CCU2_COMB0.FCO
+Info:  0.0 11.6    Net full_product_CCU2C_S0_13$CCU2_FCI_INT (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_13$CCU2_COMB1.FCI
+Info:  0.0 11.6  Source full_product_CCU2C_S0_13$CCU2_COMB1.FCO
+Info:  0.0 11.6    Net full_product_CCU2C_S0_3_COUT[27] (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_12$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.6  Source full_product_CCU2C_S0_12$CCU2_COMB0.FCO
+Info:  0.0 11.6    Net full_product_CCU2C_S0_12$CCU2_FCI_INT (14,11) -> (14,11)
+Info:                Sink full_product_CCU2C_S0_12$CCU2_COMB1.FCI
+Info:  0.0 11.6  Source full_product_CCU2C_S0_12$CCU2_COMB1.FCO
+Info:  0.0 11.6    Net full_product_CCU2C_S0_3_COUT[29] (14,11) -> (15,11)
+Info:                Sink full_product_CCU2C_S0_10$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.7  Source full_product_CCU2C_S0_10$CCU2_COMB0.FCO
+Info:  0.0 11.7    Net full_product_CCU2C_S0_10$CCU2_FCI_INT (15,11) -> (15,11)
+Info:                Sink full_product_CCU2C_S0_10$CCU2_COMB1.FCI
+Info:  0.4 12.1  Source full_product_CCU2C_S0_10$CCU2_COMB1.F
+Info:  1.0 13.1    Net debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_D0_PFUMX_Z_C0_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_6_S1[2] (15,11) -> (18,11)
+Info:                Sink debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_7_S1_LUT4_A_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_L6MUX21_Z_1_D0_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.C
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:37.15-37.27
+Info:  0.4 13.5  Source debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_7_S1_LUT4_A_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_L6MUX21_Z_1_D0_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.OFX
+Info:  0.0 13.5    Net debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_7_S1_LUT4_A_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_L6MUX21_Z_1_D0_L6MUX21_Z_D1 (18,11) -> (18,11)
+Info:                Sink debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_7_S1_LUT4_A_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_L6MUX21_Z_1_D0_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.FXB
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:157.54-157.56
+Info:  0.2 13.7  Source debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_7_S1_LUT4_A_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_L6MUX21_Z_1_D0_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:  0.0 13.7    Net debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_7_S1_LUT4_A_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_L6MUX21_Z_1_D0 (18,11) -> (18,11)
+Info:                Sink debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_7_S1_LUT4_A_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_L6MUX21_Z_1_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.FXA
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:157.66-157.68
+Info:  0.2 13.9  Source debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_7_S1_LUT4_A_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_L6MUX21_Z_1_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:  0.8 14.7    Net debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_7_S1_LUT4_A_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z[3] (18,11) -> (18,18)
+Info:                Sink debug_data_LUT4_Z_12_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.D
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 14.9  Source debug_data_LUT4_Z_12_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.F
+Info:  0.0 14.9    Net debug_data_LUT4_Z_12_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT (18,18) -> (18,18)
+Info:                Sink debug_data_LUT4_Z_12_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.F1
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:141.30-141.32
+Info:  0.2 15.1  Source debug_data_LUT4_Z_12_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.OFX
+Info:  0.0 15.1    Net debug_data_LUT4_Z_12_A_LUT4_Z_B_L6MUX21_Z_D1 (18,18) -> (18,18)
+Info:                Sink debug_data_LUT4_Z_12_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.FXB
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:141.38-141.40
+Info:  0.2 15.4  Source debug_data_LUT4_Z_12_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:  1.5 16.8    Net debug_data_LUT4_Z_12_A_LUT4_Z_B[2] (18,18) -> (18,26)
+Info:                Sink debug_data_LUT4_Z_12_A_LUT4_Z.D
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 17.1  Source debug_data_LUT4_Z_12_A_LUT4_Z.F
+Info:  0.8 17.9    Net debug_data_LUT4_Z_12_A[0] (18,26) -> (18,26)
+Info:                Sink debug_data_LUT4_Z_12.A
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 18.1  Source debug_data_LUT4_Z_12.F
+Info:  3.5 21.6    Net debug_data[17]$TRELLIS_IO_OUT (18,26) -> (72,26)
+Info:                Sink debug_data[17]$tr_io.I
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv:11.22-11.32
+Info: 9.2 ns logic, 12.4 ns routing
+
+Info: Max frequency for clock '$glbnet$clk$TRELLIS_IO_IN': 51.01 MHz (PASS at 20.00 MHz)
+
+Info: Max delay <async>                           -> <async>                          : 15.91 ns
+Info: Max delay <async>                           -> posedge $glbnet$clk$TRELLIS_IO_IN: 17.57 ns
+Info: Max delay posedge $glbnet$clk$TRELLIS_IO_IN -> <async>                          : 21.58 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 3 endpoint(s)
+Info:          + represents [1,3) endpoint(s)
+Info: [ 30396,  31316) |*****************+
+Info: [ 31316,  32236) |*************************************************+
+Info: [ 32236,  33156) |*****************************************+
+Info: [ 33156,  34076) |******************************+
+Info: [ 34076,  34996) |*+
+Info: [ 34996,  35916) | 
+Info: [ 35916,  36836) |+
+Info: [ 36836,  37756) |**+
+Info: [ 37756,  38676) |+
+Info: [ 38676,  39596) |***+
+Info: [ 39596,  40516) |********* 
+Info: [ 40516,  41436) |*********+
+Info: [ 41436,  42356) |********************************************* 
+Info: [ 42356,  43276) |************************************************************ 
+Info: [ 43276,  44196) |***************************************+
+Info: [ 44196,  45116) |*********+
+Info: [ 45116,  46036) |****************+
+Info: [ 46036,  46956) |****************+
+Info: [ 46956,  47876) |*******+
+Info: [ 47876,  48796) |*+
+
+Info: Program finished normally.

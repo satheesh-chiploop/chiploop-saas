@@ -1,0 +1,77 @@
+{
+  "agent": "FPGA RTL Quality Gate Agent",
+  "pass1": {
+    "rtl_file_count": 1,
+    "status": "pass",
+    "suffix": "pass1",
+    "tools": {
+      "iverilog": {
+        "available": true,
+        "cmd": [
+          "iverilog",
+          "-g2012",
+          "-tnull",
+          "/root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/quality/iverilog_pass1.log",
+        "ok": true,
+        "returncode": 0
+      },
+      "verilator": {
+        "available": true,
+        "cmd": [
+          "verilator",
+          "--lint-only",
+          "-Wall",
+          "-Wno-fatal",
+          "/root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/quality/verilator_pass1.log",
+        "ok": true,
+        "returncode": 0
+      }
+    }
+  },
+  "pass2": {
+    "rtl_file_count": 1,
+    "status": "pass",
+    "suffix": "pass2",
+    "tools": {
+      "iverilog": {
+        "available": true,
+        "cmd": [
+          "iverilog",
+          "-g2012",
+          "-tnull",
+          "/root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/quality/iverilog_pass2.log",
+        "ok": true,
+        "returncode": 0
+      },
+      "verilator": {
+        "available": true,
+        "cmd": [
+          "verilator",
+          "--lint-only",
+          "-Wall",
+          "-Wno-fatal",
+          "/root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/quality/verilator_pass2.log",
+        "ok": true,
+        "returncode": 0
+      }
+    }
+  },
+  "repair": {
+    "applied": false,
+    "enabled": true
+  },
+  "repair_enabled": true,
+  "rtl_file_count": 1,
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv"
+  ],
+  "status": "pass"
+}

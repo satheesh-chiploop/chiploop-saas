@@ -1639,7 +1639,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               {results.map((item) => {
                 const fmax = firstNumber(item.best_frequency_mhz) || 0;
                 const failureKind = firstString(item.failure_kind);
-                const outcome = failureKind === "capacity_exceeded" ? "does not fit" : failureKind === "io_packing" ? "tool I/O packing failed" : firstString(item.status) === "implementation_failed" ? "implementation failed" : item.target_met === true ? "target met" : "target missed";
+                const failureReason = firstString(item.failure_reason).toLowerCase();
+                const capacityExceeded = failureKind === "capacity_exceeded" || firstNumber(item.logic_utilization_percent) > 100 || /no bels remaining|check constraints and utilisation/.test(failureReason);
+                const outcome = capacityExceeded ? "does not fit" : failureKind === "io_packing" ? "tool I/O packing failed" : firstString(item.status) === "implementation_failed" ? "implementation failed" : item.target_met === true ? "target met" : "target missed";
                 return <Bar key={firstString(item.board)} label={`${firstString(item.label, item.board)} - ${outcome}`} value={fmax} total={maxFmax} color={item.target_met === true ? "bg-emerald-500" : firstString(item.status) === "implementation_failed" ? "bg-rose-500" : "bg-amber-500"} />;
               })}
             </div>
@@ -1652,7 +1654,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               const boardIo = ioMappings.find((mapping) => firstString(mapping.board) === firstString(item.board));
               const implementationFailed = firstString(item.status) === "implementation_failed";
               const failureKind = firstString(item.failure_kind);
-              const failureLabel = failureKind === "capacity_exceeded" ? "Does not fit" : failureKind === "io_packing" ? "Tool I/O packing failed" : "Implementation failed";
+              const failureReason = firstString(item.failure_reason).toLowerCase();
+              const capacityExceeded = failureKind === "capacity_exceeded" || firstNumber(item.logic_utilization_percent) > 100 || /no bels remaining|check constraints and utilisation/.test(failureReason);
+              const failureLabel = capacityExceeded ? "Does not fit" : failureKind === "io_packing" ? "Tool I/O packing failed" : "Implementation failed";
               return (
                 <details key={firstString(item.board)} className="rounded-2xl border border-slate-800 bg-slate-950/35 px-4 py-3">
                   <summary className="cursor-pointer">
