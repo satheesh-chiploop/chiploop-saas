@@ -89,8 +89,8 @@ const paths = [
 ];
 
 const platformStats = [
-  ["377", "Registered Agents", "text-cyan-300"],
-  ["57", "Published Apps", "text-emerald-300"],
+  ["223", "Unique Agent Implementations", "text-cyan-300"],
+  ["56", "Published Apps", "text-emerald-300"],
   ["36", "Prebuilt Workflows", "text-violet-300"],
   ["10", "Reference Journeys", "text-amber-300"],
   ["5", "Product Journeys", "text-pink-300"],
@@ -120,16 +120,9 @@ const subscriptionLoops = [
     hover: "hover:border-lime-300 hover:shadow-lime-950/35",
   },
   {
-    name: "Analog Design",
-    href: "/loops/analog",
-    body: "Analog requirements, simulation, corners, model validation, and correlation evidence.",
-    border: "border-fuchsia-400/55",
-    hover: "hover:border-fuchsia-300 hover:shadow-fuchsia-950/35",
-  },
-  {
     name: "Mixed Signal",
     href: "/loops/mixed-signal",
-    body: "System and mixed-signal integration across digital RTL, analog models, SoC intent, simulation, and synthesis.",
+    body: "Analog design, simulation, model correlation, and mixed-signal integration across RTL, SoC intent, and system evidence.",
     border: "border-rose-400/55",
     hover: "hover:border-rose-300 hover:shadow-rose-950/35",
   },
