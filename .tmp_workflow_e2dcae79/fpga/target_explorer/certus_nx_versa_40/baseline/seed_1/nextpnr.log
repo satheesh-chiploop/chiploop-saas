@@ -1,0 +1,281 @@
+Info: Packing IOLOGIC...
+Info: Packing DSPs...
+Info: Packing BRAM...
+Info: Packing LRAM...
+Info: Packing carries...
+Info: Packing FFs...
+Info:     Created 799 OXIDE_FF cells from:
+Info:            177x FD1P3BX
+Info:            618x FD1P3DX
+Info:              4x FD1P3IX
+Info: Packing LUTs...
+Info: Packing IOLOGIC...
+Info: Placing DQSBUFs...
+Info: Placing edge clocks...
+Info: Inferring LUT+FF pairs...
+Info:     Created 91 LUT+FF pairs and extended 131 clusters using total 799 FFs and 2678 LUTs
+Info: Promoting globals...
+Info: Placing globals...
+Info: Generating derived timing constraints...
+
+Info: Device utilisation:
+Info: 	            OXIDE_FF:     799/  32256     2%
+Info: 	          OXIDE_COMB:    2678/  32256     8%
+Info: 	                RAMW:       0/   4032     0%
+Info: 	         SEIO33_CORE:       0/    111     0%
+Info: 	         SEIO18_CORE:       0/     74     0%
+Info: 	       DIFFIO18_CORE:       0/     37     0%
+Info: 	            OSC_CORE:       0/      1     0%
+Info: 	           OXIDE_EBR:       0/     84     0%
+Info: 	        PREADD9_CORE:       8/    112     7%
+Info: 	          MULT9_CORE:       8/    112     7%
+Info: 	         MULT18_CORE:       4/     56     7%
+Info: 	          REG18_CORE:       4/    112     3%
+Info: 	      MULT18X36_CORE:       2/     28     7%
+Info: 	         MULT36_CORE:       1/     14     7%
+Info: 	          ACC54_CORE:       0/     28     0%
+Info: 	                 DCC:       0/     62     0%
+Info: 	             VCC_DRV:       1/     86     1%
+Info: 	            PLL_CORE:       0/      3     0%
+Info: 	           LRAM_CORE:       0/      2     0%
+Info: 	             IOLOGIC:       0/     74     0%
+Info: 	            SIOLOGIC:       0/    110     0%
+Info: 	        ECLKDIV_CORE:       0/     12     0%
+Info: 	       ECLKSYNC_CORE:       0/     12     0%
+Info: 	         DQSBUF_CORE:       0/      4     0%
+Info: 	         DDRDLL_CORE:       0/      2     0%
+Info: 	                 DCS:       0/      1     0%
+Info: 	CONFIG_MULTIBOOT_CORE:       0/      1     0%
+Info: 	    CONFIG_LMMI_CORE:       0/      1     0%
+Info: 	  CONFIG_CLKRST_CORE:       0/      1     0%
+Info: 	     CONFIG_HSE_CORE:       0/      1     0%
+
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 2535 cells, random placement wirelen = 177386.
+Info:     at initial placer iter 0, wirelen = 1953
+Info:     at initial placer iter 1, wirelen = 1918
+Info:     at initial placer iter 2, wirelen = 1908
+Info:     at initial placer iter 3, wirelen = 1914
+Info: Running main analytical placer, max placement attempts per cell = 1535628.
+Info:     at iteration #1, type OXIDE_COMB: wirelen solved = 2240, spread = 54105, legal = 54055; time = 0.05s
+Info:     at iteration #1, type OXIDE_FF: wirelen solved = 45558, spread = 46488, legal = 46531; time = 0.03s
+Info:     at iteration #1, type PREADD9_CORE: wirelen solved = 45863, spread = 45863, legal = 46787; time = 0.03s
+Info:     at iteration #1, type VCC_DRV: wirelen solved = 46787, spread = 46787, legal = 46787; time = 0.03s
+Info:     at iteration #1, type ALL: wirelen solved = 1937, spread = 41161, legal = 41313; time = 0.07s
+Info:     at iteration #2, type OXIDE_COMB: wirelen solved = 12269, spread = 28393, legal = 28546; time = 0.05s
+Info:     at iteration #2, type OXIDE_FF: wirelen solved = 23882, spread = 24013, legal = 24279; time = 0.03s
+Info:     at iteration #2, type PREADD9_CORE: wirelen solved = 24268, spread = 24268, legal = 24279; time = 0.04s
+Info:     at iteration #2, type VCC_DRV: wirelen solved = 24279, spread = 24279, legal = 24279; time = 0.03s
+Info:     at iteration #2, type ALL: wirelen solved = 3122, spread = 22801, legal = 24324; time = 0.07s
+Info:     at iteration #3, type OXIDE_COMB: wirelen solved = 14492, spread = 25587, legal = 25551; time = 0.05s
+Info:     at iteration #3, type OXIDE_FF: wirelen solved = 23001, spread = 23043, legal = 23261; time = 0.03s
+Info:     at iteration #3, type PREADD9_CORE: wirelen solved = 23043, spread = 23043, legal = 23261; time = 0.04s
+Info:     at iteration #3, type VCC_DRV: wirelen solved = 23261, spread = 23261, legal = 23261; time = 0.04s
+Info:     at iteration #3, type ALL: wirelen solved = 5471, spread = 21959, legal = 22581; time = 0.07s
+Info:     at iteration #4, type OXIDE_COMB: wirelen solved = 12948, spread = 22944, legal = 22964; time = 0.05s
+Info:     at iteration #4, type OXIDE_FF: wirelen solved = 21235, spread = 21316, legal = 21626; time = 0.02s
+Info:     at iteration #4, type PREADD9_CORE: wirelen solved = 21601, spread = 21601, legal = 21626; time = 0.03s
+Info:     at iteration #4, type VCC_DRV: wirelen solved = 21626, spread = 21626, legal = 21626; time = 0.03s
+Info:     at iteration #4, type ALL: wirelen solved = 7854, spread = 20708, legal = 21264; time = 0.07s
+Info:     at iteration #5, type OXIDE_COMB: wirelen solved = 13286, spread = 21038, legal = 21167; time = 0.05s
+Info:     at iteration #5, type OXIDE_FF: wirelen solved = 20122, spread = 20249, legal = 20480; time = 0.02s
+Info:     at iteration #5, type PREADD9_CORE: wirelen solved = 20404, spread = 20404, legal = 20480; time = 0.03s
+Info:     at iteration #5, type VCC_DRV: wirelen solved = 20480, spread = 20480, legal = 20480; time = 0.03s
+Info:     at iteration #5, type ALL: wirelen solved = 9536, spread = 18881, legal = 19486; time = 0.06s
+Info:     at iteration #6, type OXIDE_COMB: wirelen solved = 13600, spread = 21793, legal = 21884; time = 0.05s
+Info:     at iteration #6, type OXIDE_FF: wirelen solved = 20577, spread = 20626, legal = 20895; time = 0.03s
+Info:     at iteration #6, type PREADD9_CORE: wirelen solved = 20828, spread = 20828, legal = 20895; time = 0.04s
+Info:     at iteration #6, type VCC_DRV: wirelen solved = 20895, spread = 20895, legal = 20895; time = 0.03s
+Info:     at iteration #6, type ALL: wirelen solved = 10677, spread = 19174, legal = 19900; time = 0.06s
+Info:     at iteration #7, type OXIDE_COMB: wirelen solved = 14212, spread = 19877, legal = 20065; time = 0.05s
+Info:     at iteration #7, type OXIDE_FF: wirelen solved = 19081, spread = 19171, legal = 19455; time = 0.02s
+Info:     at iteration #7, type PREADD9_CORE: wirelen solved = 19351, spread = 19351, legal = 19455; time = 0.03s
+Info:     at iteration #7, type VCC_DRV: wirelen solved = 19455, spread = 19455, legal = 19455; time = 0.04s
+Info:     at iteration #7, type ALL: wirelen solved = 11349, spread = 18179, legal = 18994; time = 0.07s
+Info:     at iteration #8, type OXIDE_COMB: wirelen solved = 14649, spread = 19785, legal = 19938; time = 0.05s
+Info:     at iteration #8, type OXIDE_FF: wirelen solved = 19019, spread = 19131, legal = 19429; time = 0.03s
+Info:     at iteration #8, type PREADD9_CORE: wirelen solved = 19262, spread = 19262, legal = 19429; time = 0.03s
+Info:     at iteration #8, type VCC_DRV: wirelen solved = 19429, spread = 19429, legal = 19429; time = 0.03s
+Info:     at iteration #8, type ALL: wirelen solved = 11934, spread = 17362, legal = 17986; time = 0.06s
+Info:     at iteration #9, type OXIDE_COMB: wirelen solved = 14031, spread = 19211, legal = 19349; time = 0.05s
+Info:     at iteration #9, type OXIDE_FF: wirelen solved = 18408, spread = 18464, legal = 18801; time = 0.03s
+Info:     at iteration #9, type PREADD9_CORE: wirelen solved = 18579, spread = 18579, legal = 18801; time = 0.03s
+Info:     at iteration #9, type VCC_DRV: wirelen solved = 18801, spread = 18801, legal = 18801; time = 0.03s
+Info:     at iteration #9, type ALL: wirelen solved = 12153, spread = 17505, legal = 18048; time = 0.08s
+Info:     at iteration #10, type OXIDE_COMB: wirelen solved = 14322, spread = 18412, legal = 18569; time = 0.05s
+Info:     at iteration #10, type OXIDE_FF: wirelen solved = 17923, spread = 18095, legal = 18422; time = 0.02s
+Info:     at iteration #10, type PREADD9_CORE: wirelen solved = 18149, spread = 18149, legal = 19449; time = 0.03s
+Info:     at iteration #10, type VCC_DRV: wirelen solved = 19449, spread = 19449, legal = 19449; time = 0.03s
+Info:     at iteration #10, type ALL: wirelen solved = 13043, spread = 17607, legal = 18998; time = 0.06s
+Info:     at iteration #11, type OXIDE_COMB: wirelen solved = 15805, spread = 19199, legal = 19337; time = 0.05s
+Info:     at iteration #11, type OXIDE_FF: wirelen solved = 18877, spread = 19313, legal = 19629; time = 0.03s
+Info:     at iteration #11, type PREADD9_CORE: wirelen solved = 18879, spread = 18879, legal = 19629; time = 0.04s
+Info:     at iteration #11, type VCC_DRV: wirelen solved = 19629, spread = 19629, legal = 19629; time = 0.03s
+Info:     at iteration #11, type ALL: wirelen solved = 13689, spread = 16370, legal = 16934; time = 0.07s
+Info: HeAP Placer Time: 2.87s
+Info:   of which solving equations: 2.01s
+Info:   of which spreading cells: 0.27s
+Info:   of which strict legalisation: 0.12s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 747, wirelen = 16934
+Info:   at iteration #5: temp = 0.000000, timing cost = 513, wirelen = 15307
+Info:   at iteration #10: temp = 0.000000, timing cost = 510, wirelen = 14742
+Info:   at iteration #15: temp = 0.000000, timing cost = 506, wirelen = 14517
+Info:   at iteration #20: temp = 0.000000, timing cost = 505, wirelen = 14453
+Info:   at iteration #20: temp = 0.000000, timing cost = 505, wirelen = 14453 
+Info: SA placement time 5.34s
+
+Info: Max frequency for clock 'clk': 65.58 MHz (PASS at 25.00 MHz)
+
+Info: Slack histogram:
+Info:  legend: * represents 4 endpoint(s)
+Info:          + represents [1,4) endpoint(s)
+Info: [ 24751,  25485) |**************************+
+Info: [ 25485,  26219) |************************************************************ 
+Info: [ 26219,  26953) |***************************+
+Info: [ 26953,  27687) |+
+Info: [ 27687,  28421) | 
+Info: [ 28421,  29155) | 
+Info: [ 29155,  29889) |**+
+Info: [ 29889,  30623) |***+
+Info: [ 30623,  31357) |**+
+Info: [ 31357,  32091) |*****+
+Info: [ 32091,  32825) |************************************+
+Info: [ 32825,  33559) |*****************+
+Info: [ 33559,  34293) |*******************************+
+Info: [ 34293,  35027) |*******************************+
+Info: [ 35027,  35761) |*********+
+Info: [ 35761,  36495) |****+
+Info: [ 36495,  37229) |*******+
+Info: [ 37229,  37963) |************+
+Info: [ 37963,  38697) |*****************+
+Info: [ 38697,  39431) |*+
+Info: Checksum: 0xaf3814cf
+Info: Running post-place optimisations...
+Info:      created 60 direct LUT-FF pairs
+Info: Routing globals...
+Info: Running router2...
+Info: Setting up routing resources...
+Info: Running main router loop...
+Info:     iter=1 wires=67360 overused=12098 overuse=13660 archfail=NA
+Info:     iter=2 wires=61691 overused=3052 overuse=3117 archfail=NA
+Info:     iter=3 wires=60884 overused=838 overuse=847 archfail=NA
+Info:     iter=4 wires=60759 overused=322 overuse=323 archfail=NA
+Info:     iter=5 wires=60732 overused=174 overuse=174 archfail=NA
+Info:     iter=6 wires=60772 overused=147 overuse=147 archfail=NA
+Info:     iter=7 wires=60781 overused=115 overuse=115 archfail=NA
+Info:     iter=8 wires=60776 overused=104 overuse=104 archfail=NA
+Info:     iter=9 wires=60802 overused=85 overuse=85 archfail=NA
+Info:     iter=10 wires=60810 overused=66 overuse=66 archfail=NA
+Info:     iter=11 wires=60818 overused=56 overuse=56 archfail=NA
+Info:     iter=12 wires=60823 overused=55 overuse=55 archfail=NA
+Info:     iter=13 wires=60807 overused=50 overuse=50 archfail=NA
+Info:     iter=14 wires=60818 overused=50 overuse=50 archfail=NA
+Info:     iter=15 wires=60827 overused=41 overuse=41 archfail=NA
+Info:     iter=16 wires=60829 overused=36 overuse=36 archfail=NA
+Info:     iter=17 wires=60829 overused=34 overuse=34 archfail=NA
+Info:     iter=18 wires=60835 overused=23 overuse=23 archfail=NA
+Info:     iter=19 wires=60831 overused=23 overuse=23 archfail=NA
+Info:     iter=20 wires=60837 overused=22 overuse=22 archfail=NA
+Info:     iter=21 wires=60852 overused=5 overuse=5 archfail=NA
+Info:     iter=22 wires=60854 overused=3 overuse=3 archfail=NA
+Info:     iter=23 wires=60854 overused=3 overuse=3 archfail=NA
+Info:     iter=24 wires=60854 overused=3 overuse=3 archfail=NA
+Info:     iter=25 wires=60860 overused=2 overuse=2 archfail=NA
+Info:     iter=26 wires=60860 overused=2 overuse=2 archfail=NA
+Info:     iter=27 wires=60864 overused=1 overuse=1 archfail=NA
+Info:     iter=28 wires=60864 overused=1 overuse=1 archfail=NA
+Info:     iter=29 wires=60864 overused=1 overuse=1 archfail=NA
+Info:     iter=30 wires=60864 overused=1 overuse=1 archfail=NA
+Info:     iter=31 wires=60864 overused=1 overuse=1 archfail=NA
+Info:     iter=32 wires=60864 overused=1 overuse=1 archfail=NA
+Info:     iter=33 wires=60864 overused=1 overuse=1 archfail=NA
+Info:     iter=34 wires=60868 overused=0 overuse=0 archfail=0
+Info: Router2 time 8.69s
+Info: Running router1 to check that route is legal...
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 0 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:          0 |        0          0 |    0     0 |         0|       0.44       0.44|
+Info: Routing complete.
+Info: Router1 time 0.44s
+Info: Checksum: 0x08fb9640
+
+Info: Critical path report for clock 'clk' (posedge -> posedge):
+Info:       type curr  total name
+Info:   clk-to-q  0.34  0.34 Source operand_a_FD1P3DX_Q_24.Q
+Info:    routing  1.30  1.63 Net operand_a[7] (14,8) -> (16,19)
+Info:                          Sink full_product_MULT36X36_Z/MULT9_CORE_x1_z2.A7
+Info:                          Defined in:
+Info:                               /root/chiploop-backend/backend/workflows/e2dcae79-59c3-49fc-a3b2-2a9441a52240/fpga/src/rtl/review_input.sv:17.14-17.23
+Info:      logic  1.25  2.88 Source full_product_MULT36X36_Z/MULT9_CORE_x1_z2.P1817
+Info:    routing  0.00  2.88 Net full_product_MULT36X36_Z/MULT9_CORE_x1_z2$conn$P1817 (16,19) -> (16,19)
+Info:                          Sink full_product_MULT36X36_Z/MULT18_CORE_x1_z4.PL1817
+Info:      logic  1.40  4.28 Source full_product_MULT36X36_Z/MULT18_CORE_x1_z4.SIGNED18
+Info:    routing  0.00  4.28 Net full_product_MULT36X36_Z/MULT18_CORE_x1_z4$conn$SIGNED18 (16,19) -> (17,19)
+Info:                          Sink full_product_MULT36X36_Z/MULT18X36_CORE_x2_z4.SGNED18H
+Info:      logic  1.40  5.68 Source full_product_MULT36X36_Z/MULT18X36_CORE_x2_z4.P7241
+Info:    routing  0.00  5.68 Net full_product_MULT36X36_Z/MULT18X36_CORE_x2_z4$conn$P7241 (17,19) -> (21,19)
+Info:                          Sink full_product_MULT36X36_Z/MULT36_CORE_x6_z6.PL7241
+Info:      logic  0.52  6.20 Source full_product_MULT36X36_Z/MULT36_CORE_x6_z6.PML7254
+Info:    routing  0.00  6.20 Net full_product_MULT36X36_Z/MULT36_CORE_x6_z6$conn$PML7254 (21,19) -> (17,19)
+Info:                          Sink full_product_MULT36X36_Z/REG18_CORE_x2_z3.PM0
+Info:      logic  0.15  6.35 Source full_product_MULT36X36_Z/REG18_CORE_x2_z3.PP6
+Info:    routing  1.84  8.19 Net full_product[60] (17,19) -> (17,9)
+Info:                          Sink debug_data_LUT4_Z_3_A_LUT4_Z_D_LUT4_Z_D_LUT4_Z_D_LUT4_Z.B
+Info:                          Defined in:
+Info:                               /root/chiploop-backend/backend/workflows/e2dcae79-59c3-49fc-a3b2-2a9441a52240/fpga/src/rtl/review_input.sv:37.15-37.27
+Info:      logic  0.23  8.43 Source debug_data_LUT4_Z_3_A_LUT4_Z_D_LUT4_Z_D_LUT4_Z_D_LUT4_Z.F
+Info:    routing  0.13  8.56 Net debug_data_LUT4_Z_3_A_LUT4_Z_D_LUT4_Z_D_LUT4_Z_D (17,9) -> (17,9)
+Info:                          Sink debug_data_LUT4_Z_3_A_LUT4_Z_D_LUT4_Z_D_LUT4_Z.D
+Info:      logic  0.23  8.79 Source debug_data_LUT4_Z_3_A_LUT4_Z_D_LUT4_Z_D_LUT4_Z.F
+Info:    routing  0.40  9.19 Net debug_data_LUT4_Z_3_A_LUT4_Z_D_LUT4_Z_D (17,9) -> (20,9)
+Info:                          Sink debug_data_LUT4_Z_3_A_LUT4_Z_D_LUT4_Z.D
+Info:      logic  0.23  9.42 Source debug_data_LUT4_Z_3_A_LUT4_Z_D_LUT4_Z.F
+Info:    routing  0.31  9.73 Net debug_data_LUT4_Z_3_A_LUT4_Z_D (20,9) -> (22,9)
+Info:                          Sink debug_data_LUT4_Z_3_A_LUT4_Z_C_WIDEFN9_A0$widefn_comb[1]$.C
+Info:      logic  0.23  9.96 Source debug_data_LUT4_Z_3_A_LUT4_Z_C_WIDEFN9_A0$widefn_comb[1]$.F
+Info:    routing  0.00  9.96 Net debug_data_LUT4_Z_3_A_LUT4_Z_C_WIDEFN9_A0$widefn_f1$ (22,9) -> (22,9)
+Info:                          Sink debug_data_LUT4_Z_3_A_LUT4_Z_C_WIDEFN9_A0$widefn_comb[0]$.F1
+Info:      logic  0.11  10.07 Source debug_data_LUT4_Z_3_A_LUT4_Z_C_WIDEFN9_A0$widefn_comb[0]$.OFX
+Info:    routing  0.44  10.51 Net debug_data_LUT4_Z_3_A_LUT4_Z_C_WIDEFN9_A0_Z (22,9) -> (29,9)
+Info:                          Sink debug_data_LUT4_Z_3_A_LUT4_Z_C_WIDEFN9_A0_Z_LUT4_C.C
+Info:                          Defined in:
+Info:                               /root/chiploop-backend/backend/workflows/e2dcae79-59c3-49fc-a3b2-2a9441a52240/fpga/src/rtl/review_input.sv:30.14-30.24
+Info:      logic  0.23  10.75 Source debug_data_LUT4_Z_3_A_LUT4_Z_C_WIDEFN9_A0_Z_LUT4_C.F
+Info:    routing  0.53  11.28 Net debug_data_LUT4_Z_3_A_LUT4_Z_C_WIDEFN9_A0_Z_LUT4_C_Z (29,9) -> (29,11)
+Info:                          Sink register_bank[12]_FD1P3BX_Q.M
+Info:      setup  0.00  11.28 Source register_bank[12]_FD1P3BX_Q.M
+Info: 6.33 ns logic, 4.95 ns routing
+
+Info: Max frequency for clock 'clk': 88.65 MHz (PASS at 25.00 MHz)
+
+Info: Slack histogram:
+Info:  legend: * represents 5 endpoint(s)
+Info:          + represents [1,5) endpoint(s)
+Info: [ 28720,  29257) |**********************+
+Info: [ 29257,  29794) |************************************************************ 
+Info: [ 29794,  30331) |*************+
+Info: [ 30331,  30868) |+
+Info: [ 30868,  31405) |+
+Info: [ 31405,  31942) | 
+Info: [ 31942,  32479) |+
+Info: [ 32479,  33016) |*****+
+Info: [ 33016,  33553) |+
+Info: [ 33553,  34090) |+
+Info: [ 34090,  34627) |********+
+Info: [ 34627,  35164) |***********************+
+Info: [ 35164,  35701) |**********************************************+
+Info: [ 35701,  36238) |****************************+
+Info: [ 36238,  36775) |****+
+Info: [ 36775,  37312) |****+
+Info: [ 37312,  37849) |***********+
+Info: [ 37849,  38386) |*******+
+Info: [ 38386,  38923) |***********+
+Info: [ 38923,  39460) |*+
+
+Info: Program finished normally.

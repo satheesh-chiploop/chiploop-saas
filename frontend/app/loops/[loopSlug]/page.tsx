@@ -15,12 +15,21 @@ const metricDisplay = [
   { key: "productJourneys", label: "Product journeys", color: "bg-pink-400" },
   { key: "referenceJourneys", label: "Reference journeys", color: "bg-amber-300" },
 ] as const;
-const miniRvSeedSweep = [
-  { seed: "Seed 1", achieved: 32.38 },
-  { seed: "Seed 2", achieved: 31.12 },
-  { seed: "Seed 3", achieved: 29.62 },
+const miniRvBoardSweep = [
+  { board: "Lattice iCEBreaker", fmax: 0, status: "Does not fit", utilization: 105.53 },
+  { board: "Lattice UPduino v3", fmax: 0, status: "Does not fit", utilization: 105.53 },
+  { board: "Lattice iCEstick", fmax: 0, status: "Does not fit", utilization: 435.313 },
+  { board: "Lattice iCE40 HX8K Breakout", fmax: 32.377, status: "Target met", utilization: 72.552 },
+  { board: "Lattice Colorlight 5A-75B ECP5-25F", fmax: 51.01, status: "Target met", utilization: 16.753 },
+  { board: "Lattice ULX3S ECP5-45F", fmax: 52.187, status: "Target met", utilization: 9.28 },
+  { board: "Lattice OrangeCrab ECP5-85F", fmax: 51.578, status: "Target met", utilization: 4.865 },
+  { board: "Gowin Tang Nano 9K", fmax: 0, status: "Does not fit", utilization: 156.771 },
+  { board: "Gowin Tang Nano 20K", fmax: 50.984, status: "Target met", utilization: 66.04 },
+  { board: "Gowin Tang Primer 20K", fmax: 50.256, status: "Target met", utilization: 66.04 },
+  { board: "Lattice Certus-NX Versa", fmax: 88.652, status: "Target met", utilization: 8.302 },
+  { board: "Lattice CrossLink-NX Evaluation", fmax: 96.488, status: "Target met", utilization: 8.302 },
 ];
-
+const miniRvChartMax = 100;
 export default function LoopOverviewPage() {
   const params = useParams<{ loopSlug: string }>();
   const router = useRouter();
@@ -96,22 +105,34 @@ export default function LoopOverviewPage() {
           {params.loopSlug === "fpga" ? (
             <div className="mt-8 rounded-xl border border-lime-300/35 bg-slate-900/70 p-5 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-lime-200">MiniRV FPGA Explorer</p><h2 className="mt-2 text-2xl font-extrabold">Real reference seed sweep</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">Lattice iCE40 HX8K Breakout, 75 MHz target. This saved run used 5,572 of 7,680 logic cells; other boards in the interrupted run did not produce comparable reports.</p></div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-lime-200">MiniRV FPGA Explorer</p>
+                  <h2 className="mt-2 text-2xl font-extrabold">12-board reference comparison</h2>
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">Completed reference run at a 25 MHz target using one baseline seed per board. Eight targets met timing; four smaller targets did not fit the design.</p>
+                </div>
                 <button onClick={() => router.push("/apps/fpga-target-explorer?reference=minirv")} className="rounded-lg bg-lime-300 px-4 py-2 text-sm font-extrabold text-slate-950 hover:bg-lime-200">Run MiniRV Explorer</button>
               </div>
+              <div className="mt-5 flex flex-wrap gap-2 text-xs">
+                <span className="rounded-full border border-lime-300/35 bg-lime-300/10 px-3 py-1.5 font-bold text-lime-200">Best overall: CrossLink-NX</span>
+                <span className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1.5 font-bold text-cyan-200">Best performance: 96.488 MHz</span>
+                <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1.5 font-bold text-amber-200">Best low cost: iCE40 HX8K</span>
+                <span className="rounded-full border border-violet-300/30 bg-violet-300/10 px-3 py-1.5 font-bold text-violet-200">Best growth: OrangeCrab ECP5-85F</span>
+              </div>
               <div className="mt-6 space-y-3">
-                {miniRvSeedSweep.map((result) => (
-                  <div key={result.seed} className="grid grid-cols-[64px_1fr_72px] items-center gap-3 text-xs">
-                    <span className="font-bold text-slate-300">{result.seed}</span>
-                    <div className="relative h-7 overflow-hidden rounded-md bg-slate-950"><div className="absolute inset-y-0 left-0 bg-lime-300/75" style={{ width: `${(result.achieved / 75) * 100}%` }} /><div className="absolute inset-y-0 right-0 border-l border-dashed border-amber-300/70" title="75 MHz target" /></div>
-                    <span className="text-right font-extrabold text-white">{result.achieved} MHz</span>
+                {miniRvBoardSweep.map((result) => (
+                  <div key={result.board} className="grid gap-1 text-xs sm:grid-cols-[260px_1fr_150px] sm:items-center sm:gap-3">
+                    <span className="truncate font-bold text-slate-300" title={result.board}>{result.board}</span>
+                    <div className="relative h-6 overflow-hidden rounded-md bg-slate-950">
+                      {result.fmax > 0 ? <div className="absolute inset-y-0 left-0 bg-lime-300/75" style={{ width: `${(result.fmax / miniRvChartMax) * 100}%` }} /> : null}
+                      <div className="absolute inset-y-0 border-l border-dashed border-amber-300/80" style={{ left: "25%" }} title="25 MHz target" />
+                    </div>
+                    <span className={`text-right font-extrabold ${result.fmax > 0 ? "text-white" : "text-rose-300"}`}>{result.fmax > 0 ? `${result.fmax} MHz` : `Does not fit (${result.utilization}%)`}</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500"><span>0 MHz</span><span className="text-amber-200">Target 75 MHz</span></div>
+              <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500"><span>0 MHz</span><span className="text-amber-200">Target 25 MHz</span><span>100 MHz</span></div>
             </div>
-          ) : null}
-          <div className="mt-8 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          ) : null}          <div className="mt-8 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
               <div className="flex items-center gap-3"><FaMicrochip className={`h-5 w-5 ${loop.accentText}`} /><h2 className="text-xl font-extrabold">What you receive</h2></div>
               <div className="mt-5 space-y-3">{loop.outcomes.map((outcome) => <div key={outcome} className="flex items-center gap-3 text-sm text-slate-300"><span className={`h-2 w-2 rounded-full ${loop.accent}`} />{outcome}</div>)}</div>

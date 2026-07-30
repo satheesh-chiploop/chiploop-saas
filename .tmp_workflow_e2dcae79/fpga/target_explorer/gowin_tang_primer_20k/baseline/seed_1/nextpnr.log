@@ -1,0 +1,717 @@
+Info: Using uarch 'gowin' for device 'GW2A-LV18PG256C8/I7'
+
+Info: Create constant nets...
+Info: Modify LUTs...
+Info: Pack IOBs...
+Info: Pack I3C IOs...
+Info: Pack MIPI IOs...
+Info: Pack diff IOBs...
+Info: Pack FFs into IO cells...
+Info: Pack IODELAY...
+Info: Pack Input Edge Monitors...
+Info: Pack IO logic...
+Info: Pack DESER16 logic...
+Info: Pack GSR...
+Info: Pack HCLK cells...
+Info: Pack DLLDLYs...
+Info: Pack wide LUTs...
+Info: Packed MUX2_LUT8:267, MUX2_LU7:307, MUX2_LUT6:744, MUX2_LUT5:341
+Info: Pack ALUs...
+Info: Pack SSRAMs...
+Info: Constrained 67 LUTFF pairs.
+Info: Pack PLL...
+Info: Pack ADC...
+Info: Pack BSRAMs...
+Info: Pack DSP...
+Info: Pack INV...
+Info: Pack buffered nets...
+Info: Pack EMCU and UserFlash cells...
+Info: Pack UserFlash cells...
+Info: Pack DQCE cells...
+Info: Pack DCS cells...
+Info: Checksum: 0x9af8260b
+
+Info: Device utilisation:
+Info: 	                 VCC:       1/      1   100%
+Info: 	                 IOB:       0/    384     0%
+Info: 	                LUT4:   13545/  20736    65%
+Info: 	            IOLOGICI:       0/    384     0%
+Info: 	            IOLOGICO:       0/    384     0%
+Info: 	           MUX2_LUT5:    5193/  10368    50%
+Info: 	           MUX2_LUT6:    2426/   5184    46%
+Info: 	           MUX2_LUT7:     841/   2592    32%
+Info: 	           MUX2_LUT8:     267/   2592    10%
+Info: 	                 ALU:     500/  15552     3%
+Info: 	                 GND:       1/      1   100%
+Info: 	                 DFF:     799/  15552     5%
+Info: 	           RAM16SDP4:       0/    648     0%
+Info: 	               BSRAM:       0/     46     0%
+Info: 	              ALU54D:       0/     24     0%
+Info: 	     MULTADDALU18X18:       0/     24     0%
+Info: 	        MULTALU18X18:       0/     24     0%
+Info: 	        MULTALU36X18:       0/     24     0%
+Info: 	           MULT36X36:       0/     12     0%
+Info: 	           MULT18X18:       0/     48     0%
+Info: 	             MULT9X9:       0/     96     0%
+Info: 	              PADD18:       0/     48     0%
+Info: 	               PADD9:       0/     96     0%
+Info: 	                 GSR:       1/      1   100%
+Info: 	                 OSC:       0/      1     0%
+Info: 	                rPLL:       0/      4     0%
+Info: 	                BUFG:       0/     24     0%
+Info: 	                DQCE:       0/     24     0%
+Info: 	                 DCS:       0/      8     0%
+Info: 	               DHCEN:       0/     24     0%
+Info: 	              CLKDIV:       0/      8     0%
+Info: 	             CLKDIV2:       0/     16     0%
+
+Info: Running custom HCLK placer...
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 5072 cells, random placement wirelen = 273982.
+Info:     at initial placer iter 0, wirelen = 3443
+Info:     at initial placer iter 1, wirelen = 3315
+Info:     at initial placer iter 2, wirelen = 3290
+Info:     at initial placer iter 3, wirelen = 3264
+Info: Running main analytical placer, max placement attempts per cell = 69466684.
+Info:     at iteration #1, type ALL: wirelen solved = 3323, spread = 64082, legal = 189382; time = 13.32s
+Info:     at iteration #2, type ALL: wirelen solved = 8414, spread = 50214, legal = 138612; time = 3.36s
+Info:     at iteration #3, type ALL: wirelen solved = 14638, spread = 46286, legal = 123079; time = 2.30s
+Info:     at iteration #4, type ALL: wirelen solved = 19505, spread = 61975, legal = 124177; time = 1.79s
+Info:     at iteration #5, type ALL: wirelen solved = 22598, spread = 53404, legal = 115169; time = 3.37s
+Info:     at iteration #6, type ALL: wirelen solved = 22108, spread = 64119, legal = 126263; time = 2.93s
+Info:     at iteration #7, type ALL: wirelen solved = 28025, spread = 52572, legal = 103547; time = 2.41s
+Info:     at iteration #8, type ALL: wirelen solved = 26311, spread = 59866, legal = 110087; time = 1.73s
+Info:     at iteration #9, type ALL: wirelen solved = 33040, spread = 54785, legal = 94794; time = 2.14s
+Info:     at iteration #10, type ALL: wirelen solved = 33181, spread = 50000, legal = 99116; time = 3.74s
+Info:     at iteration #11, type ALL: wirelen solved = 32271, spread = 50587, legal = 91077; time = 2.37s
+Info:     at iteration #12, type ALL: wirelen solved = 33261, spread = 47769, legal = 89245; time = 1.93s
+Info:     at iteration #13, type ALL: wirelen solved = 34073, spread = 47558, legal = 91197; time = 2.67s
+Info:     at iteration #14, type ALL: wirelen solved = 35256, spread = 48791, legal = 84563; time = 1.45s
+Info:     at iteration #15, type ALL: wirelen solved = 35955, spread = 48554, legal = 81195; time = 1.50s
+Info:     at iteration #16, type ALL: wirelen solved = 36947, spread = 72145, legal = 102420; time = 2.38s
+Info:     at iteration #17, type ALL: wirelen solved = 42005, spread = 73219, legal = 104587; time = 2.78s
+Info:     at iteration #18, type ALL: wirelen solved = 47264, spread = 66335, legal = 98969; time = 3.07s
+Info:     at iteration #19, type ALL: wirelen solved = 46877, spread = 65829, legal = 95290; time = 2.12s
+Info:     at iteration #20, type ALL: wirelen solved = 47733, spread = 70340, legal = 98970; time = 2.54s
+Info: HeAP Placer Time: 64.03s
+Info:   of which solving equations: 7.36s
+Info:   of which spreading cells: 1.42s
+Info:   of which strict legalisation: 51.54s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 5888, wirelen = 81195
+Info:   at iteration #5: temp = 0.000000, timing cost = 8610, wirelen = 51250
+Info:   at iteration #10: temp = 0.000000, timing cost = 7438, wirelen = 46224
+Info:   at iteration #15: temp = 0.000000, timing cost = 7747, wirelen = 43831
+Info:   at iteration #20: temp = 0.000000, timing cost = 7607, wirelen = 42496
+Info:   at iteration #25: temp = 0.000000, timing cost = 7978, wirelen = 41467
+Info:   at iteration #30: temp = 0.000000, timing cost = 7926, wirelen = 41135
+Info:   at iteration #35: temp = 0.000000, timing cost = 7941, wirelen = 41035
+Info:   at iteration #40: temp = 0.000000, timing cost = 7894, wirelen = 41007
+Info:   at iteration #40: temp = 0.000000, timing cost = 7891, wirelen = 41014 
+Info: SA placement time 134.33s
+
+Info: Max frequency for clock 'clk': 42.09 MHz (PASS at 25.00 MHz)
+
+Info: Slack histogram:
+Info:  legend: * represents 2 endpoint(s)
+Info:          + represents [1,2) endpoint(s)
+Info: [ 16242,  17412) |***************************+
+Info: [ 17412,  18582) |*********************+
+Info: [ 18582,  19752) | 
+Info: [ 19752,  20922) |*+
+Info: [ 20922,  22092) |**+
+Info: [ 22092,  23262) |**+
+Info: [ 23262,  24432) |+
+Info: [ 24432,  25602) |*+
+Info: [ 25602,  26772) |+
+Info: [ 26772,  27942) |*+
+Info: [ 27942,  29112) |+
+Info: [ 29112,  30282) | 
+Info: [ 30282,  31452) |+
+Info: [ 31452,  32622) |+
+Info: [ 32622,  33792) |*+
+Info: [ 33792,  34962) |*******+
+Info: [ 34962,  36132) |***********************+
+Info: [ 36132,  37302) |************************************************+
+Info: [ 37302,  38472) |************************************************************ 
+Info: [ 38472,  39642) |***************************+
+Info: Checksum: 0xbdf204cf
+Info: Routing globals...
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_18_SUM_LUT4_F_I0_LUT4_F_1_I2_LUT4_F_I1[3]' is routed using segments.
+Info:     'read_b_LUT3_F_26_I0_MUX2_LUT8_O_S0_MUX2_LUT5_O_I1_LUT4_F_I3[3]' is routed using segments.
+Info:     'instruction[4]' is routed using segments.
+Info:     'read_b_LUT3_F_11_I0_LUT3_F_I2[1]' is routed using segments.
+Info:     'register_bank[15]_DFFPE_Q_CE' is routed using segments.
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_18_SUM_MUX2_LUT5_O_1_I1_LUT4_F_I2_MUX2_LUT6_O_I0_MUX2_LUT5_O_I0_LUT1_F_I0_LUT3_I0_F_MUX2_LUT5_O_1_I0_LUT3_F_I0[3]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT2_F_5_I0[1]' is routed using segments.
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_SUM_LUT2_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I1_MUX2_LUT6_O_I1_MUX2_LUT5_O_I0_LUT1_F_I0_LUT1_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_LUT3_F_1_I1[4]' is routed using segments.
+Info:     'register_bank[9]_DFFPE_Q_CE' is routed using segments.
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_1_S0_ALU_SUM_COUT_ALU_COUT_29_SUM[4]' is routed using segments.
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_18_SUM_MUX2_LUT5_O_1_I1_LUT4_F_I1_LUT3_F_I0[3]' is routed using segments.
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_19_SUM_LUT4_F_I0[0]' is routed using segments.
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_18_SUM_LUT4_F_I0_LUT4_F_2_I1_LUT3_I2_F_MUX2_LUT5_O_1_S0[1]' is routed using segments.
+Info:     'register_bank[7]_DFFPE_Q_CE' is routed using segments.
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_1_S0_ALU_SUM_COUT_ALU_COUT_18_SUM_LUT3_F_I2[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_MUX2_LUT7_O_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_MUX2_LUT5_S0_1_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_MUX2_LUT7_O_1_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_LUT4_I0_1_F_LUT3_F_I0_MUX2_LUT7_O_S0[5]' is routed using segments.
+Info:     'read_b_LUT3_F_26_I0_MUX2_LUT8_O_S0_LUT4_F_3_I1[1]' is routed using segments.
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_18_SUM_LUT4_F_I0_LUT4_F_1_I2[1]' is routed using segments.
+Info:     'read_b_LUT3_F_I0_MUX2_LUT5_O_S0_LUT4_F_4_I1[2]' is routed using segments.
+Info:     'read_b_LUT3_F_26_I0_MUX2_LUT8_O_S0_LUT4_F_2_I1[1]' is routed using segments.
+Info:     'instruction[5]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_LUT3_F_I0[1]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F[1]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_1_S0_LUT3_F_I0_MUX2_LUT7_O_S0[1]' is routed using segments.
+Info:     'uart_tx_DFFPE_Q_CE[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_1_S0_LUT4_F_1_I0_LUT4_I0_F_LUT3_F_I0_LUT4_F_I0_LUT2_I0_F_LUT2_I0_1_F[7]' is routed using segments.
+Info:     'read_b_LUT3_F_26_I0_MUX2_LUT8_O_S0_LUT4_F_I0[0]' is routed using segments.
+Info:     'read_b_LUT3_F_11_I0_LUT3_F_1_I2[1]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT3_F_11_I0_LUT4_F_I0_LUT4_I0_F_MUX2_LUT6_S0_O[6]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT3_F_11_I0_LUT4_F_I0_LUT4_I0_F[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT3_F_11_I0_LUT4_F_I0_LUT4_I0_F_MUX2_LUT6_S0_O[2]' is routed using segments.
+Info:     'debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_2_I0_LUT2_F_I0_ALU_SUM_COUT_ALU_COUT_15_SUM_MUX2_LUT5_S0_O_MUX2_LUT5_O_S0_LUT3_F_I1[3]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_MUX2_LUT7_O_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_MUX2_LUT5_S0_1_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_MUX2_LUT7_O_1_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_LUT4_I0_1_F_MUX2_LUT6_O_2_S0_LUT3_F_I0[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_MUX2_LUT7_O_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_MUX2_LUT5_S0_1_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_LUT4_F_I0_LUT4_I0_F_LUT3_F_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I0_LUT4_F_I0[1]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_MUX2_LUT7_O_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_MUX2_LUT5_S0_1_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_MUX2_LUT7_O_1_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_LUT4_I0_1_F_MUX2_LUT6_O_1_S0[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_MUX2_LUT7_O_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_MUX2_LUT5_S0_1_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_LUT4_F_I0_LUT4_I0_F_LUT3_F_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I0_LUT4_F_I0[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_1_S0_LUT3_F_I0_MUX2_LUT7_O_S0_MUX2_LUT8_O_5_S0[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I3_MUX2_LUT8_O_S0_MUX2_LUT8_S0_O[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I3_LUT2_F_1_I0[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_F_I0_LUT4_I2_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT7_O_S0_LUT3_I0_F_MUX2_LUT7_O_S0[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT6_O_1_S0_MUX2_LUT8_O_2_S0[7]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT2_F_2_I0_MUX2_LUT7_O_S0[3]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT6_O_1_S0[5]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3[6]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT4_I0_2_F_MUX2_LUT6_O_1_S0[3]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_1_S0_LUT4_F_1_I0_LUT4_I0_F_LUT3_F_I0_LUT4_F_I0_LUT2_I0_F[3]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_1_S0_LUT4_F_1_I0_LUT4_I0_F_LUT3_F_I0_LUT4_F_I0_LUT2_I0_F_LUT2_I0_1_F_LUT4_F_I2_MUX2_LUT7_S0_O_MUX2_LUT8_O_3_S0[5]' is routed using segments.
+Info:     'read_b_LUT3_F_I0_MUX2_LUT5_O_S0_LUT4_F_3_I1[1]' is routed using segments.
+Info:     'read_b_LUT3_F_26_I0_MUX2_LUT8_O_S0_LUT4_F_2_I1[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_MUX2_LUT7_O_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_MUX2_LUT5_S0_1_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_MUX2_LUT7_O_1_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_LUT4_I0_1_F_MUX2_LUT6_O_1_S0_MUX2_LUT6_S0_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_LUT4_F_I0_LUT4_I0_F[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_I0_MUX2_LUT5_O_S0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_MUX2_LUT6_O_2_S0_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT6_O_S0_LUT4_F_I0_LUT4_I0_F[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT3_F_7_I0_LUT4_F_I0_LUT4_I0_F[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT3_F_6_I0_LUT4_F_I0_LUT4_I0_F_MUX2_LUT5_O_S0_MUX2_LUT5_S0_O[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT3_F_5_I0_LUT4_F_I0_LUT4_I0_F_MUX2_LUT6_S0_O[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT3_F_10_I0_LUT4_F_I0_LUT4_I0_F[5]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT3_F_7_I0_MUX2_LUT8_O_S0[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT3_F_11_I0_LUT4_F_I0_LUT4_I0_F[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_MUX2_LUT7_O_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_MUX2_LUT5_S0_1_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_MUX2_LUT7_O_1_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_LUT4_I0_1_F_LUT3_F_I0_MUX2_LUT7_O_S0[4]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0[1]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_MUX2_LUT7_O_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_MUX2_LUT5_S0_1_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_MUX2_LUT7_O_1_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_MUX2_LUT5_S0_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT8_I1_O[5]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I3_MUX2_LUT8_O_S0[5]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT7_O_3_S0_LUT4_F_I0_LUT4_I0_F_LUT4_F_I0_LUT4_I0_F_MUX2_LUT7_O_I0_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F_I1_LUT2_I0_F_MUX2_LUT5_S0_1_O_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F_I0_LUT4_F_I0_LUT4_I0_F[1]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_1_S0_LUT3_F_I0_MUX2_LUT7_O_S0_MUX2_LUT8_O_4_S0[0]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_F_I0_LUT4_I2_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I0_F[3]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_F_I0_LUT4_I2_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT7_O_S0_LUT3_I0_F_MUX2_LUT7_O_S0[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0[5]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT2_F_2_I0_MUX2_LUT7_O_S0[4]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_MUX2_LUT6_O_S0_MUX2_LUT8_O_1_S0[2]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_MUX2_LUT6_O_S0_MUX2_LUT8_O_1_S0[7]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_1_S0_LUT4_F_1_I0_LUT4_I0_F_LUT3_F_I0_LUT4_F_I0_LUT2_I0_F_LUT2_I0_1_F_LUT4_F_I2_MUX2_LUT7_S0_O_MUX2_LUT8_O_3_S0[4]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_1_S0_LUT4_F_1_I0_LUT4_I0_F_LUT3_F_I0_LUT4_F_I0_LUT2_I0_F_LUT2_I0_1_F_LUT4_F_I2_MUX2_LUT7_S0_O_MUX2_LUT8_O_3_S0[7]' is routed using segments.
+Info:     'full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_1_S0_LUT4_F_1_I0_LUT4_I0_F_LUT3_F_I0_LUT4_F_I0_LUT2_I0_F[2]' is routed using segments.
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 65904 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:       1000 |      129        870 |  129   870 |     65299|       1.90       1.90|
+Info:       2000 |      311       1688 |  182   818 |     64761|       1.12       3.01|
+Info:       3000 |      531       2468 |  220   780 |     64473|       1.25       4.26|
+Info:       4000 |      794       3205 |  263   737 |     64294|       1.39       5.65|
+Info:       5000 |     1064       3935 |  270   730 |     64123|       1.21       6.85|
+Info:       6000 |     1275       4724 |  211   789 |     63808|       1.32       8.17|
+Info:       7000 |     1502       5497 |  227   773 |     63582|       1.39       9.57|
+Info:       8000 |     1725       6274 |  223   777 |     63120|       1.33      10.89|
+Info:       9000 |     1922       7077 |  197   803 |     62802|       1.43      12.32|
+Info:      10000 |     2188       7811 |  266   734 |     62763|       1.34      13.66|
+Info:      11000 |     2449       8550 |  261   739 |     62691|       1.50      15.16|
+Info:      12000 |     2790       9209 |  341   659 |     62743|       1.56      16.71|
+Info:      13000 |     3119       9880 |  329   671 |     62575|       1.58      18.29|
+Info:      14000 |     3310      10689 |  191   809 |     62293|       1.26      19.56|
+Info:      15000 |     3502      11497 |  192   808 |     62043|       1.44      21.00|
+Info:      16000 |     3806      12193 |  304   696 |     61957|       1.54      22.54|
+Info:      17000 |     4064      12935 |  258   742 |     61828|       1.39      23.93|
+Info:      18000 |     4297      13702 |  233   767 |     61688|       2.03      25.96|
+Info:      19000 |     4586      14413 |  289   711 |     61505|       1.98      27.94|
+Info:      20000 |     4840      15159 |  254   746 |     61525|       1.79      29.73|
+Info:      21000 |     5042      15957 |  202   798 |     61183|       1.60      31.33|
+Info:      22000 |     5247      16752 |  205   795 |     60992|       1.64      32.98|
+Info:      23000 |     5455      17544 |  208   792 |     60728|       1.39      34.36|
+Info:      24000 |     5682      18317 |  227   773 |     60985|       1.76      36.12|
+Info:      25000 |     5875      19124 |  193   807 |     60626|       1.53      37.65|
+Info:      26000 |     6095      19904 |  220   780 |     60339|       1.66      39.31|
+Info:      27000 |     6339      20660 |  244   756 |     59985|       1.53      40.84|
+Info:      28000 |     6543      21456 |  204   796 |     59497|       1.44      42.27|
+Info:      29000 |     6762      22237 |  219   781 |     59100|       1.35      43.63|
+Info:      30000 |     6929      23070 |  167   833 |     58485|       1.26      44.89|
+Info:      31000 |     7182      23817 |  253   747 |     58177|       1.54      46.42|
+Info:      32000 |     7503      24496 |  321   679 |     58138|       1.83      48.25|
+Info:      33000 |     7718      25281 |  215   785 |     57615|       1.71      49.96|
+Info:      34000 |     7998      26001 |  280   720 |     57351|       1.52      51.49|
+Info:      35000 |     8216      26783 |  218   782 |     56919|       1.62      53.11|
+Info:      36000 |     8474      27525 |  258   742 |     56653|       1.47      54.58|
+Info:      37000 |     8734      28265 |  260   740 |     56406|       1.43      56.00|
+Info:      38000 |     8990      29009 |  256   744 |     56391|       1.61      57.61|
+Info:      39000 |     9206      29793 |  216   784 |     55999|       2.06      59.67|
+Info:      40000 |     9391      30608 |  185   815 |     55503|       1.54      61.21|
+Info:      41000 |     9660      31339 |  269   731 |     55387|       1.80      63.01|
+Info:      42000 |     9958      32041 |  298   702 |     55180|       1.71      64.72|
+Info:      43000 |    10175      32824 |  217   783 |     54841|       1.60      66.32|
+Info:      44000 |    10425      33574 |  250   750 |     54649|       1.50      67.82|
+Info:      45000 |    10647      34352 |  222   778 |     54349|       1.62      69.44|
+Info:      46000 |    10889      35110 |  242   758 |     54088|       1.47      70.91|
+Info:      47000 |    11167      35832 |  278   722 |     54024|       1.91      72.82|
+Info:      48000 |    11423      36576 |  256   744 |     53718|       1.84      74.66|
+Info:      49000 |    11622      37377 |  199   801 |     53310|       1.70      76.36|
+Info:      50000 |    11897      38102 |  275   725 |     53147|       2.03      78.40|
+Info:      51000 |    12182      38817 |  285   715 |     53027|       2.06      80.46|
+Info:      52000 |    12470      39529 |  288   712 |     52855|       2.16      82.62|
+Info:      53000 |    12611      40388 |  141   859 |     52309|       1.92      84.55|
+Info:      54000 |    12847      41152 |  236   764 |     51859|       1.92      86.47|
+Info:      55000 |    13040      41959 |  193   807 |     51248|       1.80      88.27|
+Info:      56000 |    13221      42778 |  181   819 |     50694|       1.76      90.03|
+Info:      57000 |    13449      43550 |  228   772 |     50263|       1.46      91.48|
+Info:      58000 |    13702      44297 |  253   747 |     49845|       1.67      93.15|
+Info:      59000 |    13929      45070 |  227   773 |     49365|       1.70      94.85|
+Info:      60000 |    14156      45843 |  227   773 |     48826|       1.32      96.18|
+Info:      61000 |    14377      46622 |  221   779 |     48441|       1.25      97.43|
+Info:      62000 |    14634      47365 |  257   743 |     48061|       1.33      98.76|
+Info:      63000 |    14914      48085 |  280   720 |     47817|       1.61     100.37|
+Info:      64000 |    15116      48883 |  202   798 |     47482|       1.46     101.84|
+Info:      65000 |    15373      49626 |  257   743 |     47381|       1.42     103.25|
+Info:      66000 |    15695      50304 |  322   678 |     47585|       2.07     105.32|
+Info:      67000 |    16008      50991 |  313   687 |     47365|       2.17     107.49|
+Info:      68000 |    16283      51716 |  275   725 |     46971|       1.70     109.20|
+Info:      69000 |    16598      52401 |  315   685 |     46780|       1.85     111.05|
+Info:      70000 |    16753      53246 |  155   845 |     46124|       0.99     112.04|
+Info:      71000 |    16971      54028 |  218   782 |     45699|       1.12     113.16|
+Info:      72000 |    17198      54801 |  227   773 |     45319|       1.21     114.37|
+Info:      73000 |    17464      55535 |  266   734 |     44971|       1.39     115.76|
+Info:      74000 |    17746      56253 |  282   718 |     44643|       1.37     117.13|
+Info:      75000 |    17958      57041 |  212   788 |     44170|       1.23     118.36|
+Info:      76000 |    18161      57838 |  203   797 |     43644|       1.25     119.61|
+Info:      77000 |    18375      58624 |  214   786 |     43230|       1.38     120.99|
+Info:      78000 |    18564      59435 |  189   811 |     42820|       1.29     122.28|
+Info:      79000 |    18764      60235 |  200   800 |     42436|       1.02     123.31|
+Info:      80000 |    19058      60941 |  294   706 |     42219|       2.04     125.35|
+Info:      81000 |    19354      61645 |  296   704 |     41913|       1.61     126.96|
+Info:      82000 |    19611      62388 |  257   743 |     41560|       1.23     128.19|
+Info:      83000 |    19909      63090 |  298   702 |     41262|       1.34     129.52|
+Info:      84000 |    20124      63875 |  215   785 |     40834|       1.03     130.55|
+Info:      85000 |    20385      64614 |  261   739 |     40605|       1.21     131.77|
+Info:      86000 |    20638      65361 |  253   747 |     40198|       1.24     133.00|
+Info:      87000 |    20951      66048 |  313   687 |     39934|       1.31     134.31|
+Info:      88000 |    21222      66777 |  271   729 |     39560|       1.44     135.75|
+Info:      89000 |    21484      67515 |  262   738 |     39306|       1.22     136.98|
+Info:      90000 |    21713      68286 |  229   771 |     38974|       1.51     138.49|
+Info:      91000 |    21950      69049 |  237   763 |     38665|       1.25     139.74|
+Info:      92000 |    22241      69758 |  291   709 |     38672|       1.61     141.36|
+Info:      93000 |    22480      70519 |  239   761 |     38265|       1.18     142.53|
+Info:      94000 |    22757      71242 |  277   723 |     38001|       1.41     143.94|
+Info:      95000 |    22802      71500 |   45   258 |     37099|       0.41     144.36|
+Info:      96000 |    22803      71512 |    1    12 |     36101|       0.14     144.50|
+Info:      97000 |    22818      71535 |   15    23 |     35124|       0.12     144.62|
+Info:      98000 |    22827      71575 |    9    40 |     34144|       0.17     144.79|
+Info:      99000 |    22833      71627 |    6    52 |     33160|       0.28     145.07|
+Info:     100000 |    22848      71683 |   15    56 |     32204|       0.19     145.26|
+Info:     101000 |    22879      71722 |   31    39 |     31262|       0.30     145.57|
+Info:     102000 |    22895      71781 |   16    59 |     30299|       0.35     145.92|
+Info:     103000 |    22904      71813 |    9    32 |     29308|       0.16     146.08|
+Info:     104000 |    22905      71834 |    1    21 |     28310|       0.11     146.19|
+Info:     105000 |    22913      71868 |    8    34 |     27325|       0.17     146.36|
+Info:     106000 |    22932      71953 |   19    85 |     26364|       0.24     146.60|
+Info:     107000 |    22965      72438 |   33   485 |     25414|       0.63     147.23|
+Info:     108000 |    23097      73173 |  132   735 |     25023|       1.48     148.70|
+Info:     109000 |    23239      73900 |  142   727 |     24391|       1.50     150.20|
+Info:     110000 |    23421      74648 |  182   748 |     24096|       1.46     151.66|
+Info:     111000 |    23533      75391 |  112   743 |     23631|       1.23     152.89|
+Info:     112000 |    23622      76134 |   89   743 |     22816|       1.26     154.15|
+Info:     113000 |    23688      76847 |   66   713 |     21948|       0.94     155.09|
+Info:     114000 |    23826      77555 |  138   708 |     21304|       1.25     156.34|
+Info:     115000 |    24008      78275 |  182   720 |     20865|       1.55     157.90|
+Info:     116000 |    24200      78967 |  192   692 |     20540|       1.70     159.59|
+Info:     117000 |    24529      79632 |  329   665 |     20384|       1.99     161.59|
+Info:     118000 |    24696      80329 |  167   697 |     19904|       1.59     163.18|
+Info:     119000 |    24973      80964 |  277   635 |     19709|       2.10     165.28|
+Info:     120000 |    25281      81656 |  308   692 |     19718|       2.11     167.39|
+Info:     121000 |    25595      82342 |  314   686 |     19698|       2.26     169.65|
+Info:     122000 |    25798      83044 |  203   702 |     19267|       1.49     171.15|
+Info:     123000 |    25917      83732 |  119   688 |     18528|       1.24     172.39|
+Info:     124000 |    26080      84460 |  163   728 |     18066|       1.40     173.79|
+Info:     125000 |    26300      85132 |  220   672 |     17732|       1.67     175.45|
+Info:     126000 |    26423      85802 |  123   670 |     16940|       1.18     176.64|
+Info:     127000 |    26551      86490 |  128   688 |     16180|       1.13     177.77|
+Info:     128000 |    26724      87163 |  173   673 |     15589|       1.48     179.25|
+Info:     129000 |    26865      87864 |  141   701 |     14957|       1.44     180.69|
+Info:     130000 |    26999      88540 |  134   676 |     14236|       1.60     182.30|
+Info:     131000 |    27172      89236 |  173   696 |     13701|       1.39     183.69|
+Info:     132000 |    27474      89934 |  302   698 |     13867|       2.20     185.89|
+Info:     133000 |    27706      90636 |  232   702 |     13470|       1.52     187.41|
+Info:     134000 |    27901      91323 |  195   687 |     13008|       1.51     188.92|
+Info:     135000 |    28126      91954 |  225   631 |     12547|       1.58     190.50|
+Info:     136000 |    28334      92600 |  208   646 |     11941|       1.48     191.98|
+Info:     137000 |    28520      93292 |  186   692 |     11426|       1.53     193.51|
+Info:     138000 |    28714      93964 |  194   672 |     10911|       1.40     194.90|
+Info:     139000 |    28847      94641 |  133   677 |     10150|       1.38     196.28|
+Info:     140000 |    29012      95342 |  165   701 |      9714|       1.57     197.85|
+Info:     141000 |    29307      96000 |  295   658 |      9510|       2.24     200.09|
+Info:     142000 |    29667      96640 |  360   640 |      9612|       2.38     202.47|
+Info:     143000 |    29970      97337 |  303   697 |      9578|       1.71     204.18|
+Info:     144000 |    30292      98005 |  322   668 |      9455|       2.71     206.89|
+Info:     145000 |    30531      98665 |  239   660 |      9038|       1.68     208.57|
+Info:     146000 |    30692      99327 |  161   662 |      8332|       1.56     210.13|
+Info:     147000 |    30887      99998 |  195   671 |      7970|       1.76     211.89|
+Info:     148000 |    31174     100711 |  287   713 |      7888|       2.39     214.29|
+Info:     149000 |    31410     101391 |  236   680 |      7451|       1.87     216.16|
+Info:     150000 |    31629     102052 |  219   661 |      7036|       1.86     218.02|
+Info:     151000 |    31861     102739 |  232   687 |      6724|       1.63     219.65|
+Info:     152000 |    32076     103381 |  215   642 |      6439|       1.81     221.46|
+Info:     153000 |    32338     104117 |  262   736 |      6230|       2.29     223.75|
+Info:     154000 |    32612     104805 |  274   688 |      6035|       2.01     225.76|
+Info:     155000 |    32810     105450 |  198   645 |      5391|       1.49     227.25|
+Info:     156000 |    33029     106087 |  219   637 |      4861|       1.76     229.01|
+Info:     157000 |    33342     106769 |  313   682 |      4802|       2.19     231.20|
+Info:     158000 |    33614     107379 |  272   610 |      4663|       1.78     232.98|
+Info:     159000 |    33962     108031 |  348   652 |      4618|       2.58     235.56|
+Info:     160000 |    34275     108718 |  313   687 |      4536|       2.03     237.60|
+Info:     161000 |    34542     109414 |  267   696 |      4359|       2.37     239.97|
+Info:     162000 |    34755     110106 |  213   692 |      3752|       1.80     241.77|
+Info:     163000 |    34976     110749 |  221   643 |      3269|       1.94     243.71|
+Info:     164000 |    35346     111357 |  370   608 |      3180|       2.27     245.98|
+Info:     165000 |    35701     111993 |  355   636 |      3171|       2.61     248.59|
+Info:     166000 |    35985     112640 |  284   647 |      2834|       2.12     250.71|
+Info:     167000 |    36238     113299 |  253   659 |      2411|       2.05     252.75|
+Info:     168000 |    36456     114020 |  218   721 |      2105|       2.05     254.80|
+Info:     169000 |    36718     114676 |  262   656 |      1691|       2.28     257.08|
+Info:     170000 |    37029     115308 |  311   632 |      1493|       2.13     259.22|
+Info:     171000 |    37338     115942 |  309   634 |      1062|       2.19     261.40|
+Info:     172000 |    37625     116566 |  287   624 |       658|       2.20     263.61|
+Info:     173000 |    37900     117220 |  275   654 |       221|       2.96     266.56|
+Info:     173472 |    38029     117528 |  129   308 |         0|       1.21     267.77|
+Info: Routing complete.
+Info: Router1 time 267.77s
+Info: Checksum: 0x570cb5cb
+
+Info: Critical path report for clock 'clk' (posedge -> posedge):
+Info:       type curr  total name
+Info:   clk-to-q  0.23  0.23 Source operand_b_DFFC_Q_26.Q
+Info:    routing  1.88  2.11 Net debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_2_I0_LUT2_F_I0_ALU_SUM_COUT_ALU_COUT_9_SUM[0] (2,31) -> (10,10)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT7_O_S0_MUX2_LUT8_O_S0_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F.I1
+Info:                          Defined in:
+Info:                               /root/chiploop-backend/backend/workflows/e2dcae79-59c3-49fc-a3b2-2a9441a52240/fpga/src/rtl/review_input.sv:18.14-18.23
+Info:      logic  0.57  2.68 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT7_O_S0_MUX2_LUT8_O_S0_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0_LUT4_F.F
+Info:    routing  0.00  2.68 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT7_O_S0_MUX2_LUT8_O_S0_MUX2_LUT6_O_1_I0_MUX2_LUT5_O_I0 (10,10) -> (10,10)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT7_O_S0_MUX2_LUT8_O_S0_MUX2_LUT6_O_1_I0_MUX2_LUT5_O.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:158.41-158.66
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:151.9-151.11
+Info:      logic  0.27  2.94 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT7_O_S0_MUX2_LUT8_O_S0_MUX2_LUT6_O_1_I0_MUX2_LUT5_O.O
+Info:    routing  0.00  2.94 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT7_O_S0_MUX2_LUT8_O_S0_MUX2_LUT6_O_1_I0 (10,10) -> (10,10)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT7_O_S0_MUX2_LUT8_O_S0_MUX2_LUT6_O_1.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:157.9-157.11
+Info:      logic  0.27  3.21 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT7_O_S0_MUX2_LUT8_O_S0_MUX2_LUT6_O_1.O
+Info:    routing  1.29  4.50 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0[2] (10,10) -> (9,4)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_LUT4_I1_7.I2
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:130.20-130.21
+Info:      logic  0.46  4.96 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_LUT4_I1_7.F
+Info:    routing  0.00  4.96 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_LUT4_I1_7_F (9,4) -> (9,4)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT6_O_1_S0_MUX2_LUT8_O_S0_MUX2_LUT5_S0_3.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:171.43-171.68
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:164.41-164.66
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:158.41-158.66
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:151.9-151.11
+Info:      logic  0.27  5.23 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT6_O_1_S0_MUX2_LUT8_O_S0_MUX2_LUT5_S0_3.O
+Info:    routing  0.00  5.23 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT6_O_1_S0_MUX2_LUT8_O_S0_MUX2_LUT5_S0_3_O (9,4) -> (9,4)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT6_O_1_S0_MUX2_LUT8_O_S0_MUX2_LUT5_S0_3_O_MUX2_LUT6_I0.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:171.43-171.68
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:164.41-164.66
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:157.9-157.11
+Info:      logic  0.27  5.50 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_5_S0_LUT3_F_I2_MUX2_LUT6_O_1_S0_MUX2_LUT8_O_S0_MUX2_LUT5_S0_3_O_MUX2_LUT6_I0.O
+Info:    routing  0.00  5.50 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_MUX2_LUT7_S0_I0 (9,4) -> (9,4)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_MUX2_LUT7_S0.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:171.43-171.68
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:163.9-163.11
+Info:      logic  0.27  5.76 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_MUX2_LUT7_S0.O
+Info:    routing  0.00  5.76 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_MUX2_LUT7_S0_O (9,4) -> (9,4)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_MUX2_LUT8_S0.I1
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:169.13-169.15
+Info:      logic  0.27  6.03 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_2_S0_LUT3_F_I1_LUT4_F_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O_S0_MUX2_LUT8_S0.O
+Info:    routing  1.05  7.08 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_LUT4_F_I3_MUX2_LUT7_O_S0[2] (9,4) -> (14,7)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F.I1
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:130.20-130.21
+Info:      logic  0.57  7.65 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1_LUT4_F.F
+Info:    routing  0.00  7.65 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O_I1 (14,7) -> (14,7)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O.I1
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:165.42-165.67
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:158.41-158.66
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:151.13-151.15
+Info:      logic  0.27  7.92 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O.O
+Info:    routing  0.00  7.92 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1_I1_MUX2_LUT6_O_I0 (14,7) -> (14,7)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1_I1_MUX2_LUT6_O.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:165.42-165.67
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:157.9-157.11
+Info:      logic  0.27  8.19 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1_I1_MUX2_LUT6_O.O
+Info:    routing  0.00  8.19 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1_I1 (14,7) -> (14,7)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1.I1
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:163.13-163.15
+Info:      logic  0.27  8.45 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F_MUX2_LUT7_O_1.O
+Info:    routing  0.47  8.93 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_LUT4_F_I0_MUX2_LUT6_O_S0_LUT3_F_I0_LUT4_I0_1_F_LUT4_F_I3_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_MUX2_LUT5_O_S0_LUT3_I0_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I1_O_LUT2_I0_F[2] (14,7) -> (12,7)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O_I0_LUT4_F.I2
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:130.20-130.21
+Info:      logic  0.46  9.39 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O_I0_LUT4_F.F
+Info:    routing  0.00  9.39 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O_I0 (12,7) -> (12,7)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:165.42-165.67
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:158.41-158.66
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:151.9-151.11
+Info:      logic  0.27  9.66 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O_I1_MUX2_LUT6_O_I0_MUX2_LUT5_O.O
+Info:    routing  0.00  9.66 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O_I1_MUX2_LUT6_O_I0 (12,7) -> (12,7)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O_I1_MUX2_LUT6_O.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:165.42-165.67
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:157.9-157.11
+Info:      logic  0.27  9.93 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O_I1_MUX2_LUT6_O.O
+Info:    routing  0.00  9.93 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O_I1 (12,7) -> (12,7)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O.I1
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:163.13-163.15
+Info:      logic  0.27  10.19 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_4_S0_MUX2_LUT7_O.O
+Info:    routing  0.64  10.84 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_3_S0[1] (12,7) -> (13,10)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_3_I0_MUX2_LUT5_O_I0_LUT4_F.I1
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:130.20-130.21
+Info:      logic  0.57  11.40 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_3_I0_MUX2_LUT5_O_I0_LUT4_F.F
+Info:    routing  0.00  11.40 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_3_I0_MUX2_LUT5_O_I0 (13,10) -> (13,10)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_3_I0_MUX2_LUT5_O.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:158.41-158.66
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:151.9-151.11
+Info:      logic  0.27  11.67 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_3_I0_MUX2_LUT5_O.O
+Info:    routing  0.00  11.67 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_3_I0 (13,10) -> (13,10)
+Info:                          Sink full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_3.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:157.9-157.11
+Info:      logic  0.27  11.94 Source full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F_MUX2_LUT6_O_3.O
+Info:    routing  1.41  13.35 Net full_product_ALU_SUM_41_I0_LUT4_F_I2_LUT3_I2_F_LUT3_F_I0_LUT4_I1_F_LUT4_I0_F_MUX2_LUT5_I1_O_MUX2_LUT6_I1_O_MUX2_LUT7_I1_O_LUT3_I1_F_LUT4_I0_F[27] (13,10) -> (17,25)
+Info:                          Sink full_product_ALU_SUM_43.I1
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/techmap.v:200.21-200.22
+Info:      logic  0.57  13.92 Source full_product_ALU_SUM_43.COUT
+Info:    routing  0.00  13.92 Net full_product_ALU_SUM_4_COUT[28] (17,25) -> (18,25)
+Info:                          Sink full_product_ALU_SUM_42.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  13.96 Source full_product_ALU_SUM_42.COUT
+Info:    routing  0.00  13.96 Net full_product_ALU_SUM_4_COUT[29] (18,25) -> (18,25)
+Info:                          Sink full_product_ALU_SUM_40.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  13.99 Source full_product_ALU_SUM_40.COUT
+Info:    routing  0.00  13.99 Net full_product_ALU_SUM_4_COUT[30] (18,25) -> (18,25)
+Info:                          Sink full_product_ALU_SUM_39.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.03 Source full_product_ALU_SUM_39.COUT
+Info:    routing  0.00  14.03 Net full_product_ALU_SUM_4_COUT[31] (18,25) -> (18,25)
+Info:                          Sink full_product_ALU_SUM_38.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.06 Source full_product_ALU_SUM_38.COUT
+Info:    routing  0.00  14.06 Net full_product_ALU_SUM_4_COUT[32] (18,25) -> (18,25)
+Info:                          Sink full_product_ALU_SUM_37.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.10 Source full_product_ALU_SUM_37.COUT
+Info:    routing  0.00  14.10 Net full_product_ALU_SUM_4_COUT[33] (18,25) -> (18,25)
+Info:                          Sink full_product_ALU_SUM_36.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.13 Source full_product_ALU_SUM_36.COUT
+Info:    routing  0.00  14.13 Net full_product_ALU_SUM_4_COUT[34] (18,25) -> (19,25)
+Info:                          Sink full_product_ALU_SUM_35.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.17 Source full_product_ALU_SUM_35.COUT
+Info:    routing  0.00  14.17 Net full_product_ALU_SUM_4_COUT[35] (19,25) -> (19,25)
+Info:                          Sink full_product_ALU_SUM_34.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.20 Source full_product_ALU_SUM_34.COUT
+Info:    routing  0.00  14.20 Net full_product_ALU_SUM_4_COUT[36] (19,25) -> (19,25)
+Info:                          Sink full_product_ALU_SUM_33.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.24 Source full_product_ALU_SUM_33.COUT
+Info:    routing  0.00  14.24 Net full_product_ALU_SUM_4_COUT[37] (19,25) -> (19,25)
+Info:                          Sink full_product_ALU_SUM_32.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.27 Source full_product_ALU_SUM_32.COUT
+Info:    routing  0.00  14.27 Net full_product_ALU_SUM_4_COUT[38] (19,25) -> (19,25)
+Info:                          Sink full_product_ALU_SUM_31.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.31 Source full_product_ALU_SUM_31.COUT
+Info:    routing  0.00  14.31 Net full_product_ALU_SUM_4_COUT[39] (19,25) -> (19,25)
+Info:                          Sink full_product_ALU_SUM_29.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.34 Source full_product_ALU_SUM_29.COUT
+Info:    routing  0.00  14.34 Net full_product_ALU_SUM_4_COUT[40] (19,25) -> (20,25)
+Info:                          Sink full_product_ALU_SUM_28.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.38 Source full_product_ALU_SUM_28.COUT
+Info:    routing  0.00  14.38 Net full_product_ALU_SUM_4_COUT[41] (20,25) -> (20,25)
+Info:                          Sink full_product_ALU_SUM_27.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.41 Source full_product_ALU_SUM_27.COUT
+Info:    routing  0.00  14.41 Net full_product_ALU_SUM_4_COUT[42] (20,25) -> (20,25)
+Info:                          Sink full_product_ALU_SUM_26.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.45 Source full_product_ALU_SUM_26.COUT
+Info:    routing  0.00  14.45 Net full_product_ALU_SUM_4_COUT[43] (20,25) -> (20,25)
+Info:                          Sink full_product_ALU_SUM_25.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.48 Source full_product_ALU_SUM_25.COUT
+Info:    routing  0.00  14.48 Net full_product_ALU_SUM_4_COUT[44] (20,25) -> (20,25)
+Info:                          Sink full_product_ALU_SUM_24.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.52 Source full_product_ALU_SUM_24.COUT
+Info:    routing  0.00  14.52 Net full_product_ALU_SUM_4_COUT[45] (20,25) -> (20,25)
+Info:                          Sink full_product_ALU_SUM_23.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.55 Source full_product_ALU_SUM_23.COUT
+Info:    routing  0.00  14.55 Net full_product_ALU_SUM_4_COUT[46] (20,25) -> (21,25)
+Info:                          Sink full_product_ALU_SUM_22.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.59 Source full_product_ALU_SUM_22.COUT
+Info:    routing  0.00  14.59 Net full_product_ALU_SUM_4_COUT[47] (21,25) -> (21,25)
+Info:                          Sink full_product_ALU_SUM_21.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.62 Source full_product_ALU_SUM_21.COUT
+Info:    routing  0.00  14.62 Net full_product_ALU_SUM_4_COUT[48] (21,25) -> (21,25)
+Info:                          Sink full_product_ALU_SUM_20.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.66 Source full_product_ALU_SUM_20.COUT
+Info:    routing  0.00  14.66 Net full_product_ALU_SUM_4_COUT[49] (21,25) -> (21,25)
+Info:                          Sink full_product_ALU_SUM_18.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.69 Source full_product_ALU_SUM_18.COUT
+Info:    routing  0.00  14.69 Net full_product_ALU_SUM_4_COUT[50] (21,25) -> (21,25)
+Info:                          Sink full_product_ALU_SUM_17.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.73 Source full_product_ALU_SUM_17.COUT
+Info:    routing  0.00  14.73 Net full_product_ALU_SUM_4_COUT[51] (21,25) -> (21,25)
+Info:                          Sink full_product_ALU_SUM_16.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.76 Source full_product_ALU_SUM_16.COUT
+Info:    routing  0.00  14.76 Net full_product_ALU_SUM_4_COUT[52] (21,25) -> (22,25)
+Info:                          Sink full_product_ALU_SUM_15.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.80 Source full_product_ALU_SUM_15.COUT
+Info:    routing  0.00  14.80 Net full_product_ALU_SUM_4_COUT[53] (22,25) -> (22,25)
+Info:                          Sink full_product_ALU_SUM_14.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.04  14.83 Source full_product_ALU_SUM_14.COUT
+Info:    routing  0.00  14.83 Net full_product_ALU_SUM_4_COUT[54] (22,25) -> (22,25)
+Info:                          Sink full_product_ALU_SUM_13.CIN
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/arith_map.v:52.24-52.25
+Info:      logic  0.47  15.30 Source full_product_ALU_SUM_13.SUM
+Info:    routing  0.91  16.21 Net full_product[55] (22,25) -> (26,34)
+Info:                          Sink debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_19_SUM_LUT4_F_I0_LUT2_I1_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I0_O_MUX2_LUT5_O_1_S0_ALU_SUM_COUT_ALU_COUT_1_SUM_LUT4_F.I3
+Info:                          Defined in:
+Info:                               /root/chiploop-backend/backend/workflows/e2dcae79-59c3-49fc-a3b2-2a9441a52240/fpga/src/rtl/review_input.sv:37.15-37.27
+Info:      logic  0.37  16.58 Source debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_19_SUM_LUT4_F_I0_LUT2_I1_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I0_O_MUX2_LUT5_O_1_S0_ALU_SUM_COUT_ALU_COUT_1_SUM_LUT4_F.F
+Info:    routing  0.24  16.82 Net debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_19_SUM_LUT4_F_I0_LUT2_I1_F_MUX2_LUT5_I0_O_MUX2_LUT6_I0_O_MUX2_LUT7_I0_O_MUX2_LUT5_O_1_S0_ALU_SUM_COUT_ALU_COUT_1_SUM[3] (26,34) -> (26,34)
+Info:                          Sink debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_2_I0_LUT2_F_I0_ALU_SUM_COUT_ALU_COUT_15_SUM_MUX2_LUT5_S0_O_MUX2_LUT5_O_1_I0_LUT4_F.I3
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:130.20-130.21
+Info:      logic  0.37  17.19 Source debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_2_I0_LUT2_F_I0_ALU_SUM_COUT_ALU_COUT_15_SUM_MUX2_LUT5_S0_O_MUX2_LUT5_O_1_I0_LUT4_F.F
+Info:    routing  0.00  17.19 Net debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_2_I0_LUT2_F_I0_ALU_SUM_COUT_ALU_COUT_15_SUM_MUX2_LUT5_S0_O_MUX2_LUT5_O_1_I0 (26,34) -> (26,34)
+Info:                          Sink debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_2_I0_LUT2_F_I0_ALU_SUM_COUT_ALU_COUT_15_SUM_MUX2_LUT5_S0_O_MUX2_LUT5_O_1.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:151.9-151.11
+Info:      logic  0.27  17.46 Source debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_2_I0_LUT2_F_I0_ALU_SUM_COUT_ALU_COUT_15_SUM_MUX2_LUT5_S0_O_MUX2_LUT5_O_1.O
+Info:    routing  0.55  18.00 Net debug_data_LUT4_F_1_I0_ALU_SUM_COUT_ALU_COUT_4_SUM_LUT4_F_I0_LUT3_F_I1_LUT4_I1_F_MUX2_LUT5_O_2_I0_LUT2_F_I0_ALU_SUM_COUT_ALU_COUT_15_SUM_MUX2_LUT5_S0_O[5] (26,34) -> (29,34)
+Info:                          Sink debug_data_LUT3_F_4_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O.S0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:130.20-130.21
+Info:      logic  0.10  18.11 Source debug_data_LUT3_F_4_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0_MUX2_LUT6_O.O
+Info:    routing  0.00  18.11 Net debug_data_LUT3_F_4_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O_I0 (29,34) -> (29,34)
+Info:                          Sink debug_data_LUT3_F_4_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:170.42-170.67
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:163.9-163.11
+Info:      logic  0.27  18.38 Source debug_data_LUT3_F_4_I0_MUX2_LUT8_O_I0_MUX2_LUT7_O.O
+Info:    routing  0.00  18.38 Net debug_data_LUT3_F_4_I0_MUX2_LUT8_O_I0 (29,34) -> (28,34)
+Info:                          Sink debug_data_LUT3_F_4_I0_MUX2_LUT8_O.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:169.9-169.11
+Info:      logic  0.27  18.64 Source debug_data_LUT3_F_4_I0_MUX2_LUT8_O.O
+Info:    routing  0.67  19.31 Net debug_data_LUT3_F_4_I0[1] (28,34) -> (28,42)
+Info:                          Sink register_bank[0]_DFFCE_Q_5_D_LUT4_F.I0
+Info:                          Defined in:
+Info:                               /usr/bin/../share/yosys/gowin/cells_map.v:130.20-130.21
+Info:      logic  0.55  19.86 Source register_bank[0]_DFFCE_Q_5_D_LUT4_F.F
+Info:    routing  0.00  19.86 Net register_bank[0]_DFFCE_Q_5_D (28,42) -> (28,42)
+Info:                          Sink register_bank[0]_DFFCE_Q_5.D
+Info:      setup  0.04  19.90 Source register_bank[0]_DFFCE_Q_5.D
+Info: 10.79 ns logic, 9.10 ns routing
+
+Info: Max frequency for clock 'clk': 50.26 MHz (PASS at 25.00 MHz)
+
+Info: Slack histogram:
+Info:  legend: * represents 1 endpoint(s)
+Info:          + represents [1,1) endpoint(s)
+Info: [ 20102,  21056) |***** 
+Info: [ 21056,  22010) |* 
+Info: [ 22010,  22964) | 
+Info: [ 22964,  23918) | 
+Info: [ 23918,  24872) | 
+Info: [ 24872,  25826) |* 
+Info: [ 25826,  26780) | 
+Info: [ 26780,  27734) |*** 
+Info: [ 27734,  28688) |* 
+Info: [ 28688,  29642) | 
+Info: [ 29642,  30596) | 
+Info: [ 30596,  31550) | 
+Info: [ 31550,  32504) |* 
+Info: [ 32504,  33458) | 
+Info: [ 33458,  34412) | 
+Info: [ 34412,  35366) |** 
+Info: [ 35366,  36320) |********** 
+Info: [ 36320,  37274) |************** 
+Info: [ 37274,  38228) |****************************** 
+Info: [ 38228,  39182) |****************** 
+
+Info: Program finished normally.
