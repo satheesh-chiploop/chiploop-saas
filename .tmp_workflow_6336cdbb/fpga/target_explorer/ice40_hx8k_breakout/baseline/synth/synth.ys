@@ -1,0 +1,2 @@
+read_verilog -sv /root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/src/rtl/review_input.sv
+synth_ice40 -top minirv_edge_controller -noflatten -json /root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/synth/minirv_edge_controller_ice40.json

@@ -1,0 +1,592 @@
+{
+  "candidate_count": 4,
+  "continuation": {
+    "app": "fpga-bitstream",
+    "label": "Continue to FPGA Prototyping",
+    "selected_board": "ulx3s_ecp5_45f",
+    "source_workflow_id": "6336cdbb-d539-48af-a39d-c10f6bb1304e",
+    "target_frequency_mhz": 15.0,
+    "top_module": "minirv_edge_controller",
+    "winning_configuration": {
+      "achieved_frequency_mhz": 52.187,
+      "seed": 1,
+      "synthesis_strategy": "baseline",
+      "timing_margin_percent": 247.913,
+      "tool_effort": "balanced"
+    }
+  },
+  "design_intent": "MiniRV Edge Controller reference journey.\nCompare one fixed RTL design across supported iCE40 and ECP5 targets at 75 MHz. The dual-read 16x32 register bank, 32-bit ALU, multiplier, sensor accumulator, UART, timer, interrupt logic, and four PWM channels are intentionally substantial enough to create a meaningful multi-board utilization and timing comparison.",
+  "design_intent_provided": true,
+  "frequency_relaxation_policy": "reported only for candidates that fail the requested target after closure",
+  "recommendation_details": {
+    "best_for_growth": {
+      "best_frequency_mhz": 52.187,
+      "board": "ulx3s_ecp5_45f",
+      "constraint_confidence": "exploration_only",
+      "label": "Lattice ULX3S ECP5-45F",
+      "next_step": "Continue to FPGA Prototyping to apply verified board pins, rerun implementation, verify, and generate the bitstream.",
+      "resource_headroom_percent": 90.72,
+      "target_frequency_mhz": 15.0,
+      "target_met": true,
+      "timing_margin_percent": 247.913,
+      "toolchain_confidence": "qualified",
+      "why": "Meets 15 MHz with 247.9% timing margin and 90.7% logic headroom."
+    },
+    "best_low_cost": {
+      "best_frequency_mhz": 32.377,
+      "board": "ice40_hx8k_breakout",
+      "constraint_confidence": "exploration_only",
+      "label": "Lattice iCE40 HX8K Breakout",
+      "next_step": "Continue to FPGA Prototyping to apply verified board pins, rerun implementation, verify, and generate the bitstream.",
+      "resource_headroom_percent": 27.448,
+      "target_frequency_mhz": 15.0,
+      "target_met": true,
+      "timing_margin_percent": 115.847,
+      "toolchain_confidence": "qualified",
+      "why": "Meets 15 MHz with 115.8% timing margin and 27.4% logic headroom."
+    },
+    "best_overall": {
+      "best_frequency_mhz": 52.187,
+      "board": "ulx3s_ecp5_45f",
+      "constraint_confidence": "exploration_only",
+      "label": "Lattice ULX3S ECP5-45F",
+      "next_step": "Continue to FPGA Prototyping to apply verified board pins, rerun implementation, verify, and generate the bitstream.",
+      "resource_headroom_percent": 90.72,
+      "target_frequency_mhz": 15.0,
+      "target_met": true,
+      "timing_margin_percent": 247.913,
+      "toolchain_confidence": "qualified",
+      "why": "Meets 15 MHz with 247.9% timing margin and 90.7% logic headroom."
+    },
+    "best_performance": {
+      "best_frequency_mhz": 52.187,
+      "board": "ulx3s_ecp5_45f",
+      "constraint_confidence": "exploration_only",
+      "label": "Lattice ULX3S ECP5-45F",
+      "next_step": "Continue to FPGA Prototyping to apply verified board pins, rerun implementation, verify, and generate the bitstream.",
+      "resource_headroom_percent": 90.72,
+      "target_frequency_mhz": 15.0,
+      "target_met": true,
+      "timing_margin_percent": 247.913,
+      "toolchain_confidence": "qualified",
+      "why": "Meets 15 MHz with 247.9% timing margin and 90.7% logic headroom."
+    }
+  },
+  "recommendation_policy": {
+    "best_for_growth": "largest remaining logic headroom",
+    "best_low_cost": "smallest viable FPGA capacity proxy; live board pricing is not assumed",
+    "best_overall": "target met, timing stability, useful headroom, performance, then smallest viable target",
+    "best_performance": "highest robust median Fmax"
+  },
+  "recommendations": {
+    "best_for_growth": "ulx3s_ecp5_45f",
+    "best_low_cost": "ice40_hx8k_breakout",
+    "best_overall": "ulx3s_ecp5_45f",
+    "best_performance": "ulx3s_ecp5_45f"
+  },
+  "requested_profile": "best_overall",
+  "results": [
+    {
+      "best_frequency_mhz": 52.187,
+      "board": "ulx3s_ecp5_45f",
+      "board_input_frequency_mhz": 25.0,
+      "closure_used": false,
+      "constraint_confidence": "exploration_only",
+      "constraint_scope": "capacity_and_timing_exploration; board pin compatibility must be confirmed in FPGA Prototyping",
+      "device": "45k",
+      "failure_kind": null,
+      "failure_reason": null,
+      "family": "ecp5",
+      "frequency_relaxation": {
+        "eligible": false,
+        "reason": null,
+        "recommended_mhz": null
+      },
+      "implementation_key": "ecp5:45k:CABGA381",
+      "label": "Lattice ULX3S ECP5-45F",
+      "logic_cells_available": 43848,
+      "logic_cells_used": 4069,
+      "logic_utilization_percent": 9.28,
+      "median_frequency_mhz": 52.187,
+      "package": "CABGA381",
+      "pnr_runs": [
+        {
+          "command": [
+            "/usr/bin/nextpnr-ecp5",
+            "--45k",
+            "--package",
+            "CABGA381",
+            "--json",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/minirv_edge_controller_ecp5.json",
+            "--report",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/nextpnr_report.json",
+            "--textcfg",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/routed.config",
+            "--lpf-allow-unconstrained",
+            "--timing-allow-fail",
+            "--detailed-timing-report",
+            "--freq",
+            "15.0",
+            "--seed",
+            "1"
+          ],
+          "effective_args": [
+            "--detailed-timing-report",
+            "--freq",
+            "15.0"
+          ],
+          "effort": "balanced",
+          "error": null,
+          "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/nextpnr.log",
+          "logic_cells_available": 43848,
+          "logic_cells_used": 4069,
+          "logic_utilization_percent": 9.28,
+          "max_frequency_mhz": 52.187,
+          "report": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/nextpnr_report.json",
+          "routed_flip_flops": 799,
+          "routed_lut4_cells": 4069,
+          "routed_output": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/routed.config",
+          "seed": 1,
+          "status": "completed",
+          "synthesis_strategy": "baseline",
+          "timing_met": true,
+          "tool_version": "\"nextpnr-ecp5\" -- Next Generation Place and Route (Version 0.7-1build1)"
+        }
+      ],
+      "product_family": "ecp5",
+      "resource_headroom_percent": 90.72,
+      "segments": [],
+      "status": "target_met",
+      "support_tier": "production",
+      "synthesis_runs": [
+        {
+          "command": [
+            "/usr/bin/yosys",
+            "-s",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/synth.ys"
+          ],
+          "effective_options": [
+            "-noflatten"
+          ],
+          "error": null,
+          "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/yosys.log",
+          "netlist": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/minirv_edge_controller_ecp5.json",
+          "script": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/synth.ys",
+          "status": "completed",
+          "strategy": "baseline",
+          "tool_version": "Yosys 0.33 (git sha1 2584903a060)"
+        }
+      ],
+      "target_frequency_mhz": 15.0,
+      "target_met": true,
+      "timing_margin_percent": 247.913,
+      "timing_pass_rate": 1.0,
+      "toolchain_confidence": "qualified",
+      "vendor": "lattice",
+      "winning_run": {
+        "command": [
+          "/usr/bin/nextpnr-ecp5",
+          "--45k",
+          "--package",
+          "CABGA381",
+          "--json",
+          "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/minirv_edge_controller_ecp5.json",
+          "--report",
+          "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/nextpnr_report.json",
+          "--textcfg",
+          "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/routed.config",
+          "--lpf-allow-unconstrained",
+          "--timing-allow-fail",
+          "--detailed-timing-report",
+          "--freq",
+          "15.0",
+          "--seed",
+          "1"
+        ],
+        "effective_args": [
+          "--detailed-timing-report",
+          "--freq",
+          "15.0"
+        ],
+        "effort": "balanced",
+        "error": null,
+        "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/nextpnr.log",
+        "logic_cells_available": 43848,
+        "logic_cells_used": 4069,
+        "logic_utilization_percent": 9.28,
+        "max_frequency_mhz": 52.187,
+        "report": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/nextpnr_report.json",
+        "routed_flip_flops": 799,
+        "routed_lut4_cells": 4069,
+        "routed_output": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ulx3s_ecp5_45f/baseline/seed_1/routed.config",
+        "seed": 1,
+        "status": "completed",
+        "synthesis_strategy": "baseline",
+        "timing_met": true,
+        "tool_version": "\"nextpnr-ecp5\" -- Next Generation Place and Route (Version 0.7-1build1)"
+      },
+      "winning_seed": 1,
+      "worst_frequency_mhz": 52.187
+    },
+    {
+      "best_frequency_mhz": null,
+      "board": "gowin_tang_nano_9k",
+      "board_input_frequency_mhz": 27.0,
+      "closure_used": false,
+      "constraint_confidence": "exploration_only",
+      "constraint_scope": "capacity_and_timing_exploration; board pin compatibility must be confirmed in FPGA Prototyping",
+      "device": "GW1NR-LV9QN88PC6/I5",
+      "failure_kind": null,
+      "failure_reason": "Info: Using uarch 'gowin' for device 'GW1NR-LV9QN88PC6/I5'\n\nInfo: Create constant nets...\nInfo: Modify LUTs...\nInfo: Pack IOBs...\nERROR: Top-level port 'uart_tx' driven by illegal port uart_tx_DFFPE_Q.Q\n0 warnings, 1 error\n",
+      "family": "gowin",
+      "frequency_relaxation": {
+        "eligible": false,
+        "reason": null,
+        "recommended_mhz": null
+      },
+      "implementation_key": "gowin:GW1NR-LV9QN88PC6/I5:QN88",
+      "label": "Gowin Tang Nano 9K (LittleBee GW1NR-9)",
+      "logic_cells_available": null,
+      "logic_cells_used": null,
+      "logic_utilization_percent": null,
+      "median_frequency_mhz": null,
+      "package": "QN88",
+      "pnr_runs": [
+        {
+          "command": [
+            "/opt/chiploop-eda/bin/nextpnr-himbaechel",
+            "--device",
+            "GW1NR-LV9QN88PC6/I5",
+            "--vopt",
+            "family=GW1N-9C",
+            "--json",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/gowin_tang_nano_9k/baseline/synth/minirv_edge_controller_gowin.json",
+            "--report",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/gowin_tang_nano_9k/baseline/seed_1/nextpnr_report.json",
+            "--write",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/gowin_tang_nano_9k/baseline/seed_1/routed.json",
+            "--freq",
+            "15.0",
+            "--seed",
+            "1"
+          ],
+          "effective_args": [
+            "--freq",
+            "15.0"
+          ],
+          "effort": "balanced",
+          "error": "Info: Using uarch 'gowin' for device 'GW1NR-LV9QN88PC6/I5'\n\nInfo: Create constant nets...\nInfo: Modify LUTs...\nInfo: Pack IOBs...\nERROR: Top-level port 'uart_tx' driven by illegal port uart_tx_DFFPE_Q.Q\n0 warnings, 1 error\n",
+          "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/gowin_tang_nano_9k/baseline/seed_1/nextpnr.log",
+          "logic_cells_available": 8640,
+          "logic_cells_used": null,
+          "logic_utilization_percent": null,
+          "max_frequency_mhz": null,
+          "report": null,
+          "routed_flip_flops": null,
+          "routed_lut4_cells": null,
+          "routed_output": null,
+          "seed": 1,
+          "status": "failed",
+          "synthesis_strategy": "baseline",
+          "timing_met": null,
+          "tool_version": null
+        }
+      ],
+      "product_family": "LittleBee",
+      "resource_headroom_percent": null,
+      "segments": [
+        "education",
+        "makers",
+        "IoT",
+        "low-cost embedded",
+        "small industrial control"
+      ],
+      "status": "implementation_failed",
+      "support_tier": "beta",
+      "synthesis_runs": [
+        {
+          "command": [
+            "/usr/bin/yosys",
+            "-s",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/gowin_tang_nano_9k/baseline/synth/synth.ys"
+          ],
+          "effective_options": [
+            "-noflatten",
+            "-noiopads"
+          ],
+          "error": null,
+          "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/gowin_tang_nano_9k/baseline/synth/yosys.log",
+          "netlist": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/gowin_tang_nano_9k/baseline/synth/minirv_edge_controller_gowin.json",
+          "script": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/gowin_tang_nano_9k/baseline/synth/synth.ys",
+          "status": "completed",
+          "strategy": "baseline",
+          "tool_version": "Yosys 0.33 (git sha1 2584903a060)"
+        }
+      ],
+      "target_frequency_mhz": 15.0,
+      "target_met": false,
+      "timing_margin_percent": null,
+      "timing_pass_rate": 0.0,
+      "toolchain_confidence": "beta",
+      "vendor": "gowin",
+      "winning_run": null,
+      "winning_seed": null,
+      "worst_frequency_mhz": null
+    },
+    {
+      "best_frequency_mhz": 32.377,
+      "board": "ice40_hx8k_breakout",
+      "board_input_frequency_mhz": 12.0,
+      "closure_used": false,
+      "constraint_confidence": "exploration_only",
+      "constraint_scope": "capacity_and_timing_exploration; board pin compatibility must be confirmed in FPGA Prototyping",
+      "device": "hx8k",
+      "failure_kind": null,
+      "failure_reason": null,
+      "family": "ice40",
+      "frequency_relaxation": {
+        "eligible": false,
+        "reason": null,
+        "recommended_mhz": null
+      },
+      "implementation_key": "ice40:hx8k:ct256",
+      "label": "Lattice iCE40 HX8K Breakout",
+      "logic_cells_available": 7680,
+      "logic_cells_used": 5572,
+      "logic_utilization_percent": 72.552,
+      "median_frequency_mhz": 32.377,
+      "package": "ct256",
+      "pnr_runs": [
+        {
+          "command": [
+            "/usr/bin/nextpnr-ice40",
+            "--hx8k",
+            "--package",
+            "ct256",
+            "--json",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/synth/minirv_edge_controller_ice40.json",
+            "--report",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/nextpnr_report.json",
+            "--asc",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/routed.asc",
+            "--pcf-allow-unconstrained",
+            "--timing-allow-fail",
+            "--detailed-timing-report",
+            "--freq",
+            "15.0",
+            "--seed",
+            "1"
+          ],
+          "effective_args": [
+            "--detailed-timing-report",
+            "--freq",
+            "15.0"
+          ],
+          "effort": "balanced",
+          "error": null,
+          "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/nextpnr.log",
+          "logic_cells_available": 7680,
+          "logic_cells_used": 5572,
+          "logic_utilization_percent": 72.552,
+          "max_frequency_mhz": 32.377,
+          "report": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/nextpnr_report.json",
+          "routed_flip_flops": 799,
+          "routed_lut4_cells": 4923,
+          "routed_output": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/routed.asc",
+          "seed": 1,
+          "status": "completed",
+          "synthesis_strategy": "baseline",
+          "timing_met": true,
+          "tool_version": "\"nextpnr-ice40\" -- Next Generation Place and Route (Version 0.7-1build1)"
+        }
+      ],
+      "product_family": "ice40",
+      "resource_headroom_percent": 27.448,
+      "segments": [],
+      "status": "target_met",
+      "support_tier": "production",
+      "synthesis_runs": [
+        {
+          "command": [
+            "/usr/bin/yosys",
+            "-s",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/synth/synth.ys"
+          ],
+          "effective_options": [
+            "-noflatten"
+          ],
+          "error": null,
+          "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/synth/yosys.log",
+          "netlist": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/synth/minirv_edge_controller_ice40.json",
+          "script": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/synth/synth.ys",
+          "status": "completed",
+          "strategy": "baseline",
+          "tool_version": "Yosys 0.33 (git sha1 2584903a060)"
+        }
+      ],
+      "target_frequency_mhz": 15.0,
+      "target_met": true,
+      "timing_margin_percent": 115.847,
+      "timing_pass_rate": 1.0,
+      "toolchain_confidence": "qualified",
+      "vendor": "lattice",
+      "winning_run": {
+        "command": [
+          "/usr/bin/nextpnr-ice40",
+          "--hx8k",
+          "--package",
+          "ct256",
+          "--json",
+          "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/synth/minirv_edge_controller_ice40.json",
+          "--report",
+          "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/nextpnr_report.json",
+          "--asc",
+          "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/routed.asc",
+          "--pcf-allow-unconstrained",
+          "--timing-allow-fail",
+          "--detailed-timing-report",
+          "--freq",
+          "15.0",
+          "--seed",
+          "1"
+        ],
+        "effective_args": [
+          "--detailed-timing-report",
+          "--freq",
+          "15.0"
+        ],
+        "effort": "balanced",
+        "error": null,
+        "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/nextpnr.log",
+        "logic_cells_available": 7680,
+        "logic_cells_used": 5572,
+        "logic_utilization_percent": 72.552,
+        "max_frequency_mhz": 32.377,
+        "report": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/nextpnr_report.json",
+        "routed_flip_flops": 799,
+        "routed_lut4_cells": 4923,
+        "routed_output": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/ice40_hx8k_breakout/baseline/seed_1/routed.asc",
+        "seed": 1,
+        "status": "completed",
+        "synthesis_strategy": "baseline",
+        "timing_met": true,
+        "tool_version": "\"nextpnr-ice40\" -- Next Generation Place and Route (Version 0.7-1build1)"
+      },
+      "winning_seed": 1,
+      "worst_frequency_mhz": 32.377
+    },
+    {
+      "best_frequency_mhz": null,
+      "board": "upduino_v3",
+      "board_input_frequency_mhz": 12.0,
+      "closure_used": false,
+      "constraint_confidence": "exploration_only",
+      "constraint_scope": "capacity_and_timing_exploration; board pin compatibility must be confirmed in FPGA Prototyping",
+      "device": "up5k",
+      "failure_kind": null,
+      "failure_reason": "Warning: No PCF file specified; IO pins will be placed automatically\n\nInfo: Packing constants..\nInfo: Packing IOs..\nInfo: Packing LUT-FFs..\nInfo:     4701 LCs used as LUT4 only\nInfo:      222 LCs used as LUT4 and DFF\nInfo: Packing non-LUT FFs..\nInfo:      577 LCs used as DFF only\nInfo: Packing carries..\nInfo:       99 LCs used as CARRY only\nInfo: Packing indirect carry+LUT pairs...\nInfo:       40 LUTs merged into carry LCs\nInfo: Packing RAMs..\nInfo: Placing PLLs..\nInfo: Packing special functions..\nInfo: Packing PLLs..\nInfo: Promoting globals..\nInfo: promoting clk$SB_IO_IN (fanout 799)\nInfo: promoting reset_n_SB_LUT4_I3_O [reset] (fanout 795)\nInfo: promoting sensor_valid$SB_IO_IN [cen] (fanout 48)\nInfo: promoting register_bank[0]_SB_DFFES_Q_E [cen] (fanout 32)\nInfo: promoting register_bank[10]_SB_DFFES_Q_E [cen] (fanout 32)\nInfo: promoting register_bank[11]_SB_DFFES_Q_E [cen] (fanout 32)\nInfo: Constraining chains...\nInfo:       11 LCs used to legalise carry chains.\nInfo: Checksum: 0xd98a6e30\n\nInfo: Device utilisation:\nInfo: \t         ICESTORM_LC:  5572/ 5280   105%\nInfo: \t        ICESTORM_RAM:     0/   30     0%\nInfo: \t               SB_IO:    82/   96    85%\nInfo: \t               SB_GB:     6/    8    75%\nInfo: \t        ICESTORM_PLL:     0/    1     0%\nInfo: \t         SB_WARMBOOT:     0/    1     0%\nInfo: \t        ICESTORM_DSP:     0/    8     0%\nInfo: \t      ICESTORM_HFOSC:     0/    1     0%\nInfo: \t      ICESTORM_LFOSC:     0/    1     0%\nInfo: \t              SB_I2C:     0/    2     0%\nInfo: \t              SB_SPI:     0/    2     0%\nInfo: \t              IO_I3C:     0/    2     0%\nInfo: \t         SB_LEDDA_IP:     0/    1     0%\nInfo: \t         SB_RGBA_DRV:     0/    1     0%\nInfo: \t      ICESTORM_SPRAM:     0/    4     0%\n\nInfo: Placed 0 cells based on constraints.\nERROR: Unable to find a placement location for cell 'sensor_data[14]$sb_io'\n1 warning, 1 error\n",
+      "family": "ice40",
+      "frequency_relaxation": {
+        "eligible": false,
+        "reason": null,
+        "recommended_mhz": null
+      },
+      "implementation_key": "ice40:up5k:sg48",
+      "label": "Lattice UPduino v3",
+      "logic_cells_available": null,
+      "logic_cells_used": null,
+      "logic_utilization_percent": null,
+      "median_frequency_mhz": null,
+      "package": "sg48",
+      "pnr_runs": [
+        {
+          "command": [
+            "/usr/bin/nextpnr-ice40",
+            "--up5k",
+            "--package",
+            "sg48",
+            "--json",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/upduino_v3/baseline/synth/minirv_edge_controller_ice40.json",
+            "--report",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/upduino_v3/baseline/seed_1/nextpnr_report.json",
+            "--asc",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/upduino_v3/baseline/seed_1/routed.asc",
+            "--pcf-allow-unconstrained",
+            "--timing-allow-fail",
+            "--detailed-timing-report",
+            "--freq",
+            "15.0",
+            "--seed",
+            "1"
+          ],
+          "effective_args": [
+            "--detailed-timing-report",
+            "--freq",
+            "15.0"
+          ],
+          "effort": "balanced",
+          "error": "Warning: No PCF file specified; IO pins will be placed automatically\n\nInfo: Packing constants..\nInfo: Packing IOs..\nInfo: Packing LUT-FFs..\nInfo:     4701 LCs used as LUT4 only\nInfo:      222 LCs used as LUT4 and DFF\nInfo: Packing non-LUT FFs..\nInfo:      577 LCs used as DFF only\nInfo: Packing carries..\nInfo:       99 LCs used as CARRY only\nInfo: Packing indirect carry+LUT pairs...\nInfo:       40 LUTs merged into carry LCs\nInfo: Packing RAMs..\nInfo: Placing PLLs..\nInfo: Packing special functions..\nInfo: Packing PLLs..\nInfo: Promoting globals..\nInfo: promoting clk$SB_IO_IN (fanout 799)\nInfo: promoting reset_n_SB_LUT4_I3_O [reset] (fanout 795)\nInfo: promoting sensor_valid$SB_IO_IN [cen] (fanout 48)\nInfo: promoting register_bank[0]_SB_DFFES_Q_E [cen] (fanout 32)\nInfo: promoting register_bank[10]_SB_DFFES_Q_E [cen] (fanout 32)\nInfo: promoting register_bank[11]_SB_DFFES_Q_E [cen] (fanout 32)\nInfo: Constraining chains...\nInfo:       11 LCs used to legalise carry chains.\nInfo: Checksum: 0xd98a6e30\n\nInfo: Device utilisation:\nInfo: \t         ICESTORM_LC:  5572/ 5280   105%\nInfo: \t        ICESTORM_RAM:     0/   30     0%\nInfo: \t               SB_IO:    82/   96    85%\nInfo: \t               SB_GB:     6/    8    75%\nInfo: \t        ICESTORM_PLL:     0/    1     0%\nInfo: \t         SB_WARMBOOT:     0/    1     0%\nInfo: \t        ICESTORM_DSP:     0/    8     0%\nInfo: \t      ICESTORM_HFOSC:     0/    1     0%\nInfo: \t      ICESTORM_LFOSC:     0/    1     0%\nInfo: \t              SB_I2C:     0/    2     0%\nInfo: \t              SB_SPI:     0/    2     0%\nInfo: \t              IO_I3C:     0/    2     0%\nInfo: \t         SB_LEDDA_IP:     0/    1     0%\nInfo: \t         SB_RGBA_DRV:     0/    1     0%\nInfo: \t      ICESTORM_SPRAM:     0/    4     0%\n\nInfo: Placed 0 cells based on constraints.\nERROR: Unable to find a placement location for cell 'sensor_data[14]$sb_io'\n1 warning, 1 error\n",
+          "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/upduino_v3/baseline/seed_1/nextpnr.log",
+          "logic_cells_available": 5280,
+          "logic_cells_used": 5572,
+          "logic_utilization_percent": 105.53,
+          "max_frequency_mhz": null,
+          "report": null,
+          "routed_flip_flops": 799,
+          "routed_lut4_cells": 4923,
+          "routed_output": null,
+          "seed": 1,
+          "status": "failed",
+          "synthesis_strategy": "baseline",
+          "timing_met": null,
+          "tool_version": "\"nextpnr-ice40\" -- Next Generation Place and Route (Version 0.7-1build1)"
+        }
+      ],
+      "product_family": "ice40",
+      "resource_headroom_percent": null,
+      "segments": [],
+      "status": "implementation_failed",
+      "support_tier": "production",
+      "synthesis_runs": [
+        {
+          "command": [
+            "/usr/bin/yosys",
+            "-s",
+            "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/upduino_v3/baseline/synth/synth.ys"
+          ],
+          "effective_options": [
+            "-noflatten"
+          ],
+          "error": null,
+          "log": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/upduino_v3/baseline/synth/yosys.log",
+          "netlist": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/upduino_v3/baseline/synth/minirv_edge_controller_ice40.json",
+          "script": "/root/chiploop-backend/backend/workflows/6336cdbb-d539-48af-a39d-c10f6bb1304e/fpga/target_explorer/upduino_v3/baseline/synth/synth.ys",
+          "status": "completed",
+          "strategy": "baseline",
+          "tool_version": "Yosys 0.33 (git sha1 2584903a060)"
+        }
+      ],
+      "target_frequency_mhz": 15.0,
+      "target_met": false,
+      "timing_margin_percent": null,
+      "timing_pass_rate": 0.0,
+      "toolchain_confidence": "qualified",
+      "vendor": "lattice",
+      "winning_run": null,
+      "winning_seed": null,
+      "worst_frequency_mhz": null
+    }
+  ],
+  "rtl_file_count": 1,
+  "seed_policy": {
+    "baseline_seed_count": 1,
+    "closure_is_conditional": true,
+    "closure_seed_count": 1
+  },
+  "selected_recommendation": "ulx3s_ecp5_45f",
+  "status": "completed",
+  "target_frequency_mhz": 15.0,
+  "top_module": "minirv_edge_controller",
+  "type": "fpga_target_explorer",
+  "unique_implementation_count": 4
+}

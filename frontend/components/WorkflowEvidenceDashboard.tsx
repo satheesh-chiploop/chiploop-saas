@@ -1638,7 +1638,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <div className="mt-4 space-y-3">
               {results.map((item) => {
                 const fmax = firstNumber(item.best_frequency_mhz) || 0;
-                const outcome = firstString(item.status) === "implementation_failed" ? "implementation failed" : item.target_met === true ? "target met" : "target missed";
+                const failureKind = firstString(item.failure_kind);
+                const outcome = failureKind === "capacity_exceeded" ? "does not fit" : failureKind === "io_packing" ? "tool I/O packing failed" : firstString(item.status) === "implementation_failed" ? "implementation failed" : item.target_met === true ? "target met" : "target missed";
                 return <Bar key={firstString(item.board)} label={`${firstString(item.label, item.board)} - ${outcome}`} value={fmax} total={maxFmax} color={item.target_met === true ? "bg-emerald-500" : firstString(item.status) === "implementation_failed" ? "bg-rose-500" : "bg-amber-500"} />;
               })}
             </div>
@@ -1650,12 +1651,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               const relaxation = record(item.frequency_relaxation);
               const boardIo = ioMappings.find((mapping) => firstString(mapping.board) === firstString(item.board));
               const implementationFailed = firstString(item.status) === "implementation_failed";
+              const failureKind = firstString(item.failure_kind);
+              const failureLabel = failureKind === "capacity_exceeded" ? "Does not fit" : failureKind === "io_packing" ? "Tool I/O packing failed" : "Implementation failed";
               return (
                 <details key={firstString(item.board)} className="rounded-2xl border border-slate-800 bg-slate-950/35 px-4 py-3">
                   <summary className="cursor-pointer">
                     <div className="inline-flex w-[calc(100%_-_1rem)] flex-wrap items-center justify-between gap-3 align-middle">
                       <div><span className="font-semibold text-white">{firstString(item.label, item.board)}</span><span className="ml-2 text-xs text-slate-500">{firstString(item.family)} {firstString(item.device)} / {firstString(item.package)}</span></div>
-                      <div className={item.target_met === true ? "text-sm font-semibold text-emerald-300" : implementationFailed ? "text-sm font-semibold text-rose-300" : "text-sm font-semibold text-amber-300"}>{item.target_met === true ? "Target met" : implementationFailed ? "Implementation failed" : "Target missed"}</div>
+                      <div className={item.target_met === true ? "text-sm font-semibold text-emerald-300" : implementationFailed ? "text-sm font-semibold text-rose-300" : "text-sm font-semibold text-amber-300"}>{item.target_met === true ? "Target met" : implementationFailed ? failureLabel : "Target missed"}</div>
                     </div>
                   </summary>
                   <div className="mt-4 grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-2 xl:grid-cols-4">
