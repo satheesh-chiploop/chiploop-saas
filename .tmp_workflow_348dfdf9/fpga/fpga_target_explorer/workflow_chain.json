@@ -1,0 +1,10 @@
+{
+  "source_arch2rtl_workflow_id": null,
+  "parent_workflow_id": null,
+  "current_workflow_id": "348dfdf9-8c11-400f-8e25-503b3373a6d9",
+  "current_run_id": "5703440c-d68a-44a0-a247-6cb3ae667b5a",
+  "current_app": "fpga_target_explorer",
+  "upstream_workflows": {
+    "fpga_target_explorer": "348dfdf9-8c11-400f-8e25-503b3373a6d9"
+  }
+}

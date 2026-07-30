@@ -1,0 +1,1752 @@
+/----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Executing script file `/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/target_explorer/ice40_hx8k_breakout/baseline/synth/synth.ys' --
+
+1. Executing Verilog-2005 frontend: /root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv
+Parsing SystemVerilog input from `/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv' to AST representation.
+Generating RTLIL representation for module `\minirv_edge_controller'.
+Warning: Replacing memory \register_bank with list of registers. See /root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:89
+Warning: Replacing memory \pwm_duty with list of registers. See /root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:79
+Successfully finished Verilog frontend.
+
+2. Executing SYNTH_ICE40 pass.
+
+2.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/ice40/cells_sim.v
+Parsing Verilog input from `/usr/bin/../share/yosys/ice40/cells_sim.v' to AST representation.
+Generating RTLIL representation for module `\SB_IO'.
+Generating RTLIL representation for module `\SB_GB_IO'.
+Generating RTLIL representation for module `\SB_GB'.
+Generating RTLIL representation for module `\SB_LUT4'.
+Generating RTLIL representation for module `\SB_CARRY'.
+Generating RTLIL representation for module `\SB_DFF'.
+Generating RTLIL representation for module `\SB_DFFE'.
+Generating RTLIL representation for module `\SB_DFFSR'.
+Generating RTLIL representation for module `\SB_DFFR'.
+Generating RTLIL representation for module `\SB_DFFSS'.
+Generating RTLIL representation for module `\SB_DFFS'.
+Generating RTLIL representation for module `\SB_DFFESR'.
+Generating RTLIL representation for module `\SB_DFFER'.
+Generating RTLIL representation for module `\SB_DFFESS'.
+Generating RTLIL representation for module `\SB_DFFES'.
+Generating RTLIL representation for module `\SB_DFFN'.
+Generating RTLIL representation for module `\SB_DFFNE'.
+Generating RTLIL representation for module `\SB_DFFNSR'.
+Generating RTLIL representation for module `\SB_DFFNR'.
+Generating RTLIL representation for module `\SB_DFFNSS'.
+Generating RTLIL representation for module `\SB_DFFNS'.
+Generating RTLIL representation for module `\SB_DFFNESR'.
+Generating RTLIL representation for module `\SB_DFFNER'.
+Generating RTLIL representation for module `\SB_DFFNESS'.
+Generating RTLIL representation for module `\SB_DFFNES'.
+Generating RTLIL representation for module `\SB_RAM40_4K'.
+Generating RTLIL representation for module `\SB_RAM40_4KNR'.
+Generating RTLIL representation for module `\SB_RAM40_4KNW'.
+Generating RTLIL representation for module `\SB_RAM40_4KNRNW'.
+Generating RTLIL representation for module `\ICESTORM_LC'.
+Generating RTLIL representation for module `\SB_PLL40_CORE'.
+Generating RTLIL representation for module `\SB_PLL40_PAD'.
+Generating RTLIL representation for module `\SB_PLL40_2_PAD'.
+Generating RTLIL representation for module `\SB_PLL40_2F_CORE'.
+Generating RTLIL representation for module `\SB_PLL40_2F_PAD'.
+Generating RTLIL representation for module `\SB_WARMBOOT'.
+Generating RTLIL representation for module `\SB_SPRAM256KA'.
+Generating RTLIL representation for module `\SB_HFOSC'.
+Generating RTLIL representation for module `\SB_LFOSC'.
+Generating RTLIL representation for module `\SB_RGBA_DRV'.
+Generating RTLIL representation for module `\SB_LED_DRV_CUR'.
+Generating RTLIL representation for module `\SB_RGB_DRV'.
+Generating RTLIL representation for module `\SB_I2C'.
+Generating RTLIL representation for module `\SB_SPI'.
+Generating RTLIL representation for module `\SB_LEDDA_IP'.
+Generating RTLIL representation for module `\SB_FILTER_50NS'.
+Generating RTLIL representation for module `\SB_IO_I3C'.
+Generating RTLIL representation for module `\SB_IO_OD'.
+Generating RTLIL representation for module `\SB_MAC16'.
+Generating RTLIL representation for module `\ICESTORM_RAM'.
+Successfully finished Verilog frontend.
+
+2.2. Executing HIERARCHY pass (managing design hierarchy).
+
+2.2.1. Analyzing design hierarchy..
+Top module:  \minirv_edge_controller
+
+2.2.2. Analyzing design hierarchy..
+Top module:  \minirv_edge_controller
+Removed 0 unused modules.
+
+2.3. Executing PROC pass (convert processes to netlists).
+
+2.3.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.3.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1414$317 in module SB_DFFNES.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1353$310 in module SB_DFFNESS.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1273$306 in module SB_DFFNER.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1212$299 in module SB_DFFNESR.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1138$296 in module SB_DFFNS.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1088$293 in module SB_DFFNSS.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1017$290 in module SB_DFFNR.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:967$287 in module SB_DFFNSR.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:803$279 in module SB_DFFES.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:742$272 in module SB_DFFESS.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:662$268 in module SB_DFFER.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:601$261 in module SB_DFFESR.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:527$258 in module SB_DFFS.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:477$255 in module SB_DFFSS.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:406$252 in module SB_DFFR.
+Marked 1 switch rules as full_case in process $proc$/usr/bin/../share/yosys/ice40/cells_sim.v:356$249 in module SB_DFFSR.
+Removed 1 dead cases from process $proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$74 in module minirv_edge_controller.
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$74 in module minirv_edge_controller.
+Removed 1 dead cases from process $proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$71 in module minirv_edge_controller.
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$71 in module minirv_edge_controller.
+Marked 7 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32 in module minirv_edge_controller.
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:40$14 in module minirv_edge_controller.
+Removed a total of 2 dead cases.
+
+2.3.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 17 redundant assignments.
+Promoted 33 assignments to connections.
+
+2.3.4. Executing PROC_INIT pass (extract init attributes).
+Found init rule in `\SB_DFFNES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$320'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFNESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$316'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFNER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$309'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFNESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$305'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFNS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$298'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFNSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$295'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFNR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$292'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFNSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$289'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFNE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$286'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFN.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$284'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$282'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$278'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$271'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$267'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$260'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$257'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$254'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$251'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFFE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$248'.
+  Set init value: \Q = 1'0
+Found init rule in `\SB_DFF.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$246'.
+  Set init value: \Q = 1'0
+
+2.3.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \S in `\SB_DFFNES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1414$317'.
+Found async reset \R in `\SB_DFFNER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1273$306'.
+Found async reset \S in `\SB_DFFNS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1138$296'.
+Found async reset \R in `\SB_DFFNR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1017$290'.
+Found async reset \S in `\SB_DFFES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:803$279'.
+Found async reset \R in `\SB_DFFER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:662$268'.
+Found async reset \S in `\SB_DFFS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:527$258'.
+Found async reset \R in `\SB_DFFR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:406$252'.
+Found async reset \reset_n in `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+
+2.3.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~29 debug messages>
+
+2.3.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\SB_DFFNES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$320'.
+Creating decoders for process `\SB_DFFNES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1414$317'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFNESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$316'.
+Creating decoders for process `\SB_DFFNESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1353$310'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFNER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$309'.
+Creating decoders for process `\SB_DFFNER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1273$306'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFNESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$305'.
+Creating decoders for process `\SB_DFFNESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1212$299'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFNS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$298'.
+Creating decoders for process `\SB_DFFNS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1138$296'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFNSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$295'.
+Creating decoders for process `\SB_DFFNSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1088$293'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFNR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$292'.
+Creating decoders for process `\SB_DFFNR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1017$290'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFNSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$289'.
+Creating decoders for process `\SB_DFFNSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:967$287'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFNE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$286'.
+Creating decoders for process `\SB_DFFNE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:922$285'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFN.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$284'.
+Creating decoders for process `\SB_DFFN.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:882$283'.
+Creating decoders for process `\SB_DFFES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$282'.
+Creating decoders for process `\SB_DFFES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:803$279'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$278'.
+Creating decoders for process `\SB_DFFESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:742$272'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$271'.
+Creating decoders for process `\SB_DFFER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:662$268'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$267'.
+Creating decoders for process `\SB_DFFESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:601$261'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$260'.
+Creating decoders for process `\SB_DFFS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:527$258'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$257'.
+Creating decoders for process `\SB_DFFSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:477$255'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$254'.
+Creating decoders for process `\SB_DFFR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:406$252'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$251'.
+Creating decoders for process `\SB_DFFSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:356$249'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFFE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$248'.
+Creating decoders for process `\SB_DFFE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:311$247'.
+     1/1: $0\Q[0:0]
+Creating decoders for process `\SB_DFF.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$246'.
+Creating decoders for process `\SB_DFF.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:271$245'.
+Creating decoders for process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$74'.
+     1/1: $1$mem2reg_rd$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:35$3_DATA[31:0]$76
+Creating decoders for process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$71'.
+     1/1: $1$mem2reg_rd$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:34$2_DATA[31:0]$73
+Creating decoders for process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+     1/47: $0\uart_divider[9:0]
+     2/47: $2$mem2reg_wr$\pwm_duty$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:107$5_ADDR[1:0]$56
+     3/47: $2$mem2reg_wr$\pwm_duty$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:107$5_DATA[7:0]$57
+     4/47: $2$mem2reg_wr$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$4_ADDR[3:0]$53
+     5/47: $2$mem2reg_wr$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$4_DATA[31:0]$54
+     6/47: $0\interrupt[0:0]
+     7/47: $1$mem2reg_wr$\pwm_duty$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:107$5_DATA[7:0]$41
+     8/47: $1$mem2reg_wr$\pwm_duty$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:107$5_ADDR[1:0]$40
+     9/47: $1$mem2reg_wr$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$4_DATA[31:0]$39
+    10/47: $1$mem2reg_wr$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$4_ADDR[3:0]$38
+    11/47: $0\pwm_out[3:0] [3]
+    12/47: $0\pwm_out[3:0] [2]
+    13/47: $0\pwm_out[3:0] [1]
+    14/47: $0\pwm_out[3:0] [0]
+    15/47: $0\timer_count[15:0]
+    16/47: $0\multiply_result[31:0]
+    17/47: $0\operand_b[31:0]
+    18/47: $0\operand_a[31:0]
+    19/47: $0\instruction[31:0]
+    20/47: $0\pc[31:0]
+    21/47: $1\index[31:0]
+    22/47: $0\register_bank[15][31:0]
+    23/47: $0\register_bank[14][31:0]
+    24/47: $0\register_bank[13][31:0]
+    25/47: $0\register_bank[12][31:0]
+    26/47: $0\register_bank[11][31:0]
+    27/47: $0\register_bank[10][31:0]
+    28/47: $0\register_bank[9][31:0]
+    29/47: $0\register_bank[8][31:0]
+    30/47: $0\register_bank[7][31:0]
+    31/47: $0\register_bank[6][31:0]
+    32/47: $0\register_bank[5][31:0]
+    33/47: $0\register_bank[4][31:0]
+    34/47: $0\register_bank[3][31:0]
+    35/47: $0\register_bank[2][31:0]
+    36/47: $0\register_bank[1][31:0]
+    37/47: $0\register_bank[0][31:0]
+    38/47: $0\pwm_duty[3][7:0]
+    39/47: $0\pwm_duty[2][7:0]
+    40/47: $0\pwm_duty[1][7:0]
+    41/47: $0\pwm_duty[0][7:0]
+    42/47: $0\uart_shift[9:0]
+    43/47: $0\uart_bit[3:0]
+    44/47: $0\sample_count[15:0]
+    45/47: $0\sensor_accumulator[31:0]
+    46/47: $0\pwm_counter[7:0]
+    47/47: $0\uart_tx[0:0]
+Creating decoders for process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:62$27'.
+Creating decoders for process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:40$14'.
+     1/1: $1\alu_result[31:0]
+
+2.3.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\minirv_edge_controller.$mem2reg_rd$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:35$3_DATA' from process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$74'.
+No latch inferred for signal `\minirv_edge_controller.$mem2reg_rd$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:34$2_DATA' from process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$71'.
+No latch inferred for signal `\minirv_edge_controller.\write_address' from process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:62$27'.
+No latch inferred for signal `\minirv_edge_controller.\write_data' from process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:62$27'.
+No latch inferred for signal `\minirv_edge_controller.\write_enable' from process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:62$27'.
+No latch inferred for signal `\minirv_edge_controller.\alu_result' from process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:40$14'.
+
+2.3.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\SB_DFFNES.\Q' using process `\SB_DFFNES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1414$317'.
+  created $adff cell `$procdff$819' with negative edge clock and positive level reset.
+Creating register for signal `\SB_DFFNESS.\Q' using process `\SB_DFFNESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1353$310'.
+  created $dff cell `$procdff$820' with negative edge clock.
+Creating register for signal `\SB_DFFNER.\Q' using process `\SB_DFFNER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1273$306'.
+  created $adff cell `$procdff$821' with negative edge clock and positive level reset.
+Creating register for signal `\SB_DFFNESR.\Q' using process `\SB_DFFNESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1212$299'.
+  created $dff cell `$procdff$822' with negative edge clock.
+Creating register for signal `\SB_DFFNS.\Q' using process `\SB_DFFNS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1138$296'.
+  created $adff cell `$procdff$823' with negative edge clock and positive level reset.
+Creating register for signal `\SB_DFFNSS.\Q' using process `\SB_DFFNSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1088$293'.
+  created $dff cell `$procdff$824' with negative edge clock.
+Creating register for signal `\SB_DFFNR.\Q' using process `\SB_DFFNR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1017$290'.
+  created $adff cell `$procdff$825' with negative edge clock and positive level reset.
+Creating register for signal `\SB_DFFNSR.\Q' using process `\SB_DFFNSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:967$287'.
+  created $dff cell `$procdff$826' with negative edge clock.
+Creating register for signal `\SB_DFFNE.\Q' using process `\SB_DFFNE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:922$285'.
+  created $dff cell `$procdff$827' with negative edge clock.
+Creating register for signal `\SB_DFFN.\Q' using process `\SB_DFFN.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:882$283'.
+  created $dff cell `$procdff$828' with negative edge clock.
+Creating register for signal `\SB_DFFES.\Q' using process `\SB_DFFES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:803$279'.
+  created $adff cell `$procdff$829' with positive edge clock and positive level reset.
+Creating register for signal `\SB_DFFESS.\Q' using process `\SB_DFFESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:742$272'.
+  created $dff cell `$procdff$830' with positive edge clock.
+Creating register for signal `\SB_DFFER.\Q' using process `\SB_DFFER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:662$268'.
+  created $adff cell `$procdff$831' with positive edge clock and positive level reset.
+Creating register for signal `\SB_DFFESR.\Q' using process `\SB_DFFESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:601$261'.
+  created $dff cell `$procdff$832' with positive edge clock.
+Creating register for signal `\SB_DFFS.\Q' using process `\SB_DFFS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:527$258'.
+  created $adff cell `$procdff$833' with positive edge clock and positive level reset.
+Creating register for signal `\SB_DFFSS.\Q' using process `\SB_DFFSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:477$255'.
+  created $dff cell `$procdff$834' with positive edge clock.
+Creating register for signal `\SB_DFFR.\Q' using process `\SB_DFFR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:406$252'.
+  created $adff cell `$procdff$835' with positive edge clock and positive level reset.
+Creating register for signal `\SB_DFFSR.\Q' using process `\SB_DFFSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:356$249'.
+  created $dff cell `$procdff$836' with positive edge clock.
+Creating register for signal `\SB_DFFE.\Q' using process `\SB_DFFE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:311$247'.
+  created $dff cell `$procdff$837' with positive edge clock.
+Creating register for signal `\SB_DFF.\Q' using process `\SB_DFF.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:271$245'.
+  created $dff cell `$procdff$838' with positive edge clock.
+Creating register for signal `\minirv_edge_controller.\uart_tx' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$839' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\pwm_out' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $dff cell `$procdff$842' with positive edge clock.
+Creating register for signal `\minirv_edge_controller.\interrupt' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$843' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\pc' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$844' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\instruction' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$845' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\operand_a' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$846' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\operand_b' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$847' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\multiply_result' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$848' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\sensor_accumulator' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$849' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\sample_count' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$850' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\timer_count' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$851' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\pwm_counter' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$852' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\uart_divider' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$853' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\uart_bit' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$854' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\uart_shift' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$855' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\index' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$856' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\pwm_duty[0]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$857' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\pwm_duty[1]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$858' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\pwm_duty[2]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$859' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\pwm_duty[3]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$860' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[0]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$861' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[1]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$862' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[2]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$863' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[3]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$864' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[4]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$865' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[5]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$866' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[6]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$867' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[7]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$868' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[8]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$869' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[9]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$870' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[10]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$871' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[11]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$872' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[12]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$873' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[13]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$874' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[14]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$875' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.\register_bank[15]' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$876' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.$mem2reg_wr$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$4_ADDR' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$877' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.$mem2reg_wr$\register_bank$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$4_DATA' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$878' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.$mem2reg_wr$\pwm_duty$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:107$5_ADDR' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$879' with positive edge clock and negative level reset.
+Creating register for signal `\minirv_edge_controller.$mem2reg_wr$\pwm_duty$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:107$5_DATA' using process `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+  created $adff cell `$procdff$880' with positive edge clock and negative level reset.
+
+2.3.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.3.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `SB_DFFNES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$320'.
+Found and cleaned up 1 empty switch in `\SB_DFFNES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1414$317'.
+Removing empty process `SB_DFFNES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1414$317'.
+Removing empty process `SB_DFFNESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$316'.
+Found and cleaned up 2 empty switches in `\SB_DFFNESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1353$310'.
+Removing empty process `SB_DFFNESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1353$310'.
+Removing empty process `SB_DFFNER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$309'.
+Found and cleaned up 1 empty switch in `\SB_DFFNER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1273$306'.
+Removing empty process `SB_DFFNER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1273$306'.
+Removing empty process `SB_DFFNESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$305'.
+Found and cleaned up 2 empty switches in `\SB_DFFNESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1212$299'.
+Removing empty process `SB_DFFNESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1212$299'.
+Removing empty process `SB_DFFNS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$298'.
+Removing empty process `SB_DFFNS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1138$296'.
+Removing empty process `SB_DFFNSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$295'.
+Found and cleaned up 1 empty switch in `\SB_DFFNSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1088$293'.
+Removing empty process `SB_DFFNSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1088$293'.
+Removing empty process `SB_DFFNR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$292'.
+Removing empty process `SB_DFFNR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:1017$290'.
+Removing empty process `SB_DFFNSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$289'.
+Found and cleaned up 1 empty switch in `\SB_DFFNSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:967$287'.
+Removing empty process `SB_DFFNSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:967$287'.
+Removing empty process `SB_DFFNE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$286'.
+Found and cleaned up 1 empty switch in `\SB_DFFNE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:922$285'.
+Removing empty process `SB_DFFNE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:922$285'.
+Removing empty process `SB_DFFN.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$284'.
+Removing empty process `SB_DFFN.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:882$283'.
+Removing empty process `SB_DFFES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$282'.
+Found and cleaned up 1 empty switch in `\SB_DFFES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:803$279'.
+Removing empty process `SB_DFFES.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:803$279'.
+Removing empty process `SB_DFFESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$278'.
+Found and cleaned up 2 empty switches in `\SB_DFFESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:742$272'.
+Removing empty process `SB_DFFESS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:742$272'.
+Removing empty process `SB_DFFER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$271'.
+Found and cleaned up 1 empty switch in `\SB_DFFER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:662$268'.
+Removing empty process `SB_DFFER.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:662$268'.
+Removing empty process `SB_DFFESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$267'.
+Found and cleaned up 2 empty switches in `\SB_DFFESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:601$261'.
+Removing empty process `SB_DFFESR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:601$261'.
+Removing empty process `SB_DFFS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$260'.
+Removing empty process `SB_DFFS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:527$258'.
+Removing empty process `SB_DFFSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$257'.
+Found and cleaned up 1 empty switch in `\SB_DFFSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:477$255'.
+Removing empty process `SB_DFFSS.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:477$255'.
+Removing empty process `SB_DFFR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$254'.
+Removing empty process `SB_DFFR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:406$252'.
+Removing empty process `SB_DFFSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$251'.
+Found and cleaned up 1 empty switch in `\SB_DFFSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:356$249'.
+Removing empty process `SB_DFFSR.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:356$249'.
+Removing empty process `SB_DFFE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$248'.
+Found and cleaned up 1 empty switch in `\SB_DFFE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:311$247'.
+Removing empty process `SB_DFFE.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:311$247'.
+Removing empty process `SB_DFF.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:0$246'.
+Removing empty process `SB_DFF.$proc$/usr/bin/../share/yosys/ice40/cells_sim.v:271$245'.
+Found and cleaned up 1 empty switch in `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$74'.
+Removing empty process `minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$74'.
+Found and cleaned up 1 empty switch in `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$71'.
+Removing empty process `minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:0$71'.
+Found and cleaned up 8 empty switches in `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+Removing empty process `minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:68$32'.
+Removing empty process `minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:62$27'.
+Found and cleaned up 1 empty switch in `\minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:40$14'.
+Removing empty process `minirv_edge_controller.$proc$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:40$14'.
+Cleaned up 29 empty switches.
+
+2.3.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+<suppressed ~8 debug messages>
+
+2.4. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 11 unused cells and 117 unused wires.
+<suppressed ~13 debug messages>
+
+2.6. Executing CHECK pass (checking for obvious problems).
+Checking module minirv_edge_controller...
+Found and reported 0 problems.
+
+2.7. Executing OPT pass (performing simple optimizations).
+
+2.7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+2.7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \minirv_edge_controller..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~32 debug messages>
+
+2.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \minirv_edge_controller.
+Performed a total of 0 changes.
+
+2.7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.7.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 0 unused cells and 2 unused wires.
+<suppressed ~1 debug messages>
+
+2.7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.7.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.7.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \minirv_edge_controller..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~32 debug messages>
+
+2.7.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \minirv_edge_controller.
+Performed a total of 0 changes.
+
+2.7.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.7.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.7.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.7.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.7.16. Finished OPT passes. (There is nothing left to do.)
+
+2.8. Executing FSM pass (extract and optimize FSM).
+
+2.8.1. Executing FSM_DETECT pass (finding FSMs in design).
+
+2.8.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+2.8.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+2.8.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.8.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+2.8.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+2.8.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+2.8.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+2.9. Executing OPT pass (performing simple optimizations).
+
+2.9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \minirv_edge_controller..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~32 debug messages>
+
+2.9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \minirv_edge_controller.
+Performed a total of 0 changes.
+
+2.9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$876 ($adff) from module minirv_edge_controller (D = $0\register_bank[15][31:0], Q = \register_bank[15]).
+Adding EN signal on $procdff$875 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[14]).
+Adding EN signal on $procdff$874 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[13]).
+Adding EN signal on $procdff$873 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[12]).
+Adding EN signal on $procdff$872 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[11]).
+Adding EN signal on $procdff$871 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[10]).
+Adding EN signal on $procdff$870 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[9]).
+Adding EN signal on $procdff$869 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[8]).
+Adding EN signal on $procdff$868 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[7]).
+Adding EN signal on $procdff$867 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[6]).
+Adding EN signal on $procdff$866 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[5]).
+Adding EN signal on $procdff$865 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[4]).
+Adding EN signal on $procdff$864 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[3]).
+Adding EN signal on $procdff$863 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[2]).
+Adding EN signal on $procdff$862 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[1]).
+Adding EN signal on $procdff$861 ($adff) from module minirv_edge_controller (D = $xor$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:103$55_Y, Q = \register_bank[0]).
+Adding EN signal on $procdff$860 ($adff) from module minirv_edge_controller (D = \sensor_data [7:0], Q = \pwm_duty[3]).
+Adding EN signal on $procdff$859 ($adff) from module minirv_edge_controller (D = \sensor_data [7:0], Q = \pwm_duty[2]).
+Adding EN signal on $procdff$858 ($adff) from module minirv_edge_controller (D = \sensor_data [7:0], Q = \pwm_duty[1]).
+Adding EN signal on $procdff$857 ($adff) from module minirv_edge_controller (D = \sensor_data [7:0], Q = \pwm_duty[0]).
+Adding EN signal on $procdff$855 ($adff) from module minirv_edge_controller (D = $procmux$780_Y, Q = \uart_shift).
+Adding EN signal on $procdff$854 ($adff) from module minirv_edge_controller (D = $procmux$788_Y, Q = \uart_bit).
+Adding EN signal on $procdff$850 ($adff) from module minirv_edge_controller (D = $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:106$59_Y [15:0], Q = \sample_count).
+Adding EN signal on $procdff$849 ($adff) from module minirv_edge_controller (D = $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:105$58_Y, Q = \sensor_accumulator).
+Adding EN signal on $procdff$842 ($dff) from module minirv_edge_controller (D = $0\pwm_out[3:0], Q = \pwm_out).
+Adding EN signal on $procdff$839 ($adff) from module minirv_edge_controller (D = \uart_shift [0], Q = \uart_tx).
+
+2.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 44 unused cells and 44 unused wires.
+<suppressed ~45 debug messages>
+
+2.9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+<suppressed ~1 debug messages>
+
+2.9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \minirv_edge_controller..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~9 debug messages>
+
+2.9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \minirv_edge_controller.
+Performed a total of 0 changes.
+
+2.9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.9.16. Finished OPT passes. (There is nothing left to do.)
+
+2.10. Executing WREDUCE pass (reducing word size of cells).
+Removed top 26 bits (of 32) from port A of cell minirv_edge_controller.$sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:36$7 ($sub).
+Removed top 25 bits (of 32) from port Y of cell minirv_edge_controller.$sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:36$7 ($sub).
+Removed top 1 bits (of 2) from port B of cell minirv_edge_controller.$auto$opt_dff.cc:195:make_patterns_logic$883 ($ne).
+Removed top 29 bits (of 32) from port B of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:91$42 ($add).
+Removed top 28 bits (of 32) from port B of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:92$44 ($add).
+Removed top 31 bits (of 32) from port B of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:96$47 ($add).
+Removed top 16 bits (of 32) from port Y of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:96$47 ($add).
+Removed top 31 bits (of 32) from port B of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:97$48 ($add).
+Removed top 24 bits (of 32) from port Y of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:97$48 ($add).
+Removed top 31 bits (of 32) from port B of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:106$59 ($add).
+Removed top 16 bits (of 32) from port Y of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:106$59 ($add).
+Removed top 3 bits (of 10) from port B of cell minirv_edge_controller.$eq$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:110$63 ($eq).
+Removed top 31 bits (of 32) from port B of cell minirv_edge_controller.$sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:118$67 ($sub).
+Removed top 28 bits (of 32) from port Y of cell minirv_edge_controller.$sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:118$67 ($sub).
+Removed top 31 bits (of 32) from port B of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:121$68 ($add).
+Removed top 22 bits (of 32) from port Y of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:121$68 ($add).
+Removed top 7 bits (of 32) from port B of cell minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:124$70 ($add).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$510_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$511_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$512_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$513_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell minirv_edge_controller.$procmux$514_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell minirv_edge_controller.$procmux$515_CMP0 ($eq).
+Removed top 3 bits (of 4) from port B of cell minirv_edge_controller.$procmux$516_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$527_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$528_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$529_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$530_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell minirv_edge_controller.$procmux$531_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell minirv_edge_controller.$procmux$532_CMP0 ($eq).
+Removed top 3 bits (of 4) from port B of cell minirv_edge_controller.$procmux$533_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$630_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$644_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$659_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell minirv_edge_controller.$procmux$675_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell minirv_edge_controller.$procmux$692_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell minirv_edge_controller.$procmux$710_CMP0 ($eq).
+Removed top 3 bits (of 4) from port B of cell minirv_edge_controller.$procmux$729_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell minirv_edge_controller.$procmux$767_CMP0 ($eq).
+Removed top 1 bits (of 10) from mux cell minirv_edge_controller.$procmux$780 ($mux).
+Removed top 2 bits (of 6) from port B of cell minirv_edge_controller.$procmux$803_CMP0 ($eq).
+Removed top 1 bits (of 3) from port B of cell minirv_edge_controller.$auto$opt_dff.cc:195:make_patterns_logic$885 ($ne).
+Removed top 2 bits (of 6) from port B of cell minirv_edge_controller.$procmux$804_CMP0 ($eq).
+Removed top 2 bits (of 6) from port B of cell minirv_edge_controller.$procmux$805_CMP0 ($eq).
+Removed top 2 bits (of 6) from port B of cell minirv_edge_controller.$procmux$806_CMP0 ($eq).
+Removed top 2 bits (of 6) from port B of cell minirv_edge_controller.$procmux$807_CMP0 ($eq).
+Removed top 2 bits (of 6) from port B of cell minirv_edge_controller.$procmux$808_CMP0 ($eq).
+Removed top 2 bits (of 6) from port B of cell minirv_edge_controller.$procmux$809_CMP0 ($eq).
+Removed top 2 bits (of 6) from port B of cell minirv_edge_controller.$procmux$810_CMP0 ($eq).
+Removed top 3 bits (of 6) from port B of cell minirv_edge_controller.$procmux$811_CMP0 ($eq).
+Removed top 3 bits (of 6) from port B of cell minirv_edge_controller.$procmux$812_CMP0 ($eq).
+Removed top 3 bits (of 6) from port B of cell minirv_edge_controller.$procmux$813_CMP0 ($eq).
+Removed top 3 bits (of 6) from port B of cell minirv_edge_controller.$procmux$814_CMP0 ($eq).
+Removed top 4 bits (of 6) from port B of cell minirv_edge_controller.$procmux$815_CMP0 ($eq).
+Removed top 4 bits (of 6) from port B of cell minirv_edge_controller.$procmux$816_CMP0 ($eq).
+Removed top 5 bits (of 6) from port B of cell minirv_edge_controller.$procmux$817_CMP0 ($eq).
+Removed top 16 bits (of 32) from wire minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:106$59_Y.
+Removed top 22 bits (of 32) from wire minirv_edge_controller.$add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:121$68_Y.
+Removed top 31 bits (of 32) from wire minirv_edge_controller.$lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:50$23_Y.
+Removed top 1 bits (of 10) from wire minirv_edge_controller.$procmux$780_Y.
+
+2.11. Executing PEEPOPT pass (run peephole optimizers).
+
+2.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 0 unused cells and 6 unused wires.
+<suppressed ~1 debug messages>
+
+2.13. Executing SHARE pass (SAT-based resource sharing).
+Found 4 cells in module minirv_edge_controller that may be considered for resource sharing.
+  Analyzing resource sharing options for $sshr$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:49$22 ($sshr):
+    Found 1 activation_patterns using ctrl signal $procmux$811_CMP.
+    No candidates found.
+  Analyzing resource sharing options for $shr$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:48$21 ($shr):
+    Found 1 activation_patterns using ctrl signal $procmux$812_CMP.
+    No candidates found.
+  Analyzing resource sharing options for $shr$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:36$8 ($shr):
+    Found 1 activation_patterns using ctrl signal $procmux$808_CMP.
+    No candidates found.
+  Analyzing resource sharing options for $shl$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:36$6 ($shl):
+    Found 2 activation_patterns using ctrl signal { $procmux$813_CMP $procmux$808_CMP }.
+    No candidates found.
+
+2.14. Executing TECHMAP pass (map to technology primitives).
+
+2.14.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/cmp2lut.v
+Parsing Verilog input from `/usr/bin/../share/yosys/cmp2lut.v' to AST representation.
+Generating RTLIL representation for module `\_90_lut_cmp_'.
+Successfully finished Verilog frontend.
+
+2.14.2. Continuing TECHMAP pass.
+No more expansions possible.
+<suppressed ~114 debug messages>
+
+2.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.17. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module minirv_edge_controller:
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:105$58 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:106$59 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:121$68 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:124$70 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:42$15 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:57$25 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:91$42 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:92$43 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:92$44 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:94$46 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:96$47 ($add).
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:97$48 ($add).
+  creating $macc model for $mul$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:37$10 ($mul).
+  creating $macc model for $sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:118$67 ($sub).
+  creating $macc model for $sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:36$7 ($sub).
+  creating $macc model for $sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:43$16 ($sub).
+  merging $macc model for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:92$43 into $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:92$44.
+  creating $alu model for $macc $sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:36$7.
+  creating $alu model for $macc $sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:118$67.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:97$48.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:96$47.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:94$46.
+  creating $alu model for $macc $sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:43$16.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:91$42.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:57$25.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:42$15.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:124$70.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:121$68.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:106$59.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:105$58.
+  creating $macc cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:92$44: $auto$alumacc.cc:365:replace_macc$960
+  creating $macc cell for $mul$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:37$10: $auto$alumacc.cc:365:replace_macc$961
+  creating $alu model for $gt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:109$61 ($gt): new $alu
+  creating $alu model for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:100$51 ($lt): new $alu
+  creating $alu model for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:101$52 ($lt): new $alu
+  creating $alu model for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:50$23 ($lt): new $alu
+  creating $alu model for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:51$24 ($lt): new $alu
+  creating $alu model for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:98$49 ($lt): new $alu
+  creating $alu model for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:99$50 ($lt): new $alu
+  creating $alu cell for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:99$50: $auto$alumacc.cc:485:replace_alu$969
+  creating $alu cell for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:98$49: $auto$alumacc.cc:485:replace_alu$980
+  creating $alu cell for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:101$52: $auto$alumacc.cc:485:replace_alu$991
+  creating $alu cell for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:100$51: $auto$alumacc.cc:485:replace_alu$1002
+  creating $alu cell for $gt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:109$61: $auto$alumacc.cc:485:replace_alu$1013
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:105$58: $auto$alumacc.cc:485:replace_alu$1024
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:106$59: $auto$alumacc.cc:485:replace_alu$1027
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:121$68: $auto$alumacc.cc:485:replace_alu$1030
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:124$70: $auto$alumacc.cc:485:replace_alu$1033
+  creating $alu cell for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:51$24: $auto$alumacc.cc:485:replace_alu$1036
+  creating $alu cell for $lt$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:50$23: $auto$alumacc.cc:485:replace_alu$1047
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:42$15: $auto$alumacc.cc:485:replace_alu$1060
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:57$25: $auto$alumacc.cc:485:replace_alu$1063
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:91$42: $auto$alumacc.cc:485:replace_alu$1066
+  creating $alu cell for $sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:43$16: $auto$alumacc.cc:485:replace_alu$1069
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:94$46: $auto$alumacc.cc:485:replace_alu$1072
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:96$47: $auto$alumacc.cc:485:replace_alu$1075
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:97$48: $auto$alumacc.cc:485:replace_alu$1078
+  creating $alu cell for $sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:118$67: $auto$alumacc.cc:485:replace_alu$1081
+  creating $alu cell for $sub$/root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv:36$7: $auto$alumacc.cc:485:replace_alu$1084
+  created 20 $alu and 2 $macc cells.
+
+2.18. Executing OPT pass (performing simple optimizations).
+
+2.18.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.18.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.18.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \minirv_edge_controller..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~9 debug messages>
+
+2.18.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \minirv_edge_controller.
+Performed a total of 0 changes.
+
+2.18.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.18.6. Executing OPT_DFF pass (perform DFF optimizations).
+Setting constant 1-bit at position 9 on $auto$ff.cc:266:slice$945 ($adffe) from module minirv_edge_controller.
+
+2.18.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 1 unused cells and 8 unused wires.
+<suppressed ~2 debug messages>
+
+2.18.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.18.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.18.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \minirv_edge_controller..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~9 debug messages>
+
+2.18.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \minirv_edge_controller.
+Performed a total of 0 changes.
+
+2.18.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.18.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.18.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.18.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.18.16. Finished OPT passes. (There is nothing left to do.)
+
+2.19. Executing MEMORY pass.
+
+2.19.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+2.19.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+2.19.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+2.19.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+2.19.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+2.19.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.19.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+2.19.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+2.19.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.19.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+2.20. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.21. Executing MEMORY_LIBMAP pass (mapping memories to cells).
+
+2.22. Executing TECHMAP pass (map to technology primitives).
+
+2.22.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/ice40/brams_map.v
+Parsing Verilog input from `/usr/bin/../share/yosys/ice40/brams_map.v' to AST representation.
+Generating RTLIL representation for module `\$__ICE40_RAM4K_'.
+Successfully finished Verilog frontend.
+
+2.22.2. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/ice40/spram_map.v
+Parsing Verilog input from `/usr/bin/../share/yosys/ice40/spram_map.v' to AST representation.
+Generating RTLIL representation for module `\$__ICE40_SPRAM_'.
+Successfully finished Verilog frontend.
+
+2.22.3. Continuing TECHMAP pass.
+No more expansions possible.
+<suppressed ~4 debug messages>
+
+2.23. Executing ICE40_BRAMINIT pass.
+
+2.24. Executing OPT pass (performing simple optimizations).
+
+2.24.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+<suppressed ~14 debug messages>
+
+2.24.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.24.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 2 unused cells and 13 unused wires.
+<suppressed ~3 debug messages>
+
+2.24.5. Finished fast OPT passes.
+
+2.25. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+2.26. Executing OPT pass (performing simple optimizations).
+
+2.26.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.26.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.26.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \minirv_edge_controller..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~9 debug messages>
+
+2.26.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \minirv_edge_controller.
+Performed a total of 0 changes.
+
+2.26.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.26.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$844 ($adff) from module minirv_edge_controller (D = \pc [1:0], Q = \pc [1:0]).
+Handling D = Q on $auto$ff.cc:266:slice$1127 ($adffe) from module minirv_edge_controller (removing D path).
+Setting constant 0-bit at position 0 on $auto$ff.cc:266:slice$1127 ($dlatch) from module minirv_edge_controller.
+Setting constant 0-bit at position 1 on $auto$ff.cc:266:slice$1127 ($dlatch) from module minirv_edge_controller.
+
+2.26.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 1 unused cells and 1 unused wires.
+<suppressed ~2 debug messages>
+
+2.26.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.26.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.26.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \minirv_edge_controller..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~9 debug messages>
+
+2.26.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \minirv_edge_controller.
+Performed a total of 0 changes.
+
+2.26.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.26.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.26.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.26.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.26.16. Finished OPT passes. (There is nothing left to do.)
+
+2.27. Executing ICE40_WRAPCARRY pass (wrap carries).
+
+2.28. Executing TECHMAP pass (map to technology primitives).
+
+2.28.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+2.28.2. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/ice40/arith_map.v
+Parsing Verilog input from `/usr/bin/../share/yosys/ice40/arith_map.v' to AST representation.
+Generating RTLIL representation for module `\_80_ice40_alu'.
+Successfully finished Verilog frontend.
+
+2.28.3. Continuing TECHMAP pass.
+Using template $paramod$constmap:4621fcf06a436d1e2a4080e2ed9866a7d07a6e07$paramod$335cfd09f1afa8139c4aafcbbe5f361887b79c5e\_90_shift_ops_shr_shl_sshl_sshr for cells of type $shl.
+Using extmapper simplemap for cells of type $adffe.
+Using template $paramod$00298f3f8094950cb9a5ff2fda48d0d8bde8806c\_80_ice40_alu for cells of type $alu.
+Using template $paramod$constmap:f99bc636dfa98fa6983e40552c5a4e65ec62ea50$paramod$56955d0f36f77738c952d3505dc563df3ee11b94\_90_shift_ops_shr_shl_sshl_sshr for cells of type $shr.
+Using extmapper simplemap for cells of type $or.
+Using extmapper simplemap for cells of type $xor.
+Using template $paramod$6df0329addda9228fcc2546de2aaf14ad26c98e1\_80_ice40_alu for cells of type $alu.
+Using template $paramod$7f1d45a92d0221fa6c256845bf4513df30042923\_90_pmux for cells of type $pmux.
+Using template $paramod$2bd81f420048247ff6903399c560fe0f8bd48ccc\_80_ice40_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $and.
+Using extmapper simplemap for cells of type $ne.
+Using template $paramod$constmap:4621fcf06a436d1e2a4080e2ed9866a7d07a6e07$paramod$feecc7a0dbd012970970f2858f15e786e251f677\_90_shift_ops_shr_shl_sshl_sshr for cells of type $shr.
+Using template $paramod$constmap:4621fcf06a436d1e2a4080e2ed9866a7d07a6e07$paramod$e765c459d3029c22a22a27989e94858fd9ebfa9c\_90_shift_ops_shr_shl_sshl_sshr for cells of type $sshr.
+Using template $paramod$fbc7873bff55778c0b3173955b7e4bce1d9d6834\_80_ice40_alu for cells of type $alu.
+Using template $paramod$2653f68ddb8eab7b1907b4a20767b72a824a7a36\_80_ice40_alu for cells of type $alu.
+Using template $paramod$44a13d10af618e7fbe7b9aad2f6151ffcee1e2fa\_80_ice40_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $reduce_and.
+Using extmapper simplemap for cells of type $not.
+Using extmapper simplemap for cells of type $adff.
+Using template $paramod$a1bc51c02ce12ac21eb18988e83292af48ed7d72\_80_ice40_alu for cells of type $alu.
+Using extmapper maccmap for cells of type $macc.
+  add \operand_a * \operand_b (32x32 bits, unsigned)
+Using template $paramod$2af30114e9bd4ccb04dad757b3f0a8f6bf0615b0\_80_ice40_alu for cells of type $alu.
+Using template $paramod$c3cd1564c35d873179656addd6052d7ea8b6d991\_80_ice40_alu for cells of type $alu.
+Using template $paramod$8742280fdebca84e1c87f2a86ed84f62d558f4cc\_80_ice40_alu for cells of type $alu.
+Using template $paramod$7e708ae28ab761f11d0fb59d3ffc72f6a4baf5d9\_90_alu for cells of type $alu.
+Using template $paramod$754650b284649a026620fc6856e5b6886cbfe794\_80_ice40_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $eq.
+Using extmapper simplemap for cells of type $logic_not.
+Using extmapper simplemap for cells of type $logic_and.
+Using extmapper simplemap for cells of type $reduce_bool.
+Using template $paramod$400c7651a899d7a17809b04e69e36ebc18745d70\_80_ice40_alu for cells of type $alu.
+  add \read_a (32 bits, unsigned)
+  add \debug_addr_b (4 bits, unsigned)
+  add { \pc [31:2] 2'00 } (32 bits, unsigned)
+Using template $paramod$8d502f02b5b0b72663c46788e07dcce65ffb9a1e\_90_pmux for cells of type $pmux.
+Using extmapper simplemap for cells of type $dffe.
+Using extmapper simplemap for cells of type $pos.
+Using template $paramod\_90_fa\WIDTH=32'00000000000000000000000001000000 for cells of type $fa.
+Using template $paramod$039520c137afc9cd69dd56c3fb11a4e1fbe5f664\_80_ice40_alu for cells of type $alu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000010 for cells of type $lcu.
+Using template $paramod\_90_fa\WIDTH=32'00000000000000000000000000100000 for cells of type $fa.
+No more expansions possible.
+<suppressed ~3040 debug messages>
+
+2.29. Executing OPT pass (performing simple optimizations).
+
+2.29.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+<suppressed ~6919 debug messages>
+
+2.29.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+<suppressed ~1788 debug messages>
+Removed a total of 596 cells.
+
+2.29.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.29.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 429 unused cells and 1424 unused wires.
+<suppressed ~430 debug messages>
+
+2.29.5. Finished fast OPT passes.
+
+2.30. Executing ICE40_OPT pass (performing simple optimizations).
+
+2.30.1. Running ICE40 specific optimizations.
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1027.slice[0].carry: CO=\sample_count [0]
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1030.slice[0].carry: CO=\uart_divider [0]
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1033.slice[0].carry: CO=\register_bank[15] [0]
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1066.slice[0].carry: CO=\pc [2]
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1075.slice[0].carry: CO=\timer_count [0]
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1078.slice[0].carry: CO=\pwm_counter [0]
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1081.slice[0].carry: CO=\uart_bit [0]
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[0].carry: CO=1'0
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$maccmap.cc:240:synth$4998.slice[0].carry: CO=1'0
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$opt_expr.cc:1942:replace_const_cells$1108.slice[0].carry: CO=$auto$alumacc.cc:485:replace_alu$1069.BB [0]
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$opt_expr.cc:1942:replace_const_cells$1108.slice[5].carry: CO=1'1
+
+2.30.2. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.30.3. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.30.4. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.30.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+2.30.6. Rerunning OPT passes. (Removed registers in this run.)
+
+2.30.7. Running ICE40 specific optimizations.
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[1].carry: CO=1'0
+
+2.30.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.30.9. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.30.10. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.30.11. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.30.12. Rerunning OPT passes. (Removed registers in this run.)
+
+2.30.13. Running ICE40 specific optimizations.
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[2].carry: CO=1'0
+
+2.30.14. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.30.15. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.30.16. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.30.17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.30.18. Rerunning OPT passes. (Removed registers in this run.)
+
+2.30.19. Running ICE40 specific optimizations.
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[3].carry: CO=1'0
+
+2.30.20. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.30.21. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.30.22. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.30.23. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.30.24. Rerunning OPT passes. (Removed registers in this run.)
+
+2.30.25. Running ICE40 specific optimizations.
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[4].carry: CO=1'0
+
+2.30.26. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.30.27. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.30.28. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.30.29. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.30.30. Rerunning OPT passes. (Removed registers in this run.)
+
+2.30.31. Running ICE40 specific optimizations.
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[5].carry: CO=1'0
+
+2.30.32. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.30.33. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.30.34. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.30.35. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.30.36. Rerunning OPT passes. (Removed registers in this run.)
+
+2.30.37. Running ICE40 specific optimizations.
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[6].carry: CO=1'0
+
+2.30.38. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.30.39. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.30.40. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.30.41. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.30.42. Rerunning OPT passes. (Removed registers in this run.)
+
+2.30.43. Running ICE40 specific optimizations.
+Optimized $__ICE40_CARRY_WRAPPER cell back to logic (without SB_CARRY) minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[7].carry: CO=1'0
+
+2.30.44. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.30.45. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.30.46. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.30.47. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.30.48. Rerunning OPT passes. (Removed registers in this run.)
+
+2.30.49. Running ICE40 specific optimizations.
+
+2.30.50. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.30.51. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.30.52. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.30.53. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.30.54. Finished OPT passes. (There is nothing left to do.)
+
+2.31. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+
+2.32. Executing TECHMAP pass (map to technology primitives).
+
+2.32.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/ice40/ff_map.v
+Parsing Verilog input from `/usr/bin/../share/yosys/ice40/ff_map.v' to AST representation.
+Generating RTLIL representation for module `\$_DFF_N_'.
+Generating RTLIL representation for module `\$_DFF_P_'.
+Generating RTLIL representation for module `\$_DFFE_NP_'.
+Generating RTLIL representation for module `\$_DFFE_PP_'.
+Generating RTLIL representation for module `\$_DFF_NP0_'.
+Generating RTLIL representation for module `\$_DFF_NP1_'.
+Generating RTLIL representation for module `\$_DFF_PP0_'.
+Generating RTLIL representation for module `\$_DFF_PP1_'.
+Generating RTLIL representation for module `\$_DFFE_NP0P_'.
+Generating RTLIL representation for module `\$_DFFE_NP1P_'.
+Generating RTLIL representation for module `\$_DFFE_PP0P_'.
+Generating RTLIL representation for module `\$_DFFE_PP1P_'.
+Generating RTLIL representation for module `\$_SDFF_NP0_'.
+Generating RTLIL representation for module `\$_SDFF_NP1_'.
+Generating RTLIL representation for module `\$_SDFF_PP0_'.
+Generating RTLIL representation for module `\$_SDFF_PP1_'.
+Generating RTLIL representation for module `\$_SDFFCE_NP0P_'.
+Generating RTLIL representation for module `\$_SDFFCE_NP1P_'.
+Generating RTLIL representation for module `\$_SDFFCE_PP0P_'.
+Generating RTLIL representation for module `\$_SDFFCE_PP1P_'.
+Successfully finished Verilog frontend.
+
+2.32.2. Continuing TECHMAP pass.
+Using template \$_DFFE_PP1P_ for cells of type $_DFFE_PP1P_.
+Using template \$_DFF_PP0_ for cells of type $_DFF_PP0_.
+Using template \$_DFF_PP1_ for cells of type $_DFF_PP1_.
+Using template \$_DFFE_PP_ for cells of type $_DFFE_PP_.
+Using template \$_DFFE_PP0P_ for cells of type $_DFFE_PP0P_.
+No more expansions possible.
+<suppressed ~825 debug messages>
+
+2.33. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.34. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1027.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1030.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1033.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1066.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1075.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1078.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$alumacc.cc:485:replace_alu$1081.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[1].carry ($lut).
+Mapping minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[2].carry ($lut).
+Mapping minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[3].carry ($lut).
+Mapping minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[4].carry ($lut).
+Mapping minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[5].carry ($lut).
+Mapping minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[6].carry ($lut).
+Mapping minirv_edge_controller.$auto$maccmap.cc:240:synth$3939.slice[7].carry ($lut).
+Mapping minirv_edge_controller.$auto$maccmap.cc:240:synth$4998.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$opt_expr.cc:1942:replace_const_cells$1108.slice[0].carry ($lut).
+Mapping minirv_edge_controller.$auto$opt_expr.cc:1942:replace_const_cells$1108.slice[5].carry ($lut).
+
+2.35. Executing ICE40_OPT pass (performing simple optimizations).
+
+2.35.1. Running ICE40 specific optimizations.
+
+2.35.2. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+<suppressed ~257 debug messages>
+
+2.35.3. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+<suppressed ~2562 debug messages>
+Removed a total of 854 cells.
+
+2.35.4. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.35.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+Removed 9 unused cells and 5502 unused wires.
+<suppressed ~10 debug messages>
+
+2.35.6. Rerunning OPT passes. (Removed registers in this run.)
+
+2.35.7. Running ICE40 specific optimizations.
+
+2.35.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module minirv_edge_controller.
+
+2.35.9. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\minirv_edge_controller'.
+Removed a total of 0 cells.
+
+2.35.10. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.35.11. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \minirv_edge_controller..
+
+2.35.12. Finished OPT passes. (There is nothing left to do.)
+
+2.36. Executing TECHMAP pass (map to technology primitives).
+
+2.36.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/ice40/latches_map.v
+Parsing Verilog input from `/usr/bin/../share/yosys/ice40/latches_map.v' to AST representation.
+Generating RTLIL representation for module `\$_DLATCH_N_'.
+Generating RTLIL representation for module `\$_DLATCH_P_'.
+Successfully finished Verilog frontend.
+
+2.36.2. Continuing TECHMAP pass.
+No more expansions possible.
+<suppressed ~4 debug messages>
+
+2.37. Executing ABC pass (technology mapping using ABC).
+
+2.37.1. Extracting gate netlist of module `\minirv_edge_controller' to `<abc-temp-dir>/input.blif'..
+Extracted 10224 gates and 11249 wires to a netlist network with 1023 inputs and 468 outputs.
+
+2.37.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_lut <abc-temp-dir>/lutdefs.txt 
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &fraig -x 
+ABC: + &put 
+ABC: + scorr 
+ABC: Warning: The network is combinational (run "fraig" or "fraig_sweep").
+ABC: + dc2 
+ABC: + dretime 
+ABC: + strash 
+ABC: + dch -f 
+ABC: + if 
+ABC: + mfs2 
+ABC: + lutpack -S 1 
+ABC: + dress <abc-temp-dir>/input.blif 
+ABC: Total number of equiv classes                =    3607.
+ABC: Participating nodes from both networks       =    7280.
+ABC: Participating nodes from the first network   =    3606. (  78.31 % of nodes)
+ABC: Participating nodes from the second network  =    3674. (  79.78 % of nodes)
+ABC: Node pairs (any polarity)                    =    3606. (  78.31 % of names can be moved)
+ABC: Node pairs (same polarity)                   =    2357. (  51.18 % of names can be moved)
+ABC: Total runtime =     0.22 sec
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+2.37.1.2. Re-integrating ABC results.
+ABC RESULTS:              $lut cells:     4604
+ABC RESULTS:        internal signals:     9758
+ABC RESULTS:           input signals:     1023
+ABC RESULTS:          output signals:      468
+Removing temp directory.
+
+2.38. Executing ICE40_WRAPCARRY pass (wrap carries).
+
+2.39. Executing TECHMAP pass (map to technology primitives).
+
+2.39.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/ice40/ff_map.v
+Parsing Verilog input from `/usr/bin/../share/yosys/ice40/ff_map.v' to AST representation.
+Generating RTLIL representation for module `\$_DFF_N_'.
+Generating RTLIL representation for module `\$_DFF_P_'.
+Generating RTLIL representation for module `\$_DFFE_NP_'.
+Generating RTLIL representation for module `\$_DFFE_PP_'.
+Generating RTLIL representation for module `\$_DFF_NP0_'.
+Generating RTLIL representation for module `\$_DFF_NP1_'.
+Generating RTLIL representation for module `\$_DFF_PP0_'.
+Generating RTLIL representation for module `\$_DFF_PP1_'.
+Generating RTLIL representation for module `\$_DFFE_NP0P_'.
+Generating RTLIL representation for module `\$_DFFE_NP1P_'.
+Generating RTLIL representation for module `\$_DFFE_PP0P_'.
+Generating RTLIL representation for module `\$_DFFE_PP1P_'.
+Generating RTLIL representation for module `\$_SDFF_NP0_'.
+Generating RTLIL representation for module `\$_SDFF_NP1_'.
+Generating RTLIL representation for module `\$_SDFF_PP0_'.
+Generating RTLIL representation for module `\$_SDFF_PP1_'.
+Generating RTLIL representation for module `\$_SDFFCE_NP0P_'.
+Generating RTLIL representation for module `\$_SDFFCE_NP1P_'.
+Generating RTLIL representation for module `\$_SDFFCE_PP0P_'.
+Generating RTLIL representation for module `\$_SDFFCE_PP1P_'.
+Successfully finished Verilog frontend.
+
+2.39.2. Continuing TECHMAP pass.
+No more expansions possible.
+<suppressed ~22 debug messages>
+Removed 121 unused cells and 2203 unused wires.
+
+2.40. Executing OPT_LUT pass (optimize LUTs).
+Discovering LUTs.
+Number of LUTs:     4945
+  1-LUT               77
+  2-LUT              519
+  3-LUT             2045
+  4-LUT             2304
+  with \SB_CARRY    (#0)  327
+  with \SB_CARRY    (#1)  328
+
+Eliminating LUTs.
+Number of LUTs:     4945
+  1-LUT               77
+  2-LUT              519
+  3-LUT             2045
+  4-LUT             2304
+  with \SB_CARRY    (#0)  327
+  with \SB_CARRY    (#1)  328
+
+Combining LUTs.
+Number of LUTs:     4923
+  1-LUT               76
+  2-LUT              495
+  3-LUT             2030
+  4-LUT             2322
+  with \SB_CARRY    (#0)  327
+  with \SB_CARRY    (#1)  328
+
+Eliminated 0 LUTs.
+Combined 22 LUTs.
+<suppressed ~29938 debug messages>
+
+2.41. Executing TECHMAP pass (map to technology primitives).
+
+2.41.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/ice40/cells_map.v
+Parsing Verilog input from `/usr/bin/../share/yosys/ice40/cells_map.v' to AST representation.
+Generating RTLIL representation for module `\$lut'.
+Successfully finished Verilog frontend.
+
+2.41.2. Continuing TECHMAP pass.
+Using template $paramod$658b9ed803f0d3d335616d3858b53e0a2522f1e8\$lut for cells of type $lut.
+Using template $paramod$571404c0889eaf57f492cb5e37f8acb5df5852f9\$lut for cells of type $lut.
+Using template $paramod$608f40069c27841a5b3bdf03643a34bdc8974072\$lut for cells of type $lut.
+Using template $paramod$272652f6c6fbe9a75eff76e45cc7e2788835518b\$lut for cells of type $lut.
+Using template $paramod$6d6beead1425af15cf78b27fd9b11b41b5d4bce8\$lut for cells of type $lut.
+Using template $paramod$6e238df02989b317f10820a22773676e71120644\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'1000 for cells of type $lut.
+Using template $paramod$179512a187da069f3b79ef6612a41e494e7d54b6\$lut for cells of type $lut.
+Using template $paramod$a15fd389a2f54cb7b94707b25934d226e68d9e2e\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0100 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10000000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01000000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00010000 for cells of type $lut.
+Using template $paramod$deba17538f4cd4af4a7f03bc51507e8ef8b1d7d8\$lut for cells of type $lut.
+Using template $paramod$cb92beff9eab733e7181d891fbc8c3950b9abc0a\$lut for cells of type $lut.
+Using template $paramod$50b99034fbf984a51c265442496081454147f31e\$lut for cells of type $lut.
+Using template $paramod$82b4a585d1edcb5c6e755dc9bd3392228a1c1304\$lut for cells of type $lut.
+Using template $paramod$78e1751931755f088c8bc676bcbc3bb642c26bfc\$lut for cells of type $lut.
+Using template $paramod$9843d77d4773ab424562cc9655d50a1bc2125488\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01111000 for cells of type $lut.
+Using template $paramod$e96de5e9fcce737e52eacf39c70c8f533dc27d63\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10110010 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10000111 for cells of type $lut.
+Using template $paramod$fd904e9e35cfd343a9df248824bd3f1408724879\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0001 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10010110 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01101001 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00101011 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01110001 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'0110 for cells of type $lut.
+Using template $paramod$595b4955041ceff09e28d600fe79275c24ba9878\$lut for cells of type $lut.
+Using template $paramod$765dca61dbfa835dacf2a260c8a4c5a36939a046\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01010011 for cells of type $lut.
+Using template $paramod$4282def8dbd6df3d1248ad282c629bee684502c2\$lut for cells of type $lut.
+Using template $paramod$e5cb8e913f4daae476fde2b364998f21967f1f08\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01100000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'1001 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11100000 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000001\LUT=2'01 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00110101 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11001010 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00111010 for cells of type $lut.
+Using template $paramod$a0110ffcad984c8a190b4246c453a50168ed201c\$lut for cells of type $lut.
+Using template $paramod$044e8b1893c94f717651c5cd428e71c892566f52\$lut for cells of type $lut.
+Using template $paramod$f3e1547c4b47e64c590e75cf09078b2507c8cc75\$lut for cells of type $lut.
+Using template $paramod$933f4f3e373a784da64d137def3625bdd36d1695\$lut for cells of type $lut.
+Using template $paramod$c1ecd13b5e2feb77a725850b71cc8207f7841c40\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01011100 for cells of type $lut.
+Using template $paramod$2902eb8ec3ca272968b5d8a7010e48f85069ed0f\$lut for cells of type $lut.
+Using template $paramod$f9ade28f1669c608093cfc771d07571aec15660d\$lut for cells of type $lut.
+Using template $paramod$9583ab40db57ba76ead4c869be5b61dc3f252411\$lut for cells of type $lut.
+Using template $paramod$a670b08a47dd8a34f954c50cd06e9996d77e8467\$lut for cells of type $lut.
+Using template $paramod$38f9bf4dd2329347b8471f0a98443dd323386889\$lut for cells of type $lut.
+Using template $paramod$45d617c2ce0041e27b541f62b0fc3c3ce441a616\$lut for cells of type $lut.
+Using template $paramod$2e11c0e004fab0373ef80005c65c968bc830b55a\$lut for cells of type $lut.
+Using template $paramod$b431bfd938e35871dd0b7668e1503c7e8b9d491c\$lut for cells of type $lut.
+Using template $paramod$ecf9cac817e9cbb222dc9e58a122faf05f34c860\$lut for cells of type $lut.
+Using template $paramod$ef6f9494c41321ef63579b1462fd44bdf781fd1c\$lut for cells of type $lut.
+Using template $paramod$da2f95476331ffa2143f8212db8aff730de806a0\$lut for cells of type $lut.
+Using template $paramod$84691e0107521b13da77b9ab7abb364a56e468f7\$lut for cells of type $lut.
+Using template $paramod$b22e1de0c50840dcbbf24001663ffaaba9d5d7b8\$lut for cells of type $lut.
+Using template $paramod$05f19d9c2311a3d1ab38ece311a1bb9f96c62043\$lut for cells of type $lut.
+Using template $paramod$a50be0e6fa3a01511bb234559cb74fb8bd3e2061\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11110001 for cells of type $lut.
+Using template $paramod$080a1e955e14f5644978c56776952e0b32d31da4\$lut for cells of type $lut.
+Using template $paramod$440c55e9b86a4d19d2d9af4513ac1f3c626292af\$lut for cells of type $lut.
+Using template $paramod$61964c6767cca185f8add6dba9079cca510fdde8\$lut for cells of type $lut.
+Using template $paramod$6d23198eb2b8f79a41c7626605a61009695893b1\$lut for cells of type $lut.
+Using template $paramod$acf49cb7bd2805dee4b4ebb218aa5924b1be7704\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10110100 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00000111 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00010111 for cells of type $lut.
+Using template $paramod$59ad7643a6592a7af331878e9c90559a0d5892f1\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10100011 for cells of type $lut.
+Using template $paramod$a86299e9fbfd5faf85d540b9af0e759bc8421f9c\$lut for cells of type $lut.
+Using template $paramod$4adb41216162ad4c68ce9ea5c48385c753262ac3\$lut for cells of type $lut.
+Using template $paramod$df196ed0a1da5c4a58c5e08a1dac304fd3fccaab\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00010100 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10010000 for cells of type $lut.
+Using template $paramod$bba54c1ef87367812b4c15f4aed5ac70773df775\$lut for cells of type $lut.
+Using template $paramod$388dbf93bee91918d385c696f1b8d4515b94b317\$lut for cells of type $lut.
+Using template $paramod$32f5ea57a02a66d26d4a2e3cd7f26ba05fa8bd58\$lut for cells of type $lut.
+Using template $paramod$0de052767abdccc3aefc818722bdc3c7850d25d6\$lut for cells of type $lut.
+Using template $paramod$868427562418b5dc988caeac6a54689ec9c9025e\$lut for cells of type $lut.
+Using template $paramod$24ced899438e172604a424008974634c832673b7\$lut for cells of type $lut.
+Using template $paramod$956157c0497c969d2ee7549e519f18a7bb88f829\$lut for cells of type $lut.
+Using template $paramod$041aa1dcdd60d3c4ff6eb6326c9e544a0334c607\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10101100 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'01110000 for cells of type $lut.
+Using template $paramod$d6cf0a4b6f6ccd87588da28c41b5b6c258da2509\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00001101 for cells of type $lut.
+Using template $paramod$c1a19a87ccbbb03d43a72335db63f692ddf82cc1\$lut for cells of type $lut.
+Using template $paramod$ec731ba0b03f9a8c2f9a148aad53e934d7e8d215\$lut for cells of type $lut.
+Using template $paramod$279a8d961e6b2ded8450bee8ed637cb9efa31f02\$lut for cells of type $lut.
+Using template $paramod$41326ad8644342a66dfb051d050f2b6fbf15015b\$lut for cells of type $lut.
+Using template $paramod$59de045429641615f9fe556a2af28d0739e5972e\$lut for cells of type $lut.
+Using template $paramod$2bdfdda73873e8931790d872b72220895e67fee5\$lut for cells of type $lut.
+Using template $paramod$0cf69d223154b4a6209139daec3524052ac22dd1\$lut for cells of type $lut.
+Using template $paramod$1f3b67373a23476b64a6ed61bde9dbe9df1086de\$lut for cells of type $lut.
+Using template $paramod$2ea69c779d6c1b79ac5a87b0d1523c67d5628dba\$lut for cells of type $lut.
+Using template $paramod$e5e9da8fed769f971686eed8c5eea50e61f73aaa\$lut for cells of type $lut.
+Using template $paramod$7f88ae8b0ca78f7b736f446522956805c49fb79f\$lut for cells of type $lut.
+Using template $paramod$6b0849254d6c87461fb93e37cc18f089f61eb912\$lut for cells of type $lut.
+Using template $paramod$61bd22ed39633bcefc17b2f3d6b6b1529797c785\$lut for cells of type $lut.
+Using template $paramod$1bf62ab10e48d71d6497bccacf5c70420c470fe9\$lut for cells of type $lut.
+Using template $paramod$71d951b20e73043168c1656217d126e617052faa\$lut for cells of type $lut.
+Using template $paramod$b93d1ea7a612a32c185108f67a153d44ffb9aac2\$lut for cells of type $lut.
+Using template $paramod$14bf4d6cadf1fd9ca4c56f9d25e40a420b38c8b5\$lut for cells of type $lut.
+Using template $paramod$d6d3aaeac1b9aa2c4b652c48e0deb565040dda72\$lut for cells of type $lut.
+Using template $paramod$69f20e0703606f2ffd2ee27cd26f815bd5eeb6e9\$lut for cells of type $lut.
+Using template $paramod$8b24407096beec47292ddeb1567a058197a320b9\$lut for cells of type $lut.
+Using template $paramod$adac5163f2ca606e303e4fcb6e4ac1a8cfe9825d\$lut for cells of type $lut.
+Using template $paramod$b4410865e8124402796f9dfbf73ef8d279fdbd08\$lut for cells of type $lut.
+Using template $paramod$703a13a751e631ef123f38f7d2125aeabec0f94c\$lut for cells of type $lut.
+Using template $paramod$d53578aacfd93124244778d88be0e90eb09c1b1b\$lut for cells of type $lut.
+Using template $paramod$bf60f6ec407ee294958b6566514fc3125ec42258\$lut for cells of type $lut.
+Using template $paramod$43779580bfffd5d5a9f321249a174febf1dac288\$lut for cells of type $lut.
+Using template $paramod$e053a22d78e6bd5ea33183ea69976f0db741be0e\$lut for cells of type $lut.
+Using template $paramod$19ec49f31a8d230a567aa44ce3ea81a03c101e2b\$lut for cells of type $lut.
+Using template $paramod$50666a8f9d622ca1f027a4587dfd5f2a7d8810c9\$lut for cells of type $lut.
+Using template $paramod$240307bbace6557f3d46ac64c87ca4d697801fc3\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11000101 for cells of type $lut.
+Using template $paramod$441de597d9318495d3225f370c9f7379b3b0fd0d\$lut for cells of type $lut.
+Using template $paramod$973818279bc95792902f3c09371fd2407d04a2a5\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'00000001 for cells of type $lut.
+Using template $paramod$49308c380d4434ff502cc9276068deff427c75f2\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'11010100 for cells of type $lut.
+Using template $paramod$2d07c1a6c53c7b878509360922c4fa5ebedc3011\$lut for cells of type $lut.
+Using template $paramod$59c595af41d4a5cce2d588c3a5f1342749ce7a77\$lut for cells of type $lut.
+Using template $paramod$9c6e6a10ea00e5b0682f6243b802d7839a398197\$lut for cells of type $lut.
+Using template $paramod$b4d0f4738a5ce50c7f36c2aa2ecc09cfb874f2b6\$lut for cells of type $lut.
+Using template $paramod$c5b694ec89d7629b942ccf6a9be1d39e24f8edec\$lut for cells of type $lut.
+Using template $paramod$314fe9458b07176c4d2c8c59533027c4c55155b5\$lut for cells of type $lut.
+Using template $paramod$df0b68f8e63b2deb6710e23abd8b8ff0796d4897\$lut for cells of type $lut.
+Using template $paramod$b4f85a6321a00b090afc4e21d68e7b99eb94d149\$lut for cells of type $lut.
+Using template $paramod$12879138d1e376f344e47ea40be66b776233be75\$lut for cells of type $lut.
+Using template $paramod$0629d68dd84e7f3d668ea0a47594067425b1ed6d\$lut for cells of type $lut.
+Using template $paramod$6a0e81b59311b6e9b1de7926ed0ede1a2d604f37\$lut for cells of type $lut.
+Using template $paramod$e56d99447d8a3ece8eda45209ed4b9fdcdbf8d26\$lut for cells of type $lut.
+Using template $paramod$774861bf9b1885d60265e6ddea1c95a32f095489\$lut for cells of type $lut.
+Using template $paramod$02124d42e8a5a4220d8c8e1235a8790f30076968\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000010\LUT=4'1011 for cells of type $lut.
+Using template $paramod$fa960b0ced687dd93c15ed8130e27eea044c58f6\$lut for cells of type $lut.
+Using template $paramod$d3a3ddc7575971ca62210d5a8f545d7e1ae72a48\$lut for cells of type $lut.
+Using template $paramod$048d4aa2263b685fba6c6b0d38f6224df0dc3042\$lut for cells of type $lut.
+Using template $paramod$ed10455c824c2a3761aabdeb1e31dad905f66e6e\$lut for cells of type $lut.
+Using template $paramod$2d73cf21e7a3b53006ebbae47ecc48e73975ec46\$lut for cells of type $lut.
+Using template $paramod$fceb3a526de44b8f6b38e567360f59f7cf5878fb\$lut for cells of type $lut.
+Using template $paramod$986569468136396bfb899d9fcf8f75bcabc8cd05\$lut for cells of type $lut.
+Using template $paramod$cd6c4b4da6d8737b72fd2dc8f5d83d8967445809\$lut for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10001111 for cells of type $lut.
+Using template $paramod\$lut\WIDTH=32'00000000000000000000000000000011\LUT=8'10110000 for cells of type $lut.
+Using template $paramod$d4fae2c0d9ad2966369cd4e39b81c71bcd1327c9\$lut for cells of type $lut.
+Using template $paramod$9ce83c401f07863ef6c07aa36141bf86d010bac8\$lut for cells of type $lut.
+Using template $paramod$5766b753e513aa2393ffc25ef94ebc79dc098484\$lut for cells of type $lut.
+Using template $paramod$a59507d273cd827eb6c46c37820d50a1b717efdf\$lut for cells of type $lut.
+No more expansions possible.
+<suppressed ~6954 debug messages>
+Removed 0 unused cells and 12097 unused wires.
+
+2.42. Executing AUTONAME pass.
+Renamed 562300 objects in module minirv_edge_controller (265 iterations).
+<suppressed ~8152 debug messages>
+
+2.43. Executing HIERARCHY pass (managing design hierarchy).
+
+2.43.1. Analyzing design hierarchy..
+Top module:  \minirv_edge_controller
+
+2.43.2. Analyzing design hierarchy..
+Top module:  \minirv_edge_controller
+Removed 0 unused modules.
+
+2.44. Printing statistics.
+
+=== minirv_edge_controller ===
+
+   Number of wires:               2053
+   Number of wire bits:           8593
+   Number of public wires:        2053
+   Number of public wire bits:    8593
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               6144
+     SB_CARRY                      422
+     SB_DFFE                         4
+     SB_DFFER                      431
+     SB_DFFES                      175
+     SB_DFFR                       187
+     SB_DFFS                         2
+     SB_LUT4                      4923
+
+2.45. Executing CHECK pass (checking for obvious problems).
+Checking module minirv_edge_controller...
+Found and reported 0 problems.
+
+2.46. Executing JSON backend.
+
+Warnings: 2 unique messages, 2 total
+End of script. Logfile hash: acb4a340e3, CPU: user 18.34s system 0.28s, MEM: 155.45 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 23% 39x opt_expr (5 sec), 16% 1x abc (3 sec), ...

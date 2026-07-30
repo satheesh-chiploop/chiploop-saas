@@ -5,20 +5,16 @@ import { notFound, useParams, useRouter } from "next/navigation";
 import { FaArrowRight, FaCheck, FaChevronDown, FaFileUpload, FaMicrochip, FaPlay } from "react-icons/fa";
 import TopNav from "@/components/TopNav";
 import { loopOverviews } from "@/lib/loopOverview";
+import { loopCatalogMetrics } from "@/lib/platformMetrics";
 
 type DetailView = "workflow" | "apps" | "agents";
-type LoopMetric = { label: string; value: number; color: string };
-
-const catalogMetrics: Record<string, LoopMetric[]> = {
-  digital: [{ label: "Agents", value: 47, color: "bg-cyan-300" }, { label: "Workflows", value: 6, color: "bg-violet-400" }, { label: "Apps", value: 9, color: "bg-emerald-300" }, { label: "Product journeys", value: 2, color: "bg-pink-400" }, { label: "Reference journeys", value: 5, color: "bg-amber-300" }],
-  "digital-implementation": [{ label: "Agents", value: 41, color: "bg-cyan-300" }, { label: "Workflows", value: 6, color: "bg-violet-400" }, { label: "Apps", value: 8, color: "bg-emerald-300" }, { label: "Product journeys", value: 2, color: "bg-pink-400" }, { label: "Reference journeys", value: 3, color: "bg-amber-300" }],
-  fpga: [{ label: "Agents", value: 18, color: "bg-cyan-300" }, { label: "Workflows", value: 4, color: "bg-violet-400" }, { label: "Apps", value: 7, color: "bg-emerald-300" }, { label: "Product journeys", value: 1, color: "bg-pink-400" }, { label: "Reference journeys", value: 2, color: "bg-amber-300" }],
-  analog: [{ label: "Agents", value: 22, color: "bg-cyan-300" }, { label: "Workflows", value: 4, color: "bg-violet-400" }, { label: "Apps", value: 8, color: "bg-emerald-300" }, { label: "Product journeys", value: 1, color: "bg-pink-400" }, { label: "Reference journeys", value: 1, color: "bg-amber-300" }],
-  "mixed-signal": [{ label: "Agents", value: 77, color: "bg-cyan-300" }, { label: "Workflows", value: 6, color: "bg-violet-400" }, { label: "Apps", value: 13, color: "bg-emerald-300" }, { label: "Product journeys", value: 2, color: "bg-pink-400" }, { label: "Reference journeys", value: 2, color: "bg-amber-300" }],
-  firmware: [{ label: "Agents", value: 62, color: "bg-cyan-300" }, { label: "Workflows", value: 4, color: "bg-violet-400" }, { label: "Apps", value: 11, color: "bg-emerald-300" }, { label: "Product journeys", value: 3, color: "bg-pink-400" }, { label: "Reference journeys", value: 5, color: "bg-amber-300" }],
-  validation: [{ label: "Agents", value: 17, color: "bg-cyan-300" }, { label: "Workflows", value: 2, color: "bg-violet-400" }, { label: "Apps", value: 5, color: "bg-emerald-300" }, { label: "Product journeys", value: 3, color: "bg-pink-400" }, { label: "Reference journeys", value: 4, color: "bg-amber-300" }],
-};
-
+const metricDisplay = [
+  { key: "agents", label: "Agents", color: "bg-cyan-300" },
+  { key: "workflows", label: "Workflows", color: "bg-violet-400" },
+  { key: "apps", label: "Apps", color: "bg-emerald-300" },
+  { key: "productJourneys", label: "Product journeys", color: "bg-pink-400" },
+  { key: "referenceJourneys", label: "Reference journeys", color: "bg-amber-300" },
+] as const;
 const miniRvSeedSweep = [
   { seed: "Seed 1", achieved: 32.38 },
   { seed: "Seed 2", achieved: 31.12 },
@@ -31,7 +27,8 @@ export default function LoopOverviewPage() {
   const [detailView, setDetailView] = useState<DetailView>("workflow");
   const loop = useMemo(() => loopOverviews[params.loopSlug], [params.loopSlug]);
   if (!loop) notFound();
-  const metrics = catalogMetrics[params.loopSlug] || [];
+  const catalog = loopCatalogMetrics[params.loopSlug];
+  const metrics = catalog ? metricDisplay.map((metric) => ({ ...metric, value: catalog[metric.key] })) : [];
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">

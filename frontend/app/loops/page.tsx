@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import TopNav from "@/components/TopNav";
+import { loopCatalogMetrics } from "@/lib/platformMetrics";
 
-type MetricKey = "agents" | "apps" | "workflows" | "journeys";
+type MetricKey = "agents" | "apps" | "workflows" | "referenceJourneys";
 
 const loops = [
   {
@@ -12,7 +13,7 @@ const loops = [
     core: "RTL, DQA, RTL review",
     advanced: "Spec2RTL, assertions, closure analysis",
     href: "/loops/digital",
-    metrics: { agents: 47, apps: 9, workflows: 6, journeys: 5 },
+    metricKey: "digital",
     border: "border-cyan-400/55",
     hover: "hover:border-cyan-300 hover:shadow-cyan-950/35",
   },
@@ -22,7 +23,7 @@ const loops = [
     core: "Synthesis, constraints, reports",
     advanced: "Constraint review, timing debug, LEC, MBIST, RTL-to-GDS, signoff",
     href: "/loops/digital-implementation",
-    metrics: { agents: 41, apps: 8, workflows: 6, journeys: 3 },
+    metricKey: "digital-implementation",
     border: "border-violet-400/55",
     hover: "hover:border-violet-300 hover:shadow-violet-950/35",
   },
@@ -32,17 +33,26 @@ const loops = [
     core: "FPGA2RTL, RTL quality, iCE40/ECP5 (Lattice FPGA families) synthesis, place-and-route, timing, bitstream",
     advanced: "FPGA Verify, verification closure, timing closure, board presets, hardware bring-up",
     href: "/loops/fpga",
-    metrics: { agents: 18, apps: 3, workflows: 4, journeys: 1 },
+    metricKey: "fpga",
     border: "border-lime-300/55",
     hover: "hover:border-lime-300 hover:shadow-lime-950/35",
   },
   {
+    name: "Analog Design",
+    short: "Turn analog requirements into reviewable simulations, models, and correlated evidence.",
+    core: "Specifications, netlist review, simulation",
+    advanced: "Corners, model validation, correlation",
+    href: "/loops/analog",
+    metricKey: "analog",
+    border: "border-fuchsia-400/55",
+    hover: "hover:border-fuchsia-300 hover:shadow-fuchsia-950/35",
+  },  {
     name: "Mixed Signal",
     short: "Connect digital RTL, analog models, and system-level execution.",
     core: "System RTL, Sim, Synthesis",
     advanced: "Integration debug, System PD, validation handoff",
     href: "/loops/mixed-signal",
-    metrics: { agents: 77, apps: 13, workflows: 6, journeys: 2 },
+    metricKey: "mixed-signal",
     border: "border-rose-400/55",
     hover: "hover:border-rose-300 hover:shadow-rose-950/35",
   },
@@ -52,7 +62,7 @@ const loops = [
     core: "HAL, drivers, firmware build",
     advanced: "SDK/API, co-sim, package validation",
     href: "/loops/firmware",
-    metrics: { agents: 62, apps: 11, workflows: 4, journeys: 5 },
+    metricKey: "firmware",
     border: "border-emerald-400/55",
     hover: "hover:border-emerald-300 hover:shadow-emerald-950/35",
   },
@@ -62,7 +72,7 @@ const loops = [
     core: "Plans, bench setup, preflight",
     advanced: "Orchestration, analytics, plan evolution",
     href: "/loops/validation",
-    metrics: { agents: 17, apps: 5, workflows: 2, journeys: 4 },
+    metricKey: "validation",
     border: "border-amber-300/55",
     hover: "hover:border-amber-300 hover:shadow-amber-950/35",
   },
@@ -72,7 +82,7 @@ const metrics: Array<{ key: MetricKey; label: string; color: string }> = [
   { key: "agents", label: "Agents", color: "bg-cyan-300" },
   { key: "apps", label: "Apps", color: "bg-violet-400" },
   { key: "workflows", label: "Workflows", color: "bg-amber-300" },
-  { key: "journeys", label: "Journeys", color: "bg-emerald-300" },
+  { key: "referenceJourneys", label: "Reference journeys", color: "bg-emerald-300" },
 ];
 
 const chartMax = 80;
@@ -200,7 +210,7 @@ export default function LoopsPage() {
                       {loops.map((loop) => (
                         <div key={loop.name} className="flex h-full items-end justify-center gap-1.5">
                           {metrics.map((metric) => {
-                            const value = loop.metrics[metric.key];
+                            const value = loopCatalogMetrics[loop.metricKey][metric.key];
                             const height = `${Math.max((value / chartMax) * 100, 4)}%`;
                             return (
                               <div key={metric.key} className="flex h-full w-7 flex-col items-center justify-end gap-1">

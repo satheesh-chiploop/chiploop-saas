@@ -89,11 +89,11 @@ const paths = [
 ];
 
 const platformStats = [
-  ["208+", "Agents", "text-cyan-300"],
-  ["46+", "Apps", "text-emerald-300"],
-  ["18+", "Workflow Templates", "text-violet-300"],
-  ["10+", "Reference Journeys", "text-amber-300"],
-  ["5+", "Product Journeys", "text-pink-300"],
+  ["377", "Registered Agents", "text-cyan-300"],
+  ["57", "Published Apps", "text-emerald-300"],
+  ["36", "Prebuilt Workflows", "text-violet-300"],
+  ["10", "Reference Journeys", "text-amber-300"],
+  ["5", "Product Journeys", "text-pink-300"],
   ["SDK + CLI + Studio", "Developer Access", "text-slate-100"],
 ];
 
@@ -118,6 +118,13 @@ const subscriptionLoops = [
     body: "Target and board exploration, RTL handoff, iCE40/ECP5 synthesis, place-and-route closure, timing evidence, bitstream packaging, and programming handoff.",
     border: "border-lime-300/55",
     hover: "hover:border-lime-300 hover:shadow-lime-950/35",
+  },
+  {
+    name: "Analog Design",
+    href: "/loops/analog",
+    body: "Analog requirements, simulation, corners, model validation, and correlation evidence.",
+    border: "border-fuchsia-400/55",
+    hover: "hover:border-fuchsia-300 hover:shadow-fuchsia-950/35",
   },
   {
     name: "Mixed Signal",

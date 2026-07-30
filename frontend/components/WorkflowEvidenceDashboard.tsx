@@ -1039,6 +1039,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       fpga_target_explorer: [
         "fpga_target_explorer.json",
         "fpga/target_explorer/fpga_target_explorer.json",
+        "fpga_explorer_io_mapping.json",
+        "fpga/target_explorer/fpga_explorer_io_mapping.json",
         "fpga_handoff_ingest.json",
         "fpga/handoff/fpga_handoff_ingest.json",
       ],
@@ -1567,6 +1569,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const recommendations = record(explorer.recommendations);
       const recommendationDetails = record(explorer.recommendation_details);
       const continuation = record(explorer.continuation);
+      const ioMapping = record(ev("fpga_explorer_io_mapping.json", "fpga/target_explorer/fpga_explorer_io_mapping.json"));
+      const ioMappings = array(ioMapping.mappings).map(record);
       const targetMhz = firstNumber(explorer.target_frequency_mhz);
       const maxFmax = Math.max(...results.map((item) => firstNumber(item.best_frequency_mhz) || 0), targetMhz || 1);
       const recommendationItems = [
@@ -1634,7 +1638,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <div className="mt-4 space-y-3">
               {results.map((item) => {
                 const fmax = firstNumber(item.best_frequency_mhz) || 0;
-                return <Bar key={firstString(item.board)} label={`${firstString(item.label, item.board)}${item.target_met === true ? " - target met" : " - target missed"}`} value={fmax} total={maxFmax} color={item.target_met === true ? "bg-emerald-500" : "bg-amber-500"} />;
+                const outcome = firstString(item.status) === "implementation_failed" ? "implementation failed" : item.target_met === true ? "target met" : "target missed";
+                return <Bar key={firstString(item.board)} label={`${firstString(item.label, item.board)} - ${outcome}`} value={fmax} total={maxFmax} color={item.target_met === true ? "bg-emerald-500" : firstString(item.status) === "implementation_failed" ? "bg-rose-500" : "bg-amber-500"} />;
               })}
             </div>
           </section>
@@ -1643,29 +1648,32 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             {results.map((item) => {
               const runs = array(item.pnr_runs).map(record);
               const relaxation = record(item.frequency_relaxation);
+              const boardIo = ioMappings.find((mapping) => firstString(mapping.board) === firstString(item.board));
+              const implementationFailed = firstString(item.status) === "implementation_failed";
               return (
                 <details key={firstString(item.board)} className="rounded-2xl border border-slate-800 bg-slate-950/35 px-4 py-3">
                   <summary className="cursor-pointer">
                     <div className="inline-flex w-[calc(100%_-_1rem)] flex-wrap items-center justify-between gap-3 align-middle">
                       <div><span className="font-semibold text-white">{firstString(item.label, item.board)}</span><span className="ml-2 text-xs text-slate-500">{firstString(item.family)} {firstString(item.device)} / {firstString(item.package)}</span></div>
-                      <div className={item.target_met === true ? "text-sm font-semibold text-emerald-300" : "text-sm font-semibold text-amber-300"}>{item.target_met === true ? "Target met" : "Target missed"}</div>
+                      <div className={item.target_met === true ? "text-sm font-semibold text-emerald-300" : implementationFailed ? "text-sm font-semibold text-rose-300" : "text-sm font-semibold text-amber-300"}>{item.target_met === true ? "Target met" : implementationFailed ? "Implementation failed" : "Target missed"}</div>
                     </div>
                   </summary>
                   <div className="mt-4 grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <Stat title="Best Fmax" value={item.best_frequency_mhz ? `${formatNumber(firstNumber(item.best_frequency_mhz))} MHz` : "failed"} />
-                    <Stat title="Median Fmax" value={item.median_frequency_mhz ? `${formatNumber(firstNumber(item.median_frequency_mhz))} MHz` : "failed"} />
-                    <Stat title="Worst Fmax" value={item.worst_frequency_mhz ? `${formatNumber(firstNumber(item.worst_frequency_mhz))} MHz` : "failed"} />
-                    <Stat title="Timing Pass Rate" value={`${formatNumber(firstNumber(item.timing_pass_rate) * 100)}%`} />
-                    <Stat title="Logic Utilization" value={item.logic_utilization_percent !== undefined ? `${formatNumber(firstNumber(item.logic_utilization_percent))}%` : "unavailable"} />
-                    <Stat title="Resource Headroom" value={item.resource_headroom_percent !== undefined ? `${formatNumber(firstNumber(item.resource_headroom_percent))}%` : "unavailable"} />
+                    <Stat title="Best Fmax" value={item.best_frequency_mhz ? `${formatNumber(firstNumber(item.best_frequency_mhz))} MHz` : "not produced"} />
+                    <Stat title="Median Fmax" value={item.median_frequency_mhz ? `${formatNumber(firstNumber(item.median_frequency_mhz))} MHz` : "not produced"} />
+                    <Stat title="Worst Fmax" value={item.worst_frequency_mhz ? `${formatNumber(firstNumber(item.worst_frequency_mhz))} MHz` : "not produced"} />
+                    <Stat title="Timing Pass Rate" value={implementationFailed ? "not run" : `${formatNumber(firstNumber(item.timing_pass_rate) * 100)}%`} />
+                    <Stat title="Logic Utilization" value={item.logic_utilization_percent !== undefined && item.logic_utilization_percent !== null ? `${formatNumber(firstNumber(item.logic_utilization_percent))}%` : "not produced"} />
+                    <Stat title="Resource Headroom" value={item.resource_headroom_percent !== undefined && item.resource_headroom_percent !== null ? `${formatNumber(firstNumber(item.resource_headroom_percent))}%` : "not produced"} />
                     <Stat title="Winning Seed" value={String(firstPresent(item.winning_seed, "not available"))} />
-                    <Stat title="Closure" value={item.closure_used === true ? "used" : "not needed"} />
+                    <Stat title="Closure" value={implementationFailed ? "not attempted" : item.closure_used === true ? "used" : "not needed"} />
                     <Stat title="Relaxed Frequency" value={relaxation.recommended_mhz ? `${formatNumber(firstNumber(relaxation.recommended_mhz))} MHz` : "not applicable"} />
                     <Stat title="P&R Attempts" value={runs.length} />
                     <Stat title="Board Input Clock" value={item.board_input_frequency_mhz ? `${formatNumber(firstNumber(item.board_input_frequency_mhz))} MHz` : "unavailable"} />
                     <Stat title="Implementation Reuse" value={firstString(item.reused_implementation_from, "unique target")} />
                   </div>
-                  <div className="mt-3 text-xs leading-5 text-slate-500">{firstString(item.constraint_scope)}</div>
+                  {firstString(item.failure_reason) ? <div className="mt-3 rounded-lg border border-rose-500/25 bg-rose-500/5 px-3 py-2 text-xs leading-5 text-rose-200">{firstString(item.failure_reason)}</div> : null}
+                  <div className="mt-3 text-xs leading-5 text-slate-500">{firstString(item.constraint_scope)}{boardIo ? ` · I/O mapping: ${array(boardIo.unmapped_ports).length ? `${array(boardIo.unmapped_ports).length} unmapped (${array(boardIo.unmapped_ports).map(String).join(", ")})` : "all ports mapped"}` : ""}</div>
                 </details>
               );
             })}
