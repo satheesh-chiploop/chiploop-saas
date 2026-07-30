@@ -89,7 +89,7 @@ const paths = [
 ];
 
 const platformStats = [
-  ["223", "Unique Agent Implementations", "text-cyan-300"],
+  ["223", "Published Agents", "text-cyan-300"],
   ["56", "Published Apps", "text-emerald-300"],
   ["36", "Prebuilt Workflows", "text-violet-300"],
   ["10", "Reference Journeys", "text-amber-300"],
