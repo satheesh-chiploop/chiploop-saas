@@ -13,7 +13,7 @@ export type LoopCatalogMetric = {
 export const loopCatalogMetrics: Record<string, LoopCatalogMetric> = {
   digital: { agents: 47, workflows: 6, apps: 9, productJourneys: 2, referenceJourneys: 5 },
   "digital-implementation": { agents: 41, workflows: 6, apps: 8, productJourneys: 2, referenceJourneys: 3 },
-  fpga: { agents: 18, workflows: 4, apps: 7, productJourneys: 1, referenceJourneys: 2 },
+  fpga: { agents: 22, workflows: 4, apps: 10, productJourneys: 1, referenceJourneys: 2 },
   analog: { agents: 22, workflows: 4, apps: 8, productJourneys: 1, referenceJourneys: 1 },
   "mixed-signal": { agents: 77, workflows: 6, apps: 13, productJourneys: 2, referenceJourneys: 2 },
   firmware: { agents: 62, workflows: 4, apps: 11, productJourneys: 3, referenceJourneys: 5 },

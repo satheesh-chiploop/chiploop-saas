@@ -1051,6 +1051,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "fpga/handoff/fpga_handoff_ingest.json",
         "fpga_constraints_summary.json",
         "fpga/constraints/fpga_constraints_summary.json",
+        "fpga/signoff/fpga_constraint_cdc_signoff_summary.json",
+        "fpga/qualification/fpga_power_device_qualification_summary.json",
+        "fpga/hardware/fpga_hardware_validation_summary.json",
         "fpga_synthesis_summary.json",
         "fpga/synth/fpga_synthesis_summary.json",
         "fpga_synthesis_closure_plan.json",
@@ -1695,6 +1698,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const handoff = record(ev("fpga_handoff_ingest.json", "fpga/handoff/fpga_handoff_ingest.json"));
       const constraints = record(ev("fpga_constraints_summary.json", "fpga/constraints/fpga_constraints_summary.json"));
       const synth = record(firstPresent(ev("fpga_synthesis_summary.json", "fpga/synth/fpga_synthesis_summary.json"), dashboard.synthesis));
+      const lec = record(firstPresent(ev("fpga_lec_summary.json", "fpga/lec/fpga_lec_summary.json"), dashboard.lec));
+      const constraintSignoff = record(firstPresent(ev("fpga_constraint_cdc_signoff_summary.json", "fpga/signoff/fpga_constraint_cdc_signoff_summary.json"), dashboard.constraint_cdc_signoff));
+      const powerQualification = record(firstPresent(ev("fpga_power_device_qualification_summary.json", "fpga/qualification/fpga_power_device_qualification_summary.json"), dashboard.power_device_qualification));
+      const hardwareValidation = record(firstPresent(ev("fpga_hardware_validation_summary.json", "fpga/hardware/fpga_hardware_validation_summary.json"), dashboard.hardware_validation));
       const rtlQuality = record(firstPresent(ev("fpga_rtl_quality_summary.json", "fpga/quality/fpga_rtl_quality_summary.json"), dashboard.rtl_quality));
       const rtlQualityPass1 = record(rtlQuality.pass1);
       const rtlQualityPass2 = record(rtlQuality.pass2);
@@ -2032,6 +2039,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
                 <Stat title="Code Branch Coverage" value={codeBranchCoverage} />
                 <Stat title="Code Toggle Coverage" value={codeToggleCoverage} />
                 <Stat title="Formal Verification" value={formalStatus} />
+                <Stat title="RTL-to-Netlist LEC" value={firstString(lec.status, "not run") === "disabled" ? "disabled by user" : statusLabel(firstString(lec.status, "not run"))} />
+                <Stat title="Constraint + CDC/RDC Signoff" value={statusLabel(firstString(constraintSignoff.status, "not run"))} />
+                <Stat title="Device Qualification" value={statusLabel(firstString(powerQualification.status, "not run"))} />
+                <Stat title="Estimated Power" value={powerQualification.estimated_total_power_mw !== undefined && powerQualification.estimated_total_power_mw !== null ? `${formatNumber(firstNumber(powerQualification.estimated_total_power_mw))} mW` : "not produced"} />
+                <Stat title="Hardware Validation" value={firstString(hardwareValidation.status, "not run") === "disabled" ? "disabled by user" : statusLabel(firstString(hardwareValidation.status, "not run"))} />
               </div>
             </div>
           </details>

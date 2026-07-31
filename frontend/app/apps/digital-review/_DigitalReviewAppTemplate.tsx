@@ -35,7 +35,7 @@ type Props = {
   defaultSourceMode?: "from_arch2rtl" | "paste" | "repo_path" | "generate_arch2rtl";
   sourceModeLabel?: string;
   closureRunPath?: string;
-  fpgaMode?: "bitstream" | "fpga2rtl" | "verify" | "formal" | "synthesis" | "implementation" | "target-explorer";
+  fpgaMode?: "bitstream" | "fpga2rtl" | "verify" | "formal" | "synthesis" | "implementation" | "target-explorer" | "constraint-signoff" | "board-bringup" | "power-qualification";
   referenceRtl?: { label: string; rtl: string; topModule: string; notes?: string };
 };
 
@@ -84,6 +84,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [topModule, setTopModule] = useState("");
   const [pcfText, setPcfText] = useState("");
   const [runFpgaTimingClosureLoop, setRunFpgaTimingClosureLoop] = useState(true);
+  const [runFpgaLec, setRunFpgaLec] = useState(true);
   const [fpgaClosureMode, setFpgaClosureMode] = useState<"balanced" | "advanced">("balanced");
   const [allowAutomaticRtlTimingRepair, setAllowAutomaticRtlTimingRepair] = useState(false);
   const [contextMode, setContextMode] = useState<"smart" | "full">("smart");
@@ -358,6 +359,14 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         cst_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
         notes: notes.trim() || undefined,
         run_fpga_rtl_repair_loop: fields.includes("fpga") ? true : undefined,
+        run_fpga_lec: fields.includes("fpga") ? runFpgaLec : undefined,
+        require_fpga_lec: fields.includes("fpga") ? runFpgaLec : undefined,
+        run_fpga_constraint_signoff: fields.includes("fpga") ? true : undefined,
+        require_fpga_constraint_signoff: fields.includes("fpga") ? true : undefined,
+        run_fpga_hardware_validation: fpgaMode === "board-bringup" ? true : undefined,
+        require_fpga_hardware_validation: fpgaMode === "board-bringup" ? false : undefined,
+        program_connected_fpga: fpgaMode === "board-bringup" ? false : undefined,
+        hardware_expected_behavior: fpgaMode === "board-bringup" ? notes.trim() || undefined : undefined,
         run_fpga_synthesis_closure_loop: fields.includes("fpga") ? runFpgaTimingClosureLoop : undefined,
         max_fpga_synthesis_closure_iterations: fields.includes("fpga") ? (fpgaClosureMode === "advanced" ? 3 : 2) : undefined,
         run_fpga_timing_closure_loop: fields.includes("fpga") ? fpgaMode !== "synthesis" && runFpgaTimingClosureLoop : undefined,
@@ -670,6 +679,13 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                   />
                   <span className="block text-xs text-amber-200">Use real board pin names before programming hardware. Blank PCF creates a starter file only.</span>
 
+                  <label className="flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-4 text-sm text-slate-200">
+                    <input type="checkbox" checked={runFpgaLec} onChange={(e) => setRunFpgaLec(e.target.checked)} className="mt-1" />
+                    <span>
+                      <span className="block font-semibold text-white">RTL-to-netlist equivalence (LEC)</span>
+                      <span className="text-slate-400">Enabled by default. Yosys proves the synthesized netlist matches the approved RTL before place-and-route. Disable only when you intentionally accept no equivalence evidence.</span>
+                    </span>
+                  </label>
                   <div className="rounded-2xl border border-cyan-500/30 bg-cyan-950/10 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>

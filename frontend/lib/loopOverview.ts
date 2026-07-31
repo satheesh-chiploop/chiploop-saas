@@ -128,11 +128,14 @@ const fpga: LoopOverview = {
     { name: "FPGA Prototyping", description: "Go from design intent to verified RTL and bitstream.", href: "/apps/fpga2rtl?reference=pwm" },
     { name: "FPGA Target Explorer", description: "Compare selected boards using the same design.", href: "/apps/fpga-target-explorer?reference=minirv" },
     { name: "FPGA Verify", description: "Check simulation, assertions, and coverage.", href: "/apps/fpga-verify" },
+    { name: "FPGA Constraint Signoff", description: "Check clock, I/O, CDC, RDC, and unconstrained-path safety.", href: "/apps/fpga-constraint-signoff" },
+    { name: "FPGA Board Bring-up", description: "Prepare programming and hardware smoke-test evidence.", href: "/apps/fpga-board-bringup" },
+    { name: "FPGA Power Qualification", description: "Review device fit, headroom, and estimated power.", href: "/apps/fpga-power-qualification" },
   ],
   agentGroups: [
     { name: "Design and quality", description: "Creates FPGA-ready RTL and checks it." },
     { name: "Verification", description: "Confirms behavior and coverage." },
-    { name: "Implementation and closure", description: "Runs synthesis, P&R, timing closure, and packaging." },
+    { name: "Implementation and closure", description: "Runs synthesis, RTL-to-netlist equivalence, P&R, timing closure, and packaging." },
   ],
   reference: {
     title: "PWM FPGA prototype",

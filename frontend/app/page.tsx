@@ -89,8 +89,8 @@ const paths = [
 ];
 
 const platformStats = [
-  ["223", "Published Agents", "text-cyan-300"],
-  ["56", "Published Apps", "text-emerald-300"],
+  ["227", "Published Agents", "text-cyan-300"],
+  ["59", "Published Apps", "text-emerald-300"],
   ["36", "Prebuilt Workflows", "text-violet-300"],
   ["10", "Reference Journeys", "text-amber-300"],
   ["5", "Product Journeys", "text-pink-300"],
@@ -161,7 +161,7 @@ const workflowAgentChart = [
   {
     label: "FPGA Prototype",
     example: "PWM to bitstream",
-    agents: { system: 4, analog: 0, digital: 14, fpga: 18, firmware: 0, software: 0, product: 3 },
+    agents: { system: 4, analog: 0, digital: 16, fpga: 22, firmware: 0, software: 0, product: 3 },
   },
   {
     label: "Mixed-Signal IP Product",
