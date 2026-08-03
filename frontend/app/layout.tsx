@@ -15,11 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.getchiploops.com"),
   title: {
-    default: "ChipLoop | Agentic AI for Chip Design",
+    default: "ChipLoop | Agentic AI for Physical AI and Silicon Development",
     template: "%s | ChipLoop",
   },
   description:
-    "Build chip design workflows with AI agents for architecture, RTL, simulation, firmware, and analysis.",
+    "All-in-one Agentic AI platform for Physical AI and Silicon Development, from physics models to RTL, FPGA, firmware, validation, and product delivery.",
   applicationName: "ChipLoop",
   alternates: {
     canonical: "/",
@@ -28,9 +28,9 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://www.getchiploops.com",
     siteName: "ChipLoop",
-    title: "ChipLoop | Agentic AI for Chip Design",
+    title: "ChipLoop | Agentic AI for Physical AI and Silicon Development",
     description:
-      "Build chip design workflows with AI agents for architecture, RTL, simulation, firmware, and analysis.",
+      "All-in-one Agentic AI platform for Physical AI and Silicon Development, from physics models to RTL, FPGA, firmware, validation, and product delivery.",
     images: [
       {
         url: "/og-chiploop.png",
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ChipLoop | Agentic AI for Chip Design",
+    title: "ChipLoop | Agentic AI for Physical AI and Silicon Development",
     description:
-      "Build chip design workflows with AI agents for architecture, RTL, simulation, firmware, and analysis.",
+      "All-in-one Agentic AI platform for Physical AI and Silicon Development, from physics models to RTL, FPGA, firmware, validation, and product delivery.",
     images: ["/og-chiploop.png"],
   },
   icons: {

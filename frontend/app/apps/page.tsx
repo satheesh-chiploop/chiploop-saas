@@ -327,6 +327,24 @@ export default function AppsHomePage() {
       promise: "Catch issues before tape-in",
     },
     {
+      slug: "physical-ai",
+      title: "Physical AI Design Studio",
+      subtitle: "Select a physics model, validate requirements, and orchestrate existing ChipLoop implementation loops",
+      loop_type: "system",
+      status: "New",
+      nudge: "Parent workflow",
+      promise: "Move from physical requirements to validated product handoffs",
+    },
+    {
+      slug: "physical-ai-motor-control",
+      title: "Physical AI Motor Control",
+      subtitle: "PhysicsNeMo surrogate, Nemotron agents, and an OrangeCrab FPGA motor-control handoff",
+      loop_type: "fpga",
+      status: "New",
+      nudge: "Physical AI",
+      promise: "Build the first physics-to-FPGA application package",
+    },
+    {
       slug: "fpga-target-explorer",
       title: "FPGA Target Explorer",
       subtitle: "Sweep one RTL design across supported FPGA targets and choose the right board",
@@ -1052,6 +1070,8 @@ export default function AppsHomePage() {
       "fpga-formal": "/apps/fpga-formal",
       "fpga-synthesis": "/apps/fpga-synthesis",
       "fpga-implementation": "/apps/fpga-implementation",
+      "physical-ai-motor-control": "/apps/physical-ai-motor-control",
+      "physical-ai": "/apps/physical-ai",
       "integrate": "/apps/integrate",
       "dqa": "/apps/dqa",
       "verify": "/apps/verify",
@@ -1721,8 +1741,6 @@ export default function AppsHomePage() {
     </main>
   );
 }
-
-
 
 
 

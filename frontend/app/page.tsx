@@ -97,7 +97,22 @@ const platformStats = [
   ["SDK + CLI + Studio", "Developer Access", "text-slate-100"],
 ];
 
-const subscriptionLoops = [
+const subscriptionLoops: Array<{
+  name: string;
+  href: string;
+  body: string;
+  border: string;
+  hover: string;
+  comingSoon?: boolean;
+}> = [
+  {
+    name: "Physical AI",
+    href: "/apps/physical-ai",
+    body: "Define physical requirements, select equation or surrogate models, validate operating envelopes, and orchestrate downstream silicon and product loops.",
+    border: "border-fuchsia-400/55",
+    hover: "hover:border-fuchsia-300 hover:shadow-fuchsia-950/35",
+    comingSoon: true,
+  },
   {
     name: "Digital Design",
     href: "/loops/digital",
@@ -289,10 +304,10 @@ function LandingPageContent() {
       <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.16),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_62%,#020617_100%)]">
         <div className={`${landingShellClass} flex flex-col items-center px-4 pb-8 pt-24 text-center sm:px-6 sm:pb-10 sm:pt-28 lg:pt-28`}>
           <h1 className="max-w-[1440px] text-4xl font-extrabold leading-[1.06] text-white min-[420px]:text-5xl sm:text-6xl lg:text-7xl">
-            All-in-one agentic AI platform for Silicon Development
+            All-in-one Agentic AI platform for Physical AI and Silicon Development
           </h1>
           <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-xl sm:leading-9">
-            Help one engineer or a small team move from requirements to RTL, verification, firmware, software, co-simulation, tapeout, validation, and product demo in one connected platform.
+            Move from physics requirements and surrogate models to architecture, RTL, FPGA, firmware, software, tapeout, validation, and product delivery in one connected platform.
           </p>
           <div className="mt-7 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
             <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
@@ -334,7 +349,7 @@ function LandingPageContent() {
         <div className={landingShellClass}>
         <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
           <div className="mx-auto max-w-4xl text-center">
-            <p className={eyebrowClass}>Choose Your Chip Design Loop</p>
+            <p className={eyebrowClass}>Choose Your Engineering Loop</p>
             <h2 className={`${sectionTitleClass} mx-auto`}>
               One platform. Connected design loops. Shared engineering context.
             </h2>
@@ -342,12 +357,13 @@ function LandingPageContent() {
               Start with one Core loop. Add Advanced capability or more credits as your work grows.
             </p>
           </div>
-          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6">
+          <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-7">
             {subscriptionLoops.map((loop) => (
-              <button type="button" onClick={() => goTo(loop.href)} key={loop.name} className={`relative rounded-xl border-2 ${loop.border} bg-slate-950/70 p-4 text-left shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
+              <button type="button" onClick={() => goTo(loop.href)} key={loop.name} className={`relative min-w-0 rounded-xl border-2 ${loop.border} bg-slate-950/70 p-3 text-left shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-950 hover:shadow-xl ${loop.hover}`}>
                 <span aria-hidden="true" className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-sm font-bold text-cyan-200">&#8599;</span>
-                <h3 className={`${cardTitleClass} pr-8`}>{loop.name}</h3>
-                <p className={`${cardBodyClass} min-h-32`}>{loop.body}</p>
+                <h3 className="pr-8 text-base font-bold leading-snug text-white">{loop.name}</h3>
+                {loop.comingSoon && <span className="mt-2 inline-flex rounded-full border border-fuchsia-400/40 bg-fuchsia-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span>}
+                <p className="mt-3 min-h-36 text-xs leading-5 text-slate-400">{loop.body}</p>
               </button>
             ))}
           </div>

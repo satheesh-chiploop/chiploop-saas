@@ -68,6 +68,8 @@ export default function AppSlugRouter() {
       "system-software": "/apps/system-software",
       "system-software-validation": "/apps/system-software-validation",
       "system-rtl": "/apps/system-rtl",
+      "physical-ai-motor-control": "/apps/physical-ai-motor-control",
+      "physical-ai": "/apps/physical-ai",
 
     };
 
