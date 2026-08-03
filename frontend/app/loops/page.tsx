@@ -6,7 +6,28 @@ import { loopCatalogMetrics } from "@/lib/platformMetrics";
 
 type MetricKey = "agents" | "apps" | "workflows" | "referenceJourneys";
 
-const loops = [
+const loops: Array<{
+  name: string;
+  short: string;
+  core: string;
+  advanced: string;
+  href: string;
+  metricKey: string;
+  border: string;
+  hover: string;
+  comingSoon?: boolean;
+}> = [
+  {
+    name: "Physical AI",
+    short: "Move from physics requirements and equation or surrogate models to FPGA, firmware, validation, and a product demonstration.",
+    core: "Requirements, model selection, physics execution, fixed-point and RTL handoff",
+    advanced: "HEM orchestration, FPGA implementation, firmware, co-simulation, validation, product demo",
+    href: "/loops/physical-ai",
+    metricKey: "physical-ai",
+    border: "border-fuchsia-400/55",
+    hover: "hover:border-fuchsia-300 hover:shadow-fuchsia-950/35",
+    comingSoon: true,
+  },
   {
     name: "Digital Design",
     short: "From requirements to RTL and verification-ready handoff.",
@@ -79,12 +100,18 @@ const metrics: Array<{ key: MetricKey; label: string; color: string }> = [
 const chartMax = 80;
 
 const unlockExamples = [
+  ["Physical AI product demo", "Physical AI + FPGA + Firmware/Software + Validation"],
   ["Digital IP with synthesis", "Digital Design + Digital Implementation"],
   ["Mixed-signal product", "Mixed Signal + Firmware/Software + Validation"],
   ["Full product handoff", "Design + Implementation + Software + Validation"],
 ];
 
 const referenceJourneys = [
+  {
+    title: "PMSM Motor Control — Coming soon",
+    body: "A Physical AI journey from equation-model validation through fixed-point RTL, FPGA, firmware, co-simulation, and product demo.",
+    href: "/apps/physical-ai",
+  },
   {
     title: "PWM Controller",
     body: "A compact digital IP journey from RTL to firmware, software validation, and product app.",
@@ -138,14 +165,14 @@ export default function LoopsPage() {
 
       <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-[1680px]">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-7">
           {loops.map((loop) => (
             <button
               key={loop.name}
               onClick={() => router.push(loop.href)}
               className={`rounded-xl border-2 ${loop.border} bg-slate-900/70 p-5 text-left shadow-lg shadow-slate-950/20 transition hover:-translate-y-0.5 hover:bg-slate-900 hover:shadow-xl ${loop.hover}`}
             >
-              <h2 className="text-xl font-extrabold text-white">{loop.name}</h2>
+              <div className="flex flex-wrap items-center gap-2"><h2 className="text-xl font-extrabold text-white">{loop.name}</h2>{loop.comingSoon ? <span className="rounded-full border border-fuchsia-400/40 bg-fuchsia-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span> : null}</div>
               <p className="mt-3 min-h-20 text-sm leading-6 text-slate-300">{loop.short}</p>
               <div className="mt-4 text-xs font-semibold uppercase text-slate-500">Explore loop</div>
             </button>
@@ -197,7 +224,7 @@ export default function LoopsPage() {
                       <span className="border-t border-slate-700" />
                     </div>
 
-                    <div className="relative grid h-full grid-cols-6 items-end gap-6 px-2">
+                    <div className="relative grid h-full grid-cols-7 items-end gap-5 px-2">
                       {loops.map((loop) => (
                         <div key={loop.name} className="flex h-full items-end justify-center gap-1.5">
                           {metrics.map((metric) => {
@@ -215,7 +242,7 @@ export default function LoopsPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-6 gap-6 px-2 text-center">
+                  <div className="mt-4 grid grid-cols-7 gap-5 px-2 text-center">
                     {loops.map((loop) => (
                       <div key={loop.name} className="text-xs font-bold leading-4 text-slate-100">{loop.name}</div>
                     ))}

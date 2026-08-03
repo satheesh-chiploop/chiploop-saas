@@ -47,7 +47,7 @@ export default function LoopOverviewPage() {
           <button onClick={() => router.push("/loops")} className="text-sm font-semibold text-slate-400 hover:text-cyan-200">&larr; All design loops</button>
           <div className="mt-8 grid items-center gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
-              <p className={`text-xs font-bold uppercase tracking-[0.18em] ${loop.accentText}`}>{loop.eyebrow}</p>
+              <div className="flex flex-wrap items-center gap-3"><p className={`text-xs font-bold uppercase tracking-[0.18em] ${loop.accentText}`}>{loop.eyebrow}</p>{params.loopSlug === "physical-ai" ? <span className="rounded-full border border-fuchsia-400/40 bg-fuchsia-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span> : null}</div>
               <h1 className="mt-3 max-w-4xl text-4xl font-extrabold leading-tight sm:text-5xl">{loop.promise}</h1>
               <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">{loop.description}</p>
               <div className="mt-7 flex flex-wrap gap-3">

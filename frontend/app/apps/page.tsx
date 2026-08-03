@@ -25,10 +25,10 @@ import {
 
 const supabase = createClientComponentClient();
 
-type LoopType = "digital" | "validation" | "analog" | "embedded" | "system" | "fpga";
+type LoopType = "physical_ai" | "digital" | "validation" | "analog" | "embedded" | "system" | "fpga";
 
-const LOOP_TYPES: LoopType[] = ["digital", "fpga", "analog", "system", "embedded", "validation"];
-type CatalogView = "home" | "digital" | "fpga" | "system" | "analog" | "embedded" | "validation";
+const LOOP_TYPES: LoopType[] = ["physical_ai", "digital", "fpga", "analog", "system", "embedded", "validation"];
+type CatalogView = "home" | "physical_ai" | "digital" | "fpga" | "system" | "analog" | "embedded" | "validation";
 
 type OnboardingResponse = {
   status: string;
@@ -102,6 +102,7 @@ type ReferenceJourney = {
   button: string;
   onClick: () => void;
   stages?: string[];
+  comingSoon?: boolean;
 };
 
 const LOOP_META: Record<LoopType, {
@@ -112,6 +113,14 @@ const LOOP_META: Record<LoopType, {
   softBg: string;
   border: string;
 }> = {
+  physical_ai: {
+    title: "Physical AI Loop",
+    tagline: "Physics requirements to model to silicon and product handoff",
+    icon: "P",
+    accent: "bg-fuchsia-400",
+    softBg: "bg-fuchsia-500/10 text-fuchsia-200",
+    border: "border-fuchsia-500/30",
+  },
   digital: {
     title: "Digital Loop",
     tagline: "Design to RTL to verify to improve",
@@ -233,6 +242,15 @@ export default function AppsHomePage() {
 
   // Apps are grouped by loop so the page can present both guided entry points and full catalog sections.
   const apps: AppCard[] = useMemo(() => ([
+    {
+      slug: "physical-ai",
+      title: "Physical AI Design Studio",
+      subtitle: "Physics requirements, governed model selection, validation, fixed-point RTL, and HEM downstream orchestration",
+      loop_type: "physical_ai",
+      status: "Coming",
+      nudge: "PMSM reference application",
+      promise: "Move from an equation or surrogate model to FPGA, firmware, validation, and product evidence",
+    },
     {
       slug: "ask-project",
       title: "Ask this Project",
@@ -1121,6 +1139,17 @@ export default function AppsHomePage() {
 
   const referenceJourneys: ReferenceJourney[] = [
     {
+      key: "physical-ai-pmsm",
+      exploreTitle: "Explore Physical AI Motor Control",
+      segment: "Physical AI / Motor Control",
+      title: "PMSM Motor Control: physics equations to fixed-point RTL, FPGA, firmware, validation, and product demo",
+      copy: "The first Physical AI reference journey uses a governed PMSM dq equation model to validate the operating envelope, create fixed-point and RTL contracts, explore an FPGA target, generate firmware and software, and build a simulator-backed product demonstration.",
+      button: "Open Physical AI Studio",
+      onClick: () => router.push("/apps/physical-ai"),
+      stages: ["Requirements", "Model Selection", "Physics", "Fixed Point", "RTL", "FPGA", "Firmware", "Validation", "Product Demo"],
+      comingSoon: true,
+    },
+    {
       key: "temperature-monitor",
       exploreTitle: "Explore Temperature Monitor",
       segment: "Mixed-Signal / Product SoC",
@@ -1216,6 +1245,7 @@ export default function AppsHomePage() {
   ];
 
   const catalogButtons: Array<{ view: CatalogView; title: string; body: string; count?: number }> = [
+    { view: "physical_ai", title: "Explore Physical AI apps", body: "Physics requirements, equation and surrogate models, fixed-point RTL, FPGA, firmware, validation, and product orchestration.", count: apps.filter((app) => app.loop_type === "physical_ai").length },
     { view: "digital", title: "Explore Digital apps", body: "RTL, DQA, verify, synthesis, tapeout, and handoff apps.", count: apps.filter((app) => app.loop_type === "digital").length },
     { view: "fpga", title: "Explore FPGA apps", body: "FPGA2RTL, RTL quality, iCE40/ECP5 (Lattice FPGA families) synthesis, place-and-route, timing, and bitstream handoff.", count: apps.filter((app) => app.loop_type === "fpga").length },
     { view: "system", title: "Explore System apps", body: "System RTL, simulation, synthesis, PD, firmware, software, validation, and product builder.", count: apps.filter((app) => app.loop_type === "system").length },
@@ -1224,7 +1254,7 @@ export default function AppsHomePage() {
     { view: "validation", title: "Explore Validation apps", body: "Validation plans, bench setup, preflight, execution orchestration, analytics, and insights.", count: apps.filter((app) => app.loop_type === "validation").length },
   ];
 
-  const selectedCatalogLoop = ["digital", "fpga", "system", "analog", "embedded", "validation"].includes(catalogView)
+  const selectedCatalogLoop = ["physical_ai", "digital", "fpga", "system", "analog", "embedded", "validation"].includes(catalogView)
     ? catalogView as LoopType
     : null;
 
@@ -1631,7 +1661,7 @@ export default function AppsHomePage() {
                       : "border border-slate-600 bg-slate-950/35 text-white hover:border-cyan-300 hover:text-cyan-200"
                   }`}
                 >
-                  <div className="text-lg font-extrabold">{journey.exploreTitle}</div>
+                  <div className="flex flex-wrap items-start justify-between gap-2"><div className="text-lg font-extrabold">{journey.exploreTitle}</div>{journey.comingSoon ? <span className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${active ? "border-slate-900/20 bg-slate-950/10 text-slate-900" : "border-fuchsia-400/40 bg-fuchsia-500/10 text-fuchsia-200"}`}>Coming soon</span> : null}</div>
                   <div className={`mt-3 text-sm font-semibold leading-6 ${active ? "text-slate-900" : "text-slate-300"}`}>
                     {journey.segment}
                   </div>
@@ -1645,7 +1675,7 @@ export default function AppsHomePage() {
       {selectedReference ? (
         <section id="reference-journey-detail" className="mx-auto max-w-[1440px] px-6 pb-7 scroll-mt-24">
           <div className="rounded-2xl border border-slate-800 bg-slate-950/45 p-5">
-            <div className="mb-2 text-xs font-semibold uppercase text-cyan-300">{selectedReference.segment}</div>
+            <div className="mb-2 flex flex-wrap items-center gap-3"><span className="text-xs font-semibold uppercase text-cyan-300">{selectedReference.segment}</span>{selectedReference.comingSoon ? <span className="rounded-full border border-fuchsia-400/40 bg-fuchsia-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span> : null}</div>
             <div className="text-xl font-bold text-white">{selectedReference.title}</div>
             <p className="mt-2 text-sm leading-6 text-slate-300">{selectedReference.copy}</p>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-300">
@@ -1741,8 +1771,6 @@ export default function AppsHomePage() {
     </main>
   );
 }
-
-
 
 
 

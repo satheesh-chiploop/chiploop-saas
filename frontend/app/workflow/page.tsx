@@ -35,7 +35,7 @@ import { FiGrid } from "react-icons/fi";
 /* =========================
    Types & Constants
 ========================= */
-type LoopKey = "digital" | "analog" | "embedded" | "system" |"validation";
+type LoopKey = "physical_ai" | "digital" | "analog" | "embedded" | "system" | "validation";
 type AgentNodeSize = "regular" | "cozy" | "compact";
 type AgentNodeData = { uiLabel: string; backendLabel: string; desc?: string; nodeSize?: AgentNodeSize };
 type WorkflowGraphDefinition = {
@@ -111,6 +111,7 @@ type CustomWorkflowRow = {
 };
 
 const APP_PREBUILT_WORKFLOWS: CustomWorkflowRow[] = [
+  { name: "Physical_AI_Loop", displayName: "Physical AI Loop — Coming soon", loop_type: "physical_ai", is_prebuilt: true },
   { name: "Digital_Arch2RTL", displayName: "Arch2RTL", loop_type: "digital", is_prebuilt: true },
   { name: "Digital_Arch2Synthesis", displayName: "Arch2Synthesis", loop_type: "digital", is_prebuilt: true },
   { name: "Digital_Arch2Sim", displayName: "Arch2Sim", loop_type: "digital", is_prebuilt: true },
@@ -261,6 +262,12 @@ const SYSTEM_ARCHITECTURE_EXPLORER_AGENTS = [
 ];
 
 const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition> = {
+  Physical_AI_Loop: linearWorkflowDefinition([
+    "Physical AI Requirements Agent",
+    "Physical AI Model Selection Agent",
+    "Physical AI Physics Execution Agent",
+    "Physical AI Orchestrator Agent",
+  ]),
   Digital_Arch2RTL: linearWorkflowDefinition([
     "Digital Spec Agent",
     "Digital Architecture Agent",
@@ -632,6 +639,7 @@ const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition>
 function inferLoopTypeFromName(name: string): string {
   if (!name) return "digital";
   const normalized = name.trim();
+  if (normalized.startsWith("Physical_AI") || normalized.startsWith("App: Physical AI")) return "physical_ai";
   if (normalized.startsWith("Validation_") || normalized.startsWith("App: Validation")) return "validation";
   if (normalized.startsWith("System_") || normalized.startsWith("App: System")) return "system";
   if (normalized.startsWith("Analog_") || normalized.startsWith("App: Analog")) return "analog";
@@ -641,7 +649,7 @@ function inferLoopTypeFromName(name: string): string {
 
 function normalizeLoopType(value?: string | null, fallbackName?: string): LoopKey {
   const normalized = String(value || "").trim().toLowerCase();
-  if (["digital", "analog", "embedded", "system", "validation"].includes(normalized)) {
+  if (["physical_ai", "digital", "analog", "embedded", "system", "validation"].includes(normalized)) {
     return normalized as LoopKey;
   }
   return inferLoopTypeFromName(fallbackName || "") as LoopKey;
@@ -889,6 +897,12 @@ type UserAppsResponse = {
 // }
 
 const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
+  physical_ai: [
+    { uiLabel: "Physical AI Requirements Agent", backendLabel: "Physical AI Requirements Agent", desc: "Normalizes application, operating-envelope, accuracy, safety, and implementation requirements." },
+    { uiLabel: "Physical AI Model Selection Agent", backendLabel: "Physical AI Model Selection Agent", desc: "Selects a compatible governed equation or surrogate model from Supabase." },
+    { uiLabel: "Physical AI Physics Execution Agent", backendLabel: "Physical AI Physics Execution Agent", desc: "Executes physics validation and generates operating-envelope, fixed-point, RTL, and register-map evidence." },
+    { uiLabel: "Physical AI Orchestrator Agent", backendLabel: "Physical AI Orchestrator Agent", desc: "Judges readiness and delegates to FPGA, firmware, validation, and product workflows." },
+  ],
   digital: [
     { uiLabel: "Digital Spec Agent", backendLabel: "Digital Spec Agent", desc: "Capture design spec & I/Os" },
     { uiLabel: "Digital RTL Agent", backendLabel: "Digital RTL Agent", desc: "Generate synthesizable RTL" },
@@ -3588,6 +3602,7 @@ type SystemPlannerIntent = {
               onChange={(e) => setLoop(e.target.value as LoopKey)}
               className="w-full rounded-lg bg-slate-800 border border-slate-700 p-2 text-slate-200"
             >
+              <option value="physical_ai">Physical AI Loop — Coming soon</option>
               <option value="digital">Digital Loop</option>
               <option value="analog">Analog Loop</option>
               <option value="embedded">Embedded Loop</option>
@@ -4238,7 +4253,7 @@ type SystemPlannerIntent = {
                     onChange={(event) => setAgentEditor((current) => current ? { ...current, loopType: event.target.value } : current)}
                     className="mt-2 w-full rounded border border-slate-700 bg-black/40 px-3 py-2 text-sm font-normal outline-none focus:border-cyan-600"
                   >
-                    {["digital", "analog", "embedded", "system", "validation"].map((item) => (
+                    {["physical_ai", "digital", "analog", "embedded", "system", "validation"].map((item) => (
                       <option key={item} value={item}>{item[0].toUpperCase() + item.slice(1)}</option>
                     ))}
                   </select>

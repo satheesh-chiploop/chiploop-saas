@@ -61,6 +61,46 @@ const digital: LoopOverview = {
   },
 };
 
+const physicalAi: LoopOverview = {
+  name: "Physical AI",
+  eyebrow: "Physics intelligence to working silicon",
+  promise: "Turn physical-system requirements into validated digital implementation evidence.",
+  description: "Choose a governed equation or surrogate model, validate its operating envelope, create implementation contracts, and let HEM continue through existing FPGA, firmware, validation, and product loops.",
+  accent: "bg-fuchsia-400",
+  accentText: "text-fuchsia-200",
+  accentBorder: "border-fuchsia-400/45",
+  inputs: ["Physical application requirements", "Operating envelope and safety limits", "Equation or surrogate model selection"],
+  stages: [
+    { label: "Define", detail: "Normalize application, physics, accuracy, safety, and target requirements." },
+    { label: "Model", detail: "Select a governed equation or surrogate model from Supabase." },
+    { label: "Validate", detail: "Execute physics, sweep the operating envelope, and quantify implementation error." },
+    { label: "Implement", detail: "Generate fixed-point contracts, RTL, register maps, and FPGA handoffs." },
+    { label: "Orchestrate", detail: "Use HEM to reuse FPGA, firmware, software-validation, and product workflows." },
+  ],
+  outcomes: ["Physics and operating-envelope evidence", "Fixed-point RTL and register-map package", "Linked FPGA, firmware, validation, and product-demo workflows"],
+  starts: [
+    { title: "PMSM motor control", body: "Run the first equation-mode Physical AI reference journey.", label: "Open Physical AI Studio", href: "/apps/physical-ai" },
+    { title: "Choose a physics model", body: "Compare ready equation models and future GPU surrogate models.", label: "Select model", href: "/apps/physical-ai" },
+    { title: "Run automatically", body: "Enable HEM for the cloud journey while preserving hardware approval gates.", label: "Configure HEM", href: "/apps/physical-ai" },
+  ],
+  workflow: "Physical AI Design Studio runs Physical_AI_Loop through four dedicated agents, then delegates approved evidence to FPGA_Target_Explorer, FPGA_RTL_to_Bitstream, System_Firmware, System_Software, System_Software_Validation_L2, and System_Product_App_Builder.",
+  apps: [
+    { name: "Physical AI Design Studio — Coming soon", description: "Define the application, select a physics model, validate it, and orchestrate downstream implementation.", href: "/apps/physical-ai" },
+  ],
+  agentGroups: [
+    { name: "Physical AI Requirements Agent", description: "Creates the application and safety requirements contract." },
+    { name: "Physical AI Model Selection Agent", description: "Selects a compatible governed model from Supabase." },
+    { name: "Physical AI Physics Execution Agent", description: "Executes physics, envelope, fixed-point, and RTL evidence." },
+    { name: "Physical AI Orchestrator Agent", description: "Judges readiness and delegates to existing ChipLoop loops." },
+  ],
+  reference: {
+    title: "PMSM Motor Control — Coming soon",
+    description: "Follow equation-mode PMSM control from physics validation to FPGA, firmware, co-simulation, and product demo.",
+    href: "/apps/physical-ai",
+    results: [{ label: "Physics", value: 100 }, { label: "Fixed point", value: 100 }, { label: "RTL smoke", value: 100 }, { label: "Hardware", value: 0 }],
+  },
+};
+
 const implementation: LoopOverview = {
   name: "Digital Implementation",
   eyebrow: "From RTL to implementation evidence",
@@ -285,6 +325,7 @@ const validation = domainLoop({
 });
 
 export const loopOverviews: Record<string, LoopOverview> = {
+  "physical-ai": physicalAi,
   digital,
   "digital-implementation": implementation,
   fpga,
