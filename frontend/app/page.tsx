@@ -89,10 +89,10 @@ const paths = [
 ];
 
 const platformStats = [
-  ["227", "Published Agents", "text-cyan-300"],
-  ["59", "Published Apps", "text-emerald-300"],
-  ["36", "Prebuilt Workflows", "text-violet-300"],
-  ["10", "Reference Journeys", "text-amber-300"],
+  ["231", "Published Agents", "text-cyan-300"],
+  ["60", "Published Apps", "text-emerald-300"],
+  ["37", "Prebuilt Workflows", "text-violet-300"],
+  ["11", "Reference Journeys", "text-amber-300"],
   ["5", "Product Journeys", "text-pink-300"],
   ["SDK + CLI + Studio", "Developer Access", "text-slate-100"],
 ];
@@ -158,6 +158,7 @@ const subscriptionLoops: Array<{
 ];
 
 const agentSegments = [
+  { key: "physical_ai", label: "Physical AI", color: "#e879f9" },
   { key: "system", label: "System", color: "#a78bfa" },
   { key: "analog", label: "Analog", color: "#fb7185" },
   { key: "digital", label: "Digital", color: "#22d3ee" },
@@ -169,29 +170,34 @@ const agentSegments = [
 
 const workflowAgentChart = [
   {
+    label: "Physical AI Motor Product",
+    example: "PMSM model to product demo",
+    agents: { physical_ai: 4, system: 4, analog: 0, digital: 0, fpga: 22, firmware: 10, software: 12, product: 6 },
+  },
+  {
     label: "Digital IP Product",
     example: "PWM to demo",
-    agents: { system: 6, analog: 0, digital: 39, fpga: 0, firmware: 10, software: 12, product: 6 },
+    agents: { physical_ai: 0, system: 6, analog: 0, digital: 39, fpga: 0, firmware: 10, software: 12, product: 6 },
   },
   {
     label: "FPGA Prototype",
     example: "PWM to bitstream",
-    agents: { system: 4, analog: 0, digital: 16, fpga: 22, firmware: 0, software: 0, product: 3 },
+    agents: { physical_ai: 0, system: 4, analog: 0, digital: 16, fpga: 22, firmware: 0, software: 0, product: 3 },
   },
   {
     label: "Mixed-Signal IP Product",
     example: "Temp Monitor SoC",
-    agents: { system: 12, analog: 18, digital: 38, fpga: 0, firmware: 10, software: 12, product: 8 },
+    agents: { physical_ai: 0, system: 12, analog: 18, digital: 38, fpga: 0, firmware: 10, software: 12, product: 8 },
   },
   {
     label: "Digital IP + Tapeout",
     example: "RTL to GDS/signoff",
-    agents: { system: 5, analog: 0, digital: 76, fpga: 0, firmware: 0, software: 0, product: 7 },
+    agents: { physical_ai: 0, system: 5, analog: 0, digital: 76, fpga: 0, firmware: 0, software: 0, product: 7 },
   },
   {
     label: "Mixed-Signal Product + Tapeout",
     example: "SoC to demo + GDS",
-    agents: { system: 16, analog: 22, digital: 51, fpga: 0, firmware: 12, software: 14, product: 8 },
+    agents: { physical_ai: 0, system: 16, analog: 22, digital: 51, fpga: 0, firmware: 12, software: 14, product: 8 },
   },
 ];
 
@@ -232,6 +238,9 @@ const selfRegulatedFeatures = [
 ];
 
 const endToEndJourney = [
+  "Physics Requirements",
+  "Equation / Surrogate",
+  "Architecture",
   "Design Intent",
   "RTL",
   "Verification",
@@ -241,6 +250,16 @@ const endToEndJourney = [
   "Tapeout",
   "Validation",
   "Product Demo",
+];
+
+const physicalAiReferenceFlow = [
+  { type: "App", name: "Physical AI Design Studio" },
+  { type: "Workflow", name: "Physical_AI_Loop" },
+  { type: "Agent", name: "Requirements" },
+  { type: "Agent", name: "Model Selection" },
+  { type: "Agent", name: "Physics Execution" },
+  { type: "Agent", name: "Orchestrator" },
+  { type: "HEM", name: "FPGA → Firmware → Validation → Product" },
 ];
 
 const eyebrowClass = "text-xs font-semibold uppercase text-cyan-300";
@@ -376,6 +395,31 @@ function LandingPageContent() {
         </div>
       </section>
 
+      <section className="w-full border-y border-slate-800 bg-fuchsia-950/10 px-4 py-10 sm:px-6 sm:py-14">
+        <div className={landingShellClass}>
+          <div className="rounded-xl border border-fuchsia-400/30 bg-slate-900/70 p-5 sm:p-8">
+            <div className="mx-auto max-w-4xl text-center">
+              <div className="flex flex-wrap items-center justify-center gap-3"><p className="text-xs font-semibold uppercase text-fuchsia-300">Physical AI Reference Journey</p><span className="rounded-full border border-fuchsia-400/40 bg-fuchsia-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span></div>
+              <h2 className={`${sectionTitleClass} mx-auto`}>From a governed physics model to a validated product demonstration.</h2>
+              <p className={`${sectionBodyClass} mx-auto`}>The parent Physical AI workflow owns requirements and physics evidence, then HEM reuses ChipLoop&apos;s FPGA, firmware, software, validation, and product workflows.</p>
+            </div>
+            <div className="mt-8 overflow-x-auto pb-2">
+              <div className="mx-auto grid min-w-[1180px] grid-cols-[repeat(13,minmax(0,auto))] items-stretch justify-center gap-2">
+                {physicalAiReferenceFlow.map((stage, index) => (
+                  <div key={`${stage.type}-${stage.name}`} className="contents">
+                    <div className="flex w-36 flex-col justify-center rounded-xl border border-fuchsia-400/30 bg-slate-950/80 p-3 text-center">
+                      <span className="text-[10px] font-bold uppercase tracking-wide text-fuchsia-300">{stage.type}</span>
+                      <span className="mt-2 text-xs font-semibold leading-5 text-slate-100">{stage.name}</span>
+                    </div>
+                    {index < physicalAiReferenceFlow.length - 1 && <div className="flex items-center justify-center text-lg font-bold text-fuchsia-300/60" aria-hidden="true">→</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="w-full border-y border-slate-800 bg-slate-800/30 px-4 py-8 sm:px-6 sm:py-10">
         <div className={landingShellClass}>
         <div className="text-center">
@@ -412,7 +456,7 @@ function LandingPageContent() {
             </p>
           </div>
           <div className="mx-auto mt-8 w-full max-w-[1680px] overflow-x-auto pb-2">
-            <div className="grid min-w-[980px] grid-cols-[repeat(17,minmax(0,auto))] items-center justify-center gap-1.5 lg:gap-2">
+            <div className="grid min-w-[1420px] grid-cols-[repeat(23,minmax(0,auto))] items-center justify-center gap-1.5 lg:gap-2">
             {endToEndJourney.map((stage, index) => (
               <div key={stage} className="contents">
                 <div className="flex h-12 w-[88px] items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 px-2 text-center text-[10px] font-semibold leading-4 text-slate-100 sm:w-24 md:w-28 md:text-xs lg:w-32">

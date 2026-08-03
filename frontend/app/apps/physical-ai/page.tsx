@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
+import { HemAutomaticRunControls } from "@/components/HemAutomaticRun";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 const supabase = createClientComponentClient();
@@ -31,12 +32,31 @@ export default function PhysicalAiStudioPage() {
   const [load, setLoad] = useState("0.15");
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hemEnabled, setHemEnabled] = useState(true);
+  const [hemAdaptive, setHemAdaptive] = useState(false);
+  const [hemStages, setHemStages] = useState({ fpga_exploration: true, fpga_bitstream: true, firmware_product: true });
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       if (!data.session) return router.replace("/login?next=/apps/physical-ai");
       const accessToken = data.session.access_token;
       setToken(accessToken);
+      const rerun = window.localStorage.getItem("chiploop_physical_ai_rerun");
+      if (rerun) {
+        try {
+          const prior = JSON.parse(rerun);
+          const requirements = prior.requirements || {};
+          const parameters = requirements.parameters || {};
+          if (requirements.objective) setObjective(String(requirements.objective));
+          if (requirements.implementation_target) setTarget(String(requirements.implementation_target));
+          if (prior.physics_model_id) setModelId(String(prior.physics_model_id));
+          if (parameters.dc_bus_voltage_v != null) setVoltage(String(parameters.dc_bus_voltage_v));
+          if (parameters.rated_speed_rpm != null) setSpeed(String(parameters.rated_speed_rpm));
+          if (parameters.load_torque_nm != null) setLoad(String(parameters.load_torque_nm));
+        } finally {
+          window.localStorage.removeItem("chiploop_physical_ai_rerun");
+        }
+      }
       const response = await fetch(`${API_BASE}/apps/physical-ai/models`, { headers: { Authorization: `Bearer ${accessToken}` } });
       if (response.ok) setModels((await response.json()).models || []);
     });
@@ -63,6 +83,10 @@ export default function PhysicalAiStudioPage() {
           safety_constraints: ["current limit must pass", "winding temperature below 120 C"],
           parameters: { dc_bus_voltage_v: Number(voltage), rated_speed_rpm: Number(speed), load_torque_nm: Number(load), control_loop_hz: 20000 },
           model_policy: { mode, selected_model: standardModel },
+          hem_enabled: hemEnabled,
+          hem_mode: hemAdaptive ? "adaptive" : "fixed",
+          hem_goal: "product_demo",
+          hem_stage_toggles: hemStages,
         }),
       });
       const data = await response.json();
@@ -99,7 +123,7 @@ export default function PhysicalAiStudioPage() {
         </section>
       </div>
 
-      <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/40 p-6"><h2 className="text-xl font-bold">3. End-to-end loop</h2><div className="mt-4 grid gap-3 md:grid-cols-4">{["Requirements + model", "Physics validation", "Existing child loops", "Product validation"].map((stage, index) => <div key={stage} className="rounded-lg bg-slate-950 p-3 text-sm"><span className="mr-2 text-violet-300">{index + 1}</span>{stage}</div>)}</div>{error && <p className="mt-4 text-red-300">{error}</p>}<button onClick={start} disabled={!token || running || selected?.availability !== "ready"} className="mt-6 rounded-xl bg-violet-400 px-6 py-3 font-bold text-slate-950 disabled:opacity-50">{running ? "Starting Physical AI loop…" : "Start Physical AI loop"}</button></section>
+      <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/40 p-6"><h2 className="text-xl font-bold">3. HEM end-to-end automation</h2><div className="mt-4"><HemAutomaticRunControls enabled={hemEnabled} adaptive={hemAdaptive} onEnabledChange={setHemEnabled} onAdaptiveChange={setHemAdaptive} currentStageLabel="Physical AI RTL validation" nextStageLabel="FPGA Target Explorer" stageOptions={[{ key: "fpga_exploration", label: "FPGA Target Explorer", enabled: hemStages.fpga_exploration }, { key: "fpga_bitstream", label: "FPGA RTL to Bitstream", enabled: hemStages.fpga_bitstream }, { key: "firmware_product", label: "Firmware, validation + product demo", enabled: hemStages.firmware_product }]} onStageToggle={(key, value) => setHemStages((current) => ({ ...current, [key]: value }))} /></div><div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">{["Physics + fixed point", "RTL compile + smoke", "FPGA exploration", "FPGA bitstream", "Firmware + software", "Validation + product demo"].map((stage, index) => <div key={stage} className="rounded-lg bg-slate-950 p-3 text-sm"><span className="mr-2 text-violet-300">{index + 1}</span>{stage}</div>)}</div><p className="mt-4 text-xs text-amber-200">Board programming and motor energization always require explicit hardware approval.</p>{error && <p className="mt-4 text-red-300">{error}</p>}<button onClick={start} disabled={!token || running || selected?.availability !== "ready"} className="mt-6 rounded-xl bg-violet-400 px-6 py-3 font-bold text-slate-950 disabled:opacity-50">{running ? "Starting Physical AI loop…" : hemEnabled ? "Start automatic Physical AI loop" : "Run Physical AI validation only"}</button></section>
     </div>
   </main>;
 }
