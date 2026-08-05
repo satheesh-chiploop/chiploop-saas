@@ -1,0 +1,8 @@
+{
+  "workflow_id": "d429319c-00bc-498e-8a6f-0efd6eaf389e",
+  "workflow_dir": "backend/workflows/d429319c-00bc-498e-8a6f-0efd6eaf389e",
+  "digital_spec_json": "backend/workflows/d429319c-00bc-498e-8a6f-0efd6eaf389e/spec/doMINO_aero_ctrl_safety_wrapper_spec.json",
+  "spec_json": "backend/workflows/d429319c-00bc-498e-8a6f-0efd6eaf389e/spec/doMINO_aero_ctrl_safety_wrapper_spec.json",
+  "digital_spec_json_exists": true,
+  "spec_json_exists": true
+}

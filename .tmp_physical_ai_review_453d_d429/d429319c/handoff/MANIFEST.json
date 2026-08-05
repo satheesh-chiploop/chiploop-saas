@@ -1,0 +1,89 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "doMINO_aero_ctrl_safety_wrapper",
+  "generated_at": "2026-08-05T06:07:36.166214",
+  "file_count": 16,
+  "files": [
+    {
+      "path": "docs/arch/digital_architecture.json",
+      "sha256": "204e98cd9d0c8632d0eb262802e34ec16c948bc19fcdde13ec5e8d4373b08eb4",
+      "bytes": 10565
+    },
+    {
+      "path": "docs/microarch/digital_microarchitecture.json",
+      "sha256": "1692147aaa985d9d7b27b0cb8b6f4cbd00d16f0574e93c60f2cb902c6d1a9254",
+      "bytes": 6634
+    },
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "b68834d938c77a7f45ec63413eddd98d686fbd1420b35c500ce5787417a1d0dc",
+      "bytes": 30719
+    },
+    {
+      "path": "docs/regmap/digital_regmap_raw_output.txt",
+      "sha256": "ab40573380ac69401f3f7a601d1423d0230d747a56b9d88da54978e8bf2d13d2",
+      "bytes": 19455
+    },
+    {
+      "path": "docs/spec/doMINO_aero_ctrl_safety_wrapper_spec.json",
+      "sha256": "e28c3f5afbfcccef6fc6ecfb7554a25cb0da382fc7b725d27829bef8a8e7f9e2",
+      "bytes": 8782
+    },
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "f292112daeaf0e003fe6b0cdb27e69e3458e073938cf1e665494c9846d5e7c6f",
+      "bytes": 11243
+    },
+    {
+      "path": "docs/spec/spec_agent_normalized.json",
+      "sha256": "e28c3f5afbfcccef6fc6ecfb7554a25cb0da382fc7b725d27829bef8a8e7f9e2",
+      "bytes": 8782
+    },
+    {
+      "path": "misc/power_intent_findings.json",
+      "sha256": "17465502e6f6d02617f8974d14e9c656184277e3e12bd4e9f9af5fdb0bd7afd9",
+      "bytes": 309
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "d3b2def608ea4be979bc29dfca497347b54b7195fbdf333dbbb75f8163fe0f37",
+      "bytes": 447
+    },
+    {
+      "path": "misc/rtl_agent_preflight.json",
+      "sha256": "99937b6da98ffd0ff8ddc563dbef85e1abc5b4dbb510debbfd7564da97b168df",
+      "bytes": 242
+    },
+    {
+      "path": "misc/tool_execution_summary.json",
+      "sha256": "80a1aa58e598819ac085783f651608de12b145aaeafeb7f8cc53c28f811f6552",
+      "bytes": 7752
+    },
+    {
+      "path": "misc/tool_profile_used.json",
+      "sha256": "11c75a5525cc3d922151609681da6a98cb0ec7e5813c53bc742f9d3356b6d4d8",
+      "bytes": 1101
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "90401dddccdb68bd6a0ffd1a53c9418d745eaac6330272530a07846cf8a5682b",
+      "bytes": 2221
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "a071cfab6d7a1903b9ad747635fe188e80baa926001226697bf41ab55a5fa21f",
+      "bytes": 776
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "052573e40dbeb7d7c48c1d3b4ae87b0a8bed78dcea54c2bde501ec8574d51bad",
+      "bytes": 352
+    },
+    {
+      "path": "rtl/doMINO_aero_ctrl_safety_wrapper.v",
+      "sha256": "03e2176706d2899e041b80c9737a34b958ef66c8eabc0c94ee6fbc7780dacd5d",
+      "bytes": 14214
+    }
+  ]
+}

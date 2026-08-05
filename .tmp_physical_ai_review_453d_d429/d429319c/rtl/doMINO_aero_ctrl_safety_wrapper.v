@@ -1,0 +1,415 @@
+module doMINO_aero_ctrl_safety_wrapper (
+    clk,
+    reset_n,
+    vehicle_geometry_valid,
+    vehicle_geometry_id,
+    flow_conditions_valid,
+    stream_velocity_mps,
+    model_response_valid,
+    model_response_seq,
+    model_response_age,
+    drag_force_in,
+    lift_force_in,
+    surface_pressure_in,
+    flow_field_valid,
+    actuator_enable_in,
+    actuator_command_out,
+    actuator_command_valid,
+    fault_status_out,
+    fallback_active,
+    model_request_valid
+);
+
+input clk;
+input reset_n;
+input vehicle_geometry_valid;
+input [15:0] vehicle_geometry_id;
+input flow_conditions_valid;
+input [15:0] stream_velocity_mps;
+input model_response_valid;
+input [15:0] model_response_seq;
+input [15:0] model_response_age;
+input [31:0] drag_force_in;
+input [31:0] lift_force_in;
+input [31:0] surface_pressure_in;
+input flow_field_valid;
+input actuator_enable_in;
+
+output reg [63:0] actuator_command_out;
+output reg actuator_command_valid;
+output reg [7:0] fault_status_out;
+output reg fallback_active;
+output reg model_request_valid;
+
+reg req_arm;
+reg fault_clear_req;
+reg slew_en;
+reg cfg_valid_only;
+
+reg [15:0] fresh_thr_reg;
+reg [15:0] timeout_thr_reg;
+reg [63:0] clamp_min_reg;
+reg [63:0] clamp_max_reg;
+reg [63:0] slew_delta_reg;
+reg [63:0] fallback_cmd_reg;
+
+reg [15:0] req_seq_reg;
+reg [15:0] outstanding_age_reg;
+reg outstanding_req_reg;
+reg resp_match_reg;
+reg resp_complete_reg;
+reg resp_accepted_reg;
+reg req_issued_reg;
+reg flow_in_range_reg;
+reg geom_valid_reg;
+reg enable_in_reg;
+reg [15:0] resp_seq_shadow_reg;
+reg [15:0] resp_age_shadow_reg;
+reg [15:0] stream_vel_shadow_reg;
+reg [15:0] vehicle_geom_id_shadow_reg;
+
+reg invalid_input_sticky_reg;
+reg stale_response_sticky_reg;
+reg timeout_sticky_reg;
+reg clamp_active_sticky_reg;
+reg response_missing_sticky_reg;
+reg fallback_active_reg;
+
+reg [63:0] prev_command_reg;
+reg [2:0] state_reg;
+reg [2:0] state_next;
+reg [7:0] fault_status_next;
+reg [63:0] command_next;
+reg command_valid_next;
+reg fallback_active_next;
+reg model_request_valid_next;
+reg [15:0] req_seq_next;
+reg [15:0] outstanding_age_next;
+reg outstanding_req_next;
+reg resp_match_next;
+reg resp_complete_next;
+reg resp_accepted_next;
+reg req_issued_next;
+reg flow_in_range_next;
+reg geom_valid_next;
+reg enable_in_next;
+reg [15:0] resp_seq_shadow_next;
+reg [15:0] resp_age_shadow_next;
+reg [15:0] stream_vel_shadow_next;
+reg [15:0] vehicle_geom_id_shadow_next;
+
+reg invalid_input_sticky_next;
+reg stale_response_sticky_next;
+reg timeout_sticky_next;
+reg clamp_active_sticky_next;
+reg response_missing_sticky_next;
+
+reg [63:0] candidate_command;
+reg [63:0] clamped_command;
+reg [63:0] slew_command;
+reg [63:0] delta_abs;
+reg [63:0] fallback_cmd_local;
+reg [63:0] clamp_min_local;
+reg [63:0] clamp_max_local;
+reg [63:0] slew_delta_local;
+reg [15:0] fresh_thr_local;
+reg [15:0] timeout_thr_local;
+reg [15:0] outstanding_age_inc;
+reg [15:0] response_age_limit;
+reg [15:0] response_seq_sample;
+reg [15:0] req_seq_inc;
+reg response_complete_cond;
+reg response_match_cond;
+reg response_stale_cond;
+reg response_missing_cond;
+reg request_allowed_cond;
+reg flow_in_range_cond;
+reg geom_valid_cond;
+reg enable_in_cond;
+reg request_timeout_cond;
+reg clamp_low_cond;
+reg clamp_high_cond;
+reg use_surface_pressure_cond;
+reg use_flow_field_cond;
+reg acceptable_response_cond;
+reg request_issue_cond;
+reg clear_faults_cond;
+reg req_arm_consumed;
+
+localparam [2:0] ST_IDLE = 3'd0;
+localparam [2:0] ST_REQUEST_SENT = 3'd1;
+localparam [2:0] ST_WAIT_RESPONSE = 3'd2;
+localparam [2:0] ST_VALIDATE_RESPONSE = 3'd3;
+localparam [2:0] ST_APPLY_CLAMP = 3'd4;
+localparam [2:0] ST_OUTPUT = 3'd5;
+localparam [2:0] ST_FALLBACK = 3'd6;
+
+always @(*) begin
+    state_next = state_reg;
+    fault_status_next = 8'b00000000;
+    command_next = fallback_cmd_reg;
+    command_valid_next = 1'b0;
+    fallback_active_next = 1'b1;
+    model_request_valid_next = 1'b0;
+
+    req_seq_next = req_seq_reg;
+    outstanding_age_next = outstanding_age_reg;
+    outstanding_req_next = outstanding_req_reg;
+    resp_match_next = 1'b0;
+    resp_complete_next = 1'b0;
+    resp_accepted_next = 1'b0;
+    req_issued_next = 1'b0;
+    flow_in_range_next = flow_in_range_reg;
+    geom_valid_next = geom_valid_reg;
+    enable_in_next = enable_in_reg;
+    resp_seq_shadow_next = resp_seq_shadow_reg;
+    resp_age_shadow_next = resp_age_shadow_reg;
+    stream_vel_shadow_next = stream_vel_shadow_reg;
+    vehicle_geom_id_shadow_next = vehicle_geom_id_shadow_reg;
+
+    invalid_input_sticky_next = invalid_input_sticky_reg;
+    stale_response_sticky_next = stale_response_sticky_reg;
+    timeout_sticky_next = timeout_sticky_reg;
+    clamp_active_sticky_next = clamp_active_sticky_reg;
+    response_missing_sticky_next = response_missing_sticky_reg;
+
+    fallback_cmd_local = fallback_cmd_reg;
+    clamp_min_local = clamp_min_reg;
+    clamp_max_local = clamp_max_reg;
+    slew_delta_local = slew_delta_reg;
+    fresh_thr_local = fresh_thr_reg;
+    timeout_thr_local = timeout_thr_reg;
+    req_arm_consumed = 1'b0;
+    clear_faults_cond = fault_clear_req;
+
+    flow_in_range_cond = flow_conditions_valid & (stream_velocity_mps >= 16'd20) & (stream_velocity_mps <= 16'd55);
+    geom_valid_cond = vehicle_geometry_valid;
+    enable_in_cond = actuator_enable_in;
+    request_allowed_cond = geom_valid_cond & flow_in_range_cond & enable_in_cond & cfg_valid_only;
+    response_match_cond = model_response_valid & outstanding_req_reg & (model_response_seq == req_seq_reg);
+    response_complete_cond = model_response_valid & (drag_force_in[31:0] == drag_force_in[31:0]) & (lift_force_in[31:0] == lift_force_in[31:0]);
+    use_surface_pressure_cond = 1'b1;
+    use_flow_field_cond = flow_field_valid;
+    response_complete_cond = response_complete_cond & (use_surface_pressure_cond | use_flow_field_cond);
+    response_stale_cond = model_response_valid & (model_response_age > fresh_thr_local);
+    response_missing_cond = outstanding_req_reg & (~model_response_valid);
+    request_timeout_cond = outstanding_req_reg & (outstanding_age_reg >= timeout_thr_local);
+    acceptable_response_cond = response_match_cond & response_complete_cond & (~response_stale_cond) & (~response_missing_cond) & (~request_timeout_cond);
+
+    candidate_command = {vehicle_geometry_id, stream_velocity_mps, model_response_seq, model_response_age};
+
+    if (candidate_command < clamp_min_local) begin
+        clamped_command = clamp_min_local;
+        clamp_low_cond = 1'b1;
+        clamp_high_cond = 1'b0;
+    end else if (candidate_command > clamp_max_local) begin
+        clamped_command = clamp_max_local;
+        clamp_low_cond = 1'b0;
+        clamp_high_cond = 1'b1;
+    end else begin
+        clamped_command = candidate_command;
+        clamp_low_cond = 1'b0;
+        clamp_high_cond = 1'b0;
+    end
+
+    delta_abs = (clamped_command >= prev_command_reg) ? (clamped_command - prev_command_reg) : (prev_command_reg - clamped_command);
+    if (slew_en && (delta_abs > slew_delta_local)) begin
+        if (clamped_command >= prev_command_reg) begin
+            slew_command = prev_command_reg + slew_delta_local;
+        end else begin
+            slew_command = prev_command_reg - slew_delta_local;
+        end
+    end else begin
+        slew_command = clamped_command;
+    end
+
+    if (clear_faults_cond) begin
+        invalid_input_sticky_next = 1'b0;
+        stale_response_sticky_next = 1'b0;
+        timeout_sticky_next = 1'b0;
+        clamp_active_sticky_next = 1'b0;
+        response_missing_sticky_next = 1'b0;
+    end
+
+    if (~request_allowed_cond) begin
+        invalid_input_sticky_next = invalid_input_sticky_next | (~geom_valid_cond | ~flow_in_range_cond | ~enable_in_cond);
+    end
+
+    if (request_timeout_cond) begin
+        timeout_sticky_next = 1'b1;
+        response_missing_sticky_next = 1'b1;
+    end
+
+    if (response_stale_cond) begin
+        stale_response_sticky_next = 1'b1;
+    end
+
+    if (clamp_low_cond | clamp_high_cond) begin
+        clamp_active_sticky_next = 1'b1;
+    end
+
+    if (response_missing_cond) begin
+        response_missing_sticky_next = 1'b1;
+    end
+
+    case (state_reg)
+        ST_IDLE: begin
+            fallback_active_next = 1'b1;
+            if (req_arm & request_allowed_cond & (~outstanding_req_reg)) begin
+                model_request_valid_next = 1'b1;
+                req_issued_next = 1'b1;
+                outstanding_req_next = 1'b1;
+                outstanding_age_next = 16'd0;
+                req_seq_next = req_seq_reg + 16'd1;
+                state_next = ST_REQUEST_SENT;
+                fallback_active_next = 1'b1;
+                req_arm_consumed = 1'b1;
+            end else if (~request_allowed_cond) begin
+                state_next = ST_FALLBACK;
+            end
+        end
+        ST_REQUEST_SENT: begin
+            fallback_active_next = 1'b1;
+            state_next = ST_WAIT_RESPONSE;
+        end
+        ST_WAIT_RESPONSE: begin
+            fallback_active_next = 1'b1;
+            if (request_timeout_cond) begin
+                state_next = ST_FALLBACK;
+                outstanding_req_next = 1'b0;
+            end else if (model_response_valid) begin
+                state_next = ST_VALIDATE_RESPONSE;
+                resp_seq_shadow_next = model_response_seq;
+                resp_age_shadow_next = model_response_age;
+                stream_vel_shadow_next = stream_velocity_mps;
+                vehicle_geom_id_shadow_next = vehicle_geometry_id;
+                resp_match_next = response_match_cond;
+                resp_complete_next = response_complete_cond;
+            end
+        end
+        ST_VALIDATE_RESPONSE: begin
+            fallback_active_next = 1'b1;
+            if (acceptable_response_cond) begin
+                state_next = ST_APPLY_CLAMP;
+                resp_accepted_next = 1'b1;
+            end else begin
+                state_next = ST_FALLBACK;
+            end
+        end
+        ST_APPLY_CLAMP: begin
+            fallback_active_next = 1'b0;
+            command_next = slew_command;
+            state_next = ST_OUTPUT;
+        end
+        ST_OUTPUT: begin
+            fallback_active_next = 1'b0;
+            command_next = slew_command;
+            command_valid_next = 1'b1;
+            outstanding_req_next = 1'b0;
+            state_next = ST_IDLE;
+        end
+        default: begin
+            fallback_active_next = 1'b1;
+            state_next = ST_FALLBACK;
+        end
+    endcase
+
+    if (state_reg == ST_FALLBACK) begin
+        fallback_active_next = 1'b1;
+        command_next = fallback_cmd_local;
+        command_valid_next = 1'b0;
+        outstanding_req_next = 1'b0;
+        state_next = ST_IDLE;
+    end
+
+    fault_status_next[0] = invalid_input_sticky_next;
+    fault_status_next[1] = stale_response_sticky_next;
+    fault_status_next[2] = timeout_sticky_next;
+    fault_status_next[3] = clamp_active_sticky_next;
+    fault_status_next[4] = fallback_active_next;
+    fault_status_next[5] = response_missing_sticky_next;
+    fault_status_next[6] = outstanding_req_next;
+    fault_status_next[7] = command_valid_next;
+
+    if (cfg_valid_only & (~enable_in_cond)) begin
+        command_valid_next = 1'b0;
+        fallback_active_next = 1'b1;
+    end
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        req_arm <= 1'b0;
+        fault_clear_req <= 1'b0;
+        slew_en <= 1'b0;
+        cfg_valid_only <= 1'b1;
+        fresh_thr_reg <= 16'd16;
+        timeout_thr_reg <= 16'd32;
+        clamp_min_reg <= 64'd0;
+        clamp_max_reg <= 64'h00000000FFFFFFFF;
+        slew_delta_reg <= 64'd0;
+        fallback_cmd_reg <= 64'd0;
+        req_seq_reg <= 16'd0;
+        outstanding_age_reg <= 16'd0;
+        outstanding_req_reg <= 1'b0;
+        resp_match_reg <= 1'b0;
+        resp_complete_reg <= 1'b0;
+        resp_accepted_reg <= 1'b0;
+        req_issued_reg <= 1'b0;
+        flow_in_range_reg <= 1'b0;
+        geom_valid_reg <= 1'b0;
+        enable_in_reg <= 1'b0;
+        resp_seq_shadow_reg <= 16'd0;
+        resp_age_shadow_reg <= 16'd0;
+        stream_vel_shadow_reg <= 16'd0;
+        vehicle_geom_id_shadow_reg <= 16'd0;
+        invalid_input_sticky_reg <= 1'b0;
+        stale_response_sticky_reg <= 1'b0;
+        timeout_sticky_reg <= 1'b0;
+        clamp_active_sticky_reg <= 1'b0;
+        response_missing_sticky_reg <= 1'b0;
+        fallback_active_reg <= 1'b1;
+        prev_command_reg <= 64'd0;
+        state_reg <= ST_IDLE;
+        actuator_command_out <= 64'd0;
+        actuator_command_valid <= 1'b0;
+        fault_status_out <= 8'h10;
+        fallback_active <= 1'b1;
+        model_request_valid <= 1'b0;
+    end else begin
+        req_arm <= vehicle_geometry_valid & flow_conditions_valid & (stream_velocity_mps >= 16'd20) & (stream_velocity_mps <= 16'd55) & actuator_enable_in;
+        fault_clear_req <= 1'b0;
+        slew_en <= slew_en;
+        cfg_valid_only <= cfg_valid_only;
+
+        req_seq_reg <= req_seq_next;
+        outstanding_age_reg <= outstanding_age_next + 16'd1;
+        outstanding_req_reg <= outstanding_req_next;
+        resp_match_reg <= resp_match_next;
+        resp_complete_reg <= resp_complete_next;
+        resp_accepted_reg <= resp_accepted_next;
+        req_issued_reg <= req_issued_next;
+        flow_in_range_reg <= flow_in_range_cond;
+        geom_valid_reg <= geom_valid_cond;
+        enable_in_reg <= enable_in_cond;
+        resp_seq_shadow_reg <= resp_seq_shadow_next;
+        resp_age_shadow_reg <= resp_age_shadow_next;
+        stream_vel_shadow_reg <= stream_vel_shadow_next;
+        vehicle_geom_id_shadow_reg <= vehicle_geom_id_shadow_next;
+        invalid_input_sticky_reg <= invalid_input_sticky_next;
+        stale_response_sticky_reg <= stale_response_sticky_next;
+        timeout_sticky_reg <= timeout_sticky_next;
+        clamp_active_sticky_reg <= clamp_active_sticky_next;
+        response_missing_sticky_reg <= response_missing_sticky_next;
+        fallback_active_reg <= fallback_active_next;
+        prev_command_reg <= command_next;
+        state_reg <= state_next;
+        actuator_command_out <= command_next;
+        actuator_command_valid <= command_valid_next;
+        fault_status_out <= fault_status_next;
+        fallback_active <= fallback_active_next;
+        model_request_valid <= model_request_valid_next;
+    end
+end
+
+endmodule

@@ -1,0 +1,180 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "top_module": "doMINO_aero_ctrl_safety_wrapper",
+  "design_summary": {
+    "purpose": "Synthesizable ASIC safety wrapper that manages deterministic control, request sequencing, freshness checking, clamp and optional slew limiting, fallback management, and fault supervision around an external DoMINO aero model service. The block does not implement the physics surrogate model, does not invent surrogate outputs, and only converts validated external model responses plus local policy inputs into bounded actuator commands or safe fallback commands.",
+    "operating_model": "Single-clock synchronous logic on clk with active-low reset_n. The wrapper accepts geometry and flow metadata, issues a request strobe to an external model orchestration layer, tracks outstanding request sequence state, validates model response completeness and freshness, then either applies deterministic fixed-point command fusion with saturation and optional slew limiting or remains in fallback. All behavior is deterministic and synthesizable, with no floating-point, dynamic memory, unbounded loops, or software dependency.",
+    "external_interfaces": [
+      {
+        "direction": "input",
+        "name": "clk",
+        "width": 1,
+        "intent": "Primary synchronous clock."
+      },
+      {
+        "direction": "input",
+        "name": "reset_n",
+        "width": 1,
+        "intent": "Active-low reset that initializes safe fallback and clears tracked request/response state and sticky faults."
+      },
+      {
+        "direction": "input",
+        "name": "vehicle_geometry_valid",
+        "width": 1,
+        "intent": "Qualifies geometry metadata for request acceptance."
+      },
+      {
+        "direction": "input",
+        "name": "vehicle_geometry_id",
+        "width": 16,
+        "intent": "Geometry identifier or descriptor handle used only as validated request metadata."
+      },
+      {
+        "direction": "input",
+        "name": "flow_conditions_valid",
+        "width": 1,
+        "intent": "Qualifies flow condition metadata for request acceptance."
+      },
+      {
+        "direction": "input",
+        "name": "stream_velocity_mps",
+        "width": 16,
+        "intent": "Fixed-point stream velocity used for envelope validation and request packaging."
+      },
+      {
+        "direction": "input",
+        "name": "model_response_valid",
+        "width": 1,
+        "intent": "Indicates an external model response candidate is present."
+      },
+      {
+        "direction": "input",
+        "name": "model_response_seq",
+        "width": 16,
+        "intent": "Response sequence tag checked against the outstanding request sequence."
+      },
+      {
+        "direction": "input",
+        "name": "model_response_age",
+        "width": 16,
+        "intent": "Response age compared against the programmable freshness threshold."
+      },
+      {
+        "direction": "input",
+        "name": "drag_force_in",
+        "width": 32,
+        "intent": "Validated model response input used only after completeness and freshness checks."
+      },
+      {
+        "direction": "input",
+        "name": "lift_force_in",
+        "width": 32,
+        "intent": "Validated model response input used only after completeness and freshness checks."
+      },
+      {
+        "direction": "input",
+        "name": "surface_pressure_in",
+        "width": 32,
+        "intent": "Optional validated model response input used per integration configuration."
+      },
+      {
+        "direction": "input",
+        "name": "flow_field_valid",
+        "width": 1,
+        "intent": "Alternative completeness qualifier depending on integration configuration."
+      },
+      {
+        "direction": "input",
+        "name": "actuator_enable_in",
+        "width": 1,
+        "intent": "Local enable that can force fallback when deasserted."
+      },
+      {
+        "direction": "output",
+        "name": "actuator_command_out",
+        "width": 64,
+        "intent": "Bounded actuator command vector, saturated before valid assertion."
+      },
+      {
+        "direction": "output",
+        "name": "actuator_command_valid",
+        "width": 1,
+        "intent": "One-cycle or registered valid indicator asserted only after all safety checks and clamp processing complete."
+      },
+      {
+        "direction": "output",
+        "name": "fault_status_out",
+        "width": 8,
+        "intent": "Packed fault/status summary including invalid_input, stale_response, timeout, clamp_active, fallback_active, and response_missing at minimum."
+      },
+      {
+        "direction": "output",
+        "name": "fallback_active",
+        "width": 1,
+        "intent": "Indicates predefined safe fallback command selection is active."
+      },
+      {
+        "direction": "output",
+        "name": "model_request_valid",
+        "width": 1,
+        "intent": "Request strobe/registered handshake to external orchestration for the DoMINO model service."
+      }
+    ]
+  },
+  "module_architecture": {
+    "name": "doMINO_aero_ctrl_safety_wrapper",
+    "role": "Top-level flat safety/control wrapper around an external aero model service.",
+    "responsibilities": [
+      "Initialize to safe fallback mode on reset.",
+      "Validate geometry presence and flow envelope before allowing request issuance.",
+      "Generate deterministic request sequencing and hold off new requests while a previous request is outstanding.",
+      "Reject stale, missing, incomplete, invalid, or mismatched responses.",
+      "Apply deterministic local fusion and policy logic only after validated response completeness.",
+      "Saturate actuator commands to configured clamp bounds before asserting valid.",
+      "Optionally apply slew-rate limiting using registered previous-command state and bounded per-cycle delta.",
+      "Maintain sticky fault reporting and fallback indication.",
+      "Remain safe under model unavailability, latency, or remote worker execution.",
+      "Never assert actuator_command_valid from model_response_valid alone."
+    ],
+    "interface_notes": [
+      "All listed ports are externally visible and must be preserved as defined in the source specification.",
+      "model_request_valid is an outbound request indicator only; it does not imply model availability or response acceptance.",
+      "fault_status_out is a packed status vector with at least the required fault and fallback indicators encoded.",
+      "The block operates with registered handshake behavior on external interfaces and enable-qualified state updates suitable for ASIC synthesis."
+    ],
+    "ownership_notes": [
+      "Request acceptance depends on vehicle_geometry_valid, vehicle_geometry_id as metadata, flow_conditions_valid, and stream_velocity_mps being within the inclusive 20 to 55 m/s envelope.",
+      "Response ownership is associated with an internal outstanding request sequence counter and freshness threshold.",
+      "Command ownership remains local and deterministic; the external model provides only validated data inputs, not direct commands.",
+      "Fallback command values and clamp/rate parameters are synthesizable configuration points or small CSR-like registers consistent with ASIC integration."
+    ]
+  },
+  "data_flow_summary": [
+    "vehicle_geometry_valid and vehicle_geometry_id are validated as request metadata before any request is emitted.",
+    "flow_conditions_valid and stream_velocity_mps are checked against the 20 to 55 m/s inclusive envelope; out-of-range values force fallback and fault assertion.",
+    "When geometry and flow inputs are accepted and no request is outstanding, model_request_valid is generated to request external DoMINO processing.",
+    "The wrapper retains a request sequence counter and compares model_response_seq against the outstanding request; unmatched or stale responses are rejected.",
+    "model_response_age is compared to a programmable freshness threshold; excessive age causes stale handling and fallback.",
+    "drag_force_in, lift_force_in, and either surface_pressure_in or flow_field_valid, per integration configuration, must indicate completeness before command generation can proceed.",
+    "Validated response data and local policy inputs feed deterministic fixed-point fusion logic; no physics surrogate is computed internally.",
+    "Generated command vectors pass through compare-and-saturate clamp logic and optional slew-rate limiting before actuator_command_valid can assert.",
+    "When responses are stale, incomplete, invalid, missing, out of sequence, out of freshness threshold, or actuator_enable_in is deasserted, the wrapper selects fallback command behavior and suppresses valid output.",
+    "Sticky faults capture invalid_input, stale_response, timeout, clamp_active, fallback_active, and response_missing conditions, with reset-clearing behavior."
+  ],
+  "clock_reset_summary": {
+    "clocking": "Single synchronous clock domain on clk. State updates are synchronous and may be enable-qualified in a synthesis-safe manner consistent with clock-gating insertion requirements. No separate asynchronous clock domains are defined.",
+    "reset_behavior": "On reset_n deassertion, the wrapper enters safe fallback mode, clears request sequence and outstanding request tracking, clears response acceptance state, deasserts actuator_command_valid and model_request_valid, asserts fallback_active, initializes previous-command state for slew limiting to deterministic fallback defaults, and clears sticky fault bits to their reset defaults."
+  },
+  "integration_notes": [
+    "The wrapper is compatible with remote DoMINO execution on NIM or GPU workers and must tolerate model unavailability without loss of safe control.",
+    "The model service is external to this block; this wrapper only manages request sequencing, response qualification, and downstream actuator command safety.",
+    "Parameterization for freshness threshold, clamp limits, optional rate limits, and fallback command vector shall be provided as synthesis-time parameters or small CSR-like configuration inputs suitable for ASIC integration.",
+    "All arithmetic, compare, saturate, freshness, and sequence logic must remain fixed-point and synthesizable.",
+    "If inference is not executed or no valid response is present, the wrapper remains in fallback and does not synthesize surrogate outputs."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "Hierarchy, ports, and filenames are inherited from digital_spec_json."
+  ]
+}

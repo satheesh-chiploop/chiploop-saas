@@ -1,0 +1,16 @@
+{
+  "domains": [
+    {
+      "name": "PD_TOP",
+      "elements": [
+        "doMINO_aero_ctrl_safety_wrapper"
+      ],
+      "primary_power_net": "VDD",
+      "primary_ground_net": "VSS"
+    }
+  ],
+  "isolation": [],
+  "retention": [],
+  "spec_mode": "flat",
+  "top_module": "doMINO_aero_ctrl_safety_wrapper"
+}

@@ -1,0 +1,939 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "partial",
+  "summary": {
+    "checked": 48,
+    "matched": 37,
+    "partial": 0,
+    "missing": 11,
+    "inconclusive": 0
+  },
+  "setup_issues": [],
+  "top_module": {
+    "expected": "doMINO_aero_ctrl_safety_wrapper",
+    "modules_found": [
+      "doMINO_aero_ctrl_safety_wrapper"
+    ],
+    "status": "pass"
+  },
+  "interface": {
+    "status": "pass",
+    "expected_ports": [
+      "actuator_command_out",
+      "actuator_command_valid",
+      "actuator_enable_in",
+      "clk",
+      "drag_force_in",
+      "fallback_active",
+      "fault_status_out",
+      "flow_conditions_valid",
+      "flow_field_valid",
+      "lift_force_in",
+      "model_request_valid",
+      "model_response_age",
+      "model_response_seq",
+      "model_response_valid",
+      "reset_n",
+      "stream_velocity_mps",
+      "surface_pressure_in",
+      "vehicle_geometry_id",
+      "vehicle_geometry_valid"
+    ],
+    "matched_ports": [
+      "actuator_command_out",
+      "actuator_command_valid",
+      "actuator_enable_in",
+      "clk",
+      "drag_force_in",
+      "fallback_active",
+      "fault_status_out",
+      "flow_conditions_valid",
+      "flow_field_valid",
+      "lift_force_in",
+      "model_request_valid",
+      "model_response_age",
+      "model_response_seq",
+      "model_response_valid",
+      "reset_n",
+      "stream_velocity_mps",
+      "surface_pressure_in",
+      "vehicle_geometry_id",
+      "vehicle_geometry_valid"
+    ],
+    "missing_ports": [],
+    "rtl_ports": [
+      "actuator_command_out",
+      "actuator_command_valid",
+      "actuator_enable_in",
+      "clk",
+      "drag_force_in",
+      "fallback_active",
+      "fault_status_out",
+      "flow_conditions_valid",
+      "flow_field_valid",
+      "lift_force_in",
+      "model_request_valid",
+      "model_response_age",
+      "model_response_seq",
+      "model_response_valid",
+      "reset_n",
+      "stream_velocity_mps",
+      "surface_pressure_in",
+      "vehicle_geometry_id",
+      "vehicle_geometry_valid"
+    ]
+  },
+  "register_map": {
+    "expected": [
+      "CFG_FRESH_THR_H",
+      "CFG_FRESH_THR_L",
+      "CFG_TIMEOUT_H",
+      "CFG_TIMEOUT_L",
+      "CFG_VALID_ONLY",
+      "CLAMP_ACTIVE",
+      "CLAMP_MAX0",
+      "CLAMP_MAX1",
+      "CLAMP_MAX2",
+      "CLAMP_MAX3",
+      "CLAMP_MAX4",
+      "CLAMP_MAX5",
+      "CLAMP_MAX6",
+      "CLAMP_MAX7",
+      "CLAMP_MIN0",
+      "CLAMP_MIN1",
+      "CLAMP_MIN2",
+      "CLAMP_MIN3",
+      "CLAMP_MIN4",
+      "CLAMP_MIN5",
+      "CLAMP_MIN6",
+      "CLAMP_MIN7",
+      "CLEAR_ALL_STICKY",
+      "COMMAND_VALID",
+      "ENABLE_IN",
+      "FALLBACK_ACTIVE",
+      "FALLBACK_CMD0",
+      "FALLBACK_CMD1",
+      "FALLBACK_CMD2",
+      "FALLBACK_CMD3",
+      "FALLBACK_CMD4",
+      "FALLBACK_CMD5",
+      "FALLBACK_CMD6",
+      "FALLBACK_CMD7",
+      "FAULT_CLEAR",
+      "FLOW_IN_RANGE",
+      "GEOM_VALID",
+      "INVALID_INPUT",
+      "OUTSTANDING_REQ",
+      "REQ_ARM",
+      "REQ_ISSUED",
+      "REQ_SEQ_H",
+      "REQ_SEQ_L",
+      "RESPONSE_MISSING",
+      "RESP_ACCEPTED",
+      "RESP_AGE_H",
+      "RESP_AGE_L",
+      "RESP_COMPLETE",
+      "RESP_MATCH",
+      "RESP_SEQ_H",
+      "RESP_SEQ_L",
+      "SLEW_DELTA0",
+      "SLEW_DELTA1",
+      "SLEW_DELTA2",
+      "SLEW_DELTA3",
+      "SLEW_DELTA4",
+      "SLEW_DELTA5",
+      "SLEW_DELTA6",
+      "SLEW_DELTA7",
+      "SLEW_EN",
+      "STALE_RESPONSE",
+      "STREAM_VEL_H",
+      "STREAM_VEL_L",
+      "TIMEOUT",
+      "VEH_GEOM_ID_H",
+      "VEH_GEOM_ID_L"
+    ],
+    "matched": [
+      "CFG_VALID_ONLY",
+      "CLAMP_ACTIVE",
+      "COMMAND_VALID",
+      "ENABLE_IN",
+      "FALLBACK_ACTIVE",
+      "FAULT_CLEAR",
+      "FLOW_IN_RANGE",
+      "GEOM_VALID",
+      "INVALID_INPUT",
+      "OUTSTANDING_REQ",
+      "REQ_ARM",
+      "REQ_ISSUED",
+      "RESPONSE_MISSING",
+      "RESP_ACCEPTED",
+      "RESP_AGE_H",
+      "RESP_AGE_L",
+      "RESP_COMPLETE",
+      "RESP_MATCH",
+      "RESP_SEQ_H",
+      "RESP_SEQ_L",
+      "SLEW_EN",
+      "STALE_RESPONSE",
+      "STREAM_VEL_H",
+      "STREAM_VEL_L",
+      "TIMEOUT",
+      "VEH_GEOM_ID_H",
+      "VEH_GEOM_ID_L"
+    ],
+    "expected_registers": [
+      "CFG_FRESH_THR_H",
+      "CFG_FRESH_THR_L",
+      "CFG_TIMEOUT_H",
+      "CFG_TIMEOUT_L",
+      "CLAMP_MAX0",
+      "CLAMP_MAX1",
+      "CLAMP_MAX2",
+      "CLAMP_MAX3",
+      "CLAMP_MAX4",
+      "CLAMP_MAX5",
+      "CLAMP_MAX6",
+      "CLAMP_MAX7",
+      "CLAMP_MIN0",
+      "CLAMP_MIN1",
+      "CLAMP_MIN2",
+      "CLAMP_MIN3",
+      "CLAMP_MIN4",
+      "CLAMP_MIN5",
+      "CLAMP_MIN6",
+      "CLAMP_MIN7",
+      "CTRL",
+      "FALLBACK_CMD0",
+      "FALLBACK_CMD1",
+      "FALLBACK_CMD2",
+      "FALLBACK_CMD3",
+      "FALLBACK_CMD4",
+      "FALLBACK_CMD5",
+      "FALLBACK_CMD6",
+      "FALLBACK_CMD7",
+      "FAULT_CLEAR_EVENT",
+      "REQ_SEQ_H",
+      "REQ_SEQ_L",
+      "RESP_AGE_H",
+      "RESP_AGE_L",
+      "RESP_SEQ_H",
+      "RESP_SEQ_L",
+      "SLEW_DELTA0",
+      "SLEW_DELTA1",
+      "SLEW_DELTA2",
+      "SLEW_DELTA3",
+      "SLEW_DELTA4",
+      "SLEW_DELTA5",
+      "SLEW_DELTA6",
+      "SLEW_DELTA7",
+      "STATUS0",
+      "STATUS1",
+      "STREAM_VEL_H",
+      "STREAM_VEL_L",
+      "VEH_GEOM_ID_H",
+      "VEH_GEOM_ID_L"
+    ],
+    "matched_registers": [
+      "CFG_FRESH_THR_L"
+    ],
+    "expected_addresses": [
+      "0x00",
+      "0x01",
+      "0x02",
+      "0x03",
+      "0x04",
+      "0x05",
+      "0x06",
+      "0x07",
+      "0x08",
+      "0x09",
+      "0x0A",
+      "0x0B",
+      "0x0C",
+      "0x0D",
+      "0x10",
+      "0x11",
+      "0x12",
+      "0x13",
+      "0x20",
+      "0x21",
+      "0x22",
+      "0x23",
+      "0x24",
+      "0x25",
+      "0x26",
+      "0x27",
+      "0x28",
+      "0x29",
+      "0x2A",
+      "0x2B",
+      "0x2C",
+      "0x2D",
+      "0x2E",
+      "0x2F",
+      "0x30",
+      "0x31",
+      "0x32",
+      "0x33",
+      "0x34",
+      "0x35",
+      "0x36",
+      "0x37",
+      "0x40",
+      "0x41",
+      "0x42",
+      "0x43",
+      "0x44",
+      "0x45",
+      "0x46",
+      "0x47"
+    ],
+    "matched_addresses": [
+      "0x10"
+    ],
+    "missing": [
+      "CFG_FRESH_THR_H",
+      "CFG_FRESH_THR_L",
+      "CFG_TIMEOUT_H",
+      "CFG_TIMEOUT_L",
+      "CLAMP_MAX0",
+      "CLAMP_MAX1",
+      "CLAMP_MAX2",
+      "CLAMP_MAX3",
+      "CLAMP_MAX4",
+      "CLAMP_MAX5",
+      "CLAMP_MAX6",
+      "CLAMP_MAX7",
+      "CLAMP_MIN0",
+      "CLAMP_MIN1",
+      "CLAMP_MIN2",
+      "CLAMP_MIN3",
+      "CLAMP_MIN4",
+      "CLAMP_MIN5",
+      "CLAMP_MIN6",
+      "CLAMP_MIN7",
+      "CLEAR_ALL_STICKY",
+      "FALLBACK_CMD0",
+      "FALLBACK_CMD1",
+      "FALLBACK_CMD2",
+      "FALLBACK_CMD3",
+      "FALLBACK_CMD4",
+      "FALLBACK_CMD5",
+      "FALLBACK_CMD6",
+      "FALLBACK_CMD7",
+      "REQ_SEQ_H",
+      "REQ_SEQ_L",
+      "SLEW_DELTA0",
+      "SLEW_DELTA1",
+      "SLEW_DELTA2",
+      "SLEW_DELTA3",
+      "SLEW_DELTA4",
+      "SLEW_DELTA5",
+      "SLEW_DELTA6",
+      "SLEW_DELTA7"
+    ],
+    "missing_registers": [
+      "CFG_FRESH_THR_H",
+      "CFG_TIMEOUT_H",
+      "CFG_TIMEOUT_L",
+      "CLAMP_MAX0",
+      "CLAMP_MAX1",
+      "CLAMP_MAX2",
+      "CLAMP_MAX3",
+      "CLAMP_MAX4",
+      "CLAMP_MAX5",
+      "CLAMP_MAX6",
+      "CLAMP_MAX7",
+      "CLAMP_MIN0",
+      "CLAMP_MIN1",
+      "CLAMP_MIN2",
+      "CLAMP_MIN3",
+      "CLAMP_MIN4",
+      "CLAMP_MIN5",
+      "CLAMP_MIN6",
+      "CLAMP_MIN7",
+      "CTRL",
+      "FALLBACK_CMD0",
+      "FALLBACK_CMD1",
+      "FALLBACK_CMD2",
+      "FALLBACK_CMD3",
+      "FALLBACK_CMD4",
+      "FALLBACK_CMD5",
+      "FALLBACK_CMD6",
+      "FALLBACK_CMD7",
+      "FAULT_CLEAR_EVENT",
+      "REQ_SEQ_H",
+      "REQ_SEQ_L",
+      "RESP_AGE_H",
+      "RESP_AGE_L",
+      "RESP_SEQ_H",
+      "RESP_SEQ_L",
+      "SLEW_DELTA0",
+      "SLEW_DELTA1",
+      "SLEW_DELTA2",
+      "SLEW_DELTA3",
+      "SLEW_DELTA4",
+      "SLEW_DELTA5",
+      "SLEW_DELTA6",
+      "SLEW_DELTA7",
+      "STATUS0",
+      "STATUS1",
+      "STREAM_VEL_H",
+      "STREAM_VEL_L",
+      "VEH_GEOM_ID_H",
+      "VEH_GEOM_ID_L"
+    ],
+    "missing_addresses": [
+      "0x00",
+      "0x01",
+      "0x02",
+      "0x03",
+      "0x04",
+      "0x05",
+      "0x06",
+      "0x07",
+      "0x08",
+      "0x09",
+      "0x0A",
+      "0x0B",
+      "0x0C",
+      "0x0D",
+      "0x11",
+      "0x12",
+      "0x13",
+      "0x20",
+      "0x21",
+      "0x22",
+      "0x23",
+      "0x24",
+      "0x25",
+      "0x26",
+      "0x27",
+      "0x28",
+      "0x29",
+      "0x2A",
+      "0x2B",
+      "0x2C",
+      "0x2D",
+      "0x2E",
+      "0x2F",
+      "0x30",
+      "0x31",
+      "0x32",
+      "0x33",
+      "0x34",
+      "0x35",
+      "0x36",
+      "0x37",
+      "0x40",
+      "0x41",
+      "0x42",
+      "0x43",
+      "0x44",
+      "0x45",
+      "0x46",
+      "0x47"
+    ],
+    "status": "issues"
+  },
+  "clock_reset": {
+    "clock_ports": [
+      "clk"
+    ],
+    "reset_ports": [
+      "reset_n"
+    ],
+    "status": "pass"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "requirement": "Initialize to safe fallback mode on reset.",
+      "status": "matched",
+      "evidence_tokens": [
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "requirement": "Validate flow envelope and geometry presence before allowing request issuance.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-003",
+      "requirement": "Generate deterministic request sequencing and hold off new requests while one is outstanding.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-004",
+      "requirement": "Reject stale, missing, incomplete, or mismatched responses.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-005",
+      "requirement": "Apply local deterministic fusion and policy logic only after validated response completeness.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-006",
+      "requirement": "Saturate actuator command outputs to programmable clamp bounds before asserting valid.",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_command_valid",
+        "command_next",
+        "command_valid_next"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "requirement": "Optionally apply slew-rate limiting using registered previous-command state and bounded deltas.",
+      "status": "matched",
+      "evidence_tokens": [
+        "command_next",
+        "slew_command",
+        "state_next"
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "requirement": "Provide sticky fault reporting with explicit clear on reset only in this contract.",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_status_next",
+        "reset_zero",
+        "internal_state_contract"
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "requirement": "Remain safe under model unavailability or remote worker latency.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-010",
+      "requirement": "Never assert actuator_command_valid from model_response_valid alone.",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_command_valid",
+        "model_response_valid"
+      ]
+    },
+    {
+      "id": "REQ-011",
+      "requirement": "The request state machine shall be synthesized from deterministic synchronous logic and may include states IDLE, REQUEST_SENT, WAIT_RESPONSE, VALIDATE_RESPONSE, APPLY_CLAMP, OUTPUT, and FALLBACK.",
+      "status": "matched",
+      "evidence_tokens": [
+        "state_next"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "requirement": "A flow_conditions_valid request may only be considered if stream_velocity_mps is within 20 to 55 m/s inclusive; otherwise invalid_input and out_of-envelope flow fault behavior shall be asserted and fallback forced.",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_conditions_valid",
+        "stream_velocity_mps",
+        "fault_status_next"
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "requirement": "A request shall not be reissued while a previous request is outstanding and unaccepted.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-014",
+      "requirement": "model_request_valid is a one-cycle strobe or registered handshake output and must not imply model availability or command validity.",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_valid",
+        "command_next"
+      ]
+    },
+    {
+      "id": "REQ-015",
+      "requirement": "model_response_valid alone shall never directly cause actuator_command_valid to assert.",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_valid",
+        "actuator_command_valid"
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "requirement": "A response is acceptable only if model_response_seq matches the outstanding request sequence, model_response_age is within the programmed freshness threshold, and the required response completeness condition is met.",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_seq",
+        "model_response_age"
+      ]
+    },
+    {
+      "id": "REQ-017",
+      "requirement": "Response completeness requires drag_force_in and lift_force_in valid, plus either surface_pressure_in or flow_field_valid depending on the configured integration mode; incomplete responses shall be rejected and force fallback.",
+      "status": "matched",
+      "evidence_tokens": [
+        "drag_force_in",
+        "lift_force_in",
+        "surface_pressure_in",
+        "flow_field_valid"
+      ]
+    },
+    {
+      "id": "REQ-018",
+      "requirement": "Deterministic aero decision fusion shall use only validated response data and local policy inputs, implemented in fixed-point combinational or pipelined logic.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-019",
+      "requirement": "All actuator_command_out values shall be clamped to configured min/max bounds before command valid is asserted.",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_command_out",
+        "clamped_command",
+        "command_next",
+        "command_valid_next"
+      ]
+    },
+    {
+      "id": "REQ-020",
+      "requirement": "If slew limiting is enabled, the command shall be rate-limited against the previous registered command using bounded per-cycle delta.",
+      "status": "matched",
+      "evidence_tokens": [
+        "command_next",
+        "slew_command"
+      ]
+    },
+    {
+      "id": "REQ-021",
+      "requirement": "fault_status_out shall encode at minimum invalid_input, stale_response, timeout, clamp_active, fallback_active, and response_missing status bits.",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_status_out",
+        "fallback_active"
+      ]
+    },
+    {
+      "id": "REQ-022",
+      "requirement": "Sticky fault bits shall be clearable only by reset or an explicit clear control if later added by integration; in this contract they are reset-cleared only.",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_status_next",
+        "reset_zero",
+        "internal_state_contract"
+      ]
+    },
+    {
+      "id": "REQ-023",
+      "requirement": "If inference is not executed or no valid response is present, the block shall remain in fallback mode and shall not synthesize surrogate outputs.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-024",
+      "requirement": "Clock gating insertion shall preserve functionality by keeping all state updates enable-qualified and synchronous to clk.",
+      "status": "matched",
+      "evidence_tokens": [
+        "clk",
+        "state_next"
+      ]
+    },
+    {
+      "id": "REQ-025",
+      "requirement": "The implementation shall tolerate remote DoMINO execution on NIM/GPU workers without loss of safe control.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-026",
+      "requirement": "All internal arithmetic, compares, saturates, freshness checks, and sequence checks shall be fixed-point and synthesizable.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-027",
+      "requirement": "actuator_command_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_command_out"
+      ]
+    },
+    {
+      "id": "REQ-028",
+      "requirement": "actuator_command_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_command_valid"
+      ]
+    },
+    {
+      "id": "REQ-029",
+      "requirement": "fault_status_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_status_out"
+      ]
+    },
+    {
+      "id": "REQ-030",
+      "requirement": "fallback_active",
+      "status": "matched",
+      "evidence_tokens": [
+        "fallback_active"
+      ]
+    },
+    {
+      "id": "REQ-031",
+      "requirement": "model_request_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_valid"
+      ]
+    },
+    {
+      "id": "REQ-032",
+      "requirement": "vehicle_geometry_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_valid"
+      ]
+    },
+    {
+      "id": "REQ-033",
+      "requirement": "vehicle_geometry_id",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_id"
+      ]
+    },
+    {
+      "id": "REQ-034",
+      "requirement": "flow_conditions_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_conditions_valid"
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "requirement": "stream_velocity_mps",
+      "status": "matched",
+      "evidence_tokens": [
+        "stream_velocity_mps"
+      ]
+    },
+    {
+      "id": "REQ-036",
+      "requirement": "model_response_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_valid"
+      ]
+    },
+    {
+      "id": "REQ-037",
+      "requirement": "model_response_seq",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_seq"
+      ]
+    },
+    {
+      "id": "REQ-038",
+      "requirement": "model_response_age",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_age"
+      ]
+    },
+    {
+      "id": "REQ-039",
+      "requirement": "drag_force_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "drag_force_in"
+      ]
+    },
+    {
+      "id": "REQ-040",
+      "requirement": "lift_force_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "lift_force_in"
+      ]
+    },
+    {
+      "id": "REQ-041",
+      "requirement": "surface_pressure_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "surface_pressure_in"
+      ]
+    },
+    {
+      "id": "REQ-042",
+      "requirement": "flow_field_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_field_valid"
+      ]
+    },
+    {
+      "id": "REQ-043",
+      "requirement": "actuator_enable_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_enable_in"
+      ]
+    },
+    {
+      "id": "REQ-044",
+      "requirement": "On reset_n deassertion, the block shall enter safe fallback mode, clear outstanding request tracking, clear request sequence state, clear response acceptance state, deassert actuator_command_valid, deassert model_request_valid, and drive fa",
+      "status": "matched",
+      "evidence_tokens": [
+        "reset_n",
+        "actuator_command_valid",
+        "model_request_valid",
+        "state_next",
+        "reset_zero"
+      ]
+    }
+  ],
+  "rtl_files": [
+    "backend/workflows/d429319c-00bc-498e-8a6f-0efd6eaf389e/rtl/doMINO_aero_ctrl_safety_wrapper.v"
+  ],
+  "modules": [
+    {
+      "name": "doMINO_aero_ctrl_safety_wrapper",
+      "file": "backend/workflows/d429319c-00bc-498e-8a6f-0efd6eaf389e/rtl/doMINO_aero_ctrl_safety_wrapper.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "vehicle_geometry_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "vehicle_geometry_id",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "flow_conditions_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "stream_velocity_mps",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "model_response_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_response_seq",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "model_response_age",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "drag_force_in",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "lift_force_in",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "surface_pressure_in",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "flow_field_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "actuator_enable_in",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "actuator_command_out",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "actuator_command_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_status_out",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_request_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}

@@ -1,0 +1,34 @@
+Design a synthesizable digital IP block named doMINO_aero_ctrl_safety_wrapper for ASIC implementation. The block shall not implement the physics surrogate model itself; it shall only manage deterministic control around an external DoMINO model service. The IP shall provide input/output ports for clock, active-low reset, vehicle_geometry_valid, vehicle_geometry_id or descriptor handle, flow_conditions_valid, stream_velocity_mps, model_response_valid, model_response_seq, model_response_age, drag_force_in, lift_force_in, surface_pressure_in, flow_field_valid, actuator_enable_in, and outputs actuator_command_out, actuator_command_valid, fault_status_out, fallback_active, and model_request_valid.
+
+Functional requirements:
+1) On reset, the IP shall initialize to safe fallback mode, clear all pending request/response state, deassert actuator_command_valid, and assert fallback_active until a valid operational state is established.
+2) The IP shall accept flow_conditions only when stream_velocity_mps is within the inclusive envelope 20 to 55 m/s. Out-of-range values shall assert fault_status_out and force fallback.
+3) The IP shall package validated geometry and flow condition metadata into a model_request packet interface for the external DoMINO service. The packetizer shall not create or assume physics outputs.
+4) The IP shall maintain a request sequence counter and a response sequence checker. Any response whose sequence does not match the outstanding request, or whose age exceeds a programmable freshness threshold, shall be treated as stale and rejected.
+5) The IP shall require response completeness: drag_force_in, lift_force_in, and either surface_pressure_in or flow_field_valid as defined by the integration configuration must be marked valid before any downstream command generation can occur.
+6) The IP shall implement deterministic aero decision fusion logic using only validated model responses and local control policy inputs. The exact control policy may be implemented as fixed-point combinational or pipelined logic, but must be fully synthesizable and must not depend on software execution.
+7) The IP shall implement command clamp logic with programmable minimum and maximum bounds for each actuator command dimension. All outputs shall be saturated to bounds before being marked valid.
+8) The IP shall implement optional slew-rate limiting, where configured, using registered previous-command state and bounded delta per cycle.
+9) The IP shall implement a safe fallback manager that selects a predefined command vector whenever model data are stale, invalid, incomplete, or when actuator_enable_in is deasserted. Fallback command values shall be registered constants or CSR-programmed values with deterministic reset defaults.
+10) The IP shall implement a fault and timeout supervisor that raises individual sticky bits for stale response, timeout, invalid geometry, out-of-envelope flow, clamp event, and fallback entry. Sticky bits shall be clearable only by reset or explicit clear control.
+11) The IP shall never directly drive actuator_command_valid from model_response_valid alone; command_valid shall be asserted only after all safety checks pass and clamping is complete.
+12) The IP shall provide backpressure-safe behavior to the external model interface, including request holdoff when a previous request is outstanding and a response has not yet been accepted.
+13) All internal arithmetic shall be fixed-point and synthesizable. No floating-point, dynamic memory, or unbounded loops are permitted.
+14) The IP shall support parameterization for request freshness threshold, command clamp limits, optional rate limits, and fallback command vector, all as static synthesis-time parameters or small CSR registers suitable for ASIC integration.
+15) The IP shall be clock-gated or enable-qualified only where synthesis-safe and must preserve functional correctness under clock gating insertion.
+16) The IP shall expose fault_status_out as a packed status vector encoding at minimum: invalid_input, stale_response, timeout, clamp_active, fallback_active, and response_missing.
+17) The IP shall be compatible with a higher-level architecture where the external DoMINO model may execute on a remote NIM or GPU worker. The IP must tolerate model unavailability without loss of safe control.
+18) If inference is not executed or no valid response is present, the IP shall remain in fallback mode and shall not invent or synthesize surrogate outputs.
+
+Microarchitecture guidance:
+- Use a request state machine with states IDLE, REQUEST_SENT, WAIT_RESPONSE, VALIDATE_RESPONSE, APPLY_CLAMP, OUTPUT, and FALLBACK.
+- Use registered handshake signals on all external interfaces.
+- Use compare-and-saturate units for clamp logic.
+- Use sticky fault registers and a separate clear path.
+- Use one-cycle valid strobes or ready/valid handshakes as appropriate for ASIC integration.
+- Use parameterized bit widths for command vector and status vector.
+
+Non-goals:
+- No implementation of the physics surrogate or GPU inference engine.
+- No training logic.
+- No floating-point model execution.

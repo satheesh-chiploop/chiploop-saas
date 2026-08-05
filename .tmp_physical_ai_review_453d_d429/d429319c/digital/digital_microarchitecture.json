@@ -1,0 +1,88 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "doMINO_aero_ctrl_safety_wrapper",
+  "module_microarchitecture": [
+    {
+      "name": "doMINO_aero_ctrl_safety_wrapper",
+      "implementation_style": "Single-clock synchronous ASIC safety wrapper with registered request/response tracking, fixed-point qualification, clamp/slew control, and fallback selection around an external DoMINO service.",
+      "control_strategy": "Use simple deterministic control gating: accept geometry/flow only when valid and in-envelope, issue at most one outstanding request, qualify responses by sequence and freshness, require completeness before command generation, then either apply local fixed-point policy, clamp, optional slew limit, and output valid, or force fallback and suppress valid.",
+      "state_strategy": "Maintain small registered state for reset-safe fallback indication, outstanding request sequence, request outstanding flag, response acceptance flag, freshness/timeout supervision, previous commanded value for optional slew limiting, and sticky fault bits. A compact request state machine may be used with the intent states IDLE, REQUEST_SENT, WAIT_RESPONSE, VALIDATE_RESPONSE, APPLY_CLAMP, OUTPUT, and FALLBACK, but only as a straightforward synchronous sequencing aid.",
+      "output_strategy": "Drive model_request_valid as a registered request strobe/handshake only when geometry and flow are qualified and no request is outstanding. Drive actuator_command_out from either validated-and-clamped model-derived command or registered fallback vector. Assert actuator_command_valid only after all safety checks, completeness checks, clamping, and any enabled slew limiting are complete. Encode fault_status_out as a packed sticky status vector including at minimum invalid_input, stale_response, timeout, clamp_active, fallback_active, and response_missing. Hold fallback_active high whenever control is not in a validated operational state.",
+      "ownership_notes": [
+        "The wrapper owns deterministic safety control only; it does not own the physics surrogate model or inference engine.",
+        "vehicle_geometry_id and stream_velocity_mps are treated strictly as request metadata and are never modified.",
+        "model_response_* inputs are sampled and checked, but no response input alone can authorize output validity.",
+        "Fallback command values and clamp/rate parameters are implementation-configurable but remain fixed-point and synthesizable.",
+        "All state updates are synchronous to clk and reset-safe under active-low reset_n."
+      ]
+    }
+  ],
+  "fsm_intent": {
+    "present": true,
+    "description": "A compact synchronous request/response sequencing intent is implied to manage one outstanding request, validate returned data, and select fallback when qualification fails. The FSM should remain minimal and deterministic, with no complex branching beyond request issue, wait, validate, clamp/output, and fallback handling.",
+    "states": [
+      "IDLE",
+      "REQUEST_SENT",
+      "WAIT_RESPONSE",
+      "VALIDATE_RESPONSE",
+      "APPLY_CLAMP",
+      "OUTPUT",
+      "FALLBACK"
+    ]
+  },
+  "datapath_intent": {
+    "inputs": [
+      "vehicle_geometry_valid",
+      "vehicle_geometry_id",
+      "flow_conditions_valid",
+      "stream_velocity_mps",
+      "model_response_valid",
+      "model_response_seq",
+      "model_response_age",
+      "drag_force_in",
+      "lift_force_in",
+      "surface_pressure_in",
+      "flow_field_valid",
+      "actuator_enable_in"
+    ],
+    "internal_storage": [
+      "registered outstanding request sequence counter",
+      "request outstanding flag",
+      "response accepted/qualified flag",
+      "freshness/timeout compare state",
+      "sticky fault bits",
+      "previous commanded vector for optional slew limiting",
+      "registered fallback command vector",
+      "programmable clamp min/max bounds",
+      "optional per-cycle slew delta limit"
+    ],
+    "output_mapping": [
+      "model_request_valid is asserted from registered request qualification and holdoff logic, not directly from response presence.",
+      "actuator_command_out is selected from validated model-derived command or fallback vector, then clamped and optionally slew-limited before being registered to the output.",
+      "actuator_command_valid is asserted only after response qualification, completeness, policy fusion, clamp completion, and enable checks pass.",
+      "fallback_active reflects the active selection of the safe fallback command path.",
+      "fault_status_out packs sticky error and supervision indicators, at minimum invalid_input, stale_response, timeout, clamp_active, fallback_active, and response_missing."
+    ]
+  },
+  "sequencing_notes": [
+    "Accept geometry/flow metadata only when vehicle_geometry_valid is asserted and stream_velocity_mps is within the inclusive 20 to 55 m/s envelope.",
+    "Issue model_request_valid only when no request is outstanding and the wrapper is not already waiting on an unaccepted response.",
+    "Tag each request with an internal sequence counter and accept a response only when model_response_seq matches the outstanding sequence.",
+    "Compare model_response_age against the freshness threshold before any command generation path is allowed.",
+    "Require response completeness: drag_force_in and lift_force_in plus either surface_pressure_in or flow_field_valid, according to integration configuration, before downstream use.",
+    "Never derive actuator_command_valid from model_response_valid alone.",
+    "Force fallback whenever actuator_enable_in is deasserted, response data are stale or missing, completeness is not met, or any required safety check fails."
+  ],
+  "timing_notes": [
+    "All logic is synchronous to clk with active-low synchronous reset_n behavior as specified.",
+    "Registered handshakes are preferred on external interfaces to keep the design backpressure-safe and ASIC friendly.",
+    "Clamp and optional slew-rate limiting are intended as compare-and-saturate style datapath operations that can be completed within a cycle or pipelined if needed, while preserving deterministic control.",
+    "Clock-gating insertion, if applied by implementation flow, must preserve enable-qualified state updates and functional correctness.",
+    "No floating-point or unbounded iterative timing structure is implied; all comparisons and arithmetic remain fixed-point and synthesizable."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}
