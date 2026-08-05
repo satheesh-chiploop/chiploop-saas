@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ApiClientError, apiGet } from "@/lib/apiClient";
 import { createClientComponentClient } from "@/lib/platformClient";
 
-type Stage = "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "fpga" | "fpga_target_explorer" | "verification" | "embedded" | "software" | "validation" | "product";
+type Stage = "physical_ai" | "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "fpga" | "fpga_target_explorer" | "verification" | "embedded" | "software" | "validation" | "product";
 type JsonMap = Record<string, unknown>;
 
 type Props = {
@@ -87,6 +87,15 @@ const OPTIONAL_DIGITAL_FLOW: Record<Extract<Stage, "dqa" | "rtl_review" | "const
 };
 
 function displayedFlow(stage: Stage): FlowItem[] {
+  if (stage === "physical_ai") {
+    return [
+      { id: "physical_ai", label: "Physical AI" },
+      { id: "arch2rtl", label: "RTL" },
+      { id: "verification", label: "Verify" },
+      { id: "fpga", label: "FPGA" },
+      { id: "tapeout", label: "ASIC" },
+    ];
+  }
   if (stage === "fpga") {
     return [
       RTL_STAGE,
@@ -458,6 +467,9 @@ async function artifact(workflowId: string, filename: string): Promise<JsonMap |
 
 function stageEvidenceReady(stage: Stage, evidence: Record<string, JsonMap | null>): boolean {
   const has = (key: string) => Object.keys(record(evidence[key])).length > 0;
+  if (stage === "physical_ai") {
+    return has("physical_ai_workflow_summary.json") || has("physical_ai_loop_state.json") || has("model_generated_architecture.json");
+  }
   if (stage === "product") {
     return has("system_product_dashboard_manifest.json") || has("system_product_package.json");
   }
@@ -920,6 +932,15 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     if (!workflowId || !resultsReady) return;
     let active = true;
     const files: Record<Stage, string[]> = {
+      physical_ai: [
+        "physical_ai_workflow_summary.json",
+        "physical_ai/physical_ai_workflow_summary.json",
+        "requirements_contract.json",
+        "selected_physics_model.json",
+        "model_generated_architecture.json",
+        "physical_ai_loop_state.json",
+        "child_handoff.json",
+      ],
       arch2rtl: [
         "arch2rtl_dashboard.json",
         "digital/arch2rtl_dashboard.json",
@@ -1190,6 +1211,43 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       return (
         <div className="mt-5 rounded-lg border border-slate-800 bg-black/20 p-4 text-sm text-slate-400">
           Result artifacts are syncing. The dashboard will populate when the generated stage artifact is available.
+        </div>
+      );
+    }
+
+    if (stage === "physical_ai") {
+      const summary = record(evidence["physical_ai_workflow_summary.json"]);
+      const requirements = record(summary.requirements || evidence["requirements_contract.json"]);
+      const physicsModel = record(summary.physics_model || evidence["selected_physics_model.json"]);
+      const execution = record(summary.physics_execution);
+      const architecture = record(execution.architecture || evidence["model_generated_architecture.json"]);
+      const loop = record(summary.loop || evidence["physical_ai_loop_state.json"]);
+      const hem = record(summary.hem);
+      const implementationPath = firstString(execution.implementation_path, loop.implementation_path, requirements.implementation_path, "not selected");
+      const inferenceStatus = firstString(execution.inference_status, loop.inference_status, execution.execution_mode === "architecture" ? "not_executed" : "executed");
+      return (
+        <div className="mt-5 space-y-5">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Stat title="Physics Model" value={firstString(physicsModel.name, physicsModel.model_id, "selected")} />
+            <Stat title="Mode" value={firstString(execution.execution_mode, requirements.execution_mode, "validated")} />
+            <Stat title="Inference" value={inferenceStatus} />
+            <Stat title="Implementation" value={implementationPath} />
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-lg border border-slate-800 bg-black/20 p-4">
+              <div className="text-sm font-semibold text-white">Generated product architecture</div>
+              <div className="mt-2 text-sm text-slate-300">{firstString(architecture.product_summary, architecture.purpose, requirements.objective, "Architecture evidence generated.")}</div>
+              <div className="mt-3 text-xs text-slate-500">{array(architecture.blocks).length} architecture blocks · {array(architecture.interfaces).length} interfaces</div>
+            </div>
+            <div className="rounded-lg border border-slate-800 bg-black/20 p-4">
+              <div className="text-sm font-semibold text-white">Continuation</div>
+              <div className="mt-2 text-sm text-slate-300">{Boolean(hem.enabled) ? "HEM follows the selected RTL, verification, and implementation path automatically." : "HEM is off; continue to the next workflow manually."}</div>
+              <div className="mt-3 text-xs text-slate-500">Status: {firstString(summary.status, status, "running").replaceAll("_", " ")}</div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button type="button" onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/workflow/${workflowId}/download_zip?full=1`, "_blank")} className="rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-sm font-semibold text-emerald-100 hover:border-emerald-300">Download run ZIP</button>
+          </div>
         </div>
       );
     }
