@@ -816,6 +816,7 @@ export default function AppsHomePage() {
     .filter((app): app is AppCard => Boolean(app));
 
   const outcomeInputs: Record<LoopType, string> = {
+    physical_ai: "Physical application requirements and governed model selection",
     digital: "Architecture spec or RTL",
     fpga: "RTL, board target, and PCF constraints",
     analog: "Analog spec or netlist",
@@ -825,6 +826,7 @@ export default function AppsHomePage() {
   };
 
   const outcomeOutputs: Record<LoopType, string> = {
+    physical_ai: "Physics evidence or architecture and digital-IP contracts",
     digital: "RTL, reports, constraints, and ZIP package",
     fpga: "JSON netlist, place-and-route, timing report, and bitstream package",
     analog: "Models, correlation reports, and integration views",
@@ -1138,6 +1140,17 @@ export default function AppsHomePage() {
   };
 
   const referenceJourneys: ReferenceJourney[] = [
+    {
+      key: "physical-ai-pretrained-aero",
+      exploreTitle: "Explore a Pretrained Surrogate",
+      segment: "Physical AI / Automotive Aerodynamics",
+      title: "Pretrained NVIDIA DoMINO: surrogate interface to product architecture and digital IP",
+      copy: "Select a real pretrained NVIDIA automotive-aerodynamics surrogate and create traceable model-interface, product-architecture, validation, and digital-IP contracts without claiming that GPU inference ran.",
+      button: "Open Pretrained Surrogate Journey",
+      onClick: () => router.push("/apps/physical-ai?reference=pretrained-aero"),
+      stages: ["Requirements", "Pretrained Model Selection", "Interface Contract", "Architecture", "Digital IP", "Digital Design"],
+      comingSoon: true,
+    },
     {
       key: "physical-ai-pmsm",
       exploreTitle: "Explore Physical AI Motor Control",
@@ -1771,8 +1784,6 @@ export default function AppsHomePage() {
     </main>
   );
 }
-
-
 
 
 

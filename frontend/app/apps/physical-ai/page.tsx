@@ -25,6 +25,8 @@ export default function PhysicalAiStudioPage() {
   const [modelId, setModelId] = useState("chiploop.pmsm.dq.v1");
   const [objective, setObjective] = useState("Validate PMSM speed control and prepare an FPGA implementation handoff");
   const [target, setTarget] = useState("fpga");
+  const [executionMode, setExecutionMode] = useState<"architecture" | "validated">("validated");
+  const [implementationPath, setImplementationPath] = useState<"architecture_only" | "digital_ip_asic" | "fpga_prototype" | "fpga_then_asic">("digital_ip_asic");
   const [mode, setMode] = useState<"standard" | "smart">("standard");
   const [standardModel, setStandardModel] = useState("chiploop_default");
   const [voltage, setVoltage] = useState("48");
@@ -63,9 +65,23 @@ export default function PhysicalAiStudioPage() {
   }, [router]);
 
   const selected = models.find((model) => model.model_id === modelId);
+  const architectureMode = executionMode === "architecture";
+  const validatedModeAvailable = selected?.availability === "ready";
+
+  useEffect(() => {
+    if (typeof window === "undefined" || models.length === 0) return;
+    if (new URLSearchParams(window.location.search).get("reference") === "pretrained-aero") {
+      setModelId("nvidia.domino.automotive_aero");
+      setObjective("Define an AI-assisted active-aerodynamics product architecture and digital IP using the published interface of NVIDIA's pretrained DoMINO surrogate");
+      setTarget("asic");
+      setExecutionMode("architecture");
+      setImplementationPath("digital_ip_asic");
+      setHemEnabled(false);
+    }
+  }, [models]);
 
   async function start() {
-    if (!token || running || selected?.availability !== "ready") return;
+    if (!token || running || !selected || (!architectureMode && !validatedModeAvailable)) return;
     setRunning(true);
     setError(null);
     try {
@@ -73,17 +89,19 @@ export default function PhysicalAiStudioPage() {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          application: "pmsm_motor_control",
+          application: architectureMode ? "automotive_aerodynamics_architecture" : "pmsm_motor_control",
           objective,
           physics_domain: selected?.domain || "motor_control",
           physics_model_id: modelId,
           implementation_target: target,
+          execution_mode: architectureMode ? "architecture" : "validated",
+          implementation_path: implementationPath,
           maximum_error_percent: 3,
           operating_envelope: { speed_rpm: [0, Number(speed)], load_torque_nm: [0, Number(load)] },
           safety_constraints: ["current limit must pass", "winding temperature below 120 C"],
-          parameters: { dc_bus_voltage_v: Number(voltage), rated_speed_rpm: Number(speed), load_torque_nm: Number(load), control_loop_hz: 20000 },
+          parameters: architectureMode ? { stream_velocity_mps: 38.89, geometry_format: "STL", geometry_source: "DrivAerML reference geometry" } : { dc_bus_voltage_v: Number(voltage), rated_speed_rpm: Number(speed), load_torque_nm: Number(load), control_loop_hz: 20000 },
           model_policy: { mode, selected_model: standardModel },
-          hem_enabled: hemEnabled,
+          hem_enabled: architectureMode ? false : hemEnabled,
           hem_mode: hemAdaptive ? "adaptive" : "fixed",
           hem_goal: "product_demo",
           hem_stage_toggles: hemStages,
@@ -108,9 +126,21 @@ export default function PhysicalAiStudioPage() {
         <section className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6">
           <h2 className="text-xl font-bold">1. Application requirements</h2>
           <label className="mt-4 block text-sm text-slate-300">Objective<textarea value={objective} onChange={(e) => setObjective(e.target.value)} className="mt-2 min-h-24 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>
-          <div className="mt-4 grid grid-cols-3 gap-3">
+          <div className="mt-5 text-sm font-semibold text-slate-200">Execution mode</div>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">{[
+            { key: "architecture", title: "Architecture", body: "No GPU. Define architecture and digital IP from the published model interface." },
+            { key: "validated", title: "Validated surrogate", body: "Execute the model and validate with real predictions. Requires an available runtime." },
+          ].map((item) => <button type="button" key={item.key} disabled={item.key === "validated" && !validatedModeAvailable} onClick={() => setExecutionMode(item.key as "architecture" | "validated")} className={`rounded-xl border p-4 text-left disabled:cursor-not-allowed disabled:opacity-40 ${executionMode === item.key ? "border-cyan-400 bg-cyan-500/10" : "border-slate-700"}`}><div className="font-semibold">{item.title}</div><div className="mt-1 text-xs text-slate-400">{item.body}</div>{item.key === "validated" && !validatedModeAvailable && <div className="mt-2 text-xs font-semibold text-amber-300">Connect NIM or a GPU worker to enable</div>}</button>)}</div>
+          {!architectureMode && <div className="mt-4 grid grid-cols-3 gap-3">
             {[['DC bus (V)', voltage, setVoltage], ['Speed (RPM)', speed, setSpeed], ['Load (N·m)', load, setLoad]].map(([label, value, setter]) => <label key={label as string} className="text-sm text-slate-300">{label as string}<input type="number" step="any" value={value as string} onChange={(e) => (setter as (value: string) => void)(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>)}
-          </div>
+          </div>}
+          {architectureMode && <div className="mt-4 rounded-lg border border-cyan-500/30 bg-cyan-500/10 p-4 text-sm text-cyan-100"><div className="font-semibold">Architecture-definition mode</div><p className="mt-2">Uses the published pretrained-model interface to create product and digital-IP contracts. Surrogate inference is recorded as not executed; no GPU worker is required.</p></div>}
+          {architectureMode && <><div className="mt-5 text-sm font-semibold text-slate-200">After architecture</div><div className="mt-2 grid gap-2">{[
+            ["architecture_only", "Architecture only", "Stop after architecture and digital-IP specifications."],
+            ["digital_ip_asic", "Digital IP / ASIC", "Generate and verify RTL, then continue through digital implementation."],
+            ["fpga_prototype", "FPGA prototype", "Generate and verify RTL, then select a board and build the prototype."],
+            ["fpga_then_asic", "FPGA then ASIC", "Prototype verified RTL first, then continue to digital implementation."],
+          ].map(([key, title, body]) => <button type="button" key={key} onClick={() => setImplementationPath(key as typeof implementationPath)} className={`rounded-lg border p-3 text-left ${implementationPath === key ? "border-violet-400 bg-violet-500/10" : "border-slate-700"}`}><div className="text-sm font-semibold">{title}</div><div className="mt-1 text-xs text-slate-400">{body}</div></button>)}</div></>}
           <label className="mt-4 block text-sm text-slate-300">Implementation target<select value={target} onChange={(e) => setTarget(e.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="fpga">FPGA</option><option value="asic">ASIC</option><option value="software">Software</option></select></label>
         </section>
 
@@ -123,7 +153,7 @@ export default function PhysicalAiStudioPage() {
         </section>
       </div>
 
-      <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/40 p-6"><h2 className="text-xl font-bold">3. HEM end-to-end automation</h2><div className="mt-4"><HemAutomaticRunControls enabled={hemEnabled} adaptive={hemAdaptive} onEnabledChange={setHemEnabled} onAdaptiveChange={setHemAdaptive} currentStageLabel="Physical AI RTL validation" nextStageLabel="FPGA Target Explorer" stageOptions={[{ key: "fpga_exploration", label: "FPGA Target Explorer", enabled: hemStages.fpga_exploration }, { key: "fpga_bitstream", label: "FPGA RTL to Bitstream", enabled: hemStages.fpga_bitstream }, { key: "firmware_product", label: "Firmware, validation + product demo", enabled: hemStages.firmware_product }]} onStageToggle={(key, value) => setHemStages((current) => ({ ...current, [key]: value }))} /></div><div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">{["Physics + fixed point", "RTL compile + smoke", "FPGA exploration", "FPGA bitstream", "Firmware + software", "Validation + product demo"].map((stage, index) => <div key={stage} className="rounded-lg bg-slate-950 p-3 text-sm"><span className="mr-2 text-violet-300">{index + 1}</span>{stage}</div>)}</div><p className="mt-4 text-xs text-amber-200">Board programming and motor energization always require explicit hardware approval.</p>{error && <p className="mt-4 text-red-300">{error}</p>}<button onClick={start} disabled={!token || running || selected?.availability !== "ready"} className="mt-6 rounded-xl bg-violet-400 px-6 py-3 font-bold text-slate-950 disabled:opacity-50">{running ? "Starting Physical AI loop…" : hemEnabled ? "Start automatic Physical AI loop" : "Run Physical AI validation only"}</button></section>
+      <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/40 p-6"><h2 className="text-xl font-bold">3. {architectureMode ? "Architecture handoff" : "HEM end-to-end automation"}</h2>{!architectureMode && <><div className="mt-4"><HemAutomaticRunControls enabled={hemEnabled} adaptive={hemAdaptive} onEnabledChange={setHemEnabled} onAdaptiveChange={setHemAdaptive} currentStageLabel="Physical AI RTL validation" nextStageLabel="FPGA Target Explorer" stageOptions={[{ key: "fpga_exploration", label: "FPGA Target Explorer", enabled: hemStages.fpga_exploration }, { key: "fpga_bitstream", label: "FPGA RTL to Bitstream", enabled: hemStages.fpga_bitstream }, { key: "firmware_product", label: "Firmware, validation + product demo", enabled: hemStages.firmware_product }]} onStageToggle={(key, value) => setHemStages((current) => ({ ...current, [key]: value }))} /></div><div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">{["Physics + fixed point", "RTL compile + smoke", "FPGA exploration", "FPGA bitstream", "Firmware + software", "Validation + product demo"].map((stage, index) => <div key={stage} className="rounded-lg bg-slate-950 p-3 text-sm"><span className="mr-2 text-violet-300">{index + 1}</span>{stage}</div>)}</div><p className="mt-4 text-xs text-amber-200">Board programming and motor energization always require explicit hardware approval.</p></>}{architectureMode && <div className="mt-4 grid gap-3 md:grid-cols-3">{["Published surrogate interface", "Product + system architecture", "Digital-IP specification"].map((stage, index) => <div key={stage} className="rounded-lg bg-slate-950 p-3 text-sm"><span className="mr-2 text-cyan-300">{index + 1}</span>{stage}</div>)}</div>}{error && <p className="mt-4 text-red-300">{error}</p>}<button onClick={start} disabled={!token || running || !selected} className="mt-6 rounded-xl bg-violet-400 px-6 py-3 font-bold text-slate-950 disabled:opacity-50">{running ? "Starting Physical AI loop…" : architectureMode ? "Run pretrained-surrogate architecture journey" : hemEnabled ? "Start automatic Physical AI loop" : "Run Physical AI validation only"}</button></section>
     </div>
   </main>;
 }
