@@ -1,0 +1,669 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "flat",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": [
+      {
+        "name": "CFG_GEOMETRY_SOURCE",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Firmware-visible geometry source metadata, mirroring cfg_geometry_source input. Value is captured by the RTL only through the top-level port; this register is for software traceability and programming intent.",
+        "fields": [
+          {
+            "name": "GEOMETRY_SOURCE",
+            "lsb": 0,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Vehicle geometry source metadata. Encoded value is implementation-defined but must remain stable for verification."
+          }
+        ]
+      },
+      {
+        "name": "CFG_GEOMETRY_FORMAT",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Firmware-visible geometry format metadata, mirroring cfg_geometry_format input.",
+        "fields": [
+          {
+            "name": "GEOMETRY_FORMAT",
+            "lsb": 0,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Vehicle geometry format metadata. Encoded value is implementation-defined but stable."
+          }
+        ]
+      },
+      {
+        "name": "CFG_GEOMETRY_ID_LO",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Low byte of geometry identifier metadata, mirroring cfg_geometry_id input.",
+        "fields": [
+          {
+            "name": "GEOMETRY_ID[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low 8 bits of cfg_geometry_id."
+          }
+        ]
+      },
+      {
+        "name": "CFG_GEOMETRY_ID_HI",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "High byte of geometry identifier metadata, mirroring cfg_geometry_id input.",
+        "fields": [
+          {
+            "name": "GEOMETRY_ID[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of cfg_geometry_id."
+          }
+        ]
+      },
+      {
+        "name": "FLOW_VELOCITY_LO",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "Low byte of the sampled stream velocity presented to the request supervisor.",
+        "fields": [
+          {
+            "name": "STREAM_VELOCITY_MPS[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low 8 bits of stream_velocity_mps."
+          }
+        ]
+      },
+      {
+        "name": "FLOW_VELOCITY_HI",
+        "offset": "0x05",
+        "access": "RO",
+        "description": "High byte of the sampled stream velocity presented to the request supervisor.",
+        "fields": [
+          {
+            "name": "STREAM_VELOCITY_MPS[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "High 8 bits of stream_velocity_mps."
+          }
+        ]
+      },
+      {
+        "name": "REQ_ID_LO",
+        "offset": "0x06",
+        "access": "RO",
+        "description": "Traceability register for the current or most recently issued request ID.",
+        "fields": [
+          {
+            "name": "REQ_ID[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low 8 bits of req_id / trace_req_id."
+          }
+        ]
+      },
+      {
+        "name": "REQ_ID_HI",
+        "offset": "0x07",
+        "access": "RO",
+        "description": "Traceability register for the current or most recently issued request ID.",
+        "fields": [
+          {
+            "name": "REQ_ID[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "High 8 bits of req_id / trace_req_id."
+          }
+        ]
+      },
+      {
+        "name": "RSP_ID_LO",
+        "offset": "0x08",
+        "access": "RO",
+        "description": "Traceability register for the most recently observed response ID.",
+        "fields": [
+          {
+            "name": "RSP_ID[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low 8 bits of rsp_id / trace_rsp_id."
+          }
+        ]
+      },
+      {
+        "name": "RSP_ID_HI",
+        "offset": "0x09",
+        "access": "RO",
+        "description": "Traceability register for the most recently observed response ID.",
+        "fields": [
+          {
+            "name": "RSP_ID[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "High 8 bits of rsp_id / trace_rsp_id."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_CMD_LO",
+        "offset": "0x0A",
+        "access": "RO",
+        "description": "Low byte of the registered actuator command output.",
+        "fields": [
+          {
+            "name": "ACTUATOR_CMD[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low 8 bits of actuator_cmd."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_CMD_HI",
+        "offset": "0x0B",
+        "access": "RO",
+        "description": "High byte of the registered actuator command output.",
+        "fields": [
+          {
+            "name": "ACTUATOR_CMD[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "High 8 bits of actuator_cmd."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x0C",
+        "access": "RO",
+        "description": "Status encoding for idle, pending, accepted, fallback, and faulted operating modes.",
+        "fields": [
+          {
+            "name": "STATUS_CODE",
+            "lsb": 0,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Status code encoding. Must be stable for verification. Suggested semantic coverage: idle, request_pending, response_accepted, fallback_active, faulted."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 1,
+            "description": "Reflects fallback_active. Asserted in safe state and whenever safety supervision suppresses normal actuator updates."
+          },
+          {
+            "name": "STALE_REJECT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reflects stale_reject. May be pulse-style or sticky depending on implementation policy; sticky behavior clears only on reset or explicit clear control."
+          },
+          {
+            "name": "TIMEOUT_FAULT",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reflects timeout_fault. May be pulse-style or sticky depending on implementation policy; sticky behavior clears only on reset or explicit clear control."
+          },
+          {
+            "name": "CMD_CLAMPED",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reflects cmd_clamped. Asserted when actuator command candidate saturates to configured bounds."
+          },
+          {
+            "name": "ACTUATOR_VALID",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reflects actuator_valid. Deasserted in safe fallback."
+          }
+        ]
+      },
+      {
+        "name": "FAULT",
+        "offset": "0x0D",
+        "access": "RO",
+        "description": "Fault encoding for stale response, timeout, envelope violation, integrity error, clamp event, and none.",
+        "fields": [
+          {
+            "name": "FAULT_CODE",
+            "lsb": 0,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Fault code encoding. Must be stable for verification. Suggested semantic coverage: none, stale_response, timeout, envelope_violation, integrity_error, clamp_event."
+          },
+          {
+            "name": "PENDING",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a request is pending and awaiting a matching response or timeout."
+          },
+          {
+            "name": "REQ_VALID_OUT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirrors req_valid output for firmware visibility."
+          },
+          {
+            "name": "RSP_VALID_IN",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reflects the sampled response valid qualifier as observed at the interface."
+          },
+          {
+            "name": "FLOW_VALID_IN",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reflects the sampled flow_valid qualifier as observed at the interface."
+          },
+          {
+            "name": "FLOW_ENVELOPE_OK",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the most recently sampled flow velocity was inside the accepted operating envelope."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_DEFAULT_CMD_LO",
+        "offset": "0x0E",
+        "access": "RO",
+        "description": "Low byte of the registered safe default actuator command value used during fallback.",
+        "fields": [
+          {
+            "name": "SAFE_DEFAULT_CMD[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low 8 bits of the safe default actuator command."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_DEFAULT_CMD_HI",
+        "offset": "0x0F",
+        "access": "RO",
+        "description": "High byte of the registered safe default actuator command value used during fallback.",
+        "fields": [
+          {
+            "name": "SAFE_DEFAULT_CMD[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "High 8 bits of the safe default actuator command."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CFG_LO",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Low byte of the programmable timeout count used by the request supervisor.",
+        "fields": [
+          {
+            "name": "TIMEOUT_COUNT[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 32,
+            "description": "Low 8 bits of the timeout value. The RTL uses this as the request age/down-counter limit."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CFG_HI",
+        "offset": "0x11",
+        "access": "RW",
+        "description": "High byte of the programmable timeout count used by the request supervisor.",
+        "fields": [
+          {
+            "name": "TIMEOUT_COUNT[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of the timeout value."
+          }
+        ]
+      },
+      {
+        "name": "VEL_MIN_CFG_LO",
+        "offset": "0x12",
+        "access": "RW",
+        "description": "Low byte of the programmable lower velocity envelope bound.",
+        "fields": [
+          {
+            "name": "VEL_MIN[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 20,
+            "description": "Low 8 bits of the lower accepted stream velocity bound. Must support 20 inclusive."
+          }
+        ]
+      },
+      {
+        "name": "VEL_MIN_CFG_HI",
+        "offset": "0x13",
+        "access": "RW",
+        "description": "High byte of the programmable lower velocity envelope bound.",
+        "fields": [
+          {
+            "name": "VEL_MIN[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of the lower accepted stream velocity bound."
+          }
+        ]
+      },
+      {
+        "name": "VEL_MAX_CFG_LO",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Low byte of the programmable upper velocity envelope bound.",
+        "fields": [
+          {
+            "name": "VEL_MAX[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 55,
+            "description": "Low 8 bits of the upper accepted stream velocity bound. Must support 55 inclusive."
+          }
+        ]
+      },
+      {
+        "name": "VEL_MAX_CFG_HI",
+        "offset": "0x15",
+        "access": "RW",
+        "description": "High byte of the programmable upper velocity envelope bound.",
+        "fields": [
+          {
+            "name": "VEL_MAX[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of the upper accepted stream velocity bound."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MIN_CFG_LO",
+        "offset": "0x16",
+        "access": "RW",
+        "description": "Low byte of the minimum actuator command clamp bound.",
+        "fields": [
+          {
+            "name": "ACT_MIN[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low 8 bits of the minimum actuator command limit."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MIN_CFG_HI",
+        "offset": "0x17",
+        "access": "RW",
+        "description": "High byte of the minimum actuator command clamp bound.",
+        "fields": [
+          {
+            "name": "ACT_MIN[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of the minimum actuator command limit."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MAX_CFG_LO",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Low byte of the maximum actuator command clamp bound.",
+        "fields": [
+          {
+            "name": "ACT_MAX[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Low 8 bits of the maximum actuator command limit."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MAX_CFG_HI",
+        "offset": "0x19",
+        "access": "RW",
+        "description": "High byte of the maximum actuator command clamp bound.",
+        "fields": [
+          {
+            "name": "ACT_MAX[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of the maximum actuator command limit."
+          }
+        ]
+      },
+      {
+        "name": "RATE_LIMIT_CFG_LO",
+        "offset": "0x1A",
+        "access": "RW",
+        "description": "Low byte of the optional per-update rate limit delta.",
+        "fields": [
+          {
+            "name": "RATE_LIMIT_DELTA[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low 8 bits of the maximum command delta per accepted update. A zero value may disable rate limiting depending on implementation parameterization."
+          }
+        ]
+      },
+      {
+        "name": "RATE_LIMIT_CFG_HI",
+        "offset": "0x1B",
+        "access": "RW",
+        "description": "High byte of the optional per-update rate limit delta.",
+        "fields": [
+          {
+            "name": "RATE_LIMIT_DELTA[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of the maximum command delta per accepted update."
+          }
+        ]
+      },
+      {
+        "name": "CLEAR_STICKY",
+        "offset": "0x1C",
+        "access": "WO",
+        "description": "Synchronous control to clear sticky stale_reject and timeout_fault indicators when sticky behavior is implemented.",
+        "fields": [
+          {
+            "name": "CLEAR_STICKY_FAULTS",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to request synchronous clear of sticky stale_reject and timeout_fault indicators. If outputs are pulse-style, this write may be ignored by implementation policy."
+          }
+        ]
+      },
+      {
+        "name": "TRACE_FLAGS",
+        "offset": "0x1D",
+        "access": "RO",
+        "description": "Additional trace and supervisory flags for firmware polling.",
+        "fields": [
+          {
+            "name": "PENDING_REQUEST",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Pending request indicator."
+          },
+          {
+            "name": "REQ_ACCEPTED",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a request was accepted into the transaction path."
+          },
+          {
+            "name": "RSP_ACCEPTED",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a response was accepted and used for command synthesis."
+          },
+          {
+            "name": "ENVELOPE_VIOLATION",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the sampled flow velocity was outside the accepted envelope."
+          },
+          {
+            "name": "INTEGRITY_ERROR",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates response integrity checks failed."
+          },
+          {
+            "name": "FALLBACK_LATCHED",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 1,
+            "description": "Indicates fallback is currently active or latched by safety supervision."
+          },
+          {
+            "name": "RSP_MATCH",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the latest response ID matched the outstanding request ID."
+          },
+          {
+            "name": "FLOW_FIELD_VALID",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reflects the flow_field_valid qualifier from the response path."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "FAULT_IRQ",
+        "description": "Optional composite fault indication for firmware polling/interrupt integration. May be implemented internally from timeout_fault, stale_reject, envelope_violation, integrity_error, and clamp events if the platform provides an interrupt wrapper. The top-level DIGITAL_SPEC_JSON itself does not define an interrupt port, so this is informational only."
+      },
+      {
+        "name": "STATUS_CHANGE_IRQ",
+        "description": "Optional status transition indication for firmware polling/interrupt integration. Informational only; not a top-level RTL port."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Program SAFE_DEFAULT_CMD if the implementation exposes it as a parameterized ROM/constant; otherwise read it for confirmation.",
+      "Program TIMEOUT_CFG to the desired watchdog value, ensuring it is compatible with ASIC system latency.",
+      "Program VEL_MIN_CFG and VEL_MAX_CFG to at least the mandatory supported envelope of 20..55 inclusive.",
+      "Program ACT_MIN_CFG and ACT_MAX_CFG to the desired actuator clamp limits.",
+      "Program RATE_LIMIT_CFG if rate limiting is enabled in the implementation.",
+      "Write CLEAR_STICKY with 1 once after reset if sticky fault indicators are implemented and the system requires a clean start."
+    ],
+    "polling_sequence": [
+      "Poll STATUS and FAULT until PENDING_REQUEST is low and FALLBACK_LATCHED is low.",
+      "When FLOW_ENVELOPE_OK is high and FLOW_VALID_IN is high, allow the top-level transaction path to issue a request.",
+      "After issuing a request, poll REQ_ID and PENDING_REQUEST until a matching response is observed or a fault is raised.",
+      "If STALE_REJECT or TIMEOUT_FAULT asserts, clear sticky indicators with CLEAR_STICKY when supported, then wait for a valid envelope-compliant sample and a clean recovery cycle.",
+      "Read ACTUATOR_CMD and ACTUATOR_VALID only when FALLBACK_LATCHED is low and RSP_ACCEPTED has occurred."
+    ],
+    "irq_sequence": [
+      "Treat FAULT_IRQ as an indication to read STATUS, FAULT, REQ_ID, and RSP_ID immediately.",
+      "If an optional status-change interrupt is present in the integration wrapper, use it to wake firmware from polling after request acceptance or fallback entry.",
+      "On fault IRQ, write CLEAR_STICKY if sticky mode is implemented and the fault should be acknowledged by software."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "No new hierarchy, ports, or interface protocol is invented beyond a firmware-visible register view that mirrors the existing top-level signals.",
+    "The regmap is informational/minimal and does not imply an AXI/APB/I2C wrapper for the RTL top module.",
+    "Wide values are split across byte registers to match the requested 8-bit firmware-visible register map format.",
+    "Status and fault encodings are intentionally parameterizable but stable for verification; software must rely on the documented semantic groups rather than hard-coded numeric values unless frozen by integration policy."
+  ]
+}

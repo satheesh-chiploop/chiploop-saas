@@ -1,0 +1,1086 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "partial",
+  "summary": {
+    "checked": 64,
+    "matched": 57,
+    "partial": 0,
+    "missing": 7,
+    "inconclusive": 0
+  },
+  "setup_issues": [],
+  "top_module": {
+    "expected": "active_aero_ctrl_top",
+    "modules_found": [
+      "active_aero_ctrl_top"
+    ],
+    "status": "pass"
+  },
+  "interface": {
+    "status": "pass",
+    "expected_ports": [
+      "actuator_cmd",
+      "actuator_valid",
+      "cfg_clear_sticky_faults",
+      "cfg_geometry_format",
+      "cfg_geometry_id",
+      "cfg_geometry_source",
+      "clk",
+      "cmd_clamped",
+      "drag_force",
+      "fallback_active",
+      "fault_code",
+      "flow_field_meta",
+      "flow_field_valid",
+      "flow_valid",
+      "lift_force",
+      "req_flow_valid",
+      "req_geometry_format",
+      "req_geometry_id",
+      "req_geometry_source",
+      "req_id",
+      "req_stream_velocity_mps",
+      "req_valid",
+      "reset_n",
+      "rsp_id",
+      "rsp_valid",
+      "stale_reject",
+      "status_code",
+      "stream_velocity_mps",
+      "surface_pressure",
+      "timeout_fault",
+      "trace_req_id",
+      "trace_rsp_id"
+    ],
+    "matched_ports": [
+      "actuator_cmd",
+      "actuator_valid",
+      "cfg_clear_sticky_faults",
+      "cfg_geometry_format",
+      "cfg_geometry_id",
+      "cfg_geometry_source",
+      "clk",
+      "cmd_clamped",
+      "drag_force",
+      "fallback_active",
+      "fault_code",
+      "flow_field_meta",
+      "flow_field_valid",
+      "flow_valid",
+      "lift_force",
+      "req_flow_valid",
+      "req_geometry_format",
+      "req_geometry_id",
+      "req_geometry_source",
+      "req_id",
+      "req_stream_velocity_mps",
+      "req_valid",
+      "reset_n",
+      "rsp_id",
+      "rsp_valid",
+      "stale_reject",
+      "status_code",
+      "stream_velocity_mps",
+      "surface_pressure",
+      "timeout_fault",
+      "trace_req_id",
+      "trace_rsp_id"
+    ],
+    "missing_ports": [],
+    "rtl_ports": [
+      "actuator_cmd",
+      "actuator_valid",
+      "cfg_clear_sticky_faults",
+      "cfg_geometry_format",
+      "cfg_geometry_id",
+      "cfg_geometry_source",
+      "clk",
+      "cmd_clamped",
+      "drag_force",
+      "fallback_active",
+      "fault_code",
+      "flow_field_meta",
+      "flow_field_valid",
+      "flow_valid",
+      "lift_force",
+      "req_flow_valid",
+      "req_geometry_format",
+      "req_geometry_id",
+      "req_geometry_source",
+      "req_id",
+      "req_stream_velocity_mps",
+      "req_valid",
+      "reset_n",
+      "rsp_id",
+      "rsp_valid",
+      "stale_reject",
+      "status_code",
+      "stream_velocity_mps",
+      "surface_pressure",
+      "timeout_fault",
+      "trace_req_id",
+      "trace_rsp_id"
+    ]
+  },
+  "register_map": {
+    "expected": [
+      "ACTUATOR_CMD[15:8]",
+      "ACTUATOR_CMD[7:0]",
+      "ACTUATOR_VALID",
+      "ACT_MAX[15:8]",
+      "ACT_MAX[7:0]",
+      "ACT_MIN[15:8]",
+      "ACT_MIN[7:0]",
+      "CLEAR_STICKY_FAULTS",
+      "CMD_CLAMPED",
+      "ENVELOPE_VIOLATION",
+      "FALLBACK_ACTIVE",
+      "FALLBACK_LATCHED",
+      "FAULT_CODE",
+      "FLOW_ENVELOPE_OK",
+      "FLOW_FIELD_VALID",
+      "FLOW_VALID_IN",
+      "GEOMETRY_FORMAT",
+      "GEOMETRY_ID[15:8]",
+      "GEOMETRY_ID[7:0]",
+      "GEOMETRY_SOURCE",
+      "INTEGRITY_ERROR",
+      "PENDING",
+      "PENDING_REQUEST",
+      "RATE_LIMIT_DELTA[15:8]",
+      "RATE_LIMIT_DELTA[7:0]",
+      "REQ_ACCEPTED",
+      "REQ_ID[15:8]",
+      "REQ_ID[7:0]",
+      "REQ_VALID_OUT",
+      "RSP_ACCEPTED",
+      "RSP_ID[15:8]",
+      "RSP_ID[7:0]",
+      "RSP_MATCH",
+      "RSP_VALID_IN",
+      "SAFE_DEFAULT_CMD[15:8]",
+      "SAFE_DEFAULT_CMD[7:0]",
+      "STALE_REJECT",
+      "STATUS_CODE",
+      "STREAM_VELOCITY_MPS[15:8]",
+      "STREAM_VELOCITY_MPS[7:0]",
+      "TIMEOUT_COUNT[15:8]",
+      "TIMEOUT_COUNT[7:0]",
+      "TIMEOUT_FAULT",
+      "VEL_MAX[15:8]",
+      "VEL_MAX[7:0]",
+      "VEL_MIN[15:8]",
+      "VEL_MIN[7:0]"
+    ],
+    "matched": [
+      "ACTUATOR_VALID",
+      "CLEAR_STICKY_FAULTS",
+      "CMD_CLAMPED",
+      "FALLBACK_ACTIVE",
+      "FAULT_CODE",
+      "FLOW_FIELD_VALID",
+      "GEOMETRY_FORMAT",
+      "GEOMETRY_SOURCE",
+      "PENDING",
+      "STALE_REJECT",
+      "STATUS_CODE",
+      "TIMEOUT_FAULT"
+    ],
+    "expected_registers": [
+      "ACTUATOR_CMD_HI",
+      "ACTUATOR_CMD_LO",
+      "ACT_MAX_CFG_HI",
+      "ACT_MAX_CFG_LO",
+      "ACT_MIN_CFG_HI",
+      "ACT_MIN_CFG_LO",
+      "CFG_GEOMETRY_FORMAT",
+      "CFG_GEOMETRY_ID_HI",
+      "CFG_GEOMETRY_ID_LO",
+      "CFG_GEOMETRY_SOURCE",
+      "CLEAR_STICKY",
+      "FAULT",
+      "FLOW_VELOCITY_HI",
+      "FLOW_VELOCITY_LO",
+      "RATE_LIMIT_CFG_HI",
+      "RATE_LIMIT_CFG_LO",
+      "REQ_ID_HI",
+      "REQ_ID_LO",
+      "RSP_ID_HI",
+      "RSP_ID_LO",
+      "SAFE_DEFAULT_CMD_HI",
+      "SAFE_DEFAULT_CMD_LO",
+      "STATUS",
+      "TIMEOUT_CFG_HI",
+      "TIMEOUT_CFG_LO",
+      "TRACE_FLAGS",
+      "VEL_MAX_CFG_HI",
+      "VEL_MAX_CFG_LO",
+      "VEL_MIN_CFG_HI",
+      "VEL_MIN_CFG_LO"
+    ],
+    "matched_registers": [
+      "CFG_GEOMETRY_FORMAT",
+      "CFG_GEOMETRY_SOURCE",
+      "CLEAR_STICKY"
+    ],
+    "expected_addresses": [
+      "0x00",
+      "0x01",
+      "0x02",
+      "0x03",
+      "0x04",
+      "0x05",
+      "0x06",
+      "0x07",
+      "0x08",
+      "0x09",
+      "0x0A",
+      "0x0B",
+      "0x0C",
+      "0x0D",
+      "0x0E",
+      "0x0F",
+      "0x10",
+      "0x11",
+      "0x12",
+      "0x13",
+      "0x14",
+      "0x15",
+      "0x16",
+      "0x17",
+      "0x18",
+      "0x19",
+      "0x1A",
+      "0x1B",
+      "0x1C",
+      "0x1D"
+    ],
+    "matched_addresses": [
+      "0x00"
+    ],
+    "missing": [
+      "ACTUATOR_CMD[15:8]",
+      "ACTUATOR_CMD[7:0]",
+      "ACT_MAX[15:8]",
+      "ACT_MAX[7:0]",
+      "ACT_MIN[15:8]",
+      "ACT_MIN[7:0]",
+      "ENVELOPE_VIOLATION",
+      "FALLBACK_LATCHED",
+      "FLOW_ENVELOPE_OK",
+      "FLOW_VALID_IN",
+      "GEOMETRY_ID[15:8]",
+      "GEOMETRY_ID[7:0]",
+      "INTEGRITY_ERROR",
+      "PENDING_REQUEST",
+      "RATE_LIMIT_DELTA[15:8]",
+      "RATE_LIMIT_DELTA[7:0]",
+      "REQ_ACCEPTED",
+      "REQ_ID[15:8]",
+      "REQ_ID[7:0]",
+      "REQ_VALID_OUT",
+      "RSP_ACCEPTED",
+      "RSP_ID[15:8]",
+      "RSP_ID[7:0]",
+      "RSP_MATCH",
+      "RSP_VALID_IN",
+      "SAFE_DEFAULT_CMD[15:8]",
+      "SAFE_DEFAULT_CMD[7:0]",
+      "STREAM_VELOCITY_MPS[15:8]",
+      "STREAM_VELOCITY_MPS[7:0]",
+      "TIMEOUT_COUNT[15:8]",
+      "TIMEOUT_COUNT[7:0]",
+      "VEL_MAX[15:8]",
+      "VEL_MAX[7:0]",
+      "VEL_MIN[15:8]",
+      "VEL_MIN[7:0]"
+    ],
+    "missing_registers": [
+      "ACTUATOR_CMD_HI",
+      "ACTUATOR_CMD_LO",
+      "ACT_MAX_CFG_HI",
+      "ACT_MAX_CFG_LO",
+      "ACT_MIN_CFG_HI",
+      "ACT_MIN_CFG_LO",
+      "CFG_GEOMETRY_ID_HI",
+      "CFG_GEOMETRY_ID_LO",
+      "FAULT",
+      "FLOW_VELOCITY_HI",
+      "FLOW_VELOCITY_LO",
+      "RATE_LIMIT_CFG_HI",
+      "RATE_LIMIT_CFG_LO",
+      "REQ_ID_HI",
+      "REQ_ID_LO",
+      "RSP_ID_HI",
+      "RSP_ID_LO",
+      "SAFE_DEFAULT_CMD_HI",
+      "SAFE_DEFAULT_CMD_LO",
+      "STATUS",
+      "TIMEOUT_CFG_HI",
+      "TIMEOUT_CFG_LO",
+      "TRACE_FLAGS",
+      "VEL_MAX_CFG_HI",
+      "VEL_MAX_CFG_LO",
+      "VEL_MIN_CFG_HI",
+      "VEL_MIN_CFG_LO"
+    ],
+    "missing_addresses": [
+      "0x01",
+      "0x02",
+      "0x03",
+      "0x04",
+      "0x05",
+      "0x06",
+      "0x07",
+      "0x08",
+      "0x09",
+      "0x0A",
+      "0x0B",
+      "0x0C",
+      "0x0D",
+      "0x0E",
+      "0x0F",
+      "0x10",
+      "0x11",
+      "0x12",
+      "0x13",
+      "0x14",
+      "0x15",
+      "0x16",
+      "0x17",
+      "0x18",
+      "0x19",
+      "0x1A",
+      "0x1B",
+      "0x1C",
+      "0x1D"
+    ],
+    "status": "issues"
+  },
+  "clock_reset": {
+    "clock_ports": [
+      "clk"
+    ],
+    "reset_ports": [
+      "reset_n"
+    ],
+    "status": "pass"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "requirement": "Capture and register configuration metadata for geometry source, format, and ID.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-002",
+      "requirement": "Accept runtime flow samples only when flow_valid is asserted and the sample is in the allowable velocity envelope.",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_valid"
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "requirement": "Generate a monotonic req_id for each accepted request transaction.",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_id",
+        "status_accepted"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "requirement": "Drive a valid request bundle to the external surrogate using explicit transaction ports.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-005",
+      "requirement": "Track a pending request until matching response acceptance or timeout.",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_pending"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "requirement": "Discard mismatched responses and flag stale_reject.",
+      "status": "matched",
+      "evidence_tokens": [
+        "stale_reject"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "requirement": "Detect timeout expiration using a synthesizable counter while a request is pending.",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_pending"
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "requirement": "Validate response integrity using sequence match and required qualifiers.",
+      "status": "matched",
+      "evidence_tokens": [
+        "response_match"
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "requirement": "Synthesize an actuator command from validated model outputs using fixed-point policy logic.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-010",
+      "requirement": "Clamp actuator command to configurable bounds and optionally apply rate limiting.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-011",
+      "requirement": "Assert fallback_active and suppress actuator_valid whenever safety conditions require fallback.",
+      "status": "matched",
+      "evidence_tokens": [
+        "fallback_active",
+        "actuator_valid",
+        "status_fallback"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "requirement": "Provide stable traceability registers for req_id, rsp_id, status_code, and fault_code.",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_id",
+        "rsp_id",
+        "status_code",
+        "fault_code"
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "requirement": "Support synchronous recovery from fallback only after a valid request-response cycle and clearance of all safety conditions.",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_fallback"
+      ]
+    },
+    {
+      "id": "REQ-014",
+      "requirement": "A new request may be issued only when flow_valid is asserted, the current flow sample is inside the programmable envelope, the block is not in a hard fault latch, and no older pending request blocks issuance.",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_valid",
+        "fault_envelope",
+        "status_pending"
+      ]
+    },
+    {
+      "id": "REQ-015",
+      "requirement": "The supported mandatory acceptance envelope for stream_velocity_mps is 20 through 55 inclusive; values outside this range shall force fallback and inhibit request issuance until a valid sample is accepted.",
+      "status": "matched",
+      "evidence_tokens": [
+        "stream_velocity_mps",
+        "status_accepted",
+        "status_fallback"
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "requirement": "req_id shall monotonically increment for each accepted request transaction and shall be captured as the outstanding sequence ID.",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_id",
+        "status_accepted",
+        "increment_logic"
+      ]
+    },
+    {
+      "id": "REQ-017",
+      "requirement": "req_valid shall only assert when the request bundle is being presented to the external surrogate; req_flow_valid shall mirror acceptance of the sampled flow into the request transaction.",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_valid",
+        "req_flow_valid"
+      ]
+    },
+    {
+      "id": "REQ-018",
+      "requirement": "A request becomes pending when req_valid is asserted and remains pending until a matching response is accepted or timeout occurs.",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_valid",
+        "status_accepted",
+        "status_pending"
+      ]
+    },
+    {
+      "id": "REQ-019",
+      "requirement": "A response shall be accepted only when rsp_valid is asserted, rsp_id matches the outstanding req_id, flow_field_valid is asserted, and payload integrity qualifiers are non-zero/valid as applicable.",
+      "status": "matched",
+      "evidence_tokens": [
+        "rsp_valid",
+        "rsp_id",
+        "req_id",
+        "flow_field_valid",
+        "status_accepted"
+      ]
+    },
+    {
+      "id": "REQ-020",
+      "requirement": "If rsp_id does not match the outstanding req_id, the response shall be discarded and stale_reject shall assert for that transaction.",
+      "status": "matched",
+      "evidence_tokens": [
+        "rsp_id",
+        "req_id",
+        "stale_reject",
+        "response_match"
+      ]
+    },
+    {
+      "id": "REQ-021",
+      "requirement": "If the response arrives after timeout expiry, timeout_fault shall assert and the response shall be ignored.",
+      "status": "matched",
+      "evidence_tokens": [
+        "timeout_fault"
+      ]
+    },
+    {
+      "id": "REQ-022",
+      "requirement": "The timeout counter shall be a synthesizable age or down counter clocked while a request is pending and cleared on acceptance, timeout, or reset.",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_pending",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-023",
+      "requirement": "Command synthesis shall be deterministic fixed-point combinational logic based on validated model outputs; the RTL shall not model surrogate physics.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-024",
+      "requirement": "The clamp stage shall saturate actuator_cmd to configured min/max bounds; when clamping occurs, cmd_clamped shall assert.",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_cmd",
+        "cmd_clamped"
+      ]
+    },
+    {
+      "id": "REQ-025",
+      "requirement": "If rate limiting is enabled by implementation parameter, actuator_cmd updates shall be limited by a parameterized delta per accepted response using registered previous output and saturating arithmetic.",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_cmd",
+        "status_accepted"
+      ]
+    },
+    {
+      "id": "REQ-026",
+      "requirement": "fallback_active shall dominate normal command flow whenever stale response, timeout, invalid response, mismatch, envelope violation, or reset is present.",
+      "status": "matched",
+      "evidence_tokens": [
+        "fallback_active",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-027",
+      "requirement": "actuator_valid shall be low whenever fallback_active is asserted.",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_valid",
+        "fallback_active"
+      ]
+    },
+    {
+      "id": "REQ-028",
+      "requirement": "status_code and fault_code shall reflect idle, request_pending, response_accepted, fallback_active, faulted and none, stale_response, timeout, envelope_violation, integrity_error, clamp_event respectively using parameterizable stable encodi",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_code",
+        "fault_code",
+        "fallback_active",
+        "clamp_event",
+        "status_faulted",
+        "status_idle"
+      ]
+    },
+    {
+      "id": "REQ-029",
+      "requirement": "trace_req_id and trace_rsp_id shall expose the currently issued request ID and the most recently observed response ID for debug and verification.",
+      "status": "matched",
+      "evidence_tokens": [
+        "trace_req_id",
+        "trace_rsp_id"
+      ]
+    },
+    {
+      "id": "REQ-030",
+      "requirement": "cfg_clear_sticky_faults, if asserted, shall synchronously clear sticky stale_reject and timeout_fault indicators if sticky mode is enabled; otherwise these outputs may be pulse-style and deassert on the next cycle.",
+      "status": "matched",
+      "evidence_tokens": [
+        "cfg_clear_sticky_faults",
+        "stale_reject",
+        "timeout_fault",
+        "clear_sticky"
+      ]
+    },
+    {
+      "id": "REQ-031",
+      "requirement": "No combinational loops, X-dependent control, or asynchronous recovery behavior are permitted.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-032",
+      "requirement": "req_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_valid"
+      ]
+    },
+    {
+      "id": "REQ-033",
+      "requirement": "req_geometry_source",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_geometry_source"
+      ]
+    },
+    {
+      "id": "REQ-034",
+      "requirement": "req_geometry_format",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_geometry_format"
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "requirement": "req_geometry_id",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_geometry_id"
+      ]
+    },
+    {
+      "id": "REQ-036",
+      "requirement": "req_stream_velocity_mps",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_stream_velocity_mps"
+      ]
+    },
+    {
+      "id": "REQ-037",
+      "requirement": "req_flow_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "req_flow_valid"
+      ]
+    },
+    {
+      "id": "REQ-038",
+      "requirement": "actuator_cmd",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_cmd"
+      ]
+    },
+    {
+      "id": "REQ-039",
+      "requirement": "actuator_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_valid"
+      ]
+    },
+    {
+      "id": "REQ-040",
+      "requirement": "fallback_active",
+      "status": "matched",
+      "evidence_tokens": [
+        "fallback_active"
+      ]
+    },
+    {
+      "id": "REQ-041",
+      "requirement": "stale_reject",
+      "status": "matched",
+      "evidence_tokens": [
+        "stale_reject"
+      ]
+    },
+    {
+      "id": "REQ-042",
+      "requirement": "timeout_fault",
+      "status": "matched",
+      "evidence_tokens": [
+        "timeout_fault"
+      ]
+    },
+    {
+      "id": "REQ-043",
+      "requirement": "cmd_clamped",
+      "status": "matched",
+      "evidence_tokens": [
+        "cmd_clamped"
+      ]
+    },
+    {
+      "id": "REQ-044",
+      "requirement": "status_code",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_code"
+      ]
+    },
+    {
+      "id": "REQ-045",
+      "requirement": "fault_code",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_code"
+      ]
+    },
+    {
+      "id": "REQ-046",
+      "requirement": "trace_req_id",
+      "status": "matched",
+      "evidence_tokens": [
+        "trace_req_id"
+      ]
+    },
+    {
+      "id": "REQ-047",
+      "requirement": "trace_rsp_id",
+      "status": "matched",
+      "evidence_tokens": [
+        "trace_rsp_id"
+      ]
+    },
+    {
+      "id": "REQ-048",
+      "requirement": "cfg_geometry_source",
+      "status": "matched",
+      "evidence_tokens": [
+        "cfg_geometry_source"
+      ]
+    },
+    {
+      "id": "REQ-049",
+      "requirement": "cfg_geometry_format",
+      "status": "matched",
+      "evidence_tokens": [
+        "cfg_geometry_format"
+      ]
+    },
+    {
+      "id": "REQ-050",
+      "requirement": "cfg_geometry_id",
+      "status": "matched",
+      "evidence_tokens": [
+        "cfg_geometry_id"
+      ]
+    },
+    {
+      "id": "REQ-051",
+      "requirement": "stream_velocity_mps",
+      "status": "matched",
+      "evidence_tokens": [
+        "stream_velocity_mps"
+      ]
+    },
+    {
+      "id": "REQ-052",
+      "requirement": "flow_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_valid"
+      ]
+    },
+    {
+      "id": "REQ-053",
+      "requirement": "rsp_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "rsp_valid"
+      ]
+    },
+    {
+      "id": "REQ-054",
+      "requirement": "drag_force",
+      "status": "matched",
+      "evidence_tokens": [
+        "drag_force"
+      ]
+    },
+    {
+      "id": "REQ-055",
+      "requirement": "lift_force",
+      "status": "matched",
+      "evidence_tokens": [
+        "lift_force"
+      ]
+    },
+    {
+      "id": "REQ-056",
+      "requirement": "surface_pressure",
+      "status": "matched",
+      "evidence_tokens": [
+        "surface_pressure"
+      ]
+    },
+    {
+      "id": "REQ-057",
+      "requirement": "flow_field_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_field_valid"
+      ]
+    },
+    {
+      "id": "REQ-058",
+      "requirement": "flow_field_meta",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_field_meta"
+      ]
+    },
+    {
+      "id": "REQ-059",
+      "requirement": "cfg_clear_sticky_faults",
+      "status": "matched",
+      "evidence_tokens": [
+        "cfg_clear_sticky_faults"
+      ]
+    },
+    {
+      "id": "REQ-060",
+      "requirement": "On reset_n deassertion, all state elements including request sequence counter, pending flag, timeout counter, safety flags, actuator registers, trace registers, and sticky status indicators shall initialize to safe values. The safe state sh",
+      "status": "matched",
+      "evidence_tokens": [
+        "reset_n",
+        "clear_sticky",
+        "status_pending",
+        "reset_zero"
+      ]
+    }
+  ],
+  "rtl_files": [
+    "backend/workflows/bc17f83c-f768-40d1-bd61-1230c3032b20/rtl/active_aero_ctrl_top.v"
+  ],
+  "modules": [
+    {
+      "name": "active_aero_ctrl_top",
+      "file": "backend/workflows/bc17f83c-f768-40d1-bd61-1230c3032b20/rtl/active_aero_ctrl_top.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "cfg_geometry_source",
+          "direction": "input",
+          "width": "[2:0]",
+          "bits": 3
+        },
+        {
+          "name": "cfg_geometry_format",
+          "direction": "input",
+          "width": "[2:0]",
+          "bits": 3
+        },
+        {
+          "name": "cfg_geometry_id",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "stream_velocity_mps",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "flow_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "req_id",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "req_geometry_source",
+          "direction": "output",
+          "width": "[2:0]",
+          "bits": 3
+        },
+        {
+          "name": "req_geometry_format",
+          "direction": "output",
+          "width": "[2:0]",
+          "bits": 3
+        },
+        {
+          "name": "req_geometry_id",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "req_stream_velocity_mps",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "req_flow_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rsp_id",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "drag_force",
+          "direction": "input",
+          "width": "[23:0]",
+          "bits": 24
+        },
+        {
+          "name": "lift_force",
+          "direction": "input",
+          "width": "[23:0]",
+          "bits": 24
+        },
+        {
+          "name": "surface_pressure",
+          "direction": "input",
+          "width": "[23:0]",
+          "bits": 24
+        },
+        {
+          "name": "flow_field_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "flow_field_meta",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "stale_reject",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "timeout_fault",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "cmd_clamped",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_code",
+          "direction": "output",
+          "width": "[2:0]",
+          "bits": 3
+        },
+        {
+          "name": "fault_code",
+          "direction": "output",
+          "width": "[2:0]",
+          "bits": 3
+        },
+        {
+          "name": "trace_req_id",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "trace_rsp_id",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "cfg_clear_sticky_faults",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}

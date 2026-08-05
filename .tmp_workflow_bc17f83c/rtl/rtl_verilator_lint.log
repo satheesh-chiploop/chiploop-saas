@@ -1,0 +1,55 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.043 MB sources in 2 modules, into 0.063 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.026 s (elab=0.003, cvt=0.013, bld=0.000); cpu 0.026 s on 1 threads; allocated 31.355 MB
+
+=== STDERR ===
+%Warning-WIDTHEXPAND: active_aero_ctrl_top.v:146:39: Operator ADD expects 16 bits on the RHS, but RHS's VARREF 'cfg_geometry_source_r' generates 3 bits.
+                                                   : ... note: In instance 'active_aero_ctrl_top'
+  146 |         raw_candidate = raw_candidate + cfg_geometry_source_r;
+      |                                       ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: active_aero_ctrl_top.v:147:39: Operator ADD expects 16 bits on the RHS, but RHS's VARREF 'cfg_geometry_format_r' generates 3 bits.
+                                                   : ... note: In instance 'active_aero_ctrl_top'
+  147 |         raw_candidate = raw_candidate + cfg_geometry_format_r;
+      |                                       ^
+%Warning-UNUSEDPARAM: active_aero_ctrl_top.v:40:22: Parameter is not used: 'STATUS_FAULTED'
+                                                  : ... note: In instance 'active_aero_ctrl_top'
+   40 |     localparam [2:0] STATUS_FAULTED = 3'd4;
+      |                      ^~~~~~~~~~~~~~
+                      ... For warning description see https://verilator.org/warn/UNUSEDPARAM?v=5.047
+                      ... Use "/* verilator lint_off UNUSEDPARAM */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: active_aero_ctrl_top.v:81:16: Signal is not used: 'latched_drag_force_r'
+                                                   : ... note: In instance 'active_aero_ctrl_top'
+   81 |     reg [15:0] latched_drag_force_r;
+      |                ^~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: active_aero_ctrl_top.v:82:16: Signal is not used: 'latched_lift_force_r'
+                                                   : ... note: In instance 'active_aero_ctrl_top'
+   82 |     reg [15:0] latched_lift_force_r;
+      |                ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_ctrl_top.v:83:16: Signal is not used: 'latched_surface_pressure_r'
+                                                   : ... note: In instance 'active_aero_ctrl_top'
+   83 |     reg [15:0] latched_surface_pressure_r;
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_ctrl_top.v:85:9: Signal is not used: 'flow_field_valid_r'
+                                                  : ... note: In instance 'active_aero_ctrl_top'
+   85 |     reg flow_field_valid_r;
+      |         ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_ctrl_top.v:86:9: Signal is not used: 'integrity_ok_r'
+                                                  : ... note: In instance 'active_aero_ctrl_top'
+   86 |     reg integrity_ok_r;
+      |         ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_ctrl_top.v:95:16: Signal is not used: 'timeout_limit'
+                                                   : ... note: In instance 'active_aero_ctrl_top'
+   95 |     reg [15:0] timeout_limit;
+      |                ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_ctrl_top.v:105:9: Signal is not used: 'clear_sticky'
+                                                   : ... note: In instance 'active_aero_ctrl_top'
+  105 |     reg clear_sticky;
+      |         ^~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

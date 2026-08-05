@@ -1,0 +1,260 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "top_module": "active_aero_ctrl_top",
+  "design_summary": {
+    "purpose": "Synthesizable ASIC digital IP block that supervises safety-critical command handling around an external DoMINO automotive aerodynamics surrogate using synchronous valid-qualified transactions, envelope checking, response integrity validation, timeout supervision, command clamping, and safety fallback.",
+    "operating_model": "The RTL block captures geometry metadata and flow samples, issues a request bundle to an off-block/off-chip surrogate only when the sampled flow is valid and within the accepted velocity envelope, tracks a pending request by monotonically increasing req_id, monitors the response for sequence match and integrity, synthesizes a deterministic fixed-point actuator command from validated model outputs, and arbitrates between normal actuation and safe fallback. The external physics model is not implemented in RTL and is referenced only through the transaction interface.",
+    "external_interfaces": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": 1,
+        "role": "primary synchronous clock"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": 1,
+        "role": "active-low synchronous reset"
+      },
+      {
+        "name": "cfg_geometry_source",
+        "direction": "input",
+        "width": 3,
+        "role": "geometry configuration metadata"
+      },
+      {
+        "name": "cfg_geometry_format",
+        "direction": "input",
+        "width": 3,
+        "role": "geometry configuration metadata"
+      },
+      {
+        "name": "cfg_geometry_id",
+        "direction": "input",
+        "width": 16,
+        "role": "geometry configuration metadata"
+      },
+      {
+        "name": "stream_velocity_mps",
+        "direction": "input",
+        "width": 16,
+        "role": "runtime flow input"
+      },
+      {
+        "name": "flow_valid",
+        "direction": "input",
+        "width": 1,
+        "role": "runtime flow qualifier"
+      },
+      {
+        "name": "req_valid",
+        "direction": "output",
+        "width": 1,
+        "role": "model request transaction valid"
+      },
+      {
+        "name": "req_id",
+        "direction": "output",
+        "width": 16,
+        "role": "monotonic request sequence identifier"
+      },
+      {
+        "name": "req_geometry_source",
+        "direction": "output",
+        "width": 3,
+        "role": "forwarded geometry metadata in request bundle"
+      },
+      {
+        "name": "req_geometry_format",
+        "direction": "output",
+        "width": 3,
+        "role": "forwarded geometry metadata in request bundle"
+      },
+      {
+        "name": "req_geometry_id",
+        "direction": "output",
+        "width": 16,
+        "role": "forwarded geometry metadata in request bundle"
+      },
+      {
+        "name": "req_stream_velocity_mps",
+        "direction": "output",
+        "width": 16,
+        "role": "forwarded flow condition in request bundle"
+      },
+      {
+        "name": "req_flow_valid",
+        "direction": "output",
+        "width": 1,
+        "role": "forwarded flow validity in request bundle"
+      },
+      {
+        "name": "rsp_valid",
+        "direction": "input",
+        "width": 1,
+        "role": "model response transaction valid"
+      },
+      {
+        "name": "rsp_id",
+        "direction": "input",
+        "width": 16,
+        "role": "response sequence identifier"
+      },
+      {
+        "name": "drag_force",
+        "direction": "input",
+        "width": 24,
+        "role": "validated surrogate output payload"
+      },
+      {
+        "name": "lift_force",
+        "direction": "input",
+        "width": 24,
+        "role": "validated surrogate output payload"
+      },
+      {
+        "name": "surface_pressure",
+        "direction": "input",
+        "width": 24,
+        "role": "validated surrogate output payload"
+      },
+      {
+        "name": "flow_field_valid",
+        "direction": "input",
+        "width": 1,
+        "role": "response integrity qualifier"
+      },
+      {
+        "name": "flow_field_meta",
+        "direction": "input",
+        "width": 16,
+        "role": "response metadata payload"
+      },
+      {
+        "name": "actuator_cmd",
+        "direction": "output",
+        "width": 16,
+        "role": "synthesized actuator command"
+      },
+      {
+        "name": "actuator_valid",
+        "direction": "output",
+        "width": 1,
+        "role": "actuator command qualifier"
+      },
+      {
+        "name": "fallback_active",
+        "direction": "output",
+        "width": 1,
+        "role": "safety fallback indicator"
+      },
+      {
+        "name": "stale_reject",
+        "direction": "output",
+        "width": 1,
+        "role": "stale response rejection indicator"
+      },
+      {
+        "name": "timeout_fault",
+        "direction": "output",
+        "width": 1,
+        "role": "timeout supervision indicator"
+      },
+      {
+        "name": "cmd_clamped",
+        "direction": "output",
+        "width": 1,
+        "role": "command clamp indicator"
+      },
+      {
+        "name": "status_code",
+        "direction": "output",
+        "width": 3,
+        "role": "traceable status encoding"
+      },
+      {
+        "name": "fault_code",
+        "direction": "output",
+        "width": 3,
+        "role": "traceable fault encoding"
+      },
+      {
+        "name": "trace_req_id",
+        "direction": "output",
+        "width": 16,
+        "role": "request traceability register"
+      },
+      {
+        "name": "trace_rsp_id",
+        "direction": "output",
+        "width": 16,
+        "role": "response traceability register"
+      },
+      {
+        "name": "cfg_clear_sticky_faults",
+        "direction": "input",
+        "width": 1,
+        "role": "synchronous sticky fault clear control"
+      }
+    ]
+  },
+  "module_architecture": {
+    "name": "active_aero_ctrl_top",
+    "role": "Single top-level synchronous control block that integrates request supervision, response monitoring, command synthesis, clamping, rate limiting, fallback arbitration, and traceability for the external DoMINO surrogate contract.",
+    "responsibilities": [
+      "Capture and register geometry configuration metadata for source, format, and ID.",
+      "Accept runtime flow samples only when flow_valid is asserted and stream_velocity_mps is inside the parameterized operating envelope, with mandatory acceptance support for 20 through 55 inclusive.",
+      "Generate a monotonically incrementing req_id for each accepted model request transaction.",
+      "Drive the valid request bundle to the external surrogate through explicit request ports.",
+      "Track a pending request until a matching response is accepted or timeout occurs.",
+      "Discard mismatched responses and assert stale_reject for the transaction.",
+      "Detect timeout expiration using a synthesizable counter while a request is pending.",
+      "Validate response integrity using sequence match, required qualifiers, and freshness timing.",
+      "Synthesize an actuator command from validated model outputs using deterministic fixed-point or integer policy logic.",
+      "Clamp actuator command to configurable bounds and optionally apply rate limiting using registered previous output and saturating arithmetic.",
+      "Assert fallback_active and suppress actuator_valid whenever safety conditions require fallback.",
+      "Provide stable traceability registers for req_id, rsp_id, status_code, and fault_code.",
+      "Support synchronous recovery from fallback only after a valid request-response cycle and clearance of all safety conditions."
+    ],
+    "interface_notes": [
+      "All handshakes are synchronous to clk and use explicit valid qualifiers.",
+      "reset_n is active-low, synchronous, and initializes all state to safe fallback.",
+      "The external surrogate is outside the ASIC netlist and is referenced only by the request/response contract.",
+      "No new modules, ports, or filenames are introduced beyond the spec-defined top-level interface."
+    ],
+    "ownership_notes": [
+      "Safe state asserts fallback_active, deasserts actuator_valid, and drives actuator_cmd to the registered safe default value.",
+      "All state elements including request sequence tracking, pending status, timeout supervision, safety flags, actuator registers, trace registers, and sticky status indicators are reset synchronously.",
+      "The block remains RTL-clean and synthesis-friendly for ASIC integration."
+    ]
+  },
+  "data_flow_summary": [
+    "Configuration metadata enters through cfg_geometry_source, cfg_geometry_format, and cfg_geometry_id and is forwarded into the request bundle when a request is issued.",
+    "Runtime flow input enters through stream_velocity_mps and flow_valid; only valid samples within the allowed velocity envelope can initiate a new request.",
+    "When issuance conditions are met, the block presents req_valid together with req_id and forwarded geometry/flow fields to the external surrogate.",
+    "The response path accepts rsp_valid, rsp_id, drag_force, lift_force, surface_pressure, flow_field_valid, and flow_field_meta and checks sequence alignment, integrity qualifiers, and freshness.",
+    "Validated response data feed deterministic command synthesis logic, which produces a command candidate that is then clamped and optionally rate-limited before reaching actuator_cmd.",
+    "Safety supervision overrides the normal command path whenever reset, envelope violation, stale response, timeout, mismatch, or response invalidity is detected.",
+    "Trace outputs expose the issued request ID and the most recently observed response ID along with stable status_code and fault_code encodings.",
+    "Sticky or pulse behavior for stale_reject and timeout_fault is controlled by the implementation policy described in the spec, with synchronous clear support via cfg_clear_sticky_faults if sticky mode is used."
+  ],
+  "clock_reset_summary": {
+    "clocking": "Single clock domain on clk at 50.0 MHz nominal operating frequency with 20.0 ns period; all logic is fully synchronous.",
+    "reset_behavior": "reset_n is active-low and synchronous. On reset_n deassertion, all state initializes to safe fallback: request sequence counter cleared, pending request flag cleared, timeout counter cleared, safety flags asserted to fallback-safe defaults, actuator registers set to the registered safe default value, trace registers cleared or driven to safe values, and non-sticky indicators cleared unless explicitly parameterized as sticky. Recovery from fallback is synchronous and deterministic; no asynchronous release behavior is used."
+  },
+  "integration_notes": [
+    "The block is intended for ASIC integration as digital_ip_asic and relies on an external DoMINO surrogate service for physics computation.",
+    "The request/response contract is explicitly visible at the ports; the surrogate itself is outside RTL.",
+    "Parameterized envelope, timeout, clamp limits, rate-limit delta, safe default actuator value, and stable status/fault encodings are implementation parameters, but the architecture must support the required velocity acceptance range of 20..55 inclusive.",
+    "All arithmetic is fixed-point or integer; no floating-point operator is required.",
+    "Long control paths should be registered as needed to meet ASIC timing closure.",
+    "No combinational loops or X-dependent handshake logic are permitted.",
+    "cfg_clear_sticky_faults may be used to clear sticky stale_reject and timeout_fault indicators when sticky mode is implemented."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "Hierarchy, ports, and filenames are inherited from digital_spec_json."
+  ]
+}
