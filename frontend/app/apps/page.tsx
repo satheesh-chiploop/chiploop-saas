@@ -1090,7 +1090,7 @@ export default function AppsHomePage() {
       "fpga-formal": "/apps/fpga-formal",
       "fpga-synthesis": "/apps/fpga-synthesis",
       "fpga-implementation": "/apps/fpga-implementation",
-      "physical-ai-motor-control": "/apps/physical-ai-motor-control",
+      "physical-ai-motor-control": "/apps/physical-ai?reference=motor",
       "physical-ai": "/apps/physical-ai",
       "integrate": "/apps/integrate",
       "dqa": "/apps/dqa",
@@ -1784,7 +1784,6 @@ export default function AppsHomePage() {
     </main>
   );
 }
-
 
 
 

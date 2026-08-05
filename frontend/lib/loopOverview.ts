@@ -91,6 +91,7 @@ const physicalAi: LoopOverview = {
     { name: "Physical AI Requirements Agent", description: "Creates the application and safety requirements contract." },
     { name: "Physical AI Model Selection Agent", description: "Selects a compatible governed model from Supabase." },
     { name: "Physical AI Physics Execution Agent", description: "Executes physics, envelope, fixed-point, and RTL evidence." },
+    { name: "Physical AI Architecture Agent", description: "Uses the selected agent model and physics evidence to create the product architecture and RTL-ready specification." },
     { name: "Physical AI Orchestrator Agent", description: "Judges readiness and delegates to existing ChipLoop loops." },
   ],
   reference: {

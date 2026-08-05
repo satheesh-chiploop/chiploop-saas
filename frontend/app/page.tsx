@@ -172,7 +172,7 @@ const workflowAgentChart = [
   {
     label: "Physical AI Motor Product",
     example: "PMSM model to product demo",
-    agents: { physical_ai: 4, system: 4, analog: 0, digital: 0, fpga: 22, firmware: 10, software: 12, product: 6 },
+    agents: { physical_ai: 5, system: 4, analog: 0, digital: 0, fpga: 22, firmware: 10, software: 12, product: 6 },
   },
   {
     label: "Digital IP Product",
@@ -253,13 +253,12 @@ const endToEndJourney = [
 ];
 
 const physicalAiReferenceFlow = [
-  { type: "App", name: "Physical AI Design Studio" },
-  { type: "Workflow", name: "Physical_AI_Loop" },
-  { type: "Agent", name: "Requirements" },
-  { type: "Agent", name: "Model Selection" },
-  { type: "Agent", name: "Physics Execution" },
-  { type: "Agent", name: "Orchestrator" },
-  { type: "HEM", name: "FPGA → Firmware → Validation → Product" },
+  { step: "1", name: "Bring your application", detail: "Describe what you want to build" },
+  { step: "2", name: "Choose a surrogate model", detail: "Use a pretrained physics model" },
+  { step: "3", name: "Define the architecture", detail: "Explore and optimize the product design" },
+  { step: "4", name: "Create and verify the design", detail: "Generate RTL and check that it works" },
+  { step: "5", name: "Choose FPGA or ASIC", detail: "Prototype on a board or build digital IP" },
+  { step: "6", name: "Build the product", detail: "Add software, test, and deliver" },
 ];
 
 const eyebrowClass = "text-xs font-semibold uppercase text-cyan-300";
@@ -400,16 +399,17 @@ function LandingPageContent() {
           <div className="rounded-xl border border-fuchsia-400/30 bg-slate-900/70 p-5 sm:p-8">
             <div className="mx-auto max-w-4xl text-center">
               <div className="flex flex-wrap items-center justify-center gap-3"><p className="text-xs font-semibold uppercase text-fuchsia-300">Physical AI Reference Journey</p><span className="rounded-full border border-fuchsia-400/40 bg-fuchsia-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span></div>
-              <h2 className={`${sectionTitleClass} mx-auto`}>From a governed physics model to a validated product demonstration.</h2>
-              <p className={`${sectionBodyClass} mx-auto`}>The parent Physical AI workflow owns requirements and physics evidence, then HEM reuses ChipLoop&apos;s FPGA, firmware, software, validation, and product workflows.</p>
+              <h2 className={`${sectionTitleClass} mx-auto`}>Bring an application. Build an FPGA or ASIC product.</h2>
+              <p className={`${sectionBodyClass} mx-auto`}>Choose a pretrained surrogate model, shape the best architecture, create and verify the design, then decide whether to prototype with an FPGA or continue as digital IP for an ASIC.</p>
             </div>
             <div className="mt-8 overflow-x-auto pb-2">
-              <div className="mx-auto grid min-w-[1180px] grid-cols-[repeat(13,minmax(0,auto))] items-stretch justify-center gap-2">
+              <div className="mx-auto grid min-w-[1050px] grid-cols-[repeat(11,minmax(0,auto))] items-stretch justify-center gap-2">
                 {physicalAiReferenceFlow.map((stage, index) => (
-                  <div key={`${stage.type}-${stage.name}`} className="contents">
-                    <div className="flex w-36 flex-col justify-center rounded-xl border border-fuchsia-400/30 bg-slate-950/80 p-3 text-center">
-                      <span className="text-[10px] font-bold uppercase tracking-wide text-fuchsia-300">{stage.type}</span>
-                      <span className="mt-2 text-xs font-semibold leading-5 text-slate-100">{stage.name}</span>
+                  <div key={stage.name} className="contents">
+                    <div className="flex w-40 flex-col justify-center rounded-xl border border-fuchsia-400/30 bg-slate-950/80 p-4 text-center">
+                      <span className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-fuchsia-500/15 text-xs font-bold text-fuchsia-200">{stage.step}</span>
+                      <span className="mt-3 text-sm font-semibold leading-5 text-slate-100">{stage.name}</span>
+                      <span className="mt-2 text-xs leading-5 text-slate-400">{stage.detail}</span>
                     </div>
                     {index < physicalAiReferenceFlow.length - 1 && <div className="flex items-center justify-center text-lg font-bold text-fuchsia-300/60" aria-hidden="true">→</div>}
                   </div>
