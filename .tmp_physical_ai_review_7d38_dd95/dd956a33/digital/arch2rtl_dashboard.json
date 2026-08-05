@@ -1,0 +1,1852 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "aero_guard_ctrl",
+  "rtl_file_count": 2,
+  "module_count": 1,
+  "modules": [
+    {
+      "name": "aero_guard_ctrl",
+      "file": "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v",
+      "input_count": 179,
+      "output_count": 153,
+      "inout_count": 0,
+      "input_port_count": 15,
+      "output_port_count": 19,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_in",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "flow_conditions_in",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "model_request_ready_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_response_valid_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_response_request_id_in",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "model_response_status_in",
+          "direction": "input",
+          "width": "[3:0]"
+        },
+        {
+          "name": "model_response_drag_force_in",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "model_response_lift_force_in",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "model_response_surface_pressure_in",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "model_response_flow_field_token_in",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "external_fault_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "manual_override_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "safe_mode_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_request_valid_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "model_request_request_id_out",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "model_request_geometry_out",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "model_request_flow_conditions_out",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "model_request_mode_flags_out",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "model_request_ready_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "actuator_cmd_valid_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "actuator_cmd_surface_select_out",
+          "direction": "output",
+          "width": "[3:0]"
+        },
+        {
+          "name": "actuator_cmd_position_setpoint_out",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator_cmd_enable_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "actuator_cmd_fault_flag_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "safe_fallback_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "busy",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "stale_reject",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "clamp_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "timeout_flag",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_flag",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 179,
+    "output_count": 153,
+    "inout_count": 0,
+    "input_port_count": 15,
+    "output_port_count": 19,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "vehicle_geometry_in",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "flow_conditions_in",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "model_request_ready_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_response_valid_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_response_request_id_in",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "model_response_status_in",
+        "direction": "input",
+        "width": "[3:0]"
+      },
+      {
+        "name": "model_response_drag_force_in",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "model_response_lift_force_in",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "model_response_surface_pressure_in",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "model_response_flow_field_token_in",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "external_fault_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "manual_override_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "safe_mode_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_request_valid_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "model_request_request_id_out",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "model_request_geometry_out",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "model_request_flow_conditions_out",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "model_request_mode_flags_out",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "model_request_ready_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "actuator_cmd_valid_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "actuator_cmd_surface_select_out",
+        "direction": "output",
+        "width": "[3:0]"
+      },
+      {
+        "name": "actuator_cmd_position_setpoint_out",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator_cmd_enable_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "actuator_cmd_fault_flag_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "safe_fallback_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "busy",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "stale_reject",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "clamp_active",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fallback_active",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "timeout_flag",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fault_flag",
+        "direction": "output",
+        "width": "1"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 484,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 49,
+    "latch_target_count": 0,
+    "sequential_blocks": 4,
+    "posedge_blocks": 2,
+    "negedge_blocks": 2,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "actuator_cmd_enable_reg",
+      "actuator_cmd_fault_flag_reg",
+      "actuator_cmd_position_setpoint_reg",
+      "actuator_cmd_surface_select_reg",
+      "actuator_cmd_valid_reg",
+      "busy_out_reg",
+      "busy_reg",
+      "clamp_active_out_reg",
+      "clamp_active_reg",
+      "cmd_max_reg",
+      "cmd_min_reg",
+      "ctrl_reg",
+      "fallback_active_out_reg",
+      "fallback_active_reg",
+      "fault_flag_out_reg",
+      "fault_flag_reg",
+      "final_enable_reg",
+      "final_fault_reg",
+      "final_setpoint_reg",
+      "final_surface_select_reg",
+      "final_valid_reg",
+      "model_request_flow_conditions_reg",
+      "model_request_geometry_reg",
+      "model_request_mode_flags_reg",
+      "model_request_ready_reg",
+      "model_request_request_id_reg",
+      "model_request_valid_reg",
+      "outstanding_request_reg",
+      "pre_clamp_setpoint_reg",
+      "rate_max_delta_reg",
+      "req_flow_reg",
+      "req_geom_reg",
+      "req_mode_flags_reg",
+      "request_age_reg",
+      "request_id_reg",
+      "request_pending_reg",
+      "resp_drag_reg",
+      "resp_flow_token_reg",
+      "resp_lift_reg",
+      "resp_pressure_reg",
+      "resp_status_reg",
+      "safe_fallback_reg",
+      "safe_position_reg",
+      "stale_reject_out_reg",
+      "stale_reject_reg",
+      "timeout_cycles_reg",
+      "timeout_flag_out_reg",
+      "timeout_flag_reg",
+      "valid_reg"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 2,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "warnings",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 0,
+    "warning_count": 18,
+    "error_count": 0,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "aero_guard_ctrl",
+      "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v",
+      "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/pass2/aero_guard_ctrl.v"
+    ],
+    "stdout_tail": [
+      "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b",
+      "- Verilator: Built from 0.079 MB sources in 2 modules, into 0.038 MB in 3 C++ files needing 0.000 MB",
+      "- Verilator: Walltime 0.020 s (elab=0.002, cvt=0.008, bld=0.000); cpu 0.020 s on 1 threads; allocated 32.355 MB"
+    ],
+    "stderr_tail": [
+      "    1 | module aero_guard_ctrl (",
+      "      |        ^~~~~~~~~~~~~~~",
+      "                 backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:1:8: ... Location of original declaration",
+      "    1 | module aero_guard_ctrl (",
+      "      |        ^~~~~~~~~~~~~~~",
+      "                 ... For warning description see https://verilator.org/warn/MODDUP?v=5.047",
+      "                 ... Use \"/* verilator lint_off MODDUP */\" and lint_on around source to disable this message.",
+      "%Warning-ALWNEVER: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:220:1: 'always @*' will never execute as expression list is empty (no variables read)",
+      "                                                                                                     : ... note: In instance 'aero_guard_ctrl'",
+      "                                                                                                     : ... Suggest use 'always_comb'",
+      "  220 | always @(*) begin",
+      "      | ^~~~~~",
+      "                   ... For warning description see https://verilator.org/warn/ALWNEVER?v=5.047",
+      "                   ... Use \"/* verilator lint_off ALWNEVER */\" and lint_on around source to disable this message.",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:80:11: Bits of signal are not used: 'ctrl_reg'[7:4]",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "   80 | reg [7:0] ctrl_reg;",
+      "      |           ^~~~~~~~",
+      "                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047",
+      "                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:84:12: Signal is not used: 'safe_position_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "   84 | reg [15:0] safe_position_reg;",
+      "      |            ^~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:89:5: Signal is not used: 'outstanding_request_reg'",
+      "                                                                                                        : ... note: In instance 'aero_guard_ctrl'",
+      "   89 | reg outstanding_request_reg;",
+      "      |     ^~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:91:12: Signal is not used: 'req_geom_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "   91 | reg [63:0] req_geom_reg;",
+      "      |            ^~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:92:12: Signal is not used: 'req_flow_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "   92 | reg [31:0] req_flow_reg;",
+      "      |            ^~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:93:11: Signal is not used: 'req_mode_flags_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "   93 | reg [7:0] req_mode_flags_reg;",
+      "      |           ^~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:96:12: Signal is not used: 'resp_lift_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "   96 | reg [15:0] resp_lift_reg;",
+      "      |            ^~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:98:11: Signal is not used: 'resp_flow_token_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "   98 | reg [7:0] resp_flow_token_reg;",
+      "      |           ^~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:99:11: Signal is not used: 'resp_status_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "   99 | reg [3:0] resp_status_reg;",
+      "      |           ^~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:101:12: Signal is not used: 'pre_clamp_setpoint_reg'",
+      "                                                                                                          : ... note: In instance 'aero_guard_ctrl'",
+      "  101 | reg [15:0] pre_clamp_setpoint_reg;",
+      "      |            ^~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:102:12: Signal is not used: 'final_setpoint_reg'",
+      "                                                                                                          : ... note: In instance 'aero_guard_ctrl'",
+      "  102 | reg [15:0] final_setpoint_reg;",
+      "      |            ^~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:103:11: Signal is not used: 'final_surface_select_reg'",
+      "                                                                                                          : ... note: In instance 'aero_guard_ctrl'",
+      "  103 | reg [3:0] final_surface_select_reg;",
+      "      |           ^~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:104:5: Signal is not used: 'final_enable_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "  104 | reg final_enable_reg;",
+      "      |     ^~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:105:5: Signal is not used: 'final_valid_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "  105 | reg final_valid_reg;",
+      "      |     ^~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:112:5: Signal is not used: 'busy_reg'",
+      "                                                                                                         : ... note: In instance 'aero_guard_ctrl'",
+      "  112 | reg busy_reg;",
+      "      |     ^~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:156:13: Signal is not used: 'rate_limited_setpoint'",
+      "                                                                                                          : ... note: In instance 'aero_guard_ctrl'",
+      "  156 | wire [15:0] rate_limited_setpoint;",
+      "      |             ^~~~~~~~~~~~~~~~~~~~~"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "aero_guard_ctrl",
+        "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v",
+        "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/pass2/aero_guard_ctrl.v"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stdout": "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b\n- Verilator: Built from 0.079 MB sources in 2 modules, into 0.038 MB in 3 C++ files needing 0.000 MB\n- Verilator: Walltime 0.020 s (elab=0.002, cvt=0.008, bld=0.000); cpu 0.020 s on 1 threads; allocated 32.355 MB\n",
+      "stderr": "%Warning-MODDUP: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/pass2/aero_guard_ctrl.v:1:8: Duplicate declaration of module: 'aero_guard_ctrl'\n    1 | module aero_guard_ctrl (\n      |        ^~~~~~~~~~~~~~~\n                 backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:1:8: ... Location of original declaration\n    1 | module aero_guard_ctrl (\n      |        ^~~~~~~~~~~~~~~\n                 ... For warning description see https://verilator.org/warn/MODDUP?v=5.047\n                 ... Use \"/* verilator lint_off MODDUP */\" and lint_on around source to disable this message.\n%Warning-ALWNEVER: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:220:1: 'always @*' will never execute as expression list is empty (no variables read)\n                                                                                                     : ... note: In instance 'aero_guard_ctrl'\n                                                                                                     : ... Suggest use 'always_comb'\n  220 | always @(*) begin\n      | ^~~~~~\n                   ... For warning description see https://verilator.org/warn/ALWNEVER?v=5.047\n                   ... Use \"/* verilator lint_off ALWNEVER */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:80:11: Bits of signal are not used: 'ctrl_reg'[7:4]\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n   80 | reg [7:0] ctrl_reg;\n      |           ^~~~~~~~\n                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047\n                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:84:12: Signal is not used: 'safe_position_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n   84 | reg [15:0] safe_position_reg;\n      |            ^~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:89:5: Signal is not used: 'outstanding_request_reg'\n                                                                                                        : ... note: In instance 'aero_guard_ctrl'\n   89 | reg outstanding_request_reg;\n      |     ^~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:91:12: Signal is not used: 'req_geom_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n   91 | reg [63:0] req_geom_reg;\n      |            ^~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:92:12: Signal is not used: 'req_flow_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n   92 | reg [31:0] req_flow_reg;\n      |            ^~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:93:11: Signal is not used: 'req_mode_flags_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n   93 | reg [7:0] req_mode_flags_reg;\n      |           ^~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:96:12: Signal is not used: 'resp_lift_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n   96 | reg [15:0] resp_lift_reg;\n      |            ^~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:98:11: Signal is not used: 'resp_flow_token_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n   98 | reg [7:0] resp_flow_token_reg;\n      |           ^~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:99:11: Signal is not used: 'resp_status_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n   99 | reg [3:0] resp_status_reg;\n      |           ^~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:101:12: Signal is not used: 'pre_clamp_setpoint_reg'\n                                                                                                          : ... note: In instance 'aero_guard_ctrl'\n  101 | reg [15:0] pre_clamp_setpoint_reg;\n      |            ^~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:102:12: Signal is not used: 'final_setpoint_reg'\n                                                                                                          : ... note: In instance 'aero_guard_ctrl'\n  102 | reg [15:0] final_setpoint_reg;\n      |            ^~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:103:11: Signal is not used: 'final_surface_select_reg'\n                                                                                                          : ... note: In instance 'aero_guard_ctrl'\n  103 | reg [3:0] final_surface_select_reg;\n      |           ^~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:104:5: Signal is not used: 'final_enable_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n  104 | reg final_enable_reg;\n      |     ^~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:105:5: Signal is not used: 'final_valid_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n  105 | reg final_valid_reg;\n      |     ^~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:112:5: Signal is not used: 'busy_reg'\n                                                                                                         : ... note: In instance 'aero_guard_ctrl'\n  112 | reg busy_reg;\n      |     ^~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v:156:13: Signal is not used: 'rate_limited_setpoint'\n                                                                                                          : ... note: In instance 'aero_guard_ctrl'\n  156 | wire [15:0] rate_limited_setpoint;\n      |             ^~~~~~~~~~~~~~~~~~~~~\n",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-05T14:28:41.708064+00:00",
+      "ended_at": "2026-08-05T14:28:41.828388+00:00",
+      "elapsed_ms": 120
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 2,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "aero_guard_ctrl",
+          "file": "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v",
+          "input_count": 179,
+          "output_count": 153,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 19,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_in",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "flow_conditions_in",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_request_ready_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_valid_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_request_id_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_status_in",
+              "direction": "input",
+              "width": "[3:0]"
+            },
+            {
+              "name": "model_response_drag_force_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_lift_force_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_surface_pressure_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_flow_field_token_in",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "external_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "manual_override_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_mode_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_request_valid_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_request_request_id_out",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_request_geometry_out",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "model_request_flow_conditions_out",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_request_mode_flags_out",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "model_request_ready_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_valid_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_surface_select_out",
+              "direction": "output",
+              "width": "[3:0]"
+            },
+            {
+              "name": "actuator_cmd_position_setpoint_out",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_cmd_enable_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_fault_flag_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_fallback_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_flag",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_flag",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 179,
+        "output_count": 153,
+        "inout_count": 0,
+        "input_port_count": 15,
+        "output_port_count": 19,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_in",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "flow_conditions_in",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_request_ready_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_valid_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_request_id_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_status_in",
+            "direction": "input",
+            "width": "[3:0]"
+          },
+          {
+            "name": "model_response_drag_force_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_lift_force_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_surface_pressure_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_flow_field_token_in",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "external_fault_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "manual_override_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "safe_mode_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_request_valid_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_request_request_id_out",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_request_geometry_out",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "model_request_flow_conditions_out",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_request_mode_flags_out",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "model_request_ready_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_valid_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_surface_select_out",
+            "direction": "output",
+            "width": "[3:0]"
+          },
+          {
+            "name": "actuator_cmd_position_setpoint_out",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_cmd_enable_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_fault_flag_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "safe_fallback_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "busy",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "stale_reject",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "clamp_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "timeout_flag",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_flag",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 484,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 49,
+        "latch_target_count": 0,
+        "sequential_blocks": 4,
+        "posedge_blocks": 2,
+        "negedge_blocks": 2,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_cmd_enable_reg",
+          "actuator_cmd_fault_flag_reg",
+          "actuator_cmd_position_setpoint_reg",
+          "actuator_cmd_surface_select_reg",
+          "actuator_cmd_valid_reg",
+          "busy_out_reg",
+          "busy_reg",
+          "clamp_active_out_reg",
+          "clamp_active_reg",
+          "cmd_max_reg",
+          "cmd_min_reg",
+          "ctrl_reg",
+          "fallback_active_out_reg",
+          "fallback_active_reg",
+          "fault_flag_out_reg",
+          "fault_flag_reg",
+          "final_enable_reg",
+          "final_fault_reg",
+          "final_setpoint_reg",
+          "final_surface_select_reg",
+          "final_valid_reg",
+          "model_request_flow_conditions_reg",
+          "model_request_geometry_reg",
+          "model_request_mode_flags_reg",
+          "model_request_ready_reg",
+          "model_request_request_id_reg",
+          "model_request_valid_reg",
+          "outstanding_request_reg",
+          "pre_clamp_setpoint_reg",
+          "rate_max_delta_reg",
+          "req_flow_reg",
+          "req_geom_reg",
+          "req_mode_flags_reg",
+          "request_age_reg",
+          "request_id_reg",
+          "request_pending_reg",
+          "resp_drag_reg",
+          "resp_flow_token_reg",
+          "resp_lift_reg",
+          "resp_pressure_reg",
+          "resp_status_reg",
+          "safe_fallback_reg",
+          "safe_position_reg",
+          "stale_reject_out_reg",
+          "stale_reject_reg",
+          "timeout_cycles_reg",
+          "timeout_flag_out_reg",
+          "timeout_flag_reg",
+          "valid_reg"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 2,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 1,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "aero_guard_ctrl",
+          "file": "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/handoff/aero_guard_ctrl_ip_package/rtl/aero_guard_ctrl.v",
+          "input_count": 179,
+          "output_count": 153,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 19,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_in",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "flow_conditions_in",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_request_ready_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_valid_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_request_id_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_status_in",
+              "direction": "input",
+              "width": "[3:0]"
+            },
+            {
+              "name": "model_response_drag_force_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_lift_force_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_surface_pressure_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_flow_field_token_in",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "external_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "manual_override_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_mode_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_request_valid_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_request_request_id_out",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_request_geometry_out",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "model_request_flow_conditions_out",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_request_mode_flags_out",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "model_request_ready_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_valid_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_surface_select_out",
+              "direction": "output",
+              "width": "[3:0]"
+            },
+            {
+              "name": "actuator_cmd_position_setpoint_out",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_cmd_enable_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_fault_flag_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_fallback_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_flag",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_flag",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 179,
+        "output_count": 153,
+        "inout_count": 0,
+        "input_port_count": 15,
+        "output_port_count": 19,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_in",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "flow_conditions_in",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_request_ready_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_valid_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_request_id_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_status_in",
+            "direction": "input",
+            "width": "[3:0]"
+          },
+          {
+            "name": "model_response_drag_force_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_lift_force_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_surface_pressure_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_flow_field_token_in",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "external_fault_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "manual_override_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "safe_mode_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_request_valid_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_request_request_id_out",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_request_geometry_out",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "model_request_flow_conditions_out",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_request_mode_flags_out",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "model_request_ready_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_valid_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_surface_select_out",
+            "direction": "output",
+            "width": "[3:0]"
+          },
+          {
+            "name": "actuator_cmd_position_setpoint_out",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_cmd_enable_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_fault_flag_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "safe_fallback_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "busy",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "stale_reject",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "clamp_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "timeout_flag",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_flag",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 484,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 49,
+        "latch_target_count": 0,
+        "sequential_blocks": 2,
+        "posedge_blocks": 1,
+        "negedge_blocks": 1,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_cmd_enable_reg",
+          "actuator_cmd_fault_flag_reg",
+          "actuator_cmd_position_setpoint_reg",
+          "actuator_cmd_surface_select_reg",
+          "actuator_cmd_valid_reg",
+          "busy_out_reg",
+          "busy_reg",
+          "clamp_active_out_reg",
+          "clamp_active_reg",
+          "cmd_max_reg",
+          "cmd_min_reg",
+          "ctrl_reg",
+          "fallback_active_out_reg",
+          "fallback_active_reg",
+          "fault_flag_out_reg",
+          "fault_flag_reg",
+          "final_enable_reg",
+          "final_fault_reg",
+          "final_setpoint_reg",
+          "final_surface_select_reg",
+          "final_valid_reg",
+          "model_request_flow_conditions_reg",
+          "model_request_geometry_reg",
+          "model_request_mode_flags_reg",
+          "model_request_ready_reg",
+          "model_request_request_id_reg",
+          "model_request_valid_reg",
+          "outstanding_request_reg",
+          "pre_clamp_setpoint_reg",
+          "rate_max_delta_reg",
+          "req_flow_reg",
+          "req_geom_reg",
+          "req_mode_flags_reg",
+          "request_age_reg",
+          "request_id_reg",
+          "request_pending_reg",
+          "resp_drag_reg",
+          "resp_flow_token_reg",
+          "resp_lift_reg",
+          "resp_pressure_reg",
+          "resp_status_reg",
+          "safe_fallback_reg",
+          "safe_position_reg",
+          "stale_reject_out_reg",
+          "stale_reject_reg",
+          "timeout_cycles_reg",
+          "timeout_flag_out_reg",
+          "timeout_flag_reg",
+          "valid_reg"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 1,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 40,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control and status shadow register for firmware-visible configuration and observation of the aero_guard_ctrl pipeline. Writes program operating mode qualifiers; reads return live status-encoded bits where applicable.",
+        "fields": [
+          {
+            "name": "MANUAL_OVERRIDE_EN",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Firmware shadow of manual override intent. When set, firmware indicates the controller should remain in conservative fallback behavior. This does not bypass safety checks."
+          },
+          {
+            "name": "SAFE_MODE_EN",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Firmware shadow of safe mode intent. When set, firmware requests conservative fallback behavior. This does not bypass safety checks."
+          },
+          {
+            "name": "REQUEST_ARM",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Firmware request arm bit. When written to 1, the controller may launch a request if model_request_ready_in is asserted, no outstanding request is active, and fallback lockout conditions do not apply. Self-clears in hardware after accepted launch or if launch is not permitted."
+          },
+          {
+            "name": "RATE_LIMIT_EN",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables the optional rate limiter if implemented by parameterization. When 0, only clamp protection applies."
+          },
+          {
+            "name": "CLEAR_STICKY",
+            "lsb": 4,
+            "msb": 4,
+            "access": "W1C",
+            "reset": 0,
+            "description": "Write 1 to clear sticky software-visible fault/status summary bits that are clearable by firmware. Does not clear live hardware conditions such as external_fault_in or timeout until they deassert or are serviced by hardware."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x01",
+        "access": "RO",
+        "description": "Live status summary reflecting the final decision of the control pipeline each cycle.",
+        "fields": [
+          {
+            "name": "VALID",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Final-cycle command validity indication."
+          },
+          {
+            "name": "BUSY",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Outstanding request is active."
+          },
+          {
+            "name": "STALE_REJECT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "A stale, mismatched, late, missing, or otherwise invalid response was discarded."
+          },
+          {
+            "name": "CLAMP_ACTIVE",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Synthesized position setpoint was saturated to CMD_MIN/CMD_MAX or otherwise limited."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 1,
+            "description": "Conservative fallback command selection is active."
+          },
+          {
+            "name": "TIMEOUT_FLAG",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Request age exceeded TIMEOUT_CYCLES before a matching valid response arrived."
+          },
+          {
+            "name": "FAULT_FLAG",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "System-level fault indication reflecting final pipeline safety status."
+          },
+          {
+            "name": "OUTSTANDING_REQUEST",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Hardware indicates a request is in flight and awaiting response."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CYCLES_L",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Low byte of programmable TIMEOUT_CYCLES register.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Least significant byte of TIMEOUT_CYCLES. Together with TIMEOUT_CYCLES_H, defines the maximum allowed response age in cycles."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CYCLES_H",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "High byte of programmable TIMEOUT_CYCLES register.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of TIMEOUT_CYCLES."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN_L",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Low byte of commanded setpoint minimum bound.",
+        "fields": [
+          {
+            "name": "CMD_MIN_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least significant byte of CMD_MIN. The clamp stage enforces position_setpoint >= CMD_MIN."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN_H",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "High byte of commanded setpoint minimum bound.",
+        "fields": [
+          {
+            "name": "CMD_MIN_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of CMD_MIN."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX_L",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Low byte of commanded setpoint maximum bound.",
+        "fields": [
+          {
+            "name": "CMD_MAX_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Least significant byte of CMD_MAX. The clamp stage enforces position_setpoint <= CMD_MAX."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX_H",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "High byte of commanded setpoint maximum bound.",
+        "fields": [
+          {
+            "name": "CMD_MAX_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of CMD_MAX."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_POSITION_L",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Low byte of conservative fallback actuator position.",
+        "fields": [
+          {
+            "name": "SAFE_POSITION_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least significant byte of SAFE_POSITION. Used when fallback is active or command validity cannot be guaranteed."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_POSITION_H",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "High byte of conservative fallback actuator position.",
+        "fields": [
+          {
+            "name": "SAFE_POSITION_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of SAFE_POSITION."
+          }
+        ]
+      },
+      {
+        "name": "RATE_MAX_DELTA_L",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "Low byte of per-cycle rate limit magnitude.",
+        "fields": [
+          {
+            "name": "RATE_MAX_DELTA_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least significant byte of RATE_MAX_DELTA. If RATE_LIMIT_EN is set, setpoint delta per cycle shall not exceed this magnitude."
+          }
+        ]
+      },
+      {
+        "name": "RATE_MAX_DELTA_H",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "High byte of per-cycle rate limit magnitude.",
+        "fields": [
+          {
+            "name": "RATE_MAX_DELTA_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of RATE_MAX_DELTA."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

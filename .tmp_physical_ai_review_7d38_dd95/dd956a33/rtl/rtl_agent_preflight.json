@@ -1,0 +1,11 @@
+{
+  "mode": "flat",
+  "top_module": "aero_guard_ctrl",
+  "expected_files": [
+    "aero_guard_ctrl.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 76633
+}

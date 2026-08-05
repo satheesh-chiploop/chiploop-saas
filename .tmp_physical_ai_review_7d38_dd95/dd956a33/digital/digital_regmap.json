@@ -1,0 +1,893 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "flat",
+  "regmap": {
+    "bus": "custom",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control and status shadow register for firmware-visible configuration and observation of the aero_guard_ctrl pipeline. Writes program operating mode qualifiers; reads return live status-encoded bits where applicable.",
+        "fields": [
+          {
+            "name": "MANUAL_OVERRIDE_EN",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Firmware shadow of manual override intent. When set, firmware indicates the controller should remain in conservative fallback behavior. This does not bypass safety checks."
+          },
+          {
+            "name": "SAFE_MODE_EN",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Firmware shadow of safe mode intent. When set, firmware requests conservative fallback behavior. This does not bypass safety checks."
+          },
+          {
+            "name": "REQUEST_ARM",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Firmware request arm bit. When written to 1, the controller may launch a request if model_request_ready_in is asserted, no outstanding request is active, and fallback lockout conditions do not apply. Self-clears in hardware after accepted launch or if launch is not permitted."
+          },
+          {
+            "name": "RATE_LIMIT_EN",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables the optional rate limiter if implemented by parameterization. When 0, only clamp protection applies."
+          },
+          {
+            "name": "CLEAR_STICKY",
+            "lsb": 4,
+            "msb": 4,
+            "access": "W1C",
+            "reset": 0,
+            "description": "Write 1 to clear sticky software-visible fault/status summary bits that are clearable by firmware. Does not clear live hardware conditions such as external_fault_in or timeout until they deassert or are serviced by hardware."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x01",
+        "access": "RO",
+        "description": "Live status summary reflecting the final decision of the control pipeline each cycle.",
+        "fields": [
+          {
+            "name": "VALID",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Final-cycle command validity indication."
+          },
+          {
+            "name": "BUSY",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Outstanding request is active."
+          },
+          {
+            "name": "STALE_REJECT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "A stale, mismatched, late, missing, or otherwise invalid response was discarded."
+          },
+          {
+            "name": "CLAMP_ACTIVE",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Synthesized position setpoint was saturated to CMD_MIN/CMD_MAX or otherwise limited."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 1,
+            "description": "Conservative fallback command selection is active."
+          },
+          {
+            "name": "TIMEOUT_FLAG",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Request age exceeded TIMEOUT_CYCLES before a matching valid response arrived."
+          },
+          {
+            "name": "FAULT_FLAG",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "System-level fault indication reflecting final pipeline safety status."
+          },
+          {
+            "name": "OUTSTANDING_REQUEST",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Hardware indicates a request is in flight and awaiting response."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CYCLES_L",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Low byte of programmable TIMEOUT_CYCLES register.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Least significant byte of TIMEOUT_CYCLES. Together with TIMEOUT_CYCLES_H, defines the maximum allowed response age in cycles."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CYCLES_H",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "High byte of programmable TIMEOUT_CYCLES register.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of TIMEOUT_CYCLES."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN_L",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Low byte of commanded setpoint minimum bound.",
+        "fields": [
+          {
+            "name": "CMD_MIN_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least significant byte of CMD_MIN. The clamp stage enforces position_setpoint >= CMD_MIN."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN_H",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "High byte of commanded setpoint minimum bound.",
+        "fields": [
+          {
+            "name": "CMD_MIN_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of CMD_MIN."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX_L",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Low byte of commanded setpoint maximum bound.",
+        "fields": [
+          {
+            "name": "CMD_MAX_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Least significant byte of CMD_MAX. The clamp stage enforces position_setpoint <= CMD_MAX."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX_H",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "High byte of commanded setpoint maximum bound.",
+        "fields": [
+          {
+            "name": "CMD_MAX_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of CMD_MAX."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_POSITION_L",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Low byte of conservative fallback actuator position.",
+        "fields": [
+          {
+            "name": "SAFE_POSITION_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least significant byte of SAFE_POSITION. Used when fallback is active or command validity cannot be guaranteed."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_POSITION_H",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "High byte of conservative fallback actuator position.",
+        "fields": [
+          {
+            "name": "SAFE_POSITION_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of SAFE_POSITION."
+          }
+        ]
+      },
+      {
+        "name": "RATE_MAX_DELTA_L",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "Low byte of per-cycle rate limit magnitude.",
+        "fields": [
+          {
+            "name": "RATE_MAX_DELTA_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least significant byte of RATE_MAX_DELTA. If RATE_LIMIT_EN is set, setpoint delta per cycle shall not exceed this magnitude."
+          }
+        ]
+      },
+      {
+        "name": "RATE_MAX_DELTA_H",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "High byte of per-cycle rate limit magnitude.",
+        "fields": [
+          {
+            "name": "RATE_MAX_DELTA_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of RATE_MAX_DELTA."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_ID",
+        "offset": "0x0C",
+        "access": "RO",
+        "description": "Current stored outstanding request identifier.",
+        "fields": [
+          {
+            "name": "REQUEST_ID_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Least significant byte of the monotonic request_id used for response correlation."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_ID_H",
+        "offset": "0x0D",
+        "access": "RO",
+        "description": "High byte of current stored outstanding request identifier.",
+        "fields": [
+          {
+            "name": "REQUEST_ID_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most significant byte of request_id."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_AGE_L",
+        "offset": "0x0E",
+        "access": "RO",
+        "description": "Low byte of current outstanding request age counter.",
+        "fields": [
+          {
+            "name": "REQUEST_AGE_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Least significant byte of request_age, incremented every cycle while a request is outstanding."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_AGE_H",
+        "offset": "0x0F",
+        "access": "RO",
+        "description": "High byte of current outstanding request age counter.",
+        "fields": [
+          {
+            "name": "REQUEST_AGE_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most significant byte of request_age."
+          }
+        ]
+      },
+      {
+        "name": "REQ_GEOM_0",
+        "offset": "0x10",
+        "access": "RO",
+        "description": "Captured request geometry descriptor byte 0; compact geometry descriptor only, not a full mesh.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BYTE0",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 0 of vehicle_geometry_in exported in the request packet context."
+          }
+        ]
+      },
+      {
+        "name": "REQ_GEOM_1",
+        "offset": "0x11",
+        "access": "RO",
+        "description": "Captured request geometry descriptor byte 1.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BYTE1",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 1 of vehicle_geometry_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_GEOM_2",
+        "offset": "0x12",
+        "access": "RO",
+        "description": "Captured request geometry descriptor byte 2.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BYTE2",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 2 of vehicle_geometry_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_GEOM_3",
+        "offset": "0x13",
+        "access": "RO",
+        "description": "Captured request geometry descriptor byte 3.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BYTE3",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 3 of vehicle_geometry_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_GEOM_4",
+        "offset": "0x14",
+        "access": "RO",
+        "description": "Captured request geometry descriptor byte 4.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BYTE4",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 4 of vehicle_geometry_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_GEOM_5",
+        "offset": "0x15",
+        "access": "RO",
+        "description": "Captured request geometry descriptor byte 5.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BYTE5",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 5 of vehicle_geometry_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_GEOM_6",
+        "offset": "0x16",
+        "access": "RO",
+        "description": "Captured request geometry descriptor byte 6.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BYTE6",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 6 of vehicle_geometry_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_GEOM_7",
+        "offset": "0x17",
+        "access": "RO",
+        "description": "Captured request geometry descriptor byte 7.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BYTE7",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 7 of vehicle_geometry_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_FLOW_0",
+        "offset": "0x18",
+        "access": "RO",
+        "description": "Captured request flow descriptor byte 0.",
+        "fields": [
+          {
+            "name": "FLOW_BYTE0",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 0 of flow_conditions_in exported in the request packet context."
+          }
+        ]
+      },
+      {
+        "name": "REQ_FLOW_1",
+        "offset": "0x19",
+        "access": "RO",
+        "description": "Captured request flow descriptor byte 1.",
+        "fields": [
+          {
+            "name": "FLOW_BYTE1",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 1 of flow_conditions_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_FLOW_2",
+        "offset": "0x1A",
+        "access": "RO",
+        "description": "Captured request flow descriptor byte 2.",
+        "fields": [
+          {
+            "name": "FLOW_BYTE2",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 2 of flow_conditions_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_FLOW_3",
+        "offset": "0x1B",
+        "access": "RO",
+        "description": "Captured request flow descriptor byte 3.",
+        "fields": [
+          {
+            "name": "FLOW_BYTE3",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 3 of flow_conditions_in."
+          }
+        ]
+      },
+      {
+        "name": "REQ_MODE_FLAGS",
+        "offset": "0x1C",
+        "access": "RO",
+        "description": "Mode flags associated with the most recent or current request packet.",
+        "fields": [
+          {
+            "name": "REQ_ARMED",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a request launch was armed/qualified by hardware."
+          },
+          {
+            "name": "RATE_LIMIT_EN_SHADOW",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Shadow of the rate limit enable condition used for the request context."
+          },
+          {
+            "name": "MANUAL_OVERRIDE_SHADOW",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Shadow of manual override intent captured into request context."
+          },
+          {
+            "name": "SAFE_MODE_SHADOW",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Shadow of safe mode intent captured into request context."
+          },
+          {
+            "name": "OUTSTANDING_VALID",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a valid outstanding request context exists."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "RESP_STATUS",
+        "offset": "0x1D",
+        "access": "RO",
+        "description": "Captured response status for the last accepted or examined response.",
+        "fields": [
+          {
+            "name": "RESP_STATUS_CODE",
+            "lsb": 0,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Raw response status metadata captured from model_response_status_in when a response is evaluated."
+          },
+          {
+            "name": "RESP_VALID_MATCH",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the last evaluated response satisfied identity and status matching criteria."
+          },
+          {
+            "name": "RESP_FRESH",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the last evaluated response was fresh and not late."
+          },
+          {
+            "name": "RESP_COMPLETE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the last evaluated response payload was considered complete enough for control use."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "RESP_DRAG_L",
+        "offset": "0x1E",
+        "access": "RO",
+        "description": "Low byte of captured validated response drag_force summary.",
+        "fields": [
+          {
+            "name": "DRAG_FORCE_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Least significant byte of model_response_drag_force_in captured on validated response acceptance."
+          }
+        ]
+      },
+      {
+        "name": "RESP_DRAG_H",
+        "offset": "0x1F",
+        "access": "RO",
+        "description": "High byte of captured validated response drag_force summary.",
+        "fields": [
+          {
+            "name": "DRAG_FORCE_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most significant byte of drag_force summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_LIFT_L",
+        "offset": "0x20",
+        "access": "RO",
+        "description": "Low byte of captured validated response lift_force summary.",
+        "fields": [
+          {
+            "name": "LIFT_FORCE_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Least significant byte of model_response_lift_force_in captured on validated response acceptance."
+          }
+        ]
+      },
+      {
+        "name": "RESP_LIFT_H",
+        "offset": "0x21",
+        "access": "RO",
+        "description": "High byte of captured validated response lift_force summary.",
+        "fields": [
+          {
+            "name": "LIFT_FORCE_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most significant byte of lift_force summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_PRESSURE_L",
+        "offset": "0x22",
+        "access": "RO",
+        "description": "Low byte of captured surface pressure summary metadata.",
+        "fields": [
+          {
+            "name": "PRESSURE_SUMMARY_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Least significant byte of model_response_surface_pressure_in treated as compact control metadata."
+          }
+        ]
+      },
+      {
+        "name": "RESP_PRESSURE_H",
+        "offset": "0x23",
+        "access": "RO",
+        "description": "High byte of captured surface pressure summary metadata.",
+        "fields": [
+          {
+            "name": "PRESSURE_SUMMARY_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most significant byte of surface pressure summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_FLOW_TOKEN",
+        "offset": "0x24",
+        "access": "RO",
+        "description": "Captured compact flow-field status token.",
+        "fields": [
+          {
+            "name": "FLOW_FIELD_TOKEN",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "model_response_flow_field_token_in captured as control metadata and freshness/context indicator."
+          }
+        ]
+      },
+      {
+        "name": "CMD_OUT_0",
+        "offset": "0x25",
+        "access": "RO",
+        "description": "Low byte of registered final actuator setpoint output.",
+        "fields": [
+          {
+            "name": "POSITION_SETPOINT_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Least significant byte of actuator_cmd_position_setpoint_out after synthesis, clamp, optional rate limiting, and fallback override."
+          }
+        ]
+      },
+      {
+        "name": "CMD_OUT_1",
+        "offset": "0x26",
+        "access": "RO",
+        "description": "High byte of registered final actuator setpoint output.",
+        "fields": [
+          {
+            "name": "POSITION_SETPOINT_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most significant byte of actuator_cmd_position_setpoint_out."
+          }
+        ]
+      },
+      {
+        "name": "CMD_CTRL",
+        "offset": "0x27",
+        "access": "RO",
+        "description": "Registered final actuator command control summary.",
+        "fields": [
+          {
+            "name": "SURFACE_SELECT",
+            "lsb": 0,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Selected active-aerodynamics surface identifier."
+          },
+          {
+            "name": "ENABLE",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Registered actuator enable control. In fallback mode this is driven to the safe disabled value."
+          },
+          {
+            "name": "FAULT_FLAG_OUT",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Command-level fault indicator reflecting invalid, stale, timeout, or fallback conditions."
+          },
+          {
+            "name": "VALID_OUT",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Registered final command validity indication."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, reads as 0."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "FAULT_IRQ",
+        "description": "Optional level or pulse interrupt source that may be asserted when fault_flag or timeout_flag is active, or when stale_reject indicates an invalid response was discarded. Firmware may also poll STATUS if no interrupt aggregation is implemented by the project wrapper."
+      },
+      {
+        "name": "VALID_IRQ",
+        "description": "Optional completion/status interrupt source that may be asserted when a validated response has been accepted and a new final actuator command has been registered. This is informational and implementation-dependent."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Write CMD_MIN, CMD_MAX, SAFE_POSITION, RATE_MAX_DELTA, and TIMEOUT_CYCLES registers to the desired configuration values before enabling operation.",
+      "Write CTRL.MANUAL_OVERRIDE_EN and CTRL.SAFE_MODE_EN as required by the integration context; keep both deasserted for normal autonomous supervision.",
+      "Optionally set CTRL.RATE_LIMIT_EN if cycle-to-cycle limiting is desired.",
+      "Clear sticky status via CTRL.CLEAR_STICKY if supported by the implementation.",
+      "Arm request launch by writing CTRL.REQUEST_ARM=1 only when the external service boundary is known to be ready.",
+      "Poll STATUS until BUSY deasserts and VALID or FALLBACK_ACTIVE is observed as appropriate."
+    ],
+    "polling_sequence": [
+      "Read STATUS to monitor VALID, BUSY, STALE_REJECT, CLAMP_ACTIVE, FALLBACK_ACTIVE, TIMEOUT_FLAG, FAULT_FLAG, and OUTSTANDING_REQUEST.",
+      "Read REQUEST_ID and REQUEST_AGE to monitor outstanding request tracking.",
+      "Read RESP_STATUS and response metadata registers to inspect the most recent accepted or examined response context.",
+      "Read CMD_OUT_0/CMD_OUT_1/CMD_CTRL to obtain the registered final actuator command visible to firmware.",
+      "If TIMEOUT_FLAG, STALE_REJECT, or FAULT_FLAG asserts, treat the current model-derived result as invalid and rely on fallback output until the condition clears."
+    ],
+    "irq_sequence": [
+      "On FAULT_IRQ, read STATUS immediately and service the cause; if TIMEOUT_FLAG or STALE_REJECT is active, maintain conservative operation.",
+      "On VALID_IRQ, read CMD_OUT_0/CMD_OUT_1/CMD_CTRL and STATUS to capture the final command and confirm the pipeline decision.",
+      "If interrupts are not implemented by the wrapper, firmware shall poll STATUS instead; no interrupt is required by the base RTL interface."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is firmware-visible only and does not invent new RTL hierarchy or ports.",
+    "The register bus described here is custom and byte-oriented, avoiding any implication of AXI/APB beyond what the specification requires.",
+    "All multi-byte quantities are split across 8-bit registers because the firmware-visible bus is 8 bits wide.",
+    "The map reflects live status and configurable safety parameters only; it does not expose any physics inference engine, neural network, GPU, transport, or large-memory blob functionality."
+  ]
+}

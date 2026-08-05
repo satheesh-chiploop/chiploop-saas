@@ -325,7 +325,7 @@ function LandingPageContent() {
             All-in-one Agentic AI platform for Physical AI and Silicon Development
           </h1>
           <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-xl sm:leading-9">
-            Move from physics requirements and surrogate models to architecture, RTL, FPGA, firmware, software, tapeout, validation, and product delivery in one connected platform.
+            Start from a physics surrogate model, application requirements, or a traditional chip specification—then move through architecture, RTL, verification, FPGA prototyping, firmware, software, ASIC tapeout, validation, and product delivery in one connected platform.
           </p>
           <div className="mt-7 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
             <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">

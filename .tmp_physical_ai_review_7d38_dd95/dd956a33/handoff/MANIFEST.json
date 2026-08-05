@@ -1,0 +1,89 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "aero_guard_ctrl",
+  "generated_at": "2026-08-05T14:28:40.104125",
+  "file_count": 16,
+  "files": [
+    {
+      "path": "docs/arch/digital_architecture.json",
+      "sha256": "c36ee9eadfa9eeff2ff38eb89148e6f1f4ff52c65c3754b7d6eded2c454fe515",
+      "bytes": 17303
+    },
+    {
+      "path": "docs/microarch/digital_microarchitecture.json",
+      "sha256": "0447a7baf4cdc73922f14e5f349b56b5f96858d3f04ec4cb976fc7ae57a82c08",
+      "bytes": 6847
+    },
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "1c9cb51223fb246c8d55fbc043a1d09f6125620b64c21f25052215c9753571f1",
+      "bytes": 28576
+    },
+    {
+      "path": "docs/regmap/digital_regmap_raw_output.txt",
+      "sha256": "ec25522e59ed7805a00163a3bd23c305095d3151d54dc09914faf48854af3e31",
+      "bytes": 18459
+    },
+    {
+      "path": "docs/spec/aero_guard_ctrl_spec.json",
+      "sha256": "8130502c2595bc197f84e44eba674e605c3e4de97b405a582ca72cbf98f4ec75",
+      "bytes": 11675
+    },
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "6154d796c1045c36b5ec58e4313241e115bd2f8fba968fa78b40f1954013e41a",
+      "bytes": 14587
+    },
+    {
+      "path": "docs/spec/spec_agent_normalized.json",
+      "sha256": "8130502c2595bc197f84e44eba674e605c3e4de97b405a582ca72cbf98f4ec75",
+      "bytes": 11675
+    },
+    {
+      "path": "misc/power_intent_findings.json",
+      "sha256": "28d594ee0a049ea3b7523c2792b4a7992ae32eb2152bbaf9773ded4dffe6c4c6",
+      "bytes": 277
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "eb259a3f15af49bf2a3f60212b913894a301bd9083082175baf0940008aeec20",
+      "bytes": 415
+    },
+    {
+      "path": "misc/rtl_agent_preflight.json",
+      "sha256": "4dafc50c0819fdb89355045e7a36c76107e66ab71a4148dce719671361436621",
+      "bytes": 210
+    },
+    {
+      "path": "misc/tool_execution_summary.json",
+      "sha256": "f7b2bb91bc4eb373a93f6935da86760364d2ab9b2f5b253dca7d4970d6950fcf",
+      "bytes": 8185
+    },
+    {
+      "path": "misc/tool_profile_used.json",
+      "sha256": "11c75a5525cc3d922151609681da6a98cb0ec7e5813c53bc742f9d3356b6d4d8",
+      "bytes": 1101
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "5517ba211acef9dbe648468d663aae3c2188ffda0b0c1c8b3524a27c0bcdb286",
+      "bytes": 2221
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "a071cfab6d7a1903b9ad747635fe188e80baa926001226697bf41ab55a5fa21f",
+      "bytes": 776
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "ad9b913ca7fff820d45db1c8136eafedb7f85333413c27615d246c4665dfca7d",
+      "bytes": 320
+    },
+    {
+      "path": "rtl/aero_guard_ctrl.v",
+      "sha256": "e3d8b979b6ccb7c93e0063f80edaa56fee35755e74ae9deade03a0d98f988bf9",
+      "bytes": 11728
+    }
+  ]
+}

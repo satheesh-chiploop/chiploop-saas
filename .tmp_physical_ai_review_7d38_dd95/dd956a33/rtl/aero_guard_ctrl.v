@@ -1,0 +1,323 @@
+module aero_guard_ctrl (
+    clk,
+    reset_n,
+    vehicle_geometry_in,
+    flow_conditions_in,
+    model_request_ready_in,
+    model_response_valid_in,
+    model_response_request_id_in,
+    model_response_status_in,
+    model_response_drag_force_in,
+    model_response_lift_force_in,
+    model_response_surface_pressure_in,
+    model_response_flow_field_token_in,
+    external_fault_in,
+    manual_override_in,
+    safe_mode_in,
+    model_request_valid_out,
+    model_request_request_id_out,
+    model_request_geometry_out,
+    model_request_flow_conditions_out,
+    model_request_mode_flags_out,
+    model_request_ready_out,
+    actuator_cmd_valid_out,
+    actuator_cmd_surface_select_out,
+    actuator_cmd_position_setpoint_out,
+    actuator_cmd_enable_out,
+    actuator_cmd_fault_flag_out,
+    safe_fallback_out,
+    valid,
+    busy,
+    stale_reject,
+    clamp_active,
+    fallback_active,
+    timeout_flag,
+    fault_flag
+);
+
+input clk;
+input reset_n;
+input [63:0] vehicle_geometry_in;
+input [31:0] flow_conditions_in;
+input model_request_ready_in;
+input model_response_valid_in;
+input [15:0] model_response_request_id_in;
+input [3:0] model_response_status_in;
+input [15:0] model_response_drag_force_in;
+input [15:0] model_response_lift_force_in;
+input [15:0] model_response_surface_pressure_in;
+input [7:0] model_response_flow_field_token_in;
+input external_fault_in;
+input manual_override_in;
+input safe_mode_in;
+
+output model_request_valid_out;
+output [15:0] model_request_request_id_out;
+output [63:0] model_request_geometry_out;
+output [31:0] model_request_flow_conditions_out;
+output [7:0] model_request_mode_flags_out;
+output model_request_ready_out;
+output actuator_cmd_valid_out;
+output [3:0] actuator_cmd_surface_select_out;
+output [15:0] actuator_cmd_position_setpoint_out;
+output actuator_cmd_enable_out;
+output actuator_cmd_fault_flag_out;
+output safe_fallback_out;
+output valid;
+output busy;
+output stale_reject;
+output clamp_active;
+output fallback_active;
+output timeout_flag;
+output fault_flag;
+
+localparam [15:0] TIMEOUT_CYCLES_INIT = 16'd255;
+localparam [15:0] CMD_MIN_INIT = 16'd0;
+localparam [15:0] CMD_MAX_INIT = 16'd255;
+localparam [15:0] SAFE_POSITION_INIT = 16'd0;
+localparam [15:0] RATE_MAX_DELTA_INIT = 16'd0;
+
+reg [7:0] ctrl_reg;
+reg [15:0] timeout_cycles_reg;
+reg [15:0] cmd_min_reg;
+reg [15:0] cmd_max_reg;
+reg [15:0] safe_position_reg;
+reg [15:0] rate_max_delta_reg;
+
+reg [15:0] request_id_reg;
+reg [15:0] request_age_reg;
+reg outstanding_request_reg;
+reg request_pending_reg;
+reg [63:0] req_geom_reg;
+reg [31:0] req_flow_reg;
+reg [7:0] req_mode_flags_reg;
+
+reg [15:0] resp_drag_reg;
+reg [15:0] resp_lift_reg;
+reg [15:0] resp_pressure_reg;
+reg [7:0] resp_flow_token_reg;
+reg [3:0] resp_status_reg;
+
+reg [15:0] pre_clamp_setpoint_reg;
+reg [15:0] final_setpoint_reg;
+reg [3:0] final_surface_select_reg;
+reg final_enable_reg;
+reg final_valid_reg;
+reg final_fault_reg;
+reg fallback_active_reg;
+reg stale_reject_reg;
+reg clamp_active_reg;
+reg timeout_flag_reg;
+reg fault_flag_reg;
+reg busy_reg;
+reg safe_fallback_reg;
+reg model_request_valid_reg;
+reg model_request_ready_reg;
+reg [15:0] model_request_request_id_reg;
+reg [63:0] model_request_geometry_reg;
+reg [31:0] model_request_flow_conditions_reg;
+reg [7:0] model_request_mode_flags_reg;
+reg actuator_cmd_valid_reg;
+reg [3:0] actuator_cmd_surface_select_reg;
+reg [15:0] actuator_cmd_position_setpoint_reg;
+reg actuator_cmd_enable_reg;
+reg actuator_cmd_fault_flag_reg;
+reg valid_reg;
+reg busy_out_reg;
+reg stale_reject_out_reg;
+reg clamp_active_out_reg;
+reg fallback_active_out_reg;
+reg timeout_flag_out_reg;
+reg fault_flag_out_reg;
+
+wire request_arm;
+wire rate_limit_en;
+wire manual_shadow;
+wire safe_shadow;
+wire launch_allowed;
+wire response_status_valid;
+wire response_id_match;
+wire response_before_timeout;
+wire response_complete;
+wire response_valid_all;
+wire [15:0] clamp_hi;
+wire [15:0] clamp_lo;
+wire [15:0] rate_limited_up;
+wire [15:0] rate_limited_dn;
+wire [15:0] delta_from_prev;
+wire delta_over_max;
+wire clamp_hi_hit;
+wire clamp_lo_hit;
+wire rate_hit;
+wire response_acceptable;
+wire force_fallback;
+wire [15:0] raw_setpoint;
+wire [15:0] clamped_setpoint;
+wire [15:0] rate_limited_setpoint;
+
+assign request_arm = ctrl_reg[2];
+assign rate_limit_en = ctrl_reg[3];
+assign manual_shadow = ctrl_reg[0];
+assign safe_shadow = ctrl_reg[1];
+assign response_status_valid = (model_response_status_in == 4'd1);
+assign response_id_match = (model_response_request_id_in == request_id_reg);
+assign response_before_timeout = (request_pending_reg == 1'b1) && (request_age_reg <= timeout_cycles_reg);
+assign response_complete = (model_response_flow_field_token_in != 8'h00) | (model_response_status_in == 4'd1);
+assign response_valid_all = model_response_valid_in & response_status_valid & response_id_match & response_before_timeout & response_complete;
+assign launch_allowed = (request_pending_reg == 1'b0) & model_request_ready_in & ~safe_mode_in & ~external_fault_in & ~manual_override_in & ~safe_shadow & ~manual_shadow;
+assign force_fallback = external_fault_in | manual_override_in | safe_mode_in | timeout_flag_reg | stale_reject_reg | final_fault_reg;
+assign raw_setpoint = resp_pressure_reg + resp_drag_reg + flow_conditions_in[15:0];
+assign clamp_hi = (raw_setpoint > cmd_max_reg) ? cmd_max_reg : raw_setpoint;
+assign clamp_lo = (clamp_hi < cmd_min_reg) ? cmd_min_reg : clamp_hi;
+assign clamped_setpoint = clamp_lo;
+assign delta_from_prev = (clamped_setpoint >= actuator_cmd_position_setpoint_reg) ? (clamped_setpoint - actuator_cmd_position_setpoint_reg) : (actuator_cmd_position_setpoint_reg - clamped_setpoint);
+assign delta_over_max = rate_limit_en & (delta_from_prev > rate_max_delta_reg);
+assign rate_limited_up = actuator_cmd_position_setpoint_reg + rate_max_delta_reg;
+assign rate_limited_dn = actuator_cmd_position_setpoint_reg - rate_max_delta_reg;
+assign rate_limited_setpoint = (clamped_setpoint >= actuator_cmd_position_setpoint_reg) ? rate_limited_up : rate_limited_dn;
+assign clamp_hi_hit = (raw_setpoint > cmd_max_reg);
+assign clamp_lo_hit = (raw_setpoint < cmd_min_reg);
+assign rate_hit = delta_over_max;
+assign response_acceptable = response_valid_all;
+assign model_request_valid_out = model_request_valid_reg;
+assign model_request_request_id_out = model_request_request_id_reg;
+assign model_request_geometry_out = model_request_geometry_reg;
+assign model_request_flow_conditions_out = model_request_flow_conditions_reg;
+assign model_request_mode_flags_out = model_request_mode_flags_reg;
+assign model_request_ready_out = model_request_ready_reg;
+assign actuator_cmd_valid_out = actuator_cmd_valid_reg;
+assign actuator_cmd_surface_select_out = actuator_cmd_surface_select_reg;
+assign actuator_cmd_position_setpoint_out = actuator_cmd_position_setpoint_reg;
+assign actuator_cmd_enable_out = actuator_cmd_enable_reg;
+assign actuator_cmd_fault_flag_out = actuator_cmd_fault_flag_reg;
+assign safe_fallback_out = safe_fallback_reg;
+assign valid = valid_reg;
+assign busy = busy_out_reg;
+assign stale_reject = stale_reject_out_reg;
+assign clamp_active = clamp_active_out_reg;
+assign fallback_active = fallback_active_out_reg;
+assign timeout_flag = timeout_flag_out_reg;
+assign fault_flag = fault_flag_out_reg;
+
+always @(*) begin
+    if (launch_allowed && request_arm) begin
+    end
+end
+
+always @(*) begin
+    if (response_acceptable) begin
+    end
+end
+
+always @(*) begin
+    if (!force_fallback) begin
+        if (rate_hit) begin
+        end else begin
+        end
+    end
+end
+
+always @(*) begin
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        ctrl_reg <= 8'h00;
+        timeout_cycles_reg <= TIMEOUT_CYCLES_INIT;
+        cmd_min_reg <= CMD_MIN_INIT;
+        cmd_max_reg <= CMD_MAX_INIT;
+        safe_position_reg <= SAFE_POSITION_INIT;
+        rate_max_delta_reg <= RATE_MAX_DELTA_INIT;
+        request_id_reg <= 16'h0000;
+        request_age_reg <= 16'h0000;
+        outstanding_request_reg <= 1'b0;
+        request_pending_reg <= 1'b0;
+        req_geom_reg <= 64'h0000000000000000;
+        req_flow_reg <= 32'h00000000;
+        req_mode_flags_reg <= 8'h00;
+        resp_drag_reg <= 16'h0000;
+        resp_lift_reg <= 16'h0000;
+        resp_pressure_reg <= 16'h0000;
+        resp_flow_token_reg <= 8'h00;
+        resp_status_reg <= 4'h0;
+        pre_clamp_setpoint_reg <= 16'h0000;
+        final_setpoint_reg <= 16'h0000;
+        final_surface_select_reg <= 4'h0;
+        final_enable_reg <= 1'b0;
+        final_valid_reg <= 1'b0;
+        final_fault_reg <= 1'b0;
+        fallback_active_reg <= 1'b1;
+        stale_reject_reg <= 1'b0;
+        clamp_active_reg <= 1'b0;
+        timeout_flag_reg <= 1'b0;
+        fault_flag_reg <= 1'b0;
+        busy_reg <= 1'b0;
+        safe_fallback_reg <= 1'b1;
+        model_request_valid_reg <= 1'b0;
+        model_request_ready_reg <= 1'b0;
+        model_request_request_id_reg <= 16'h0000;
+        model_request_geometry_reg <= 64'h0000000000000000;
+        model_request_flow_conditions_reg <= 32'h00000000;
+        model_request_mode_flags_reg <= 8'h00;
+        actuator_cmd_valid_reg <= 1'b0;
+        actuator_cmd_surface_select_reg <= 4'h0;
+        actuator_cmd_position_setpoint_reg <= 16'h0000;
+        actuator_cmd_enable_reg <= 1'b0;
+        actuator_cmd_fault_flag_reg <= 1'b0;
+        valid_reg <= 1'b0;
+        busy_out_reg <= 1'b0;
+        stale_reject_out_reg <= 1'b0;
+        clamp_active_out_reg <= 1'b0;
+        fallback_active_out_reg <= 1'b1;
+        timeout_flag_out_reg <= 1'b0;
+        fault_flag_out_reg <= 1'b0;
+    end else begin
+        ctrl_reg[0] <= manual_override_in;
+        ctrl_reg[1] <= safe_mode_in;
+        ctrl_reg[2] <= request_arm;
+        ctrl_reg[3] <= rate_limit_en;
+        ctrl_reg[4] <= 1'b0;
+        ctrl_reg[7:5] <= 3'b000;
+        if (launch_allowed && request_arm) begin
+            request_id_reg <= request_id_reg + 16'd1;
+            request_age_reg <= 16'h0000;
+            outstanding_request_reg <= 1'b1;
+            request_pending_reg <= 1'b1;
+            req_geom_reg <= vehicle_geometry_in;
+            req_flow_reg <= flow_conditions_in;
+            req_mode_flags_reg <= {3'b000, manual_override_in, safe_mode_in, rate_limit_en, request_arm, 1'b1};
+        end else if (request_pending_reg) begin
+            request_age_reg <= request_age_reg + 16'd1;
+        end
+        if (response_valid_all) begin
+            resp_drag_reg <= model_response_drag_force_in;
+            resp_lift_reg <= model_response_lift_force_in;
+            resp_pressure_reg <= model_response_surface_pressure_in;
+            resp_flow_token_reg <= model_response_flow_field_token_in;
+            resp_status_reg <= model_response_status_in;
+            request_pending_reg <= 1'b0;
+            outstanding_request_reg <= 1'b0;
+            final_setpoint_reg <= clamped_setpoint;
+        end
+        if (request_pending_reg && (request_age_reg > timeout_cycles_reg)) begin
+            timeout_flag_reg <= 1'b1;
+            request_pending_reg <= 1'b0;
+            outstanding_request_reg <= 1'b0;
+        end
+        stale_reject_reg <= (model_response_valid_in & ~response_valid_all);
+        clamp_active_reg <= clamp_hi_hit | clamp_lo_hit | rate_hit;
+        fallback_active_reg <= force_fallback;
+        fault_flag_reg <= force_fallback | timeout_flag_reg;
+        busy_reg <= request_pending_reg;
+        safe_fallback_reg <= force_fallback;
+        valid_reg <= actuator_cmd_valid_reg;
+        busy_out_reg <= request_pending_reg;
+        stale_reject_out_reg <= stale_reject_reg;
+        clamp_active_out_reg <= clamp_active_reg;
+        fallback_active_out_reg <= fallback_active_reg;
+        timeout_flag_out_reg <= timeout_flag_reg;
+        fault_flag_out_reg <= fault_flag_reg;
+    end
+end
+
+endmodule

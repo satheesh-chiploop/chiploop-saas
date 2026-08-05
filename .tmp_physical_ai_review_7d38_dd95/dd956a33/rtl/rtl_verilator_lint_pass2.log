@@ -1,0 +1,82 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.040 MB sources in 2 modules, into 0.037 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.015 s (elab=0.001, cvt=0.007, bld=0.000); cpu 0.015 s on 1 threads; allocated 31.352 MB
+
+=== STDERR ===
+%Warning-ALWNEVER: pass2/aero_guard_ctrl.v:220:1: 'always @*' will never execute as expression list is empty (no variables read)
+                                                : ... note: In instance 'aero_guard_ctrl'
+                                                : ... Suggest use 'always_comb'
+  220 | always @(*) begin
+      | ^~~~~~
+                   ... For warning description see https://verilator.org/warn/ALWNEVER?v=5.047
+                   ... Use "/* verilator lint_off ALWNEVER */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:80:11: Bits of signal are not used: 'ctrl_reg'[7:4]
+                                                    : ... note: In instance 'aero_guard_ctrl'
+   80 | reg [7:0] ctrl_reg;
+      |           ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:84:12: Signal is not used: 'safe_position_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+   84 | reg [15:0] safe_position_reg;
+      |            ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:89:5: Signal is not used: 'outstanding_request_reg'
+                                                   : ... note: In instance 'aero_guard_ctrl'
+   89 | reg outstanding_request_reg;
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:91:12: Signal is not used: 'req_geom_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+   91 | reg [63:0] req_geom_reg;
+      |            ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:92:12: Signal is not used: 'req_flow_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+   92 | reg [31:0] req_flow_reg;
+      |            ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:93:11: Signal is not used: 'req_mode_flags_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+   93 | reg [7:0] req_mode_flags_reg;
+      |           ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:96:12: Signal is not used: 'resp_lift_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+   96 | reg [15:0] resp_lift_reg;
+      |            ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:98:11: Signal is not used: 'resp_flow_token_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+   98 | reg [7:0] resp_flow_token_reg;
+      |           ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:99:11: Signal is not used: 'resp_status_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+   99 | reg [3:0] resp_status_reg;
+      |           ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:101:12: Signal is not used: 'pre_clamp_setpoint_reg'
+                                                     : ... note: In instance 'aero_guard_ctrl'
+  101 | reg [15:0] pre_clamp_setpoint_reg;
+      |            ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:102:12: Signal is not used: 'final_setpoint_reg'
+                                                     : ... note: In instance 'aero_guard_ctrl'
+  102 | reg [15:0] final_setpoint_reg;
+      |            ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:103:11: Signal is not used: 'final_surface_select_reg'
+                                                     : ... note: In instance 'aero_guard_ctrl'
+  103 | reg [3:0] final_surface_select_reg;
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:104:5: Signal is not used: 'final_enable_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+  104 | reg final_enable_reg;
+      |     ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:105:5: Signal is not used: 'final_valid_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+  105 | reg final_valid_reg;
+      |     ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:112:5: Signal is not used: 'busy_reg'
+                                                    : ... note: In instance 'aero_guard_ctrl'
+  112 | reg busy_reg;
+      |     ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/aero_guard_ctrl.v:156:13: Signal is not used: 'rate_limited_setpoint'
+                                                     : ... note: In instance 'aero_guard_ctrl'
+  156 | wire [15:0] rate_limited_setpoint;
+      |             ^~~~~~~~~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

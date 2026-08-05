@@ -1,4 +1,0 @@
-Digital Power Intent (UPF-Lite) Agent Report
-Spec mode: flat
-Top module: doMINO_aero_ctrl_safety_wrapper
-Domains: ['PD_TOP']

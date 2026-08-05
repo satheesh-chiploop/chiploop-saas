@@ -1,0 +1,19 @@
+{
+  "type": "ip_packaging_handoff",
+  "version": "1.0",
+  "top_module": "aero_guard_ctrl",
+  "package_dir": "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/handoff/aero_guard_ctrl_ip_package",
+  "zip_path": "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/handoff/aero_guard_ctrl_ip_package.zip",
+  "bucket_counts": {
+    "rtl": 2,
+    "spec": 3,
+    "arch": 1,
+    "microarch": 1,
+    "regmap": 2,
+    "constraints": 0,
+    "power_intent": 1,
+    "verification": 0,
+    "reports": 0,
+    "other": 7
+  }
+}

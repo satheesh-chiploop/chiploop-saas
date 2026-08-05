@@ -1,0 +1,73 @@
+{
+  "architecture_passed": true,
+  "child_handoff": {
+    "digital_ip_spec": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7d38540c-26fa-4d7d-928b-362471036ed2/cbdcee79-6e7f-4c50-b40a-f7fb20625a8c/physical_ai/physical_ai/surrogate_architecture/digital_ip_spec.json",
+    "implementation_path": "digital_ip_asic",
+    "inference_status": "not_executed",
+    "model_generated_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7d38540c-26fa-4d7d-928b-362471036ed2/cbdcee79-6e7f-4c50-b40a-f7fb20625a8c/physical_ai/physical_ai/model_generated_architecture.json",
+    "next_loop": "digital_design",
+    "parent_workflow_id": "7d38540c-26fa-4d7d-928b-362471036ed2",
+    "product_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7d38540c-26fa-4d7d-928b-362471036ed2/cbdcee79-6e7f-4c50-b40a-f7fb20625a8c/physical_ai/physical_ai/surrogate_architecture/product_architecture.json",
+    "return_to_parent": true,
+    "rtl_spec_text": "Design a synthesizable ASIC digital IP block named aero_guard_ctrl that implements a deterministic active-aerodynamics supervision and command-synthesis pipeline around an external DoMINO model service. The RTL shall not include any physics inference engine, neural network, or GPU functionality. The block shall provide valid/ready style handshaking at its input and output boundaries and shall support a single outstanding model request at a time unless otherwise parameterized.\n\n1. Clocking and reset\n- The design shall use a single primary clock clk and active-low synchronous reset_n unless a project wrapper specifies otherwise.\n- On reset, all internal registers shall initialize to a safe state: request_valid=0, outstanding_request=0, fallback_active=1, actuator_enable=0, command outputs set to conservative defaults, stale_reject=0, timeout_flag=0, clamp_active=0.\n\n2. Input capture and request formation\n- The block shall accept geometry descriptor inputs vehicle_geometry_in and flow_conditions_in.\n- The geometry interface shall consume compact descriptor fields only; no parsing of full STL meshes or floating-point geometry computation shall be implemented in RTL.\n- The block shall assemble a request packet containing request_id, geometry descriptor fields, stream_velocity_mps, and mode flags for export to model_request_out.\n- request_id shall increment monotonically for each accepted request launch and shall be stored for response matching.\n- The request launch shall only occur when the controller is not in fallback lockout and no newer request is outstanding.\n\n3. Outstanding request tracking and stale rejection\n- A request_age counter shall increment every cycle while a request is outstanding.\n- A programmable TIMEOUT_CYCLES register shall define the maximum allowed response age.\n- If request_age exceeds TIMEOUT_CYCLES before a matching response is received, the design shall assert timeout_flag, clear request_pending, and force fallback_active.\n- A model response shall be accepted only if response.request_id equals the stored outstanding request_id and the response status indicates valid completion.\n- Any response with mismatched request_id, missing payload, or late arrival after timeout shall be discarded and shall assert stale_reject.\n\n4. Response validation\n- The response capture path shall latch drag_force, lift_force, surface_pressure summary fields, and a compact flow_field status token if present.\n- The design shall treat surface_pressure and flow_field as control metadata, not as large memory blobs. The implementation may store only compressed summary fields or flags.\n- The response validity filter shall verify header match, completeness, and freshness before releasing values to command synthesis.\n- Invalid or absent values shall not propagate to command synthesis and shall instead route the controller to fallback.\n\n5. Command synthesis\n- The Actuator Command Synthesis block shall map validated model outputs and current flow conditions to digital actuator setpoints for the active-aerodynamics surfaces.\n- The mapping shall be deterministic, combinational or pipelined, and free of floating-point neural inference semantics.\n- The command interface shall output at minimum surface_select, position_setpoint, enable, and fault_flag.\n- The design shall support a configurable safe command range defined by CMD_MIN and CMD_MAX registers or generics.\n- The command synthesis output shall be registered before the clamp stage.\n\n6. Clamp and rate limiting\n- A command clamp stage shall enforce CMD_MIN <= position_setpoint <= CMD_MAX.\n- If a synthesized command exceeds bounds, the design shall saturate it to the nearest limit and assert clamp_active.\n- If enabled by parameter, a rate limiter shall limit setpoint delta per cycle to RATE_MAX_DELTA.\n- Rate-limited or clamped commands shall still remain safe and valid for downstream actuation.\n\n7. Safe fallback behavior\n- The Safe Fallback Controller shall generate conservative actuator commands independent of the model response path.\n- Fallback shall be asserted when no model response is available, when timeout occurs, when stale_reject is asserted, when response validity fails, or when an external fault input is asserted.\n- In fallback mode, actuator_enable shall be driven to a safe value and the setpoint shall be forced to a predefined conservative position encoded in SAFE_POSITION or equivalent.\n- The design shall provide a manual_override or safe_mode input if required by the integration wrapper, but model-derived commands shall never bypass safety checks.\n\n8. Output interface\n- The output interface shall register final actuator commands before driving actuator_cmd_out.\n- The design shall expose safe_fallback_out as either a separate port or encoded fault/enable combination, depending on integration style, but the fallback state shall always be externally observable.\n- The design shall not drive unknown or high-impedance values on synthesizable outputs.\n\n9. Status and observability\n- The block shall provide status flags valid, busy, stale_reject, clamp_active, fallback_active, timeout_flag, and fault_flag for system integration and verification.\n- Status flags shall be updated synchronously and shall reflect the final decision of the control pipeline each cycle.\n\n10. Parameterization\n- The design shall expose parameters or generics for TIMEOUT_CYCLES, CMD_MIN, CMD_MAX, SAFE_POSITION, RATE_MAX_DELTA, and optionally SINGLE_OUTSTANDING_REQUEST.\n- The design shall be synthesizable in ASIC flows and shall avoid unbounded loops, dynamic allocation, file I/O, and unsynthesizable real-number operations.\n\n11. Environmental assumptions\n- The controller shall accept flow_conditions for stream velocity within the configured operating envelope of 20 to 55 m/s.\n- The reference condition stream_velocity_mps=38.89 and geometry_source=DrivAerML reference geometry shall be treated as configuration context for verification and integration, not as hard-coded inference outputs.\n\n12. External service boundary\n- The RTL shall terminate at a service boundary for the NVIDIA DoMINO model runtime. Any GPU worker, remote NIM, or network transport shall be implemented outside this IP.\n- The model interface shall be treated as an asynchronous external functional block with request/response semantics.\n\n13. Safety intent\n- The design shall reject stale model commands, clamp actuator commands, and provide a safe fallback at all times.\n- If the controller cannot guarantee validity of the current command, it shall output the safe fallback rather than attempting to reuse an expired result.\n- All safety behavior shall be deterministic, synthesizable, and suitable for formal verification and gate-level implementation.",
+    "schema": "chiploop.physical_ai.architecture_handoff.v1",
+    "source_model_id": "nvidia.domino.automotive_aero",
+    "surrogate_interface_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7d38540c-26fa-4d7d-928b-362471036ed2/cbdcee79-6e7f-4c50-b40a-f7fb20625a8c/physical_ai/physical_ai/surrogate_architecture/surrogate_interface_contract.json"
+  },
+  "fixed_point_passed": false,
+  "implementation_path": "digital_ip_asic",
+  "inference_status": "not_executed",
+  "physics_passed": false,
+  "rtl_smoke_passed": false,
+  "stages": [
+    {
+      "id": "requirements",
+      "owner": "physical_ai",
+      "status": "completed"
+    },
+    {
+      "id": "model_selection",
+      "owner": "physical_ai",
+      "status": "completed"
+    },
+    {
+      "id": "surrogate_interface",
+      "owner": "physical_ai",
+      "status": "completed"
+    },
+    {
+      "id": "architecture_definition",
+      "owner": "physical_ai",
+      "status": "completed"
+    },
+    {
+      "id": "surrogate_inference",
+      "owner": "physical_ai",
+      "status": "not_executed"
+    },
+    {
+      "app_path": "/apps/arch2rtl",
+      "id": "digital_design",
+      "owner": "existing_loop",
+      "status": "ready"
+    },
+    {
+      "app_path": "/apps/verify",
+      "id": "rtl_verification",
+      "owner": "existing_loop",
+      "status": "planned"
+    },
+    {
+      "app_path": "/apps/fpga-implementation",
+      "id": "digital_implementation",
+      "owner": "existing_loop",
+      "status": "planned"
+    },
+    {
+      "app_path": "/apps/fpga-target-explorer",
+      "id": "fpga_exploration",
+      "owner": "existing_loop",
+      "status": "not_requested"
+    }
+  ]
+}

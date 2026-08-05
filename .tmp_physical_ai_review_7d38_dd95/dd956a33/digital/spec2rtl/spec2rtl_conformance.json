@@ -1,0 +1,1182 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "partial",
+  "summary": {
+    "checked": 68,
+    "matched": 50,
+    "partial": 4,
+    "missing": 14,
+    "inconclusive": 0
+  },
+  "setup_issues": [],
+  "top_module": {
+    "expected": "aero_guard_ctrl",
+    "modules_found": [
+      "aero_guard_ctrl"
+    ],
+    "status": "pass"
+  },
+  "interface": {
+    "status": "pass",
+    "expected_ports": [
+      "actuator_cmd_enable_out",
+      "actuator_cmd_fault_flag_out",
+      "actuator_cmd_position_setpoint_out",
+      "actuator_cmd_surface_select_out",
+      "actuator_cmd_valid_out",
+      "busy",
+      "clamp_active",
+      "clk",
+      "external_fault_in",
+      "fallback_active",
+      "fault_flag",
+      "flow_conditions_in",
+      "manual_override_in",
+      "model_request_flow_conditions_out",
+      "model_request_geometry_out",
+      "model_request_mode_flags_out",
+      "model_request_ready_in",
+      "model_request_ready_out",
+      "model_request_request_id_out",
+      "model_request_valid_out",
+      "model_response_drag_force_in",
+      "model_response_flow_field_token_in",
+      "model_response_lift_force_in",
+      "model_response_request_id_in",
+      "model_response_status_in",
+      "model_response_surface_pressure_in",
+      "model_response_valid_in",
+      "reset_n",
+      "safe_fallback_out",
+      "safe_mode_in",
+      "stale_reject",
+      "timeout_flag",
+      "valid",
+      "vehicle_geometry_in"
+    ],
+    "matched_ports": [
+      "actuator_cmd_enable_out",
+      "actuator_cmd_fault_flag_out",
+      "actuator_cmd_position_setpoint_out",
+      "actuator_cmd_surface_select_out",
+      "actuator_cmd_valid_out",
+      "busy",
+      "clamp_active",
+      "clk",
+      "external_fault_in",
+      "fallback_active",
+      "fault_flag",
+      "flow_conditions_in",
+      "manual_override_in",
+      "model_request_flow_conditions_out",
+      "model_request_geometry_out",
+      "model_request_mode_flags_out",
+      "model_request_ready_in",
+      "model_request_ready_out",
+      "model_request_request_id_out",
+      "model_request_valid_out",
+      "model_response_drag_force_in",
+      "model_response_flow_field_token_in",
+      "model_response_lift_force_in",
+      "model_response_request_id_in",
+      "model_response_status_in",
+      "model_response_surface_pressure_in",
+      "model_response_valid_in",
+      "reset_n",
+      "safe_fallback_out",
+      "safe_mode_in",
+      "stale_reject",
+      "timeout_flag",
+      "valid",
+      "vehicle_geometry_in"
+    ],
+    "missing_ports": [],
+    "rtl_ports": [
+      "actuator_cmd_enable_out",
+      "actuator_cmd_fault_flag_out",
+      "actuator_cmd_position_setpoint_out",
+      "actuator_cmd_surface_select_out",
+      "actuator_cmd_valid_out",
+      "busy",
+      "clamp_active",
+      "clk",
+      "external_fault_in",
+      "fallback_active",
+      "fault_flag",
+      "flow_conditions_in",
+      "manual_override_in",
+      "model_request_flow_conditions_out",
+      "model_request_geometry_out",
+      "model_request_mode_flags_out",
+      "model_request_ready_in",
+      "model_request_ready_out",
+      "model_request_request_id_out",
+      "model_request_valid_out",
+      "model_response_drag_force_in",
+      "model_response_flow_field_token_in",
+      "model_response_lift_force_in",
+      "model_response_request_id_in",
+      "model_response_status_in",
+      "model_response_surface_pressure_in",
+      "model_response_valid_in",
+      "reset_n",
+      "safe_fallback_out",
+      "safe_mode_in",
+      "stale_reject",
+      "timeout_flag",
+      "valid",
+      "vehicle_geometry_in"
+    ]
+  },
+  "register_map": {
+    "expected": [
+      "BUSY",
+      "CLAMP_ACTIVE",
+      "CLEAR_STICKY",
+      "CMD_MAX_LSB",
+      "CMD_MAX_MSB",
+      "CMD_MIN_LSB",
+      "CMD_MIN_MSB",
+      "DRAG_FORCE_LSB",
+      "DRAG_FORCE_MSB",
+      "ENABLE",
+      "FALLBACK_ACTIVE",
+      "FAULT_FLAG",
+      "FAULT_FLAG_OUT",
+      "FLOW_BYTE0",
+      "FLOW_BYTE1",
+      "FLOW_BYTE2",
+      "FLOW_BYTE3",
+      "FLOW_FIELD_TOKEN",
+      "GEOMETRY_BYTE0",
+      "GEOMETRY_BYTE1",
+      "GEOMETRY_BYTE2",
+      "GEOMETRY_BYTE3",
+      "GEOMETRY_BYTE4",
+      "GEOMETRY_BYTE5",
+      "GEOMETRY_BYTE6",
+      "GEOMETRY_BYTE7",
+      "LIFT_FORCE_LSB",
+      "LIFT_FORCE_MSB",
+      "MANUAL_OVERRIDE_EN",
+      "MANUAL_OVERRIDE_SHADOW",
+      "OUTSTANDING_REQUEST",
+      "OUTSTANDING_VALID",
+      "POSITION_SETPOINT_LSB",
+      "POSITION_SETPOINT_MSB",
+      "PRESSURE_SUMMARY_LSB",
+      "PRESSURE_SUMMARY_MSB",
+      "RATE_LIMIT_EN",
+      "RATE_LIMIT_EN_SHADOW",
+      "RATE_MAX_DELTA_LSB",
+      "RATE_MAX_DELTA_MSB",
+      "REQUEST_AGE_LSB",
+      "REQUEST_AGE_MSB",
+      "REQUEST_ARM",
+      "REQUEST_ID_LSB",
+      "REQUEST_ID_MSB",
+      "REQ_ARMED",
+      "RESP_COMPLETE",
+      "RESP_FRESH",
+      "RESP_STATUS_CODE",
+      "RESP_VALID_MATCH",
+      "SAFE_MODE_EN",
+      "SAFE_MODE_SHADOW",
+      "SAFE_POSITION_LSB",
+      "SAFE_POSITION_MSB",
+      "STALE_REJECT",
+      "SURFACE_SELECT",
+      "TIMEOUT_CYCLES_LSB",
+      "TIMEOUT_CYCLES_MSB",
+      "TIMEOUT_FLAG",
+      "VALID",
+      "VALID_OUT",
+      "aero_guard_ctrl"
+    ],
+    "matched": [
+      "BUSY",
+      "CLAMP_ACTIVE",
+      "ENABLE",
+      "FALLBACK_ACTIVE",
+      "FAULT_FLAG",
+      "FAULT_FLAG_OUT",
+      "FLOW_FIELD_TOKEN",
+      "OUTSTANDING_REQUEST",
+      "RATE_LIMIT_EN",
+      "REQUEST_ARM",
+      "RESP_COMPLETE",
+      "STALE_REJECT",
+      "SURFACE_SELECT",
+      "TIMEOUT_FLAG",
+      "VALID",
+      "VALID_OUT",
+      "aero_guard_ctrl"
+    ],
+    "expected_registers": [
+      "CMD_CTRL",
+      "CMD_MAX_H",
+      "CMD_MAX_L",
+      "CMD_MIN_H",
+      "CMD_MIN_L",
+      "CMD_OUT_0",
+      "CMD_OUT_1",
+      "CTRL",
+      "RATE_MAX_DELTA_H",
+      "RATE_MAX_DELTA_L",
+      "REQUEST_AGE_H",
+      "REQUEST_AGE_L",
+      "REQUEST_ID",
+      "REQUEST_ID_H",
+      "REQ_FLOW_0",
+      "REQ_FLOW_1",
+      "REQ_FLOW_2",
+      "REQ_FLOW_3",
+      "REQ_GEOM_0",
+      "REQ_GEOM_1",
+      "REQ_GEOM_2",
+      "REQ_GEOM_3",
+      "REQ_GEOM_4",
+      "REQ_GEOM_5",
+      "REQ_GEOM_6",
+      "REQ_GEOM_7",
+      "REQ_MODE_FLAGS",
+      "RESP_DRAG_H",
+      "RESP_DRAG_L",
+      "RESP_FLOW_TOKEN",
+      "RESP_LIFT_H",
+      "RESP_LIFT_L",
+      "RESP_PRESSURE_H",
+      "RESP_PRESSURE_L",
+      "RESP_STATUS",
+      "SAFE_POSITION_H",
+      "SAFE_POSITION_L",
+      "STATUS",
+      "TIMEOUT_CYCLES_H",
+      "TIMEOUT_CYCLES_L"
+    ],
+    "matched_registers": [
+      "CTRL"
+    ],
+    "expected_addresses": [
+      "0x00",
+      "0x01",
+      "0x02",
+      "0x03",
+      "0x04",
+      "0x05",
+      "0x06",
+      "0x07",
+      "0x08",
+      "0x09",
+      "0x0A",
+      "0x0B",
+      "0x0C",
+      "0x0D",
+      "0x0E",
+      "0x0F",
+      "0x10",
+      "0x11",
+      "0x12",
+      "0x13",
+      "0x14",
+      "0x15",
+      "0x16",
+      "0x17",
+      "0x18",
+      "0x19",
+      "0x1A",
+      "0x1B",
+      "0x1C",
+      "0x1D",
+      "0x1E",
+      "0x1F",
+      "0x20",
+      "0x21",
+      "0x22",
+      "0x23",
+      "0x24",
+      "0x25",
+      "0x26",
+      "0x27"
+    ],
+    "matched_addresses": [
+      "0x00"
+    ],
+    "missing": [
+      "CLEAR_STICKY",
+      "CMD_MAX_LSB",
+      "CMD_MAX_MSB",
+      "CMD_MIN_LSB",
+      "CMD_MIN_MSB",
+      "DRAG_FORCE_LSB",
+      "DRAG_FORCE_MSB",
+      "FLOW_BYTE0",
+      "FLOW_BYTE1",
+      "FLOW_BYTE2",
+      "FLOW_BYTE3",
+      "GEOMETRY_BYTE0",
+      "GEOMETRY_BYTE1",
+      "GEOMETRY_BYTE2",
+      "GEOMETRY_BYTE3",
+      "GEOMETRY_BYTE4",
+      "GEOMETRY_BYTE5",
+      "GEOMETRY_BYTE6",
+      "GEOMETRY_BYTE7",
+      "LIFT_FORCE_LSB",
+      "LIFT_FORCE_MSB",
+      "MANUAL_OVERRIDE_EN",
+      "MANUAL_OVERRIDE_SHADOW",
+      "OUTSTANDING_VALID",
+      "POSITION_SETPOINT_LSB",
+      "POSITION_SETPOINT_MSB",
+      "PRESSURE_SUMMARY_LSB",
+      "PRESSURE_SUMMARY_MSB",
+      "RATE_LIMIT_EN_SHADOW",
+      "RATE_MAX_DELTA_LSB",
+      "RATE_MAX_DELTA_MSB",
+      "REQUEST_AGE_LSB",
+      "REQUEST_AGE_MSB",
+      "REQUEST_ID_LSB",
+      "REQUEST_ID_MSB",
+      "REQ_ARMED",
+      "RESP_FRESH",
+      "RESP_STATUS_CODE",
+      "RESP_VALID_MATCH",
+      "SAFE_MODE_EN",
+      "SAFE_MODE_SHADOW",
+      "SAFE_POSITION_LSB",
+      "SAFE_POSITION_MSB",
+      "TIMEOUT_CYCLES_LSB",
+      "TIMEOUT_CYCLES_MSB"
+    ],
+    "missing_registers": [
+      "CMD_CTRL",
+      "CMD_MAX_H",
+      "CMD_MAX_L",
+      "CMD_MIN_H",
+      "CMD_MIN_L",
+      "CMD_OUT_0",
+      "CMD_OUT_1",
+      "RATE_MAX_DELTA_H",
+      "RATE_MAX_DELTA_L",
+      "REQUEST_AGE_H",
+      "REQUEST_AGE_L",
+      "REQUEST_ID",
+      "REQUEST_ID_H",
+      "REQ_FLOW_0",
+      "REQ_FLOW_1",
+      "REQ_FLOW_2",
+      "REQ_FLOW_3",
+      "REQ_GEOM_0",
+      "REQ_GEOM_1",
+      "REQ_GEOM_2",
+      "REQ_GEOM_3",
+      "REQ_GEOM_4",
+      "REQ_GEOM_5",
+      "REQ_GEOM_6",
+      "REQ_GEOM_7",
+      "REQ_MODE_FLAGS",
+      "RESP_DRAG_H",
+      "RESP_DRAG_L",
+      "RESP_FLOW_TOKEN",
+      "RESP_LIFT_H",
+      "RESP_LIFT_L",
+      "RESP_PRESSURE_H",
+      "RESP_PRESSURE_L",
+      "RESP_STATUS",
+      "SAFE_POSITION_H",
+      "SAFE_POSITION_L",
+      "STATUS",
+      "TIMEOUT_CYCLES_H",
+      "TIMEOUT_CYCLES_L"
+    ],
+    "missing_addresses": [
+      "0x01",
+      "0x02",
+      "0x03",
+      "0x04",
+      "0x05",
+      "0x06",
+      "0x07",
+      "0x08",
+      "0x09",
+      "0x0A",
+      "0x0B",
+      "0x0C",
+      "0x0D",
+      "0x0E",
+      "0x0F",
+      "0x10",
+      "0x11",
+      "0x12",
+      "0x13",
+      "0x14",
+      "0x15",
+      "0x16",
+      "0x17",
+      "0x18",
+      "0x19",
+      "0x1A",
+      "0x1B",
+      "0x1C",
+      "0x1D",
+      "0x1E",
+      "0x1F",
+      "0x20",
+      "0x21",
+      "0x22",
+      "0x23",
+      "0x24",
+      "0x25",
+      "0x26",
+      "0x27"
+    ],
+    "status": "issues"
+  },
+  "clock_reset": {
+    "clock_ports": [
+      "clk"
+    ],
+    "reset_ports": [
+      "reset_n"
+    ],
+    "status": "pass"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "requirement": "Accept and register compact vehicle_geometry_in and flow_conditions_in descriptors.",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_in",
+        "flow_conditions_in"
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "requirement": "Assemble model_request_out semantics through explicit request output ports.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-003",
+      "requirement": "Maintain monotonically incrementing request_id for accepted launches.",
+      "status": "matched",
+      "evidence_tokens": [
+        "increment_logic"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "requirement": "Track a single outstanding request and its age.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-005",
+      "requirement": "Assert timeout_flag when request_age exceeds TIMEOUT_CYCLES before a matching valid response arrives.",
+      "status": "matched",
+      "evidence_tokens": [
+        "timeout_flag",
+        "valid",
+        "response_status_valid",
+        "response_valid_all"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "requirement": "Accept only matching, valid, and fresh model responses.",
+      "status": "partial",
+      "evidence_tokens": [
+        "valid"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "requirement": "Assert stale_reject for mismatched, missing, invalid, or late responses.",
+      "status": "matched",
+      "evidence_tokens": [
+        "stale_reject"
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "requirement": "Capture compact response metadata including drag, lift, surface_pressure summary, and flow_field token.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-009",
+      "requirement": "Generate deterministic actuator command setpoints from validated responses and flow conditions.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-010",
+      "requirement": "Clamp commands to CMD_MIN and CMD_MAX and optionally rate-limit delta per cycle.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-011",
+      "requirement": "Force conservative SAFE_POSITION and actuator disable in fallback mode.",
+      "status": "matched",
+      "evidence_tokens": [
+        "force_fallback"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "requirement": "Expose system status flags for safety, integration, and verification.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-013",
+      "requirement": "Never bypass safety checks with model-derived commands.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-014",
+      "requirement": "Request formation shall occur only when not in fallback lockout, no newer request is outstanding, model_request_ready_in is asserted, and neither safe_mode_in nor external_fault_in forces fallback.",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_ready_in",
+        "safe_mode_in",
+        "external_fault_in"
+      ]
+    },
+    {
+      "id": "REQ-015",
+      "requirement": "request_id shall increment monotonically on each accepted request launch and shall be used for response matching.",
+      "status": "matched",
+      "evidence_tokens": [
+        "increment_logic"
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "requirement": "request_age shall increment every cycle while a request is outstanding.",
+      "status": "matched",
+      "evidence_tokens": [
+        "increment_logic"
+      ]
+    },
+    {
+      "id": "REQ-017",
+      "requirement": "If request_age exceeds TIMEOUT_CYCLES before a matching valid response is received, timeout_flag shall assert, the pending request shall be cleared, and fallback_active shall be forced high.",
+      "status": "matched",
+      "evidence_tokens": [
+        "valid",
+        "timeout_flag",
+        "fallback_active",
+        "response_status_valid",
+        "response_valid_all"
+      ]
+    },
+    {
+      "id": "REQ-018",
+      "requirement": "A response shall be accepted only when model_response_valid_in is asserted, model_response_request_id_in matches the stored outstanding request_id, model_response_status_in indicates valid completion, and the response arrives before timeout",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_valid_in",
+        "model_response_request_id_in",
+        "model_response_status_in",
+        "valid",
+        "response_before_timeout",
+        "response_status_valid",
+        "response_valid_all"
+      ]
+    },
+    {
+      "id": "REQ-019",
+      "requirement": "Any response with mismatched request_id, invalid status, missing payload indicators, or late arrival after timeout shall be discarded and shall assert stale_reject.",
+      "status": "matched",
+      "evidence_tokens": [
+        "stale_reject"
+      ]
+    },
+    {
+      "id": "REQ-020",
+      "requirement": "The response validation filter shall verify identity, completeness, and freshness before command synthesis may use the response fields.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-021",
+      "requirement": "The command synthesis stage shall be deterministic, combinational or pipelined, and shall map validated model outputs and current flow conditions to surface_select, position_setpoint, enable, and fault_flag.",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_flag"
+      ]
+    },
+    {
+      "id": "REQ-022",
+      "requirement": "The synthesized command shall be registered before the clamp stage.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-023",
+      "requirement": "Clamp stage shall enforce CMD_MIN <= position_setpoint <= CMD_MAX and assert clamp_active when saturation occurs.",
+      "status": "matched",
+      "evidence_tokens": [
+        "clamp_active"
+      ]
+    },
+    {
+      "id": "REQ-024",
+      "requirement": "If rate limiting is enabled by parameterization, setpoint delta per cycle shall not exceed RATE_MAX_DELTA.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-025",
+      "requirement": "Rate-limited or clamped commands shall remain valid and safe for downstream actuation.",
+      "status": "partial",
+      "evidence_tokens": [
+        "valid"
+      ]
+    },
+    {
+      "id": "REQ-026",
+      "requirement": "Safe fallback shall override model-derived commands whenever no valid response exists, timeout occurs, stale_reject asserts, response validation fails, external_fault_in asserts, manual_override_in requires it, or safe_mode_in requires it.",
+      "status": "matched",
+      "evidence_tokens": [
+        "valid",
+        "stale_reject",
+        "external_fault_in",
+        "manual_override_in",
+        "safe_mode_in",
+        "response_status_valid",
+        "response_valid_all"
+      ]
+    },
+    {
+      "id": "REQ-027",
+      "requirement": "In fallback mode, actuator_cmd_enable_out shall be driven to a safe disabled value and the setpoint shall be forced to SAFE_POSITION.",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_cmd_enable_out",
+        "safe_mode_in"
+      ]
+    },
+    {
+      "id": "REQ-028",
+      "requirement": "Final actuator outputs shall be registered before driving actuator_cmd_out ports.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-029",
+      "requirement": "valid shall reflect the final decision that a command is valid for use this cycle.",
+      "status": "partial",
+      "evidence_tokens": [
+        "valid"
+      ]
+    },
+    {
+      "id": "REQ-030",
+      "requirement": "busy shall reflect whether an outstanding request is active.",
+      "status": "partial",
+      "evidence_tokens": [
+        "busy"
+      ]
+    },
+    {
+      "id": "REQ-031",
+      "requirement": "stale_reject, clamp_active, fallback_active, timeout_flag, and fault_flag shall update synchronously and reflect the final pipeline decision each cycle.",
+      "status": "matched",
+      "evidence_tokens": [
+        "stale_reject",
+        "clamp_active",
+        "fallback_active",
+        "timeout_flag",
+        "fault_flag"
+      ]
+    },
+    {
+      "id": "REQ-032",
+      "requirement": "The IP shall not instantiate any physics inference engine, neural network, GPU worker, or transport protocol.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-033",
+      "requirement": "The IP shall not use unbounded loops, dynamic allocation, file I/O, or real-number arithmetic.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-034",
+      "requirement": "model_request_valid_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_valid_out"
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "requirement": "model_request_request_id_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_request_id_out"
+      ]
+    },
+    {
+      "id": "REQ-036",
+      "requirement": "model_request_geometry_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_geometry_out"
+      ]
+    },
+    {
+      "id": "REQ-037",
+      "requirement": "model_request_flow_conditions_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_flow_conditions_out"
+      ]
+    },
+    {
+      "id": "REQ-038",
+      "requirement": "model_request_mode_flags_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_mode_flags_out"
+      ]
+    },
+    {
+      "id": "REQ-039",
+      "requirement": "model_request_ready_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_ready_out"
+      ]
+    },
+    {
+      "id": "REQ-040",
+      "requirement": "actuator_cmd_valid_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_cmd_valid_out"
+      ]
+    },
+    {
+      "id": "REQ-041",
+      "requirement": "actuator_cmd_surface_select_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_cmd_surface_select_out"
+      ]
+    },
+    {
+      "id": "REQ-042",
+      "requirement": "actuator_cmd_position_setpoint_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_cmd_position_setpoint_out"
+      ]
+    },
+    {
+      "id": "REQ-043",
+      "requirement": "actuator_cmd_enable_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_cmd_enable_out"
+      ]
+    },
+    {
+      "id": "REQ-044",
+      "requirement": "actuator_cmd_fault_flag_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_cmd_fault_flag_out"
+      ]
+    },
+    {
+      "id": "REQ-045",
+      "requirement": "safe_fallback_out",
+      "status": "matched",
+      "evidence_tokens": [
+        "safe_fallback_out"
+      ]
+    },
+    {
+      "id": "REQ-046",
+      "requirement": "stale_reject",
+      "status": "matched",
+      "evidence_tokens": [
+        "stale_reject"
+      ]
+    },
+    {
+      "id": "REQ-047",
+      "requirement": "clamp_active",
+      "status": "matched",
+      "evidence_tokens": [
+        "clamp_active"
+      ]
+    },
+    {
+      "id": "REQ-048",
+      "requirement": "fallback_active",
+      "status": "matched",
+      "evidence_tokens": [
+        "fallback_active"
+      ]
+    },
+    {
+      "id": "REQ-049",
+      "requirement": "timeout_flag",
+      "status": "matched",
+      "evidence_tokens": [
+        "timeout_flag"
+      ]
+    },
+    {
+      "id": "REQ-050",
+      "requirement": "fault_flag",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_flag"
+      ]
+    },
+    {
+      "id": "REQ-051",
+      "requirement": "vehicle_geometry_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_in"
+      ]
+    },
+    {
+      "id": "REQ-052",
+      "requirement": "flow_conditions_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_conditions_in"
+      ]
+    },
+    {
+      "id": "REQ-053",
+      "requirement": "model_request_ready_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_ready_in"
+      ]
+    },
+    {
+      "id": "REQ-054",
+      "requirement": "model_response_valid_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_valid_in"
+      ]
+    },
+    {
+      "id": "REQ-055",
+      "requirement": "model_response_request_id_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_request_id_in"
+      ]
+    },
+    {
+      "id": "REQ-056",
+      "requirement": "model_response_status_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_status_in"
+      ]
+    },
+    {
+      "id": "REQ-057",
+      "requirement": "model_response_drag_force_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_drag_force_in"
+      ]
+    },
+    {
+      "id": "REQ-058",
+      "requirement": "model_response_lift_force_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_lift_force_in"
+      ]
+    },
+    {
+      "id": "REQ-059",
+      "requirement": "model_response_surface_pressure_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_surface_pressure_in"
+      ]
+    },
+    {
+      "id": "REQ-060",
+      "requirement": "model_response_flow_field_token_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_flow_field_token_in"
+      ]
+    },
+    {
+      "id": "REQ-061",
+      "requirement": "external_fault_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "external_fault_in"
+      ]
+    },
+    {
+      "id": "REQ-062",
+      "requirement": "manual_override_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "manual_override_in"
+      ]
+    },
+    {
+      "id": "REQ-063",
+      "requirement": "safe_mode_in",
+      "status": "matched",
+      "evidence_tokens": [
+        "safe_mode_in"
+      ]
+    },
+    {
+      "id": "REQ-064",
+      "requirement": "On synchronous active-low reset_n deassertion to 0, all state-holding registers shall enter a safe deterministic state: request_valid=0, outstanding_request=0, fallback_active=1, actuator_enable=0, command outputs set to conservative defaul",
+      "status": "matched",
+      "evidence_tokens": [
+        "reset_n",
+        "fallback_active",
+        "reset_zero"
+      ]
+    }
+  ],
+  "rtl_files": [
+    "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v"
+  ],
+  "modules": [
+    {
+      "name": "aero_guard_ctrl",
+      "file": "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/aero_guard_ctrl.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "vehicle_geometry_in",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "flow_conditions_in",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "model_request_ready_in",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_response_valid_in",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_response_request_id_in",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "model_response_status_in",
+          "direction": "input",
+          "width": "[3:0]",
+          "bits": 4
+        },
+        {
+          "name": "model_response_drag_force_in",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "model_response_lift_force_in",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "model_response_surface_pressure_in",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "model_response_flow_field_token_in",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "external_fault_in",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "manual_override_in",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "safe_mode_in",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_request_valid_out",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_request_request_id_out",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "model_request_geometry_out",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "model_request_flow_conditions_out",
+          "direction": "output",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "model_request_mode_flags_out",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "model_request_ready_out",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "actuator_cmd_valid_out",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "actuator_cmd_surface_select_out",
+          "direction": "output",
+          "width": "[3:0]",
+          "bits": 4
+        },
+        {
+          "name": "actuator_cmd_position_setpoint_out",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator_cmd_enable_out",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "actuator_cmd_fault_flag_out",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "safe_fallback_out",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "busy",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "stale_reject",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "clamp_active",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "timeout_flag",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_flag",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}

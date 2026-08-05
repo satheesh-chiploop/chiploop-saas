@@ -1,0 +1,8 @@
+{
+  "workflow_id": "dd956a33-acc5-4350-8ff0-76c8f001ec5f",
+  "workflow_dir": "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f",
+  "digital_spec_json": "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/spec/aero_guard_ctrl_spec.json",
+  "spec_json": "backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/spec/aero_guard_ctrl_spec.json",
+  "digital_spec_json_exists": true,
+  "spec_json_exists": true
+}

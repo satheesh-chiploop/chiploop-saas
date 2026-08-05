@@ -1,0 +1,97 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "aero_guard_ctrl",
+  "module_microarchitecture": [
+    {
+      "name": "aero_guard_ctrl",
+      "implementation_style": "Single-clock synthesizable RTL supervisor with registered request/response handshaking, deterministic command synthesis, clamp/rate-limit protection, and priority-based safe fallback arbitration around an external asynchronous model service boundary.",
+      "control_strategy": "Capture compact geometry and flow descriptors, form a request packet only when the external request boundary is ready and no outstanding request is active, track request_id and request_age, accept only matching and fresh responses, and force conservative fallback whenever validity, freshness, or safety cannot be guaranteed.",
+      "state_strategy": "Use synchronous state registers for outstanding_request, request_id, request_age, captured request context, captured validated response metadata, synthesized command registers, clamp and timeout indicators, fallback state, and status outputs; initialize all state to safe defaults on synchronous active-low reset.",
+      "output_strategy": "Drive registered request outputs toward the external DoMINO boundary, then register the synthesized actuator command before clamp/rate limiting and again at the final output boundary so actuator_cmd_out and status flags reflect the final synchronized decision each cycle.",
+      "ownership_notes": [
+        "Owns top-level request launch qualification and response acceptance gating.",
+        "Owns request_id monotonic incrementing and outstanding request tracking.",
+        "Owns timeout detection, stale rejection, and fallback assertion.",
+        "Owns deterministic command synthesis, clamp enforcement, and optional rate limiting.",
+        "Owns final output registration and external observability of safe_fallback_out and status flags.",
+        "Does not instantiate any neural, GPU, physics inference, or transport functionality inside RTL."
+      ]
+    }
+  ],
+  "fsm_intent": {
+    "present": false,
+    "description": "No explicit complex FSM is required; implement as simple synchronous control with combinational qualification and registered state updates for idle/request-outstanding/response-accepted/fallback conditions.",
+    "states": []
+  },
+  "datapath_intent": {
+    "inputs": [
+      "vehicle_geometry_in",
+      "flow_conditions_in",
+      "model_request_ready_in",
+      "model_response_valid_in",
+      "model_response_request_id_in",
+      "model_response_status_in",
+      "model_response_drag_force_in",
+      "model_response_lift_force_in",
+      "model_response_surface_pressure_in",
+      "model_response_flow_field_token_in",
+      "external_fault_in",
+      "manual_override_in",
+      "safe_mode_in"
+    ],
+    "internal_storage": [
+      "request_id register",
+      "request_age counter",
+      "outstanding_request flag",
+      "captured geometry descriptor register",
+      "captured flow condition register",
+      "captured request mode flags",
+      "validated response metadata registers for drag_force, lift_force, surface_pressure summary, and flow_field token",
+      "registered synthesized surface_select, position_setpoint, enable, and fault_flag",
+      "clamp_active flag",
+      "timeout_flag",
+      "stale_reject flag",
+      "fallback_active flag",
+      "valid and busy status registers"
+    ],
+    "output_mapping": [
+      "model_request_valid_out asserts when a new request packet is launched",
+      "model_request_request_id_out carries the stored monotonic request_id",
+      "model_request_geometry_out re-exports the captured compact geometry descriptor",
+      "model_request_flow_conditions_out re-exports the captured flow condition descriptor",
+      "model_request_mode_flags_out encodes request/control metadata",
+      "model_request_ready_out reflects request-side readiness/acknowledgment style behavior per the integration contract",
+      "actuator_cmd_valid_out indicates the final command is valid for use this cycle",
+      "actuator_cmd_surface_select_out is driven from deterministic command synthesis",
+      "actuator_cmd_position_setpoint_out is the final registered command after clamp/rate limiting and fallback override",
+      "actuator_cmd_enable_out is forced safe-low in fallback mode",
+      "actuator_cmd_fault_flag_out reflects invalid, stale, timeout, or fallback-related command fault state",
+      "safe_fallback_out exposes the fallback condition externally",
+      "valid, busy, stale_reject, clamp_active, fallback_active, timeout_flag, and fault_flag are driven synchronously as final pipeline status"
+    ]
+  },
+  "sequencing_notes": [
+    "On reset, clear all request, response, command, and status state to safe defaults.",
+    "Each cycle, first qualify request launch using fallback lockout, outstanding-request state, and model_request_ready_in.",
+    "When a request is accepted, increment request_id, capture geometry and flow descriptors, assert request valid, and start request_age at zero.",
+    "While a request is outstanding, increment request_age every cycle and compare against TIMEOUT_CYCLES.",
+    "If request_age exceeds TIMEOUT_CYCLES before a valid matching response is captured, assert timeout_flag, clear the pending request, and force fallback_active.",
+    "When model_response_valid_in is asserted, accept the response only if request_id matches, status indicates valid completion, and the response is fresh; otherwise assert stale_reject.",
+    "Only validated responses may feed deterministic command synthesis.",
+    "Register the synthesized command before clamp/rate limiting, then register the final commanded output at the external boundary.",
+    "Fallback selection overrides model-derived commands whenever external_fault_in, manual_override_in, safe_mode_in, timeout, stale_reject, or invalid response conditions require it."
+  ],
+  "timing_notes": [
+    "All state updates are synchronous to clk with active-low synchronous reset_n.",
+    "The design is intended to be fully synthesizable with simple registered control and bounded counters.",
+    "Request launch and response capture are treated as boundary events; no unsynthesizable asynchronous transport behavior is implemented inside the IP.",
+    "Command synthesis may be combinational or pipelined, but the synthesized command shall be registered before clamp enforcement and final output driving.",
+    "Clamp and optional rate limiting operate on registered setpoints and preserve safe deterministic behavior.",
+    "No unbounded loops, dynamic allocation, file I/O, or real-number operations are implied."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}
