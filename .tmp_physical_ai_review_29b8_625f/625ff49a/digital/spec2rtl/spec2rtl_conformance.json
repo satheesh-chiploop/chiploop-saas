@@ -1,0 +1,1296 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "partial",
+  "summary": {
+    "checked": 81,
+    "matched": 67,
+    "partial": 1,
+    "missing": 13,
+    "inconclusive": 0
+  },
+  "setup_issues": [],
+  "top_module": {
+    "expected": "active_aero_controller_wrap",
+    "modules_found": [
+      "active_aero_controller_wrap"
+    ],
+    "status": "pass"
+  },
+  "interface": {
+    "status": "pass",
+    "expected_ports": [
+      "actuator0_max_limit",
+      "actuator0_min_limit",
+      "actuator0_rate_limit_delta",
+      "actuator1_max_limit",
+      "actuator1_min_limit",
+      "actuator1_rate_limit_delta",
+      "actuator_command0",
+      "actuator_command1",
+      "actuator_safe_hold_value",
+      "clk",
+      "diagnostic_live_faults",
+      "diagnostic_outstanding",
+      "diagnostic_request_seq",
+      "diagnostic_response_age",
+      "diagnostic_response_seq",
+      "diagnostic_sticky_faults",
+      "diagnostic_timeout_counter",
+      "fault_clamp_active",
+      "fault_fallback_active",
+      "fault_input_range",
+      "fault_request_outstanding",
+      "fault_response_valid",
+      "fault_stale_reject",
+      "fault_timeout",
+      "flow_conditions_meta",
+      "flow_conditions_update",
+      "flow_conditions_valid",
+      "flow_conditions_velocity_mps",
+      "model_request_ready",
+      "model_response_drag_force",
+      "model_response_error",
+      "model_response_flow_field",
+      "model_response_id",
+      "model_response_lift_force",
+      "model_response_ready",
+      "model_response_surface_pressure",
+      "model_response_valid",
+      "request_age",
+      "request_flow_meta",
+      "request_flow_velocity_mps",
+      "request_geometry_desc",
+      "request_geometry_payload",
+      "request_id",
+      "request_valid",
+      "reset_n",
+      "safe_fallback_request",
+      "vehicle_geometry_desc",
+      "vehicle_geometry_last",
+      "vehicle_geometry_len",
+      "vehicle_geometry_payload",
+      "vehicle_geometry_start",
+      "vehicle_geometry_valid"
+    ],
+    "matched_ports": [
+      "actuator0_max_limit",
+      "actuator0_min_limit",
+      "actuator0_rate_limit_delta",
+      "actuator1_max_limit",
+      "actuator1_min_limit",
+      "actuator1_rate_limit_delta",
+      "actuator_command0",
+      "actuator_command1",
+      "actuator_safe_hold_value",
+      "clk",
+      "diagnostic_live_faults",
+      "diagnostic_outstanding",
+      "diagnostic_request_seq",
+      "diagnostic_response_age",
+      "diagnostic_response_seq",
+      "diagnostic_sticky_faults",
+      "diagnostic_timeout_counter",
+      "fault_clamp_active",
+      "fault_fallback_active",
+      "fault_input_range",
+      "fault_request_outstanding",
+      "fault_response_valid",
+      "fault_stale_reject",
+      "fault_timeout",
+      "flow_conditions_meta",
+      "flow_conditions_update",
+      "flow_conditions_valid",
+      "flow_conditions_velocity_mps",
+      "model_request_ready",
+      "model_response_drag_force",
+      "model_response_error",
+      "model_response_flow_field",
+      "model_response_id",
+      "model_response_lift_force",
+      "model_response_ready",
+      "model_response_surface_pressure",
+      "model_response_valid",
+      "request_age",
+      "request_flow_meta",
+      "request_flow_velocity_mps",
+      "request_geometry_desc",
+      "request_geometry_payload",
+      "request_id",
+      "request_valid",
+      "reset_n",
+      "safe_fallback_request",
+      "vehicle_geometry_desc",
+      "vehicle_geometry_last",
+      "vehicle_geometry_len",
+      "vehicle_geometry_payload",
+      "vehicle_geometry_start",
+      "vehicle_geometry_valid"
+    ],
+    "missing_ports": [],
+    "rtl_ports": [
+      "actuator0_max_limit",
+      "actuator0_min_limit",
+      "actuator0_rate_limit_delta",
+      "actuator1_max_limit",
+      "actuator1_min_limit",
+      "actuator1_rate_limit_delta",
+      "actuator_command0",
+      "actuator_command1",
+      "actuator_safe_hold_value",
+      "clk",
+      "diagnostic_live_faults",
+      "diagnostic_outstanding",
+      "diagnostic_request_seq",
+      "diagnostic_response_age",
+      "diagnostic_response_seq",
+      "diagnostic_sticky_faults",
+      "diagnostic_timeout_counter",
+      "fault_clamp_active",
+      "fault_fallback_active",
+      "fault_input_range",
+      "fault_request_outstanding",
+      "fault_response_valid",
+      "fault_stale_reject",
+      "fault_timeout",
+      "flow_conditions_meta",
+      "flow_conditions_update",
+      "flow_conditions_valid",
+      "flow_conditions_velocity_mps",
+      "model_request_ready",
+      "model_response_drag_force",
+      "model_response_error",
+      "model_response_flow_field",
+      "model_response_id",
+      "model_response_lift_force",
+      "model_response_ready",
+      "model_response_surface_pressure",
+      "model_response_valid",
+      "request_age",
+      "request_flow_meta",
+      "request_flow_velocity_mps",
+      "request_geometry_desc",
+      "request_geometry_payload",
+      "request_id",
+      "request_valid",
+      "reset_n",
+      "safe_fallback_request",
+      "vehicle_geometry_desc",
+      "vehicle_geometry_last",
+      "vehicle_geometry_len",
+      "vehicle_geometry_payload",
+      "vehicle_geometry_start",
+      "vehicle_geometry_valid"
+    ]
+  },
+  "register_map": {
+    "expected": [
+      "ACTUATOR_COMMAND0[15:8]",
+      "ACTUATOR_COMMAND0[7:0]",
+      "ACTUATOR_COMMAND1[15:8]",
+      "ACTUATOR_COMMAND1[7:0]",
+      "CLAMP_EVENT",
+      "DIAGNOSTIC_OUTSTANDING",
+      "DIAGNOSTIC_REQUEST_SEQ[15:8]",
+      "DIAGNOSTIC_REQUEST_SEQ[7:0]",
+      "DIAGNOSTIC_RESPONSE_AGE[14:8]",
+      "DIAGNOSTIC_RESPONSE_AGE[7:0]",
+      "DIAGNOSTIC_RESPONSE_SEQ[15:8]",
+      "DIAGNOSTIC_RESPONSE_SEQ[7:0]",
+      "DIAGNOSTIC_TIMEOUT_COUNTER[15:8]",
+      "DIAGNOSTIC_TIMEOUT_COUNTER[7:0]",
+      "FALLBACK_ACTIVE",
+      "FAULT_CLAMP_ACTIVE",
+      "FAULT_FALLBACK_ACTIVE",
+      "FAULT_INPUT_RANGE",
+      "FAULT_REQUEST_OUTSTANDING",
+      "FAULT_RESPONSE_VALID",
+      "FAULT_STALE_REJECT",
+      "FAULT_TIMEOUT",
+      "REQUEST_OUTSTANDING",
+      "REQUEST_VALID",
+      "RESPONSE_VALID_EVENT",
+      "SAFE_FALLBACK_REQUEST",
+      "STALE_REJECT_EVENT",
+      "STICKY_FAULT_CLAMP_ACTIVE",
+      "STICKY_FAULT_FALLBACK_ACTIVE",
+      "STICKY_FAULT_INPUT_RANGE",
+      "STICKY_FAULT_REQUEST_OUTSTANDING",
+      "STICKY_FAULT_RESPONSE_VALID",
+      "STICKY_FAULT_STALE_REJECT",
+      "STICKY_FAULT_TIMEOUT",
+      "TIMEOUT_EVENT",
+      "fault_status"
+    ],
+    "matched": [
+      "CLAMP_EVENT",
+      "DIAGNOSTIC_OUTSTANDING",
+      "FALLBACK_ACTIVE",
+      "FAULT_CLAMP_ACTIVE",
+      "FAULT_FALLBACK_ACTIVE",
+      "FAULT_INPUT_RANGE",
+      "FAULT_REQUEST_OUTSTANDING",
+      "FAULT_RESPONSE_VALID",
+      "FAULT_STALE_REJECT",
+      "FAULT_TIMEOUT",
+      "REQUEST_OUTSTANDING",
+      "REQUEST_VALID",
+      "SAFE_FALLBACK_REQUEST",
+      "TIMEOUT_EVENT"
+    ],
+    "expected_registers": [
+      "REG0_LIVE_FAULTS",
+      "REG10_REQUEST_STATUS",
+      "REG11_ACTUATOR0_COMMAND_LO",
+      "REG12_ACTUATOR0_COMMAND_HI",
+      "REG13_ACTUATOR1_COMMAND_LO",
+      "REG14_ACTUATOR1_COMMAND_HI",
+      "REG15_RESERVED",
+      "REG1_STICKY_FAULTS",
+      "REG2_REQUEST_SEQ_LO",
+      "REG3_REQUEST_SEQ_HI",
+      "REG4_RESPONSE_SEQ_LO",
+      "REG5_RESPONSE_SEQ_HI",
+      "REG6_TIMEOUT_COUNTER_LO",
+      "REG7_TIMEOUT_COUNTER_HI",
+      "REG8_OUTSTANDING_AND_AGE_LO",
+      "REG9_RESPONSE_AGE_LO"
+    ],
+    "matched_registers": [
+      "REG0_LIVE_FAULTS"
+    ],
+    "expected_addresses": [
+      "0x00",
+      "0x01",
+      "0x02",
+      "0x03",
+      "0x04",
+      "0x05",
+      "0x06",
+      "0x07",
+      "0x08",
+      "0x09",
+      "0x0A",
+      "0x0B",
+      "0x0C",
+      "0x0D",
+      "0x0E",
+      "0x0F"
+    ],
+    "matched_addresses": [
+      "0x00"
+    ],
+    "missing": [
+      "ACTUATOR_COMMAND0[15:8]",
+      "ACTUATOR_COMMAND0[7:0]",
+      "ACTUATOR_COMMAND1[15:8]",
+      "ACTUATOR_COMMAND1[7:0]",
+      "DIAGNOSTIC_REQUEST_SEQ[15:8]",
+      "DIAGNOSTIC_REQUEST_SEQ[7:0]",
+      "DIAGNOSTIC_RESPONSE_AGE[14:8]",
+      "DIAGNOSTIC_RESPONSE_AGE[7:0]",
+      "DIAGNOSTIC_RESPONSE_SEQ[15:8]",
+      "DIAGNOSTIC_RESPONSE_SEQ[7:0]",
+      "DIAGNOSTIC_TIMEOUT_COUNTER[15:8]",
+      "DIAGNOSTIC_TIMEOUT_COUNTER[7:0]",
+      "RESPONSE_VALID_EVENT",
+      "STALE_REJECT_EVENT",
+      "STICKY_FAULT_CLAMP_ACTIVE",
+      "STICKY_FAULT_FALLBACK_ACTIVE",
+      "STICKY_FAULT_INPUT_RANGE",
+      "STICKY_FAULT_REQUEST_OUTSTANDING",
+      "STICKY_FAULT_RESPONSE_VALID",
+      "STICKY_FAULT_STALE_REJECT",
+      "STICKY_FAULT_TIMEOUT",
+      "fault_status"
+    ],
+    "missing_registers": [
+      "REG10_REQUEST_STATUS",
+      "REG11_ACTUATOR0_COMMAND_LO",
+      "REG12_ACTUATOR0_COMMAND_HI",
+      "REG13_ACTUATOR1_COMMAND_LO",
+      "REG14_ACTUATOR1_COMMAND_HI",
+      "REG15_RESERVED",
+      "REG1_STICKY_FAULTS",
+      "REG2_REQUEST_SEQ_LO",
+      "REG3_REQUEST_SEQ_HI",
+      "REG4_RESPONSE_SEQ_LO",
+      "REG5_RESPONSE_SEQ_HI",
+      "REG6_TIMEOUT_COUNTER_LO",
+      "REG7_TIMEOUT_COUNTER_HI",
+      "REG8_OUTSTANDING_AND_AGE_LO",
+      "REG9_RESPONSE_AGE_LO"
+    ],
+    "missing_addresses": [
+      "0x01",
+      "0x02",
+      "0x03",
+      "0x04",
+      "0x05",
+      "0x06",
+      "0x07",
+      "0x08",
+      "0x09",
+      "0x0A",
+      "0x0B",
+      "0x0C",
+      "0x0D",
+      "0x0E",
+      "0x0F"
+    ],
+    "status": "issues"
+  },
+  "clock_reset": {
+    "clock_ports": [
+      "clk"
+    ],
+    "reset_ports": [
+      "reset_n"
+    ],
+    "status": "pass"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "requirement": "Sample and register vehicle_geometry and flow_conditions inputs before any request generation.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-002",
+      "requirement": "Check flow_conditions_velocity_mps against the 20 to 55 m/s inclusive range and assert invalid-input fault outside that envelope.",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_conditions_velocity_mps",
+        "fault_input_range"
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "requirement": "Generate a monotonic request_id and request_valid handshake to the external model service.",
+      "status": "matched",
+      "evidence_tokens": [
+        "request_id",
+        "request_valid"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "requirement": "Track a single outstanding request, its age, and its timeout status.",
+      "status": "matched",
+      "evidence_tokens": [
+        "age_next",
+        "request_age",
+        "request_age_next",
+        "request_outstanding_next",
+        "timeout_next"
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "requirement": "Validate model_response_valid, model_response_id, and response freshness against the outstanding request.",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_valid",
+        "model_response_id",
+        "request_outstanding_next"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "requirement": "Reject stale, duplicated, out-of-order, malformed, and timeout responses.",
+      "status": "matched",
+      "evidence_tokens": [
+        "timeout_next"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "requirement": "Compute actuator targets from validated model outputs only; do not infer or encode physics or surrogate-model logic in RTL.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-008",
+      "requirement": "Clamp actuator outputs to programmable limits and optionally apply monotonic bounded rate limiting.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-009",
+      "requirement": "Assert safe_fallback_request and hold safe outputs during any unsafe condition.",
+      "status": "matched",
+      "evidence_tokens": [
+        "safe_fallback_request"
+      ]
+    },
+    {
+      "id": "REQ-010",
+      "requirement": "Provide registered fault and diagnostic outputs suitable for ASIC integration and system software polling.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-011",
+      "requirement": "All state changes shall occur only on clk edges; combinational feedback is forbidden.",
+      "status": "partial",
+      "evidence_tokens": [
+        "clk"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "requirement": "vehicle_geometry shall be accepted only as framed metadata and payload descriptor storage; RTL shall not parse STL contents.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-013",
+      "requirement": "flow_conditions_velocity_mps shall be range-checked to 20..55 m/s inclusive; out-of-range values assert fault_input_range and inhibit actuation updates.",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_conditions_velocity_mps",
+        "fault_input_range"
+      ]
+    },
+    {
+      "id": "REQ-014",
+      "requirement": "Inputs shall be sampled into internal registers before request issuance.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-015",
+      "requirement": "Each request shall increment a monotonic sequence counter and capture geometry descriptor, payload handle, flow velocity, flow metadata, and age metadata.",
+      "status": "matched",
+      "evidence_tokens": [
+        "age_next",
+        "request_age",
+        "request_age_next",
+        "request_geometry_payload",
+        "increment_logic"
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "requirement": "Only one outstanding request is required; a new request shall not be launched until the previous request is resolved or declared timed out.",
+      "status": "matched",
+      "evidence_tokens": [
+        "request_outstanding_next"
+      ]
+    },
+    {
+      "id": "REQ-017",
+      "requirement": "model_response_id must match the outstanding request_id exactly; stale, duplicated, out-of-order, malformed, or timed-out responses shall be rejected.",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_id",
+        "request_id"
+      ]
+    },
+    {
+      "id": "REQ-018",
+      "requirement": "safe_fallback_request shall assert on any unsafe condition and remain asserted until a fresh, sequence-matched, validated response clears the fault condition.",
+      "status": "matched",
+      "evidence_tokens": [
+        "safe_fallback_request"
+      ]
+    },
+    {
+      "id": "REQ-019",
+      "requirement": "Validated model outputs shall be consumed only after matching sequence validation; no surrogate physics is embedded in RTL.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-020",
+      "requirement": "Actuator targets shall pass through per-channel clamp logic before output registration.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-021",
+      "requirement": "Clamp logic shall saturate to programmable minimum and maximum limits and raise fault_clamp_active when saturation occurs.",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_clamp_active"
+      ]
+    },
+    {
+      "id": "REQ-022",
+      "requirement": "Optional rate limiting, if implemented by configuration, shall be monotonic and bounded by the per-channel delta limits.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-023",
+      "requirement": "actuator_command outputs shall be registered and glitch-free at the interface boundary.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-024",
+      "requirement": "diagnostic_live_faults shall encode current live fault state; diagnostic_sticky_faults shall retain fault history until reset or explicit clear logic if later added.",
+      "status": "matched",
+      "evidence_tokens": [
+        "diagnostic_live_faults",
+        "diagnostic_sticky_faults",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-025",
+      "requirement": "The external model service interface remains runtime-independent and may connect to future NVIDIA-hosted NIM or ChipLoop GPU worker implementations without RTL changes.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-026",
+      "requirement": "All arithmetic used in control law shall be bounded, deterministic, and synthesizable in standard-cell ASIC flows.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-027",
+      "requirement": "request_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "request_valid"
+      ]
+    },
+    {
+      "id": "REQ-028",
+      "requirement": "request_id",
+      "status": "matched",
+      "evidence_tokens": [
+        "request_id"
+      ]
+    },
+    {
+      "id": "REQ-029",
+      "requirement": "request_geometry_desc",
+      "status": "matched",
+      "evidence_tokens": [
+        "request_geometry_desc"
+      ]
+    },
+    {
+      "id": "REQ-030",
+      "requirement": "request_geometry_payload",
+      "status": "matched",
+      "evidence_tokens": [
+        "request_geometry_payload"
+      ]
+    },
+    {
+      "id": "REQ-031",
+      "requirement": "request_flow_velocity_mps",
+      "status": "matched",
+      "evidence_tokens": [
+        "request_flow_velocity_mps"
+      ]
+    },
+    {
+      "id": "REQ-032",
+      "requirement": "request_flow_meta",
+      "status": "matched",
+      "evidence_tokens": [
+        "request_flow_meta"
+      ]
+    },
+    {
+      "id": "REQ-033",
+      "requirement": "request_age",
+      "status": "matched",
+      "evidence_tokens": [
+        "request_age"
+      ]
+    },
+    {
+      "id": "REQ-034",
+      "requirement": "safe_fallback_request",
+      "status": "matched",
+      "evidence_tokens": [
+        "safe_fallback_request"
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "requirement": "fault_input_range",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_input_range"
+      ]
+    },
+    {
+      "id": "REQ-036",
+      "requirement": "fault_request_outstanding",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_request_outstanding"
+      ]
+    },
+    {
+      "id": "REQ-037",
+      "requirement": "fault_response_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_response_valid"
+      ]
+    },
+    {
+      "id": "REQ-038",
+      "requirement": "fault_stale_reject",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_stale_reject"
+      ]
+    },
+    {
+      "id": "REQ-039",
+      "requirement": "fault_timeout",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_timeout"
+      ]
+    },
+    {
+      "id": "REQ-040",
+      "requirement": "fault_clamp_active",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_clamp_active"
+      ]
+    },
+    {
+      "id": "REQ-041",
+      "requirement": "fault_fallback_active",
+      "status": "matched",
+      "evidence_tokens": [
+        "fault_fallback_active"
+      ]
+    },
+    {
+      "id": "REQ-042",
+      "requirement": "actuator_command0",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_command0"
+      ]
+    },
+    {
+      "id": "REQ-043",
+      "requirement": "actuator_command1",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_command1"
+      ]
+    },
+    {
+      "id": "REQ-044",
+      "requirement": "diagnostic_live_faults",
+      "status": "matched",
+      "evidence_tokens": [
+        "diagnostic_live_faults"
+      ]
+    },
+    {
+      "id": "REQ-045",
+      "requirement": "diagnostic_sticky_faults",
+      "status": "matched",
+      "evidence_tokens": [
+        "diagnostic_sticky_faults"
+      ]
+    },
+    {
+      "id": "REQ-046",
+      "requirement": "diagnostic_request_seq",
+      "status": "matched",
+      "evidence_tokens": [
+        "diagnostic_request_seq"
+      ]
+    },
+    {
+      "id": "REQ-047",
+      "requirement": "diagnostic_response_seq",
+      "status": "matched",
+      "evidence_tokens": [
+        "diagnostic_response_seq"
+      ]
+    },
+    {
+      "id": "REQ-048",
+      "requirement": "diagnostic_timeout_counter",
+      "status": "matched",
+      "evidence_tokens": [
+        "diagnostic_timeout_counter"
+      ]
+    },
+    {
+      "id": "REQ-049",
+      "requirement": "diagnostic_outstanding",
+      "status": "matched",
+      "evidence_tokens": [
+        "diagnostic_outstanding"
+      ]
+    },
+    {
+      "id": "REQ-050",
+      "requirement": "diagnostic_response_age",
+      "status": "matched",
+      "evidence_tokens": [
+        "diagnostic_response_age"
+      ]
+    },
+    {
+      "id": "REQ-051",
+      "requirement": "vehicle_geometry_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_valid"
+      ]
+    },
+    {
+      "id": "REQ-052",
+      "requirement": "vehicle_geometry_start",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_start"
+      ]
+    },
+    {
+      "id": "REQ-053",
+      "requirement": "vehicle_geometry_last",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_last"
+      ]
+    },
+    {
+      "id": "REQ-054",
+      "requirement": "vehicle_geometry_len",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_len"
+      ]
+    },
+    {
+      "id": "REQ-055",
+      "requirement": "vehicle_geometry_desc",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_desc"
+      ]
+    },
+    {
+      "id": "REQ-056",
+      "requirement": "vehicle_geometry_payload",
+      "status": "matched",
+      "evidence_tokens": [
+        "vehicle_geometry_payload"
+      ]
+    },
+    {
+      "id": "REQ-057",
+      "requirement": "flow_conditions_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_conditions_valid"
+      ]
+    },
+    {
+      "id": "REQ-058",
+      "requirement": "flow_conditions_velocity_mps",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_conditions_velocity_mps"
+      ]
+    },
+    {
+      "id": "REQ-059",
+      "requirement": "flow_conditions_meta",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_conditions_meta"
+      ]
+    },
+    {
+      "id": "REQ-060",
+      "requirement": "flow_conditions_update",
+      "status": "matched",
+      "evidence_tokens": [
+        "flow_conditions_update"
+      ]
+    },
+    {
+      "id": "REQ-061",
+      "requirement": "model_request_ready",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_request_ready"
+      ]
+    },
+    {
+      "id": "REQ-062",
+      "requirement": "model_response_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_valid"
+      ]
+    },
+    {
+      "id": "REQ-063",
+      "requirement": "model_response_ready",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_ready"
+      ]
+    },
+    {
+      "id": "REQ-064",
+      "requirement": "model_response_id",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_id"
+      ]
+    },
+    {
+      "id": "REQ-065",
+      "requirement": "model_response_drag_force",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_drag_force"
+      ]
+    },
+    {
+      "id": "REQ-066",
+      "requirement": "model_response_lift_force",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_lift_force"
+      ]
+    },
+    {
+      "id": "REQ-067",
+      "requirement": "model_response_surface_pressure",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_surface_pressure"
+      ]
+    },
+    {
+      "id": "REQ-068",
+      "requirement": "model_response_flow_field",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_flow_field"
+      ]
+    },
+    {
+      "id": "REQ-069",
+      "requirement": "model_response_error",
+      "status": "matched",
+      "evidence_tokens": [
+        "model_response_error"
+      ]
+    },
+    {
+      "id": "REQ-070",
+      "requirement": "actuator0_min_limit",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator0_min_limit"
+      ]
+    },
+    {
+      "id": "REQ-071",
+      "requirement": "actuator0_max_limit",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator0_max_limit"
+      ]
+    },
+    {
+      "id": "REQ-072",
+      "requirement": "actuator0_rate_limit_delta",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator0_rate_limit_delta"
+      ]
+    },
+    {
+      "id": "REQ-073",
+      "requirement": "actuator1_min_limit",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator1_min_limit"
+      ]
+    },
+    {
+      "id": "REQ-074",
+      "requirement": "actuator1_max_limit",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator1_max_limit"
+      ]
+    },
+    {
+      "id": "REQ-075",
+      "requirement": "actuator1_rate_limit_delta",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator1_rate_limit_delta"
+      ]
+    },
+    {
+      "id": "REQ-076",
+      "requirement": "actuator_safe_hold_value",
+      "status": "matched",
+      "evidence_tokens": [
+        "actuator_safe_hold_value"
+      ]
+    },
+    {
+      "id": "REQ-077",
+      "requirement": "On synchronous assertion of reset_n, all internal state registers clear to a known safe state, including outstanding request tracking, monotonic counters, freshness/age tracking, sticky and live fault flags, clamp event indicators, and any ",
+      "status": "matched",
+      "evidence_tokens": [
+        "reset_n",
+        "age_next",
+        "clamp_event_any",
+        "fault_request_outstanding",
+        "request_age",
+        "request_age_next",
+        "request_outstanding_next",
+        "reset_zero"
+      ]
+    }
+  ],
+  "rtl_files": [
+    "backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v"
+  ],
+  "modules": [
+    {
+      "name": "active_aero_controller_wrap",
+      "file": "backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "vehicle_geometry_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "vehicle_geometry_start",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "vehicle_geometry_last",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "vehicle_geometry_len",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "vehicle_geometry_desc",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "vehicle_geometry_payload",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "flow_conditions_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "flow_conditions_velocity_mps",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "flow_conditions_meta",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "flow_conditions_update",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_request_ready",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_response_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_response_ready",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "model_response_id",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "model_response_drag_force",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "model_response_lift_force",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "model_response_surface_pressure",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "model_response_flow_field",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "model_response_error",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "actuator0_min_limit",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator0_max_limit",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator0_rate_limit_delta",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator1_min_limit",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator1_max_limit",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator1_rate_limit_delta",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator_safe_hold_value",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator_command0",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator_command1",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "request_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "request_id",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "request_geometry_desc",
+          "direction": "output",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "request_geometry_payload",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "request_flow_velocity_mps",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "request_flow_meta",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "request_age",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "safe_fallback_request",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_input_range",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_request_outstanding",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_response_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_stale_reject",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_timeout",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_clamp_active",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_fallback_active",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "diagnostic_live_faults",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "diagnostic_sticky_faults",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "diagnostic_request_seq",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "diagnostic_response_seq",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "diagnostic_timeout_counter",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "diagnostic_outstanding",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "diagnostic_response_age",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}

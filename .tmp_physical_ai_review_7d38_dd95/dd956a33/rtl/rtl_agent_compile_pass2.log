@@ -1,4 +1,0 @@
-backend/workflows/dd956a33-acc5-4350-8ff0-76c8f001ec5f/rtl/pass2/aero_guard_ctrl.v:220: warning: @* found no sensitivities so it will never trigger.
-
-=== VERILATOR LINT ===
-PASS: Verilator lint completed successfully.

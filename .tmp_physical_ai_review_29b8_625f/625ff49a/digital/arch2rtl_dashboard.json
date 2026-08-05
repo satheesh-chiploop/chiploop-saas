@@ -1,0 +1,2415 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "active_aero_controller_wrap",
+  "rtl_file_count": 1,
+  "module_count": 1,
+  "modules": [
+    {
+      "name": "active_aero_controller_wrap",
+      "file": "backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v",
+      "input_count": 443,
+      "output_count": 282,
+      "inout_count": 0,
+      "input_port_count": 28,
+      "output_port_count": 24,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_start",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_last",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_len",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "vehicle_geometry_desc",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "vehicle_geometry_payload",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "flow_conditions_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "flow_conditions_velocity_mps",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "flow_conditions_meta",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "flow_conditions_update",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_request_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_response_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_response_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_response_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "model_response_drag_force",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "model_response_lift_force",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "model_response_surface_pressure",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "model_response_flow_field",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "model_response_error",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "actuator0_min_limit",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator0_max_limit",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator0_rate_limit_delta",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator1_min_limit",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator1_max_limit",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator1_rate_limit_delta",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator_safe_hold_value",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator_command0",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator_command1",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_geometry_desc",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "request_geometry_payload",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "request_flow_velocity_mps",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_flow_meta",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_age",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "safe_fallback_request",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_input_range",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_request_outstanding",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_response_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_stale_reject",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_timeout",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_clamp_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "diagnostic_live_faults",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "diagnostic_sticky_faults",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "diagnostic_request_seq",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "diagnostic_response_seq",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "diagnostic_timeout_counter",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "diagnostic_outstanding",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "diagnostic_response_age",
+          "direction": "output",
+          "width": "[15:0]"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 443,
+    "output_count": 282,
+    "inout_count": 0,
+    "input_port_count": 28,
+    "output_port_count": 24,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "vehicle_geometry_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "vehicle_geometry_start",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "vehicle_geometry_last",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "vehicle_geometry_len",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "vehicle_geometry_desc",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "vehicle_geometry_payload",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "flow_conditions_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "flow_conditions_velocity_mps",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "flow_conditions_meta",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "flow_conditions_update",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_request_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_response_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_response_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_response_id",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "model_response_drag_force",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "model_response_lift_force",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "model_response_surface_pressure",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "model_response_flow_field",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "model_response_error",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "actuator0_min_limit",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator0_max_limit",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator0_rate_limit_delta",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator1_min_limit",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator1_max_limit",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator1_rate_limit_delta",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator_safe_hold_value",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator_command0",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator_command1",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "request_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "request_id",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "request_geometry_desc",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "request_geometry_payload",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "request_flow_velocity_mps",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "request_flow_meta",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "request_age",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "safe_fallback_request",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fault_input_range",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fault_request_outstanding",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fault_response_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fault_stale_reject",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fault_timeout",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fault_clamp_active",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fault_fallback_active",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "diagnostic_live_faults",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "diagnostic_sticky_faults",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "diagnostic_request_seq",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "diagnostic_response_seq",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "diagnostic_timeout_counter",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "diagnostic_outstanding",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "diagnostic_response_age",
+        "direction": "output",
+        "width": "[15:0]"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 851,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 58,
+    "latch_target_count": 0,
+    "sequential_blocks": 1,
+    "posedge_blocks": 1,
+    "negedge_blocks": 0,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "actuator_command0_r",
+      "actuator_command1_r",
+      "clamped0",
+      "clamped1",
+      "diagnostic_live_faults_r",
+      "diagnostic_outstanding_r",
+      "diagnostic_request_seq_r",
+      "diagnostic_response_age_r",
+      "diagnostic_response_seq_r",
+      "diagnostic_sticky_faults_r",
+      "diagnostic_timeout_counter_r",
+      "fault_clamp_active_r",
+      "fault_fallback_active_r",
+      "fault_input_range_r",
+      "fault_request_outstanding_r",
+      "fault_response_valid_r",
+      "fault_stale_reject_r",
+      "fault_timeout_r",
+      "limited0",
+      "limited1",
+      "prev_command0",
+      "prev_command1",
+      "request_age_r",
+      "request_flow_meta_r",
+      "request_flow_velocity_mps_r",
+      "request_geometry_desc_r",
+      "request_geometry_payload_r",
+      "request_id_r",
+      "request_valid_r",
+      "safe_fallback_request_r",
+      "sampled_actuator0_max_limit",
+      "sampled_actuator0_min_limit",
+      "sampled_actuator0_rate_limit_delta",
+      "sampled_actuator1_max_limit",
+      "sampled_actuator1_min_limit",
+      "sampled_actuator1_rate_limit_delta",
+      "sampled_actuator_safe_hold_value",
+      "sampled_flow_conditions_meta",
+      "sampled_flow_conditions_update",
+      "sampled_flow_conditions_valid",
+      "sampled_flow_conditions_velocity_mps",
+      "sampled_model_request_ready",
+      "sampled_model_response_drag_force",
+      "sampled_model_response_error",
+      "sampled_model_response_flow_field",
+      "sampled_model_response_id",
+      "sampled_model_response_lift_force",
+      "sampled_model_response_ready",
+      "sampled_model_response_surface_pressure",
+      "sampled_model_response_valid"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 0,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "warnings",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 0,
+    "warning_count": 9,
+    "error_count": 0,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "active_aero_controller_wrap",
+      "backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v"
+    ],
+    "stdout_tail": [
+      "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b",
+      "- Verilator: Built from 0.049 MB sources in 2 modules, into 0.047 MB in 3 C++ files needing 0.000 MB",
+      "- Verilator: Walltime 0.026 s (elab=0.003, cvt=0.013, bld=0.000); cpu 0.026 s on 1 threads; allocated 32.359 MB"
+    ],
+    "stderr_tail": [
+      "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:131:16: Signal is not used: 'sampled_vehicle_geometry_len'",
+      "                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'",
+      "  131 |     reg [15:0] sampled_vehicle_geometry_len;",
+      "      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047",
+      "                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:140:9: Signal is not used: 'sampled_flow_conditions_update'",
+      "                                                                                                                     : ... note: In instance 'active_aero_controller_wrap'",
+      "  140 |     reg sampled_flow_conditions_update;",
+      "      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:145:16: Bits of signal are not used: 'sampled_model_response_drag_force'[31:16]",
+      "                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'",
+      "  145 |     reg [31:0] sampled_model_response_drag_force;",
+      "      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:146:16: Bits of signal are not used: 'sampled_model_response_lift_force'[31:16]",
+      "                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'",
+      "  146 |     reg [31:0] sampled_model_response_lift_force;",
+      "      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:147:16: Bits of signal are not used: 'sampled_model_response_surface_pressure'[31:16]",
+      "                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'",
+      "  147 |     reg [31:0] sampled_model_response_surface_pressure;",
+      "      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:148:16: Bits of signal are not used: 'sampled_model_response_flow_field'[63:16]",
+      "                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'",
+      "  148 |     reg [63:0] sampled_model_response_flow_field;",
+      "      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:166:16: Signal is not driven, nor used: 'age_next'",
+      "                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'",
+      "  166 |     reg [15:0] age_next;",
+      "      |                ^~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:167:16: Signal is not driven, nor used: 'timeout_next'",
+      "                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'",
+      "  167 |     reg [15:0] timeout_next;",
+      "      |                ^~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:185:17: Signal is not used: 'request_age_next'",
+      "                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'",
+      "  185 |     wire [15:0] request_age_next;",
+      "      |                 ^~~~~~~~~~~~~~~~"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "active_aero_controller_wrap",
+        "backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stdout": "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b\n- Verilator: Built from 0.049 MB sources in 2 modules, into 0.047 MB in 3 C++ files needing 0.000 MB\n- Verilator: Walltime 0.026 s (elab=0.003, cvt=0.013, bld=0.000); cpu 0.026 s on 1 threads; allocated 32.359 MB\n",
+      "stderr": "%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:131:16: Signal is not used: 'sampled_vehicle_geometry_len'\n                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'\n  131 |     reg [15:0] sampled_vehicle_geometry_len;\n      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~\n                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047\n                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:140:9: Signal is not used: 'sampled_flow_conditions_update'\n                                                                                                                     : ... note: In instance 'active_aero_controller_wrap'\n  140 |     reg sampled_flow_conditions_update;\n      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:145:16: Bits of signal are not used: 'sampled_model_response_drag_force'[31:16]\n                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'\n  145 |     reg [31:0] sampled_model_response_drag_force;\n      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:146:16: Bits of signal are not used: 'sampled_model_response_lift_force'[31:16]\n                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'\n  146 |     reg [31:0] sampled_model_response_lift_force;\n      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:147:16: Bits of signal are not used: 'sampled_model_response_surface_pressure'[31:16]\n                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'\n  147 |     reg [31:0] sampled_model_response_surface_pressure;\n      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:148:16: Bits of signal are not used: 'sampled_model_response_flow_field'[63:16]\n                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'\n  148 |     reg [63:0] sampled_model_response_flow_field;\n      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:166:16: Signal is not driven, nor used: 'age_next'\n                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'\n  166 |     reg [15:0] age_next;\n      |                ^~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:167:16: Signal is not driven, nor used: 'timeout_next'\n                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'\n  167 |     reg [15:0] timeout_next;\n      |                ^~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v:185:17: Signal is not used: 'request_age_next'\n                                                                                                                      : ... note: In instance 'active_aero_controller_wrap'\n  185 |     wire [15:0] request_age_next;\n      |                 ^~~~~~~~~~~~~~~~\n",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-05T15:09:57.969889+00:00",
+      "ended_at": "2026-08-05T15:09:58.111414+00:00",
+      "elapsed_ms": 141
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 1,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "active_aero_controller_wrap",
+          "file": "backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/rtl/active_aero_controller_wrap.v",
+          "input_count": 443,
+          "output_count": 282,
+          "inout_count": 0,
+          "input_port_count": 28,
+          "output_port_count": 24,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_len",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "vehicle_geometry_desc",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "vehicle_geometry_payload",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "flow_conditions_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "flow_conditions_velocity_mps",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_conditions_meta",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_conditions_update",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_request_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_drag_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_response_lift_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_response_surface_pressure",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_response_flow_field",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "model_response_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "actuator0_min_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator0_max_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator0_rate_limit_delta",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator1_min_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator1_max_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator1_rate_limit_delta",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_safe_hold_value",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_command0",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_command1",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_geometry_desc",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "request_geometry_payload",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_flow_velocity_mps",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_flow_meta",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "safe_fallback_request",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_input_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_request_outstanding",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_response_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "diagnostic_live_faults",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "diagnostic_sticky_faults",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "diagnostic_request_seq",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "diagnostic_response_seq",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "diagnostic_timeout_counter",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "diagnostic_outstanding",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "diagnostic_response_age",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 443,
+        "output_count": 282,
+        "inout_count": 0,
+        "input_port_count": 28,
+        "output_port_count": 24,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_start",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_last",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_len",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "vehicle_geometry_desc",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "vehicle_geometry_payload",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "flow_conditions_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "flow_conditions_velocity_mps",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_conditions_meta",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_conditions_update",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_request_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_id",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_drag_force",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_response_lift_force",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_response_surface_pressure",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_response_flow_field",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "model_response_error",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "actuator0_min_limit",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator0_max_limit",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator0_rate_limit_delta",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator1_min_limit",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator1_max_limit",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator1_rate_limit_delta",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_safe_hold_value",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_command0",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_command1",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_id",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_geometry_desc",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "request_geometry_payload",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "request_flow_velocity_mps",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_flow_meta",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_age",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "safe_fallback_request",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_input_range",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_request_outstanding",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_response_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_stale_reject",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_timeout",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_clamp_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "diagnostic_live_faults",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "diagnostic_sticky_faults",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "diagnostic_request_seq",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "diagnostic_response_seq",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "diagnostic_timeout_counter",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "diagnostic_outstanding",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "diagnostic_response_age",
+            "direction": "output",
+            "width": "[15:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 851,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 58,
+        "latch_target_count": 0,
+        "sequential_blocks": 1,
+        "posedge_blocks": 1,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_command0_r",
+          "actuator_command1_r",
+          "clamped0",
+          "clamped1",
+          "diagnostic_live_faults_r",
+          "diagnostic_outstanding_r",
+          "diagnostic_request_seq_r",
+          "diagnostic_response_age_r",
+          "diagnostic_response_seq_r",
+          "diagnostic_sticky_faults_r",
+          "diagnostic_timeout_counter_r",
+          "fault_clamp_active_r",
+          "fault_fallback_active_r",
+          "fault_input_range_r",
+          "fault_request_outstanding_r",
+          "fault_response_valid_r",
+          "fault_stale_reject_r",
+          "fault_timeout_r",
+          "limited0",
+          "limited1",
+          "prev_command0",
+          "prev_command1",
+          "request_age_r",
+          "request_flow_meta_r",
+          "request_flow_velocity_mps_r",
+          "request_geometry_desc_r",
+          "request_geometry_payload_r",
+          "request_id_r",
+          "request_valid_r",
+          "safe_fallback_request_r",
+          "sampled_actuator0_max_limit",
+          "sampled_actuator0_min_limit",
+          "sampled_actuator0_rate_limit_delta",
+          "sampled_actuator1_max_limit",
+          "sampled_actuator1_min_limit",
+          "sampled_actuator1_rate_limit_delta",
+          "sampled_actuator_safe_hold_value",
+          "sampled_flow_conditions_meta",
+          "sampled_flow_conditions_update",
+          "sampled_flow_conditions_valid",
+          "sampled_flow_conditions_velocity_mps",
+          "sampled_model_request_ready",
+          "sampled_model_response_drag_force",
+          "sampled_model_response_error",
+          "sampled_model_response_flow_field",
+          "sampled_model_response_id",
+          "sampled_model_response_lift_force",
+          "sampled_model_response_ready",
+          "sampled_model_response_surface_pressure",
+          "sampled_model_response_valid"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 1,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "active_aero_controller_wrap",
+          "file": "backend/workflows/625ff49a-5c61-4c75-8d74-d876c5a71dfe/handoff/active_aero_controller_wrap_ip_package/rtl/active_aero_controller_wrap.v",
+          "input_count": 443,
+          "output_count": 282,
+          "inout_count": 0,
+          "input_port_count": 28,
+          "output_port_count": 24,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_len",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "vehicle_geometry_desc",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "vehicle_geometry_payload",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "flow_conditions_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "flow_conditions_velocity_mps",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_conditions_meta",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_conditions_update",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_request_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_response_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_response_drag_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_response_lift_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_response_surface_pressure",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "model_response_flow_field",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "model_response_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "actuator0_min_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator0_max_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator0_rate_limit_delta",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator1_min_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator1_max_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator1_rate_limit_delta",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_safe_hold_value",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_command0",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_command1",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_geometry_desc",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "request_geometry_payload",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_flow_velocity_mps",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_flow_meta",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "safe_fallback_request",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_input_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_request_outstanding",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_response_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "diagnostic_live_faults",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "diagnostic_sticky_faults",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "diagnostic_request_seq",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "diagnostic_response_seq",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "diagnostic_timeout_counter",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "diagnostic_outstanding",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "diagnostic_response_age",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 443,
+        "output_count": 282,
+        "inout_count": 0,
+        "input_port_count": 28,
+        "output_port_count": 24,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_start",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_last",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_len",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "vehicle_geometry_desc",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "vehicle_geometry_payload",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "flow_conditions_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "flow_conditions_velocity_mps",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_conditions_meta",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_conditions_update",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_request_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_response_id",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "model_response_drag_force",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_response_lift_force",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_response_surface_pressure",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "model_response_flow_field",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "model_response_error",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "actuator0_min_limit",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator0_max_limit",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator0_rate_limit_delta",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator1_min_limit",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator1_max_limit",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator1_rate_limit_delta",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_safe_hold_value",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_command0",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_command1",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_id",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_geometry_desc",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "request_geometry_payload",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "request_flow_velocity_mps",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_flow_meta",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_age",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "safe_fallback_request",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_input_range",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_request_outstanding",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_response_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_stale_reject",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_timeout",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_clamp_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "diagnostic_live_faults",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "diagnostic_sticky_faults",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "diagnostic_request_seq",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "diagnostic_response_seq",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "diagnostic_timeout_counter",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "diagnostic_outstanding",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "diagnostic_response_age",
+            "direction": "output",
+            "width": "[15:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 851,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 58,
+        "latch_target_count": 0,
+        "sequential_blocks": 1,
+        "posedge_blocks": 1,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_command0_r",
+          "actuator_command1_r",
+          "clamped0",
+          "clamped1",
+          "diagnostic_live_faults_r",
+          "diagnostic_outstanding_r",
+          "diagnostic_request_seq_r",
+          "diagnostic_response_age_r",
+          "diagnostic_response_seq_r",
+          "diagnostic_sticky_faults_r",
+          "diagnostic_timeout_counter_r",
+          "fault_clamp_active_r",
+          "fault_fallback_active_r",
+          "fault_input_range_r",
+          "fault_request_outstanding_r",
+          "fault_response_valid_r",
+          "fault_stale_reject_r",
+          "fault_timeout_r",
+          "limited0",
+          "limited1",
+          "prev_command0",
+          "prev_command1",
+          "request_age_r",
+          "request_flow_meta_r",
+          "request_flow_velocity_mps_r",
+          "request_geometry_desc_r",
+          "request_geometry_payload_r",
+          "request_id_r",
+          "request_valid_r",
+          "safe_fallback_request_r",
+          "sampled_actuator0_max_limit",
+          "sampled_actuator0_min_limit",
+          "sampled_actuator0_rate_limit_delta",
+          "sampled_actuator1_max_limit",
+          "sampled_actuator1_min_limit",
+          "sampled_actuator1_rate_limit_delta",
+          "sampled_actuator_safe_hold_value",
+          "sampled_flow_conditions_meta",
+          "sampled_flow_conditions_update",
+          "sampled_flow_conditions_valid",
+          "sampled_flow_conditions_velocity_mps",
+          "sampled_model_request_ready",
+          "sampled_model_response_drag_force",
+          "sampled_model_response_error",
+          "sampled_model_response_flow_field",
+          "sampled_model_response_id",
+          "sampled_model_response_lift_force",
+          "sampled_model_response_ready",
+          "sampled_model_response_surface_pressure",
+          "sampled_model_response_valid"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 16,
+    "registers": [
+      {
+        "name": "REG0_LIVE_FAULTS",
+        "offset": "0x00",
+        "access": "RO",
+        "description": "Packed live fault indicators. Bit 0=input range fault, bit 1=request outstanding, bit 2=response valid, bit 3=stale reject, bit 4=timeout, bit 5=clamp active, bit 6=fallback active, bit 7=reserved.",
+        "fields": [
+          {
+            "name": "FAULT_INPUT_RANGE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current input-range fault status; asserted when flow_conditions_velocity_mps is outside 20..55 m/s inclusive."
+          },
+          {
+            "name": "FAULT_REQUEST_OUTSTANDING",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a request is outstanding and awaiting a matching response."
+          },
+          {
+            "name": "FAULT_RESPONSE_VALID",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the current response path has observed a valid response event."
+          },
+          {
+            "name": "FAULT_STALE_REJECT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a stale, duplicated, or out-of-order response was rejected."
+          },
+          {
+            "name": "FAULT_TIMEOUT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the outstanding request exceeded the configured timeout."
+          },
+          {
+            "name": "FAULT_CLAMP_ACTIVE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates one or more actuator commands were saturated to configured min/max limits."
+          },
+          {
+            "name": "FAULT_FALLBACK_ACTIVE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 1,
+            "description": "Indicates safe fallback is currently active."
+          }
+        ]
+      },
+      {
+        "name": "REG1_STICKY_FAULTS",
+        "offset": "0x01",
+        "access": "RO",
+        "description": "Packed sticky fault indicators retained until reset. Bit 0=input range fault, bit 1=request outstanding, bit 2=response valid, bit 3=stale reject, bit 4=timeout, bit 5=clamp active, bit 6=fallback active, bit 7=reserved.",
+        "fields": [
+          {
+            "name": "STICKY_FAULT_INPUT_RANGE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of input-range fault."
+          },
+          {
+            "name": "STICKY_FAULT_REQUEST_OUTSTANDING",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of request-outstanding fault or condition."
+          },
+          {
+            "name": "STICKY_FAULT_RESPONSE_VALID",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of valid response observation."
+          },
+          {
+            "name": "STICKY_FAULT_STALE_REJECT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of stale or out-of-order response rejection."
+          },
+          {
+            "name": "STICKY_FAULT_TIMEOUT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of timeout."
+          },
+          {
+            "name": "STICKY_FAULT_CLAMP_ACTIVE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of clamp saturation."
+          },
+          {
+            "name": "STICKY_FAULT_FALLBACK_ACTIVE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 1,
+            "description": "Latched history of fallback activation."
+          }
+        ]
+      },
+      {
+        "name": "REG2_REQUEST_SEQ_LO",
+        "offset": "0x02",
+        "access": "RO",
+        "description": "Current diagnostic request sequence number, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_REQUEST_SEQ[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of the monotonic request sequence counter."
+          }
+        ]
+      },
+      {
+        "name": "REG3_REQUEST_SEQ_HI",
+        "offset": "0x03",
+        "access": "RO",
+        "description": "Current diagnostic request sequence number, little-endian byte lane 1.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_REQUEST_SEQ[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of the monotonic request sequence counter."
+          }
+        ]
+      },
+      {
+        "name": "REG4_RESPONSE_SEQ_LO",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "Most recently accepted or observed response sequence number, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_RESPONSE_SEQ[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of the response sequence tracking register."
+          }
+        ]
+      },
+      {
+        "name": "REG5_RESPONSE_SEQ_HI",
+        "offset": "0x05",
+        "access": "RO",
+        "description": "Most recently accepted or observed response sequence number, little-endian byte lane 1.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_RESPONSE_SEQ[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of the response sequence tracking register."
+          }
+        ]
+      },
+      {
+        "name": "REG6_TIMEOUT_COUNTER_LO",
+        "offset": "0x06",
+        "access": "RO",
+        "description": "Timeout counter, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_TIMEOUT_COUNTER[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of the timeout counter."
+          }
+        ]
+      },
+      {
+        "name": "REG7_TIMEOUT_COUNTER_HI",
+        "offset": "0x07",
+        "access": "RO",
+        "description": "Timeout counter, little-endian byte lane 1.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_TIMEOUT_COUNTER[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of the timeout counter."
+          }
+        ]
+      },
+      {
+        "name": "REG8_OUTSTANDING_AND_AGE_LO",
+        "offset": "0x08",
+        "access": "RO",
+        "description": "Outstanding request flag and response age, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_OUTSTANDING",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates whether a request is currently outstanding."
+          },
+          {
+            "name": "DIAGNOSTIC_RESPONSE_AGE[14:8]",
+            "lsb": 1,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 7 bits of response age."
+          }
+        ]
+      },
+      {
+        "name": "REG9_RESPONSE_AGE_LO",
+        "offset": "0x09",
+        "access": "RO",
+        "description": "Response age, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_RESPONSE_AGE[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of response age."
+          }
+        ]
+      },
+      {
+        "name": "REG10_REQUEST_STATUS",
+        "offset": "0x0A",
+        "access": "RO",
+        "description": "Request/response status summary register.",
+        "fields": [
+          {
+            "name": "REQUEST_VALID",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Registered request_valid transaction indicator."
+          },
+          {
+            "name": "SAFE_FALLBACK_REQUEST",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 1,
+            "description": "Registered safe fallback request indicator."
+          },
+          {
+            "name": "REQUEST_OUTSTANDING",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that a request is outstanding."
+          },
+          {
+            "name": "RESPONSE_VALID_EVENT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that a response has been accepted or observed as valid."
+          },
+          {
+            "name": "STALE_REJECT_EVENT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that a stale response was rejected."
+          },
+          {
+            "name": "TIMEOUT_EVENT",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that a timeout has occurred."
+          },
+          {
+            "name": "CLAMP_EVENT",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that output clamping occurred."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 1,
+            "description": "Summary indication that fallback is active."
+          }
+        ]
+      },
+      {
+        "name": "REG11_ACTUATOR0_COMMAND_LO",
+        "offset": "0x0B",
+        "access": "RO",
+        "description": "Registered actuator_command0, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "ACTUATOR_COMMAND0[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of actuator_command0."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "module_name": "active_aero_controller_wrap",
+  "microarchitecture_summary": {
+    "implementation_style": "Single-clock, register-based ASIC wrapper with a minimal transaction-control datapath and no hidden submodules beyond the explicitly implied control, validation, clamp, and diagnostics functions.",
+    "control_strategy": "Sample vehicle_geometry and flow_conditions into internal registers, range-check flow velocity, issue at most one outstanding model_request with a monotonic sequence counter, validate model_response by exact sequence match and freshness, then compute bounded actuator targets from validated response fields using simple deterministic arithmetic or threshold logic.",
+    "state_strategy": "All state is synchronous to clk and cleared by the active-high synchronous reset_n; internal state includes sampled inputs, request sequence/outstanding tracking, response age/timeout tracking, live and sticky fault indicators, clamp status, fallback status, and registered actuator outputs.",
+    "output_strategy": "Drive all external outputs as registered, glitch-free signals; request outputs reflect the sampled request payload, actuator outputs reflect clamped and optionally rate-limited safe command values, and diagnostics/fault outputs expose live and sticky status derived from the current control state."
+  },
+  "fsm_intent": {
+    "present": false,
+    "description": "A dedicated multi-state FSM is not required by the spec; implement the behavior as simple synchronous state registers with combinational next-state selection for request issue, response acceptance, fault detection, clamp indication, and safe-fallback gating.",
+    "states": []
+  },
+  "datapath_intent": {
+    "inputs": [
+      "vehicle_geometry_valid",
+      "vehicle_geometry_start",
+      "vehicle_geometry_last",
+      "vehicle_geometry_len",
+      "vehicle_geometry_desc",
+      "vehicle_geometry_payload",
+      "flow_conditions_valid",
+      "flow_conditions_velocity_mps",
+      "flow_conditions_meta",
+      "flow_conditions_update",
+      "model_request_ready",
+      "model_response_valid",
+      "model_response_ready",
+      "model_response_id",
+      "model_response_drag_force",
+      "model_response_lift_force",
+      "model_response_surface_pressure",
+      "model_response_flow_field",
+      "model_response_error",
+      "actuator0_min_limit",
+      "actuator0_max_limit",
+      "actuator0_rate_limit_delta",
+      "actuator1_min_limit",
+      "actuator1_max_limit",
+      "actuator1_rate_limit_delta",
+      "actuator_safe_hold_value"
+    ],
+    "internal_storage": [
+      "Sampled geometry descriptor/payload-handle registers and framing metadata registers.",
+      "Sampled flow-condition registers including velocity and metadata.",
+      "Monotonic request sequence counter and outstanding-request valid/age tracking.",
+      "Captured request payload registers used to drive request_valid, request_id, request_geometry_desc, request_geometry_payload, request_flow_velocity_mps, request_flow_meta, and request_age.",
+      "Response validation registers for outstanding request ID, last accepted response ID, response freshness/age, and timeout counting.",
+      "Live fault and sticky fault registers for input-range, outstanding-request, response-valid, stale-reject, timeout, clamp-active, and fallback-active conditions.",
+      "Registered actuator command hold values and optional rate-limited previous command values for each channel."
+    ],
+    "output_mapping": [
+      "request_valid asserts when a sampled request is being presented and the model service can accept it; request_id and request payload fields reflect the registered request snapshot.",
+      "safe_fallback_request asserts whenever invalid input, stale response, timeout, malformed response, or interface fault is detected, and remains asserted until a fresh sequence-matched valid response clears the condition.",
+      "fault_input_range, fault_request_outstanding, fault_response_valid, fault_stale_reject, fault_timeout, fault_clamp_active, and fault_fallback_active are direct registered indicators of current live fault state.",
+      "actuator_command0 and actuator_command1 are registered outputs driven from validated control-law results, then optionally rate-limited, then clamped to min/max limits, otherwise forced to actuator_safe_hold_value during fallback.",
+      "diagnostic_live_faults and diagnostic_sticky_faults are packed status views of current and retained fault conditions; diagnostic_request_seq, diagnostic_response_seq, diagnostic_timeout_counter, diagnostic_outstanding, and diagnostic_response_age mirror the internal tracking registers."
+    ]
+  },
+  "sequencing_notes": [
+    "Sample vehicle_geometry and flow_conditions before any request generation.",
+    "Advance the monotonic request_id only when a new request is issued.",
+    "Allow only one outstanding request in the baseline implementation; do not launch a new request until the prior one is accepted, rejected, or timed out.",
+    "Accept model_response only when model_response_valid is asserted and model_response_id matches the outstanding request_id exactly.",
+    "Treat duplicated, stale, out-of-order, malformed, or timed-out responses as rejects that assert fault and fallback behavior.",
+    "Update actuator outputs only from validated responses; otherwise hold safe fallback or the last safe registered value as configured.",
+    "Clamp and optional rate-limit decisions are performed after the control-law result is formed and before actuator output registration."
+  ],
+  "timing_notes": [
+    "All sequential elements update on the rising edge of clk only.",
+    "reset_n is implemented as an active-high synchronous reset behavior per spec and clears state on a clock edge.",
+    "No combinational feedback loops should be introduced between request generation, response validation, control-law computation, and output registration.",
+    "Major datapath decisions should be register-to-register to keep the design ASIC-synthesizable at the stated 50 MHz operating point.",
+    "External handshake inputs may be sampled and held internally to decouple the control-plane timing from the external DoMINO service timing."
+  ],
+  "ownership_notes": [
+    "The RTL owns request sequencing, input sampling, freshness tracking, response validation, clamp enforcement, diagnostics, and safe-fallback control.",
+    "The external DoMINO model service owns model execution only and is not implemented in RTL.",
+    "The control law must remain bounded and synthesizable, using simple arithmetic, lookup, or threshold logic only.",
+    "Future runtime attachment to NVIDIA-hosted NIM or ChipLoop GPU worker services must not require changes to the safety logic or port definitions."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "Interfaces remain exactly as defined in digital_spec_json."
+  ]
+}

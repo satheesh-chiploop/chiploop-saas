@@ -1,0 +1,47 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.048 MB sources in 2 modules, into 0.047 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.021 s (elab=0.002, cvt=0.011, bld=0.000); cpu 0.021 s on 1 threads; allocated 32.352 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: active_aero_controller_wrap.v:131:16: Signal is not used: 'sampled_vehicle_geometry_len'
+                                                           : ... note: In instance 'active_aero_controller_wrap'
+  131 |     reg [15:0] sampled_vehicle_geometry_len;
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: active_aero_controller_wrap.v:140:9: Signal is not used: 'sampled_flow_conditions_update'
+                                                          : ... note: In instance 'active_aero_controller_wrap'
+  140 |     reg sampled_flow_conditions_update;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_controller_wrap.v:145:16: Bits of signal are not used: 'sampled_model_response_drag_force'[31:16]
+                                                           : ... note: In instance 'active_aero_controller_wrap'
+  145 |     reg [31:0] sampled_model_response_drag_force;
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_controller_wrap.v:146:16: Bits of signal are not used: 'sampled_model_response_lift_force'[31:16]
+                                                           : ... note: In instance 'active_aero_controller_wrap'
+  146 |     reg [31:0] sampled_model_response_lift_force;
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_controller_wrap.v:147:16: Bits of signal are not used: 'sampled_model_response_surface_pressure'[31:16]
+                                                           : ... note: In instance 'active_aero_controller_wrap'
+  147 |     reg [31:0] sampled_model_response_surface_pressure;
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_controller_wrap.v:148:16: Bits of signal are not used: 'sampled_model_response_flow_field'[63:16]
+                                                           : ... note: In instance 'active_aero_controller_wrap'
+  148 |     reg [63:0] sampled_model_response_flow_field;
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_controller_wrap.v:166:16: Signal is not driven, nor used: 'age_next'
+                                                           : ... note: In instance 'active_aero_controller_wrap'
+  166 |     reg [15:0] age_next;
+      |                ^~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_controller_wrap.v:167:16: Signal is not driven, nor used: 'timeout_next'
+                                                           : ... note: In instance 'active_aero_controller_wrap'
+  167 |     reg [15:0] timeout_next;
+      |                ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: active_aero_controller_wrap.v:185:17: Signal is not used: 'request_age_next'
+                                                           : ... note: In instance 'active_aero_controller_wrap'
+  185 |     wire [15:0] request_age_next;
+      |                 ^~~~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

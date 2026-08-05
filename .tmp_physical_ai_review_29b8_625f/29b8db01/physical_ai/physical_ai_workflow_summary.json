@@ -1,0 +1,447 @@
+{
+  "architecture_generation": {
+    "agent_model_policy": {
+      "mode": "standard",
+      "selected_model": "chiploop_default"
+    },
+    "inference_status": "not_executed",
+    "status": "generated"
+  },
+  "files": {
+    "child_handoff": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/child_handoff.json",
+    "digital_ip_spec": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/surrogate_architecture/digital_ip_spec.json",
+    "loop_state": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/physical_ai_loop_state.json",
+    "model_generated_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/model_generated_architecture.json",
+    "model_generated_architecture_raw": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/model_generated_architecture_raw.txt",
+    "product_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/surrogate_architecture/product_architecture.json",
+    "product_map": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/surrogate_architecture/product_map.json",
+    "requirements_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/requirements_contract.json",
+    "selected_physics_model": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/selected_physics_model.json",
+    "surrogate_interface_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/surrogate_architecture/surrogate_interface_contract.json",
+    "validation_plan": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/surrogate_architecture/validation_plan.json"
+  },
+  "hem": {
+    "enabled": true,
+    "goal": "product_demo",
+    "mode": "fixed",
+    "stage_toggles": {
+      "firmware_product": true,
+      "fpga_bitstream": true,
+      "fpga_exploration": true
+    },
+    "start_condition": "architecture_passed"
+  },
+  "loop": {
+    "architecture_passed": true,
+    "child_handoff": {
+      "digital_ip_spec": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/surrogate_architecture/digital_ip_spec.json",
+      "implementation_path": "digital_ip_asic",
+      "inference_status": "not_executed",
+      "model_generated_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/model_generated_architecture.json",
+      "next_loop": "digital_design",
+      "parent_workflow_id": "29b8db01-7632-4323-9788-4841b0de4964",
+      "product_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/surrogate_architecture/product_architecture.json",
+      "return_to_parent": true,
+      "rtl_spec_text": "Create a synthesizable digital IP block named active_aero_controller_wrap for ASIC integration. The block shall implement a synchronous, resettable control plane that accepts vehicle_geometry and flow_conditions inputs, generates model_request transactions for an external DoMINO model service, validates model_response transactions, computes actuator targets from validated outputs, clamps outputs to safe bounds, and provides a safe fallback state when required.\n\n1. Clocking and reset\n- The design shall use a single primary clock and an active-high synchronous reset, or equivalent ASIC-friendly synchronous reset scheme.\n- All state elements shall be clocked. No combinational feedback loops shall exist.\n- On reset, the block shall clear outstanding request state, invalid/stale flags, fault counters, and shall drive actuator outputs to the defined safe fallback state.\n\n2. Input handling\n- The vehicle_geometry input shall be accepted as a framed payload or memory-mapped descriptor corresponding to the supplied STL-based geometry source. The RTL shall not implement STL parsing algorithms beyond simple framing, length checking, and storage of payload descriptors needed for service requests.\n- The flow_conditions input shall include a numeric stream velocity field expressed in m/s and optional control metadata.\n- The flow_conditions field shall be range-checked against the operating envelope 20 to 55 m/s. Values outside this range shall assert an invalid-input fault and shall inhibit actuation updates until corrected.\n- Inputs shall be sampled into registers before request generation.\n\n3. Request generation\n- The block shall generate model_request packets containing: request_valid, request_id/sequence number, geometry descriptor or payload handle, flow-condition payload, and any required timestamp or age metadata.\n- Each request shall increment or otherwise advance a monotonic sequence counter.\n- Only one outstanding request shall be required by the baseline architecture unless the implementation chooses to support deeper pipelining; if pipelining is supported, each response shall be matched by ID.\n- The request interface shall be compatible with a future NVIDIA-hosted NIM or ChipLoop GPU worker runtime and shall remain independent of the runtime implementation.\n\n4. Response validation\n- The block shall accept model_response transactions containing drag_force, lift_force, surface_pressure, and flow_field data fields.\n- The validator shall compare response sequence ID against the most recent outstanding request sequence.\n- The validator shall reject stale responses, duplicated responses, out-of-order responses, malformed responses, or responses received after a configurable timeout.\n- A stale response, timeout, or malformed response shall trigger fault_status and safe_fallback_request.\n- The design shall not make any assumptions about the physics values beyond their presence and format; it shall not encode surrogate-model predictions in RTL.\n\n5. Control law and command generation\n- The control law block shall consume validated model outputs and generate desired actuator targets for the active-aerodynamics system.\n- The control law shall be deterministic, fully synthesizable, and based on configurable arithmetic, lookup, or threshold logic.\n- The architecture shall support one or more actuator channels, each with its own target value path, but the exact plant behavior is outside the RTL scope.\n- If validated model data is unavailable, the control law shall not update actuator targets and shall defer to safe fallback.\n\n6. Clamp and rate limiting\n- All actuator target values shall pass through a clamp block before being sent to outputs.\n- The clamp block shall enforce programmable minimum and maximum limits for each actuator channel.\n- If commanded value exceeds bounds, the block shall saturate to the nearest bound and set a clamp event flag.\n- Optional rate limiting may be included as a synthesizable feature; if implemented, it shall be monotonic and bounded by programmable delta limits.\n\n7. Safe fallback behavior\n- The safe fallback supervisor shall monitor invalid-input, stale-response, timeout, and interface-fault conditions.\n- On any unsafe condition, it shall assert safe_fallback_request and cause actuator outputs to transition to a predefined safe state.\n- The safe state shall be a registered value, such as hold-last-safe or park-position, as configured by system integration.\n- Fallback shall persist until the block receives a valid, fresh, sequence-matched model_response and the validator clears the fault condition.\n\n8. Outputs and diagnostics\n- actuator_command outputs shall be registered and glitch-free at the interface boundary.\n- fault_status shall expose at least: input range fault, request outstanding, response valid, stale reject, timeout, clamp active, and fallback active.\n- A diagnostics register file shall be provided for system software to read live and sticky fault indicators.\n\n9. Timing and synthesis constraints\n- All major paths shall be partitioned into registers so the design is suitable for ASIC synthesis.\n- The design shall not require GPU logic, floating-point accelerator internals, or any neural-network inference hardware.\n- Any arithmetic used in the control law shall be explicitly bounded and synthesizable in standard-cell ASIC flows.\n- The block shall tolerate the specified operating envelope without changing RTL structure; only configuration values such as thresholds and clamp limits may vary.\n\n10. Integration contract\n- The block shall expose a clear transaction boundary for the external DoMINO model service.\n- The external model service is not part of the RTL deliverable; the RTL only manages handshake, freshness, and safe use of returned model data.\n- The implementation shall support future connection to either NVIDIA-hosted NIM or ChipLoop GPU worker without modification to the core safety logic.",
+      "schema": "chiploop.physical_ai.architecture_handoff.v1",
+      "source_model_id": "nvidia.domino.automotive_aero",
+      "surrogate_interface_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/29b8db01-7632-4323-9788-4841b0de4964/d328f4dd-bc52-4ee1-8c7b-566c764ac0e7/physical_ai/physical_ai/surrogate_architecture/surrogate_interface_contract.json"
+    },
+    "fixed_point_passed": false,
+    "implementation_path": "digital_ip_asic",
+    "inference_status": "not_executed",
+    "physics_passed": false,
+    "rtl_smoke_passed": false,
+    "stages": [
+      {
+        "id": "requirements",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "model_selection",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "surrogate_interface",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "architecture_definition",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "surrogate_inference",
+        "owner": "physical_ai",
+        "status": "not_executed"
+      },
+      {
+        "app_path": "/apps/arch2rtl",
+        "id": "digital_design",
+        "owner": "existing_loop",
+        "status": "ready"
+      },
+      {
+        "app_path": "/apps/verify",
+        "id": "rtl_verification",
+        "owner": "existing_loop",
+        "status": "planned"
+      },
+      {
+        "app_path": "/apps/fpga-implementation",
+        "id": "digital_implementation",
+        "owner": "existing_loop",
+        "status": "planned"
+      },
+      {
+        "app_path": "/apps/fpga-target-explorer",
+        "id": "fpga_exploration",
+        "owner": "existing_loop",
+        "status": "not_requested"
+      }
+    ]
+  },
+  "physics_execution": {
+    "architecture": {
+      "architecture_decisions": [
+        "Use a split architecture: a synthesizable on-chip digital control plane plus a non-RTL external model-service integration path for NVIDIA DoMINO Automotive Aero.",
+        "Keep the physics/surrogate model outside RTL; only define the hardware blocks needed to package inputs, manage requests, validate responses, and generate actuator commands.",
+        "Design for ASIC implementation with deterministic clocked control logic, registered interfaces, and explicit validity/timeout handling.",
+        "Assume the model service is accessed through a future GPU-backed runtime, but make the ASIC independent of the runtime by using a generic request/response protocol.",
+        "Represent vehicle geometry as preprocessed/encoded geometry descriptors rather than raw STL parsing in the critical control path; STL handling is an off-chip or system-level preprocessing responsibility.",
+        "Treat flow_conditions as a compact input bundle containing stream velocity and any required ancillary control fields, with the required operating range of 20 to 55 m/s.",
+        "Reject stale model commands by attaching sequence IDs, timestamps, and age checks to all model responses and downstream actuator updates.",
+        "Clamp all actuator outputs to configurable min/max bounds before driving the active-aerodynamics actuators.",
+        "Provide a safe fallback that holds or returns actuators to a predefined safe position when model data is unavailable, invalid, late, or inconsistent.",
+        "Do not infer any drag/lift/pressure/flow-field values in architecture mode; the controller only consumes model outputs when they are supplied by the external runtime."
+      ],
+      "blocks": [
+        {
+          "function": "Accepts vehicle_geometry metadata and encoded geometry payloads derived from the supplied STL reference geometry. Performs framing, buffering, and handoff to the model request packer.",
+          "name": "Geometry Input Adapter",
+          "rtl_scope": "synthesizable",
+          "type": "digital_ip"
+        },
+        {
+          "function": "Captures flow_conditions including stream velocity and any required control flags. Enforces range checks for the defined operating envelope.",
+          "name": "Flow Conditions Register Block",
+          "rtl_scope": "synthesizable",
+          "type": "digital_ip"
+        },
+        {
+          "function": "Forms model requests using geometry and flow inputs, adds sequence number, request ID, and age metadata, and forwards them to the external model-service interface.",
+          "name": "Model Request Packer",
+          "rtl_scope": "synthesizable",
+          "type": "digital_ip"
+        },
+        {
+          "function": "Non-RTL boundary to NVIDIA-hosted NIM or ChipLoop GPU worker runtime. Carries requests and returns drag_force, lift_force, surface_pressure, and flow_field data.",
+          "name": "External Model Service Interface",
+          "rtl_scope": "non_rtl_boundary",
+          "type": "interface_block"
+        },
+        {
+          "function": "Checks response integrity, validates sequence match, enforces freshness/timeout policy, and rejects stale model commands.",
+          "name": "Response Validator and Freshness Filter",
+          "rtl_scope": "synthesizable",
+          "type": "digital_ip"
+        },
+        {
+          "function": "Maps validated model outputs into desired active-aerodynamic actuator targets using configurable deterministic control logic. No surrogate inference is performed here.",
+          "name": "Aerodynamic Control Law Block",
+          "rtl_scope": "synthesizable",
+          "type": "digital_ip"
+        },
+        {
+          "function": "Clamps target commands to safe actuator bounds and applies optional digital rate limiting before output.",
+          "name": "Actuator Clamp and Rate Limit Block",
+          "rtl_scope": "synthesizable",
+          "type": "digital_ip"
+        },
+        {
+          "function": "Monitors model availability, validation failures, and stale-data events; forces safe fallback actuation state when required.",
+          "name": "Safe Fallback Supervisor",
+          "rtl_scope": "synthesizable",
+          "type": "digital_ip"
+        },
+        {
+          "function": "Drives the active-aerodynamics actuators with registered command outputs and accompanying valid/fault indicators.",
+          "name": "Actuator Output Interface",
+          "rtl_scope": "synthesizable",
+          "type": "digital_ip"
+        },
+        {
+          "function": "Exposes status, error counters, freshness faults, clamp events, and fallback-state indicators to the host system.",
+          "name": "Diagnostics and Telemetry Register File",
+          "rtl_scope": "synthesizable",
+          "type": "digital_ip"
+        }
+      ],
+      "interfaces": [
+        {
+          "description": "Encoded geometry payload and metadata derived from the supplied STL geometry source. Used as model input and cached for request generation.",
+          "direction": "input",
+          "format": "stream_or_memory_mapped",
+          "name": "vehicle_geometry"
+        },
+        {
+          "description": "Flow-condition bundle containing stream_velocity_mps and optional control metadata. Must support operating envelope 20 to 55 m/s.",
+          "direction": "input",
+          "format": "register_or_stream",
+          "name": "flow_conditions"
+        },
+        {
+          "description": "Request transaction to external DoMINO service containing geometry, flow conditions, sequence ID, and validity metadata.",
+          "direction": "output",
+          "format": "transactional",
+          "name": "model_request"
+        },
+        {
+          "description": "Response transaction containing drag_force, lift_force, surface_pressure, and flow_field from the external model runtime.",
+          "direction": "input",
+          "format": "transactional",
+          "name": "model_response"
+        },
+        {
+          "description": "Clamped digital command set for active aerodynamic surfaces.",
+          "direction": "output",
+          "format": "parallel_control_bus",
+          "name": "actuator_command"
+        },
+        {
+          "description": "Sticky and live status bits indicating stale response rejection, invalid input, timeout, clamp events, and fallback activation.",
+          "direction": "output",
+          "format": "register_bus",
+          "name": "fault_status"
+        },
+        {
+          "description": "Internal control signal requesting fallback-safe actuation when model data is not usable.",
+          "direction": "internal",
+          "format": "single_bit",
+          "name": "safe_fallback_request"
+        }
+      ],
+      "product_name": "AI-Assisted Active Aerodynamics Controller for Automotive Use",
+      "product_summary": "Digital ASIC architecture for an active-aerodynamics controller that wraps NVIDIA's DoMINO Automotive Aero model interface. The design accepts STL vehicle geometry and flow-conditions inputs, invokes the surrogate model through a future GPU-backed service path, and converts model outputs into bounded actuator commands for active aerodynamic surfaces. The architecture is defined for automotive aerodynamics at 20 to 55 m/s, with a reference condition of 38.89 m/s and DrivAerML geometry. Because inference was not executed, no performance predictions are asserted; the hardware architecture is specified to support safe, stale-command rejection, clamped actuation, and fallback operation.",
+      "rtl_spec_text": "Create a synthesizable digital IP block named active_aero_controller_wrap for ASIC integration. The block shall implement a synchronous, resettable control plane that accepts vehicle_geometry and flow_conditions inputs, generates model_request transactions for an external DoMINO model service, validates model_response transactions, computes actuator targets from validated outputs, clamps outputs to safe bounds, and provides a safe fallback state when required.\n\n1. Clocking and reset\n- The design shall use a single primary clock and an active-high synchronous reset, or equivalent ASIC-friendly synchronous reset scheme.\n- All state elements shall be clocked. No combinational feedback loops shall exist.\n- On reset, the block shall clear outstanding request state, invalid/stale flags, fault counters, and shall drive actuator outputs to the defined safe fallback state.\n\n2. Input handling\n- The vehicle_geometry input shall be accepted as a framed payload or memory-mapped descriptor corresponding to the supplied STL-based geometry source. The RTL shall not implement STL parsing algorithms beyond simple framing, length checking, and storage of payload descriptors needed for service requests.\n- The flow_conditions input shall include a numeric stream velocity field expressed in m/s and optional control metadata.\n- The flow_conditions field shall be range-checked against the operating envelope 20 to 55 m/s. Values outside this range shall assert an invalid-input fault and shall inhibit actuation updates until corrected.\n- Inputs shall be sampled into registers before request generation.\n\n3. Request generation\n- The block shall generate model_request packets containing: request_valid, request_id/sequence number, geometry descriptor or payload handle, flow-condition payload, and any required timestamp or age metadata.\n- Each request shall increment or otherwise advance a monotonic sequence counter.\n- Only one outstanding request shall be required by the baseline architecture unless the implementation chooses to support deeper pipelining; if pipelining is supported, each response shall be matched by ID.\n- The request interface shall be compatible with a future NVIDIA-hosted NIM or ChipLoop GPU worker runtime and shall remain independent of the runtime implementation.\n\n4. Response validation\n- The block shall accept model_response transactions containing drag_force, lift_force, surface_pressure, and flow_field data fields.\n- The validator shall compare response sequence ID against the most recent outstanding request sequence.\n- The validator shall reject stale responses, duplicated responses, out-of-order responses, malformed responses, or responses received after a configurable timeout.\n- A stale response, timeout, or malformed response shall trigger fault_status and safe_fallback_request.\n- The design shall not make any assumptions about the physics values beyond their presence and format; it shall not encode surrogate-model predictions in RTL.\n\n5. Control law and command generation\n- The control law block shall consume validated model outputs and generate desired actuator targets for the active-aerodynamics system.\n- The control law shall be deterministic, fully synthesizable, and based on configurable arithmetic, lookup, or threshold logic.\n- The architecture shall support one or more actuator channels, each with its own target value path, but the exact plant behavior is outside the RTL scope.\n- If validated model data is unavailable, the control law shall not update actuator targets and shall defer to safe fallback.\n\n6. Clamp and rate limiting\n- All actuator target values shall pass through a clamp block before being sent to outputs.\n- The clamp block shall enforce programmable minimum and maximum limits for each actuator channel.\n- If commanded value exceeds bounds, the block shall saturate to the nearest bound and set a clamp event flag.\n- Optional rate limiting may be included as a synthesizable feature; if implemented, it shall be monotonic and bounded by programmable delta limits.\n\n7. Safe fallback behavior\n- The safe fallback supervisor shall monitor invalid-input, stale-response, timeout, and interface-fault conditions.\n- On any unsafe condition, it shall assert safe_fallback_request and cause actuator outputs to transition to a predefined safe state.\n- The safe state shall be a registered value, such as hold-last-safe or park-position, as configured by system integration.\n- Fallback shall persist until the block receives a valid, fresh, sequence-matched model_response and the validator clears the fault condition.\n\n8. Outputs and diagnostics\n- actuator_command outputs shall be registered and glitch-free at the interface boundary.\n- fault_status shall expose at least: input range fault, request outstanding, response valid, stale reject, timeout, clamp active, and fallback active.\n- A diagnostics register file shall be provided for system software to read live and sticky fault indicators.\n\n9. Timing and synthesis constraints\n- All major paths shall be partitioned into registers so the design is suitable for ASIC synthesis.\n- The design shall not require GPU logic, floating-point accelerator internals, or any neural-network inference hardware.\n- Any arithmetic used in the control law shall be explicitly bounded and synthesizable in standard-cell ASIC flows.\n- The block shall tolerate the specified operating envelope without changing RTL structure; only configuration values such as thresholds and clamp limits may vary.\n\n10. Integration contract\n- The block shall expose a clear transaction boundary for the external DoMINO model service.\n- The external model service is not part of the RTL deliverable; the RTL only manages handshake, freshness, and safe use of returned model data.\n- The implementation shall support future connection to either NVIDIA-hosted NIM or ChipLoop GPU worker without modification to the core safety logic.",
+      "safety_requirements": [
+        "Reject any model response whose sequence ID does not match the outstanding request sequence.",
+        "Reject any model response that exceeds the configured maximum age or timeout threshold.",
+        "Reject any model command derived from invalid or out-of-range flow conditions.",
+        "Clamp all actuator commands to configured minimum and maximum bounds before issuing outputs.",
+        "Enter safe fallback mode on missing model response, invalid response, interface fault, or freshness failure.",
+        "Hold fallback mode until a valid and fresh response is received and explicitly accepted by the validator.",
+        "Expose fault indicators for stale rejection, clamp activation, timeout, and fallback engagement.",
+        "Do not emit unregistered or combinationally unstable actuator outputs; all outputs shall be registered.",
+        "Maintain deterministic behavior under the specified operating envelope of 20 to 55 m/s.",
+        "Do not use unverified surrogate predictions in control decisions when inference_status is not_executed."
+      ],
+      "verification_goals": [
+        "Verify reset brings the controller to the safe fallback state and clears outstanding transaction state.",
+        "Verify flow_conditions range checking rejects values below 20 m/s and above 55 m/s.",
+        "Verify model_request sequencing increments monotonically and matches response validation logic.",
+        "Verify stale, duplicated, out-of-order, and timeout responses are rejected.",
+        "Verify actuator commands are clamped to configured min/max bounds for all channels.",
+        "Verify safe fallback is asserted on invalid input, stale response, timeout, and interface fault conditions.",
+        "Verify fallback persists until a valid, fresh, sequence-matched response is accepted.",
+        "Verify actuator outputs are registered and do not glitch between clock edges.",
+        "Verify diagnostics bits and counters correctly report clamp events, stale rejection, timeout, and fallback activation.",
+        "Verify no RTL block assumes or hardcodes surrogate-model predictions, because inference was not executed and the model remains external to the digital IP."
+      ]
+    },
+    "digital_ip_spec": {
+      "blocks": [
+        "register bank",
+        "sensor filter",
+        "feature aggregator",
+        "command limiter",
+        "safety state machine",
+        "watchdog",
+        "telemetry FIFO"
+      ],
+      "clock": {
+        "name": "clk",
+        "target_frequency_mhz": 100
+      },
+      "downstream_loop": "Digital Design Loop",
+      "interfaces": [
+        "AXI4-Lite control/status",
+        "streaming pressure-sensor input",
+        "speed and yaw inputs",
+        "actuator command output",
+        "interrupt"
+      ],
+      "name": "adaptive_aero_control_ip",
+      "purpose": "Low-latency sensor aggregation, safety monitoring, and active-aero actuator control around an external GPU surrogate.",
+      "requirements": [
+        "Fail safe when surrogate command is stale or invalid",
+        "Clamp every actuator command to software-programmable limits",
+        "Expose timestamp, validity, fault, and model-version registers",
+        "Permit deterministic fallback control without the GPU service"
+      ],
+      "reset": {
+        "active_low": true,
+        "name": "reset_n"
+      },
+      "schema": "chiploop.digital_ip.spec.v1",
+      "surrogate_is_not_rtl": true
+    },
+    "execution_mode": "architecture",
+    "implementation_path": "digital_ip_asic",
+    "inference_status": "not_executed",
+    "interface": {
+      "checkpoint": "nvidia/domino_drivaerml",
+      "inference": {
+        "future_runtimes": [
+          "NVIDIA-hosted NIM",
+          "ChipLoop GPU worker"
+        ],
+        "reason": "Architecture-definition mode does not require a GPU worker or hosted NIM.",
+        "status": "not_executed"
+      },
+      "inputs": [
+        "vehicle_geometry",
+        "flow_conditions"
+      ],
+      "model_id": "nvidia.domino.automotive_aero",
+      "model_name": "NVIDIA DoMINO Automotive Aero",
+      "outputs": [
+        "drag_force",
+        "lift_force",
+        "surface_pressure",
+        "flow_field"
+      ],
+      "provider": "NVIDIA",
+      "reference_conditions": {
+        "geometry_format": "STL",
+        "geometry_source": "DrivAerML reference geometry",
+        "stream_velocity_mps": 38.89
+      },
+      "reference_url": "https://huggingface.co/nvidia/domino_drivaerml",
+      "schema": "chiploop.physical_ai.surrogate_interface.v1"
+    },
+    "product_map": {
+      "implementation_path": "digital_ip_asic",
+      "milestones": [
+        {
+          "id": "m1",
+          "name": "Architecture and digital-IP contract",
+          "status": "completed"
+        },
+        {
+          "id": "m2",
+          "name": "RTL and verification",
+          "status": "ready"
+        },
+        {
+          "id": "m3",
+          "name": "Digital IP / ASIC implementation",
+          "status": "planned"
+        },
+        {
+          "id": "m3_fpga",
+          "name": "FPGA prototype",
+          "status": "not_requested"
+        },
+        {
+          "id": "m4",
+          "name": "Surrogate-backed validation",
+          "status": "blocked_on_inference_runtime"
+        },
+        {
+          "id": "m5",
+          "name": "Optional FPGA prototype",
+          "status": "optional"
+        }
+      ],
+      "product": "AI-assisted active aerodynamics controller",
+      "schema": "chiploop.physical_ai.product_map.v1"
+    },
+    "status": "architecture_ready",
+    "validation": {
+      "architecture_gate": "passed",
+      "digital_ip_tests": [
+        "register access",
+        "stale-command timeout",
+        "limit clamping",
+        "fallback transition",
+        "fault interrupt",
+        "telemetry ordering"
+      ],
+      "required_before_validated_mode": [
+        "Connect NVIDIA NIM or GPU worker",
+        "Run reference geometry",
+        "Persist real predictions",
+        "Compare against CFD reference evidence"
+      ],
+      "schema": "chiploop.physical_ai.validation_plan.v1",
+      "surrogate_inference_gate": "not_executed"
+    }
+  },
+  "physics_model": {
+    "availability": "requires_gpu_worker",
+    "configuration": {
+      "architecture_definition_supported": true,
+      "checkpoint": "nvidia/domino_drivaerml",
+      "reference_application": "automotive_aerodynamics_architecture",
+      "reference_url": "https://huggingface.co/nvidia/domino_drivaerml",
+      "version": 2
+    },
+    "domain": "automotive_aerodynamics",
+    "executor": null,
+    "gpu_required": true,
+    "implementation_targets": [
+      "gpu_service"
+    ],
+    "inputs": [
+      "vehicle_geometry",
+      "flow_conditions"
+    ],
+    "model_id": "nvidia.domino.automotive_aero",
+    "name": "NVIDIA DoMINO Automotive Aero",
+    "outputs": [
+      "drag_force",
+      "lift_force",
+      "surface_pressure",
+      "flow_field"
+    ],
+    "provider": "NVIDIA",
+    "runtime": "remote_nim",
+    "training_required": false,
+    "updated_at": "2026-08-05T04:45:31.389991+00:00"
+  },
+  "requirements": {
+    "accuracy": {
+      "maximum_error_percent": 3.0
+    },
+    "application": "automotive_aerodynamics_architecture",
+    "approved": true,
+    "execution_mode": "architecture",
+    "implementation_path": "digital_ip_asic",
+    "implementation_target": "asic",
+    "objective": "Build an AI-assisted active-aerodynamics controller using NVIDIA's pretrained DoMINO model interface",
+    "operating_envelope": {
+      "stream_velocity_mps": [
+        20,
+        55
+      ]
+    },
+    "parameters": {
+      "geometry_format": "STL",
+      "geometry_source": "DrivAerML reference geometry",
+      "stream_velocity_mps": 38.89
+    },
+    "physics_domain": "automotive_aerodynamics",
+    "safety_constraints": [
+      "Reject stale model commands",
+      "Clamp actuator commands",
+      "Provide a safe fallback"
+    ],
+    "schema": "chiploop.physical_ai.requirements.v1"
+  },
+  "schema": "chiploop.physical_ai.workflow_result.v1",
+  "status": "ready_for_digital_design"
+}

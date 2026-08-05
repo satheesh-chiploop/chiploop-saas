@@ -1,0 +1,4 @@
+Digital Power Intent (UPF-Lite) Agent Report
+Spec mode: flat
+Top module: active_aero_controller_wrap
+Domains: ['PD_TOP']

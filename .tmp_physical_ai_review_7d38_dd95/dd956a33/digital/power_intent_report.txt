@@ -1,4 +1,0 @@
-Digital Power Intent (UPF-Lite) Agent Report
-Spec mode: flat
-Top module: aero_guard_ctrl
-Domains: ['PD_TOP']

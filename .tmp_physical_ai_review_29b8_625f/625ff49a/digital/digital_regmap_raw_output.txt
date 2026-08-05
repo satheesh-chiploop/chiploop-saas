@@ -1,0 +1,461 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "flat",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": [
+      {
+        "name": "REG0_LIVE_FAULTS",
+        "offset": "0x00",
+        "access": "RO",
+        "description": "Packed live fault indicators. Bit 0=input range fault, bit 1=request outstanding, bit 2=response valid, bit 3=stale reject, bit 4=timeout, bit 5=clamp active, bit 6=fallback active, bit 7=reserved.",
+        "fields": [
+          {
+            "name": "FAULT_INPUT_RANGE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current input-range fault status; asserted when flow_conditions_velocity_mps is outside 20..55 m/s inclusive."
+          },
+          {
+            "name": "FAULT_REQUEST_OUTSTANDING",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a request is outstanding and awaiting a matching response."
+          },
+          {
+            "name": "FAULT_RESPONSE_VALID",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the current response path has observed a valid response event."
+          },
+          {
+            "name": "FAULT_STALE_REJECT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a stale, duplicated, or out-of-order response was rejected."
+          },
+          {
+            "name": "FAULT_TIMEOUT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the outstanding request exceeded the configured timeout."
+          },
+          {
+            "name": "FAULT_CLAMP_ACTIVE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates one or more actuator commands were saturated to configured min/max limits."
+          },
+          {
+            "name": "FAULT_FALLBACK_ACTIVE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 1,
+            "description": "Indicates safe fallback is currently active."
+          }
+        ]
+      },
+      {
+        "name": "REG1_STICKY_FAULTS",
+        "offset": "0x01",
+        "access": "RO",
+        "description": "Packed sticky fault indicators retained until reset. Bit 0=input range fault, bit 1=request outstanding, bit 2=response valid, bit 3=stale reject, bit 4=timeout, bit 5=clamp active, bit 6=fallback active, bit 7=reserved.",
+        "fields": [
+          {
+            "name": "STICKY_FAULT_INPUT_RANGE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of input-range fault."
+          },
+          {
+            "name": "STICKY_FAULT_REQUEST_OUTSTANDING",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of request-outstanding fault or condition."
+          },
+          {
+            "name": "STICKY_FAULT_RESPONSE_VALID",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of valid response observation."
+          },
+          {
+            "name": "STICKY_FAULT_STALE_REJECT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of stale or out-of-order response rejection."
+          },
+          {
+            "name": "STICKY_FAULT_TIMEOUT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of timeout."
+          },
+          {
+            "name": "STICKY_FAULT_CLAMP_ACTIVE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched history of clamp saturation."
+          },
+          {
+            "name": "STICKY_FAULT_FALLBACK_ACTIVE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 1,
+            "description": "Latched history of fallback activation."
+          }
+        ]
+      },
+      {
+        "name": "REG2_REQUEST_SEQ_LO",
+        "offset": "0x02",
+        "access": "RO",
+        "description": "Current diagnostic request sequence number, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_REQUEST_SEQ[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of the monotonic request sequence counter."
+          }
+        ]
+      },
+      {
+        "name": "REG3_REQUEST_SEQ_HI",
+        "offset": "0x03",
+        "access": "RO",
+        "description": "Current diagnostic request sequence number, little-endian byte lane 1.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_REQUEST_SEQ[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of the monotonic request sequence counter."
+          }
+        ]
+      },
+      {
+        "name": "REG4_RESPONSE_SEQ_LO",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "Most recently accepted or observed response sequence number, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_RESPONSE_SEQ[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of the response sequence tracking register."
+          }
+        ]
+      },
+      {
+        "name": "REG5_RESPONSE_SEQ_HI",
+        "offset": "0x05",
+        "access": "RO",
+        "description": "Most recently accepted or observed response sequence number, little-endian byte lane 1.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_RESPONSE_SEQ[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of the response sequence tracking register."
+          }
+        ]
+      },
+      {
+        "name": "REG6_TIMEOUT_COUNTER_LO",
+        "offset": "0x06",
+        "access": "RO",
+        "description": "Timeout counter, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_TIMEOUT_COUNTER[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of the timeout counter."
+          }
+        ]
+      },
+      {
+        "name": "REG7_TIMEOUT_COUNTER_HI",
+        "offset": "0x07",
+        "access": "RO",
+        "description": "Timeout counter, little-endian byte lane 1.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_TIMEOUT_COUNTER[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of the timeout counter."
+          }
+        ]
+      },
+      {
+        "name": "REG8_OUTSTANDING_AND_AGE_LO",
+        "offset": "0x08",
+        "access": "RO",
+        "description": "Outstanding request flag and response age, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_OUTSTANDING",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates whether a request is currently outstanding."
+          },
+          {
+            "name": "DIAGNOSTIC_RESPONSE_AGE[14:8]",
+            "lsb": 1,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 7 bits of response age."
+          }
+        ]
+      },
+      {
+        "name": "REG9_RESPONSE_AGE_LO",
+        "offset": "0x09",
+        "access": "RO",
+        "description": "Response age, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "DIAGNOSTIC_RESPONSE_AGE[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of response age."
+          }
+        ]
+      },
+      {
+        "name": "REG10_REQUEST_STATUS",
+        "offset": "0x0A",
+        "access": "RO",
+        "description": "Request/response status summary register.",
+        "fields": [
+          {
+            "name": "REQUEST_VALID",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Registered request_valid transaction indicator."
+          },
+          {
+            "name": "SAFE_FALLBACK_REQUEST",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 1,
+            "description": "Registered safe fallback request indicator."
+          },
+          {
+            "name": "REQUEST_OUTSTANDING",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that a request is outstanding."
+          },
+          {
+            "name": "RESPONSE_VALID_EVENT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that a response has been accepted or observed as valid."
+          },
+          {
+            "name": "STALE_REJECT_EVENT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that a stale response was rejected."
+          },
+          {
+            "name": "TIMEOUT_EVENT",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that a timeout has occurred."
+          },
+          {
+            "name": "CLAMP_EVENT",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary indication that output clamping occurred."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 1,
+            "description": "Summary indication that fallback is active."
+          }
+        ]
+      },
+      {
+        "name": "REG11_ACTUATOR0_COMMAND_LO",
+        "offset": "0x0B",
+        "access": "RO",
+        "description": "Registered actuator_command0, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "ACTUATOR_COMMAND0[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of actuator_command0."
+          }
+        ]
+      },
+      {
+        "name": "REG12_ACTUATOR0_COMMAND_HI",
+        "offset": "0x0C",
+        "access": "RO",
+        "description": "Registered actuator_command0, little-endian byte lane 1.",
+        "fields": [
+          {
+            "name": "ACTUATOR_COMMAND0[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of actuator_command0."
+          }
+        ]
+      },
+      {
+        "name": "REG13_ACTUATOR1_COMMAND_LO",
+        "offset": "0x0D",
+        "access": "RO",
+        "description": "Registered actuator_command1, little-endian byte lane 0.",
+        "fields": [
+          {
+            "name": "ACTUATOR_COMMAND1[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of actuator_command1."
+          }
+        ]
+      },
+      {
+        "name": "REG14_ACTUATOR1_COMMAND_HI",
+        "offset": "0x0E",
+        "access": "RO",
+        "description": "Registered actuator_command1, little-endian byte lane 1.",
+        "fields": [
+          {
+            "name": "ACTUATOR_COMMAND1[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of actuator_command1."
+          }
+        ]
+      },
+      {
+        "name": "REG15_RESERVED",
+        "offset": "0x0F",
+        "access": "RO",
+        "description": "Reserved for future software-visible status expansion while preserving flat spec compatibility.",
+        "fields": [
+          {
+            "name": "RESERVED",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, reads as zero."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "FAULT_IRQ",
+        "description": "Asserted when a live unsafe condition is present, including input-range fault, stale reject, timeout, malformed response, clamp activity, or fallback activity, if the integration chooses to map the registered fault status to an interrupt."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Read REG0_LIVE_FAULTS through REG15_RESERVED after reset to confirm fallback and fault state.",
+      "Verify REG10_REQUEST_STATUS indicates safe_fallback_request asserted and request_valid deasserted immediately after reset.",
+      "Poll REG2/REG3, REG4/REG5, REG6/REG7, and REG8/REG9 until the expected zeroed counters and outstanding state are observed.",
+      "Write is not supported by this register map; configuration is provided by top-level input ports rather than a software register interface."
+    ],
+    "polling_sequence": [
+      "Periodically read REG0_LIVE_FAULTS and REG1_STICKY_FAULTS to monitor live and retained faults.",
+      "Read REG2/REG3 for request sequence progression and REG4/REG5 for the last response sequence.",
+      "Read REG6/REG7 and REG8/REG9 to monitor timeout and response age.",
+      "Read REG10_REQUEST_STATUS to determine fallback and request/response transaction state.",
+      "Read REG11_ACTUATOR0_COMMAND_LO through REG14_ACTUATOR1_COMMAND_HI to observe registered actuator outputs."
+    ],
+    "irq_sequence": [
+      "If FAULT_IRQ is connected in integration, service the interrupt by reading REG0_LIVE_FAULTS and REG1_STICKY_FAULTS to identify the active and historical fault source.",
+      "Confirm whether fallback remains active in REG10_REQUEST_STATUS and continue polling until the validator returns to a fresh, sequence-matched valid response condition."
+    ]
+  },
+  "consistency_notes": [
+    "This register map is compatible with the flat DIGITAL_SPEC_JSON port list and does not invent new RTL hierarchy or bus protocols.",
+    "A minimal custom memory-mapped view is used because the spec does not define AXI, APB, or I2C signaling pins.",
+    "All multi-byte software-visible values are split into 8-bit registers to match the implied 8-bit register access model.",
+    "Software control/configuration inputs such as clamp limits and safe hold value remain top-level ports, not writable registers, per the spec."
+  ]
+}
