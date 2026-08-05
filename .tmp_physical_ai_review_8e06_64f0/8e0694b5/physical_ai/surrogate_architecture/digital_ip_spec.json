@@ -1,0 +1,37 @@
+{
+  "blocks": [
+    "register bank",
+    "sensor filter",
+    "feature aggregator",
+    "command limiter",
+    "safety state machine",
+    "watchdog",
+    "telemetry FIFO"
+  ],
+  "clock": {
+    "name": "clk",
+    "target_frequency_mhz": 100
+  },
+  "downstream_loop": "Digital Design Loop",
+  "interfaces": [
+    "AXI4-Lite control/status",
+    "streaming pressure-sensor input",
+    "speed and yaw inputs",
+    "actuator command output",
+    "interrupt"
+  ],
+  "name": "adaptive_aero_control_ip",
+  "purpose": "Low-latency sensor aggregation, safety monitoring, and active-aero actuator control around an external GPU surrogate.",
+  "requirements": [
+    "Fail safe when surrogate command is stale or invalid",
+    "Clamp every actuator command to software-programmable limits",
+    "Expose timestamp, validity, fault, and model-version registers",
+    "Permit deterministic fallback control without the GPU service"
+  ],
+  "reset": {
+    "active_low": true,
+    "name": "reset_n"
+  },
+  "schema": "chiploop.digital_ip.spec.v1",
+  "surrogate_is_not_rtl": true
+}

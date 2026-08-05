@@ -1,0 +1,11 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: domino_active_aero_controller
+Expected files: ['domino_active_aero_controller.v', 'request_orchestrator.v', 'domino_runtime_interface.v', 'command_synthesis_engine.v', 'actuator_clamper.v', 'safe_fallback_manager.v', 'safety_supervisor.v']
+Materialized files: ['domino_active_aero_controller.v', 'request_orchestrator.v', 'domino_runtime_interface.v', 'command_synthesis_engine.v', 'actuator_clamper.v', 'safe_fallback_manager.v', 'safety_supervisor.v']
+Clock ports: ['clk']
+Reset ports: ['rst_n']
+Icarus compile: pass
+Verilator lint: pass
+Issue count: 0

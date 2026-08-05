@@ -1,0 +1,37 @@
+{
+  "implementation_path": "digital_ip_asic",
+  "milestones": [
+    {
+      "id": "m1",
+      "name": "Architecture and digital-IP contract",
+      "status": "completed"
+    },
+    {
+      "id": "m2",
+      "name": "RTL and verification",
+      "status": "ready"
+    },
+    {
+      "id": "m3",
+      "name": "Digital IP / ASIC implementation",
+      "status": "planned"
+    },
+    {
+      "id": "m3_fpga",
+      "name": "FPGA prototype",
+      "status": "not_requested"
+    },
+    {
+      "id": "m4",
+      "name": "Surrogate-backed validation",
+      "status": "blocked_on_inference_runtime"
+    },
+    {
+      "id": "m5",
+      "name": "Optional FPGA prototype",
+      "status": "optional"
+    }
+  ],
+  "product": "AI-assisted active aerodynamics controller",
+  "schema": "chiploop.physical_ai.product_map.v1"
+}

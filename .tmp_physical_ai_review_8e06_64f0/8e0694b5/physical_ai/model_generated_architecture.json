@@ -1,0 +1,170 @@
+{
+  "architecture_decisions": [
+    "Use a digital-IP architecture that separates real-time control, model I/O, and safety supervision from the external physics model runtime.",
+    "Do not embed the surrogate model in RTL; expose a narrow model-request interface matching vehicle_geometry and flow_conditions inputs and accept drag_force, lift_force, surface_pressure, and flow_field outputs.",
+    "Treat the execution evidence as architecture-definition only; no performance predictions, control efficacy claims, or model accuracy claims are inferred because inference was not executed.",
+    "Implement a timestamped command pipeline with freshness checking to reject stale model commands before they reach actuators.",
+    "Insert actuator-range clamping on all generated active-aero commands to prevent out-of-bounds deployment requests.",
+    "Provide a deterministic safe fallback state that is entered on model timeout, invalid data, stale response, internal fault, or interface mismatch.",
+    "Support ASIC deployment with fixed-point datapaths, synchronous reset, and bounded-latency handshakes suitable for synthesis.",
+    "Keep geometry ingestion abstract at the architecture level: accept STL-derived geometry descriptors or preprocessed geometry packets rather than raw mesh processing in the control datapath.",
+    "Define the controller to operate over the specified stream-velocity envelope of 20 to 55 m/s, with reference-condition metadata centered at 38.89 m/s.",
+    "Use a supervisory safety block to arbitrate between model-driven commands and fallback commands based on validity, freshness, and clamping status."
+  ],
+  "blocks": [
+    {
+      "function": "Accepts geometry descriptors derived from the vehicle_geometry input and formats them into a bounded-width transaction for the model-request path.",
+      "name": "geometry_input_adapter",
+      "notes": "Architecture-level block only; no mesh solver or STL parser is required in RTL if geometry is provided upstream as preprocessed descriptors.",
+      "type": "input_preprocessor"
+    },
+    {
+      "function": "Stores flow_conditions including stream velocity and any required context for a model request.",
+      "name": "flow_conditions_register",
+      "notes": "Must support the operating envelope of 20 to 55 m/s.",
+      "type": "configuration_register_file"
+    },
+    {
+      "function": "Issues request transactions to the external DoMINO runtime and tracks request IDs, timestamps, and response-valid handshakes.",
+      "name": "model_request_controller",
+      "notes": "No local inference; acts as an interface shim to GPU-service or hosted NIM runtime.",
+      "type": "protocol_controller"
+    },
+    {
+      "function": "Receives drag_force, lift_force, surface_pressure, and flow_field response payloads from the external model runtime.",
+      "name": "model_response_ingress",
+      "notes": "Must validate transaction ID matching and response freshness.",
+      "type": "protocol_controller"
+    },
+    {
+      "function": "Converts model outputs into active-aero actuator requests using fixed-point arithmetic and bounded control laws defined by the integration architecture.",
+      "name": "command_synthesis_engine",
+      "notes": "The exact control law may be application-specific, but it must not bypass safety checks.",
+      "type": "control_logic"
+    },
+    {
+      "function": "Clamps all actuator requests to legal minimum and maximum values before release to the actuator interface.",
+      "name": "actuator_command_clamper",
+      "notes": "Mandatory for every command path.",
+      "type": "safety_block"
+    },
+    {
+      "function": "Rejects stale model commands and stale model responses using sequence number, age, or watchdog-based freshness criteria.",
+      "name": "freshness_monitor",
+      "notes": "Must be able to force fallback when freshness conditions are violated.",
+      "type": "safety_block"
+    },
+    {
+      "function": "Generates a deterministic safe aerodynamic configuration when model data is unavailable, invalid, stale, or out of bounds.",
+      "name": "safe_fallback_manager",
+      "notes": "Fallback must be available without external model access.",
+      "type": "safety_state_machine"
+    },
+    {
+      "function": "Selects between model-driven commands and safe fallback commands after checking validity, freshness, and clamping status.",
+      "name": "safety_supervisor",
+      "notes": "Highest priority is safe fallback on any violation.",
+      "type": "arbiter"
+    },
+    {
+      "function": "Drives the active-aerodynamics actuators with final bounded command values.",
+      "name": "actuator_interface",
+      "notes": "Should support downstream acknowledgment if the actuator subsystem provides it.",
+      "type": "output_interface"
+    },
+    {
+      "function": "Captures request/response metadata, fault flags, freshness status, clamp events, and selected command source.",
+      "name": "telemetry_logger",
+      "notes": "Useful for validation, traceability, and post-silicon debug.",
+      "type": "observability_block"
+    }
+  ],
+  "interfaces": [
+    {
+      "content": "Vehicle geometry derived from the supplied STL-based DrivAerML reference geometry.",
+      "destination": "geometry_input_adapter",
+      "direction": "input",
+      "handshake": "valid/ready",
+      "name": "vehicle_geometry_in",
+      "source": "system_or_host_preprocessor",
+      "type": "geometry_descriptor"
+    },
+    {
+      "constraints": "Stream velocity must be representable across 20 to 55 m/s.",
+      "content": "Includes stream_velocity_mps and any required flow context.",
+      "destination": "flow_conditions_register",
+      "direction": "input",
+      "name": "flow_conditions_in",
+      "source": "system_or_host_preprocessor",
+      "type": "configuration_bus"
+    },
+    {
+      "content": "vehicle_geometry and flow_conditions payload plus transaction metadata.",
+      "destination": "external_domino_runtime",
+      "direction": "output",
+      "name": "model_request_out",
+      "notes": "External runtime may be NVIDIA-hosted NIM or ChipLoop GPU worker in future deployment.",
+      "source": "model_request_controller",
+      "type": "streaming_request"
+    },
+    {
+      "content": "drag_force, lift_force, surface_pressure, flow_field, plus transaction metadata.",
+      "destination": "model_response_ingress",
+      "direction": "input",
+      "name": "model_response_in",
+      "notes": "Must be checked against request ID and freshness window.",
+      "source": "external_domino_runtime",
+      "type": "streaming_response"
+    },
+    {
+      "constraints": "Must never exceed configured actuator limits.",
+      "content": "Final clamped actuator command set.",
+      "destination": "active_aero_actuators",
+      "direction": "output",
+      "name": "actuator_cmd_out",
+      "source": "safety_supervisor",
+      "type": "bounded_control_bus"
+    },
+    {
+      "content": "Valid/fault/fallback/stale/clamp status indicators.",
+      "destination": "vehicle_control_domain",
+      "direction": "output",
+      "name": "fault_status_out",
+      "source": "safety_supervisor",
+      "type": "status_bus"
+    },
+    {
+      "content": "Transaction IDs, timestamps, faults, and command source selection.",
+      "destination": "diagnostics_host",
+      "direction": "output",
+      "name": "telemetry_out",
+      "source": "telemetry_logger",
+      "type": "observability_bus"
+    }
+  ],
+  "product_name": "DoMINO Active Aero Controller ASIC",
+  "product_summary": "An ASIC-oriented digital architecture for an AI-assisted active-aerodynamics controller that wraps NVIDIA's DoMINO Automotive Aero model interface. The hardware accepts vehicle geometry and flow-condition inputs, manages model request/response transactions, computes control-safe actuator commands from model outputs, and enforces stale-command rejection, actuator clamping, and safe fallback behavior. The physics model is not implemented in RTL; the chip architecture is designed to consume surrogate-model outputs from a future GPU service or hosted NIM runtime.",
+  "rtl_spec_text": "Create a synthesizable digital IP block named domino_active_aero_controller suitable for ASIC implementation. The RTL shall not contain the physics model itself, neural network layers, or any non-deterministic software runtime. The block shall implement a request/response orchestration pipeline for an external NVIDIA DoMINO Automotive Aero runtime.\n\n1. Top-level ports and clocks\n- Provide input clk and active-low rst_n.\n- Provide input vehicle_geometry_valid and vehicle_geometry_ready handshake signals, and a bounded-width vehicle_geometry bus carrying preprocessed geometry descriptors.\n- Provide input flow_conditions_valid and flow_conditions_ready handshake signals, and a flow_conditions bus containing at least stream_velocity_mps.\n- Provide output model_req_valid and input model_req_ready for requests to the external runtime.\n- Provide output model_resp_ready and input model_resp_valid for responses from the external runtime.\n- Provide response payload inputs for drag_force, lift_force, surface_pressure, and flow_field metadata or compacted descriptors as architecturally agreed.\n- Provide output actuator_cmd_valid, input actuator_cmd_ready, and actuator_cmd bus to the active-aerodynamics actuator subsystem.\n- Provide output fault_valid and fault_code for diagnostic reporting.\n\n2. Operating envelope and configuration\n- The design shall accept stream_velocity_mps values corresponding to the specified operational envelope of 20 to 55 m/s.\n- A configuration register shall store the reference-condition metadata, including a default stream_velocity_mps reference of 38.89 m/s and the geometry format provenance tag.\n- The geometry input is architecture-defined as STL-derived DrivAerML reference geometry; RTL may accept a compact descriptor or hash/index of the geometry rather than raw STL parsing.\n- The design shall include a parameterizable fixed-point format for all internal arithmetic; all widths shall be synthesis-time generics.\n\n3. Request sequencing and freshness\n- The request controller shall issue a monotonically increasing request_id for every model transaction.\n- Every request shall carry request_id and a timestamp or cycle_age tag.\n- The response ingress shall compare the response request_id with the outstanding request_id and shall assert response_match only when the IDs align.\n- The freshness monitor shall reject responses that exceed a programmable freshness threshold or violate sequence ordering.\n- If a response is stale, duplicated, missing, or mismatched, the design shall suppress model-derived actuator output and assert fault_valid with a stale-command fault code.\n\n4. Model interaction behavior\n- The RTL shall only marshal inputs to and from the external runtime; it shall not perform local surrogate inference.\n- The model request payload shall include vehicle_geometry and flow_conditions fields only in the architecturally defined format.\n- The response payload shall accept drag_force, lift_force, surface_pressure, and flow_field summary data.\n- The design shall provide a response_valid internal qualifier that is set only after payload integrity and ID checks pass.\n\n5. Command synthesis\n- A command synthesis engine shall map validated model outputs into actuator requests using deterministic fixed-point arithmetic.\n- The command mapping shall be parameterizable by application-specific gains or tables stored in ROM or configuration registers.\n- The exact control law may be simple feedforward or table-based, but it must be synthesizable and fully deterministic.\n- No actuator command shall be driven directly from unvalidated model output signals.\n\n6. Actuator clamping\n- The actuator command clamper shall enforce min and max limits on every actuator channel.\n- If a computed command exceeds limits, the clamper shall saturate the value to the nearest legal bound and set a clamp_event flag.\n- Clamp events shall be visible to fault reporting and telemetry.\n- The unclamped path must not be exposed at the output interface.\n\n7. Safe fallback\n- The safe_fallback_manager shall implement a deterministic state machine that outputs a predefined safe aerodynamic configuration when any of the following occur: reset, invalid input, stale response, request timeout, model unavailable, payload corruption, or internal fault.\n- The safe fallback configuration shall be encoded as synthesis-time constants or configuration registers.\n- On reset, the design shall enter fallback mode and hold safe outputs until health checks and valid data are present.\n- Safe fallback outputs shall also pass through the actuator clamper.\n\n8. Safety supervision and arbitration\n- The safety_supervisor shall arbitrate between model-derived commands and fallback commands.\n- The supervisor shall prioritize fallback on any fault, mismatch, stale condition, or timeout.\n- A direct model-to-actuator bypass path is prohibited.\n- The supervisor shall assert a source_select status indicating whether the output originated from model or fallback.\n\n9. Timing and latency\n- All state transitions shall be synchronous to clk.\n- All state elements shall have synchronous behavior compatible with ASIC synthesis.\n- The design shall support a bounded-latency handshake from request issuance to response acceptance, but no numeric performance guarantee shall be assumed beyond the configured watchdog thresholds.\n\n10. Observability and diagnostics\n- The design shall expose telemetry signals for request_id, response_match, freshness status, clamp_event, fallback_active, and fault_code.\n- Telemetry registers may be memory-mapped if integrated into a larger SoC, but the controller shall remain self-contained.\n- Fault reporting shall be sticky until cleared by software or a defined clear mechanism.\n\n11. Reset and initialization\n- On rst_n deassertion, all outputs shall be driven to safe values.\n- The request controller shall clear outstanding transactions on reset.\n- The design shall require a successful configuration load, if applicable, before leaving fallback mode.\n\n12. Synthesis constraints\n- The RTL shall be written using synthesizable constructs only: flip-flops, combinational logic, synchronous FSMs, counters, comparators, saturating arithmetic, and optional small ROMs.\n- No floating-point requirement shall be assumed unless explicitly implemented as a synthesizable fixed-point approximation.\n- No file I/O, dynamic memory, tasks with side effects, or unsynthesizable delays shall be used.\n- All default values, safe fallback settings, limits, and thresholds shall be parameterizable.\n\n13. Functional intent\n- The IP shall serve as an ASIC control wrapper around an external GPU-based or hosted NIM DoMINO runtime for active aerodynamics.\n- The IP shall preserve safety by rejecting stale commands, clamping actuator commands, and providing safe fallback under all fault or invalid-data conditions.",
+  "safety_requirements": [
+    "Reject any model command or response that fails freshness, sequence, or transaction-ID checks.",
+    "Clamp every actuator command to configured legal minimum and maximum limits before output.",
+    "Enter safe fallback mode whenever the model runtime is unavailable, timed out, invalid, stale, or mismatched to the request.",
+    "Do not permit direct model-to-actuator bypass paths.",
+    "Define a deterministic reset state that forces safe fallback until configuration and health checks pass.",
+    "Maintain bounded-latency response handling appropriate for real-time active-aerodynamics control.",
+    "Preserve observability of all safety events, including stale rejection and clamping activation.",
+    "Ensure the architecture operates only as an orchestration layer around the external surrogate model; no unverified inference results may be assumed in silicon."
+  ],
+  "verification_goals": [
+    "Verify reset forces safe fallback outputs and clears outstanding transaction state.",
+    "Verify request_id increments monotonically and response matching rejects mismatched IDs.",
+    "Verify stale-response rejection when freshness thresholds are exceeded.",
+    "Verify all actuator channels saturate correctly at configured min/max bounds.",
+    "Verify safe fallback is selected on timeout, invalid payload, unavailable model, and internal fault conditions.",
+    "Verify no direct path exists from raw model response signals to actuator outputs without validation, clamping, and supervision.",
+    "Verify operating-envelope configuration accepts stream_velocity_mps values across 20 to 55 m/s.",
+    "Verify telemetry and fault indicators correctly encode clamp events, stale rejection, and fallback activation.",
+    "Verify all RTL constructs are synthesizable and free of unsynthesizable behavioral elements.",
+    "Verify the architecture preserves the model boundary: no local inference logic is present in the ASIC RTL."
+  ]
+}

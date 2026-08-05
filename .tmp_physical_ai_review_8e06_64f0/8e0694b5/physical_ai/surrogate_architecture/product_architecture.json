@@ -1,0 +1,25 @@
+{
+  "application": "automotive_aerodynamics_architecture",
+  "data_flow": [
+    "vehicle geometry and flow conditions",
+    "surrogate inference service",
+    "pressure/flow/drag engineering results",
+    "real-time aero-control policy",
+    "digital control IP and actuator commands"
+  ],
+  "execution_partition": {
+    "control_plane": "ChipLoop backend and HEM",
+    "silicon_plane": "Digital IP produced by ChipLoop Digital Design and Implementation loops",
+    "source_of_truth": "Supabase runs, model snapshot, status, and artifacts",
+    "surrogate_plane": "Optional NVIDIA NIM or GPU worker; not required for this architecture run"
+  },
+  "implementation_path": "digital_ip_asic",
+  "objective": "Build an AI-assisted active-aerodynamics controller using NVIDIA's pretrained DoMINO model interface",
+  "schema": "chiploop.physical_ai.product_architecture.v1",
+  "trust_boundaries": [
+    "authenticated job submission",
+    "versioned model identity",
+    "validated input envelope",
+    "no fabricated surrogate results"
+  ]
+}

@@ -1,0 +1,318 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "domino_active_aero_controller",
+  "design_summary": {
+    "purpose": "Synthesizable ASIC control wrapper for an external NVIDIA DoMINO Automotive Aero runtime, coordinating geometry and flow-condition intake, request/response transaction management, freshness and sequence supervision, deterministic command synthesis, clamping, safe fallback arbitration, telemetry, and sticky fault reporting.",
+    "operating_model": "The block accepts preprocessed vehicle geometry and flow-condition descriptors, packages them into bounded-width model requests with monotonic request_id and timestamp metadata, waits for matching model responses from the external runtime, qualifies responses only after correlation and freshness checks, synthesizes fixed-point actuator commands from validated outputs, clamps commands to legal bounds, and arbitrates to a predefined safe fallback on reset, invalid input, stale/mismatched response, timeout, model unavailability, payload corruption, or internal fault. No physics model, neural-network inference, or nondeterministic runtime exists inside the RTL.",
+    "external_interfaces": [
+      "clk",
+      "rst_n",
+      "vehicle_geometry_valid",
+      "vehicle_geometry_ready",
+      "vehicle_geometry",
+      "flow_conditions_valid",
+      "flow_conditions_ready",
+      "flow_conditions",
+      "model_req_valid",
+      "model_req_ready",
+      "model_req_id",
+      "model_req_timestamp",
+      "model_req_geometry",
+      "model_req_stream_velocity_mps",
+      "model_req_geometry_tag",
+      "model_resp_ready",
+      "model_resp_valid",
+      "model_resp_id",
+      "model_resp_timestamp",
+      "model_resp_drag_force",
+      "model_resp_lift_force",
+      "model_resp_surface_pressure",
+      "model_resp_flow_field_meta",
+      "actuator_cmd_valid",
+      "actuator_cmd_ready",
+      "actuator_cmd",
+      "fault_valid",
+      "fault_code",
+      "request_id_telemetry",
+      "response_match",
+      "freshness_ok",
+      "clamp_event",
+      "fallback_active",
+      "source_select",
+      "cfg_load_done",
+      "cfg_clear_faults",
+      "cfg_watchdog_threshold",
+      "cfg_freshness_threshold",
+      "cfg_reference_stream_velocity_mps",
+      "cfg_geometry_provenance_tag",
+      "cfg_safe_actuator_cmd",
+      "cfg_actuator_min",
+      "cfg_actuator_max",
+      "cfg_cmd_gain_drag",
+      "cfg_cmd_gain_lift",
+      "cfg_cmd_bias",
+      "cfg_fault_clear_sticky"
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "request_orchestrator",
+      "role": "Deterministic ingress, request sequencing, request_id/timestamp generation, and transaction tracking for geometry and flow-condition descriptors.",
+      "responsibilities": [
+        "Accept geometry and flow descriptors via ready/valid handshakes.",
+        "Package the model request payload in the architecturally defined bounded-width format.",
+        "Increment request_id monotonically for each model transaction.",
+        "Attach timestamp or cycle-age metadata to every request.",
+        "Track outstanding transactions and emit timeout_event when the watchdog threshold is exceeded.",
+        "Expose configuration readiness and preserve safe reset behavior."
+      ],
+      "interface_notes": [
+        "Consumes vehicle_geometry_valid/ready and flow_conditions_valid/ready handshakes.",
+        "Drives model_req_valid, model_req_id, model_req_timestamp, model_req_geometry, model_req_stream_velocity_mps, and model_req_geometry_tag toward the runtime interface.",
+        "Produces outstanding_valid and timeout_event for downstream safety logic.",
+        "Receives cfg_watchdog_threshold, cfg_reference_stream_velocity_mps, and cfg_geometry_provenance_tag as synthesis-time or register-configurable controls."
+      ],
+      "ownership_notes": [
+        "Owns request_id_out and timestamp_out generation.",
+        "Owns the request payload fields it emits.",
+        "Does not perform inference or alter model semantics beyond packing and sequencing."
+      ]
+    },
+    {
+      "name": "domino_runtime_interface",
+      "role": "Protocol adapter and response qualifier between the controller and the external NVIDIA DoMINO Automotive Aero runtime.",
+      "responsibilities": [
+        "Forward request fields to the external runtime contract.",
+        "Receive model response payloads from the runtime.",
+        "Compare model_resp_id with the outstanding request_id.",
+        "Check freshness and sequence ordering against programmable thresholds.",
+        "Assert response_match only on aligned IDs and response_valid_qualified only after integrity and freshness checks pass.",
+        "Expose stale_or_mismatch_fault when responses are stale, duplicated, mismatched, or corrupted."
+      ],
+      "interface_notes": [
+        "Consumes model_req_valid, model_req_id, model_req_timestamp, model_req_geometry, model_req_stream_velocity_mps, and model_req_geometry_tag.",
+        "Drives model_req_ready back to the request orchestrator and model_resp_ready toward the runtime side.",
+        "Accepts drag, lift, surface-pressure, and flow-field metadata from the external runtime.",
+        "Publishes response_match, freshness_ok, response_valid_qualified, and qualified response payloads for deterministic downstream control."
+      ],
+      "ownership_notes": [
+        "Owns response_match and freshness_ok qualification state.",
+        "Owns the validated response payload outputs it releases downstream.",
+        "Does not synthesize actuator behavior or perform local surrogate inference."
+      ]
+    },
+    {
+      "name": "command_synthesis_engine",
+      "role": "Deterministic fixed-point command mapping from validated model outputs to a raw actuator command candidate.",
+      "responsibilities": [
+        "Use only validated model data as input.",
+        "Apply synthesizable fixed-point arithmetic or table-based mapping.",
+        "Parameterize command behavior by gains or configuration contents.",
+        "Produce raw_actuator_cmd and raw_cmd_valid for downstream clamping.",
+        "Avoid any direct actuator drive or dependence on unvalidated response data."
+      ],
+      "interface_notes": [
+        "Consumes response_valid_qualified and the qualified response payload fields.",
+        "Consumes cfg_cmd_gain_drag, cfg_cmd_gain_lift, and cfg_cmd_bias.",
+        "Produces raw_actuator_cmd and raw_cmd_valid only when valid inputs are present.",
+        "Remains entirely synthesizable using deterministic arithmetic."
+      ],
+      "ownership_notes": [
+        "Owns the raw command candidate before clamping.",
+        "Does not own any final actuator output interface.",
+        "Must not expose unclamped values at the top level."
+      ]
+    },
+    {
+      "name": "actuator_clamper",
+      "role": "Saturating limit enforcement stage for actuator commands.",
+      "responsibilities": [
+        "Enforce cfg_actuator_min and cfg_actuator_max on every actuator command.",
+        "Saturate to the nearest legal bound on overflow or underflow.",
+        "Assert clamp_event whenever saturation occurs.",
+        "Prevent the unclamped path from escaping to the output interface."
+      ],
+      "interface_notes": [
+        "Consumes raw_cmd_valid and raw_actuator_cmd from command synthesis.",
+        "Consumes actuator min/max configuration values.",
+        "Produces clamped_cmd_valid, clamped_actuator_cmd, and clamp_event for supervision and telemetry."
+      ],
+      "ownership_notes": [
+        "Owns the clamped command representation passed to arbitration.",
+        "Owns clamp_event visibility for telemetry and fault handling.",
+        "No unbounded or non-deterministic behavior is introduced."
+      ]
+    },
+    {
+      "name": "safe_fallback_manager",
+      "role": "Deterministic safe-state generator and fallback mode controller.",
+      "responsibilities": [
+        "Generate a predefined safe aerodynamic actuator configuration.",
+        "Enter and hold fallback on reset and whenever configuration is incomplete or any fault/invalid condition is present.",
+        "Combine fault qualifiers, timeout, stale/mismatch, and model-unavailable indications into fallback_active.",
+        "Keep safe outputs asserted until health checks and configuration are valid."
+      ],
+      "interface_notes": [
+        "Consumes cfg_load_done, fault_in, timeout_event, stale_or_mismatch_fault, payload_corruption_fault, model_unavailable_fault, invalid_input_fault, and cfg_safe_actuator_cmd.",
+        "Produces fallback_cmd, fallback_cmd_valid, and fallback_active.",
+        "Safe fallback outputs still pass through the actuator clamper at the top level."
+      ],
+      "ownership_notes": [
+        "Owns the safe fallback command source.",
+        "Owns fallback_active status.",
+        "Does not bypass clamping or arbitration."
+      ]
+    },
+    {
+      "name": "safety_supervisor",
+      "role": "Final arbitration and sticky fault aggregation stage that selects the only legal actuator output source.",
+      "responsibilities": [
+        "Arbitrate between clamped model-derived commands and fallback commands.",
+        "Prioritize fallback on any fault, mismatch, stale condition, timeout, or configuration-not-ready condition.",
+        "Maintain sticky fault latching until the defined clear mechanism is applied.",
+        "Drive source_select to indicate model or fallback origin.",
+        "Provide final actuator_cmd_valid, actuator_cmd, fault_valid, and fault_code."
+      ],
+      "interface_notes": [
+        "Consumes clamped_cmd_valid and clamped_actuator_cmd from the clamping stage.",
+        "Consumes fallback_cmd_valid and fallback_cmd from the fallback manager.",
+        "Consumes response_match, freshness_ok, timeout_event, stale_or_mismatch_fault, invalid_input_fault, payload_corruption_fault, model_unavailable_fault, cfg_load_done, cfg_clear_faults, and cfg_fault_clear_sticky.",
+        "Outputs the final actuator command and all supervisory diagnostics."
+      ],
+      "ownership_notes": [
+        "Owns final output arbitration and source selection.",
+        "Owns sticky_fault_latched.",
+        "Prevents any direct model-to-actuator bypass path."
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "vehicle_geometry_valid / vehicle_geometry / flow_conditions_valid / flow_conditions",
+      "to": "request_orchestrator",
+      "signals": [
+        "vehicle_geometry_valid",
+        "vehicle_geometry_ready",
+        "vehicle_geometry",
+        "flow_conditions_valid",
+        "flow_conditions_ready",
+        "flow_conditions"
+      ],
+      "intent": "Ingress of preprocessed geometry and flow descriptors through ready/valid handshakes into the request sequencer."
+    },
+    {
+      "from": "request_orchestrator",
+      "to": "domino_runtime_interface",
+      "signals": [
+        "request_valid_to_runtime",
+        "req_request_id",
+        "req_timestamp",
+        "req_payload_geometry",
+        "req_payload_velocity",
+        "req_payload_geometry_tag",
+        "request_ready_from_runtime"
+      ],
+      "intent": "Package and forward architecturally defined model requests while tracking outstanding transactions and request freshness timing."
+    },
+    {
+      "from": "external runtime response channel",
+      "to": "domino_runtime_interface",
+      "signals": [
+        "model_resp_valid",
+        "model_resp_id",
+        "model_resp_timestamp",
+        "model_resp_drag_force",
+        "model_resp_lift_force",
+        "model_resp_surface_pressure",
+        "model_resp_flow_field_meta",
+        "model_resp_ready"
+      ],
+      "intent": "Receive and qualify runtime responses only when ID and freshness checks succeed."
+    },
+    {
+      "from": "domino_runtime_interface",
+      "to": "command_synthesis_engine",
+      "signals": [
+        "qualified_response_valid",
+        "qualified_response_drag_force",
+        "qualified_response_lift_force",
+        "qualified_response_surface_pressure",
+        "qualified_response_flow_field_meta"
+      ],
+      "intent": "Provide only validated model outputs to deterministic fixed-point command synthesis."
+    },
+    {
+      "from": "command_synthesis_engine",
+      "to": "actuator_clamper",
+      "signals": [
+        "raw_cmd_valid_internal",
+        "raw_actuator_cmd_internal"
+      ],
+      "intent": "Pass a deterministic raw command candidate to the saturating limiter."
+    },
+    {
+      "from": "actuator_clamper",
+      "to": "safety_supervisor",
+      "signals": [
+        "clamped_cmd_valid_internal",
+        "clamped_actuator_cmd_internal",
+        "clamp_event_internal"
+      ],
+      "intent": "Provide bounded actuator commands and visibility of saturation events for final arbitration and diagnostics."
+    },
+    {
+      "from": "safe_fallback_manager",
+      "to": "safety_supervisor",
+      "signals": [
+        "fallback_cmd_valid_internal",
+        "fallback_cmd_internal",
+        "fallback_active_internal"
+      ],
+      "intent": "Provide a predefined safe command and active fallback status whenever any fault or invalid condition occurs."
+    },
+    {
+      "from": "request_orchestrator / domino_runtime_interface / actuator_clamper / safety_supervisor",
+      "to": "top-level telemetry and fault outputs",
+      "signals": [
+        "request_id_telemetry",
+        "response_match",
+        "freshness_ok",
+        "clamp_event",
+        "fallback_active",
+        "source_select",
+        "fault_valid",
+        "fault_code"
+      ],
+      "intent": "Expose observability for request sequencing, response integrity, command saturation, fallback status, and sticky fault reporting."
+    }
+  ],
+  "data_flow_summary": [
+    "Geometry and flow-condition descriptors enter the request_orchestrator through ready/valid handshakes and are packed into bounded-width request fields.",
+    "The request_orchestrator assigns monotonically increasing request_id and timestamp metadata before forwarding the request bundle to the domino_runtime_interface.",
+    "The domino_runtime_interface compares incoming response IDs against the outstanding request, checks freshness and ordering, and only then qualifies the response payload.",
+    "The command_synthesis_engine maps qualified drag-force, lift-force, surface-pressure, and flow-field metadata to a deterministic raw actuator command using fixed-point arithmetic and configuration gains.",
+    "The actuator_clamper saturates the raw command within configured bounds and raises clamp_event if any channel exceeds legal limits.",
+    "The safe_fallback_manager generates a deterministic safe actuator command whenever reset, configuration-not-ready, timeout, stale/mismatched response, payload corruption, model unavailability, invalid input, or internal fault conditions occur.",
+    "The safety_supervisor arbitrates between the clamped model-derived command and the clamped fallback command, prioritizing fallback whenever safety conditions require it, and emits the final actuator output, telemetry, and sticky fault reporting.",
+    "No direct model response path can reach the actuator output without qualification, synthesis, clamping, and supervisory arbitration."
+  ],
+  "clock_reset_summary": {
+    "clocking": "All state transitions are synchronous to clk, and the architecture assumes ASIC-friendly flip-flops, combinational logic, synchronous FSMs, counters, comparators, saturating arithmetic, and optional small ROMs only.",
+    "reset_behavior": "rst_n is active-low. On reset deassertion, all outputs are driven to safe values, outstanding request state is cleared, request_id returns to a known safe value, fallback is active, and sticky fault behavior follows the defined clear mechanism. The design remains in fallback until configuration is loaded and health checks and valid data are present."
+  },
+  "integration_notes": [
+    "The architecture is self-contained and suitable as an ASIC wrapper around an external GPU-based or hosted DoMINO runtime.",
+    "The geometry interface is architecture-defined as a compact STL-derived DrivAerML descriptor or hash/index rather than raw STL parsing.",
+    "Stream velocity operates within the stated 20 to 55 m/s envelope using parameterizable fixed-point representation.",
+    "Configuration registers or synthesis-time constants control reference velocity, provenance tag, freshness and watchdog thresholds, safe fallback command, actuator limits, command gains, and fault clearing.",
+    "Sticky faults remain asserted until the defined clear mechanism is applied.",
+    "The unclamped command path is not exposed at the top-level interface.",
+    "source_select indicates whether the final output originated from validated model-derived logic or fallback logic.",
+    "Telemetry is provided for request_id, response_match, freshness_ok, clamp_event, fallback_active, and source_select to support SoC integration and observability."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

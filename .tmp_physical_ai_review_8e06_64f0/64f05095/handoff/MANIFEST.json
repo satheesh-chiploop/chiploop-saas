@@ -1,0 +1,119 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "domino_active_aero_controller",
+  "generated_at": "2026-08-05T14:59:54.376758",
+  "file_count": 22,
+  "files": [
+    {
+      "path": "docs/arch/digital_architecture.json",
+      "sha256": "eb2647404096c1ef3f9b9c8169e29e715023ee73aa4c9311193e85b9e2dd0d76",
+      "bytes": 17136
+    },
+    {
+      "path": "docs/microarch/digital_microarchitecture.json",
+      "sha256": "596c34acf52ab18742166559fe67094110a1b996d3e4cf57e486f9093db93f6a",
+      "bytes": 15355
+    },
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "a80518a0c99f9f6265b0dcc57b9c08221a81215f7b9eb41c78bd500204b110be",
+      "bytes": 26276
+    },
+    {
+      "path": "docs/regmap/digital_regmap_raw_output.txt",
+      "sha256": "832a95f7db28f085833908385b75c479834e9ae4e6264eae2f60f640bfcbc7d6",
+      "bytes": 16763
+    },
+    {
+      "path": "docs/spec/domino_active_aero_controller_spec.json",
+      "sha256": "049b3b9e4339e05cf81787b742328506dbfe3bb792f6637e1f264ae621ffda12",
+      "bytes": 64579
+    },
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "6c9bcec781cdf2cd9b57e992d944bbc94130b048ec9d447460705b0c3682bac2",
+      "bytes": 14823
+    },
+    {
+      "path": "docs/spec/spec_agent_normalized.json",
+      "sha256": "049b3b9e4339e05cf81787b742328506dbfe3bb792f6637e1f264ae621ffda12",
+      "bytes": 64579
+    },
+    {
+      "path": "misc/power_intent_findings.json",
+      "sha256": "5581d92fbd3c8cd7c3a3b08aa6ff90277fd11735c0dcdbbea0a424926a800e1a",
+      "bytes": 313
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "a87d6de86e15afd7e30d6334b7079c000d36da68e4c82506459cecc5dded1f8b",
+      "bytes": 443
+    },
+    {
+      "path": "misc/rtl_agent_preflight.json",
+      "sha256": "7b2d271ee16ea14d27afe2e4ace05a0ab6021eb7b4ca4d5b2030ff96870d3f69",
+      "bytes": 429
+    },
+    {
+      "path": "misc/tool_execution_summary.json",
+      "sha256": "9cbfe80b4e7d0b35aa5f359f53287b71ae1a32da0f1961d83ea817b6c04b80b2",
+      "bytes": 10399
+    },
+    {
+      "path": "misc/tool_profile_used.json",
+      "sha256": "11c75a5525cc3d922151609681da6a98cb0ec7e5813c53bc742f9d3356b6d4d8",
+      "bytes": 1101
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "4d0ed733164cd44d0e6cbf49417d059033a7ef737a635e62276ffa58403745ae",
+      "bytes": 2221
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "a071cfab6d7a1903b9ad747635fe188e80baa926001226697bf41ab55a5fa21f",
+      "bytes": 776
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "be7eaaafd02d506ae579a6833e7d3159c08fbb6b270aa0e1767d6e7b52e8d52b",
+      "bytes": 348
+    },
+    {
+      "path": "rtl/actuator_clamper.v",
+      "sha256": "7dbbdd1766f21064436057d43ad6bbd34de50505f0d26f7c97e6aa0069925f56",
+      "bytes": 1297
+    },
+    {
+      "path": "rtl/command_synthesis_engine.v",
+      "sha256": "aad48e567bfdf492e6ea435cbac426b8a387c2a619d0602c51236366f18d4740",
+      "bytes": 1809
+    },
+    {
+      "path": "rtl/domino_active_aero_controller.v",
+      "sha256": "474d91a8d95429a3b5c43d5964ee387bb9fedb60fca042a60d97ebdfce8e17a3",
+      "bytes": 9697
+    },
+    {
+      "path": "rtl/domino_runtime_interface.v",
+      "sha256": "a66a402e8ff6cff8b625c364cbcff5dbcd195fef6c9310ce8051143f64088706",
+      "bytes": 2807
+    },
+    {
+      "path": "rtl/request_orchestrator.v",
+      "sha256": "3eb32b3d7784e301624449ddb0d1a7bab684feb370e7d092f1704c0c14ec14e9",
+      "bytes": 2872
+    },
+    {
+      "path": "rtl/safe_fallback_manager.v",
+      "sha256": "a1ee2b0c2867b4504c6c7400f999f6a1ce5833f013e42923e6fd9046a71d560b",
+      "bytes": 1362
+    },
+    {
+      "path": "rtl/safety_supervisor.v",
+      "sha256": "0244a8ce945777fb77f5678e9a97b5951746951463d4ac40f8d63941ef1104e5",
+      "bytes": 2647
+    }
+  ]
+}

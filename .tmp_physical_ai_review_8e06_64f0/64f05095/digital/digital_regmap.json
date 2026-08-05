@@ -1,0 +1,878 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": [
+      {
+        "name": "CFG_REFERENCE_STREAM_VELOCITY_MPS_LO",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Low byte of cfg_reference_stream_velocity_mps fixed-point reference value. Default reset corresponds to 38.89 m/s via DIGITAL_SPEC_JSON reset value 0x0999.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 153,
+            "description": "Bits [7:0] of the 16-bit reference stream velocity fixed-point configuration."
+          }
+        ]
+      },
+      {
+        "name": "CFG_REFERENCE_STREAM_VELOCITY_MPS_HI",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "High byte of cfg_reference_stream_velocity_mps fixed-point reference value.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 9,
+            "description": "Bits [15:8] of the 16-bit reference stream velocity fixed-point configuration."
+          }
+        ]
+      },
+      {
+        "name": "CFG_GEOMETRY_PROVENANCE_TAG",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Geometry provenance tag identifying the STL-derived DrivAerML reference geometry format selection.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 1,
+            "description": "8-bit geometry provenance tag forwarded into request payloads."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WATCHDOG_THRESHOLD_LO",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Low byte of the request watchdog threshold in cycles or equivalent age units.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 232,
+            "description": "Bits [7:0] of cfg_watchdog_threshold."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WATCHDOG_THRESHOLD_HI",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "High byte of the request watchdog threshold in cycles or equivalent age units.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 3,
+            "description": "Bits [15:8] of cfg_watchdog_threshold."
+          }
+        ]
+      },
+      {
+        "name": "CFG_FRESHNESS_THRESHOLD_LO",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Low byte of the response freshness threshold in cycles or equivalent age units.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 10,
+            "description": "Bits [7:0] of cfg_freshness_threshold."
+          }
+        ]
+      },
+      {
+        "name": "CFG_FRESHNESS_THRESHOLD_HI",
+        "offset": "0x0D",
+        "access": "RW",
+        "description": "High byte of the response freshness threshold in cycles or equivalent age units.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of cfg_freshness_threshold."
+          }
+        ]
+      },
+      {
+        "name": "CFG_SAFE_ACTUATOR_CMD_0",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Byte 0 of the predefined safe fallback actuator command.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [7:0] of cfg_safe_actuator_cmd."
+          }
+        ]
+      },
+      {
+        "name": "CFG_SAFE_ACTUATOR_CMD_1",
+        "offset": "0x11",
+        "access": "RW",
+        "description": "Byte 1 of the predefined safe fallback actuator command.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of cfg_safe_actuator_cmd."
+          }
+        ]
+      },
+      {
+        "name": "CFG_SAFE_ACTUATOR_CMD_2",
+        "offset": "0x12",
+        "access": "RW",
+        "description": "Byte 2 of the predefined safe fallback actuator command.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [23:16] of cfg_safe_actuator_cmd."
+          }
+        ]
+      },
+      {
+        "name": "CFG_SAFE_ACTUATOR_CMD_3",
+        "offset": "0x13",
+        "access": "RW",
+        "description": "Byte 3 of the predefined safe fallback actuator command.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [31:24] of cfg_safe_actuator_cmd."
+          }
+        ]
+      },
+      {
+        "name": "CFG_ACTUATOR_MIN_0",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Byte 0 of the actuator minimum clamp bound.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [7:0] of cfg_actuator_min."
+          }
+        ]
+      },
+      {
+        "name": "CFG_ACTUATOR_MIN_1",
+        "offset": "0x15",
+        "access": "RW",
+        "description": "Byte 1 of the actuator minimum clamp bound.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of cfg_actuator_min."
+          }
+        ]
+      },
+      {
+        "name": "CFG_ACTUATOR_MIN_2",
+        "offset": "0x16",
+        "access": "RW",
+        "description": "Byte 2 of the actuator minimum clamp bound.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [23:16] of cfg_actuator_min."
+          }
+        ]
+      },
+      {
+        "name": "CFG_ACTUATOR_MIN_3",
+        "offset": "0x17",
+        "access": "RW",
+        "description": "Byte 3 of the actuator minimum clamp bound.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [31:24] of cfg_actuator_min."
+          }
+        ]
+      },
+      {
+        "name": "CFG_ACTUATOR_MAX_0",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Byte 0 of the actuator maximum clamp bound.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Bits [7:0] of cfg_actuator_max."
+          }
+        ]
+      },
+      {
+        "name": "CFG_ACTUATOR_MAX_1",
+        "offset": "0x19",
+        "access": "RW",
+        "description": "Byte 1 of the actuator maximum clamp bound.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Bits [15:8] of cfg_actuator_max."
+          }
+        ]
+      },
+      {
+        "name": "CFG_ACTUATOR_MAX_2",
+        "offset": "0x1A",
+        "access": "RW",
+        "description": "Byte 2 of the actuator maximum clamp bound.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Bits [23:16] of cfg_actuator_max."
+          }
+        ]
+      },
+      {
+        "name": "CFG_ACTUATOR_MAX_3",
+        "offset": "0x1B",
+        "access": "RW",
+        "description": "Byte 3 of the actuator maximum clamp bound.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 127,
+            "description": "Bits [31:24] of cfg_actuator_max. DIGITAL_SPEC_JSON reset value is 0x7FFFFFFF."
+          }
+        ]
+      },
+      {
+        "name": "CFG_CMD_GAIN_DRAG_LO",
+        "offset": "0x1C",
+        "access": "RW",
+        "description": "Low byte of the drag contribution gain used by deterministic command synthesis.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 1,
+            "description": "Bits [7:0] of cfg_cmd_gain_drag."
+          }
+        ]
+      },
+      {
+        "name": "CFG_CMD_GAIN_DRAG_HI",
+        "offset": "0x1D",
+        "access": "RW",
+        "description": "High byte of the drag contribution gain used by deterministic command synthesis.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of cfg_cmd_gain_drag."
+          }
+        ]
+      },
+      {
+        "name": "CFG_CMD_GAIN_LIFT_LO",
+        "offset": "0x20",
+        "access": "RW",
+        "description": "Low byte of the lift contribution gain used by deterministic command synthesis.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 1,
+            "description": "Bits [7:0] of cfg_cmd_gain_lift."
+          }
+        ]
+      },
+      {
+        "name": "CFG_CMD_GAIN_LIFT_HI",
+        "offset": "0x21",
+        "access": "RW",
+        "description": "High byte of the lift contribution gain used by deterministic command synthesis.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of cfg_cmd_gain_lift."
+          }
+        ]
+      },
+      {
+        "name": "CFG_CMD_BIAS_0",
+        "offset": "0x24",
+        "access": "RW",
+        "description": "Byte 0 of the deterministic command bias term.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [7:0] of cfg_cmd_bias."
+          }
+        ]
+      },
+      {
+        "name": "CFG_CMD_BIAS_1",
+        "offset": "0x25",
+        "access": "RW",
+        "description": "Byte 1 of the deterministic command bias term.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of cfg_cmd_bias."
+          }
+        ]
+      },
+      {
+        "name": "CFG_CMD_BIAS_2",
+        "offset": "0x26",
+        "access": "RW",
+        "description": "Byte 2 of the deterministic command bias term.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [23:16] of cfg_cmd_bias."
+          }
+        ]
+      },
+      {
+        "name": "CFG_CMD_BIAS_3",
+        "offset": "0x27",
+        "access": "RW",
+        "description": "Byte 3 of the deterministic command bias term.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [31:24] of cfg_cmd_bias."
+          }
+        ]
+      },
+      {
+        "name": "CFG_LOAD_DONE",
+        "offset": "0x30",
+        "access": "RW",
+        "description": "Configuration load completion indicator. The controller remains in fallback until this is set and required health conditions are met.",
+        "fields": [
+          {
+            "name": "DONE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Configuration readiness gate."
+          }
+        ]
+      },
+      {
+        "name": "CFG_CLEAR_FAULTS",
+        "offset": "0x31",
+        "access": "WO",
+        "description": "Software clear pulse for sticky fault state.",
+        "fields": [
+          {
+            "name": "PULSE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to request sticky fault clear."
+          }
+        ]
+      },
+      {
+        "name": "CFG_FAULT_CLEAR_STICKY",
+        "offset": "0x32",
+        "access": "WO",
+        "description": "Defined sticky-fault clear control input used by the safety supervisor.",
+        "fields": [
+          {
+            "name": "PULSE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to clear sticky fault latches when permitted."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_REQUEST_ID_TELEMETRY_0",
+        "offset": "0x40",
+        "access": "RO",
+        "description": "Low byte of the most recently issued request_id telemetry.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [7:0] of request_id_telemetry."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_REQUEST_ID_TELEMETRY_1",
+        "offset": "0x41",
+        "access": "RO",
+        "description": "High byte of the most recently issued request_id telemetry.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [15:8] of request_id_telemetry."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_RESPONSE_MATCH",
+        "offset": "0x42",
+        "access": "RO",
+        "description": "Response ID match telemetry bit.",
+        "fields": [
+          {
+            "name": "MATCH",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the current response request_id aligns with the outstanding request_id."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_FRESHNESS_OK",
+        "offset": "0x43",
+        "access": "RO",
+        "description": "Response freshness qualification telemetry bit.",
+        "fields": [
+          {
+            "name": "OK",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the accepted response met freshness and ordering checks."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_CLAMP_EVENT",
+        "offset": "0x44",
+        "access": "RO",
+        "description": "Actuator clamp event telemetry bit.",
+        "fields": [
+          {
+            "name": "EVENT",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the actuator clamper saturated a command to a legal bound."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_FALLBACK_ACTIVE",
+        "offset": "0x45",
+        "access": "RO",
+        "description": "Fallback mode telemetry bit.",
+        "fields": [
+          {
+            "name": "ACTIVE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 1,
+            "description": "Indicates fallback-safe output selection is active."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_SOURCE_SELECT",
+        "offset": "0x46",
+        "access": "RO",
+        "description": "Output source telemetry bit.",
+        "fields": [
+          {
+            "name": "SOURCE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 1,
+            "description": "1 selects fallback source, 0 selects validated model-derived source."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_FAULT_VALID",
+        "offset": "0x47",
+        "access": "RO",
+        "description": "Sticky or current fault indication.",
+        "fields": [
+          {
+            "name": "VALID",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates fault_code is valid and should be sampled by software."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_FAULT_CODE_0",
+        "offset": "0x48",
+        "access": "RO",
+        "description": "Low byte of sticky fault code.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [7:0] of fault_code."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_FAULT_CODE_1",
+        "offset": "0x49",
+        "access": "RO",
+        "description": "High byte of sticky fault code.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [15:8] of fault_code."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_OUTSTANDING_VALID",
+        "offset": "0x4A",
+        "access": "RO",
+        "description": "Indicates whether the request orchestrator currently holds an outstanding model transaction.",
+        "fields": [
+          {
+            "name": "VALID",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Outstanding transaction status."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_TIMEOUT_EVENT",
+        "offset": "0x4B",
+        "access": "RO",
+        "description": "Request timeout telemetry bit.",
+        "fields": [
+          {
+            "name": "TIMEOUT",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the watchdog threshold has been exceeded for the outstanding request."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_STALE_OR_MISMATCH_FAULT",
+        "offset": "0x4C",
+        "access": "RO",
+        "description": "Stale, duplicated, mismatched, or corrupted response fault telemetry bit.",
+        "fields": [
+          {
+            "name": "FAULT",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates response integrity or sequencing failure."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_CFG_LOAD_DONE",
+        "offset": "0x4D",
+        "access": "RO",
+        "description": "Configuration readiness status bit.",
+        "fields": [
+          {
+            "name": "DONE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirrors cfg_load_done state as observed by the controller."
+          }
+        ]
+      },
+      {
+        "name": "REQ_ID_ECHO_0",
+        "offset": "0x50",
+        "access": "RO",
+        "description": "Low byte of the current request ID value being tracked by the controller.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [7:0] of the current request_id state."
+          }
+        ]
+      },
+      {
+        "name": "REQ_ID_ECHO_1",
+        "offset": "0x51",
+        "access": "RO",
+        "description": "High byte of the current request ID value being tracked by the controller.",
+        "fields": [
+          {
+            "name": "VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [15:8] of the current request_id state."
+          }
+        ]
+      },
+      {
+        "name": "RESPONSE_MATCH_ECHO",
+        "offset": "0x52",
+        "access": "RO",
+        "description": "Alias of response_match for firmware polling convenience.",
+        "fields": [
+          {
+            "name": "MATCH",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Same meaning as STATUS_RESPONSE_MATCH.MATCH."
+          }
+        ]
+      },
+      {
+        "name": "FRESHNESS_OK_ECHO",
+        "offset": "0x53",
+        "access": "RO",
+        "description": "Alias of freshness_ok for firmware polling convenience.",
+        "fields": [
+          {
+            "name": "OK",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Same meaning as STATUS_FRESHNESS_OK.OK."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_EVENT_ECHO",
+        "offset": "0x54",
+        "access": "RO",
+        "description": "Alias of clamp_event for firmware polling convenience.",
+        "fields": [
+          {
+            "name": "EVENT",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Same meaning as STATUS_CLAMP_EVENT.EVENT."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_ACTIVE_ECHO",
+        "offset": "0x55",
+        "access": "RO",
+        "description": "Alias of fallback_active for firmware polling convenience.",
+        "fields": [
+          {
+            "name": "ACTIVE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 1,
+            "description": "Same meaning as STATUS_FALLBACK_ACTIVE.ACTIVE."
+          }
+        ]
+      },
+      {
+        "name": "SOURCE_SELECT_ECHO",
+        "offset": "0x56",
+        "access": "RO",
+        "description": "Alias of source_select for firmware polling convenience.",
+        "fields": [
+          {
+            "name": "SOURCE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 1,
+            "description": "Same meaning as STATUS_SOURCE_SELECT.SOURCE."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "FAULT_IRQ",
+        "description": "Asserted when fault_valid is high and the sticky fault state is active. Software should read STATUS_FAULT_CODE and clear via CFG_CLEAR_FAULTS or CFG_FAULT_CLEAR_STICKY as permitted."
+      },
+      {
+        "name": "TIMEOUT_IRQ",
+        "description": "Asserted when STATUS_TIMEOUT_EVENT is high. Indicates the outstanding request exceeded cfg_watchdog_threshold."
+      },
+      {
+        "name": "CLAMP_IRQ",
+        "description": "Asserted when STATUS_CLAMP_EVENT is high. Indicates a model-derived or fallback command required saturation."
+      },
+      {
+        "name": "FALLBACK_IRQ",
+        "description": "Asserted when STATUS_FALLBACK_ACTIVE is high. Indicates the controller is operating in safe fallback mode."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Hold cfg_load_done low during configuration programming.",
+      "Program CFG_REFERENCE_STREAM_VELOCITY_MPS to the desired fixed-point reference, keeping it within the 20 to 55 m/s operating envelope.",
+      "Program CFG_GEOMETRY_PROVENANCE_TAG for the STL-derived DrivAerML geometry format provenance.",
+      "Program CFG_WATCHDOG_THRESHOLD and CFG_FRESHNESS_THRESHOLD to system-appropriate values.",
+      "Program CFG_SAFE_ACTUATOR_CMD, CFG_ACTUATOR_MIN, CFG_ACTUATOR_MAX, CFG_CMD_GAIN_DRAG, CFG_CMD_GAIN_LIFT, and CFG_CMD_BIAS.",
+      "Write CFG_LOAD_DONE high once the configuration image is complete and stable.",
+      "Optionally clear any latent sticky faults by writing CFG_CLEAR_FAULTS or CFG_FAULT_CLEAR_STICKY if permitted by system policy."
+    ],
+    "polling_sequence": [
+      "Poll STATUS_CFG_LOAD_DONE until set.",
+      "Poll STATUS_FALLBACK_ACTIVE, STATUS_RESPONSE_MATCH, STATUS_FRESHNESS_OK, STATUS_CLAMP_EVENT, STATUS_TIMEOUT_EVENT, and STATUS_FAULT_VALID as needed for health monitoring.",
+      "If STATUS_FAULT_VALID is set, read STATUS_FAULT_CODE_0/1 and determine whether the fault is stale/mismatch, timeout, invalid input, payload corruption, model unavailable, or configuration-not-ready related.",
+      "Use STATUS_REQUEST_ID_TELEMETRY_0/1 and REQ_ID_ECHO_0/1 for transaction tracing.",
+      "Use STATUS_SOURCE_SELECT to determine whether the active command originated from validated model output or fallback."
+    ],
+    "irq_sequence": [
+      "On FAULT_IRQ, read fault status and code, then clear sticky faults only after the underlying condition is resolved.",
+      "On TIMEOUT_IRQ, treat the external runtime as unresponsive and keep or return the system to fallback-safe operation.",
+      "On CLAMP_IRQ, inspect command scaling and configuration limits; no unclamped value is externally visible.",
+      "On FALLBACK_IRQ, maintain safe actuator behavior until configuration and health checks are valid again."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "No new hierarchy or ports are introduced.",
+    "A minimal custom byte-wide firmware-visible register map is used because no AXI/APB/I2C interface is implied by the spec.",
+    "Wide configuration and diagnostic fields are split across byte registers to remain compatible with the 8-bit register bus description and the declared digital interface."
+  ]
+}

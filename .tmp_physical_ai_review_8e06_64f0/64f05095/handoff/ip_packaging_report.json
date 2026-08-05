@@ -1,0 +1,19 @@
+{
+  "type": "ip_packaging_handoff",
+  "version": "1.0",
+  "top_module": "domino_active_aero_controller",
+  "package_dir": "backend/workflows/64f05095-d085-42f4-8c91-1a302631ffc8/handoff/domino_active_aero_controller_ip_package",
+  "zip_path": "backend/workflows/64f05095-d085-42f4-8c91-1a302631ffc8/handoff/domino_active_aero_controller_ip_package.zip",
+  "bucket_counts": {
+    "rtl": 14,
+    "spec": 3,
+    "arch": 1,
+    "microarch": 1,
+    "regmap": 2,
+    "constraints": 0,
+    "power_intent": 1,
+    "verification": 0,
+    "reports": 0,
+    "other": 7
+  }
+}

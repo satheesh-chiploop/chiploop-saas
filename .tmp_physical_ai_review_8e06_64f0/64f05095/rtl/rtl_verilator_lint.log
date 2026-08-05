@@ -1,0 +1,92 @@
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: domino_active_aero_controller.v:165:6: Instance pin connected by name with empty reference: 'model_req_id'
+  165 |     .model_req_id(),
+      |      ^~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: domino_active_aero_controller.v:166:6: Instance pin connected by name with empty reference: 'model_req_timestamp'
+  166 |     .model_req_timestamp(),
+      |      ^~~~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: domino_active_aero_controller.v:170:6: Instance pin connected by name with empty reference: 'outstanding_valid'
+  170 |     .outstanding_valid(),
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: domino_active_aero_controller.v:263:6: Instance pin connected by name with empty reference: 'actuator_cmd_valid'
+  263 |     .actuator_cmd_valid(),
+      |      ^~~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: domino_active_aero_controller.v:264:6: Instance pin connected by name with empty reference: 'actuator_cmd'
+  264 |     .actuator_cmd(),
+      |      ^~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: domino_active_aero_controller.v:265:6: Instance pin connected by name with empty reference: 'fault_valid'
+  265 |     .fault_valid(),
+      |      ^~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: domino_active_aero_controller.v:266:6: Instance pin connected by name with empty reference: 'fault_code'
+  266 |     .fault_code(),
+      |      ^~~~~~~~~~
+%Warning-PINCONNECTEMPTY: domino_active_aero_controller.v:267:6: Instance pin connected by name with empty reference: 'source_select'
+  267 |     .source_select(),
+      |      ^~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: domino_active_aero_controller.v:268:6: Instance pin connected by name with empty reference: 'sticky_fault_latched'
+  268 |     .sticky_fault_latched()
+      |      ^~~~~~~~~~~~~~~~~~~~
+%Warning-WIDTHEXPAND: domino_active_aero_controller.v:142:19: Operator ASSIGNW expects 16 bits on the Assign RHS, but Assign RHS's REPLICATE generates 13 bits.
+                                                            : ... note: In instance 'domino_active_aero_controller'
+  142 | assign fault_code = {12'b0, timeout_event_internal | stale_or_mismatch_fault_internal | invalid_input_fault_internal | model_unavailable_fault_internal};
+      |                   ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: domino_active_aero_controller.v:60:7: Signal is not used: 'model_req_ready'
+                                                           : ... note: In instance 'domino_active_aero_controller'
+   60 | input model_req_ready;
+      |       ^~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: domino_active_aero_controller.v:75:7: Signal is not used: 'actuator_cmd_ready'
+                                                           : ... note: In instance 'domino_active_aero_controller'
+   75 | input actuator_cmd_ready;
+      |       ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: domino_active_aero_controller.v:88:14: Signal is not used: 'cfg_freshness_threshold'
+                                                            : ... note: In instance 'domino_active_aero_controller'
+   88 | input [15:0] cfg_freshness_threshold;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: command_synthesis_engine.v:19:14: Bits of signal are not used: 'response_drag_force'[7:0]
+                                                       : ... note: In instance 'domino_active_aero_controller.u_command_synthesis_engine'
+   19 | input [23:0] response_drag_force;
+      |              ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: command_synthesis_engine.v:20:14: Bits of signal are not used: 'response_lift_force'[7:0]
+                                                       : ... note: In instance 'domino_active_aero_controller.u_command_synthesis_engine'
+   20 | input [23:0] response_lift_force;
+      |              ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: domino_runtime_interface.v:31:7: Signal is not used: 'model_req_valid'
+                                                      : ... note: In instance 'domino_active_aero_controller.u_domino_runtime_interface'
+   31 | input model_req_valid;
+      |       ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: domino_runtime_interface.v:35:14: Signal is not used: 'model_req_geometry'
+                                                       : ... note: In instance 'domino_active_aero_controller.u_domino_runtime_interface'
+   35 | input [63:0] model_req_geometry;
+      |              ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: domino_runtime_interface.v:36:14: Signal is not used: 'model_req_stream_velocity_mps'
+                                                       : ... note: In instance 'domino_active_aero_controller.u_domino_runtime_interface'
+   36 | input [15:0] model_req_stream_velocity_mps;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: domino_runtime_interface.v:37:13: Signal is not used: 'model_req_geometry_tag'
+                                                       : ... note: In instance 'domino_active_aero_controller.u_domino_runtime_interface'
+   37 | input [7:0] model_req_geometry_tag;
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: request_orchestrator.v:34:14: Signal is not used: 'flow_conditions'
+                                                   : ... note: In instance 'domino_active_aero_controller.u_request_orchestrator'
+   34 | input [31:0] flow_conditions;
+      |              ^~~~~~~~~~~~~~~
+%Error-BLKANDNBLK: domino_active_aero_controller.v:125:6: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'domino_active_aero_controller.cfg_load_done_internal'
+  125 | wire cfg_load_done_internal;
+      |      ^~~~~~~~~~~~~~~~~~~~~~
+                   domino_active_aero_controller.v:144:31: ... Location of blocking assignment (bits [0:0])
+  144 | assign cfg_load_done_internal = cfg_load_done;
+      |                               ^
+                   request_orchestrator.v:68:9: ... Location of nonblocking assignment (bits [0:0])
+   68 |         cfg_load_done <= cfg_load_done;
+      |         ^~~~~~~~~~~~~
+                   ... For error description see https://verilator.org/warn/BLKANDNBLK?v=5.047
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1
