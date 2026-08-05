@@ -237,28 +237,13 @@ const selfRegulatedFeatures = [
   },
 ];
 
-const endToEndJourney = [
-  "Physics Requirements",
-  "Equation / Surrogate",
-  "Architecture",
-  "Design Intent",
-  "RTL",
-  "Verification",
-  "Firmware",
-  "Software",
-  "Co-simulation",
-  "Tapeout",
-  "Validation",
-  "Product Demo",
-];
-
 const physicalAiReferenceFlow = [
-  { step: "1", name: "Bring your application", detail: "Describe what you want to build" },
-  { step: "2", name: "Choose a surrogate model", detail: "Use a pretrained physics model" },
-  { step: "3", name: "Define the architecture", detail: "Explore and optimize the product design" },
-  { step: "4", name: "Create and verify the design", detail: "Generate RTL and check that it works" },
-  { step: "5", name: "Choose FPGA or ASIC", detail: "Prototype on a board or build digital IP" },
-  { step: "6", name: "Build the product", detail: "Add software, test, and deliver" },
+  { step: "1", name: "Define architecture", detail: "Shape and optimize the design" },
+  { step: "2", name: "Create RTL", detail: "Generate the digital implementation" },
+  { step: "3", name: "Verify", detail: "Check function, safety, and coverage" },
+  { step: "4", name: "Choose implementation", detail: "FPGA prototype or Digital IP / ASIC" },
+  { step: "5", name: "Optional tapeout", detail: "Continue to GDS and signoff when needed" },
+  { step: "6", name: "Deliver the product", detail: "Add firmware, software, validation, and demos" },
 ];
 
 const eyebrowClass = "text-xs font-semibold uppercase text-cyan-300";
@@ -398,10 +383,21 @@ function LandingPageContent() {
         <div className={landingShellClass}>
           <div className="rounded-xl border border-fuchsia-400/30 bg-slate-900/70 p-5 sm:p-8">
             <div className="mx-auto max-w-4xl text-center">
-              <div className="flex flex-wrap items-center justify-center gap-3"><p className="text-xs font-semibold uppercase text-fuchsia-300">Physical AI Reference Journey</p><span className="rounded-full border border-fuchsia-400/40 bg-fuchsia-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span></div>
-              <h2 className={`${sectionTitleClass} mx-auto`}>Bring an application. Build an FPGA or ASIC product.</h2>
-              <p className={`${sectionBodyClass} mx-auto`}>Choose a pretrained surrogate model, shape the best architecture, create and verify the design, then decide whether to prototype with an FPGA or continue as digital IP for an ASIC.</p>
+              <p className="text-xs font-semibold uppercase text-fuchsia-300">One Connected Journey</p>
+              <h2 className={`${sectionTitleClass} mx-auto`}>Start with physics or a chip specification. Build the product your way.</h2>
+              <p className={`${sectionBodyClass} mx-auto`}>Both starting points use the same connected architecture, RTL, verification, FPGA, Digital IP, software, validation, and product-delivery platform.</p>
             </div>
+            <div className="mx-auto mt-8 grid max-w-4xl gap-4 md:grid-cols-2">
+              <button type="button" onClick={() => goTo("/apps/physical-ai?reference=pretrained-aero")} className="rounded-xl border-2 border-fuchsia-400/50 bg-fuchsia-500/10 p-5 text-left transition hover:-translate-y-0.5 hover:border-fuchsia-300">
+                <div className="flex flex-wrap items-center justify-between gap-2"><span className="text-lg font-bold text-white">Physical AI</span><span className="rounded-full border border-fuchsia-400/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span></div>
+                <p className="mt-3 text-sm leading-6 text-slate-300">Bring an application, physics requirements, and an equation or pretrained surrogate model.</p>
+              </button>
+              <button type="button" onClick={() => goTo("/apps/arch2rtl?guided=1")} className="rounded-xl border-2 border-cyan-400/50 bg-cyan-500/10 p-5 text-left transition hover:-translate-y-0.5 hover:border-cyan-300">
+                <div className="text-lg font-bold text-white">Silicon Development</div>
+                <p className="mt-3 text-sm leading-6 text-slate-300">Bring application requirements, a chip idea, or a traditional hardware specification.</p>
+              </button>
+            </div>
+            <div className="mt-4 text-center text-2xl font-bold text-fuchsia-300/70" aria-hidden="true">↓</div>
             <div className="mt-8 overflow-x-auto pb-2">
               <div className="mx-auto grid min-w-[1050px] grid-cols-[repeat(11,minmax(0,auto))] items-stretch justify-center gap-2">
                 {physicalAiReferenceFlow.map((stage, index) => (
@@ -439,38 +435,6 @@ function LandingPageContent() {
               </button>
             </article>
           ))}
-        </div>
-        </div>
-      </section>
-
-      <section className="w-full bg-slate-900/20 px-4 py-10 sm:px-6 sm:py-14">
-        <div className={landingShellClass}>
-        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 sm:p-8">
-          <div className="mx-auto max-w-4xl text-center">
-            <p className={eyebrowClass}>Connected Chip Journey</p>
-            <h2 className={`${sectionTitleClass} mx-auto`}>
-              From requirement capture to product demo without losing engineering context.
-            </h2>
-            <p className={`${sectionBodyClass} mx-auto`}>
-              ChipLoop keeps each stage connected, so outputs, logs, dashboards, and decisions carry forward instead of living in disconnected tools.
-            </p>
-          </div>
-          <div className="mx-auto mt-8 w-full max-w-[1680px] overflow-x-auto pb-2">
-            <div className="grid min-w-[1420px] grid-cols-[repeat(23,minmax(0,auto))] items-center justify-center gap-1.5 lg:gap-2">
-            {endToEndJourney.map((stage, index) => (
-              <div key={stage} className="contents">
-                <div className="flex h-12 w-[88px] items-center justify-center rounded-lg border border-slate-700 bg-slate-950/70 px-2 text-center text-[10px] font-semibold leading-4 text-slate-100 sm:w-24 md:w-28 md:text-xs lg:w-32">
-                  {stage}
-                </div>
-                {index < endToEndJourney.length - 1 && (
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-700 bg-slate-950 text-[10px] font-bold text-slate-500 md:h-6 md:w-6 md:text-xs" aria-hidden="true">
-                    {"\u2192"}
-                  </div>
-                )}
-              </div>
-            ))}
-            </div>
-          </div>
         </div>
         </div>
       </section>
