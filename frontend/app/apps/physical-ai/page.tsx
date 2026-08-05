@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import { HemAutomaticRunControls } from "@/components/HemAutomaticRun";
+import { HemAutomaticRunControls, HemChildDashboardLinks } from "@/components/HemAutomaticRun";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 const supabase = createClientComponentClient();
@@ -19,6 +19,9 @@ const paths: Array<{ key: ImplementationPath; title: string; body: string }> = [
   { key: "fpga_then_asic", title: "FPGA, then ASIC", body: "Prototype on FPGA first, then continue through Arch2Tapeout." },
 ];
 
+const physicalAiAgents = ["Physical AI Requirements Agent", "Physical AI Model Selection Agent", "Physical AI Physics Execution Agent", "Physical AI Architecture Agent", "Physical AI Orchestrator Agent"];
+type RunSummary = { status?: string; physics_model?: { name?: string }; physics_execution?: { execution_mode?: string; inference_status?: string; implementation_path?: string }; hem?: { enabled?: boolean } };
+
 export default function PhysicalAiStudioPage() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
@@ -33,6 +36,11 @@ export default function PhysicalAiStudioPage() {
   const [hemAdaptive, setHemAdaptive] = useState(false);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [workflowId, setWorkflowId] = useState<string | null>(null);
+  const [runStatus, setRunStatus] = useState("queued");
+  const [runPhase, setRunPhase] = useState("queued");
+  const [runLogs, setRunLogs] = useState("");
+  const [runResult, setRunResult] = useState<RunSummary | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
@@ -57,6 +65,31 @@ export default function PhysicalAiStudioPage() {
       setObjective("Build and verify a safe PMSM motor-control digital IP");
     }
   }, [models]);
+
+  useEffect(() => {
+    if (!workflowId || !token) return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const poll = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/apps/physical-ai/${workflowId}/result`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+        const payload = await response.json();
+        if (stopped) return;
+        setRunStatus(String(payload.status || "running"));
+        setRunPhase(String(payload.phase || payload.status || "running"));
+        setRunLogs(String(payload.logs || ""));
+        if (payload.result) setRunResult(payload.result as RunSummary);
+        const normalizedPhase = String(payload.phase || "").toLowerCase();
+        const hemIsRunning = Boolean(payload.result?.hem?.enabled);
+        const terminal = ["hem_complete", "hem_failed", "architecture_complete", "needs_revision", "error"].includes(normalizedPhase) || (!hemIsRunning && normalizedPhase === "digital_design_ready");
+        if (!terminal && response.status !== 409) timer = setTimeout(poll, 1500);
+      } catch (cause) {
+        if (!stopped) setError(cause instanceof Error ? cause.message : String(cause));
+      }
+    };
+    poll();
+    return () => { stopped = true; if (timer) clearTimeout(timer); };
+  }, [token, workflowId]);
 
   const selected = models.find((model) => model.model_id === modelId);
   const validatedAvailable = selected?.availability === "ready";
@@ -103,11 +136,28 @@ export default function PhysicalAiStudioPage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Unable to start Physical AI journey");
-      router.push(data.dashboard_path);
+      setWorkflowId(String(data.workflow_id));
+      setRunStatus("running");
+      setRunPhase("queued");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause));
       setRunning(false);
     }
+  }
+
+  if (workflowId) {
+    const agentStatus = (agent: string) => runLogs.includes(`Physical AI agent completed: ${agent}`) ? "completed" : runLogs.includes(`Physical AI agent started: ${agent}`) ? "running" : "queued";
+    const complete = runStatus === "completed" || Boolean(runResult);
+    return <main className="min-h-screen bg-slate-950 text-white"><div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="flex flex-wrap items-center justify-between gap-3"><button onClick={() => { setWorkflowId(null); setRunResult(null); setRunLogs(""); setRunning(false); }} className="rounded-lg border border-slate-700 px-4 py-2 text-sm">Configure another run</button><span className={`rounded-full px-3 py-2 text-xs font-bold uppercase ${runPhase === "hem_failed" || runPhase === "error" ? "bg-red-500/15 text-red-200" : complete ? "bg-lime-500/15 text-lime-200" : "bg-cyan-500/15 text-cyan-200"}`}>{runPhase.replaceAll("_", " ")}</span></div>
+      <div className="mt-8"><div className="text-xs font-bold uppercase tracking-widest text-fuchsia-300">Physical AI reference journey</div><h1 className="mt-2 text-4xl font-extrabold">{complete ? "Run dashboard" : "Physical AI agents are running"}</h1><p className="mt-3 text-slate-400">Workflow {workflowId}</p></div>
+      <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><div className="flex items-center justify-between"><h2 className="text-xl font-bold">Agent execution</h2><span className="text-sm text-slate-400">{physicalAiAgents.filter((agent) => agentStatus(agent) === "completed").length}/{physicalAiAgents.length} completed</span></div><div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">{physicalAiAgents.map((agent, index) => { const status = agentStatus(agent); return <div key={agent} className="rounded-xl border border-slate-800 bg-slate-950 p-4"><div className="text-xs font-bold text-fuchsia-300">AGENT {index + 1}</div><div className="mt-2 text-sm font-semibold">{agent}</div><div className={`mt-3 text-xs font-bold uppercase ${status === "completed" ? "text-lime-300" : status === "running" ? "text-cyan-300" : "text-slate-500"}`}>{status}</div></div>; })}</div></section>
+      <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><h2 className="text-xl font-bold">Live workflow log</h2><pre className="mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-xs leading-6 text-slate-300">{runLogs || "Waiting for the first agent…"}</pre></section>
+      {runResult && <section className="mt-6 grid gap-4 md:grid-cols-3"><div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><div className="text-xs uppercase text-slate-500">Physics model</div><div className="mt-2 font-bold">{runResult.physics_model?.name || "Selected model"}</div></div><div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><div className="text-xs uppercase text-slate-500">Mode</div><div className="mt-2 font-bold capitalize">{(runResult.physics_execution?.execution_mode || "validated").replaceAll("_", " ")}</div></div><div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><div className="text-xs uppercase text-slate-500">Implementation</div><div className="mt-2 font-bold capitalize">{(runResult.physics_execution?.implementation_path || implementationPath).replaceAll("_", " ")}</div></div></section>}
+      <section className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-6"><h2 className="text-xl font-bold">HEM and next workflows</h2><p className="mt-2 text-sm text-slate-400">Automatic child workflows appear here as they start. If HEM is off, use the evidence dashboard to continue manually.</p><HemChildDashboardLinks logs={runLogs} /></section>
+      <div className="mt-6 flex flex-wrap gap-3"><button onClick={() => router.push(`/dashboard/${workflowId}?stage=physical_ai&app=PhysicalAI`)} className="rounded-xl border border-cyan-400 px-5 py-3 text-sm font-bold text-cyan-200">Open detailed evidence</button><a href={`/api/workflow/${encodeURIComponent(workflowId)}/download_zip?full=1`} className="rounded-xl bg-fuchsia-400 px-5 py-3 text-sm font-bold text-slate-950">Download artifacts</a></div>
+      {error && <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200">{error}</div>}
+    </div></main>;
   }
 
   return <main className="min-h-screen bg-slate-950 text-white"><div className="mx-auto max-w-7xl px-6 py-10">
