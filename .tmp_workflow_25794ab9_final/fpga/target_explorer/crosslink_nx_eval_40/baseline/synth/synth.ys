@@ -1,2 +1,0 @@
-read_verilog -sv /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv
-synth_nexus -top minirv_edge_controller -family lifcl -noflatten -noiopad -json /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/target_explorer/crosslink_nx_eval_40/baseline/synth/minirv_edge_controller_nexus.json

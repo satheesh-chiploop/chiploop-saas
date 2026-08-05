@@ -1,0 +1,65 @@
+{
+  "type": "simulation_summary_coverage",
+  "simulation": {
+    "total": 8,
+    "pass": 0,
+    "fail": 8
+  },
+  "coverage": {
+    "status": "missing",
+    "functional_coverage_pct": null,
+    "bins_hit": null,
+    "total_bins": null,
+    "functional": {
+      "status": "missing",
+      "coverage_pct": null,
+      "bins_hit": null,
+      "total_bins": null,
+      "gap_count": 0,
+      "gaps": []
+    },
+    "code": {
+      "status": "missing_data",
+      "line_coverage_pct": null,
+      "line_hit": null,
+      "line_found": null,
+      "branch_coverage_pct": null,
+      "branch_hit": null,
+      "branch_found": null,
+      "condition_coverage_pct": null,
+      "condition_hit": null,
+      "condition_found": null,
+      "condition_source": "unavailable",
+      "toggle_coverage_pct": null,
+      "toggle_hit": null,
+      "toggle_found": null,
+      "toggle_source": "not_reported_by_verilator_lcov",
+      "missed_toggle_points": [],
+      "tool": "verilator_coverage"
+    },
+    "assertions": {
+      "status": "failed",
+      "assertions_generated": 13,
+      "assertion_failures": 16,
+      "assertion_pass_pct": 0.0
+    }
+  },
+  "formal": {
+    "status": "not_enabled",
+    "available": null,
+    "attempted": null,
+    "returncode": null,
+    "reason": null
+  },
+  "golden_model": {
+    "status": "not_enabled",
+    "top_module": null
+  },
+  "toolchain": {
+    "simulator": "verilator",
+    "code_coverage": "verilator_coverage",
+    "formal": "none",
+    "formal_solver": null,
+    "golden_model": "none"
+  }
+}

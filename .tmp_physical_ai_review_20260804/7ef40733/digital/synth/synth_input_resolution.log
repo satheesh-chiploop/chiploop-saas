@@ -1,0 +1,21 @@
+[2026-08-05T05:38:17.852814Z] Digital Synthesis Agent
+workflow_id=7ef40733-5be0-4054-8943-441591ec8735
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout
+spec_json=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout/handoff/spec/digital_spec.json
+top_module=aero_safety_controller
+rtl_count=4
+request_target_frequency_mhz=100.0
+clock_period_ns=10.0
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout/digital/impl_setup/constraints/aero_safety_controller.sdc
+sdc_basename=aero_safety_controller.sdc
+synth_sdc_path=artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout/digital/synth/constraints/aero_safety_controller.sdc
+state_constraints_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout/digital/impl_setup/constraints/aero_safety_controller.sdc
+pdk_variant=sky130A
+macro_lib_count=0
+macro_lef_count=0
+macro_gds_count=0
+macro_spice_count=0
+macro_verilog_count=0
+pdk_sram_collateral=[]
+yosys_macro_lib_script=artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout/digital/synth/yosys_macro_libs.ys
+pre_synthesis_rtl_repairs={}

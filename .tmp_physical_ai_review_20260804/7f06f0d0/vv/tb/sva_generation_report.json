@@ -1,0 +1,40 @@
+{
+  "type": "digital_sva_generation",
+  "version": "1.2",
+  "mode": "digital",
+  "top_module": "aero_safety_controller",
+  "spec_path": "/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/spec/aero_safety_controller_spec.json",
+  "rtl_file_count": 1,
+  "clock_names": [
+    "clk"
+  ],
+  "reset_names": [
+    "rst_n"
+  ],
+  "primary_clock": "clk",
+  "primary_reset": "rst_n",
+  "primary_reset_active_low": true,
+  "generated_dir": "vv/tb",
+  "sva_module_name": "aero_safety_controller_assertions",
+  "sva_bind_file": "aero_safety_controller_assertions_bind.sv",
+  "assertion_output_signals": [
+    "host_reg_ready",
+    "host_reg_rdata",
+    "host_reg_rvalid",
+    "model_req_valid",
+    "model_req_seq",
+    "model_req_enable",
+    "model_req_stream_velocity_mps",
+    "model_req_velocity_min_limit",
+    "model_req_velocity_max_limit",
+    "model_req_actuator_min_limit",
+    "model_req_actuator_max_limit",
+    "model_req_actuator_safe_position"
+  ],
+  "artifacts": {
+    "sva_bind_sv": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb/aero_safety_controller_assertions_bind.sv",
+    "sva_sv": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb/aero_safety_controller_assertions.sv",
+    "sva_spec_json": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb/sva_spec.json",
+    "sva_readme": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb/SVA_README.md"
+  }
+}

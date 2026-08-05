@@ -1,0 +1,24 @@
+== ChipLoop: Digital STA PostFill Agent ==
+PDK_VARIANT=sky130A
+OPENLANE_IMAGE=ghcr.io/efabless/openlane2:2.4.0.dev1
+WORKDIR=/work
+[05:38:41] WARNING  The following warnings have been generated:  __main__.py:155
+[05:38:41] WARNING  The configuration variable                   __main__.py:157
+                    'PL_TARGET_DENSITY' is deprecated. Please                   
+                    check the docs for the usage on the                         
+                    replacement variable                                        
+                    'PL_TARGET_DENSITY_PCT'.                                    
+[05:38:41] WARNING  An unknown key 'CHIPLOOP_FILELIST' was       __main__.py:157
+                    provided.                                                   
+[05:38:41] WARNING  An unknown key 'CHIPLOOP_SOURCE_SPEC_JSON'   __main__.py:157
+                    was provided.                                               
+[05:38:41] WARNING  An unknown key                               __main__.py:157
+                    'CHIPLOOP_UPSTREAM_SDC_SOURCE' was provided.                
+[05:38:41] ERROR    Errors have occurred while loading the       __main__.py:158
+                    design configuration file.                                  
+[05:38:41] ERROR    Path provided for variable                   __main__.py:160
+                    'VERILOG_FILES[0]' is invalid:                              
+                    'inputs/netlist/aero_regfile.v' does not                    
+                    exist                                                       
+[05:38:41] ERROR    OpenLane will now quit. Please check your    __main__.py:162
+                    configuration.                                              

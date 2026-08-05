@@ -1,2 +1,0 @@
-read_verilog -sv /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/src/rtl/review_input.sv
-synth_ecp5 -top minirv_edge_controller -noflatten -json /root/chiploop-backend/backend/workflows/25794ab9-7b4e-43c1-9314-2569fbe51d07/fpga/target_explorer/orangecrab_ecp5_85f/baseline/synth/minirv_edge_controller_ecp5.json

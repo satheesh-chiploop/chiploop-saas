@@ -1,0 +1,164 @@
+# Verification Plan
+
+- Source: generated_from_spec
+- Top module: `aero_safety_controller`
+- Clocks: `clk`
+- Resets: `rst_n`
+
+## User/Test Intent
+No explicit test intent was provided. The plan is derived from the resolved RTL specification.
+
+## Interfaces Under Test
+### Inputs
+- `clk` width `1`
+- `rst_n` width `1`
+- `tick_1ms` width `1`
+- `host_reg_wr_valid` width `1`
+- `host_reg_rd_valid` width `1`
+- `host_reg_addr` width `8`
+- `host_reg_wdata` width `32`
+- `stream_velocity_mps` width `16`
+- `geom_valid` width `1`
+- `geom_format_id_in` width `8`
+- `geom_source_id_in` width `8`
+- `geom_version_in` width `16`
+- `model_req_ready` width `1`
+- `model_rsp_valid` width `1`
+- `model_rsp_seq` width `16`
+- `model_rsp_drag_force` width `16`
+- `model_rsp_lift_force` width `16`
+- `model_rsp_surface_pressure` width `16`
+- `model_rsp_flow_field` width `16`
+- `model_rsp_inference_status_not_executed` width `1`
+- `aero_regfile_cfg_enable` width `1`
+- `aero_regfile_cfg_stream_velocity_mps_setpoint` width `16`
+- `aero_regfile_cfg_velocity_min_limit` width `16`
+- `aero_regfile_cfg_velocity_max_limit` width `16`
+- `aero_regfile_cfg_actuator_min_limit` width `16`
+- `aero_regfile_cfg_actuator_max_limit` width `16`
+- `aero_regfile_cfg_actuator_safe_position` width `16`
+- `aero_regfile_cfg_command_timeout_cycles` width `16`
+- `aero_regfile_cfg_max_slew_rate` width `16`
+- `aero_regfile_cfg_geometry_format_id` width `8`
+- `aero_regfile_cfg_geometry_source_id` width `8`
+- `aero_regfile_cfg_geometry_version` width `16`
+- `aero_regfile_cfg_clear_faults` width `1`
+- `aero_supervisor_req_valid` width `1`
+- `aero_supervisor_req_seq` width `16`
+- `aero_supervisor_req_inflight` width `1`
+- `aero_supervisor_fault_code` width `4`
+- `aero_supervisor_request_age_cycles` width `16`
+- `aero_supervisor_request_stale` width `1`
+- `aero_supervisor_geometry_invalid` width `1`
+- `aero_supervisor_out_of_range_fault` width `1`
+- `aero_supervisor_sequence_mismatch_fault` width `1`
+- `aero_supervisor_service_unavailable_fault` width `1`
+- `aero_supervisor_protocol_error_fault` width `1`
+- `aero_supervisor_stale_response_fault` width `1`
+- `aero_command_sanitizer_cmd_position` width `16`
+- `aero_command_sanitizer_cmd_valid` width `1`
+- `aero_command_sanitizer_cmd_enable` width `1`
+- `aero_command_sanitizer_cmd_seq` width `16`
+- `aero_command_sanitizer_fallback_active_out` width `1`
+- `aero_command_sanitizer_clamp_applied` width `1`
+- `aero_command_sanitizer_clamp_event_pulse` width `1`
+- `aero_command_sanitizer_sanitized_position` width `16`
+
+### Outputs
+- `host_reg_ready` width `1`
+- `host_reg_rdata` width `32`
+- `host_reg_rvalid` width `1`
+- `model_req_valid` width `1`
+- `model_req_seq` width `16`
+- `model_req_enable` width `1`
+- `model_req_stream_velocity_mps` width `16`
+- `model_req_velocity_min_limit` width `16`
+- `model_req_velocity_max_limit` width `16`
+- `model_req_actuator_min_limit` width `16`
+- `model_req_actuator_max_limit` width `16`
+- `model_req_actuator_safe_position` width `16`
+- `model_req_command_timeout_cycles` width `16`
+- `model_req_max_slew_rate` width `16`
+- `model_req_geometry_format_id` width `8`
+- `model_req_geometry_source_id` width `8`
+- `model_req_geometry_version` width `16`
+- `model_req_flow_velocity_mps` width `16`
+- `model_req_geom_valid` width `1`
+- `actuator_cmd_valid` width `1`
+- `actuator_cmd_enable` width `1`
+- `actuator_cmd_position` width `16`
+- `actuator_cmd_seq` width `16`
+- `actuator_cmd_fallback_active` width `1`
+- `current_state` width `4`
+- `last_fault_code` width `4`
+- `stale_reject_count` width `16`
+- `clamp_event_count` width `16`
+- `fallback_active` width `1`
+- `last_accepted_seq` width `16`
+- `last_response_age` width `16`
+- `request_inflight` width `1`
+- `model_response_valid_seen` width `1`
+- `debug_seq_trace` width `16`
+- `debug_timeout_age` width `16`
+- `aero_regfile_status_current_state` width `4`
+- `aero_regfile_status_last_fault_code` width `4`
+- `aero_regfile_status_stale_reject_count` width `16`
+- `aero_regfile_status_clamp_event_count` width `16`
+- `aero_regfile_status_fallback_active` width `1`
+- `aero_regfile_status_last_accepted_seq` width `16`
+- `aero_regfile_status_last_response_age` width `16`
+- `aero_regfile_status_request_inflight` width `1`
+- `aero_regfile_status_model_response_valid_seen` width `1`
+- `aero_supervisor_cfg_enable` width `1`
+- `aero_supervisor_cfg_stream_velocity_mps_setpoint` width `16`
+- `aero_supervisor_cfg_velocity_min_limit` width `16`
+- `aero_supervisor_cfg_velocity_max_limit` width `16`
+- `aero_supervisor_cfg_actuator_min_limit` width `16`
+- `aero_supervisor_cfg_actuator_max_limit` width `16`
+- `aero_supervisor_cfg_actuator_safe_position` width `16`
+- `aero_supervisor_cfg_command_timeout_cycles` width `16`
+- `aero_supervisor_cfg_max_slew_rate` width `16`
+- `aero_supervisor_cfg_geometry_format_id` width `8`
+- `aero_supervisor_cfg_geometry_source_id` width `8`
+- `aero_supervisor_cfg_geometry_version` width `16`
+- `aero_supervisor_cfg_clear_faults` width `1`
+- `aero_supervisor_req_ready` width `1`
+- `aero_supervisor_rsp_valid` width `1`
+- `aero_supervisor_rsp_seq` width `16`
+- `aero_supervisor_rsp_drag_force` width `16`
+- `aero_supervisor_rsp_lift_force` width `16`
+- `aero_supervisor_rsp_surface_pressure` width `16`
+- `aero_supervisor_rsp_flow_field` width `16`
+- `aero_supervisor_rsp_inference_status_not_executed` width `1`
+- `aero_command_sanitizer_cfg_actuator_min_limit` width `16`
+- `aero_command_sanitizer_cfg_actuator_max_limit` width `16`
+- `aero_command_sanitizer_cfg_actuator_safe_position` width `16`
+- `aero_command_sanitizer_cfg_max_slew_rate` width `16`
+- `aero_command_sanitizer_cfg_enable` width `1`
+- `aero_command_sanitizer_fallback_active_in` width `1`
+- `aero_command_sanitizer_fault_active_in` width `1`
+- `aero_command_sanitizer_req_seq` width `16`
+- `aero_command_sanitizer_rsp_valid` width `1`
+- `aero_command_sanitizer_rsp_seq` width `16`
+- `aero_command_sanitizer_rsp_drag_force` width `16`
+- `aero_command_sanitizer_rsp_lift_force` width `16`
+- `aero_command_sanitizer_rsp_surface_pressure` width `16`
+- `aero_command_sanitizer_rsp_flow_field` width `16`
+- `aero_command_sanitizer_safe_position_source` width `16`
+
+## Planned Tests
+- Reset/boot smoke test: drive reset, release reset, confirm stable known behavior.
+- Register or control path test: exercise configuration/control inputs and observe outputs.
+- Directed scenario tests: cover the key user intent and spec-declared behavior.
+- Constrained-random sanity: vary input values around zero, one, max, and non-zero buckets.
+- Output stability checks: confirm outputs do not become unknown after reset release.
+
+## Assertions And Checks
+- Reset sequencing checks for declared reset ports.
+- Clocked output known-value checks after reset release.
+- Interface-specific checks generated from port directions and widths.
+
+## Closure Criteria
+- All generated simulation tests pass.
+- Functional coverage points in `coverage_point_plan.md` are reviewed and either hit or waived.
+- Code coverage and formal results are reviewed when enabled for this run.

@@ -1,0 +1,25 @@
+{
+  "workflow_id": "7ef40733-5be0-4054-8943-441591ec8735",
+  "agent": "Digital Post-DFT Logic Equivalence Check Agent",
+  "status": "inconclusive",
+  "tool": "yosys",
+  "tool_available": true,
+  "return_code": null,
+  "top_module": "aero_safety_controller",
+  "synthesis_netlist": null,
+  "post_dft_netlist": null,
+  "ignored_gate_only_ports": [],
+  "macro_blackbox_stubs": [],
+  "stdcell_model_files": [
+    "stdcell_model_0_sky130_fd_sc_hd.v"
+  ],
+  "stdcell_model_reference": null,
+  "missing_stdcell_models": [],
+  "unproven_points": 0,
+  "failure_reason": "missing_synthesis_netlist",
+  "artifacts": {
+    "script": null,
+    "log": "digital/post_dft_lec/logs/yosys_post_dft_lec.log",
+    "summary": "digital/post_dft_lec/post_dft_lec_summary.json"
+  }
+}

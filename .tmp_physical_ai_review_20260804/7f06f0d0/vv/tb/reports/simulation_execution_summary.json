@@ -1,0 +1,351 @@
+{
+  "type": "simulation_execution_summary",
+  "total": 8,
+  "pass": 0,
+  "fail": 8,
+  "coverage_json_present": false,
+  "coverage_md_present": false,
+  "coverage_json_path": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb/reports/functional_coverage_summary.json",
+  "coverage_md_path": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb/reports/COVERAGE.md",
+  "code_coverage_json_present": true,
+  "code_coverage_json_path": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb/reports/code_coverage_summary.json",
+  "code_coverage": {
+    "type": "code_coverage_summary",
+    "tool": "verilator_coverage",
+    "status": "missing_data",
+    "coverage_dat_files": [],
+    "line_coverage_pct": null,
+    "branch_coverage_pct": null,
+    "condition_coverage_pct": null,
+    "toggle_coverage_pct": null,
+    "condition_source": "unavailable",
+    "toggle_source": "not_reported_by_verilator_lcov"
+  },
+  "toolchain": {
+    "simulator": "verilator",
+    "code_coverage": "verilator_coverage"
+  },
+  "results": [
+    {
+      "testcase": "smoke_test",
+      "seed": 1,
+      "pass": false,
+      "rc": 2,
+      "stdout_tail": [
+        "rm -f results.xml",
+        "\"/usr/bin/make\" -f Makefile results.xml",
+        "make[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'",
+        "mkdir -p sim_build",
+        "/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp",
+        "make[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'"
+      ],
+      "stderr_tail": [
+        "%Error: Specified --top-module 'aero_safety_controller' was not found in design.",
+        "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+        "%Error: Exiting due to 1 error(s)",
+        "make[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1",
+        "make: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2"
+      ],
+      "tool_execution": {
+        "profile_id": "chiploop_saas_default",
+        "runner": "local_saas",
+        "capability": "digital_simulation",
+        "tool": "make",
+        "executable": "/usr/bin/make",
+        "command": [
+          "/usr/bin/make",
+          "TESTCASE=smoke_test"
+        ],
+        "cwd": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb",
+        "returncode": 2,
+        "stdout": "rm -f results.xml\n\"/usr/bin/make\" -f Makefile results.xml\nmake[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\nmkdir -p sim_build\n/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp\nmake[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n",
+        "stderr": "%Error: Specified --top-module 'aero_safety_controller' was not found in design.\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\nmake[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1\nmake: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2\n",
+        "status": "failed",
+        "error": null,
+        "started_at": "2026-08-05T05:37:54.165468+00:00",
+        "ended_at": "2026-08-05T05:37:55.798692+00:00",
+        "elapsed_ms": 1633
+      }
+    },
+    {
+      "testcase": "smoke_test",
+      "seed": 2,
+      "pass": false,
+      "rc": 2,
+      "stdout_tail": [
+        "rm -f results.xml",
+        "\"/usr/bin/make\" -f Makefile results.xml",
+        "make[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'",
+        "/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp",
+        "make[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'"
+      ],
+      "stderr_tail": [
+        "%Error: Specified --top-module 'aero_safety_controller' was not found in design.",
+        "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+        "%Error: Exiting due to 1 error(s)",
+        "make[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1",
+        "make: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2"
+      ],
+      "tool_execution": {
+        "profile_id": "chiploop_saas_default",
+        "runner": "local_saas",
+        "capability": "digital_simulation",
+        "tool": "make",
+        "executable": "/usr/bin/make",
+        "command": [
+          "/usr/bin/make",
+          "TESTCASE=smoke_test"
+        ],
+        "cwd": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb",
+        "returncode": 2,
+        "stdout": "rm -f results.xml\n\"/usr/bin/make\" -f Makefile results.xml\nmake[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp\nmake[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n",
+        "stderr": "%Error: Specified --top-module 'aero_safety_controller' was not found in design.\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\nmake[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1\nmake: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2\n",
+        "status": "failed",
+        "error": null,
+        "started_at": "2026-08-05T05:37:55.805745+00:00",
+        "ended_at": "2026-08-05T05:37:57.353252+00:00",
+        "elapsed_ms": 1547
+      }
+    },
+    {
+      "testcase": "smoke_test",
+      "seed": 3,
+      "pass": false,
+      "rc": 2,
+      "stdout_tail": [
+        "rm -f results.xml",
+        "\"/usr/bin/make\" -f Makefile results.xml",
+        "make[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'",
+        "/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp",
+        "make[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'"
+      ],
+      "stderr_tail": [
+        "%Error: Specified --top-module 'aero_safety_controller' was not found in design.",
+        "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+        "%Error: Exiting due to 1 error(s)",
+        "make[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1",
+        "make: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2"
+      ],
+      "tool_execution": {
+        "profile_id": "chiploop_saas_default",
+        "runner": "local_saas",
+        "capability": "digital_simulation",
+        "tool": "make",
+        "executable": "/usr/bin/make",
+        "command": [
+          "/usr/bin/make",
+          "TESTCASE=smoke_test"
+        ],
+        "cwd": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb",
+        "returncode": 2,
+        "stdout": "rm -f results.xml\n\"/usr/bin/make\" -f Makefile results.xml\nmake[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp\nmake[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n",
+        "stderr": "%Error: Specified --top-module 'aero_safety_controller' was not found in design.\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\nmake[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1\nmake: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2\n",
+        "status": "failed",
+        "error": null,
+        "started_at": "2026-08-05T05:37:57.359926+00:00",
+        "ended_at": "2026-08-05T05:37:58.964142+00:00",
+        "elapsed_ms": 1604
+      }
+    },
+    {
+      "testcase": "smoke_test",
+      "seed": 4,
+      "pass": false,
+      "rc": 2,
+      "stdout_tail": [
+        "rm -f results.xml",
+        "\"/usr/bin/make\" -f Makefile results.xml",
+        "make[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'",
+        "/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp",
+        "make[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'"
+      ],
+      "stderr_tail": [
+        "%Error: Specified --top-module 'aero_safety_controller' was not found in design.",
+        "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+        "%Error: Exiting due to 1 error(s)",
+        "make[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1",
+        "make: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2"
+      ],
+      "tool_execution": {
+        "profile_id": "chiploop_saas_default",
+        "runner": "local_saas",
+        "capability": "digital_simulation",
+        "tool": "make",
+        "executable": "/usr/bin/make",
+        "command": [
+          "/usr/bin/make",
+          "TESTCASE=smoke_test"
+        ],
+        "cwd": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb",
+        "returncode": 2,
+        "stdout": "rm -f results.xml\n\"/usr/bin/make\" -f Makefile results.xml\nmake[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp\nmake[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n",
+        "stderr": "%Error: Specified --top-module 'aero_safety_controller' was not found in design.\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\nmake[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1\nmake: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2\n",
+        "status": "failed",
+        "error": null,
+        "started_at": "2026-08-05T05:37:58.970865+00:00",
+        "ended_at": "2026-08-05T05:38:00.524115+00:00",
+        "elapsed_ms": 1553
+      }
+    },
+    {
+      "testcase": "constrained_random_sanity",
+      "seed": 1,
+      "pass": false,
+      "rc": 2,
+      "stdout_tail": [
+        "rm -f results.xml",
+        "\"/usr/bin/make\" -f Makefile results.xml",
+        "make[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'",
+        "/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp",
+        "make[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'"
+      ],
+      "stderr_tail": [
+        "%Error: Specified --top-module 'aero_safety_controller' was not found in design.",
+        "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+        "%Error: Exiting due to 1 error(s)",
+        "make[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1",
+        "make: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2"
+      ],
+      "tool_execution": {
+        "profile_id": "chiploop_saas_default",
+        "runner": "local_saas",
+        "capability": "digital_simulation",
+        "tool": "make",
+        "executable": "/usr/bin/make",
+        "command": [
+          "/usr/bin/make",
+          "TESTCASE=constrained_random_sanity"
+        ],
+        "cwd": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb",
+        "returncode": 2,
+        "stdout": "rm -f results.xml\n\"/usr/bin/make\" -f Makefile results.xml\nmake[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp\nmake[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n",
+        "stderr": "%Error: Specified --top-module 'aero_safety_controller' was not found in design.\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\nmake[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1\nmake: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2\n",
+        "status": "failed",
+        "error": null,
+        "started_at": "2026-08-05T05:38:00.531251+00:00",
+        "ended_at": "2026-08-05T05:38:02.210062+00:00",
+        "elapsed_ms": 1678
+      }
+    },
+    {
+      "testcase": "constrained_random_sanity",
+      "seed": 2,
+      "pass": false,
+      "rc": 2,
+      "stdout_tail": [
+        "rm -f results.xml",
+        "\"/usr/bin/make\" -f Makefile results.xml",
+        "make[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'",
+        "/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp",
+        "make[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'"
+      ],
+      "stderr_tail": [
+        "%Error: Specified --top-module 'aero_safety_controller' was not found in design.",
+        "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+        "%Error: Exiting due to 1 error(s)",
+        "make[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1",
+        "make: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2"
+      ],
+      "tool_execution": {
+        "profile_id": "chiploop_saas_default",
+        "runner": "local_saas",
+        "capability": "digital_simulation",
+        "tool": "make",
+        "executable": "/usr/bin/make",
+        "command": [
+          "/usr/bin/make",
+          "TESTCASE=constrained_random_sanity"
+        ],
+        "cwd": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb",
+        "returncode": 2,
+        "stdout": "rm -f results.xml\n\"/usr/bin/make\" -f Makefile results.xml\nmake[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp\nmake[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n",
+        "stderr": "%Error: Specified --top-module 'aero_safety_controller' was not found in design.\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\nmake[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1\nmake: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2\n",
+        "status": "failed",
+        "error": null,
+        "started_at": "2026-08-05T05:38:02.217467+00:00",
+        "ended_at": "2026-08-05T05:38:03.830243+00:00",
+        "elapsed_ms": 1612
+      }
+    },
+    {
+      "testcase": "constrained_random_sanity",
+      "seed": 3,
+      "pass": false,
+      "rc": 2,
+      "stdout_tail": [
+        "rm -f results.xml",
+        "\"/usr/bin/make\" -f Makefile results.xml",
+        "make[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'",
+        "/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp",
+        "make[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'"
+      ],
+      "stderr_tail": [
+        "%Error: Specified --top-module 'aero_safety_controller' was not found in design.",
+        "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+        "%Error: Exiting due to 1 error(s)",
+        "make[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1",
+        "make: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2"
+      ],
+      "tool_execution": {
+        "profile_id": "chiploop_saas_default",
+        "runner": "local_saas",
+        "capability": "digital_simulation",
+        "tool": "make",
+        "executable": "/usr/bin/make",
+        "command": [
+          "/usr/bin/make",
+          "TESTCASE=constrained_random_sanity"
+        ],
+        "cwd": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb",
+        "returncode": 2,
+        "stdout": "rm -f results.xml\n\"/usr/bin/make\" -f Makefile results.xml\nmake[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp\nmake[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n",
+        "stderr": "%Error: Specified --top-module 'aero_safety_controller' was not found in design.\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\nmake[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1\nmake: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2\n",
+        "status": "failed",
+        "error": null,
+        "started_at": "2026-08-05T05:38:03.837126+00:00",
+        "ended_at": "2026-08-05T05:38:05.379305+00:00",
+        "elapsed_ms": 1542
+      }
+    },
+    {
+      "testcase": "constrained_random_sanity",
+      "seed": 4,
+      "pass": false,
+      "rc": 2,
+      "stdout_tail": [
+        "rm -f results.xml",
+        "\"/usr/bin/make\" -f Makefile results.xml",
+        "make[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'",
+        "/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp",
+        "make[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'"
+      ],
+      "stderr_tail": [
+        "%Error: Specified --top-module 'aero_safety_controller' was not found in design.",
+        "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+        "%Error: Exiting due to 1 error(s)",
+        "make[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1",
+        "make: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2"
+      ],
+      "tool_execution": {
+        "profile_id": "chiploop_saas_default",
+        "runner": "local_saas",
+        "capability": "digital_simulation",
+        "tool": "make",
+        "executable": "/usr/bin/make",
+        "command": [
+          "/usr/bin/make",
+          "TESTCASE=constrained_random_sanity"
+        ],
+        "cwd": "backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb",
+        "returncode": 2,
+        "stdout": "rm -f results.xml\n\"/usr/bin/make\" -f Makefile results.xml\nmake[1]: Entering directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n/usr/local/bin/verilator -cc --exe -Mdir sim_build --top-module aero_safety_controller --timescale 1ns/1ps --vpi --public-flat-rw --prefix Vtop -o Vtop -LDFLAGS \"-Wl,-rpath,/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -L/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/libs -lcocotbvpi_verilator\" --trace --trace-structs --coverage -Wno-fatal -Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-UNOPTFLAT ../../handoff/rtl/aero_command_sanitizer.v /root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb/share/lib/verilator/verilator.cpp\nmake[1]: Leaving directory '/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/vv/tb'\n",
+        "stderr": "%Error: Specified --top-module 'aero_safety_controller' was not found in design.\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\nmake[1]: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/simulators/Makefile.verilator:61: sim_build/Vtop.mk] Error 1\nmake: *** [/root/chiploop-backend/venv/lib/python3.13/site-packages/cocotb_tools/makefiles/Makefile.inc:17: sim] Error 2\n",
+        "status": "failed",
+        "error": null,
+        "started_at": "2026-08-05T05:38:05.386053+00:00",
+        "ended_at": "2026-08-05T05:38:06.923380+00:00",
+        "elapsed_ms": 1537
+      }
+    }
+  ]
+}

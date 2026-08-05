@@ -1,0 +1,2805 @@
+{
+  "design_name": "aero_safety_controller",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "aero_safety_controller",
+      "description": "Top-level safety controller integrating host register file, validation/supervision, request/response transaction handling, command derivation/sanitization, fault latching, freshness tracking, and actuator fallback gating.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "tick_1ms",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_reg_wr_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_reg_rd_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_reg_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "host_reg_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "host_reg_wdata",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "host_reg_rdata",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "host_reg_rvalid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "stream_velocity_mps",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "geom_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "geom_format_id_in",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "geom_source_id_in",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "geom_version_in",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "model_req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_req_seq",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_enable",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_stream_velocity_mps",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_velocity_min_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_velocity_max_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_actuator_min_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_actuator_max_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_actuator_safe_position",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_command_timeout_cycles",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_max_slew_rate",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_geometry_format_id",
+          "direction": "output",
+          "width": 8
+        },
+        {
+          "name": "model_req_geometry_source_id",
+          "direction": "output",
+          "width": 8
+        },
+        {
+          "name": "model_req_geometry_version",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_flow_velocity_mps",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_geom_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_seq",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "model_rsp_drag_force",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "model_rsp_lift_force",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "model_rsp_surface_pressure",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "model_rsp_flow_field",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "model_rsp_inference_status_not_executed",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_enable",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_position",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_seq",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_fallback_active",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "current_state",
+          "direction": "output",
+          "width": 4
+        },
+        {
+          "name": "last_fault_code",
+          "direction": "output",
+          "width": 4
+        },
+        {
+          "name": "stale_reject_count",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "clamp_event_count",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "last_accepted_seq",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "last_response_age",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "request_inflight",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_response_valid_seen",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "debug_seq_trace",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "debug_timeout_age",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_enable",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_regfile_cfg_stream_velocity_mps_setpoint",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_velocity_min_limit",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_velocity_max_limit",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_actuator_min_limit",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_actuator_max_limit",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_actuator_safe_position",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_command_timeout_cycles",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_max_slew_rate",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_geometry_format_id",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "aero_regfile_cfg_geometry_source_id",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "aero_regfile_cfg_geometry_version",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_cfg_clear_faults",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_regfile_status_current_state",
+          "direction": "output",
+          "width": 4
+        },
+        {
+          "name": "aero_regfile_status_last_fault_code",
+          "direction": "output",
+          "width": 4
+        },
+        {
+          "name": "aero_regfile_status_stale_reject_count",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_status_clamp_event_count",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_status_fallback_active",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_regfile_status_last_accepted_seq",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_status_last_response_age",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_regfile_status_request_inflight",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_regfile_status_model_response_valid_seen",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_cfg_enable",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_cfg_stream_velocity_mps_setpoint",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_cfg_velocity_min_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_cfg_velocity_max_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_cfg_actuator_min_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_cfg_actuator_max_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_cfg_actuator_safe_position",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_cfg_command_timeout_cycles",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_cfg_max_slew_rate",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_cfg_geometry_format_id",
+          "direction": "output",
+          "width": 8
+        },
+        {
+          "name": "aero_supervisor_cfg_geometry_source_id",
+          "direction": "output",
+          "width": 8
+        },
+        {
+          "name": "aero_supervisor_cfg_geometry_version",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_cfg_clear_faults",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_req_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_rsp_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_rsp_seq",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_rsp_drag_force",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_rsp_lift_force",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_rsp_surface_pressure",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_rsp_flow_field",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_rsp_inference_status_not_executed",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_req_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_req_seq",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_req_inflight",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_fault_code",
+          "direction": "input",
+          "width": 4
+        },
+        {
+          "name": "aero_supervisor_request_age_cycles",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_supervisor_request_stale",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_geometry_invalid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_out_of_range_fault",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_sequence_mismatch_fault",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_service_unavailable_fault",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_protocol_error_fault",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_supervisor_stale_response_fault",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_cfg_actuator_min_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_cfg_actuator_max_limit",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_cfg_actuator_safe_position",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_cfg_max_slew_rate",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_cfg_enable",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_fallback_active_in",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_fault_active_in",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_req_seq",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_rsp_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_rsp_seq",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_rsp_drag_force",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_rsp_lift_force",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_rsp_surface_pressure",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_rsp_flow_field",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_safe_position_source",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_cmd_position",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_cmd_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_cmd_enable",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_cmd_seq",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "aero_command_sanitizer_fallback_active_out",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_clamp_applied",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_clamp_event_pulse",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "aero_command_sanitizer_sanitized_position",
+          "direction": "input",
+          "width": 16
+        }
+      ],
+      "functionality": "The top module accepts host MMIO configuration writes, exposes readable status registers, validates live stream velocity against the operating envelope, checks geometry metadata completeness, emits a single in-flight request to the external runtime, captures only matching responses, derives a deterministic actuator command using fixed RTL rules external to any ML model, clamps and rate-limits the command, and enters safe fallback on reset, timeout, invalid input, stale or mismatched response, service unavailability, protocol error, or explicit fault. The block is a safety supervisor and transaction sanitizer only; it does not compute aerodynamics physics or inference results on-chip.",
+      "responsibilities": [
+        "Provide deterministic reset-safe defaults and fault/fallback initialization.",
+        "Implement register bank write/read access with write acceptance only when host_reg_valid and host_reg_ready are asserted.",
+        "Validate configuration setpoints and live flow-condition inputs against the 20 to 55 m/s required envelope.",
+        "Block request formation when geometry metadata is incomplete or unknown.",
+        "Drive a ready/valid request transaction toward the external DoMINO runtime wrapper interface.",
+        "Track outstanding request sequence, request age, response freshness, and stale rejection counts.",
+        "Capture response fields only for matching sequences before timeout.",
+        "Derive and sanitize actuator commands using fixed digital rules and configuration limits.",
+        "Clamp, slew-limit, or force safe position for invalid or out-of-range commands.",
+        "Expose readable status, counters, and fault codes to the host.",
+        "Fail safe by default on any violated assumption."
+      ],
+      "must_drive": [
+        "host_reg_ready",
+        "host_reg_rdata",
+        "host_reg_rvalid",
+        "model_req_valid",
+        "model_req_seq",
+        "model_req_enable",
+        "model_req_stream_velocity_mps",
+        "model_req_velocity_min_limit",
+        "model_req_velocity_max_limit",
+        "model_req_actuator_min_limit",
+        "model_req_actuator_max_limit",
+        "model_req_actuator_safe_position",
+        "model_req_command_timeout_cycles",
+        "model_req_max_slew_rate",
+        "model_req_geometry_format_id",
+        "model_req_geometry_source_id",
+        "model_req_geometry_version",
+        "model_req_flow_velocity_mps",
+        "model_req_geom_valid",
+        "actuator_cmd_valid",
+        "actuator_cmd_enable",
+        "actuator_cmd_position",
+        "actuator_cmd_seq",
+        "actuator_cmd_fallback_active",
+        "current_state",
+        "last_fault_code",
+        "stale_reject_count",
+        "clamp_event_count",
+        "fallback_active",
+        "last_accepted_seq",
+        "last_response_age",
+        "request_inflight",
+        "model_response_valid_seen",
+        "debug_seq_trace",
+        "debug_timeout_age"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "tick_1ms",
+        "host_reg_wr_valid",
+        "host_reg_rd_valid",
+        "host_reg_addr",
+        "host_reg_wdata",
+        "stream_velocity_mps",
+        "geom_valid",
+        "geom_format_id_in",
+        "geom_source_id_in",
+        "geom_version_in",
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_seq",
+        "model_rsp_drag_force",
+        "model_rsp_lift_force",
+        "model_rsp_surface_pressure",
+        "model_rsp_flow_field",
+        "model_rsp_inference_status_not_executed"
+      ],
+      "must_not_drive": [
+        "clk",
+        "rst_n",
+        "tick_1ms",
+        "host_reg_wr_valid",
+        "host_reg_rd_valid",
+        "host_reg_addr",
+        "host_reg_wdata",
+        "stream_velocity_mps",
+        "geom_valid",
+        "geom_format_id_in",
+        "geom_source_id_in",
+        "geom_version_in",
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_seq",
+        "model_rsp_drag_force",
+        "model_rsp_lift_force",
+        "model_rsp_surface_pressure",
+        "model_rsp_flow_field",
+        "model_rsp_inference_status_not_executed"
+      ],
+      "reset_behavior": "On rst_n assertion, all sequential state shall move to deterministic safe values: request_valid deasserted, request_inflight cleared, sequence counters cleared to zero or a known safe seed, model_response_valid_seen cleared, stale_reject_count and clamp_event_count cleared unless a future explicit configuration preserves them, fallback_active asserted, actuator_cmd_enable deasserted, actuator_cmd_valid deasserted unless required by downstream protocol, actuator_cmd_position driven to actuator_safe_position, last_fault_code set to a safe reset value such as no_fault or a reset-indicated fault state per implementation policy, and all latched fault clear behavior shall occur only if explicitly enabled by the clear_faults mechanism.",
+      "behavior_rules": [
+        "Host register writes are accepted only when host_reg_wr_valid and host_reg_ready are both asserted in the same cycle.",
+        "Host register reads are accepted only when host_reg_rd_valid and host_reg_ready are both asserted in the same cycle.",
+        "enable, setpoint, limits, timeout, slew rate, geometry metadata configuration, and clear_faults are writable control fields in the register bank.",
+        "current_state, last_fault_code, stale_reject_count, clamp_event_count, fallback_active, last_accepted_seq, last_response_age, request_inflight, and model_response_valid_seen are readable status fields.",
+        "stream_velocity_mps shall be validated against the required operating envelope of 20 to 55 m/s.",
+        "Configured stream_velocity_mps_setpoint and live stream_velocity_mps must both be within the operating envelope for request formation to proceed.",
+        "If geom_valid is low or geometry metadata fields are unknown or inconsistent, request formation shall be blocked and a geometry_invalid fault shall be latched.",
+        "model_req_valid shall remain asserted until model_req_ready is observed or until reset, fault, or fallback cancellation.",
+        "Only one outstanding request may exist; a new request may not issue while request_inflight is true.",
+        "Responses are captured only when model_rsp_valid is asserted, no timeout has occurred, and model_rsp_seq matches the outstanding req_seq.",
+        "Responses arriving with stale age, mismatched sequence, or when no request is outstanding shall be rejected and counted as invalid or stale as appropriate.",
+        "The controller must not assume any numerical property of inference_status; it may only use the valid response payload when the response handshake and sequence are correct.",
+        "Actuator command generation shall be deterministic, fixed-function RTL derived from accepted response fields and configuration context, without embedding the surrogate model itself.",
+        "actuator_cmd_position shall be clamped to actuator_min_limit and actuator_max_limit before driving the output.",
+        "If max_slew_rate is configured, the command shall be rate-limited relative to the previous accepted command.",
+        "Any invalid numeric condition, unknown value, or out-of-range command shall force actuator_safe_position and assert fallback_active.",
+        "cmd_enable is represented by actuator_cmd_enable and shall assert only when a valid command path exists and no active fault is present.",
+        "Request age shall be tracked using cycle counter logic and/or the optional tick_1ms sampling path.",
+        "If command_timeout_cycles elapse before a valid matching response is received, the request shall be declared stale, stale_reject_count shall increment, and fallback shall activate.",
+        "Faults shall be prioritized so that safety-critical faults force fallback immediately.",
+        "Fault codes shall include no_fault, out_of_range, stale_response, sequence_mismatch, geometry_invalid, service_unavailable, clamp_applied, and protocol_error.",
+        "Optional debug outputs may mirror sequence tracing and timeout diagnostics but shall not influence functional safety."
+      ],
+      "rtl_output_file": "aero_safety_controller.v"
+    },
+    "modules": [
+      {
+        "name": "aero_regfile",
+        "description": "Memory-mapped register bank and host interface decoder for writable configuration and readable status fields. It provides explicit semantic control outputs and captures status/counters for host access. It does not perform model inference or command generation.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "host_reg_wr_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_reg_rd_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_reg_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "host_reg_addr",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "host_reg_wdata",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "host_reg_rdata",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "host_reg_rvalid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_stream_velocity_mps_setpoint",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_velocity_min_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_velocity_max_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_min_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_safe_position",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_timeout_cycles",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_max_slew_rate",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_geometry_format_id",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_geometry_source_id",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_geometry_version",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_clear_faults",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_current_state",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "status_last_fault_code",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "status_stale_reject_count",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_clamp_event_count",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_last_accepted_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_last_response_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_request_inflight",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_model_response_valid_seen",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements a small memory-mapped control/status register file. Writes update configuration only when a valid host write handshake occurs and the register file is ready. Read data reflects configuration and status fields. The register file exports semantic configuration signals directly to the safety controller and receives status counters/state from the controller for host observability.",
+        "responsibilities": [
+          "Decode host register reads and writes.",
+          "Accept writes only when host_reg_wr_valid and host_reg_ready are asserted.",
+          "Provide explicit semantic config outputs for enable, limits, slew rate, geometry tags, timeout, and clear_faults.",
+          "Expose readable status fields for state, fault code, counters, and transaction freshness.",
+          "Hold deterministic reset-safe configuration defaults."
+        ],
+        "must_drive": [
+          "host_reg_ready",
+          "host_reg_rdata",
+          "host_reg_rvalid",
+          "cfg_enable",
+          "cfg_stream_velocity_mps_setpoint",
+          "cfg_velocity_min_limit",
+          "cfg_velocity_max_limit",
+          "cfg_actuator_min_limit",
+          "cfg_actuator_max_limit",
+          "cfg_actuator_safe_position",
+          "cfg_command_timeout_cycles",
+          "cfg_max_slew_rate",
+          "cfg_geometry_format_id",
+          "cfg_geometry_source_id",
+          "cfg_geometry_version",
+          "cfg_clear_faults"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "host_reg_wr_valid",
+          "host_reg_rd_valid",
+          "host_reg_addr",
+          "host_reg_wdata",
+          "status_current_state",
+          "status_last_fault_code",
+          "status_stale_reject_count",
+          "status_clamp_event_count",
+          "status_fallback_active",
+          "status_last_accepted_seq",
+          "status_last_response_age",
+          "status_request_inflight",
+          "status_model_response_valid_seen"
+        ],
+        "must_not_drive": [
+          "clk",
+          "rst_n",
+          "host_reg_wr_valid",
+          "host_reg_rd_valid",
+          "host_reg_addr",
+          "host_reg_wdata",
+          "status_current_state",
+          "status_last_fault_code",
+          "status_stale_reject_count",
+          "status_clamp_event_count",
+          "status_fallback_active",
+          "status_last_accepted_seq",
+          "status_last_response_age",
+          "status_request_inflight",
+          "status_model_response_valid_seen"
+        ],
+        "reset_behavior": "All configuration outputs shall reset to deterministic safe values: enable low, setpoint and limits set to conservative safe defaults, timeout and slew controls cleared or set to non-accident-inducing defaults, geometry tags cleared or set to known-safe tags, and clear_faults deasserted after reset. Read data and valid shall return benign values during reset.",
+        "behavior_rules": [
+          "A write side effect shall occur only on a valid handshake.",
+          "Host reads shall present a stable value and valid pulse for exactly the implementation-defined read latency.",
+          "status inputs from the controller must be relayed to host-readable registers without alteration.",
+          "No hidden state shall alter command decisions; the module is purely register/observability logic."
+        ],
+        "rtl_output_file": "aero_regfile.v"
+      },
+      {
+        "name": "aero_supervisor",
+        "description": "Safety and transaction supervision logic that validates live inputs, forms request authorization decisions, monitors outstanding request age and sequence numbers, detects stale or mismatched responses, manages fault latching, and generates fallback state and diagnostic outputs.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "tick_1ms",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_stream_velocity_mps_setpoint",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_velocity_min_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_velocity_max_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_min_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_safe_position",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_timeout_cycles",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_max_slew_rate",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_geometry_format_id",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_geometry_source_id",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_geometry_version",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_clear_faults",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stream_velocity_mps",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "geom_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "geom_format_id_in",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "geom_source_id_in",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "geom_version_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_drag_force",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_lift_force",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_surface_pressure",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_flow_field",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_inference_status_not_executed",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "req_seq",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "req_inflight",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "current_state",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "fault_code",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "stale_reject_count",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "clamp_event_count",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "fallback_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "last_accepted_seq",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "last_response_age",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "model_response_valid_seen",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "request_age_cycles",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "request_stale",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "geometry_invalid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "out_of_range_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "sequence_mismatch_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "service_unavailable_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "protocol_error_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "stale_response_fault",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Performs synchronous validation and safety supervision. It checks the live flow condition and configured setpoint against the required 20 to 55 m/s envelope, verifies geometry metadata completeness, authorizes request emission only when enabled and safe, assigns monotonically increasing request sequence numbers, tracks whether a request is inflight, records request age, and classifies responses as accepted, stale, sequence-mismatched, or invalid. It asserts fallback and latches fault codes on timeout, invalid input, protocol errors, service unavailability, or other safety-critical violations.",
+        "responsibilities": [
+          "Validate operating envelope compliance for both configured setpoint and live stream velocity.",
+          "Block request formation when geometry metadata is incomplete or inconsistent.",
+          "Generate and increment request sequence numbers monotonically.",
+          "Track outstanding request age and declare stale conditions on timeout.",
+          "Detect matching versus mismatched response sequences.",
+          "Emit fault indicators and fallback activation status.",
+          "Provide a current_state observable suitable for host diagnostics."
+        ],
+        "must_drive": [
+          "req_valid",
+          "req_seq",
+          "req_inflight",
+          "current_state",
+          "fault_code",
+          "stale_reject_count",
+          "clamp_event_count",
+          "fallback_active",
+          "last_accepted_seq",
+          "last_response_age",
+          "model_response_valid_seen",
+          "request_age_cycles",
+          "request_stale",
+          "geometry_invalid",
+          "out_of_range_fault",
+          "sequence_mismatch_fault",
+          "service_unavailable_fault",
+          "protocol_error_fault",
+          "stale_response_fault"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "tick_1ms",
+          "cfg_enable",
+          "cfg_stream_velocity_mps_setpoint",
+          "cfg_velocity_min_limit",
+          "cfg_velocity_max_limit",
+          "cfg_actuator_min_limit",
+          "cfg_actuator_max_limit",
+          "cfg_actuator_safe_position",
+          "cfg_command_timeout_cycles",
+          "cfg_max_slew_rate",
+          "cfg_geometry_format_id",
+          "cfg_geometry_source_id",
+          "cfg_geometry_version",
+          "cfg_clear_faults",
+          "stream_velocity_mps",
+          "geom_valid",
+          "geom_format_id_in",
+          "geom_source_id_in",
+          "geom_version_in",
+          "req_ready",
+          "rsp_valid",
+          "rsp_seq",
+          "rsp_drag_force",
+          "rsp_lift_force",
+          "rsp_surface_pressure",
+          "rsp_flow_field",
+          "rsp_inference_status_not_executed"
+        ],
+        "must_not_drive": [
+          "clk",
+          "rst_n",
+          "tick_1ms",
+          "cfg_enable",
+          "cfg_stream_velocity_mps_setpoint",
+          "cfg_velocity_min_limit",
+          "cfg_velocity_max_limit",
+          "cfg_actuator_min_limit",
+          "cfg_actuator_max_limit",
+          "cfg_actuator_safe_position",
+          "cfg_command_timeout_cycles",
+          "cfg_max_slew_rate",
+          "cfg_geometry_format_id",
+          "cfg_geometry_source_id",
+          "cfg_geometry_version",
+          "cfg_clear_faults",
+          "stream_velocity_mps",
+          "geom_valid",
+          "geom_format_id_in",
+          "geom_source_id_in",
+          "geom_version_in",
+          "req_ready",
+          "rsp_valid",
+          "rsp_seq",
+          "rsp_drag_force",
+          "rsp_lift_force",
+          "rsp_surface_pressure",
+          "rsp_flow_field",
+          "rsp_inference_status_not_executed"
+        ],
+        "reset_behavior": "Reset shall clear request state, counters, current_state, request_age, request_stale, and model_response_valid_seen; assert fallback_active; deassert req_valid and req_inflight; and either clear latched faults or preserve them only if the clear_faults policy specifies retention through reset. The default reset state shall be safe and deterministic.",
+        "behavior_rules": [
+          "A request may be emitted only when cfg_enable is asserted, both velocity values are in envelope, geometry metadata matches configuration and is valid, and no active fault blocks request generation.",
+          "Only one request may be outstanding at a time.",
+          "req_valid shall hold until req_ready is observed or the request is canceled by fault/reset.",
+          "Responses shall be accepted only when rsp_valid is asserted, rsp_seq matches the outstanding req_seq, and the request has not timed out.",
+          "A mismatch or timeout shall assert the appropriate fault and force fallback immediately.",
+          "Service unavailability or protocol error conditions shall force fallback and may inhibit future requests until cleared.",
+          "If cfg_clear_faults is asserted, fault latches may be cleared in a controlled manner but only with safe fallback behavior preserved during the transition.",
+          "No hidden modeling or inference behavior is permitted."
+        ],
+        "rtl_output_file": "aero_supervisor.v"
+      },
+      {
+        "name": "aero_command_sanitizer",
+        "description": "Deterministic actuator command synthesis, clamping, rate limiting, and safe fallback enforcement for downstream actuator control. It does not contain the external model; it only translates accepted response/context into a sanitized command path.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_actuator_min_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_safe_position",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_max_slew_rate",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fallback_active_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fault_active_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_drag_force",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_lift_force",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_surface_pressure",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_flow_field",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "safe_position_source",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cmd_position",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cmd_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_seq",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "fallback_active_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "clamp_applied",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "clamp_event_pulse",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "sanitized_position",
+            "direction": "output",
+            "width": 16
+          }
+        ],
+        "functionality": "Consumes accepted external runtime response fields and, using fixed deterministic logic defined by configuration and downstream integration rules, generates a sanitized actuator command. It clamps the command to actuator limits, applies optional slew-rate limiting relative to the previous accepted command, forces safe position for invalid or unknown numerical conditions, and suppresses command enable when a fault or fallback is active. It emits observability for clamp events and fallback state.",
+        "responsibilities": [
+          "Derive a command from response/context using fixed digital logic only.",
+          "Clamp command_position to actuator_min_limit and actuator_max_limit.",
+          "Apply rate limiting using cfg_max_slew_rate if configured.",
+          "Force safe fallback position on invalid numbers, faults, stale conditions, or fallback activation.",
+          "Assert cmd_enable only when a valid command path exists and no active fault is present.",
+          "Provide deterministic output behavior on reset."
+        ],
+        "must_drive": [
+          "cmd_position",
+          "cmd_valid",
+          "cmd_enable",
+          "cmd_seq",
+          "fallback_active_out",
+          "clamp_applied",
+          "clamp_event_pulse",
+          "sanitized_position"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_actuator_min_limit",
+          "cfg_actuator_max_limit",
+          "cfg_actuator_safe_position",
+          "cfg_max_slew_rate",
+          "cfg_enable",
+          "fallback_active_in",
+          "fault_active_in",
+          "req_seq",
+          "rsp_valid",
+          "rsp_seq",
+          "rsp_drag_force",
+          "rsp_lift_force",
+          "rsp_surface_pressure",
+          "rsp_flow_field",
+          "safe_position_source"
+        ],
+        "must_not_drive": [
+          "clk",
+          "rst_n",
+          "cfg_actuator_min_limit",
+          "cfg_actuator_max_limit",
+          "cfg_actuator_safe_position",
+          "cfg_max_slew_rate",
+          "cfg_enable",
+          "fallback_active_in",
+          "fault_active_in",
+          "req_seq",
+          "rsp_valid",
+          "rsp_seq",
+          "rsp_drag_force",
+          "rsp_lift_force",
+          "rsp_surface_pressure",
+          "rsp_flow_field",
+          "safe_position_source"
+        ],
+        "reset_behavior": "Reset shall drive cmd_valid low, cmd_enable low, cmd_position to the safe fallback position, cmd_seq to a deterministic reset value, fallback_active_out asserted, and clamp indicators cleared. The previous accepted command history shall be initialized to safe values.",
+        "behavior_rules": [
+          "A sanitized command may only be produced for a valid and matching response path or explicit safe fallback path.",
+          "If fallback_active_in or fault_active_in is asserted, the output shall drive safe_position_source and deassert cmd_enable.",
+          "If the computed command exceeds limits, clamp_applied and clamp_event_pulse shall assert and the command shall be limited to bounds.",
+          "If max slew rate is configured, step changes shall be limited relative to the previous accepted command.",
+          "Unknown, invalid, or out-of-range numerical conditions shall be forced to safe position.",
+          "This module shall not implement or approximate the external aero model."
+        ],
+        "rtl_output_file": "aero_command_sanitizer.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "aero_regfile.clk",
+        "aero_supervisor.clk",
+        "aero_command_sanitizer.clk"
+      ],
+      "description": "Top-level port clk connected to matching child module port(s)."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "aero_regfile.rst_n",
+        "aero_supervisor.rst_n",
+        "aero_command_sanitizer.rst_n"
+      ],
+      "description": "Top-level port rst_n connected to matching child module port(s)."
+    },
+    {
+      "top_port": "tick_1ms",
+      "connected_to": [
+        "aero_supervisor.tick_1ms"
+      ],
+      "description": "Top-level port tick_1ms connected to matching child module port(s)."
+    },
+    {
+      "top_port": "host_reg_wr_valid",
+      "connected_to": [
+        "aero_regfile.host_reg_wr_valid"
+      ],
+      "description": "Top-level port host_reg_wr_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "host_reg_rd_valid",
+      "connected_to": [
+        "aero_regfile.host_reg_rd_valid"
+      ],
+      "description": "Top-level port host_reg_rd_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "host_reg_ready",
+      "connected_to": [
+        "aero_regfile.host_reg_ready"
+      ],
+      "description": "Top-level port host_reg_ready connected to matching child module port(s)."
+    },
+    {
+      "top_port": "host_reg_addr",
+      "connected_to": [
+        "aero_regfile.host_reg_addr"
+      ],
+      "description": "Top-level port host_reg_addr connected to matching child module port(s)."
+    },
+    {
+      "top_port": "host_reg_wdata",
+      "connected_to": [
+        "aero_regfile.host_reg_wdata"
+      ],
+      "description": "Top-level port host_reg_wdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "host_reg_rdata",
+      "connected_to": [
+        "aero_regfile.host_reg_rdata"
+      ],
+      "description": "Top-level port host_reg_rdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "host_reg_rvalid",
+      "connected_to": [
+        "aero_regfile.host_reg_rvalid"
+      ],
+      "description": "Top-level port host_reg_rvalid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "stream_velocity_mps",
+      "connected_to": [
+        "aero_supervisor.stream_velocity_mps"
+      ],
+      "description": "Top-level port stream_velocity_mps connected to matching child module port(s)."
+    },
+    {
+      "top_port": "geom_valid",
+      "connected_to": [
+        "aero_supervisor.geom_valid"
+      ],
+      "description": "Top-level port geom_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "geom_format_id_in",
+      "connected_to": [
+        "aero_supervisor.geom_format_id_in"
+      ],
+      "description": "Top-level port geom_format_id_in connected to matching child module port(s)."
+    },
+    {
+      "top_port": "geom_source_id_in",
+      "connected_to": [
+        "aero_supervisor.geom_source_id_in"
+      ],
+      "description": "Top-level port geom_source_id_in connected to matching child module port(s)."
+    },
+    {
+      "top_port": "geom_version_in",
+      "connected_to": [
+        "aero_supervisor.geom_version_in"
+      ],
+      "description": "Top-level port geom_version_in connected to matching child module port(s)."
+    },
+    {
+      "top_port": "current_state",
+      "connected_to": [
+        "aero_supervisor.current_state"
+      ],
+      "description": "Top-level port current_state connected to matching child module port(s)."
+    },
+    {
+      "top_port": "stale_reject_count",
+      "connected_to": [
+        "aero_supervisor.stale_reject_count"
+      ],
+      "description": "Top-level port stale_reject_count connected to matching child module port(s)."
+    },
+    {
+      "top_port": "clamp_event_count",
+      "connected_to": [
+        "aero_supervisor.clamp_event_count"
+      ],
+      "description": "Top-level port clamp_event_count connected to matching child module port(s)."
+    },
+    {
+      "top_port": "fallback_active",
+      "connected_to": [
+        "aero_supervisor.fallback_active"
+      ],
+      "description": "Top-level port fallback_active connected to matching child module port(s)."
+    },
+    {
+      "top_port": "last_accepted_seq",
+      "connected_to": [
+        "aero_supervisor.last_accepted_seq"
+      ],
+      "description": "Top-level port last_accepted_seq connected to matching child module port(s)."
+    },
+    {
+      "top_port": "last_response_age",
+      "connected_to": [
+        "aero_supervisor.last_response_age"
+      ],
+      "description": "Top-level port last_response_age connected to matching child module port(s)."
+    },
+    {
+      "top_port": "model_response_valid_seen",
+      "connected_to": [
+        "aero_supervisor.model_response_valid_seen"
+      ],
+      "description": "Top-level port model_response_valid_seen connected to matching child module port(s)."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "aero_regfile_cfg_enable",
+      "width": 1,
+      "source": "aero_regfile.cfg_enable",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_enable"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_enable."
+    },
+    {
+      "name": "aero_regfile_cfg_stream_velocity_mps_setpoint",
+      "width": 16,
+      "source": "aero_regfile.cfg_stream_velocity_mps_setpoint",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_stream_velocity_mps_setpoint"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_stream_velocity_mps_setpoint."
+    },
+    {
+      "name": "aero_regfile_cfg_velocity_min_limit",
+      "width": 16,
+      "source": "aero_regfile.cfg_velocity_min_limit",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_velocity_min_limit"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_velocity_min_limit."
+    },
+    {
+      "name": "aero_regfile_cfg_velocity_max_limit",
+      "width": 16,
+      "source": "aero_regfile.cfg_velocity_max_limit",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_velocity_max_limit"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_velocity_max_limit."
+    },
+    {
+      "name": "aero_regfile_cfg_actuator_min_limit",
+      "width": 16,
+      "source": "aero_regfile.cfg_actuator_min_limit",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_actuator_min_limit"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_actuator_min_limit."
+    },
+    {
+      "name": "aero_regfile_cfg_actuator_max_limit",
+      "width": 16,
+      "source": "aero_regfile.cfg_actuator_max_limit",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_actuator_max_limit"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_actuator_max_limit."
+    },
+    {
+      "name": "aero_regfile_cfg_actuator_safe_position",
+      "width": 16,
+      "source": "aero_regfile.cfg_actuator_safe_position",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_actuator_safe_position"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_actuator_safe_position."
+    },
+    {
+      "name": "aero_regfile_cfg_command_timeout_cycles",
+      "width": 16,
+      "source": "aero_regfile.cfg_command_timeout_cycles",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_command_timeout_cycles"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_command_timeout_cycles."
+    },
+    {
+      "name": "aero_regfile_cfg_max_slew_rate",
+      "width": 16,
+      "source": "aero_regfile.cfg_max_slew_rate",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_max_slew_rate"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_max_slew_rate."
+    },
+    {
+      "name": "aero_regfile_cfg_geometry_format_id",
+      "width": 8,
+      "source": "aero_regfile.cfg_geometry_format_id",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_geometry_format_id"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_geometry_format_id."
+    },
+    {
+      "name": "aero_regfile_cfg_geometry_source_id",
+      "width": 8,
+      "source": "aero_regfile.cfg_geometry_source_id",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_geometry_source_id"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_geometry_source_id."
+    },
+    {
+      "name": "aero_regfile_cfg_geometry_version",
+      "width": 16,
+      "source": "aero_regfile.cfg_geometry_version",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_geometry_version"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_geometry_version."
+    },
+    {
+      "name": "aero_regfile_cfg_clear_faults",
+      "width": 1,
+      "source": "aero_regfile.cfg_clear_faults",
+      "destinations": [
+        "aero_safety_controller.aero_regfile_cfg_clear_faults"
+      ],
+      "description": "Derived internal signal produced by aero_regfile.cfg_clear_faults."
+    },
+    {
+      "name": "aero_regfile_status_current_state",
+      "width": 4,
+      "source": "aero_safety_controller.aero_regfile_status_current_state",
+      "destinations": [
+        "aero_regfile.status_current_state"
+      ],
+      "description": "Derived internal top-owned signal driving aero_regfile.status_current_state."
+    },
+    {
+      "name": "aero_regfile_status_last_fault_code",
+      "width": 4,
+      "source": "aero_safety_controller.aero_regfile_status_last_fault_code",
+      "destinations": [
+        "aero_regfile.status_last_fault_code"
+      ],
+      "description": "Derived internal top-owned signal driving aero_regfile.status_last_fault_code."
+    },
+    {
+      "name": "aero_regfile_status_stale_reject_count",
+      "width": 16,
+      "source": "aero_safety_controller.aero_regfile_status_stale_reject_count",
+      "destinations": [
+        "aero_regfile.status_stale_reject_count"
+      ],
+      "description": "Derived internal top-owned signal driving aero_regfile.status_stale_reject_count."
+    },
+    {
+      "name": "aero_regfile_status_clamp_event_count",
+      "width": 16,
+      "source": "aero_safety_controller.aero_regfile_status_clamp_event_count",
+      "destinations": [
+        "aero_regfile.status_clamp_event_count"
+      ],
+      "description": "Derived internal top-owned signal driving aero_regfile.status_clamp_event_count."
+    },
+    {
+      "name": "aero_regfile_status_fallback_active",
+      "width": 1,
+      "source": "aero_safety_controller.aero_regfile_status_fallback_active",
+      "destinations": [
+        "aero_regfile.status_fallback_active"
+      ],
+      "description": "Derived internal top-owned signal driving aero_regfile.status_fallback_active."
+    },
+    {
+      "name": "aero_regfile_status_last_accepted_seq",
+      "width": 16,
+      "source": "aero_safety_controller.aero_regfile_status_last_accepted_seq",
+      "destinations": [
+        "aero_regfile.status_last_accepted_seq"
+      ],
+      "description": "Derived internal top-owned signal driving aero_regfile.status_last_accepted_seq."
+    },
+    {
+      "name": "aero_regfile_status_last_response_age",
+      "width": 16,
+      "source": "aero_safety_controller.aero_regfile_status_last_response_age",
+      "destinations": [
+        "aero_regfile.status_last_response_age"
+      ],
+      "description": "Derived internal top-owned signal driving aero_regfile.status_last_response_age."
+    },
+    {
+      "name": "aero_regfile_status_request_inflight",
+      "width": 1,
+      "source": "aero_safety_controller.aero_regfile_status_request_inflight",
+      "destinations": [
+        "aero_regfile.status_request_inflight"
+      ],
+      "description": "Derived internal top-owned signal driving aero_regfile.status_request_inflight."
+    },
+    {
+      "name": "aero_regfile_status_model_response_valid_seen",
+      "width": 1,
+      "source": "aero_safety_controller.aero_regfile_status_model_response_valid_seen",
+      "destinations": [
+        "aero_regfile.status_model_response_valid_seen"
+      ],
+      "description": "Derived internal top-owned signal driving aero_regfile.status_model_response_valid_seen."
+    },
+    {
+      "name": "aero_supervisor_cfg_enable",
+      "width": 1,
+      "source": "aero_safety_controller.aero_supervisor_cfg_enable",
+      "destinations": [
+        "aero_supervisor.cfg_enable"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_enable."
+    },
+    {
+      "name": "aero_supervisor_cfg_stream_velocity_mps_setpoint",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_cfg_stream_velocity_mps_setpoint",
+      "destinations": [
+        "aero_supervisor.cfg_stream_velocity_mps_setpoint"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_stream_velocity_mps_setpoint."
+    },
+    {
+      "name": "aero_supervisor_cfg_velocity_min_limit",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_cfg_velocity_min_limit",
+      "destinations": [
+        "aero_supervisor.cfg_velocity_min_limit"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_velocity_min_limit."
+    },
+    {
+      "name": "aero_supervisor_cfg_velocity_max_limit",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_cfg_velocity_max_limit",
+      "destinations": [
+        "aero_supervisor.cfg_velocity_max_limit"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_velocity_max_limit."
+    },
+    {
+      "name": "aero_supervisor_cfg_actuator_min_limit",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_cfg_actuator_min_limit",
+      "destinations": [
+        "aero_supervisor.cfg_actuator_min_limit"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_actuator_min_limit."
+    },
+    {
+      "name": "aero_supervisor_cfg_actuator_max_limit",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_cfg_actuator_max_limit",
+      "destinations": [
+        "aero_supervisor.cfg_actuator_max_limit"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_actuator_max_limit."
+    },
+    {
+      "name": "aero_supervisor_cfg_actuator_safe_position",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_cfg_actuator_safe_position",
+      "destinations": [
+        "aero_supervisor.cfg_actuator_safe_position"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_actuator_safe_position."
+    },
+    {
+      "name": "aero_supervisor_cfg_command_timeout_cycles",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_cfg_command_timeout_cycles",
+      "destinations": [
+        "aero_supervisor.cfg_command_timeout_cycles"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_command_timeout_cycles."
+    },
+    {
+      "name": "aero_supervisor_cfg_max_slew_rate",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_cfg_max_slew_rate",
+      "destinations": [
+        "aero_supervisor.cfg_max_slew_rate"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_max_slew_rate."
+    },
+    {
+      "name": "aero_supervisor_cfg_geometry_format_id",
+      "width": 8,
+      "source": "aero_safety_controller.aero_supervisor_cfg_geometry_format_id",
+      "destinations": [
+        "aero_supervisor.cfg_geometry_format_id"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_geometry_format_id."
+    },
+    {
+      "name": "aero_supervisor_cfg_geometry_source_id",
+      "width": 8,
+      "source": "aero_safety_controller.aero_supervisor_cfg_geometry_source_id",
+      "destinations": [
+        "aero_supervisor.cfg_geometry_source_id"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_geometry_source_id."
+    },
+    {
+      "name": "aero_supervisor_cfg_geometry_version",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_cfg_geometry_version",
+      "destinations": [
+        "aero_supervisor.cfg_geometry_version"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_geometry_version."
+    },
+    {
+      "name": "aero_supervisor_cfg_clear_faults",
+      "width": 1,
+      "source": "aero_safety_controller.aero_supervisor_cfg_clear_faults",
+      "destinations": [
+        "aero_supervisor.cfg_clear_faults"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.cfg_clear_faults."
+    },
+    {
+      "name": "aero_supervisor_req_ready",
+      "width": 1,
+      "source": "aero_safety_controller.aero_supervisor_req_ready",
+      "destinations": [
+        "aero_supervisor.req_ready"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.req_ready."
+    },
+    {
+      "name": "aero_supervisor_rsp_valid",
+      "width": 1,
+      "source": "aero_safety_controller.aero_supervisor_rsp_valid",
+      "destinations": [
+        "aero_supervisor.rsp_valid"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.rsp_valid."
+    },
+    {
+      "name": "aero_supervisor_rsp_seq",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_rsp_seq",
+      "destinations": [
+        "aero_supervisor.rsp_seq"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.rsp_seq."
+    },
+    {
+      "name": "aero_supervisor_rsp_drag_force",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_rsp_drag_force",
+      "destinations": [
+        "aero_supervisor.rsp_drag_force"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.rsp_drag_force."
+    },
+    {
+      "name": "aero_supervisor_rsp_lift_force",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_rsp_lift_force",
+      "destinations": [
+        "aero_supervisor.rsp_lift_force"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.rsp_lift_force."
+    },
+    {
+      "name": "aero_supervisor_rsp_surface_pressure",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_rsp_surface_pressure",
+      "destinations": [
+        "aero_supervisor.rsp_surface_pressure"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.rsp_surface_pressure."
+    },
+    {
+      "name": "aero_supervisor_rsp_flow_field",
+      "width": 16,
+      "source": "aero_safety_controller.aero_supervisor_rsp_flow_field",
+      "destinations": [
+        "aero_supervisor.rsp_flow_field"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.rsp_flow_field."
+    },
+    {
+      "name": "aero_supervisor_rsp_inference_status_not_executed",
+      "width": 1,
+      "source": "aero_safety_controller.aero_supervisor_rsp_inference_status_not_executed",
+      "destinations": [
+        "aero_supervisor.rsp_inference_status_not_executed"
+      ],
+      "description": "Derived internal top-owned signal driving aero_supervisor.rsp_inference_status_not_executed."
+    },
+    {
+      "name": "aero_supervisor_req_valid",
+      "width": 1,
+      "source": "aero_supervisor.req_valid",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_req_valid"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.req_valid."
+    },
+    {
+      "name": "aero_supervisor_req_seq",
+      "width": 16,
+      "source": "aero_supervisor.req_seq",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_req_seq"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.req_seq."
+    },
+    {
+      "name": "aero_supervisor_req_inflight",
+      "width": 1,
+      "source": "aero_supervisor.req_inflight",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_req_inflight"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.req_inflight."
+    },
+    {
+      "name": "aero_supervisor_fault_code",
+      "width": 4,
+      "source": "aero_supervisor.fault_code",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_fault_code"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.fault_code."
+    },
+    {
+      "name": "aero_supervisor_request_age_cycles",
+      "width": 16,
+      "source": "aero_supervisor.request_age_cycles",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_request_age_cycles"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.request_age_cycles."
+    },
+    {
+      "name": "aero_supervisor_request_stale",
+      "width": 1,
+      "source": "aero_supervisor.request_stale",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_request_stale"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.request_stale."
+    },
+    {
+      "name": "aero_supervisor_geometry_invalid",
+      "width": 1,
+      "source": "aero_supervisor.geometry_invalid",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_geometry_invalid"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.geometry_invalid."
+    },
+    {
+      "name": "aero_supervisor_out_of_range_fault",
+      "width": 1,
+      "source": "aero_supervisor.out_of_range_fault",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_out_of_range_fault"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.out_of_range_fault."
+    },
+    {
+      "name": "aero_supervisor_sequence_mismatch_fault",
+      "width": 1,
+      "source": "aero_supervisor.sequence_mismatch_fault",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_sequence_mismatch_fault"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.sequence_mismatch_fault."
+    },
+    {
+      "name": "aero_supervisor_service_unavailable_fault",
+      "width": 1,
+      "source": "aero_supervisor.service_unavailable_fault",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_service_unavailable_fault"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.service_unavailable_fault."
+    },
+    {
+      "name": "aero_supervisor_protocol_error_fault",
+      "width": 1,
+      "source": "aero_supervisor.protocol_error_fault",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_protocol_error_fault"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.protocol_error_fault."
+    },
+    {
+      "name": "aero_supervisor_stale_response_fault",
+      "width": 1,
+      "source": "aero_supervisor.stale_response_fault",
+      "destinations": [
+        "aero_safety_controller.aero_supervisor_stale_response_fault"
+      ],
+      "description": "Derived internal signal produced by aero_supervisor.stale_response_fault."
+    },
+    {
+      "name": "aero_command_sanitizer_cfg_actuator_min_limit",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_cfg_actuator_min_limit",
+      "destinations": [
+        "aero_command_sanitizer.cfg_actuator_min_limit"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.cfg_actuator_min_limit."
+    },
+    {
+      "name": "aero_command_sanitizer_cfg_actuator_max_limit",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_cfg_actuator_max_limit",
+      "destinations": [
+        "aero_command_sanitizer.cfg_actuator_max_limit"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.cfg_actuator_max_limit."
+    },
+    {
+      "name": "aero_command_sanitizer_cfg_actuator_safe_position",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_cfg_actuator_safe_position",
+      "destinations": [
+        "aero_command_sanitizer.cfg_actuator_safe_position"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.cfg_actuator_safe_position."
+    },
+    {
+      "name": "aero_command_sanitizer_cfg_max_slew_rate",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_cfg_max_slew_rate",
+      "destinations": [
+        "aero_command_sanitizer.cfg_max_slew_rate"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.cfg_max_slew_rate."
+    },
+    {
+      "name": "aero_command_sanitizer_cfg_enable",
+      "width": 1,
+      "source": "aero_safety_controller.aero_command_sanitizer_cfg_enable",
+      "destinations": [
+        "aero_command_sanitizer.cfg_enable"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.cfg_enable."
+    },
+    {
+      "name": "aero_command_sanitizer_fallback_active_in",
+      "width": 1,
+      "source": "aero_safety_controller.aero_command_sanitizer_fallback_active_in",
+      "destinations": [
+        "aero_command_sanitizer.fallback_active_in"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.fallback_active_in."
+    },
+    {
+      "name": "aero_command_sanitizer_fault_active_in",
+      "width": 1,
+      "source": "aero_safety_controller.aero_command_sanitizer_fault_active_in",
+      "destinations": [
+        "aero_command_sanitizer.fault_active_in"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.fault_active_in."
+    },
+    {
+      "name": "aero_command_sanitizer_req_seq",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_req_seq",
+      "destinations": [
+        "aero_command_sanitizer.req_seq"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.req_seq."
+    },
+    {
+      "name": "aero_command_sanitizer_rsp_valid",
+      "width": 1,
+      "source": "aero_safety_controller.aero_command_sanitizer_rsp_valid",
+      "destinations": [
+        "aero_command_sanitizer.rsp_valid"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.rsp_valid."
+    },
+    {
+      "name": "aero_command_sanitizer_rsp_seq",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_rsp_seq",
+      "destinations": [
+        "aero_command_sanitizer.rsp_seq"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.rsp_seq."
+    },
+    {
+      "name": "aero_command_sanitizer_rsp_drag_force",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_rsp_drag_force",
+      "destinations": [
+        "aero_command_sanitizer.rsp_drag_force"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.rsp_drag_force."
+    },
+    {
+      "name": "aero_command_sanitizer_rsp_lift_force",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_rsp_lift_force",
+      "destinations": [
+        "aero_command_sanitizer.rsp_lift_force"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.rsp_lift_force."
+    },
+    {
+      "name": "aero_command_sanitizer_rsp_surface_pressure",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_rsp_surface_pressure",
+      "destinations": [
+        "aero_command_sanitizer.rsp_surface_pressure"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.rsp_surface_pressure."
+    },
+    {
+      "name": "aero_command_sanitizer_rsp_flow_field",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_rsp_flow_field",
+      "destinations": [
+        "aero_command_sanitizer.rsp_flow_field"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.rsp_flow_field."
+    },
+    {
+      "name": "aero_command_sanitizer_safe_position_source",
+      "width": 16,
+      "source": "aero_safety_controller.aero_command_sanitizer_safe_position_source",
+      "destinations": [
+        "aero_command_sanitizer.safe_position_source"
+      ],
+      "description": "Derived internal top-owned signal driving aero_command_sanitizer.safe_position_source."
+    },
+    {
+      "name": "aero_command_sanitizer_cmd_position",
+      "width": 16,
+      "source": "aero_command_sanitizer.cmd_position",
+      "destinations": [
+        "aero_safety_controller.aero_command_sanitizer_cmd_position"
+      ],
+      "description": "Derived internal signal produced by aero_command_sanitizer.cmd_position."
+    },
+    {
+      "name": "aero_command_sanitizer_cmd_valid",
+      "width": 1,
+      "source": "aero_command_sanitizer.cmd_valid",
+      "destinations": [
+        "aero_safety_controller.aero_command_sanitizer_cmd_valid"
+      ],
+      "description": "Derived internal signal produced by aero_command_sanitizer.cmd_valid."
+    },
+    {
+      "name": "aero_command_sanitizer_cmd_enable",
+      "width": 1,
+      "source": "aero_command_sanitizer.cmd_enable",
+      "destinations": [
+        "aero_safety_controller.aero_command_sanitizer_cmd_enable"
+      ],
+      "description": "Derived internal signal produced by aero_command_sanitizer.cmd_enable."
+    },
+    {
+      "name": "aero_command_sanitizer_cmd_seq",
+      "width": 16,
+      "source": "aero_command_sanitizer.cmd_seq",
+      "destinations": [
+        "aero_safety_controller.aero_command_sanitizer_cmd_seq"
+      ],
+      "description": "Derived internal signal produced by aero_command_sanitizer.cmd_seq."
+    },
+    {
+      "name": "aero_command_sanitizer_fallback_active_out",
+      "width": 1,
+      "source": "aero_command_sanitizer.fallback_active_out",
+      "destinations": [
+        "aero_safety_controller.aero_command_sanitizer_fallback_active_out"
+      ],
+      "description": "Derived internal signal produced by aero_command_sanitizer.fallback_active_out."
+    },
+    {
+      "name": "aero_command_sanitizer_clamp_applied",
+      "width": 1,
+      "source": "aero_command_sanitizer.clamp_applied",
+      "destinations": [
+        "aero_safety_controller.aero_command_sanitizer_clamp_applied"
+      ],
+      "description": "Derived internal signal produced by aero_command_sanitizer.clamp_applied."
+    },
+    {
+      "name": "aero_command_sanitizer_clamp_event_pulse",
+      "width": 1,
+      "source": "aero_command_sanitizer.clamp_event_pulse",
+      "destinations": [
+        "aero_safety_controller.aero_command_sanitizer_clamp_event_pulse"
+      ],
+      "description": "Derived internal signal produced by aero_command_sanitizer.clamp_event_pulse."
+    },
+    {
+      "name": "aero_command_sanitizer_sanitized_position",
+      "width": 16,
+      "source": "aero_command_sanitizer.sanitized_position",
+      "destinations": [
+        "aero_safety_controller.aero_command_sanitizer_sanitized_position"
+      ],
+      "description": "Derived internal signal produced by aero_command_sanitizer.sanitized_position."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "aero_regfile_cfg_enable",
+      "owner": "aero_regfile.cfg_enable"
+    },
+    {
+      "signal": "aero_regfile_cfg_stream_velocity_mps_setpoint",
+      "owner": "aero_regfile.cfg_stream_velocity_mps_setpoint"
+    },
+    {
+      "signal": "aero_regfile_cfg_velocity_min_limit",
+      "owner": "aero_regfile.cfg_velocity_min_limit"
+    },
+    {
+      "signal": "aero_regfile_cfg_velocity_max_limit",
+      "owner": "aero_regfile.cfg_velocity_max_limit"
+    },
+    {
+      "signal": "aero_regfile_cfg_actuator_min_limit",
+      "owner": "aero_regfile.cfg_actuator_min_limit"
+    },
+    {
+      "signal": "aero_regfile_cfg_actuator_max_limit",
+      "owner": "aero_regfile.cfg_actuator_max_limit"
+    },
+    {
+      "signal": "aero_regfile_cfg_actuator_safe_position",
+      "owner": "aero_regfile.cfg_actuator_safe_position"
+    },
+    {
+      "signal": "aero_regfile_cfg_command_timeout_cycles",
+      "owner": "aero_regfile.cfg_command_timeout_cycles"
+    },
+    {
+      "signal": "aero_regfile_cfg_max_slew_rate",
+      "owner": "aero_regfile.cfg_max_slew_rate"
+    },
+    {
+      "signal": "aero_regfile_cfg_geometry_format_id",
+      "owner": "aero_regfile.cfg_geometry_format_id"
+    },
+    {
+      "signal": "aero_regfile_cfg_geometry_source_id",
+      "owner": "aero_regfile.cfg_geometry_source_id"
+    },
+    {
+      "signal": "aero_regfile_cfg_geometry_version",
+      "owner": "aero_regfile.cfg_geometry_version"
+    },
+    {
+      "signal": "aero_regfile_cfg_clear_faults",
+      "owner": "aero_regfile.cfg_clear_faults"
+    },
+    {
+      "signal": "aero_regfile_status_current_state",
+      "owner": "aero_safety_controller.aero_regfile_status_current_state"
+    },
+    {
+      "signal": "aero_regfile_status_last_fault_code",
+      "owner": "aero_safety_controller.aero_regfile_status_last_fault_code"
+    },
+    {
+      "signal": "aero_regfile_status_stale_reject_count",
+      "owner": "aero_safety_controller.aero_regfile_status_stale_reject_count"
+    },
+    {
+      "signal": "aero_regfile_status_clamp_event_count",
+      "owner": "aero_safety_controller.aero_regfile_status_clamp_event_count"
+    },
+    {
+      "signal": "aero_regfile_status_fallback_active",
+      "owner": "aero_safety_controller.aero_regfile_status_fallback_active"
+    },
+    {
+      "signal": "aero_regfile_status_last_accepted_seq",
+      "owner": "aero_safety_controller.aero_regfile_status_last_accepted_seq"
+    },
+    {
+      "signal": "aero_regfile_status_last_response_age",
+      "owner": "aero_safety_controller.aero_regfile_status_last_response_age"
+    },
+    {
+      "signal": "aero_regfile_status_request_inflight",
+      "owner": "aero_safety_controller.aero_regfile_status_request_inflight"
+    },
+    {
+      "signal": "aero_regfile_status_model_response_valid_seen",
+      "owner": "aero_safety_controller.aero_regfile_status_model_response_valid_seen"
+    },
+    {
+      "signal": "aero_supervisor_cfg_enable",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_enable"
+    },
+    {
+      "signal": "aero_supervisor_cfg_stream_velocity_mps_setpoint",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_stream_velocity_mps_setpoint"
+    },
+    {
+      "signal": "aero_supervisor_cfg_velocity_min_limit",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_velocity_min_limit"
+    },
+    {
+      "signal": "aero_supervisor_cfg_velocity_max_limit",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_velocity_max_limit"
+    },
+    {
+      "signal": "aero_supervisor_cfg_actuator_min_limit",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_actuator_min_limit"
+    },
+    {
+      "signal": "aero_supervisor_cfg_actuator_max_limit",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_actuator_max_limit"
+    },
+    {
+      "signal": "aero_supervisor_cfg_actuator_safe_position",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_actuator_safe_position"
+    },
+    {
+      "signal": "aero_supervisor_cfg_command_timeout_cycles",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_command_timeout_cycles"
+    },
+    {
+      "signal": "aero_supervisor_cfg_max_slew_rate",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_max_slew_rate"
+    },
+    {
+      "signal": "aero_supervisor_cfg_geometry_format_id",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_geometry_format_id"
+    },
+    {
+      "signal": "aero_supervisor_cfg_geometry_source_id",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_geometry_source_id"
+    },
+    {
+      "signal": "aero_supervisor_cfg_geometry_version",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_geometry_version"
+    },
+    {
+      "signal": "aero_supervisor_cfg_clear_faults",
+      "owner": "aero_safety_controller.aero_supervisor_cfg_clear_faults"
+    },
+    {
+      "signal": "aero_supervisor_req_ready",
+      "owner": "aero_safety_controller.aero_supervisor_req_ready"
+    },
+    {
+      "signal": "aero_supervisor_rsp_valid",
+      "owner": "aero_safety_controller.aero_supervisor_rsp_valid"
+    },
+    {
+      "signal": "aero_supervisor_rsp_seq",
+      "owner": "aero_safety_controller.aero_supervisor_rsp_seq"
+    },
+    {
+      "signal": "aero_supervisor_rsp_drag_force",
+      "owner": "aero_safety_controller.aero_supervisor_rsp_drag_force"
+    },
+    {
+      "signal": "aero_supervisor_rsp_lift_force",
+      "owner": "aero_safety_controller.aero_supervisor_rsp_lift_force"
+    },
+    {
+      "signal": "aero_supervisor_rsp_surface_pressure",
+      "owner": "aero_safety_controller.aero_supervisor_rsp_surface_pressure"
+    },
+    {
+      "signal": "aero_supervisor_rsp_flow_field",
+      "owner": "aero_safety_controller.aero_supervisor_rsp_flow_field"
+    },
+    {
+      "signal": "aero_supervisor_rsp_inference_status_not_executed",
+      "owner": "aero_safety_controller.aero_supervisor_rsp_inference_status_not_executed"
+    },
+    {
+      "signal": "aero_supervisor_req_valid",
+      "owner": "aero_supervisor.req_valid"
+    },
+    {
+      "signal": "aero_supervisor_req_seq",
+      "owner": "aero_supervisor.req_seq"
+    },
+    {
+      "signal": "aero_supervisor_req_inflight",
+      "owner": "aero_supervisor.req_inflight"
+    },
+    {
+      "signal": "aero_supervisor_fault_code",
+      "owner": "aero_supervisor.fault_code"
+    },
+    {
+      "signal": "aero_supervisor_request_age_cycles",
+      "owner": "aero_supervisor.request_age_cycles"
+    },
+    {
+      "signal": "aero_supervisor_request_stale",
+      "owner": "aero_supervisor.request_stale"
+    },
+    {
+      "signal": "aero_supervisor_geometry_invalid",
+      "owner": "aero_supervisor.geometry_invalid"
+    },
+    {
+      "signal": "aero_supervisor_out_of_range_fault",
+      "owner": "aero_supervisor.out_of_range_fault"
+    },
+    {
+      "signal": "aero_supervisor_sequence_mismatch_fault",
+      "owner": "aero_supervisor.sequence_mismatch_fault"
+    },
+    {
+      "signal": "aero_supervisor_service_unavailable_fault",
+      "owner": "aero_supervisor.service_unavailable_fault"
+    },
+    {
+      "signal": "aero_supervisor_protocol_error_fault",
+      "owner": "aero_supervisor.protocol_error_fault"
+    },
+    {
+      "signal": "aero_supervisor_stale_response_fault",
+      "owner": "aero_supervisor.stale_response_fault"
+    },
+    {
+      "signal": "aero_command_sanitizer_cfg_actuator_min_limit",
+      "owner": "aero_safety_controller.aero_command_sanitizer_cfg_actuator_min_limit"
+    },
+    {
+      "signal": "aero_command_sanitizer_cfg_actuator_max_limit",
+      "owner": "aero_safety_controller.aero_command_sanitizer_cfg_actuator_max_limit"
+    },
+    {
+      "signal": "aero_command_sanitizer_cfg_actuator_safe_position",
+      "owner": "aero_safety_controller.aero_command_sanitizer_cfg_actuator_safe_position"
+    },
+    {
+      "signal": "aero_command_sanitizer_cfg_max_slew_rate",
+      "owner": "aero_safety_controller.aero_command_sanitizer_cfg_max_slew_rate"
+    },
+    {
+      "signal": "aero_command_sanitizer_cfg_enable",
+      "owner": "aero_safety_controller.aero_command_sanitizer_cfg_enable"
+    },
+    {
+      "signal": "aero_command_sanitizer_fallback_active_in",
+      "owner": "aero_safety_controller.aero_command_sanitizer_fallback_active_in"
+    },
+    {
+      "signal": "aero_command_sanitizer_fault_active_in",
+      "owner": "aero_safety_controller.aero_command_sanitizer_fault_active_in"
+    },
+    {
+      "signal": "aero_command_sanitizer_req_seq",
+      "owner": "aero_safety_controller.aero_command_sanitizer_req_seq"
+    },
+    {
+      "signal": "aero_command_sanitizer_rsp_valid",
+      "owner": "aero_safety_controller.aero_command_sanitizer_rsp_valid"
+    },
+    {
+      "signal": "aero_command_sanitizer_rsp_seq",
+      "owner": "aero_safety_controller.aero_command_sanitizer_rsp_seq"
+    },
+    {
+      "signal": "aero_command_sanitizer_rsp_drag_force",
+      "owner": "aero_safety_controller.aero_command_sanitizer_rsp_drag_force"
+    },
+    {
+      "signal": "aero_command_sanitizer_rsp_lift_force",
+      "owner": "aero_safety_controller.aero_command_sanitizer_rsp_lift_force"
+    },
+    {
+      "signal": "aero_command_sanitizer_rsp_surface_pressure",
+      "owner": "aero_safety_controller.aero_command_sanitizer_rsp_surface_pressure"
+    },
+    {
+      "signal": "aero_command_sanitizer_rsp_flow_field",
+      "owner": "aero_safety_controller.aero_command_sanitizer_rsp_flow_field"
+    },
+    {
+      "signal": "aero_command_sanitizer_safe_position_source",
+      "owner": "aero_safety_controller.aero_command_sanitizer_safe_position_source"
+    },
+    {
+      "signal": "aero_command_sanitizer_cmd_position",
+      "owner": "aero_command_sanitizer.cmd_position"
+    },
+    {
+      "signal": "aero_command_sanitizer_cmd_valid",
+      "owner": "aero_command_sanitizer.cmd_valid"
+    },
+    {
+      "signal": "aero_command_sanitizer_cmd_enable",
+      "owner": "aero_command_sanitizer.cmd_enable"
+    },
+    {
+      "signal": "aero_command_sanitizer_cmd_seq",
+      "owner": "aero_command_sanitizer.cmd_seq"
+    },
+    {
+      "signal": "aero_command_sanitizer_fallback_active_out",
+      "owner": "aero_command_sanitizer.fallback_active_out"
+    },
+    {
+      "signal": "aero_command_sanitizer_clamp_applied",
+      "owner": "aero_command_sanitizer.clamp_applied"
+    },
+    {
+      "signal": "aero_command_sanitizer_clamp_event_pulse",
+      "owner": "aero_command_sanitizer.clamp_event_pulse"
+    },
+    {
+      "signal": "aero_command_sanitizer_sanitized_position",
+      "owner": "aero_command_sanitizer.sanitized_position"
+    },
+    {
+      "signal": "host_reg_ready",
+      "owner": "aero_regfile.host_reg_ready"
+    },
+    {
+      "signal": "host_reg_rdata",
+      "owner": "aero_regfile.host_reg_rdata"
+    },
+    {
+      "signal": "host_reg_rvalid",
+      "owner": "aero_regfile.host_reg_rvalid"
+    },
+    {
+      "signal": "current_state",
+      "owner": "aero_supervisor.current_state"
+    },
+    {
+      "signal": "stale_reject_count",
+      "owner": "aero_supervisor.stale_reject_count"
+    },
+    {
+      "signal": "clamp_event_count",
+      "owner": "aero_supervisor.clamp_event_count"
+    },
+    {
+      "signal": "fallback_active",
+      "owner": "aero_supervisor.fallback_active"
+    },
+    {
+      "signal": "last_accepted_seq",
+      "owner": "aero_supervisor.last_accepted_seq"
+    },
+    {
+      "signal": "last_response_age",
+      "owner": "aero_supervisor.last_response_age"
+    },
+    {
+      "signal": "model_response_valid_seen",
+      "owner": "aero_supervisor.model_response_valid_seen"
+    }
+  ],
+  "register_contract": {}
+}

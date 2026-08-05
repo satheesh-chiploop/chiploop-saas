@@ -1,6 +1,0 @@
-# ChipLoop starter PDC for pwm_fpga_demo
-# target_frequency_mhz 12.0
-ldc_set_location -site {G13} [get_ports {clk}]
-ldc_set_port -iobuf {IO_TYPE=LVCMOS33} [get_ports {clk}]
-ldc_set_location -site {B3} [get_ports {led}]
-ldc_set_port -iobuf {IO_TYPE=LVCMOS33} [get_ports {led}]

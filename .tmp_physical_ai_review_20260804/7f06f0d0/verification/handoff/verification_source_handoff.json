@@ -1,0 +1,48 @@
+{
+  "type": "digital_verification_source_handoff",
+  "source_workflow_id": "e6547d97-b8ef-40ca-86b0-a6d310c4d840",
+  "spec_source_path": "backend/workflows/e6547d97-b8ef-40ca-86b0-a6d310c4d840/spec/aero_safety_controller_spec.json",
+  "rtl_source_paths": [
+    "/root/chiploop-backend/backend/workflows/e6547d97-b8ef-40ca-86b0-a6d310c4d840/handoff/aero_safety_controller_ip_package/rtl/aero_command_sanitizer.v"
+  ],
+  "rtl_source_kind": "arch2rtl_rtl",
+  "mbist_integrated_rtl": false,
+  "top_module": "aero_safety_controller",
+  "local_spec_path": "/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/spec/aero_safety_controller_spec.json",
+  "local_rtl_files": [
+    "/root/chiploop-backend/backend/workflows/7f06f0d0-f3bf-4147-a1c0-a6f1c9ff0019/handoff/rtl/aero_command_sanitizer.v"
+  ],
+  "local_sdc_files": [],
+  "clock_intent": {
+    "type": "digital_clock_intent",
+    "clocks": [
+      {
+        "name": "clk",
+        "port": "clk",
+        "frequency_mhz": null,
+        "period_ns": null,
+        "source": "rtl_port_inference",
+        "needs_user_frequency": true
+      }
+    ],
+    "resets": [
+      {
+        "name": "rst_n",
+        "port": "rst_n",
+        "active_low": true,
+        "source": "rtl_port_inference"
+      }
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "rst_n",
+    "needs_user_review": true,
+    "provenance": {
+      "requested": false,
+      "sdc_clocks": 0,
+      "spec_clocks": 0,
+      "rtl_clocks": 1,
+      "spec_resets": 0,
+      "rtl_resets": 1
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "type": "pd_signoff_closure_chart",
+  "series": [],
+  "status": "skipped",
+  "reason": "signoff_closure_loop_not_enabled"
+}

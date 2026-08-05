@@ -1,0 +1,54 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "aero_command_sanitizer",
+  "generated_at": "2026-08-05T05:38:15.083806",
+  "file_count": 9,
+  "files": [
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "9df491baf64fb6267a5737aba7864d63939e7ad9090417bfeb4892b1fc9b7f13",
+      "bytes": 19956
+    },
+    {
+      "path": "docs/spec/digital_spec.json",
+      "sha256": "9673c23961daae31a80e91992328be39f9f29165f8c888fde4905d4ad049fcf1",
+      "bytes": 95169
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "233af998db0e62d995a340b42e30f56e53fd8bb8605739bc5d3c8fda40dcebae",
+      "bytes": 2291
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "5139584a01cd29a996cf67484712774771849b2f7d41cee62b3482f7877d4d7b",
+      "bytes": 826
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "e8a733fe9e373b22802c5df1d8d0115e7cc978815340b12d75e6846a570f8eb5",
+      "bytes": 334
+    },
+    {
+      "path": "rtl/aero_command_sanitizer.v",
+      "sha256": "42ca809afb6b209411762e70eb43e04f4a64e614cfe9c29971cea2c79aec0e38",
+      "bytes": 4149
+    },
+    {
+      "path": "rtl/aero_regfile.v",
+      "sha256": "1bab352e0778f5611810cfbc4d5738006857dfb9c16f334a32f8376c873ca899",
+      "bytes": 8141
+    },
+    {
+      "path": "rtl/aero_safety_controller.v",
+      "sha256": "4687b68f96413b7b097f47a152416b67e44be0be407fb0c40fe9ccd8a12f2ef8",
+      "bytes": 23213
+    },
+    {
+      "path": "rtl/aero_supervisor.v",
+      "sha256": "278c8b7fcd06b63b82adff8e18dc0cb0415bee25e076c4addfe412975320c96d",
+      "bytes": 11438
+    }
+  ]
+}

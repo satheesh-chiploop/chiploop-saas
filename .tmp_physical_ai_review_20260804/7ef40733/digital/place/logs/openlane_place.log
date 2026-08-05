@@ -1,0 +1,1111 @@
+== ChipLoop: Digital Placement Agent ==
+PDK_VARIANT=sky130A
+OPENLANE_IMAGE=ghcr.io/efabless/openlane2:2.4.0.dev1
+WORKDIR=/work
+[05:38:30] INFO     Loading the design configuration file has      config.py:716
+                    generated the following warnings:                           
+[05:38:30] WARNING  The configuration variable 'PL_TARGET_DENSITY' config.py:720
+                    is deprecated. Please check the docs for the                
+                    usage on the replacement variable                           
+                    'PL_TARGET_DENSITY_PCT'.                                    
+[05:38:30] WARNING  An unknown key 'CHIPLOOP_FILELIST' was         config.py:720
+                    provided.                                                   
+[05:38:30] WARNING  An unknown key 'CHIPLOOP_SOURCE_SPEC_JSON' was config.py:720
+                    provided.                                                   
+[05:38:30] WARNING  An unknown key 'CHIPLOOP_UPSTREAM_SDC_SOURCE'  config.py:720
+                    was provided.                                               
+[05:38:30] INFO     Starting a new run of the 'Classic' flow with    flow.py:628
+                    the tag                                                     
+                    'Digital_Arch2Tapeout_7ef40733-5be0-4054-8943-44            
+                    1591ec8735'.                                                
+[05:38:30] INFO     Starting…                                  sequential.py:294
+[05:38:30] INFO     Gating variable for step 'Verilator.Lint'  sequential.py:317
+                    set to 'False'- the step will be skipped.                   
+[05:38:30] INFO     Skipping step 'Verilator Lint'…            sequential.py:325
+[05:38:30] INFO     Gating variable for step                   sequential.py:317
+                    'Checker.LintTimingConstructs' set to                       
+                    'False'- the step will be skipped.                          
+[05:38:30] INFO     Skipping step 'Lint Timing Error Checker'… sequential.py:325
+[05:38:30] INFO     Gating variable for step                   sequential.py:317
+                    'Checker.LintErrors' set to 'False'- the                    
+                    step will be skipped.                                       
+[05:38:30] INFO     Skipping step 'Lint Errors Checker'…       sequential.py:325
+[05:38:30] INFO     Gating variable for step                   sequential.py:317
+                    'Checker.LintWarnings' set to 'False'- the                  
+                    step will be skipped.                                       
+[05:38:30] INFO     Skipping step 'Lint Warnings Checker'…     sequential.py:325
+───────────────────────────── Generate JSON Header ─────────────────────────────
+[05:38:30] VERBOSE  Running 'Yosys.JsonHeader' at                   step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_7ef40733-5be0-             
+                    4054-8943-441591ec8735/01-yosys-jsonheader'…                
+[05:38:31] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_7ef40733-5be0-             
+                    4054-8943-441591ec8735/01-yosys-jsonheader/yosy             
+                    s-jsonheader.log'…                                          
+                                                                                
+/----------------------------------------------------------------------------\  
+|  yosys -- Yosys Open SYnthesis Suite                                       |  
+|  Copyright (C) 2012 - 2024  Claire Xenia Wolf <claire@yosyshq.com>         |  
+|  Distributed under an ISC-like license, type "license" to see terms        |  
+\----------------------------------------------------------------------------/  
+Yosys 0.46 (git sha1 e97731b9dda91fa5fa53ed87df7c34163ba59a41, clang++ 17.0.6   
+-fPIC -O3)                                                                      
+Loaded SDC plugin                                                               
+                                                                                
+1. Executing Verilog-2005 frontend:                                             
+/work/place/runs/Digital_Arch2Tapeout_7ef40733-5be0-4054-8943-441591ec8735/tmp/5
+ca2dbbe22064f01abfb6f4eaf1cb1ca.bb.v                                            
+Parsing SystemVerilog input from                                                
+`/work/place/runs/Digital_Arch2Tapeout_7ef40733-5be0-4054-8943-441591ec8735/tmp/
+5ca2dbbe22064f01abfb6f4eaf1cb1ca.bb.v' to AST representation.                   
+Generating RTLIL representation for module `\sky130_ef_sc_hd__decap_12'.        
+Generating RTLIL representation for module `\sky130_ef_sc_hd__fill_12'.         
+Generating RTLIL representation for module `\sky130_ef_sc_hd__fill_4'.          
+Generating RTLIL representation for module `\sky130_ef_sc_hd__fill_8'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111o_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111o_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111o_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111oi_0'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111oi_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111oi_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111oi_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211o_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211o_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211o_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211oi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211oi_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211oi_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21bo_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21bo_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21bo_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21boi_0'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21boi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21boi_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21boi_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221o_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221o_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221o_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221oi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221oi_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221oi_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a222oi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2o_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2o_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2o_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2oi_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2oi_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2oi_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311o_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311o_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311o_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311oi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311oi_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311oi_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2_0'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4bb_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4bb_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4bb_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_12'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_16'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_6'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_8'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__bufbuf_16'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__bufbuf_8'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__bufinv_16'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__bufinv_8'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_16'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_8'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s15_1'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s15_2'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s18_1'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s18_2'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s25_1'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s25_2'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s50_1'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s50_2'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_16'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_8'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinvlp_2'.      
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinvlp_4'.      
+Generating RTLIL representation for module `\sky130_fd_sc_hd__conb_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_12'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_3'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_6'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfbbn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfbbn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfbbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrbp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfsbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfsbp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfstp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfstp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfstp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxbp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxtp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxtp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxtp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__diode_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlclkp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlclkp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlclkp_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrbn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrbn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrbp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtn_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxbn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxbn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxtn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxtn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxtn_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxtp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlygate4sd1_1'.   
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlygate4sd2_1'.   
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlygate4sd3_1'.   
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlymetal6s2s_1'.  
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlymetal6s4s_1'.  
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlymetal6s6s_1'.  
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ebufn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ebufn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ebufn_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ebufn_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__edfxbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__edfxtp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_0'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvp_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fa_1'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fa_2'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fa_4'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fah_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fahcin_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fahcon_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_8'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ha_1'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ha_2'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ha_4'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_12'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_16'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_6'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_8'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__lpflow_bleeder_1'.
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_1'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_16'.                                      
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_2'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_4'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_8'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_1'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_16'.                                      
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_2'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_4'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_8'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_12'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_3'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_4'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_6'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_8'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputiso0n_1'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputiso0p_1'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputiso1n_1'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputiso1p_1'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputisolatch_1'.                                     
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_1'.                                         
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_16'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_2'.                                         
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_4'.                                         
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_8'.                                         
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrckapwr_16'.                                   
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_1'.                           
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_2'.                           
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_4'.                           
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_4'.                                  
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_1'.                              
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_2'.                              
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_4'.                              
+Generating RTLIL representation for module `\sky130_fd_sc_hd__macro_sparecell'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__maj3_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__maj3_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__maj3_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2_8'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2i_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2i_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2i_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux4_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux4_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux4_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2b_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2b_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2b_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3b_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3b_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3b_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4b_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4b_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4b_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4bb_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4bb_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4bb_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_8'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4bb_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4bb_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4bb_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111a_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111a_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111a_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111ai_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111ai_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111ai_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211a_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211a_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211a_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211ai_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211ai_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211ai_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ai_0'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ba_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ba_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ba_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21bai_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21bai_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21bai_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221a_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221a_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221a_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221ai_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221ai_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221ai_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2a_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2a_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2a_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2ai_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2ai_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2ai_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311a_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311a_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311a_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311ai_0'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311ai_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311ai_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311ai_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_0'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2b_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2b_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2b_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3b_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3b_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3b_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4b_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4b_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4b_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4bb_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4bb_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4bb_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__probe_p_8'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__probec_p_8'.      
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfbbn_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfbbn_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfbbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrbp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrtn_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrtp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrtp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrtp_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfsbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfsbp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfstp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfstp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfstp_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxbp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxtp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxtp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxtp_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdlclkp_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdlclkp_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdlclkp_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxbp_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxbp_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxtp_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxtp_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxtp_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tap_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tap_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tapvgnd2_1'.      
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tapvgnd_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tapvpwrvgnd_1'.   
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor2_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor2_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor2_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor3_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor3_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor3_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor2_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor2_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor2_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor3_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor3_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor3_4'.          
+Successfully finished Verilog frontend.                                         
+                                                                                
+2. Executing Verilog-2005 frontend: inputs/netlist/aero_command_sanitizer.v     
+Parsing SystemVerilog input from `inputs/netlist/aero_command_sanitizer.v' to   
+AST representation.                                                             
+Storing AST representation for module `$abstract\aero_command_sanitizer'.       
+Successfully finished Verilog frontend.                                         
+                                                                                
+3. Executing Verilog-2005 frontend: inputs/netlist/aero_regfile.v               
+Parsing SystemVerilog input from `inputs/netlist/aero_regfile.v' to AST         
+representation.                                                                 
+Storing AST representation for module `$abstract\aero_regfile'.                 
+Successfully finished Verilog frontend.                                         
+                                                                                
+4. Executing Verilog-2005 frontend: inputs/netlist/aero_safety_controller.v     
+Parsing SystemVerilog input from `inputs/netlist/aero_safety_controller.v' to   
+AST representation.                                                             
+Storing AST representation for module `$abstract\aero_safety_controller'.       
+Successfully finished Verilog frontend.                                         
+                                                                                
+5. Executing Verilog-2005 frontend: inputs/netlist/aero_supervisor.v            
+Parsing SystemVerilog input from `inputs/netlist/aero_supervisor.v' to AST      
+representation.                                                                 
+Storing AST representation for module `$abstract\aero_supervisor'.              
+Successfully finished Verilog frontend.                                         
+                                                                                
+6. Executing Verilog-2005 frontend:                                             
+inputs/netlist/df7700e5f2ca489d911ab98ff822373c.bb.v                            
+Parsing SystemVerilog input from                                                
+`inputs/netlist/df7700e5f2ca489d911ab98ff822373c.bb.v' to AST representation.   
+Storing AST representation for module `$abstract\sky130_ef_sc_hd__decap_12'.    
+Storing AST representation for module `$abstract\sky130_ef_sc_hd__fill_12'.     
+Storing AST representation for module `$abstract\sky130_ef_sc_hd__fill_4'.      
+Storing AST representation for module `$abstract\sky130_ef_sc_hd__fill_8'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2111o_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2111o_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2111o_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2111oi_0'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2111oi_1'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2111oi_2'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2111oi_4'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a211o_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a211o_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a211o_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a211oi_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a211oi_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a211oi_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21bo_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21bo_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21bo_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21boi_0'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21boi_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21boi_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21boi_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21o_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21o_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21o_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21oi_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21oi_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a21oi_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a221o_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a221o_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a221o_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a221oi_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a221oi_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a221oi_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a222oi_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a22o_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a22o_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a22o_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a22oi_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a22oi_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a22oi_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2bb2o_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2bb2o_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2bb2o_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2bb2oi_1'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2bb2oi_2'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a2bb2oi_4'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a311o_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a311o_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a311o_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a311oi_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a311oi_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a311oi_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a31o_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a31o_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a31o_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a31oi_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a31oi_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a31oi_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a32o_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a32o_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a32o_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a32oi_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a32oi_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a32oi_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a41o_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a41o_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a41o_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a41oi_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a41oi_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__a41oi_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and2_0'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and2_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and2_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and2_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and2b_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and2b_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and2b_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and3_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and3_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and3_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and3b_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and3b_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and3b_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and4_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and4_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and4_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and4b_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and4b_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and4b_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and4bb_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and4bb_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__and4bb_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__buf_1'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__buf_12'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__buf_16'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__buf_2'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__buf_4'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__buf_6'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__buf_8'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__bufbuf_16'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__bufbuf_8'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__bufinv_16'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__bufinv_8'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkbuf_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkbuf_16'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkbuf_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkbuf_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkbuf_8'.    
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__clkdlybuf4s15_1'.                                   
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__clkdlybuf4s15_2'.                                   
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__clkdlybuf4s18_1'.                                   
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__clkdlybuf4s18_2'.                                   
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__clkdlybuf4s25_1'.                                   
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__clkdlybuf4s25_2'.                                   
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__clkdlybuf4s50_1'.                                   
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__clkdlybuf4s50_2'.                                   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkinv_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkinv_16'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkinv_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkinv_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkinv_8'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkinvlp_2'.  
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__clkinvlp_4'.  
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__conb_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__decap_12'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__decap_3'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__decap_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__decap_6'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__decap_8'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfbbn_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfbbn_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfbbp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfrbp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfrbp_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfrtn_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfrtp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfrtp_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfrtp_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfsbp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfsbp_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfstp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfstp_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfstp_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfxbp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfxbp_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfxtp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfxtp_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dfxtp_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__diode_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlclkp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlclkp_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlclkp_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrbn_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrbn_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrbp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrbp_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrtn_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrtn_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrtn_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrtp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrtp_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlrtp_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlxbn_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlxbn_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlxbp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlxtn_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlxtn_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlxtn_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__dlxtp_1'.     
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__dlygate4sd1_1'.                                     
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__dlygate4sd2_1'.                                     
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__dlygate4sd3_1'.                                     
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__dlymetal6s2s_1'.                                    
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__dlymetal6s4s_1'.                                    
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__dlymetal6s6s_1'.                                    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__ebufn_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__ebufn_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__ebufn_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__ebufn_8'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__edfxbp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__edfxtp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__einvn_0'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__einvn_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__einvn_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__einvn_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__einvn_8'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__einvp_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__einvp_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__einvp_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__einvp_8'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fa_1'.        
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fa_2'.        
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fa_4'.        
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fah_1'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fahcin_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fahcon_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fill_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fill_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fill_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__fill_8'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__ha_1'.        
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__ha_2'.        
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__ha_4'.        
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__inv_1'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__inv_12'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__inv_16'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__inv_2'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__inv_4'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__inv_6'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__inv_8'.       
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_bleeder_1'.                                  
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkbufkapwr_1'.                              
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkbufkapwr_16'.                             
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkbufkapwr_2'.                              
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkbufkapwr_4'.                              
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkbufkapwr_8'.                              
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkinvkapwr_1'.                              
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkinvkapwr_16'.                             
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkinvkapwr_2'.                              
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkinvkapwr_4'.                              
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_clkinvkapwr_8'.                              
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_decapkapwr_12'.                              
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_decapkapwr_3'.                               
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_decapkapwr_4'.                               
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_decapkapwr_6'.                               
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_decapkapwr_8'.                               
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_inputiso0n_1'.                               
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_inputiso0p_1'.                               
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_inputiso1n_1'.                               
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_inputiso1p_1'.                               
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_inputisolatch_1'.                            
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_isobufsrc_1'.                                
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_isobufsrc_16'.                               
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_isobufsrc_2'.                                
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_isobufsrc_4'.                                
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_isobufsrc_8'.                                
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_isobufsrckapwr_16'.                          
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_1'.                  
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_2'.                  
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_4'.                  
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_4'.                         
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_1'.                     
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_2'.                     
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_4'.                     
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__macro_sparecell'.                                   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__maj3_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__maj3_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__maj3_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux2_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux2_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux2_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux2_8'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux2i_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux2i_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux2i_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux4_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux4_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__mux4_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand2_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand2_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand2_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand2_8'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand2b_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand2b_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand2b_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand3_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand3_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand3_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand3b_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand3b_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand3b_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand4_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand4_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand4_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand4b_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand4b_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand4b_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand4bb_1'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand4bb_2'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nand4bb_4'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor2_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor2_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor2_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor2_8'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor2b_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor2b_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor2b_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor3_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor3_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor3_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor3b_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor3b_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor3b_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor4_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor4_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor4_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor4b_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor4b_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor4b_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor4bb_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor4bb_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__nor4bb_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2111a_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2111a_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2111a_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2111ai_1'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2111ai_2'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2111ai_4'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o211a_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o211a_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o211a_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o211ai_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o211ai_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o211ai_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21a_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21a_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21a_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21ai_0'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21ai_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21ai_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21ai_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21ba_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21ba_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21ba_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21bai_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21bai_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o21bai_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o221a_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o221a_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o221a_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o221ai_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o221ai_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o221ai_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o22a_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o22a_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o22a_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o22ai_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o22ai_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o22ai_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2bb2a_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2bb2a_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2bb2a_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2bb2ai_1'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2bb2ai_2'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o2bb2ai_4'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o311a_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o311a_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o311a_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o311ai_0'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o311ai_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o311ai_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o311ai_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o31a_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o31a_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o31a_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o31ai_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o31ai_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o31ai_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o32a_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o32a_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o32a_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o32ai_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o32ai_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o32ai_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o41a_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o41a_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o41a_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o41ai_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o41ai_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__o41ai_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or2_0'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or2_1'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or2_2'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or2_4'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or2b_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or2b_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or2b_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or3_1'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or3_2'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or3_4'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or3b_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or3b_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or3b_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or4_1'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or4_2'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or4_4'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or4b_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or4b_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or4b_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or4bb_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or4bb_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__or4bb_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__probe_p_8'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__probec_p_8'.  
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfbbn_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfbbn_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfbbp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfrbp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfrbp_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfrtn_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfrtp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfrtp_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfrtp_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfsbp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfsbp_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfstp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfstp_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfstp_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfxbp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfxbp_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfxtp_1'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfxtp_2'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdfxtp_4'.    
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdlclkp_1'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdlclkp_2'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sdlclkp_4'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sedfxbp_1'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sedfxbp_2'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sedfxtp_1'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sedfxtp_2'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__sedfxtp_4'.   
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__tap_1'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__tap_2'.       
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__tapvgnd2_1'.  
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__tapvgnd_1'.   
+Storing AST representation for module                                           
+`$abstract\sky130_fd_sc_hd__tapvpwrvgnd_1'.                                     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xnor2_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xnor2_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xnor2_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xnor3_1'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xnor3_2'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xnor3_4'.     
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xor2_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xor2_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xor2_4'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xor3_1'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xor3_2'.      
+Storing AST representation for module `$abstract\sky130_fd_sc_hd__xor3_4'.      
+Successfully finished Verilog frontend.                                         
+                                                                                
+7. Executing HIERARCHY pass (managing design hierarchy).                        
+                                                                                
+8. Executing AST frontend in derive mode using pre-parsed AST for module        
+`\aero_safety_controller'.                                                      
+inputs/netlist/aero_safety_controller.v:378: ERROR: Identifier                  
+`\aero_supervisor.current_state' is implicitly declared and `default_nettype is 
+set to none.                                                                    
+[05:38:32] ERROR    Subprocess had a non-zero exit.                 step.py:1364
+[05:38:32] ERROR    Last 10 line(s):                                step.py:1369
+                    Storing AST representation for module                       
+                    `$abstract\sky130_fd_sc_hd__xor2_4'.                        
+                    Storing AST representation for module                       
+                    `$abstract\sky130_fd_sc_hd__xor3_1'.                        
+                    Storing AST representation for module                       
+                    `$abstract\sky130_fd_sc_hd__xor3_2'.                        
+                    Storing AST representation for module                       
+                    `$abstract\sky130_fd_sc_hd__xor3_4'.                        
+                    Successfully finished Verilog frontend.                     
+                                                                                
+                    7. Executing HIERARCHY pass (managing design                
+                    hierarchy).                                                 
+                                                                                
+                    8. Executing AST frontend in derive mode using              
+                    pre-parsed AST for module                                   
+                    `\aero_safety_controller'.                                  
+                    inputs/netlist/aero_safety_controller.v:378:                
+                    ERROR: Identifier                                           
+                    `\aero_supervisor.current_state' is implicitly              
+                    declared and `default_nettype is set to none.               
+                                                                                
+[05:38:32] ERROR    Full log file:                                  step.py:1372
+                    'place/runs/Digital_Arch2Tapeout_7ef40733-5be0-             
+                    4054-8943-441591ec8735/01-yosys-jsonheader/yosy             
+                    s-jsonheader.log'                                           
+Classic - Stage 5 - Generate JSON Header ━                          4/78 0:00:01
+[05:38:32] ERROR    The following error was encountered while    __main__.py:187
+                    running the flow:                                           
+                    Generate JSON Header: subprocess (1,                        
+                    ['yosys', '-y',                                             
+                    '/nix/store/7l0f3byalx17dsl5m0bpzrsl6lkcyv3g                
+                    -python3-3.11.9-env/lib/python3.11/site-pack                
+                    ages/openlane/scripts/pyosys/json_header.py'                
+                    , '--', '--config-in',                                      
+                    '/work/place/runs/Digital_Arch2Tapeout_7ef40                
+                    733-5be0-4054-8943-441591ec8735/01-yosys-jso                
+                    nheader/config.json', '--extra-in',                         
+                    '/work/place/runs/Digital_Arch2Tapeout_7ef40                
+                    733-5be0-4054-8943-441591ec8735/01-yosys-jso                
+                    nheader/extra.json', '--output',                            
+                    '/work/place/runs/Digital_Arch2Tapeout_7ef40                
+                    733-5be0-4054-8943-441591ec8735/01-yosys-jso                
+                    nheader/aero_safety_controller.h.json'])                    
+                    failed                                                      
+[05:38:32] ERROR    OpenLane will now quit.                      __main__.py:188

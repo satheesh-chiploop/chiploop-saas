@@ -416,7 +416,9 @@ function extractParticipatingAgentNames(logs: string | null | undefined): string
     const line = rawLine.trim();
     const running = line.match(/Running\s+(.+?\sAgent)\b/i);
     const finished = line.match(/^(.+?\sAgent)\s+(?:done|failed)\b/i);
-    const name = running?.[1] || finished?.[1];
+    const lifecycle = line.match(/(?:^|:)\s*(.+?\sAgent)\s+(?:started|completed|done|failed)\b/i);
+    const physicalAiLifecycle = line.match(/Physical\s+AI\s+agent\s+(?:started|completed|done|failed):\s*(.+?\sAgent)\b/i);
+    const name = physicalAiLifecycle?.[1] || running?.[1] || finished?.[1] || lifecycle?.[1];
     if (name) {
       const normalized = canonicalAgentName(name);
       if (normalized) agents.add(normalized);
@@ -640,7 +642,11 @@ function TokenHeatmap({
   }
   const hasUsefulTokenUsage = tokenResponseHasUsefulUsage(usage);
   const shouldShowExecutionFallback = fallbackAgentNames.length > 0 && !hasUsefulTokenUsage;
-  const agentCount = hasUsefulTokenUsage ? usage?.summary.agent_count || usage?.agents.length || 0 : fallbackAgentNames.length;
+  const tokenAgentNames = new Set((usage?.agents || []).map((agent) => agent.agent_name.trim().toLowerCase()));
+  const executionOnlyAgentNames = fallbackAgentNames.filter((name) => !tokenAgentNames.has(name.trim().toLowerCase()));
+  const agentCount = hasUsefulTokenUsage
+    ? (usage?.agents.length || 0) + executionOnlyAgentNames.length
+    : fallbackAgentNames.length;
   const compactTotalTokens = usage?.summary.total_tokens || 0;
   const compactLabel = hasUsefulTokenUsage
     ? `${formatCompactNumber(compactTotalTokens)} tokens across ${formatCompactNumber(agentCount)} agent${agentCount === 1 ? "" : "s"}`
@@ -800,6 +806,18 @@ function TokenHeatmap({
             </div>
           );
         })}
+        {executionOnlyAgentNames.map((name) => (
+          <div key={`execution-${name}`} className="rounded-lg border border-slate-800 bg-black/25 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="break-words text-sm font-bold text-slate-100">{name}</div>
+              <div className="text-xs font-semibold text-slate-500">executed · no model call</div>
+            </div>
+            <div className="mt-3 h-4 overflow-hidden rounded-full bg-slate-900">
+              <div className="h-full w-full rounded-full bg-slate-700/80" />
+            </div>
+            <div className="mt-2 text-xs text-slate-500">Agent execution was recorded in the workflow log; no input or output tokens were attributed to this agent.</div>
+          </div>
+        ))}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-400">
@@ -938,6 +956,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "requirements_contract.json",
         "selected_physics_model.json",
         "model_generated_architecture.json",
+        "digital_ip_spec.json",
+        "physical_ai/surrogate_architecture/digital_ip_spec.json",
         "physical_ai_loop_state.json",
         "child_handoff.json",
       ],
@@ -1221,6 +1241,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const physicsModel = record(summary.physics_model || evidence["selected_physics_model.json"]);
       const execution = record(summary.physics_execution);
       const architecture = record(execution.architecture || evidence["model_generated_architecture.json"]);
+      const digitalIpSpec = record(evidence["digital_ip_spec.json"] || evidence["physical_ai/surrogate_architecture/digital_ip_spec.json"]);
       const loop = record(summary.loop || evidence["physical_ai_loop_state.json"]);
       const hem = record(summary.hem);
       const implementationPath = firstString(execution.implementation_path, loop.implementation_path, requirements.implementation_path, "not selected");
@@ -1245,6 +1266,18 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <div className="mt-3 text-xs text-slate-500">Status: {firstString(summary.status, status, "running").replaceAll("_", " ")}</div>
             </div>
           </div>
+          <details className="rounded-lg border border-cyan-400/25 bg-cyan-950/10 p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-cyan-100">View generated Digital IP specification</summary>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              <MiniMetric label="Architecture Blocks" value={array(architecture.blocks).length || array(digitalIpSpec.blocks).length} />
+              <MiniMetric label="Interfaces" value={array(architecture.interfaces).length || array(digitalIpSpec.interfaces).length} />
+              <MiniMetric label="Implementation" value={implementationPath} />
+            </div>
+            <div className="mt-3 whitespace-pre-wrap rounded-lg border border-slate-800 bg-black/30 p-3 text-xs leading-6 text-slate-300">
+              {firstString(architecture.rtl_spec_text, digitalIpSpec.rtl_spec_text, "The RTL-ready specification is included in physical_ai/surrogate_architecture/digital_ip_spec.json in the run ZIP.")}
+            </div>
+            <div className="mt-2 text-xs text-slate-500">Artifact: physical_ai/surrogate_architecture/digital_ip_spec.json</div>
+          </details>
           <div className="flex flex-wrap gap-3">
             <button type="button" onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/workflow/${workflowId}/download_zip?full=1`, "_blank")} className="rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-sm font-semibold text-emerald-100 hover:border-emerald-300">Download run ZIP</button>
           </div>

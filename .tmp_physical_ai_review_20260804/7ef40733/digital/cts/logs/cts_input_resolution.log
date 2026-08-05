@@ -1,0 +1,16 @@
+[2026-08-05T05:38:34.031442Z] Digital CTS Agent
+workflow_id=7ef40733-5be0-4054-8943-441591ec8735
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout/digital/impl_setup/constraints/aero_safety_controller.sdc
+sdc_basename=aero_safety_controller.sdc
+stage_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout/digital/cts/constraints/aero_safety_controller.sdc
+base_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout/digital/place/config.json
+run_work_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/7ef40733-5be0-4054-8943-441591ec8735/832e1f5a-553d-4e98-be44-98e4f24c4ae9/digital/arch2tapeout/digital/run_work
+run_tag=Digital_Arch2Tapeout_7ef40733-5be0-4054-8943-441591ec8735
+top_module=aero_safety_controller
+netlist_count=1
+macro_lef_count=0
+macro_lib_count=0
+macro_gds_count=0
+macro_placement_cfg=None
+macro_placement_cfg_path=None

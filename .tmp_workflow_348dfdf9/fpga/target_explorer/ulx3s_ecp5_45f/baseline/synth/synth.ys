@@ -1,2 +1,0 @@
-read_verilog -sv /root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/src/rtl/review_input.sv
-synth_ecp5 -top minirv_edge_controller -noflatten -json /root/chiploop-backend/backend/workflows/348dfdf9-8c11-400f-8e25-503b3373a6d9/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/minirv_edge_controller_ecp5.json

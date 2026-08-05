@@ -1,0 +1,7 @@
+{
+  "type": "system_pd_signoff_closure_plan",
+  "agent": "Digital PD Signoff Closure Agent",
+  "enabled": false,
+  "status": "skipped",
+  "reason": "signoff_closure_loop_not_enabled"
+}
