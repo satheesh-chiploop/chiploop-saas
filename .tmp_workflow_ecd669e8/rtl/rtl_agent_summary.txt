@@ -1,0 +1,15 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: active_aero_supervisor
+Expected files: ['active_aero_supervisor.v', 'request_manager.v', 'response_validator.v', 'command_synthesizer.v', 'clamp_unit.v', 'safety_supervisor.v', 'telemetry_monitor.v']
+Materialized files: ['active_aero_supervisor.v', 'request_manager.v', 'response_validator.v', 'command_synthesizer.v', 'clamp_unit.v', 'safety_supervisor.v', 'telemetry_monitor.v']
+Clock ports: ['clk']
+Reset ports: ['rst_n']
+Icarus compile: fail
+Verilator lint: fatal
+Issue count: 2
+
+Issues:
+- ❌ Icarus Verilog compile failed.
+- ❌ Verilator lint failed.

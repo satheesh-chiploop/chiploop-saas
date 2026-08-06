@@ -1,0 +1,19 @@
+{
+  "type": "ip_packaging_handoff",
+  "version": "1.0",
+  "top_module": "active_aero_supervisor",
+  "package_dir": "backend/workflows/ecd669e8-7a63-4fb3-b08b-f63b14a471db/handoff/active_aero_supervisor_ip_package",
+  "zip_path": "backend/workflows/ecd669e8-7a63-4fb3-b08b-f63b14a471db/handoff/active_aero_supervisor_ip_package.zip",
+  "bucket_counts": {
+    "rtl": 14,
+    "spec": 3,
+    "arch": 1,
+    "microarch": 1,
+    "regmap": 2,
+    "constraints": 0,
+    "power_intent": 1,
+    "verification": 0,
+    "reports": 0,
+    "other": 7
+  }
+}

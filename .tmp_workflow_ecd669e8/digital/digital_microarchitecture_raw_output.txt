@@ -1,0 +1,107 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "active_aero_supervisor",
+  "module_microarchitecture": [
+    {
+      "name": "active_aero_supervisor",
+      "implementation_style": "Top-level synchronous control and supervision wrapper that coordinates request qualification, response validation, deterministic command generation, saturation, fallback selection, and telemetry using registered handoff signals between submodules.",
+      "control_strategy": "Use simple cycle-based transaction control: qualify launch conditions, allow request issuance only when the operating envelope and host routing policy permit it, accept only validated responses, and force fallback on any supervisory fault.",
+      "state_strategy": "Retain outstanding transaction context, safety flags, sticky status, counters, and registered actuator output in clocked state; clear all state to safe defaults on reset.",
+      "output_strategy": "Drive model_request_valid only for launched requests, register actuator_cmd and actuator_cmd_valid at the clamp stage, and expose safety_status plus telemetry outputs from clocked supervisory and counting logic.",
+      "ownership_notes": [
+        "Owns system-level arbitration across request_manager, response_validator, command_synthesizer, clamp_unit, safety_supervisor, and telemetry_monitor.",
+        "Does not implement the physics or surrogate model, only the control-and-supervision wrapper around the external service.",
+        "Preserves a registered and safety-gated actuator output with no combinational dependency from model_response inputs."
+      ]
+    },
+    {
+      "name": "request_manager",
+      "implementation_style": "A small transaction-launch and outstanding-context register block with deterministic payload assembly.",
+      "control_strategy": "On a qualified control cycle and when granted by the supervisory launch path, capture a new request ID, sequence number, and timestamp; otherwise hold the prior outstanding transaction until clear or timeout policy ends it.",
+      "state_strategy": "Store request ID, request sequence, request timestamp, pending state, and envelope-violation indication in registers.",
+      "output_strategy": "Emit a registered request payload containing geometry reference and stream/flow context, and assert request_valid_out only when a request is actually launched.",
+      "ownership_notes": [
+        "Owns request ID/sequence/timestamp lifecycle and payload formatting for the external transaction.",
+        "Enforces the configured operating envelope, with host fallback routing able to bypass request launch behavior as allowed by the spec.",
+        "Keeps the outstanding transaction state until response acceptance or timeout/clear."
+      ]
+    },
+    {
+      "name": "response_validator",
+      "implementation_style": "A clocked asynchronous-response qualification block with simple parsing and comparison logic.",
+      "control_strategy": "Compare incoming response transaction fields against the outstanding request context and gate acceptance only on ID match, sequence match, payload format correctness, and freshness/timeout compliance.",
+      "state_strategy": "Hold acceptance, stale, invalid, timeout, and parsed-output state in registers; rejected responses do not update the accepted-output path.",
+      "output_strategy": "Produce normalized drag_force, lift_force, surface_pressure, and flow_field metadata outputs only for accepted responses; assert explicit status pulses for stale, invalid, and timeout outcomes.",
+      "ownership_notes": [
+        "Owns response qualification and parsing state for the external model channel.",
+        "Prevents stale, malformed, mismatched, or timed-out responses from influencing actuator command generation."
+      ]
+    },
+    {
+      "name": "command_synthesizer",
+      "implementation_style": "Deterministic local hardware mapping using arithmetic, comparisons, and/or fixed tables; no model inference logic.",
+      "control_strategy": "Generate a model-derived command only from accepted response data, but override that path with the safe fallback command whenever fallback is active.",
+      "state_strategy": "Keep only the minimal registered state needed to form a stable command word and source indication; ensure outputs depend only on registered/validated inputs.",
+      "output_strategy": "Emit a raw command word and valid indication for downstream clamp logic, and indicate when the selected source is fallback versus model-derived.",
+      "ownership_notes": [
+        "Owns deterministic command synthesis for the active-aerodynamics actuator domain.",
+        "Fallback command selection has priority over all model-derived data.",
+        "Does not contain surrogate inference, GPU logic, or floating-point physics modeling."
+      ]
+    },
+    {
+      "name": "clamp_unit",
+      "implementation_style": "A registered saturation stage that enforces programmable command bounds.",
+      "control_strategy": "Compare the synthesized command against programmed minimum and maximum bounds and saturate to the nearest legal value when needed.",
+      "state_strategy": "Register the bounded command and clamp-active indication so the top-level actuator output remains fully synchronous.",
+      "output_strategy": "Output a bounded command word and valid flag; assert clamp_active for at least one cycle whenever saturation occurs.",
+      "ownership_notes": [
+        "Owns command saturation behavior and bounded output registration.",
+        "Provides the final actuator-facing command value after enforcement of COMMAND_MIN and COMMAND_MAX."
+      ]
+    },
+    {
+      "name": "safety_supervisor",
+      "implementation_style": "A compact fault-aggregation and fallback-decision block with sticky status handling.",
+      "control_strategy": "Monitor envelope violations, stale/invalid/timeout indications, clamp events, command bound checks, and internal fault inputs every cycle; assert fallback whenever any safety condition requires it.",
+      "state_strategy": "Latch safety bits and sticky bits in clocked state until host_clear_sticky or reset; keep the safety vector simple and deterministic.",
+      "output_strategy": "Drive stale_reject, timeout_fault, invalid_response, clamp_active, fallback_active, safety_status_out, and sticky_status_out directly from the registered safety state.",
+      "ownership_notes": [
+        "Owns system safety policy and sticky-bit retention.",
+        "Coordinates inhibition of model-derived actuation when a fault, timeout, malformed response, or envelope violation is detected."
+      ]
+    },
+    {
+      "name": "telemetry_monitor",
+      "implementation_style": "Straightforward clocked event counters plus sticky-status visibility logic.",
+      "control_strategy": "Increment counters only on qualified pulses for accepted responses, stale rejections, clamp events, timeouts, and fallback activations; clear sticky state on host request or reset.",
+      "state_strategy": "Maintain monotonic event counters and sticky status visibility in registers.",
+      "output_strategy": "Expose the counter values directly as synthesizable telemetry outputs, with no effect on command generation timing.",
+      "ownership_notes": [
+        "Owns observability counters and sticky telemetry presentation.",
+        "Telemetry is clocked and side-effect free with respect to actuator output."
+      ]
+    }
+  ],
+  "fsm_intent": [],
+  "datapath_intent": [],
+  "sequencing_notes": [
+    "Request launch is a single-cycle qualified event derived from control_valid, vehicle_geometry_valid, flow_conditions_valid, envelope compliance, and supervisory grant/hold policy.",
+    "The outstanding request ID, sequence, and timestamp are captured on launch and held until a matching fresh response is accepted, the transaction times out, or a safety clear path is taken.",
+    "Response validation precedes command synthesis; only accepted response data may reach the command generation path.",
+    "Fallback selection has priority over model-derived command selection and is applied before the clamp stage.",
+    "The clamp stage registers the final actuator command and valid flag, ensuring the output is synchronous and bounded."
+  ],
+  "timing_notes": [
+    "All functional blocks are clocked by clk and reset by rst_n.",
+    "The actuator_cmd output is registered and must not depend combinationally on model_response inputs.",
+    "Clamp_active must persist for at least one clock cycle on saturation events.",
+    "Telemetry counters and sticky bits update synchronously and do not create feedback into the actuator output path.",
+    "The design is intended to be deterministic even when the external model service is unavailable or unresponsive."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

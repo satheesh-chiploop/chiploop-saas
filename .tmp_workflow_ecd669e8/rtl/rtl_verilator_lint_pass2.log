@@ -1,0 +1,69 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.198 MB sources in 8 modules, into 0.045 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.022 s (elab=0.003, cvt=0.009, bld=0.000); cpu 0.022 s on 1 threads; allocated 32.355 MB
+
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: pass2/active_aero_supervisor.v:113:10: Instance pin connected by name with empty reference: 'command_source_fallback_out'
+  113 |         .command_source_fallback_out()
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: pass2/active_aero_supervisor.v:142:10: Instance pin connected by name with empty reference: 'clamp_active_out'
+  142 |         .clamp_active_out(),
+      |          ^~~~~~~~~~~~~~~~
+%Warning-WIDTHTRUNC: pass2/request_manager.v:63:35: Operator ASSIGNDLY expects 256 bits on the Assign RHS, but Assign RHS's REPLICATE generates 336 bits.
+                                                  : ... note: In instance 'active_aero_supervisor.u_request_manager'
+   63 |                 request_payload_r <= {16'h0000, request_id_r + 16'h0001, request_seq_r + 16'h0001, cycle_ctr, geometry_ref, stream_velocity_mps, host_fallback_route_en, host_operating_en_min_mps, host_operating_en_max_mps, 31'h0};
+      |                                   ^~
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/active_aero_supervisor.v:13:19: Signal is not used: 'host_response_timeout_cycles'
+                                                           : ... note: In instance 'active_aero_supervisor'
+   13 |     input  [31:0] host_response_timeout_cycles,
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/active_aero_supervisor.v:14:19: Signal is not used: 'host_fallback_command'
+                                                           : ... note: In instance 'active_aero_supervisor'
+   14 |     input  [31:0] host_fallback_command,
+      |                   ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: pass2/active_aero_supervisor.v:18:19: Signal is not driven: 'model_request_valid'
+                                                       : ... note: In instance 'active_aero_supervisor'
+   18 |     output        model_request_valid,
+      |                   ^~~~~~~~~~~~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047
+                   ... Use "/* verilator lint_off UNDRIVEN */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/active_aero_supervisor.v:56:13: Signal is not used: 'host_fallback_command_from_u_command_synthesizer'
+                                                           : ... note: In instance 'active_aero_supervisor'
+   56 | wire [31:0] host_fallback_command_from_u_command_synthesizer;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: pass2/command_synthesizer.v:10:20: Signal is not driven: 'safe_fallback_command_in'
+                                                    : ... note: In instance 'active_aero_supervisor.u_command_synthesizer'
+   10 |     output  [31:0] safe_fallback_command_in,
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/request_manager.v:18:19: Signal is not used: 'request_valid_out'
+                                                    : ... note: In instance 'active_aero_supervisor.u_request_manager'
+   18 |     input         request_valid_out,
+      |                   ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/response_validator.v:5:20: Bits of signal are not used: 'model_response_payload'[223:160]
+                                                      : ... note: In instance 'active_aero_supervisor.u_response_validator'
+    5 |     input  [255:0] model_response_payload,
+      |                    ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/response_validator.v:8:19: Signal is not used: 'outstanding_timestamp'
+                                                      : ... note: In instance 'active_aero_supervisor.u_response_validator'
+    8 |     input  [31:0] outstanding_timestamp,
+      |                   ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/telemetry_monitor.v:15:18: Signal is not used: 'sticky_status_out'
+                                                      : ... note: In instance 'active_aero_supervisor.u_telemetry_monitor'
+   15 |     input  [7:0] sticky_status_out
+      |                  ^~~~~~~~~~~~~~~~~
+%Warning-UNSIGNED: pass2/response_validator.v:40:80: Comparison is constant due to unsigned arithmetic
+                                                   : ... note: In instance 'active_aero_supervisor.u_response_validator'
+   40 |     assign age_ok = (freshness_window_cycles != 32'h0000_0000) ? (response_age <= freshness_window_cycles) : 1'b1;
+      |                                                                                ^~
+                   ... For warning description see https://verilator.org/warn/UNSIGNED?v=5.047
+                   ... Use "/* verilator lint_off UNSIGNED */" and lint_on around source to disable this message.
+
+=== RETURN CODE ===
+0

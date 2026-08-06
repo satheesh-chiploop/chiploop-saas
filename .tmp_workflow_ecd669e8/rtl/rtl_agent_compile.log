@@ -1,0 +1,8 @@
+backend/workflows/ecd669e8-7a63-4fb3-b08b-f63b14a471db/rtl/response_validator.v:38: error: reg response_age_r; cannot be driven by primitives or continuous assignment.
+1 error(s) during elaboration.
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.
