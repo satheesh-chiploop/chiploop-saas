@@ -23,6 +23,18 @@ const paths: Array<{ key: ImplementationPath; title: string; body: string }> = [
 type RunSummary = { status?: string; physics_model?: { name?: string }; physics_execution?: { execution_mode?: string; inference_status?: string; implementation_path?: string }; hem?: { enabled?: boolean } };
 type HemChildRun = { workflow_id: string; label: string; status?: string | null; dashboard_path: string };
 
+function mergeHemChildren(previous: HemChildRun[], incoming: unknown): HemChildRun[] {
+  if (!Array.isArray(incoming)) return previous;
+  const byWorkflowId = new Map(previous.map((child) => [child.workflow_id, child]));
+  for (const raw of incoming) {
+    if (!raw || typeof raw !== "object") continue;
+    const child = raw as Partial<HemChildRun>;
+    if (!child.workflow_id || !child.label || !child.dashboard_path) continue;
+    byWorkflowId.set(child.workflow_id, { ...byWorkflowId.get(child.workflow_id), ...child } as HemChildRun);
+  }
+  return Array.from(byWorkflowId.values());
+}
+
 function activeAgentFromLogs(logs: string): { agent: string; stage: string } | null {
   const lines = logs.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   for (let index = lines.length - 1; index >= 0; index -= 1) {
@@ -94,7 +106,7 @@ export default function PhysicalAiStudioPage() {
         setRunStatus(String(payload.status || "running"));
         setRunPhase(String(payload.phase || payload.status || "running"));
         setRunLogs(String(payload.logs || ""));
-        setHemChildren(Array.isArray(payload.hem_children) ? payload.hem_children : []);
+        setHemChildren((previous) => mergeHemChildren(previous, payload.hem_children));
         if (payload.result) setRunResult(payload.result as RunSummary);
         const normalizedPhase = String(payload.phase || "").toLowerCase();
         const hemIsRunning = Boolean(payload.result?.hem?.enabled);

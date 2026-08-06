@@ -61,6 +61,20 @@ const plotTitles: Record<string, string> = {
   operating_envelope_plot: "Operating envelope",
 };
 
+type HemChildRun = { workflow_id: string; label: string; status?: string | null; dashboard_path: string };
+
+function mergeHemChildren(previous: HemChildRun[], incoming: unknown): HemChildRun[] {
+  if (!Array.isArray(incoming)) return previous;
+  const byWorkflowId = new Map(previous.map((child) => [child.workflow_id, child]));
+  for (const raw of incoming) {
+    if (!raw || typeof raw !== "object") continue;
+    const child = raw as Partial<HemChildRun>;
+    if (!child.workflow_id || !child.label || !child.dashboard_path) continue;
+    byWorkflowId.set(child.workflow_id, { ...byWorkflowId.get(child.workflow_id), ...child } as HemChildRun);
+  }
+  return Array.from(byWorkflowId.values());
+}
+
 function activeAgentFromLogs(logs: string): { agent: string; stage: string } | null {
   const lines = logs.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   for (let index = lines.length - 1; index >= 0; index -= 1) {
@@ -83,7 +97,7 @@ export default function PhysicalAiResultsPage() {
   const [phase, setPhase] = useState("queued");
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState("");
-  const [hemChildren, setHemChildren] = useState<Array<{ workflow_id: string; label: string; status?: string | null; dashboard_path: string }>>([]);
+  const [hemChildren, setHemChildren] = useState<HemChildRun[]>([]);
 
   useEffect(() => {
     let stopped = false;
@@ -97,7 +111,7 @@ export default function PhysicalAiResultsPage() {
         if (response.status === 202) {
           setPhase(payload.phase || payload.status || "running");
           setLogs(payload.logs || "");
-          setHemChildren(payload.hem_children || []);
+          setHemChildren((previous) => mergeHemChildren(previous, payload.hem_children));
           if (!stopped) timer = setTimeout(poll, 1500);
           return;
         }
@@ -107,7 +121,7 @@ export default function PhysicalAiResultsPage() {
           setPlots(payload.plots || {});
           setPhase(payload.phase || "completed");
           setLogs(payload.logs || "");
-          setHemChildren(payload.hem_children || []);
+          setHemChildren((previous) => mergeHemChildren(previous, payload.hem_children));
           const hemTerminal = ["hem_complete", "hem_failed", "done", "needs_revision"].includes(String(payload.phase || "").toLowerCase());
           if (payload.result?.hem?.enabled && !hemTerminal) timer = setTimeout(poll, 2500);
         }
