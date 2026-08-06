@@ -393,7 +393,7 @@ export function HemChildDashboardLinks({ logs, runs }: { logs: string | null | u
               <th className="px-3 py-2 font-semibold">Workflow</th>
               <th className="px-3 py-2 font-semibold">Status</th>
               <th className="px-3 py-2 font-semibold">Workflow ID</th>
-              <th className="px-3 py-2 text-right font-semibold">Dashboard</th>
+              <th className="px-3 py-2 text-right font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -408,7 +408,8 @@ export function HemChildDashboardLinks({ logs, runs }: { logs: string | null | u
                 <td className="max-w-[340px] break-all px-3 py-3 font-mono text-[11px] text-slate-400">
                   {child.workflowId}
                 </td>
-                <td className="px-3 py-3 text-right">
+                <td className="px-3 py-3">
+                  <div className="flex flex-wrap justify-end gap-2">
                   <a
                     href={child.dashboardPath}
                     target="_blank"
@@ -417,6 +418,15 @@ export function HemChildDashboardLinks({ logs, runs }: { logs: string | null | u
                   >
                     Open Dashboard
                   </a>
+                  <a
+                    href={`${process.env.NEXT_PUBLIC_API_URL || "/api"}/workflow/${encodeURIComponent(child.workflowId)}/download_zip?full=1`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-100 hover:border-emerald-400"
+                  >
+                    Download ZIP
+                  </a>
+                  </div>
                 </td>
               </tr>
             ))}
