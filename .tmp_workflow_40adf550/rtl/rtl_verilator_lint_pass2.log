@@ -1,0 +1,10 @@
+=== STDERR ===
+%Error: pass2/active_aero_controller_engine.v:160:13: Can't find definition of variable: 'safe_fallback_cmd'
+                                                    : ... Suggested alternative: 'cfg_safe_fallback_cmd'
+  160 |         if (safe_fallback_cmd[0] | envelope_violation | unsupported_format | response_reject) begin
+      |             ^~~~~~~~~~~~~~~~~
+        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1

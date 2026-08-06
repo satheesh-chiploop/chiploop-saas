@@ -1,0 +1,690 @@
+---BEGIN active_aero_controller.v---
+module active_aero_controller (
+    clk,
+    rst_n,
+    cfg_wr_en,
+    cfg_rd_en,
+    cfg_addr,
+    cfg_wdata,
+    cfg_rdata,
+    cfg_ready,
+    geometry_valid,
+    flow_valid,
+    geometry_payload,
+    geometry_format,
+    flow_velocity_mps,
+    model_req_ready,
+    model_req_valid,
+    model_req_payload,
+    model_rsp_valid,
+    model_rsp_seq,
+    model_rsp_timestamp,
+    drag_force,
+    lift_force,
+    surface_pressure,
+    flow_field,
+    actuator_cmd_valid,
+    actuator_cmd,
+    fault_status,
+    diag_accepted_requests,
+    diag_accepted_responses,
+    diag_rejected_responses,
+    diag_clamp_events,
+    diag_fallback_activations,
+    active_aero_controller_cfg_cfg_model_id,
+    active_aero_controller_cfg_cfg_checkpoint_id,
+    active_aero_controller_cfg_cfg_request_timeout_cycles,
+    active_aero_controller_cfg_cfg_response_freshness_threshold,
+    active_aero_controller_cfg_cfg_min_actuator_cmd,
+    active_aero_controller_cfg_cfg_max_actuator_cmd,
+    active_aero_controller_cfg_cfg_cmd_rate_limit,
+    active_aero_controller_cfg_cfg_safe_fallback_cmd,
+    active_aero_controller_cfg_cfg_supported_geometry_format,
+    active_aero_controller_cfg_cfg_control_gain,
+    active_aero_controller_cfg_cfg_intent_map_sel,
+    active_aero_controller_cfg_cfg_reference_stream_velocity_mps,
+    active_aero_controller_cfg_cfg_reference_geometry_format,
+    active_aero_controller_cfg_cfg_reference_geometry_source,
+    active_aero_controller_engine_cfg_model_id,
+    active_aero_controller_engine_cfg_checkpoint_id,
+    active_aero_controller_engine_cfg_request_timeout_cycles,
+    active_aero_controller_engine_cfg_response_freshness_threshold,
+    active_aero_controller_engine_cfg_min_actuator_cmd,
+    active_aero_controller_engine_cfg_max_actuator_cmd,
+    active_aero_controller_engine_cfg_cmd_rate_limit,
+    active_aero_controller_engine_cfg_safe_fallback_cmd,
+    active_aero_controller_engine_cfg_supported_geometry_format,
+    active_aero_controller_engine_cfg_control_gain,
+    active_aero_controller_engine_cfg_intent_map_sel
+);
+input clk;
+input rst_n;
+input cfg_wr_en;
+input cfg_rd_en;
+input [7:0] cfg_addr;
+input [31:0] cfg_wdata;
+output [31:0] cfg_rdata;
+output cfg_ready;
+input geometry_valid;
+input flow_valid;
+input [127:0] geometry_payload;
+input [7:0] geometry_format;
+input [15:0] flow_velocity_mps;
+output model_req_ready;
+output model_req_valid;
+output [255:0] model_req_payload;
+input model_rsp_valid;
+input [15:0] model_rsp_seq;
+input [31:0] model_rsp_timestamp;
+input [31:0] drag_force;
+input [31:0] lift_force;
+input [31:0] surface_pressure;
+input [127:0] flow_field;
+output actuator_cmd_valid;
+output [127:0] actuator_cmd;
+output [7:0] fault_status;
+output [15:0] diag_accepted_requests;
+output [15:0] diag_accepted_responses;
+output [15:0] diag_rejected_responses;
+output [15:0] diag_clamp_events;
+output [15:0] diag_fallback_activations;
+input [15:0] active_aero_controller_cfg_cfg_model_id;
+input [15:0] active_aero_controller_cfg_cfg_checkpoint_id;
+input [15:0] active_aero_controller_cfg_cfg_request_timeout_cycles;
+input [15:0] active_aero_controller_cfg_cfg_response_freshness_threshold;
+input [127:0] active_aero_controller_cfg_cfg_min_actuator_cmd;
+input [127:0] active_aero_controller_cfg_cfg_max_actuator_cmd;
+input [31:0] active_aero_controller_cfg_cfg_cmd_rate_limit;
+input [127:0] active_aero_controller_cfg_cfg_safe_fallback_cmd;
+input [7:0] active_aero_controller_cfg_cfg_supported_geometry_format;
+input [15:0] active_aero_controller_cfg_cfg_control_gain;
+input [3:0] active_aero_controller_cfg_cfg_intent_map_sel;
+input [15:0] active_aero_controller_cfg_cfg_reference_stream_velocity_mps;
+input [7:0] active_aero_controller_cfg_cfg_reference_geometry_format;
+input [31:0] active_aero_controller_cfg_cfg_reference_geometry_source;
+output [15:0] active_aero_controller_engine_cfg_model_id;
+output [15:0] active_aero_controller_engine_cfg_checkpoint_id;
+output [15:0] active_aero_controller_engine_cfg_request_timeout_cycles;
+output [15:0] active_aero_controller_engine_cfg_response_freshness_threshold;
+output [127:0] active_aero_controller_engine_cfg_min_actuator_cmd;
+output [127:0] active_aero_controller_engine_cfg_max_actuator_cmd;
+output [31:0] active_aero_controller_engine_cfg_cmd_rate_limit;
+output [127:0] active_aero_controller_engine_cfg_safe_fallback_cmd;
+output [7:0] active_aero_controller_engine_cfg_supported_geometry_format;
+output [15:0] active_aero_controller_engine_cfg_control_gain;
+output [3:0] active_aero_controller_engine_cfg_intent_map_sel;
+
+wire [31:0] cfg_rdata_w;
+wire cfg_ready_w;
+wire model_req_ready_w;
+wire model_req_valid_w;
+wire [255:0] model_req_payload_w;
+wire actuator_cmd_valid_w;
+wire [127:0] actuator_cmd_w;
+wire [7:0] fault_status_w;
+wire [15:0] diag_accepted_requests_w;
+wire [15:0] diag_accepted_responses_w;
+wire [15:0] diag_rejected_responses_w;
+wire [15:0] diag_clamp_events_w;
+wire [15:0] diag_fallback_activations_w;
+
+assign cfg_rdata = cfg_rdata_w;
+assign cfg_ready = cfg_ready_w;
+assign model_req_ready = model_req_ready_w;
+assign model_req_valid = model_req_valid_w;
+assign model_req_payload = model_req_payload_w;
+assign actuator_cmd_valid = actuator_cmd_valid_w;
+assign actuator_cmd = actuator_cmd_w;
+assign fault_status = fault_status_w;
+assign diag_accepted_requests = diag_accepted_requests_w;
+assign diag_accepted_responses = diag_accepted_responses_w;
+assign diag_rejected_responses = diag_rejected_responses_w;
+assign diag_clamp_events = diag_clamp_events_w;
+assign diag_fallback_activations = diag_fallback_activations_w;
+
+assign active_aero_controller_engine_cfg_model_id = active_aero_controller_cfg_cfg_model_id;
+assign active_aero_controller_engine_cfg_checkpoint_id = active_aero_controller_cfg_cfg_checkpoint_id;
+assign active_aero_controller_engine_cfg_request_timeout_cycles = active_aero_controller_cfg_cfg_request_timeout_cycles;
+assign active_aero_controller_engine_cfg_response_freshness_threshold = active_aero_controller_cfg_cfg_response_freshness_threshold;
+assign active_aero_controller_engine_cfg_min_actuator_cmd = active_aero_controller_cfg_cfg_min_actuator_cmd;
+assign active_aero_controller_engine_cfg_max_actuator_cmd = active_aero_controller_cfg_cfg_max_actuator_cmd;
+assign active_aero_controller_engine_cfg_cmd_rate_limit = active_aero_controller_cfg_cfg_cmd_rate_limit;
+assign active_aero_controller_engine_cfg_safe_fallback_cmd = active_aero_controller_cfg_cfg_safe_fallback_cmd;
+assign active_aero_controller_engine_cfg_supported_geometry_format = active_aero_controller_cfg_cfg_supported_geometry_format;
+assign active_aero_controller_engine_cfg_control_gain = active_aero_controller_cfg_cfg_control_gain;
+assign active_aero_controller_engine_cfg_intent_map_sel = active_aero_controller_cfg_cfg_intent_map_sel;
+
+active_aero_controller_cfg u_active_aero_controller_cfg (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_wr_en(cfg_wr_en),
+    .cfg_rd_en(cfg_rd_en),
+    .cfg_addr(cfg_addr),
+    .cfg_wdata(cfg_wdata),
+    .cfg_rdata(cfg_rdata_w),
+    .cfg_ready(cfg_ready_w),
+    .cfg_model_id(active_aero_controller_cfg_cfg_model_id),
+    .cfg_checkpoint_id(active_aero_controller_cfg_cfg_checkpoint_id),
+    .cfg_request_timeout_cycles(active_aero_controller_cfg_cfg_request_timeout_cycles),
+    .cfg_response_freshness_threshold(active_aero_controller_cfg_cfg_response_freshness_threshold),
+    .cfg_min_actuator_cmd(active_aero_controller_cfg_cfg_min_actuator_cmd),
+    .cfg_max_actuator_cmd(active_aero_controller_cfg_cfg_max_actuator_cmd),
+    .cfg_cmd_rate_limit(active_aero_controller_cfg_cfg_cmd_rate_limit),
+    .cfg_safe_fallback_cmd(active_aero_controller_cfg_cfg_safe_fallback_cmd),
+    .cfg_supported_geometry_format(active_aero_controller_cfg_cfg_supported_geometry_format),
+    .cfg_control_gain(active_aero_controller_cfg_cfg_control_gain),
+    .cfg_intent_map_sel(active_aero_controller_cfg_cfg_intent_map_sel),
+    .cfg_reference_stream_velocity_mps(active_aero_controller_cfg_cfg_reference_stream_velocity_mps),
+    .cfg_reference_geometry_format(active_aero_controller_cfg_cfg_reference_geometry_format),
+    .cfg_reference_geometry_source(active_aero_controller_cfg_cfg_reference_geometry_source)
+);
+
+active_aero_controller_engine u_active_aero_controller_engine (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_model_id(active_aero_controller_engine_cfg_model_id),
+    .cfg_checkpoint_id(active_aero_controller_engine_cfg_checkpoint_id),
+    .cfg_request_timeout_cycles(active_aero_controller_engine_cfg_request_timeout_cycles),
+    .cfg_response_freshness_threshold(active_aero_controller_engine_cfg_response_freshness_threshold),
+    .cfg_min_actuator_cmd(active_aero_controller_engine_cfg_min_actuator_cmd),
+    .cfg_max_actuator_cmd(active_aero_controller_engine_cfg_max_actuator_cmd),
+    .cfg_cmd_rate_limit(active_aero_controller_engine_cfg_cmd_rate_limit),
+    .cfg_safe_fallback_cmd(active_aero_controller_engine_cfg_safe_fallback_cmd),
+    .cfg_supported_geometry_format(active_aero_controller_engine_cfg_supported_geometry_format),
+    .cfg_control_gain(active_aero_controller_engine_cfg_control_gain),
+    .cfg_intent_map_sel(active_aero_controller_engine_cfg_intent_map_sel),
+    .geometry_valid(geometry_valid),
+    .flow_valid(flow_valid),
+    .geometry_payload(geometry_payload),
+    .geometry_format(geometry_format),
+    .flow_velocity_mps(flow_velocity_mps),
+    .model_rsp_valid(model_rsp_valid),
+    .model_rsp_seq(model_rsp_seq),
+    .model_rsp_timestamp(model_rsp_timestamp),
+    .drag_force(drag_force),
+    .lift_force(lift_force),
+    .surface_pressure(surface_pressure),
+    .flow_field(flow_field),
+    .model_req_ready(model_req_ready_w),
+    .model_req_valid(model_req_valid_w),
+    .model_req_payload(model_req_payload_w),
+    .actuator_cmd_valid(actuator_cmd_valid_w),
+    .actuator_cmd(actuator_cmd_w),
+    .fault_status(fault_status_w),
+    .diag_accepted_requests(diag_accepted_requests_w),
+    .diag_accepted_responses(diag_accepted_responses_w),
+    .diag_rejected_responses(diag_rejected_responses_w),
+    .diag_clamp_events(diag_clamp_events_w),
+    .diag_fallback_activations(diag_fallback_activations_w)
+);
+
+endmodule
+
+module active_aero_controller_cfg (
+    clk,
+    rst_n,
+    cfg_wr_en,
+    cfg_rd_en,
+    cfg_addr,
+    cfg_wdata,
+    cfg_rdata,
+    cfg_ready,
+    cfg_model_id,
+    cfg_checkpoint_id,
+    cfg_request_timeout_cycles,
+    cfg_response_freshness_threshold,
+    cfg_min_actuator_cmd,
+    cfg_max_actuator_cmd,
+    cfg_cmd_rate_limit,
+    cfg_safe_fallback_cmd,
+    cfg_supported_geometry_format,
+    cfg_control_gain,
+    cfg_intent_map_sel,
+    cfg_reference_stream_velocity_mps,
+    cfg_reference_geometry_format,
+    cfg_reference_geometry_source
+);
+input clk;
+input rst_n;
+input cfg_wr_en;
+input cfg_rd_en;
+input [7:0] cfg_addr;
+input [31:0] cfg_wdata;
+output [31:0] cfg_rdata;
+output cfg_ready;
+output [15:0] cfg_model_id;
+output [15:0] cfg_checkpoint_id;
+output [15:0] cfg_request_timeout_cycles;
+output [15:0] cfg_response_freshness_threshold;
+output [127:0] cfg_min_actuator_cmd;
+output [127:0] cfg_max_actuator_cmd;
+output [31:0] cfg_cmd_rate_limit;
+output [127:0] cfg_safe_fallback_cmd;
+output [7:0] cfg_supported_geometry_format;
+output [15:0] cfg_control_gain;
+output [3:0] cfg_intent_map_sel;
+output [15:0] cfg_reference_stream_velocity_mps;
+output [7:0] cfg_reference_geometry_format;
+output [31:0] cfg_reference_geometry_source;
+
+reg [15:0] reg_model_id;
+reg [15:0] reg_checkpoint_id;
+reg [15:0] reg_request_timeout_cycles;
+reg [15:0] reg_response_freshness_threshold;
+reg [127:0] reg_min_actuator_cmd;
+reg [127:0] reg_max_actuator_cmd;
+reg [31:0] reg_cmd_rate_limit;
+reg [127:0] reg_safe_fallback_cmd;
+reg [7:0] reg_supported_geometry_format;
+reg [15:0] reg_control_gain;
+reg [3:0] reg_intent_map_sel;
+reg [15:0] reg_reference_stream_velocity_mps;
+reg [7:0] reg_reference_geometry_format;
+reg [31:0] reg_reference_geometry_source;
+reg [31:0] cfg_rdata_r;
+reg cfg_ready_r;
+
+assign cfg_model_id = reg_model_id;
+assign cfg_checkpoint_id = reg_checkpoint_id;
+assign cfg_request_timeout_cycles = reg_request_timeout_cycles;
+assign cfg_response_freshness_threshold = reg_response_freshness_threshold;
+assign cfg_min_actuator_cmd = reg_min_actuator_cmd;
+assign cfg_max_actuator_cmd = reg_max_actuator_cmd;
+assign cfg_cmd_rate_limit = reg_cmd_rate_limit;
+assign cfg_safe_fallback_cmd = reg_safe_fallback_cmd;
+assign cfg_supported_geometry_format = reg_supported_geometry_format;
+assign cfg_control_gain = reg_control_gain;
+assign cfg_intent_map_sel = reg_intent_map_sel;
+assign cfg_reference_stream_velocity_mps = reg_reference_stream_velocity_mps;
+assign cfg_reference_geometry_format = reg_reference_geometry_format;
+assign cfg_reference_geometry_source = reg_reference_geometry_source;
+assign cfg_rdata = cfg_rdata_r;
+assign cfg_ready = cfg_ready_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        reg_model_id <= 16'h0000;
+        reg_checkpoint_id <= 16'h0000;
+        reg_request_timeout_cycles <= 16'h0000;
+        reg_response_freshness_threshold <= 16'h0000;
+        reg_min_actuator_cmd <= 128'h00000000000000000000000000000000;
+        reg_max_actuator_cmd <= 128'hFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+        reg_cmd_rate_limit <= 32'h00000000;
+        reg_safe_fallback_cmd <= 128'h00000000000000000000000000000000;
+        reg_supported_geometry_format <= 8'h53;
+        reg_control_gain <= 16'h0000;
+        reg_intent_map_sel <= 4'h0;
+        reg_reference_stream_velocity_mps <= 16'h0000;
+        reg_reference_geometry_format <= 8'h53;
+        reg_reference_geometry_source <= 32'h00000000;
+        cfg_rdata_r <= 32'h00000000;
+        cfg_ready_r <= 1'b0;
+    end else begin
+        cfg_ready_r <= cfg_wr_en | cfg_rd_en;
+        case (cfg_addr)
+            8'h00: if (cfg_wr_en) reg_model_id[7:0] <= cfg_wdata[7:0];
+            8'h01: if (cfg_wr_en) reg_model_id[15:8] <= cfg_wdata[7:0];
+            8'h02: if (cfg_wr_en) reg_checkpoint_id[7:0] <= cfg_wdata[7:0];
+            8'h03: if (cfg_wr_en) reg_checkpoint_id[15:8] <= cfg_wdata[7:0];
+            8'h04: if (cfg_wr_en) reg_request_timeout_cycles[7:0] <= cfg_wdata[7:0];
+            8'h05: if (cfg_wr_en) reg_request_timeout_cycles[15:8] <= cfg_wdata[7:0];
+            8'h06: if (cfg_wr_en) reg_response_freshness_threshold[7:0] <= cfg_wdata[7:0];
+            8'h07: if (cfg_wr_en) reg_response_freshness_threshold[15:8] <= cfg_wdata[7:0];
+            8'h08: if (cfg_wr_en) reg_min_actuator_cmd[7:0] <= cfg_wdata[7:0];
+            8'h09: if (cfg_wr_en) reg_min_actuator_cmd[15:8] <= cfg_wdata[7:0];
+            8'h0A: if (cfg_wr_en) reg_min_actuator_cmd[23:16] <= cfg_wdata[7:0];
+            8'h0B: if (cfg_wr_en) reg_min_actuator_cmd[31:24] <= cfg_wdata[7:0];
+            8'h0C: if (cfg_wr_en) reg_min_actuator_cmd[39:32] <= cfg_wdata[7:0];
+            8'h0D: if (cfg_wr_en) reg_min_actuator_cmd[47:40] <= cfg_wdata[7:0];
+            8'h0E: if (cfg_wr_en) reg_min_actuator_cmd[55:48] <= cfg_wdata[7:0];
+            8'h0F: if (cfg_wr_en) reg_min_actuator_cmd[63:56] <= cfg_wdata[7:0];
+            8'h10: if (cfg_wr_en) reg_min_actuator_cmd[71:64] <= cfg_wdata[7:0];
+            8'h11: if (cfg_wr_en) reg_min_actuator_cmd[79:72] <= cfg_wdata[7:0];
+            8'h12: if (cfg_wr_en) reg_min_actuator_cmd[87:80] <= cfg_wdata[7:0];
+            8'h13: if (cfg_wr_en) reg_min_actuator_cmd[95:88] <= cfg_wdata[7:0];
+            8'h14: if (cfg_wr_en) reg_min_actuator_cmd[103:96] <= cfg_wdata[7:0];
+            8'h15: if (cfg_wr_en) reg_min_actuator_cmd[111:104] <= cfg_wdata[7:0];
+            8'h16: if (cfg_wr_en) reg_min_actuator_cmd[119:112] <= cfg_wdata[7:0];
+            8'h17: if (cfg_wr_en) reg_min_actuator_cmd[127:120] <= cfg_wdata[7:0];
+            8'h18: if (cfg_wr_en) reg_max_actuator_cmd[7:0] <= cfg_wdata[7:0];
+            8'h19: if (cfg_wr_en) reg_max_actuator_cmd[15:8] <= cfg_wdata[7:0];
+            8'h1A: if (cfg_wr_en) reg_max_actuator_cmd[23:16] <= cfg_wdata[7:0];
+            8'h1B: if (cfg_wr_en) reg_max_actuator_cmd[31:24] <= cfg_wdata[7:0];
+            8'h1C: if (cfg_wr_en) reg_max_actuator_cmd[39:32] <= cfg_wdata[7:0];
+            8'h1D: if (cfg_wr_en) reg_max_actuator_cmd[47:40] <= cfg_wdata[7:0];
+            8'h1E: if (cfg_wr_en) reg_max_actuator_cmd[55:48] <= cfg_wdata[7:0];
+            8'h1F: if (cfg_wr_en) reg_max_actuator_cmd[63:56] <= cfg_wdata[7:0];
+            8'h20: if (cfg_wr_en) reg_max_actuator_cmd[71:64] <= cfg_wdata[7:0];
+            8'h21: if (cfg_wr_en) reg_max_actuator_cmd[79:72] <= cfg_wdata[7:0];
+            8'h22: if (cfg_wr_en) reg_max_actuator_cmd[87:80] <= cfg_wdata[7:0];
+            8'h23: if (cfg_wr_en) reg_max_actuator_cmd[95:88] <= cfg_wdata[7:0];
+            8'h24: if (cfg_wr_en) reg_max_actuator_cmd[103:96] <= cfg_wdata[7:0];
+            8'h25: if (cfg_wr_en) reg_max_actuator_cmd[111:104] <= cfg_wdata[7:0];
+            8'h26: if (cfg_wr_en) reg_max_actuator_cmd[119:112] <= cfg_wdata[7:0];
+            8'h27: if (cfg_wr_en) reg_max_actuator_cmd[127:120] <= cfg_wdata[7:0];
+            8'h28: if (cfg_wr_en) reg_cmd_rate_limit[7:0] <= cfg_wdata[7:0];
+            8'h29: if (cfg_wr_en) reg_cmd_rate_limit[15:8] <= cfg_wdata[7:0];
+            8'h2A: if (cfg_wr_en) reg_cmd_rate_limit[23:16] <= cfg_wdata[7:0];
+            8'h2B: if (cfg_wr_en) reg_cmd_rate_limit[31:24] <= cfg_wdata[7:0];
+            8'h2C: if (cfg_wr_en) reg_safe_fallback_cmd[7:0] <= cfg_wdata[7:0];
+            8'h2D: if (cfg_wr_en) reg_safe_fallback_cmd[15:8] <= cfg_wdata[7:0];
+            8'h2E: if (cfg_wr_en) reg_safe_fallback_cmd[23:16] <= cfg_wdata[7:0];
+            8'h2F: if (cfg_wr_en) reg_safe_fallback_cmd[31:24] <= cfg_wdata[7:0];
+            8'h30: if (cfg_wr_en) reg_safe_fallback_cmd[39:32] <= cfg_wdata[7:0];
+            8'h31: if (cfg_wr_en) reg_safe_fallback_cmd[47:40] <= cfg_wdata[7:0];
+            8'h32: if (cfg_wr_en) reg_safe_fallback_cmd[55:48] <= cfg_wdata[7:0];
+            8'h33: if (cfg_wr_en) reg_safe_fallback_cmd[63:56] <= cfg_wdata[7:0];
+            8'h34: if (cfg_wr_en) reg_safe_fallback_cmd[71:64] <= cfg_wdata[7:0];
+            8'h35: if (cfg_wr_en) reg_safe_fallback_cmd[79:72] <= cfg_wdata[7:0];
+            8'h36: if (cfg_wr_en) reg_safe_fallback_cmd[87:80] <= cfg_wdata[7:0];
+            8'h37: if (cfg_wr_en) reg_safe_fallback_cmd[95:88] <= cfg_wdata[7:0];
+            8'h38: if (cfg_wr_en) reg_safe_fallback_cmd[103:96] <= cfg_wdata[7:0];
+            8'h39: if (cfg_wr_en) reg_safe_fallback_cmd[111:104] <= cfg_wdata[7:0];
+            8'h3A: if (cfg_wr_en) reg_safe_fallback_cmd[119:112] <= cfg_wdata[7:0];
+            8'h3B: if (cfg_wr_en) reg_safe_fallback_cmd[127:120] <= cfg_wdata[7:0];
+            8'h3C: if (cfg_wr_en) reg_supported_geometry_format <= cfg_wdata[7:0];
+            8'h3D: if (cfg_wr_en) reg_control_gain[7:0] <= cfg_wdata[7:0];
+            8'h3E: if (cfg_wr_en) reg_control_gain[15:8] <= cfg_wdata[7:0];
+            8'h3F: if (cfg_wr_en) reg_intent_map_sel <= cfg_wdata[3:0];
+            8'h40: if (cfg_wr_en) reg_reference_stream_velocity_mps[7:0] <= cfg_wdata[7:0];
+            8'h41: if (cfg_wr_en) reg_reference_stream_velocity_mps[15:8] <= cfg_wdata[7:0];
+            8'h42: if (cfg_wr_en) reg_reference_geometry_format <= cfg_wdata[7:0];
+            8'h43: if (cfg_wr_en) reg_reference_geometry_source[7:0] <= cfg_wdata[7:0];
+            8'h44: if (cfg_wr_en) reg_reference_geometry_source[15:8] <= cfg_wdata[7:0];
+            8'h45: if (cfg_wr_en) reg_reference_geometry_source[23:16] <= cfg_wdata[7:0];
+            8'h46: if (cfg_wr_en) reg_reference_geometry_source[31:24] <= cfg_wdata[7:0];
+            default: begin end
+        endcase
+        case (cfg_addr)
+            8'h00: cfg_rdata_r <= {24'h000000, reg_model_id[7:0]};
+            8'h01: cfg_rdata_r <= {24'h000000, reg_model_id[15:8]};
+            8'h02: cfg_rdata_r <= {24'h000000, reg_checkpoint_id[7:0]};
+            8'h03: cfg_rdata_r <= {24'h000000, reg_checkpoint_id[15:8]};
+            8'h04: cfg_rdata_r <= {24'h000000, reg_request_timeout_cycles[7:0]};
+            8'h05: cfg_rdata_r <= {24'h000000, reg_request_timeout_cycles[15:8]};
+            8'h06: cfg_rdata_r <= {24'h000000, reg_response_freshness_threshold[7:0]};
+            8'h07: cfg_rdata_r <= {24'h000000, reg_response_freshness_threshold[15:8]};
+            8'h08: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[7:0]};
+            8'h09: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[15:8]};
+            8'h0A: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[23:16]};
+            8'h0B: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[31:24]};
+            8'h0C: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[39:32]};
+            8'h0D: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[47:40]};
+            8'h0E: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[55:48]};
+            8'h0F: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[63:56]};
+            8'h10: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[71:64]};
+            8'h11: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[79:72]};
+            8'h12: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[87:80]};
+            8'h13: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[95:88]};
+            8'h14: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[103:96]};
+            8'h15: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[111:104]};
+            8'h16: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[119:112]};
+            8'h17: cfg_rdata_r <= {24'h000000, reg_min_actuator_cmd[127:120]};
+            8'h18: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[7:0]};
+            8'h19: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[15:8]};
+            8'h1A: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[23:16]};
+            8'h1B: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[31:24]};
+            8'h1C: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[39:32]};
+            8'h1D: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[47:40]};
+            8'h1E: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[55:48]};
+            8'h1F: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[63:56]};
+            8'h20: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[71:64]};
+            8'h21: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[79:72]};
+            8'h22: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[87:80]};
+            8'h23: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[95:88]};
+            8'h24: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[103:96]};
+            8'h25: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[111:104]};
+            8'h26: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[119:112]};
+            8'h27: cfg_rdata_r <= {24'h000000, reg_max_actuator_cmd[127:120]};
+            8'h28: cfg_rdata_r <= {24'h000000, reg_cmd_rate_limit[7:0]};
+            8'h29: cfg_rdata_r <= {24'h000000, reg_cmd_rate_limit[15:8]};
+            8'h2A: cfg_rdata_r <= {24'h000000, reg_cmd_rate_limit[23:16]};
+            8'h2B: cfg_rdata_r <= {24'h000000, reg_cmd_rate_limit[31:24]};
+            8'h2C: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[7:0]};
+            8'h2D: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[15:8]};
+            8'h2E: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[23:16]};
+            8'h2F: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[31:24]};
+            8'h30: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[39:32]};
+            8'h31: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[47:40]};
+            8'h32: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[55:48]};
+            8'h33: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[63:56]};
+            8'h34: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[71:64]};
+            8'h35: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[79:72]};
+            8'h36: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[87:80]};
+            8'h37: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[95:88]};
+            8'h38: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[103:96]};
+            8'h39: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[111:104]};
+            8'h3A: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[119:112]};
+            8'h3B: cfg_rdata_r <= {24'h000000, reg_safe_fallback_cmd[127:120]};
+            8'h3C: cfg_rdata_r <= {24'h000000, reg_supported_geometry_format};
+            8'h3D: cfg_rdata_r <= {24'h000000, reg_control_gain[7:0]};
+            8'h3E: cfg_rdata_r <= {24'h000000, reg_control_gain[15:8]};
+            8'h3F: cfg_rdata_r <= {28'h0000000, reg_intent_map_sel};
+            8'h40: cfg_rdata_r <= {24'h000000, reg_reference_stream_velocity_mps[7:0]};
+            8'h41: cfg_rdata_r <= {24'h000000, reg_reference_stream_velocity_mps[15:8]};
+            8'h42: cfg_rdata_r <= {24'h000000, reg_reference_geometry_format};
+            8'h43: cfg_rdata_r <= {24'h000000, reg_reference_geometry_source[7:0]};
+            8'h44: cfg_rdata_r <= {24'h000000, reg_reference_geometry_source[15:8]};
+            8'h45: cfg_rdata_r <= {24'h000000, reg_reference_geometry_source[23:16]};
+            8'h46: cfg_rdata_r <= {24'h000000, reg_reference_geometry_source[31:24]};
+            default: cfg_rdata_r <= 32'h00000000;
+        endcase
+    end
+end
+
+endmodule
+
+module active_aero_controller_engine (
+    clk,
+    rst_n,
+    cfg_model_id,
+    cfg_checkpoint_id,
+    cfg_request_timeout_cycles,
+    cfg_response_freshness_threshold,
+    cfg_min_actuator_cmd,
+    cfg_max_actuator_cmd,
+    cfg_cmd_rate_limit,
+    cfg_safe_fallback_cmd,
+    cfg_supported_geometry_format,
+    cfg_control_gain,
+    cfg_intent_map_sel,
+    geometry_valid,
+    flow_valid,
+    geometry_payload,
+    geometry_format,
+    flow_velocity_mps,
+    model_rsp_valid,
+    model_rsp_seq,
+    model_rsp_timestamp,
+    drag_force,
+    lift_force,
+    surface_pressure,
+    flow_field,
+    model_req_ready,
+    model_req_valid,
+    model_req_payload,
+    actuator_cmd_valid,
+    actuator_cmd,
+    fault_status,
+    diag_accepted_requests,
+    diag_accepted_responses,
+    diag_rejected_responses,
+    diag_clamp_events,
+    diag_fallback_activations
+);
+input clk;
+input rst_n;
+input [15:0] cfg_model_id;
+input [15:0] cfg_checkpoint_id;
+input [15:0] cfg_request_timeout_cycles;
+input [15:0] cfg_response_freshness_threshold;
+input [127:0] cfg_min_actuator_cmd;
+input [127:0] cfg_max_actuator_cmd;
+input [31:0] cfg_cmd_rate_limit;
+input [127:0] cfg_safe_fallback_cmd;
+input [7:0] cfg_supported_geometry_format;
+input [15:0] cfg_control_gain;
+input [3:0] cfg_intent_map_sel;
+input geometry_valid;
+input flow_valid;
+input [127:0] geometry_payload;
+input [7:0] geometry_format;
+input [15:0] flow_velocity_mps;
+input model_rsp_valid;
+input [15:0] model_rsp_seq;
+input [31:0] model_rsp_timestamp;
+input [31:0] drag_force;
+input [31:0] lift_force;
+input [31:0] surface_pressure;
+input [127:0] flow_field;
+output model_req_ready;
+output model_req_valid;
+output [255:0] model_req_payload;
+output actuator_cmd_valid;
+output [127:0] actuator_cmd;
+output [7:0] fault_status;
+output [15:0] diag_accepted_requests;
+output [15:0] diag_accepted_responses;
+output [15:0] diag_rejected_responses;
+output [15:0] diag_clamp_events;
+output [15:0] diag_fallback_activations;
+
+reg model_req_ready_r;
+reg model_req_valid_r;
+reg [255:0] model_req_payload_r;
+reg actuator_cmd_valid_r;
+reg [127:0] actuator_cmd_r;
+reg [7:0] fault_status_r;
+reg [15:0] diag_accepted_requests_r;
+reg [15:0] diag_accepted_responses_r;
+reg [15:0] diag_rejected_responses_r;
+reg [15:0] diag_clamp_events_r;
+reg [15:0] diag_fallback_activations_r;
+
+reg [15:0] outstanding_seq;
+reg outstanding_valid;
+reg [31:0] request_timestamp;
+reg [31:0] local_cycle;
+reg [127:0] last_cmd;
+reg safe_fallback_active;
+reg [15:0] request_seq_next;
+
+wire envelope_violation;
+wire unsupported_format;
+wire request_qual;
+wire response_seq_match;
+wire response_fresh;
+wire response_fields_present;
+wire response_accept;
+wire response_reject;
+wire clamp_needed;
+wire [127:0] validated_intent;
+wire [127:0] clamped_intent;
+wire [127:0] min_cmd;
+wire [127:0] max_cmd;
+wire [127:0] fallback_cmd;
+wire [31:0] flow_ext;
+wire [31:0] gain_ext;
+wire [255:0] req_payload_n;
+wire [31:0] response_age;
+
+assign model_req_ready = model_req_ready_r;
+assign model_req_valid = model_req_valid_r;
+assign model_req_payload = model_req_payload_r;
+assign actuator_cmd_valid = actuator_cmd_valid_r;
+assign actuator_cmd = actuator_cmd_r;
+assign fault_status = fault_status_r;
+assign diag_accepted_requests = diag_accepted_requests_r;
+assign diag_accepted_responses = diag_accepted_responses_r;
+assign diag_rejected_responses = diag_rejected_responses_r;
+assign diag_clamp_events = diag_clamp_events_r;
+assign diag_fallback_activations = diag_fallback_activations_r;
+
+assign min_cmd = cfg_min_actuator_cmd;
+assign max_cmd = cfg_max_actuator_cmd;
+assign fallback_cmd = cfg_safe_fallback_cmd;
+assign envelope_violation = (flow_velocity_mps < 16'd20) | (flow_velocity_mps > 16'd55);
+assign unsupported_format = (geometry_format != cfg_supported_geometry_format);
+assign request_qual = geometry_valid & flow_valid & ~envelope_violation & ~unsupported_format;
+assign response_seq_match = outstanding_valid & model_rsp_valid & (model_rsp_seq == outstanding_seq);
+assign response_age = local_cycle - model_rsp_timestamp;
+assign response_fresh = (response_age <= {16'h0000, cfg_response_freshness_threshold});
+assign response_fields_present = (drag_force !== 32'hxxxxxxxx) & (lift_force !== 32'hxxxxxxxx) & (surface_pressure !== 32'hxxxxxxxx) & (flow_field !== 128'hxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx);
+assign response_accept = response_seq_match & response_fresh & response_fields_present;
+assign response_reject = model_rsp_valid & (~response_accept);
+assign flow_ext = {16'h0000, flow_velocity_mps};
+assign gain_ext = {16'h0000, cfg_control_gain};
+assign validated_intent = (cfg_intent_map_sel == 4'h0) ? ({flow_field[127:0]} ^ {96'h0, drag_force, lift_force}[127:0]) :
+                          (cfg_intent_map_sel == 4'h1) ? ({flow_field[127:0]} + {96'h0, flow_ext}[127:0]) :
+                          (cfg_intent_map_sel == 4'h2) ? ({flow_field[127:0]} + {96'h0, gain_ext}[127:0]) :
+                          (cfg_intent_map_sel == 4'h3) ? (cfg_max_actuator_cmd ^ cfg_min_actuator_cmd) :
+                          (cfg_control_gain[0] ? (cfg_max_actuator_cmd - cfg_min_actuator_cmd) : cfg_safe_fallback_cmd);
+assign clamp_needed = (validated_intent < min_cmd) | (validated_intent > max_cmd);
+assign clamped_intent = (validated_intent < min_cmd) ? min_cmd : ((validated_intent > max_cmd) ? max_cmd : validated_intent);
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        model_req_ready_r <= 1'b0;
+        model_req_valid_r <= 1'b0;
+        model_req_payload_r <= 256'h0000000000000000000000000000000000000000000000000000000000000000;
+        actuator_cmd_valid_r <= 1'b0;
+        actuator_cmd_r <= 128'h00000000000000000000000000000000;
+        fault_status_r <= 8'h10;
+        diag_accepted_requests_r <= 16'h0000;
+        diag_accepted_responses_r <= 16'h0000;
+        diag_rejected_responses_r <= 16'h0000;
+        diag_clamp_events_r <= 16'h0000;
+        diag_fallback_activations_r <= 16'h0000;
+        outstanding_seq <= 16'h0000;
+        outstanding_valid <= 1'b0;
+        request_timestamp <= 32'h00000000;
+        local_cycle <= 32'h00000000;
+        last_cmd <= 128'h00000000000000000000000000000000;
+        safe_fallback_active <= 1'b1;
+    end else begin
+        local_cycle <= local_cycle + 32'h00000001;
+        model_req_ready_r <= request_qual & ~outstanding_valid & ~safe_fallback_active;
+        model_req_valid_r <= request_qual & ~outstanding_valid & ~safe_fallback_active;
+        model_req_payload_r <= {cfg_model_id, cfg_checkpoint_id, geometry_payload, flow_velocity_mps, outstanding_seq, local_cycle, 64'h0000000000000000};
+        if (request_qual & ~outstanding_valid & ~safe_fallback_active) begin
+            outstanding_valid <= 1'b1;
+            request_timestamp <= local_cycle;
+            outstanding_seq <= outstanding_seq + 16'h0001;
+            diag_accepted_requests_r <= (diag_accepted_requests_r == 16'hFFFF) ? 16'hFFFF : (diag_accepted_requests_r + 16'h0001);
+        end
+        if (response_reject) begin
+            diag_rejected_responses_r <= (diag_rejected_responses_r == 16'hFFFF) ? 16'hFFFF : (diag_rejected_responses_r + 16'h0001);
+            safe_fallback_active <= 1'b1;
+        end
+        if (response_accept) begin
+            diag_accepted_responses_r <= (diag_accepted_responses_r == 16'hFFFF) ? 16'hFFFF : (diag_accepted_responses_r + 16'h0001);
+            outstanding_valid <= 1'b0;
+            safe_fallback_active <= 1'b0;
+        end
+        if (envelope_violation | unsupported_format) begin
+            safe_fallback_active <= 1'b1;
+        end
+        if (safe_fallback_active | envelope_violation | unsupported_format | response_reject) begin
+            actuator_cmd_r <= fallback_cmd;
+            actuator_cmd_valid_r <= 1'b1;
+            diag_fallback_activations_r <= (diag_fallback_activations_r == 16'hFFFF) ? 16'hFFFF : (diag_fallback_activations_r + 16'h0001);
+        end else begin
+            actuator_cmd_r <= clamped_intent;
+            actuator_cmd_valid_r <= 1'b1;
+        end
+        if (clamp_needed) begin
+            diag_clamp_events_r <= (diag_clamp_events_r == 16'hFFFF) ? 16'hFFFF : (diag_clamp_events_r + 16'h0001);
+        end
+        last_cmd <= actuator_cmd_r;
+        fault_status_r[0] <= response_reject;
+        fault_status_r[1] <= envelope_violation;
+        fault_status_r[2] <= clamp_needed;
+        fault_status_r[3] <= ~response_fields_present & model_rsp_valid;
+        fault_status_r[4] <= safe_fallback_active | envelope_violation | unsupported_format | response_reject;
+        fault_status_r[5] <= unsupported_format;
+        fault_status_r[7:6] <= 2'b00;
+    end
+end
+
+endmodule
+---END active_aero_controller.v---

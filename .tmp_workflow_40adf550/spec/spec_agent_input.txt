@@ -1,0 +1,71 @@
+Implement a synthesizable synchronous digital IP called active_aero_controller around an external DoMINO model service. The RTL shall not implement the physics model; it shall implement request packing, response checking, safety arbitration, clamping, fallback, and output control.
+
+Clocking and reset:
+- single clock domain clk.
+- synchronous active-low reset rst_n.
+- on reset deassertion, all state shall return to safe non-actuating defaults.
+
+Configuration registers:
+- implement readable/writable registers for model_id/checkpoint identifier, request timeout threshold, response freshness threshold, minimum and maximum actuator command limits, command rate limit, safe fallback command value, and supported geometry format selector.
+- support a reference condition record for stream_velocity_mps=38.89 and geometry_format=STL with geometry_source metadata.
+- configuration shall be latched before operation and used by validation and control logic.
+
+Input handling:
+- geometry_valid and flow_valid qualify geometry_payload, geometry_format, and flow_velocity_mps.
+- flow_velocity_mps shall be checked against the allowed operating envelope 20..55 m/s inclusive; if outside, set envelope_violation and force fallback.
+- geometry_format shall be checked against supported format configuration; if unsupported, force fallback.
+- geometry_payload is treated as an opaque tokenized geometry descriptor suitable for transmission to a remote GPU-backed service; no geometric computation is required in RTL.
+
+Request transaction logic:
+- create an outstanding request sequence counter that increments on each accepted request.
+- when geometry and flow inputs are valid and controller is not in fault-latched fallback, build model_req_payload containing: model identifier, checkpoint identifier, geometry token, flow_velocity_mps, sequence number, local request timestamp or cycle count tag, and validity bits.
+- assert model_req_ready when a request is issued.
+- only one outstanding request may be active at a time unless a parameterized queue depth is added; default implementation shall be one-deep.
+
+Response validation:
+- accept model_rsp_valid only when a matching outstanding request exists.
+- compare model_rsp_seq with outstanding sequence; mismatch shall set stale_or_mismatched_response and ignore all response fields.
+- compare response timestamp/cycle age against freshness threshold; if exceeded, set stale_or_mismatched_response and ignore response.
+- verify required outputs are present/latched: drag_force, lift_force, surface_pressure, flow_field.
+- if any required response field is invalid, hold fallback active and ignore the response.
+- response validation shall be purely digital and synthesizable.
+
+Control arbitration:
+- convert validated surrogate outputs into actuator command intent using a deterministic mapping block. The exact plant mapping is external to the RTL architecture; the RTL shall provide a placeholder command vector path and a programmable control_gain or intent map selector.
+- if a validated response exists, the command arbiter may select model-driven intent; otherwise it shall select safe fallback.
+- safe fallback command shall be deterministic and configurable.
+
+Clamping and rate limiting:
+- implement a clamp stage on every actuator command field.
+- each command field shall be limited to configured min and max bounds.
+- implement optional per-cycle rate limiting using previous command register(s); if limit is exceeded, saturate to the permitted delta.
+- set clamp_event when any bound or rate limit is applied.
+
+Fault and fallback behavior:
+- when envelope_violation, stale_or_mismatched_response, response_invalid, or unsupported_format occurs, assert safe_fallback_active and drive fallback commands.
+- safe_fallback_active shall remain asserted until a fresh, sequence-matched, valid response is received and the fault condition clears.
+- no stale or invalid model command shall reach actuator_cmd.
+
+Output stage:
+- actuator_cmd_valid shall assert when a command vector is available after arbitration and clamp.
+- actuator_cmd shall present either clamped model-driven commands or fallback commands.
+- fault_status shall expose at least bits for stale response, envelope violation, clamp event, invalid response, and fallback active.
+
+Diagnostics:
+- count accepted requests, accepted responses, rejected responses, clamp events, and fallback activations in saturating counters.
+- counters shall be readable for system test and debug.
+
+Synthesizability constraints:
+- use registers, combinational comparators, counters, muxes, adders/subtractors, saturating arithmetic, and finite-state machines only.
+- avoid floating-point dependency in RTL; all external physical quantities shall be represented in a fixed-point or packed integer format.
+- no GPU, no neural network, and no remote inference implementation shall exist inside the ASIC IP.
+
+Interface to external model service:
+- the ASIC shall emit model_req_payload to a remote NIM/GPU worker interface implemented off-chip or in a companion subsystem.
+- the ASIC shall ingest model_rsp_valid, model_rsp_seq, model_rsp_timestamp, drag_force, lift_force, surface_pressure, and flow_field from that external service.
+- the ASIC shall remain functional even when the model service is absent by using safe fallback.
+
+Acceptance behavior:
+- a command may only be issued to the actuator subsystem if inputs are valid, the response is fresh, the sequence matches, required fields are present, and all commands pass clamp/rate checks.
+- otherwise fallback is mandatory.
+- architecture is approved for ASIC implementation and shall be coded as synthesizable RTL in an Arch2RTL flow.

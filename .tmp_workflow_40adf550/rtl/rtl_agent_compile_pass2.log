@@ -1,0 +1,9 @@
+backend/workflows/40adf550-09ce-4d11-999f-02f85b89a478/rtl/pass2/active_aero_controller_engine.v:160: error: Unable to bind wire/reg/memory `safe_fallback_cmd['sd0]' in `active_aero_controller.u_active_aero_controller_engine'
+backend/workflows/40adf550-09ce-4d11-999f-02f85b89a478/rtl/pass2/active_aero_controller_engine.v:160: error: Unable to elaborate condition expression.
+2 error(s) during elaboration.
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

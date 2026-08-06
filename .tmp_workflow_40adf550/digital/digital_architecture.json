@@ -1,0 +1,159 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "active_aero_controller",
+  "design_summary": {
+    "purpose": "Provide a synthesizable synchronous ASIC controller that interfaces to an external DoMINO-style remote aerodynamic surrogate model service through request packing, response validation, safety arbitration, clamping, fallback, and actuator output control.",
+    "operating_model": "The design operates in a single clk domain with synchronous active-low reset rst_n. Configuration is latched through the register/control block before use. The engine accepts geometry and flow samples only when qualified, checks operating-envelope and format constraints, issues at most one outstanding model request, validates returned sequence and freshness, requires all response fields, and then either forwards deterministic model-driven actuator intent through clamp/rate limiting or forces configured safe fallback. All physics and inference remain off-chip; RTL contains only digital control, comparison, muxing, counting, and state tracking.",
+    "external_interfaces": [
+      "Configuration read/write interface via cfg_wr_en, cfg_rd_en, cfg_addr, cfg_wdata, cfg_rdata, and cfg_ready.",
+      "Off-chip model-service request interface via model_req_ready, model_req_valid, and model_req_payload.",
+      "Off-chip model-service response ingress via model_rsp_valid, model_rsp_seq, model_rsp_timestamp, drag_force, lift_force, surface_pressure, and flow_field.",
+      "Actuator command interface via actuator_cmd_valid and actuator_cmd.",
+      "Fault and diagnostic observation via fault_status and saturating diagnostic counters."
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "active_aero_controller_cfg",
+      "role": "Configuration and register-latch block for controller control parameters, supported geometry selection, reference-condition metadata, and software-visible readback.",
+      "responsibilities": [
+        "Decode cfg_wr_en/cfg_rd_en/cfg_addr/cfg_wdata into stable configuration registers.",
+        "Provide readable cfg_rdata and cfg_ready for system access.",
+        "Latch model_id, checkpoint_id, request timeout threshold, response freshness threshold, actuator min/max limits, command rate limit, safe fallback command, supported geometry format, control_gain, and intent map selector.",
+        "Store the reference condition record for stream_velocity_mps=38.89 and geometry_format=STL with geometry_source metadata.",
+        "Keep configuration available as synchronous outputs consumed by the engine datapath.",
+        "Reset all configuration state to safe non-actuating defaults, with fallback-compatible bounds and restored reference-condition defaults."
+      ],
+      "interface_notes": [
+        "Receives only clk, rst_n, cfg_wr_en, cfg_rd_en, cfg_addr, and cfg_wdata.",
+        "Drives cfg_rdata, cfg_ready, and semantic configuration outputs used by the engine.",
+        "Does not drive any actuator or model-service response input.",
+        "Readable/writable registers are described as synchronous and synthesizable."
+      ],
+      "ownership_notes": [
+        "Owns the internal configuration registers and readback behavior associated with the configuration interface.",
+        "Owns the reference-condition metadata outputs.",
+        "Does not own downstream request, response, or actuator-control outputs."
+      ]
+    },
+    {
+      "name": "active_aero_controller_engine",
+      "role": "Protocol engine and safety datapath that builds model requests, validates model responses, arbitrates fallback, applies deterministic command mapping, clamps and rate-limits commands, and maintains diagnostics.",
+      "responsibilities": [
+        "Track at most one outstanding request sequence at a time.",
+        "Build model_req_payload containing model ID, checkpoint ID, opaque geometry token, flow_velocity_mps, sequence number, local request timestamp or cycle tag, and validity bits.",
+        "Assert model_req_ready and model_req_valid for request issuance handshake.",
+        "Check geometry_valid and flow_valid before issuing a request.",
+        "Reject flow_velocity_mps outside the inclusive 20..55 m/s operating envelope and force fallback on violation.",
+        "Reject unsupported geometry_format values relative to the configured supported format and force fallback on mismatch.",
+        "Accept model_rsp_valid only when a matching outstanding request exists.",
+        "Compare model_rsp_seq with the outstanding request sequence and ignore mismatches.",
+        "Evaluate response freshness against the configured threshold using model_rsp_timestamp or local age tagging.",
+        "Verify required response fields drag_force, lift_force, surface_pressure, and flow_field are present and valid before any response can influence control.",
+        "Select model-driven intent only through deterministic control_gain or intent_map_sel behavior; no continuous plant computation exists in RTL.",
+        "Apply clamp and optional rate limiting independently to every actuator command field.",
+        "Drive configured safe fallback command when faults are present or no validated response is available.",
+        "Expose fault_status and saturating diagnostic counters for accepted requests, accepted responses, rejected responses, clamp events, and fallback activations."
+      ],
+      "interface_notes": [
+        "Consumes latched configuration inputs from the top-level configuration block.",
+        "Consumes geometry and flow inputs plus external model response signals.",
+        "Drives model_req_ready, model_req_valid, model_req_payload, actuator_cmd_valid, actuator_cmd, fault_status, and diagnostic outputs.",
+        "Must not drive any of the configuration inputs or model response inputs.",
+        "All command outputs are described as fixed-point or packed integer datapath values."
+      ],
+      "ownership_notes": [
+        "Owns request sequencing, outstanding-request tracking, freshness and validity checks, safety arbitration, command mapping, clamping, rate limiting, fault encoding, and diagnostic counters.",
+        "Owns the model-service protocol side of the architecture but not the remote service itself.",
+        "Does not own configuration register storage, which remains in active_aero_controller_cfg."
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "active_aero_controller_cfg",
+      "to": "active_aero_controller_engine",
+      "signals": [
+        "active_aero_controller_cfg_cfg_model_id",
+        "active_aero_controller_cfg_cfg_checkpoint_id",
+        "active_aero_controller_cfg_cfg_request_timeout_cycles",
+        "active_aero_controller_cfg_cfg_response_freshness_threshold",
+        "active_aero_controller_cfg_cfg_min_actuator_cmd",
+        "active_aero_controller_cfg_cfg_max_actuator_cmd",
+        "active_aero_controller_cfg_cfg_cmd_rate_limit",
+        "active_aero_controller_cfg_cfg_safe_fallback_cmd",
+        "active_aero_controller_cfg_cfg_supported_geometry_format",
+        "active_aero_controller_cfg_cfg_control_gain",
+        "active_aero_controller_cfg_cfg_intent_map_sel",
+        "active_aero_controller_cfg_cfg_reference_stream_velocity_mps",
+        "active_aero_controller_cfg_cfg_reference_geometry_format",
+        "active_aero_controller_cfg_cfg_reference_geometry_source"
+      ],
+      "intent": "Provide latched configuration and reference-condition metadata from the register/control block to the engine datapath for request packing, validation, and safety control."
+    },
+    {
+      "from": "active_aero_controller_engine",
+      "to": "external model service",
+      "signals": [
+        "model_req_ready",
+        "model_req_valid",
+        "model_req_payload",
+        "model_rsp_valid",
+        "model_rsp_seq",
+        "model_rsp_timestamp",
+        "drag_force",
+        "lift_force",
+        "surface_pressure",
+        "flow_field"
+      ],
+      "intent": "Emit off-chip request transactions and ingest off-chip surrogate-model responses through a purely digital, synthesizable protocol boundary."
+    },
+    {
+      "from": "active_aero_controller_engine",
+      "to": "actuator subsystem",
+      "signals": [
+        "actuator_cmd_valid",
+        "actuator_cmd",
+        "fault_status"
+      ],
+      "intent": "Present only validated, clamped, and rate-limited model-driven commands or deterministic safe fallback commands, together with fault visibility."
+    },
+    {
+      "from": "active_aero_controller_cfg",
+      "to": "software/debug access",
+      "signals": [
+        "cfg_rdata",
+        "cfg_ready"
+      ],
+      "intent": "Provide readable configuration access and register interface acknowledgment for system software and test."
+    }
+  ],
+  "data_flow_summary": [
+    "Configuration is written into active_aero_controller_cfg, latched, and then consumed by active_aero_controller_engine as stable control constants.",
+    "Qualified geometry_payload and flow_velocity_mps inputs are checked against geometry format support and the 20..55 m/s envelope before request issuance.",
+    "When eligible, the engine increments an outstanding request sequence counter and packs the request payload with model identifier, checkpoint identifier, opaque geometry token, flow velocity, sequence, and local timestamp/cycle tagging.",
+    "Incoming model responses are accepted only if model_rsp_valid is asserted, an outstanding request exists, the sequence matches, freshness is within threshold, and all required output fields are present.",
+    "Validated surrogate outputs are mapped by a deterministic intent selector or control_gain path into actuator command intent without embedding any physics model in RTL.",
+    "Each actuator command field is then clamped to configured min/max bounds and optionally rate-limited relative to the previous command state.",
+    "If any safety condition fails, the engine asserts safe_fallback_active behavior and drives the configured fallback command instead of model-derived intent.",
+    "Diagnostic counters accumulate accepted requests, accepted responses, rejected responses, clamp events, and fallback activations using saturating arithmetic."
+  ],
+  "clock_reset_summary": {
+    "clocking": "All sequential behavior is synchronous to the single clock domain clk.",
+    "reset_behavior": "rst_n is synchronous active-low reset. On reset assertion, all internal configuration latches, outstanding request tracking, sequence counters, request timestamp or cycle tags, validation flags, fault latch state, clamp state, fallback state, actuator output registers, and saturating diagnostic counters return to safe defaults. Safe defaults are non-actuating, with actuator_cmd_valid deasserted, actuator_cmd driven to the configured or default safe fallback command, and safe_fallback_active asserted until a fresh valid response is later accepted and all fault conditions clear."
+  },
+  "integration_notes": [
+    "The architecture is intentionally limited to synthesizable digital logic: registers, combinational comparators, counters, muxes, adders/subtractors, saturating arithmetic, and finite-state machines.",
+    "No floating-point computation, GPU execution, neural network inference, or remote-service implementation exists inside the ASIC IP.",
+    "Geometry_payload is treated as an opaque tokenized descriptor suitable for transport to an off-chip service; no geometric computation is performed in RTL.",
+    "The design remains functional when the model service is absent by using configured safe fallback commands.",
+    "Only one outstanding request is supported by the default implementation; queue-depth expansion is not part of the stated contract.",
+    "No stale, mismatched, unsupported, or invalid response may reach actuator_cmd.",
+    "All port names, module names, and filenames are inherited exactly from the supplied specification and must remain unchanged in implementation."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}
