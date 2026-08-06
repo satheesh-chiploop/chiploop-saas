@@ -1,5 +1,0 @@
-/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/handoff/rtl/ag_response_parser.v
-/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/handoff/rtl/ag_input_validation.v
-/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/handoff/rtl/ag_request_sequencer.v
-/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/handoff/rtl/ag_command_and_safety_fsm.v
-/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/handoff/rtl/AeroGuard_Active_Aerodynamics_Controller.v
