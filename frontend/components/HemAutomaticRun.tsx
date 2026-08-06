@@ -371,8 +371,6 @@ export function HemChildDashboardLinks({ logs, runs }: { logs: string | null | u
     };
   }, [supabase, workflowIdKey]);
 
-  if (!childRuns.length) return null;
-
   return (
     <div className="mt-3 rounded-xl border border-cyan-900/50 bg-cyan-950/15 p-4 text-sm text-slate-300">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -397,6 +395,13 @@ export function HemChildDashboardLinks({ logs, runs }: { logs: string | null | u
             </tr>
           </thead>
           <tbody>
+            {!childRuns.length && (
+              <tr className="border-t border-slate-800 bg-black/10">
+                <td colSpan={4} className="px-3 py-6 text-center text-sm text-slate-400">
+                  Waiting for the next HEM workflow to start…
+                </td>
+              </tr>
+            )}
             {childRuns.map((child) => (
               <tr key={`${child.label}-${child.workflowId}`} className="border-t border-slate-800 bg-black/10">
                 <td className="px-3 py-3 font-semibold text-slate-100">{child.label}</td>
