@@ -1,0 +1,8 @@
+{
+  "workflow_id": "7a36393a-1776-432d-85d4-509d03eb0652",
+  "workflow_dir": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652",
+  "digital_spec_json": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/spec/motor_control_top_spec.json",
+  "spec_json": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/spec/motor_control_top_spec.json",
+  "digital_spec_json_exists": true,
+  "spec_json_exists": true
+}

@@ -1,0 +1,119 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "motor_control_top",
+  "generated_at": "2026-08-06T22:28:29.393734",
+  "file_count": 22,
+  "files": [
+    {
+      "path": "docs/arch/digital_architecture.json",
+      "sha256": "12ab624a27c26bb68baf98ea310ee0e594a27b49a4363625edb40db02a173941",
+      "bytes": 21331
+    },
+    {
+      "path": "docs/microarch/digital_microarchitecture.json",
+      "sha256": "2f8b130016e5c2bfab5f192b236a25d9920f23928d9280dd855a4e866a1a0c17",
+      "bytes": 13746
+    },
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "d05de64e53759c2b83ba032b627618b46ef9194b9393579d838433fd0a14ab2b",
+      "bytes": 13869
+    },
+    {
+      "path": "docs/regmap/digital_regmap_raw_output.txt",
+      "sha256": "85534e0b62e91b64c37e4c60bd3b0f093466827e572e40c22589488477808698",
+      "bytes": 9111
+    },
+    {
+      "path": "docs/spec/motor_control_top_spec.json",
+      "sha256": "d2a4507a0a41feeedab9228884adf52607ee17997b67a11616ccd5b1efa6efba",
+      "bytes": 75013
+    },
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "70d4114176bf234bea8603a2d774b6ad20ad530dde5faf4c5ccb3fd4aa396815",
+      "bytes": 14651
+    },
+    {
+      "path": "docs/spec/spec_agent_normalized.json",
+      "sha256": "d2a4507a0a41feeedab9228884adf52607ee17997b67a11616ccd5b1efa6efba",
+      "bytes": 75013
+    },
+    {
+      "path": "misc/power_intent_findings.json",
+      "sha256": "7fa145e2180b4086fc49a73c3fd5f9021950b98a84dc26b902eddc4f6a7ccf59",
+      "bytes": 289
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "ce85a2dcf91e0241a8883e3fe123a128a5ecc5415a54a89ebb765b45ef58d887",
+      "bytes": 419
+    },
+    {
+      "path": "misc/rtl_agent_preflight.json",
+      "sha256": "2ecbd87534d9883d100e3fbd64dceb9ebc4425497dc6583b3f64ffea73b5222f",
+      "bytes": 395
+    },
+    {
+      "path": "misc/rtl_quality_gate.json",
+      "sha256": "9c30b9e0d26d0d2420dd3e382db02fe22903dc01c7f3eee9aa57494f92dec1da",
+      "bytes": 159
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "f282feac2ab6ab793f5b775c8653c6c182837ff4a69df1870e30b59a182d8fca",
+      "bytes": 2221
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "a071cfab6d7a1903b9ad747635fe188e80baa926001226697bf41ab55a5fa21f",
+      "bytes": 776
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "76e75c796fbac581a561c45aca9ca0c22a37f836cf71a6f3bf2e37fbb98acf47",
+      "bytes": 324
+    },
+    {
+      "path": "rtl/actuator_mapping.v",
+      "sha256": "6364033e93d08528104af29ceffd37d996bbc67a056d6496fa6728f4afe6cbc1",
+      "bytes": 1559
+    },
+    {
+      "path": "rtl/csr_block.v",
+      "sha256": "061e015751b5722e744fb9f245a5ccb8ff39de11c61aa7320b29ac2562489d48",
+      "bytes": 4556
+    },
+    {
+      "path": "rtl/geometry_staging.v",
+      "sha256": "823b41bf74fcdc5fdb3ca5968f7c5ba0ede9824886505a3333c782ff950d5471",
+      "bytes": 1951
+    },
+    {
+      "path": "rtl/motor_control_top.v",
+      "sha256": "a451a46ed7dac24e60163f6b9e5e6975e7fe5ac7c89bc2266818a81c9a3fffa2",
+      "bytes": 11098
+    },
+    {
+      "path": "rtl/request_packager.v",
+      "sha256": "dd6da927394b4fbf20aaed38e3f85a27c88cfcc7079f1186ffa42f5b797e314a",
+      "bytes": 1814
+    },
+    {
+      "path": "rtl/safety_logic.v",
+      "sha256": "2d52e5b039d090a6e854ff1efb07ff9ad092f987833a9c988aaa9fa7b4f32d07",
+      "bytes": 2766
+    },
+    {
+      "path": "rtl/transport_manager.v",
+      "sha256": "cee82911200d7ddd3d31ca7c49ff95cf2d933078b3032841407b5b8d4f0ab65c",
+      "bytes": 3312
+    },
+    {
+      "path": "rtl/validation_guard.v",
+      "sha256": "9688aa2343f7e120d5bb98ae21bf33099054b5bd2c2eaeb4aecad01ac42bd6a1",
+      "bytes": 3006
+    }
+  ]
+}

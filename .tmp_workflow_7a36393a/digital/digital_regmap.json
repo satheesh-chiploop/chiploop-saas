@@ -1,0 +1,406 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "abstract",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 64,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Launch, fault clear, interrupt enable, latched fault enable, and basic control bits.",
+        "fields": [
+          {
+            "name": "LAUNCH",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "One-cycle semantic launch pulse when software writes 1 to an accepted CTRL transaction. The bit self-clears after acceptance."
+          },
+          {
+            "name": "FAULT_CLEAR",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Host clear / fault-clear semantic. When written as 1, requests fault clear and may also qualify exit from ERROR or fault-latched fallback depending on configuration."
+          },
+          {
+            "name": "IRQ_ENABLE",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables irq_out generation when status conditions are met."
+          },
+          {
+            "name": "ENABLE_LATCHED_FAULT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "When set, fault conditions latch until host clear is observed."
+          },
+          {
+            "name": "HOST_ABORT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW",
+            "reset": 0,
+            "description": "Optional host abort semantic. If written high, requests abort/fallback handling for the current transaction."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CYCLES",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Programmable timeout threshold in cycles for WAIT_RESPONSE supervision.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 23,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum number of clock cycles allowed between request issue and valid response acceptance before timeout. Zero may be treated as immediate timeout or implementation-defined minimum depending on synthesis policy, but software should program a nonzero value."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 24,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "FRESHNESS_CYCLES",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Freshness threshold used by validation_guard to reject stale responses.",
+        "fields": [
+          {
+            "name": "FRESHNESS_CYCLES",
+            "lsb": 23,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum acceptable response age in cycles relative to the configured freshness supervision point."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 24,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "FLOW_AND_FORMAT",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Flow velocity, geometry format ID, and model ID fields used by request packaging.",
+        "fields": [
+          {
+            "name": "FLOW_VELOCITY",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Flow condition input used as metadata in request packaging."
+          },
+          {
+            "name": "GEOM_FORMAT_ID",
+            "lsb": 23,
+            "msb": 16,
+            "access": "RW",
+            "reset": 0,
+            "description": "Geometry format identifier included in the outbound request descriptor."
+          },
+          {
+            "name": "MODEL_ID",
+            "lsb": 31,
+            "msb": 24,
+            "access": "RW",
+            "reset": 0,
+            "description": "External DoMINO model identifier included in the outbound request descriptor."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_LENGTH",
+        "offset": "0x20",
+        "access": "RW",
+        "description": "Configured geometry stream length and related sequence bookkeeping.",
+        "fields": [
+          {
+            "name": "GEOM_LENGTH",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Expected number of geometry beats to accept during capture. Geometry capture terminates on geom_last or when this count is reached."
+          },
+          {
+            "name": "RESERVED_1",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          },
+          {
+            "name": "RESERVED_2",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "JOB_SEQUENCE",
+        "offset": "0x28",
+        "access": "RW",
+        "description": "Job ID and sequence ID tracking fields used for response correlation.",
+        "fields": [
+          {
+            "name": "JOB_ID",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Job identifier used to correlate request and response packets."
+          },
+          {
+            "name": "SEQUENCE_ID",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RW",
+            "reset": 0,
+            "description": "Sequence identifier used to detect stale or mis-tagged responses."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "ACT_LIMITS",
+        "offset": "0x30",
+        "access": "RW",
+        "description": "Actuator minimum, maximum, and slew-limit configuration used by safety_logic.",
+        "fields": [
+          {
+            "name": "ACT_MIN",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum clamp for act_setpoint."
+          },
+          {
+            "name": "ACT_MAX",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum clamp for act_setpoint."
+          },
+          {
+            "name": "SLEW_LIMIT",
+            "lsb": 47,
+            "msb": 32,
+            "access": "RW",
+            "reset": 0,
+            "description": "Optional maximum step change allowed between accepted commands. A zero value may disable slew limiting depending on implementation policy."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 48,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x38",
+        "access": "RO",
+        "description": "Busy, fault, timeout, valid response, and fallback-active status mirror.",
+        "fields": [
+          {
+            "name": "BUSY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Controller is busy with capture, request issue, response wait, validation, or fallback sequencing."
+          },
+          {
+            "name": "FAULT",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched fault indication, if enabled/configured."
+          },
+          {
+            "name": "TIMEOUT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Timeout status asserted when WAIT_RESPONSE exceeds cfg_timeout_cycles."
+          },
+          {
+            "name": "VALID_RESPONSE",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates at least one validated response has been accepted."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 1,
+            "description": "Safe fallback posture is active."
+          },
+          {
+            "name": "TRANSPORT_ERROR",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Transport protocol or handshake error detected."
+          },
+          {
+            "name": "INVALID_RESPONSE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Malformed, checksum-failing, incomplete, or otherwise invalid response detected."
+          },
+          {
+            "name": "STALE_RESPONSE",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Response rejected by freshness/age or correlation gating."
+          },
+          {
+            "name": "GEOM_CAPTURE_DONE",
+            "lsb": 8,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Geometry capture completed successfully for the current launch."
+          },
+          {
+            "name": "GEOM_CAPTURE_ERROR",
+            "lsb": 9,
+            "msb": 9,
+            "access": "RO",
+            "reset": 0,
+            "description": "Geometry capture encountered an error such as invalid length, malformed keep, or premature/late termination."
+          },
+          {
+            "name": "OUTSTANDING_ACTIVE",
+            "lsb": 10,
+            "msb": 10,
+            "access": "RO",
+            "reset": 0,
+            "description": "A request is currently outstanding to the external worker."
+          },
+          {
+            "name": "RESPONSE_PENDING",
+            "lsb": 11,
+            "msb": 11,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response is pending and being tracked by the transport/validation path."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 12,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "IRQ_OUT",
+        "description": "Top-level interrupt output. Asserted only when irq enable is set and internal fault/status conditions warrant an interrupt according to the controller policy. Software should treat STATUS bits as the canonical source of cause."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Hold reset_n low, then release it and wait until STATUS.FALLBACK_ACTIVE is high and STATUS.BUSY is low.",
+      "Program ACT_LIMITS with valid clamp bounds and optional SLEW_LIMIT.",
+      "Program TIMEOUT_CYCLES, FRESHNESS_CYCLES, FLOW_AND_FORMAT, GEOM_LENGTH, and JOB_SEQUENCE.",
+      "Program CTRL.ENABLE_LATCHED_FAULT as required by system policy, and set CTRL.IRQ_ENABLE if interrupts are desired.",
+      "Stream geometry beats using the dedicated geometry stream, then write CTRL.LAUNCH with a valid host transaction to start the transaction."
+    ],
+    "polling_sequence": [
+      "Poll STATUS.BUSY until it deasserts or STATUS.TIMEOUT/STATUS.FAULT/STATUS.INVALID_RESPONSE/STATUS.STALE_RESPONSE/STATUS.TRANSPORT_ERROR asserts.",
+      "When STATUS.VALID_RESPONSE asserts, sample actuator outputs and any readback status mirror.",
+      "If STATUS.FALLBACK_ACTIVE asserts, keep software in safe posture until the condition clears or host clear is accepted."
+    ],
+    "irq_sequence": [
+      "On IRQ_OUT, read STATUS to identify the cause bits.",
+      "If a fault is latched or a timeout/invalid/stale/transport error occurred, write CTRL.FAULT_CLEAR and, if needed, reinitialize configuration before issuing a new launch.",
+      "Do not re-launch while STATUS.BUSY is high or while a fault is still latched."
+    ]
+  },
+  "consistency_notes": [
+    "This register map is compatible with DIGITAL_SPEC_JSON and preserves the required top module motor_control_top.",
+    "The map uses the abstract 64-bit host register window implied by the spec; no AXI/APB/I2C conversion is introduced.",
+    "No new hierarchy, ports, geometry arrays, tensors, or bulk payload interfaces are added.",
+    "All fields are defined as firmware-visible control/status semantics only; implementation details such as staging storage remain internal and bounded.",
+    "Where wider software concepts exist, they are packed into the 64-bit registers already defined by the spec."
+  ]
+}

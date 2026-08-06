@@ -1,0 +1,4452 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "motor_control_top",
+  "rtl_file_count": 8,
+  "module_count": 8,
+  "modules": [
+    {
+      "name": "actuator_mapping",
+      "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/actuator_mapping.v",
+      "input_count": 76,
+      "output_count": 23,
+      "inout_count": 0,
+      "input_port_count": 6,
+      "output_port_count": 6,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "validated_response_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "validated_response_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "validated_response_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "validated_response_keep",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "validated_response_last",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "act_mode_raw",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "act_setpoint_raw",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "act_enable_raw",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "act_fallback_raw",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "act_summary_valid",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "csr_block",
+      "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/csr_block.v",
+      "input_count": 82,
+      "output_count": 245,
+      "inout_count": 0,
+      "input_port_count": 12,
+      "output_port_count": 17,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "host_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "host_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "host_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "host_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "host_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "host_we",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "host_re",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_launch",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_timeout_cycles",
+          "direction": "output",
+          "width": "[23:0]"
+        },
+        {
+          "name": "cfg_freshness_cycles",
+          "direction": "output",
+          "width": "[23:0]"
+        },
+        {
+          "name": "cfg_flow_velocity",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geom_length",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_job_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_sequence_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_fault_clear",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_irq_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable_latched_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_act_min",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_act_max",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_slew_limit",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geom_format_id",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_model_id",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "status_busy",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_timeout",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_valid_response",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_fallback_active",
+          "direction": "input",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "geometry_staging",
+      "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/geometry_staging.v",
+      "input_count": 125,
+      "output_count": 51,
+      "inout_count": 0,
+      "input_port_count": 9,
+      "output_port_count": 5,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "geom_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "geom_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "geom_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "geom_keep",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "geom_last",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_geom_length",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "geom_capture_start",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "geom_capture_done",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "geom_capture_error",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "geom_stream_count",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "geom_crc_seed",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "geom_crc_value",
+          "direction": "output",
+          "width": "[31:0]"
+        }
+      ]
+    },
+    {
+      "name": "motor_control_top",
+      "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v",
+      "input_count": 228,
+      "output_count": 224,
+      "inout_count": 0,
+      "input_port_count": 18,
+      "output_port_count": 20,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "host_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "host_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "host_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "host_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "host_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "host_we",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "host_re",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "geom_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "geom_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "geom_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "geom_keep",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "geom_last",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "worker_req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "worker_req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "worker_req_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "worker_req_keep",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "worker_req_last",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "worker_rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "worker_rsp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "worker_rsp_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "worker_rsp_keep",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "worker_rsp_last",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "act_mode",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "act_setpoint",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "act_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "act_fallback",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "irq_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_timeout",
+          "direction": "output",
+          "width": "[23:0]"
+        },
+        {
+          "name": "geom_capture_start",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "geom_capture_done",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "geom_capture_error",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "geom_crc_seed",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "status_busy",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_valid_response",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_fallback_active",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "request_packager",
+      "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/request_packager.v",
+      "input_count": 132,
+      "output_count": 76,
+      "inout_count": 0,
+      "input_port_count": 12,
+      "output_port_count": 6,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_model_id",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_geom_format_id",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_flow_velocity",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geom_length",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_job_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_sequence_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "geom_stream_count",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "geom_crc_value",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "request_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "request_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "request_keep",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "request_last",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_fire",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "request_accepted",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_checksum_ok",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "safety_logic",
+      "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/safety_logic.v",
+      "input_count": 79,
+      "output_count": 23,
+      "inout_count": 0,
+      "input_port_count": 17,
+      "output_port_count": 6,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "act_mode_raw",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "act_setpoint_raw",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "act_enable_raw",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "act_fallback_raw",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "act_summary_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_act_min",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_act_max",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_slew_limit",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_enable_latched_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_timeout",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_transport_error",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_invalid_response",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_stale_response",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "host_abort",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "act_mode",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "act_setpoint",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "act_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "act_fallback",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_latched",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "transport_manager",
+      "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v",
+      "input_count": 77,
+      "output_count": 171,
+      "inout_count": 0,
+      "input_port_count": 7,
+      "output_port_count": 16,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "request_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "request_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "request_keep",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "request_last",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "request_accepted",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "worker_req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "worker_req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "worker_req_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "worker_req_keep",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "worker_req_last",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "worker_rsp_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "worker_rsp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "worker_rsp_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "worker_rsp_keep",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "worker_rsp_last",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "outstanding_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "transport_error",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "response_pending",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "response_beat_count",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "response_last_seen",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "validation_guard",
+      "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/validation_guard.v",
+      "input_count": 153,
+      "output_count": 79,
+      "inout_count": 0,
+      "input_port_count": 15,
+      "output_port_count": 9,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "worker_rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "worker_rsp_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "worker_rsp_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "worker_rsp_keep",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "worker_rsp_last",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_job_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_sequence_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_cycles",
+          "direction": "input",
+          "width": "[23:0]"
+        },
+        {
+          "name": "response_pending",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "response_beat_count",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "response_last_seen",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "transport_error",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "validated_response_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "validated_response_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "validated_response_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "validated_response_keep",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "validated_response_last",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "response_tag_match",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "response_fresh",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "response_checksum_ok",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "response_complete",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "response_malformed",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 228,
+    "output_count": 224,
+    "inout_count": 0,
+    "input_port_count": 18,
+    "output_port_count": 20,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "host_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "host_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "host_addr",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "host_wdata",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "host_rdata",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "host_we",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "host_re",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "geom_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "geom_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "geom_data",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "geom_keep",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "geom_last",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "worker_req_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "worker_req_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "worker_req_data",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "worker_req_keep",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "worker_req_last",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "worker_rsp_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "worker_rsp_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "worker_rsp_data",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "worker_rsp_keep",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "worker_rsp_last",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "act_mode",
+        "direction": "output",
+        "width": "[2:0]"
+      },
+      {
+        "name": "act_setpoint",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "act_enable",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "act_fallback",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "irq_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_timeout",
+        "direction": "output",
+        "width": "[23:0]"
+      },
+      {
+        "name": "geom_capture_start",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "geom_capture_done",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "geom_capture_error",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "geom_crc_seed",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "status_busy",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_fault",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_valid_response",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_fallback_active",
+        "direction": "output",
+        "width": "1"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 731,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 67,
+    "latch_target_count": 0,
+    "sequential_blocks": 14,
+    "posedge_blocks": 7,
+    "negedge_blocks": 7,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "accepted_count",
+      "act_enable",
+      "act_enable_raw",
+      "act_fallback",
+      "act_fallback_raw",
+      "act_mode",
+      "act_mode_raw",
+      "act_setpoint",
+      "act_setpoint_raw",
+      "act_summary_valid",
+      "cfg_act_max",
+      "cfg_act_min",
+      "cfg_enable_latched_fault",
+      "cfg_fault_clear",
+      "cfg_flow_velocity",
+      "cfg_freshness_cycles",
+      "cfg_geom_format_id",
+      "cfg_geom_length",
+      "cfg_irq_enable",
+      "cfg_job_id",
+      "cfg_launch",
+      "cfg_model_id",
+      "cfg_sequence_id",
+      "cfg_slew_limit",
+      "cfg_timeout_cycles",
+      "crc_accum",
+      "fallback_active",
+      "fault_latched",
+      "geom_capture_done",
+      "geom_capture_error",
+      "geom_crc_value",
+      "geom_ready",
+      "geom_stream_count",
+      "host_rdata",
+      "host_ready",
+      "outstanding_active",
+      "prev_setpoint",
+      "request_accepted",
+      "request_checksum_ok",
+      "request_data",
+      "request_keep",
+      "request_last",
+      "request_ready",
+      "request_valid",
+      "response_beat_count",
+      "response_checksum_ok",
+      "response_complete",
+      "response_fresh",
+      "response_last_seen",
+      "response_malformed"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 7,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "errors",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 1,
+    "warning_count": 16,
+    "error_count": 5,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "motor_control_top",
+      "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/actuator_mapping.v",
+      "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/csr_block.v",
+      "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/geometry_staging.v",
+      "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v",
+      "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/request_packager.v",
+      "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/safety_logic.v",
+      "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v",
+      "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/validation_guard.v"
+    ],
+    "stdout_tail": [],
+    "stderr_tail": [
+      "%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:114:6: Signal is not used: 'response_complete'",
+      "                                                                                                           : ... note: In instance 'motor_control_top'",
+      "  114 | wire response_complete;",
+      "      |      ^~~~~~~~~~~~~~~~~",
+      "%Warning-UNDRIVEN: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:124:6: Signal is not driven: 'status_busy_i'",
+      "                                                                                                       : ... note: In instance 'motor_control_top'",
+      "  124 | wire status_busy_i;",
+      "      |      ^~~~~~~~~~~~~",
+      "                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047",
+      "                   ... Use \"/* verilator lint_off UNDRIVEN */\" and lint_on around source to disable this message.",
+      "%Warning-UNDRIVEN: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:125:6: Signal is not driven: 'status_valid_response_i'",
+      "                                                                                                       : ... note: In instance 'motor_control_top'",
+      "  125 | wire status_valid_response_i;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:148:6: Signal is not used: 'geom_capture_done_from_u_geometry_staging'",
+      "                                                                                                           : ... note: In instance 'motor_control_top'",
+      "  148 | wire geom_capture_done_from_u_geometry_staging;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:149:6: Signal is not used: 'geom_capture_error_from_u_geometry_staging'",
+      "                                                                                                           : ... note: In instance 'motor_control_top'",
+      "  149 | wire geom_capture_error_from_u_geometry_staging;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/actuator_mapping.v:19:14: Bits of signal are not used: 'validated_response_data'[63:34,15:3]",
+      "                                                                                                          : ... note: In instance 'motor_control_top.u_actuator_mapping'",
+      "   19 | input [63:0] validated_response_data;",
+      "      |              ^~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/csr_block.v:36:13: Bits of signal are not used: 'host_addr'[7:6]",
+      "                                                                                                   : ... note: In instance 'motor_control_top.u_csr_block'",
+      "   36 | input [7:0] host_addr;",
+      "      |             ^~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/csr_block.v:37:14: Bits of signal are not used: 'host_wdata'[63:48]",
+      "                                                                                                   : ... note: In instance 'motor_control_top.u_csr_block'",
+      "   37 | input [63:0] host_wdata;",
+      "      |              ^~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/geometry_staging.v:21:14: Bits of signal are not used: 'geom_data'[63:32]",
+      "                                                                                                          : ... note: In instance 'motor_control_top.u_geometry_staging'",
+      "   21 | input [63:0] geom_data;",
+      "      |              ^~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/validation_guard.v:39:7: Signal is not used: 'response_last_seen'",
+      "                                                                                                         : ... note: In instance 'motor_control_top.u_validation_guard'",
+      "   39 | input response_last_seen;",
+      "      |       ^~~~~~~~~~~~~~~~~~",
+      "%Error-BLKANDNBLK: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:142:6: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_valid_int'",
+      "  142 | wire worker_rsp_valid_int;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~",
+      "                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:174:29: ... Location of blocking assignment (bits [0:0])",
+      "  174 | assign worker_rsp_valid_int = worker_rsp_valid;",
+      "      |                             ^",
+      "                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v:85:9: ... Location of nonblocking assignment (bits [0:0])",
+      "   85 |         worker_rsp_valid <= 1'b0;",
+      "      |         ^~~~~~~~~~~~~~~~",
+      "                   ... For error description see https://verilator.org/warn/BLKANDNBLK?v=5.047",
+      "%Error-BLKANDNBLK: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:143:6: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_last_int'",
+      "  143 | wire worker_rsp_last_int;",
+      "      |      ^~~~~~~~~~~~~~~~~~~",
+      "                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:175:28: ... Location of blocking assignment (bits [0:0])",
+      "  175 | assign worker_rsp_last_int = worker_rsp_last;",
+      "      |                            ^",
+      "                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v:86:9: ... Location of nonblocking assignment (bits [0:0])",
+      "   86 |         worker_rsp_last <= 1'b0;",
+      "      |         ^~~~~~~~~~~~~~~",
+      "%Error-BLKANDNBLK: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:140:13: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_data_int'",
+      "  140 | wire [63:0] worker_rsp_data_int;",
+      "      |             ^~~~~~~~~~~~~~~~~~~",
+      "                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:172:28: ... Location of blocking assignment (bits [63:0])",
+      "  172 | assign worker_rsp_data_int = worker_rsp_data;",
+      "      |                            ^",
+      "                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v:106:13: ... Location of nonblocking assignment (bits [63:0])",
+      "  106 |             worker_rsp_data <= request_data;",
+      "      |             ^~~~~~~~~~~~~~~",
+      "%Error-BLKANDNBLK: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:141:12: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_keep_int'",
+      "  141 | wire [7:0] worker_rsp_keep_int;",
+      "      |            ^~~~~~~~~~~~~~~~~~~",
+      "                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:173:28: ... Location of blocking assignment (bits [7:0])",
+      "  173 | assign worker_rsp_keep_int = worker_rsp_keep;",
+      "      |                            ^",
+      "                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v:107:13: ... Location of nonblocking assignment (bits [7:0])",
+      "  107 |             worker_rsp_keep <= request_keep;",
+      "      |             ^~~~~~~~~~~~~~~",
+      "%Error: Exiting due to 4 error(s)"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "motor_control_top",
+        "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/actuator_mapping.v",
+        "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/csr_block.v",
+        "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/geometry_staging.v",
+        "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v",
+        "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/request_packager.v",
+        "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/safety_logic.v",
+        "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v",
+        "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/validation_guard.v"
+      ],
+      "cwd": null,
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "%Warning-PINCONNECTEMPTY: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:248:6: Instance pin connected by name with empty reference: 'request_checksum_ok'\n  248 |     .request_checksum_ok()\n      |      ^~~~~~~~~~~~~~~~~~~\n                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047\n                          ... Use \"/* verilator lint_off PINCONNECTEMPTY */\" and lint_on around source to disable this message.\n%Warning-WIDTHTRUNC: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/request_packager.v:57:26: Operator ASSIGNDLY expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 80 bits.\n                                                                                                        : ... note: In instance 'motor_control_top.u_request_packager'\n   57 |             request_data <= {cfg_model_id, cfg_geom_format_id, cfg_flow_velocity, cfg_geom_length, cfg_job_id, cfg_sequence_id};\n      |                          ^~\n                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047\n                     ... Use \"/* verilator lint_off WIDTHTRUNC */\" and lint_on around source to disable this message.\n%Warning-WIDTHEXPAND: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/csr_block.v:139:35: Operator ASSIGNDLY expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 57 bits.\n                                                                                                   : ... note: In instance 'motor_control_top.u_csr_block'\n  139 |                 6'h38: host_rdata <= {52'h0, status_fallback_active, status_valid_response, status_timeout, status_fault, status_busy};\n      |                                   ^~\n                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047\n                      ... Use \"/* verilator lint_off WIDTHEXPAND */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:72:7: Signal is not used: 'geom_capture_done'\n                                                                                                          : ... note: In instance 'motor_control_top'\n   72 | input geom_capture_done;\n      |       ^~~~~~~~~~~~~~~~~\n                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047\n                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:111:6: Signal is not used: 'response_tag_match'\n                                                                                                           : ... note: In instance 'motor_control_top'\n  111 | wire response_tag_match;\n      |      ^~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:113:6: Signal is not used: 'response_checksum_ok'\n                                                                                                           : ... note: In instance 'motor_control_top'\n  113 | wire response_checksum_ok;\n      |      ^~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:114:6: Signal is not used: 'response_complete'\n                                                                                                           : ... note: In instance 'motor_control_top'\n  114 | wire response_complete;\n      |      ^~~~~~~~~~~~~~~~~\n%Warning-UNDRIVEN: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:124:6: Signal is not driven: 'status_busy_i'\n                                                                                                       : ... note: In instance 'motor_control_top'\n  124 | wire status_busy_i;\n      |      ^~~~~~~~~~~~~\n                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047\n                   ... Use \"/* verilator lint_off UNDRIVEN */\" and lint_on around source to disable this message.\n%Warning-UNDRIVEN: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:125:6: Signal is not driven: 'status_valid_response_i'\n                                                                                                       : ... note: In instance 'motor_control_top'\n  125 | wire status_valid_response_i;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:148:6: Signal is not used: 'geom_capture_done_from_u_geometry_staging'\n                                                                                                           : ... note: In instance 'motor_control_top'\n  148 | wire geom_capture_done_from_u_geometry_staging;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:149:6: Signal is not used: 'geom_capture_error_from_u_geometry_staging'\n                                                                                                           : ... note: In instance 'motor_control_top'\n  149 | wire geom_capture_error_from_u_geometry_staging;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/actuator_mapping.v:19:14: Bits of signal are not used: 'validated_response_data'[63:34,15:3]\n                                                                                                          : ... note: In instance 'motor_control_top.u_actuator_mapping'\n   19 | input [63:0] validated_response_data;\n      |              ^~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/csr_block.v:36:13: Bits of signal are not used: 'host_addr'[7:6]\n                                                                                                   : ... note: In instance 'motor_control_top.u_csr_block'\n   36 | input [7:0] host_addr;\n      |             ^~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/csr_block.v:37:14: Bits of signal are not used: 'host_wdata'[63:48]\n                                                                                                   : ... note: In instance 'motor_control_top.u_csr_block'\n   37 | input [63:0] host_wdata;\n      |              ^~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/geometry_staging.v:21:14: Bits of signal are not used: 'geom_data'[63:32]\n                                                                                                          : ... note: In instance 'motor_control_top.u_geometry_staging'\n   21 | input [63:0] geom_data;\n      |              ^~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/validation_guard.v:39:7: Signal is not used: 'response_last_seen'\n                                                                                                         : ... note: In instance 'motor_control_top.u_validation_guard'\n   39 | input response_last_seen;\n      |       ^~~~~~~~~~~~~~~~~~\n%Error-BLKANDNBLK: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:142:6: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_valid_int'\n  142 | wire worker_rsp_valid_int;\n      |      ^~~~~~~~~~~~~~~~~~~~\n                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:174:29: ... Location of blocking assignment (bits [0:0])\n  174 | assign worker_rsp_valid_int = worker_rsp_valid;\n      |                             ^\n                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v:85:9: ... Location of nonblocking assignment (bits [0:0])\n   85 |         worker_rsp_valid <= 1'b0;\n      |         ^~~~~~~~~~~~~~~~\n                   ... For error description see https://verilator.org/warn/BLKANDNBLK?v=5.047\n%Error-BLKANDNBLK: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:143:6: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_last_int'\n  143 | wire worker_rsp_last_int;\n      |      ^~~~~~~~~~~~~~~~~~~\n                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:175:28: ... Location of blocking assignment (bits [0:0])\n  175 | assign worker_rsp_last_int = worker_rsp_last;\n      |                            ^\n                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v:86:9: ... Location of nonblocking assignment (bits [0:0])\n   86 |         worker_rsp_last <= 1'b0;\n      |         ^~~~~~~~~~~~~~~\n%Error-BLKANDNBLK: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:140:13: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_data_int'\n  140 | wire [63:0] worker_rsp_data_int;\n      |             ^~~~~~~~~~~~~~~~~~~\n                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:172:28: ... Location of blocking assignment (bits [63:0])\n  172 | assign worker_rsp_data_int = worker_rsp_data;\n      |                            ^\n                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v:106:13: ... Location of nonblocking assignment (bits [63:0])\n  106 |             worker_rsp_data <= request_data;\n      |             ^~~~~~~~~~~~~~~\n%Error-BLKANDNBLK: backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:141:12: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_keep_int'\n  141 | wire [7:0] worker_rsp_keep_int;\n      |            ^~~~~~~~~~~~~~~~~~~\n                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v:173:28: ... Location of blocking assignment (bits [7:0])\n  173 | assign worker_rsp_keep_int = worker_rsp_keep;\n      |                            ^\n                   backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v:107:13: ... Location of nonblocking assignment (bits [7:0])\n  107 |             worker_rsp_keep <= request_keep;\n      |             ^~~~~~~~~~~~~~~\n%Error: Exiting due to 4 error(s)\n",
+      "status": "failed",
+      "error": null,
+      "started_at": "2026-08-06T22:28:30.614713+00:00",
+      "ended_at": "2026-08-06T22:28:30.742222+00:00",
+      "elapsed_ms": 127
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 8,
+      "module_count": 8,
+      "modules": [
+        {
+          "name": "actuator_mapping",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/actuator_mapping.v",
+          "input_count": 76,
+          "output_count": 23,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "validated_response_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "validated_response_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_mode_raw",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "act_setpoint_raw",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "act_enable_raw",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_fallback_raw",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_summary_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "csr_block",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/csr_block.v",
+          "input_count": 82,
+          "output_count": 245,
+          "inout_count": 0,
+          "input_port_count": 12,
+          "output_port_count": 17,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "host_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "host_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "host_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "host_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_re",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_launch",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_cycles",
+              "direction": "output",
+              "width": "[23:0]"
+            },
+            {
+              "name": "cfg_freshness_cycles",
+              "direction": "output",
+              "width": "[23:0]"
+            },
+            {
+              "name": "cfg_flow_velocity",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geom_length",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_job_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_sequence_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fault_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable_latched_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_slew_limit",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geom_format_id",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_model_id",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "status_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_timeout",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_valid_response",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "geometry_staging",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/geometry_staging.v",
+          "input_count": 125,
+          "output_count": 51,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "geom_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "geom_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_geom_length",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geom_capture_start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_capture_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_capture_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_stream_count",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geom_crc_seed",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "geom_crc_value",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "motor_control_top",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/motor_control_top.v",
+          "input_count": 228,
+          "output_count": 224,
+          "inout_count": 0,
+          "input_port_count": 18,
+          "output_port_count": 20,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "host_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "host_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "host_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "host_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_re",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "geom_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "geom_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_req_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_req_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_rsp_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_rsp_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "act_setpoint",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "act_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_fallback",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_timeout",
+              "direction": "output",
+              "width": "[23:0]"
+            },
+            {
+              "name": "geom_capture_start",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_capture_done",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_capture_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_crc_seed",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "status_busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_valid_response",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "request_packager",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/request_packager.v",
+          "input_count": 132,
+          "output_count": 76,
+          "inout_count": 0,
+          "input_port_count": 12,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_model_id",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_geom_format_id",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_flow_velocity",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geom_length",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_job_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geom_stream_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geom_crc_value",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "request_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fire",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_checksum_ok",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "safety_logic",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/safety_logic.v",
+          "input_count": 79,
+          "output_count": 23,
+          "inout_count": 0,
+          "input_port_count": 17,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_mode_raw",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "act_setpoint_raw",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "act_enable_raw",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_fallback_raw",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_summary_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_slew_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_enable_latched_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_timeout",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_transport_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_invalid_response",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_response",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_abort",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "act_setpoint",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "act_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_fallback",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_latched",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "transport_manager",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/transport_manager.v",
+          "input_count": 77,
+          "output_count": 171,
+          "inout_count": 0,
+          "input_port_count": 7,
+          "output_port_count": 16,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_req_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_req_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_rsp_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_rsp_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "outstanding_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "transport_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_pending",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_beat_count",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_last_seen",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "validation_guard",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/rtl/validation_guard.v",
+          "input_count": 153,
+          "output_count": 79,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 9,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_rsp_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_rsp_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_job_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_cycles",
+              "direction": "input",
+              "width": "[23:0]"
+            },
+            {
+              "name": "response_pending",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_beat_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_last_seen",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "transport_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "validated_response_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "validated_response_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_tag_match",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_fresh",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_checksum_ok",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_complete",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_malformed",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 228,
+        "output_count": 224,
+        "inout_count": 0,
+        "input_port_count": 18,
+        "output_port_count": 20,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "host_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "host_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "host_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "host_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "host_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "host_we",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "host_re",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "geom_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "geom_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "geom_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "geom_keep",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "geom_last",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "worker_req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "worker_req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "worker_req_data",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "worker_req_keep",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "worker_req_last",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "worker_rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "worker_rsp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "worker_rsp_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "worker_rsp_keep",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "worker_rsp_last",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "act_mode",
+            "direction": "output",
+            "width": "[2:0]"
+          },
+          {
+            "name": "act_setpoint",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "act_enable",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "act_fallback",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "irq_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_timeout",
+            "direction": "output",
+            "width": "[23:0]"
+          },
+          {
+            "name": "geom_capture_start",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "geom_capture_done",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "geom_capture_error",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "geom_crc_seed",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "status_busy",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_fault",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_valid_response",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_fallback_active",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 731,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 67,
+        "latch_target_count": 0,
+        "sequential_blocks": 14,
+        "posedge_blocks": 7,
+        "negedge_blocks": 7,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "accepted_count",
+          "act_enable",
+          "act_enable_raw",
+          "act_fallback",
+          "act_fallback_raw",
+          "act_mode",
+          "act_mode_raw",
+          "act_setpoint",
+          "act_setpoint_raw",
+          "act_summary_valid",
+          "cfg_act_max",
+          "cfg_act_min",
+          "cfg_enable_latched_fault",
+          "cfg_fault_clear",
+          "cfg_flow_velocity",
+          "cfg_freshness_cycles",
+          "cfg_geom_format_id",
+          "cfg_geom_length",
+          "cfg_irq_enable",
+          "cfg_job_id",
+          "cfg_launch",
+          "cfg_model_id",
+          "cfg_sequence_id",
+          "cfg_slew_limit",
+          "cfg_timeout_cycles",
+          "crc_accum",
+          "fallback_active",
+          "fault_latched",
+          "geom_capture_done",
+          "geom_capture_error",
+          "geom_crc_value",
+          "geom_ready",
+          "geom_stream_count",
+          "host_rdata",
+          "host_ready",
+          "outstanding_active",
+          "prev_setpoint",
+          "request_accepted",
+          "request_checksum_ok",
+          "request_data",
+          "request_keep",
+          "request_last",
+          "request_ready",
+          "request_valid",
+          "response_beat_count",
+          "response_checksum_ok",
+          "response_complete",
+          "response_fresh",
+          "response_last_seen",
+          "response_malformed"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 7,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 8,
+      "module_count": 8,
+      "modules": [
+        {
+          "name": "actuator_mapping",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/handoff/motor_control_top_ip_package/rtl/actuator_mapping.v",
+          "input_count": 76,
+          "output_count": 23,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "validated_response_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "validated_response_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_mode_raw",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "act_setpoint_raw",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "act_enable_raw",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_fallback_raw",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_summary_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "csr_block",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/handoff/motor_control_top_ip_package/rtl/csr_block.v",
+          "input_count": 82,
+          "output_count": 245,
+          "inout_count": 0,
+          "input_port_count": 12,
+          "output_port_count": 17,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "host_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "host_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "host_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "host_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_re",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_launch",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_cycles",
+              "direction": "output",
+              "width": "[23:0]"
+            },
+            {
+              "name": "cfg_freshness_cycles",
+              "direction": "output",
+              "width": "[23:0]"
+            },
+            {
+              "name": "cfg_flow_velocity",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geom_length",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_job_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_sequence_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fault_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable_latched_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_slew_limit",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geom_format_id",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_model_id",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "status_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_timeout",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_valid_response",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "geometry_staging",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/handoff/motor_control_top_ip_package/rtl/geometry_staging.v",
+          "input_count": 125,
+          "output_count": 51,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "geom_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "geom_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_geom_length",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geom_capture_start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_capture_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_capture_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_stream_count",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geom_crc_seed",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "geom_crc_value",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "motor_control_top",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/handoff/motor_control_top_ip_package/rtl/motor_control_top.v",
+          "input_count": 228,
+          "output_count": 224,
+          "inout_count": 0,
+          "input_port_count": 18,
+          "output_port_count": 20,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "host_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "host_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "host_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "host_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_re",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "geom_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "geom_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_req_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_req_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_rsp_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_rsp_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "act_setpoint",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "act_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_fallback",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_timeout",
+              "direction": "output",
+              "width": "[23:0]"
+            },
+            {
+              "name": "geom_capture_start",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geom_capture_done",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_capture_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geom_crc_seed",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "status_busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_valid_response",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "request_packager",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/handoff/motor_control_top_ip_package/rtl/request_packager.v",
+          "input_count": 132,
+          "output_count": 76,
+          "inout_count": 0,
+          "input_port_count": 12,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_model_id",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_geom_format_id",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_flow_velocity",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geom_length",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_job_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geom_stream_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geom_crc_value",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "request_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fire",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_checksum_ok",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "safety_logic",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/handoff/motor_control_top_ip_package/rtl/safety_logic.v",
+          "input_count": 79,
+          "output_count": 23,
+          "inout_count": 0,
+          "input_port_count": 17,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_mode_raw",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "act_setpoint_raw",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "act_enable_raw",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_fallback_raw",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_summary_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_slew_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_enable_latched_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_timeout",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_transport_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_invalid_response",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_response",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "host_abort",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "act_setpoint",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "act_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_fallback",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_latched",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "transport_manager",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/handoff/motor_control_top_ip_package/rtl/transport_manager.v",
+          "input_count": 77,
+          "output_count": 171,
+          "inout_count": 0,
+          "input_port_count": 7,
+          "output_port_count": 16,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_req_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_req_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_rsp_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_rsp_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "outstanding_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "transport_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_pending",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_beat_count",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_last_seen",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "validation_guard",
+          "file": "backend/workflows/7a36393a-1776-432d-85d4-509d03eb0652/handoff/motor_control_top_ip_package/rtl/validation_guard.v",
+          "input_count": 153,
+          "output_count": 79,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 9,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "worker_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "worker_rsp_keep",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "worker_rsp_last",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_job_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_cycles",
+              "direction": "input",
+              "width": "[23:0]"
+            },
+            {
+              "name": "response_pending",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_beat_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_last_seen",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "transport_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_response_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "validated_response_keep",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "validated_response_last",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_tag_match",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_fresh",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_checksum_ok",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_complete",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_malformed",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 228,
+        "output_count": 224,
+        "inout_count": 0,
+        "input_port_count": 18,
+        "output_port_count": 20,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "host_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "host_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "host_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "host_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "host_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "host_we",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "host_re",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "geom_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "geom_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "geom_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "geom_keep",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "geom_last",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "worker_req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "worker_req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "worker_req_data",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "worker_req_keep",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "worker_req_last",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "worker_rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "worker_rsp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "worker_rsp_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "worker_rsp_keep",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "worker_rsp_last",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "act_mode",
+            "direction": "output",
+            "width": "[2:0]"
+          },
+          {
+            "name": "act_setpoint",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "act_enable",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "act_fallback",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "irq_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_timeout",
+            "direction": "output",
+            "width": "[23:0]"
+          },
+          {
+            "name": "geom_capture_start",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "geom_capture_done",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "geom_capture_error",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "geom_crc_seed",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "status_busy",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_fault",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_valid_response",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_fallback_active",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 731,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 67,
+        "latch_target_count": 0,
+        "sequential_blocks": 14,
+        "posedge_blocks": 7,
+        "negedge_blocks": 7,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "accepted_count",
+          "act_enable",
+          "act_enable_raw",
+          "act_fallback",
+          "act_fallback_raw",
+          "act_mode",
+          "act_mode_raw",
+          "act_setpoint",
+          "act_setpoint_raw",
+          "act_summary_valid",
+          "cfg_act_max",
+          "cfg_act_min",
+          "cfg_enable_latched_fault",
+          "cfg_fault_clear",
+          "cfg_flow_velocity",
+          "cfg_freshness_cycles",
+          "cfg_geom_format_id",
+          "cfg_geom_length",
+          "cfg_irq_enable",
+          "cfg_job_id",
+          "cfg_launch",
+          "cfg_model_id",
+          "cfg_sequence_id",
+          "cfg_slew_limit",
+          "cfg_timeout_cycles",
+          "crc_accum",
+          "fallback_active",
+          "fault_latched",
+          "geom_capture_done",
+          "geom_capture_error",
+          "geom_crc_value",
+          "geom_ready",
+          "geom_stream_count",
+          "host_rdata",
+          "host_ready",
+          "outstanding_active",
+          "prev_setpoint",
+          "request_accepted",
+          "request_checksum_ok",
+          "request_data",
+          "request_keep",
+          "request_last",
+          "request_ready",
+          "request_valid",
+          "response_beat_count",
+          "response_checksum_ok",
+          "response_complete",
+          "response_fresh",
+          "response_last_seen",
+          "response_malformed"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 7,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 8,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Launch, fault clear, interrupt enable, latched fault enable, and basic control bits.",
+        "fields": [
+          {
+            "name": "LAUNCH",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "One-cycle semantic launch pulse when software writes 1 to an accepted CTRL transaction. The bit self-clears after acceptance."
+          },
+          {
+            "name": "FAULT_CLEAR",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Host clear / fault-clear semantic. When written as 1, requests fault clear and may also qualify exit from ERROR or fault-latched fallback depending on configuration."
+          },
+          {
+            "name": "IRQ_ENABLE",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables irq_out generation when status conditions are met."
+          },
+          {
+            "name": "ENABLE_LATCHED_FAULT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "When set, fault conditions latch until host clear is observed."
+          },
+          {
+            "name": "HOST_ABORT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW",
+            "reset": 0,
+            "description": "Optional host abort semantic. If written high, requests abort/fallback handling for the current transaction."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CYCLES",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Programmable timeout threshold in cycles for WAIT_RESPONSE supervision.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 23,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum number of clock cycles allowed between request issue and valid response acceptance before timeout. Zero may be treated as immediate timeout or implementation-defined minimum depending on synthesis policy, but software should program a nonzero value."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 24,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "FRESHNESS_CYCLES",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Freshness threshold used by validation_guard to reject stale responses.",
+        "fields": [
+          {
+            "name": "FRESHNESS_CYCLES",
+            "lsb": 23,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum acceptable response age in cycles relative to the configured freshness supervision point."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 24,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "FLOW_AND_FORMAT",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Flow velocity, geometry format ID, and model ID fields used by request packaging.",
+        "fields": [
+          {
+            "name": "FLOW_VELOCITY",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Flow condition input used as metadata in request packaging."
+          },
+          {
+            "name": "GEOM_FORMAT_ID",
+            "lsb": 23,
+            "msb": 16,
+            "access": "RW",
+            "reset": 0,
+            "description": "Geometry format identifier included in the outbound request descriptor."
+          },
+          {
+            "name": "MODEL_ID",
+            "lsb": 31,
+            "msb": 24,
+            "access": "RW",
+            "reset": 0,
+            "description": "External DoMINO model identifier included in the outbound request descriptor."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_LENGTH",
+        "offset": "0x20",
+        "access": "RW",
+        "description": "Configured geometry stream length and related sequence bookkeeping.",
+        "fields": [
+          {
+            "name": "GEOM_LENGTH",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Expected number of geometry beats to accept during capture. Geometry capture terminates on geom_last or when this count is reached."
+          },
+          {
+            "name": "RESERVED_1",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          },
+          {
+            "name": "RESERVED_2",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "JOB_SEQUENCE",
+        "offset": "0x28",
+        "access": "RW",
+        "description": "Job ID and sequence ID tracking fields used for response correlation.",
+        "fields": [
+          {
+            "name": "JOB_ID",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Job identifier used to correlate request and response packets."
+          },
+          {
+            "name": "SEQUENCE_ID",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RW",
+            "reset": 0,
+            "description": "Sequence identifier used to detect stale or mis-tagged responses."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "ACT_LIMITS",
+        "offset": "0x30",
+        "access": "RW",
+        "description": "Actuator minimum, maximum, and slew-limit configuration used by safety_logic.",
+        "fields": [
+          {
+            "name": "ACT_MIN",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum clamp for act_setpoint."
+          },
+          {
+            "name": "ACT_MAX",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum clamp for act_setpoint."
+          },
+          {
+            "name": "SLEW_LIMIT",
+            "lsb": 47,
+            "msb": 32,
+            "access": "RW",
+            "reset": 0,
+            "description": "Optional maximum step change allowed between accepted commands. A zero value may disable slew limiting depending on implementation policy."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 48,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x38",
+        "access": "RO",
+        "description": "Busy, fault, timeout, valid response, and fallback-active status mirror.",
+        "fields": [
+          {
+            "name": "BUSY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Controller is busy with capture, request issue, response wait, validation, or fallback sequencing."
+          },
+          {
+            "name": "FAULT",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched fault indication, if enabled/configured."
+          },
+          {
+            "name": "TIMEOUT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Timeout status asserted when WAIT_RESPONSE exceeds cfg_timeout_cycles."
+          },
+          {
+            "name": "VALID_RESPONSE",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates at least one validated response has been accepted."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 1,
+            "description": "Safe fallback posture is active."
+          },
+          {
+            "name": "TRANSPORT_ERROR",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Transport protocol or handshake error detected."
+          },
+          {
+            "name": "INVALID_RESPONSE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Malformed, checksum-failing, incomplete, or otherwise invalid response detected."
+          },
+          {
+            "name": "STALE_RESPONSE",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Response rejected by freshness/age or correlation gating."
+          },
+          {
+            "name": "GEOM_CAPTURE_DONE",
+            "lsb": 8,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Geometry capture completed successfully for the current launch."
+          },
+          {
+            "name": "GEOM_CAPTURE_ERROR",
+            "lsb": 9,
+            "msb": 9,
+            "access": "RO",
+            "reset": 0,
+            "description": "Geometry capture encountered an error such as invalid length, malformed keep, or premature/late termination."
+          },
+          {
+            "name": "OUTSTANDING_ACTIVE",
+            "lsb": 10,
+            "msb": 10,
+            "access": "RO",
+            "reset": 0,
+            "description": "A request is currently outstanding to the external worker."
+          },
+          {
+            "name": "RESPONSE_PENDING",
+            "lsb": 11,
+            "msb": 11,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response is pending and being tracked by the transport/validation path."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 12,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

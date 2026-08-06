@@ -1,0 +1,16 @@
+{
+  "domains": [
+    {
+      "name": "PD_TOP",
+      "elements": [
+        "motor_control_top"
+      ],
+      "primary_power_net": "VDD",
+      "primary_ground_net": "VSS"
+    }
+  ],
+  "isolation": [],
+  "retention": [],
+  "spec_mode": "hierarchical",
+  "top_module": "motor_control_top"
+}

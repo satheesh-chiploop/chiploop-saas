@@ -1,0 +1,114 @@
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:250:6: Instance pin connected by name with empty reference: 'request_checksum_ok'
+  250 |     .request_checksum_ok()
+      |      ^~~~~~~~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: pass2/request_packager.v:57:26: Operator ASSIGNDLY expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 80 bits.
+                                                   : ... note: In instance 'motor_control_top.u_request_packager'
+   57 |             request_data <= {cfg_model_id, cfg_geom_format_id, cfg_flow_velocity, cfg_geom_length, cfg_job_id, cfg_sequence_id};
+      |                          ^~
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:72:7: Signal is not used: 'geom_capture_done'
+                                                     : ... note: In instance 'motor_control_top'
+   72 | input geom_capture_done;
+      |       ^~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:111:6: Signal is not used: 'response_tag_match'
+                                                      : ... note: In instance 'motor_control_top'
+  111 | wire response_tag_match;
+      |      ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:113:6: Signal is not used: 'response_checksum_ok'
+                                                      : ... note: In instance 'motor_control_top'
+  113 | wire response_checksum_ok;
+      |      ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:114:6: Signal is not used: 'response_complete'
+                                                      : ... note: In instance 'motor_control_top'
+  114 | wire response_complete;
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: pass2/motor_control_top.v:121:6: Signal is not driven: 'fallback_active'
+                                                  : ... note: In instance 'motor_control_top'
+  121 | wire fallback_active;
+      |      ^~~~~~~~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047
+                   ... Use "/* verilator lint_off UNDRIVEN */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:148:6: Signal is not used: 'geom_capture_done_from_u_geometry_staging'
+                                                      : ... note: In instance 'motor_control_top'
+  148 | wire geom_capture_done_from_u_geometry_staging;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:149:6: Signal is not used: 'geom_capture_error_from_u_geometry_staging'
+                                                      : ... note: In instance 'motor_control_top'
+  149 | wire geom_capture_error_from_u_geometry_staging;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/actuator_mapping.v:19:14: Bits of signal are not used: 'validated_response_data'[63:34,15:3]
+                                                     : ... note: In instance 'motor_control_top.u_actuator_mapping'
+   19 | input [63:0] validated_response_data;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/csr_block.v:36:13: Bits of signal are not used: 'host_addr'[7:6]
+                                              : ... note: In instance 'motor_control_top.u_csr_block'
+   36 | input [7:0] host_addr;
+      |             ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/csr_block.v:37:14: Bits of signal are not used: 'host_wdata'[63:48]
+                                              : ... note: In instance 'motor_control_top.u_csr_block'
+   37 | input [63:0] host_wdata;
+      |              ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/geometry_staging.v:21:14: Bits of signal are not used: 'geom_data'[63:32]
+                                                     : ... note: In instance 'motor_control_top.u_geometry_staging'
+   21 | input [63:0] geom_data;
+      |              ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/validation_guard.v:39:7: Signal is not used: 'response_last_seen'
+                                                    : ... note: In instance 'motor_control_top.u_validation_guard'
+   39 | input response_last_seen;
+      |       ^~~~~~~~~~~~~~~~~~
+%Error-BLKANDNBLK: pass2/motor_control_top.v:142:6: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_valid_int'
+  142 | wire worker_rsp_valid_int;
+      |      ^~~~~~~~~~~~~~~~~~~~
+                   pass2/motor_control_top.v:174:29: ... Location of blocking assignment (bits [0:0])
+  174 | assign worker_rsp_valid_int = worker_rsp_valid;
+      |                             ^
+                   pass2/transport_manager.v:85:9: ... Location of nonblocking assignment (bits [0:0])
+   85 |         worker_rsp_valid <= 1'b0;
+      |         ^~~~~~~~~~~~~~~~
+                   ... For error description see https://verilator.org/warn/BLKANDNBLK?v=5.047
+%Error-BLKANDNBLK: pass2/motor_control_top.v:143:6: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_last_int'
+  143 | wire worker_rsp_last_int;
+      |      ^~~~~~~~~~~~~~~~~~~
+                   pass2/motor_control_top.v:175:28: ... Location of blocking assignment (bits [0:0])
+  175 | assign worker_rsp_last_int = worker_rsp_last;
+      |                            ^
+                   pass2/transport_manager.v:86:9: ... Location of nonblocking assignment (bits [0:0])
+   86 |         worker_rsp_last <= 1'b0;
+      |         ^~~~~~~~~~~~~~~
+%Error-BLKANDNBLK: pass2/motor_control_top.v:140:13: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_data_int'
+  140 | wire [63:0] worker_rsp_data_int;
+      |             ^~~~~~~~~~~~~~~~~~~
+                   pass2/motor_control_top.v:172:28: ... Location of blocking assignment (bits [63:0])
+  172 | assign worker_rsp_data_int = worker_rsp_data;
+      |                            ^
+                   pass2/transport_manager.v:106:13: ... Location of nonblocking assignment (bits [63:0])
+  106 |             worker_rsp_data <= request_data;
+      |             ^~~~~~~~~~~~~~~
+%Error-BLKANDNBLK: pass2/motor_control_top.v:141:12: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'motor_control_top.worker_rsp_keep_int'
+  141 | wire [7:0] worker_rsp_keep_int;
+      |            ^~~~~~~~~~~~~~~~~~~
+                   pass2/motor_control_top.v:173:28: ... Location of blocking assignment (bits [7:0])
+  173 | assign worker_rsp_keep_int = worker_rsp_keep;
+      |                            ^
+                   pass2/transport_manager.v:107:13: ... Location of nonblocking assignment (bits [7:0])
+  107 |             worker_rsp_keep <= request_keep;
+      |             ^~~~~~~~~~~~~~~
+%Error-BLKANDNBLK: pass2/motor_control_top.v:68:8: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'act_fallback'
+   68 | output act_fallback;
+      |        ^~~~~~~~~~~~
+                   pass2/motor_control_top.v:162:21: ... Location of blocking assignment (bits [0:0])
+  162 | assign act_fallback = fallback_active;
+      |                     ^
+                   pass2/safety_logic.v:68:13: ... Location of nonblocking assignment (bits [0:0])
+   68 |             act_fallback <= 1'b1;
+      |             ^~~~~~~~~~~~
+%Error: Exiting due to 5 error(s)
+
+=== RETURN CODE ===
+1

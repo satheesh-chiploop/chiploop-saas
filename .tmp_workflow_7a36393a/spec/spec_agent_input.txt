@@ -1,0 +1,59 @@
+The required synthesizable top module is motor_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must retain the motor-control request/response, safety, timeout, and actuator-command behavior.
+Design a synthesizable ASIC digital-IP block named DoMINO_AeroSafe_Controller. The RTL shall implement control, buffering, validation, timeout, and actuator-command handling for an external NVIDIA DoMINO automotive-aerodynamics model executed in software/GPU. The RTL shall not implement the surrogate model itself, nor any tensor math, CFD solver, or neural-network inference.
+
+1) Top-level interface
+- Provide a compact host register window interface using valid/ready handshaking and a 64-bit data path. No top-level port shall expose geometry arrays, flow fields, tensors, or per-element payloads.
+- Provide a 64-bit bounded streaming request path to an external model worker and a 64-bit bounded streaming response path from that worker. The interface width shall not exceed 128 bits.
+- Provide a scalar actuator command output comprising mode, setpoint, enable, and fallback indicators. Estimated scalar-equivalent top-level I/O shall remain below 256.
+
+2) Functional partition
+- CSR block: implement configuration/status registers for request launch, timeout threshold, freshness threshold, flow velocity input, geometry stream length, job ID/sequence tracking, fault clear, and interrupt enables.
+- Request packager: assemble a compact model request descriptor from host registers and streamed geometry fragments. Include model ID, geometry format ID, flow condition metadata, stream length, sequence number, and checksum/CRC.
+- Geometry staging: accept geometry fragments over the bounded stream and store only the bounded, implementation-defined staging window required for transport. The design shall not expose geometry as pins and shall not synthesize bulk payload storage as a register array for ASIC implementation.
+- Transport manager: issue request packets to the external GPU/NIM worker, track outstanding transaction state, assert backpressure when the staging window is full, and accept response packets.
+- Validation guard: verify response correlation, age/freshness, completeness, checksum, and legal state transition before the response can affect actuator outputs.
+- Actuator mapping: convert validated response metadata into a bounded actuator command. If the model response contains multiple candidate outputs, only the actuator-relevant summary shall be consumed by RTL.
+- Safety logic: clamp the actuator command to configured limits, enforce optional slew-rate limiting, and force safe fallback on timeout, invalid response, stale response, transport error, or host abort.
+
+3) State machine requirements
+- Use an explicit FSM with at least the following states: RESET, IDLE, CAPTURE_GEOMETRY, ISSUE_REQUEST, WAIT_RESPONSE, VALIDATE_RESPONSE, APPLY_COMMAND, FALLBACK, ERROR.
+- RESET shall initialize all state, clear outstanding request tags, and assert fallback_active until the first valid response is accepted.
+- IDLE shall accept a new request only when the controller is not busy and host configuration is valid.
+- CAPTURE_GEOMETRY shall accept a bounded stream of geometry words and terminate on geom_last or configured length count.
+- ISSUE_REQUEST shall transmit a compact descriptor and transition to WAIT_RESPONSE.
+- WAIT_RESPONSE shall count cycles against a programmable timeout. Expiry shall transition to FALLBACK and raise timeout status.
+- VALIDATE_RESPONSE shall reject stale, malformed, mis-tagged, incomplete, or checksum-failing responses.
+- APPLY_COMMAND shall update actuator output only after clamp/rate-limit logic passes.
+- FALLBACK shall drive the safe fallback actuator posture until cleared by host or until a fresh valid request/response completes.
+- ERROR shall latch a fault condition until host clear.
+
+4) Safety and validation
+- Reject stale model commands by comparing response sequence/job ID and elapsed age to configured thresholds.
+- Clamp actuator commands to min/max and optional step-size limits.
+- Provide a safe fallback output on any fault or timeout.
+- Ignore late responses belonging to older request IDs when a newer request is outstanding.
+- Require valid/ready completion semantics for every packet transfer; partial packets shall not be interpreted as commands.
+
+5) ASIC implementation constraints
+- Do not infer payload storage with reg arrays for bulk geometry or response payloads.
+- If bulk payload storage is later required in a Sky130 ASIC context, instantiate only the hard macro sky130_sram_1kbyte_1rw1r_32x256_8 with ports clk0, csb0, web0, wmask0[3:0], addr0[7:0], din0[31:0], dout0[31:0]. Bank multiple instances as needed.
+- Before any Sky130 macro-based implementation, require behavioral Verilog, Liberty, LEF, GDS, and SPICE collateral. If any required collateral is missing, halt at the memory-collateral gate and do not replace the macro with standard-cell registers for bulk storage.
+- For this architecture-definition deliverable, the RTL shall remain implementation-neutral with respect to the external model service and shall define only the digital-IP transport/control wrapper.
+
+6) Interface semantics
+- Host writes start requests and configuration through the register window.
+- Geometry data is streamed in as bounded 64-bit words with keep/last semantics.
+- The model worker response is streamed back in the same compact format.
+- The actuator output shall be driven only by validated, non-stale, clamped command values.
+
+7) Reset and fault behavior
+- Active-low reset shall place outputs into safe fallback.
+- Any CRC mismatch, tag mismatch, timeout, invalid length, or malformed packet shall assert fault and fallback.
+- A host clear operation shall be required to exit ERROR when latched-fault mode is enabled.
+
+8) Non-goals
+- No prediction accuracy claims are made in RTL. The 3.0% maximum error requirement applies to the overall application, but this deliverable only specifies the transport/safety hardware wrapper because inference was not executed and the model itself is external.
+- No geometry or flow-field decomposition is required in RTL.
+
+The resulting RTL shall be synthesizable, deterministic, and suitable for Arch2RTL handoff as an ASIC digital-IP controller wrapper around an external GPU-executed DoMINO service.
+ASIC MEMORY CONTRACT (mandatory): instantiate sky130_sram_1kbyte_1rw1r_32x256_8 for bulk payload/history/FIFO storage using clk0, csb0, web0, wmask0[3:0], addr0[7:0], din0[31:0], and dout0[31:0]. Do not expand payload, history, FIFO, or telemetry storage into individually named registers, flip-flop arrays, or inferred memories. Small control/status registers are allowed.

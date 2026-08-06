@@ -1,0 +1,18 @@
+{
+  "mode": "hierarchical",
+  "top_module": "motor_control_top",
+  "expected_files": [
+    "motor_control_top.v",
+    "csr_block.v",
+    "geometry_staging.v",
+    "request_packager.v",
+    "transport_manager.v",
+    "validation_guard.v",
+    "actuator_mapping.v",
+    "safety_logic.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 185950
+}
