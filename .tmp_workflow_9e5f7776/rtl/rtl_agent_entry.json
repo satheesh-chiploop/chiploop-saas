@@ -1,8 +1,0 @@
-{
-  "workflow_id": "9e5f7776-fb1b-4488-b129-da84e50d5529",
-  "workflow_dir": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529",
-  "digital_spec_json": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/spec/domino_automotive_aero_gateway_spec.json",
-  "spec_json": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/spec/domino_automotive_aero_gateway_spec.json",
-  "digital_spec_json_exists": true,
-  "spec_json_exists": true
-}

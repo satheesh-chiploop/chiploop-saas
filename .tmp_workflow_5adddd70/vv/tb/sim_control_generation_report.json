@@ -1,0 +1,22 @@
+{
+  "type": "vv_simulation_control_generation",
+  "version": "1.1",
+  "top_module": "domino_active_aero_control_wrapper",
+  "spec_path": "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/spec/domino_active_aero_control_wrapper_spec.json",
+  "rtl_file_count": 7,
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity"
+  ],
+  "simulation_manifest_json": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/simulation_manifest.json",
+  "tools_detected": {
+    "verilator": true,
+    "make": true
+  },
+  "artifacts": {
+    "simulation_manifest": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/simulation_manifest.json",
+    "runner_py": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/run_regression.py",
+    "sim_readme": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/SIM_CONTROL.md",
+    "log": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/simulation_control_agent.log"
+  }
+}

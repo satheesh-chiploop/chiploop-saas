@@ -1,0 +1,366 @@
+{
+  "top_module": "domino_active_aero_control_wrapper",
+  "soc_mode": false,
+  "clock_names": [
+    "clk"
+  ],
+  "reset_signals": [
+    {
+      "name": "rst_n",
+      "active_low": true,
+      "async": false
+    }
+  ],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "rst_n",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "host_cfg_valid",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "host_cfg_write",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "host_cfg_addr",
+      "direction": "input",
+      "width_expr": "8"
+    },
+    {
+      "name": "host_cfg_wdata",
+      "direction": "input",
+      "width_expr": "32"
+    },
+    {
+      "name": "host_cfg_ready",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "host_cfg_rdata",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "host_cfg_rvalid",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "enable",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "freshness_timeout_cycles",
+      "direction": "input",
+      "width_expr": "16"
+    },
+    {
+      "name": "request_timeout_cycles",
+      "direction": "input",
+      "width_expr": "16"
+    },
+    {
+      "name": "actuator_min_limit",
+      "direction": "input",
+      "width_expr": "16"
+    },
+    {
+      "name": "actuator_max_limit",
+      "direction": "input",
+      "width_expr": "16"
+    },
+    {
+      "name": "safe_fallback_command_value",
+      "direction": "input",
+      "width_expr": "16"
+    },
+    {
+      "name": "stream_velocity_mps",
+      "direction": "input",
+      "width_expr": "16"
+    },
+    {
+      "name": "flow_update_strobe",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "geometry_update_strobe",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "geometry_format_selector",
+      "direction": "input",
+      "width_expr": "8"
+    },
+    {
+      "name": "geometry_metadata_valid",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "geometry_metadata_tag",
+      "direction": "input",
+      "width_expr": "16"
+    },
+    {
+      "name": "geometry_handle_in",
+      "direction": "input",
+      "width_expr": "32"
+    },
+    {
+      "name": "geometry_reference_is_driaverml_stl",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "fault_clear",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "mode_select_fallback_when_valid",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "model_req_ready",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "model_rsp_valid",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "model_rsp_id",
+      "direction": "input",
+      "width_expr": "32"
+    },
+    {
+      "name": "model_rsp_epoch",
+      "direction": "input",
+      "width_expr": "32"
+    },
+    {
+      "name": "model_rsp_status_valid",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "model_rsp_status_unavailable",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "model_rsp_drag_force",
+      "direction": "input",
+      "width_expr": "32"
+    },
+    {
+      "name": "model_rsp_lift_force",
+      "direction": "input",
+      "width_expr": "32"
+    },
+    {
+      "name": "model_rsp_surface_pressure",
+      "direction": "input",
+      "width_expr": "32"
+    },
+    {
+      "name": "model_rsp_flow_field_meta",
+      "direction": "input",
+      "width_expr": "32"
+    },
+    {
+      "name": "model_req_valid",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "model_req_id",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "model_req_epoch",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "model_req_geometry_handle",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "model_req_stream_velocity_mps",
+      "direction": "output",
+      "width_expr": "16"
+    },
+    {
+      "name": "model_req_timeout_cycles",
+      "direction": "output",
+      "width_expr": "16"
+    },
+    {
+      "name": "actuator_cmd_valid",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "actuator_cmd",
+      "direction": "output",
+      "width_expr": "16"
+    },
+    {
+      "name": "actuator_cmd_safe_fallback",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "cmd_clamped",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_mode_fallback",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_mode_model",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_stale_rejected",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_faulted",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_req_id",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "status_rsp_id",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "status_last_accepted_req_id",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "status_last_accepted_rsp_id",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "status_cfg_fault",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_geometry_fault",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_flow_fault",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_request_timeout_fault",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_stale_response_fault",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_response_mismatch_fault",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_model_unavailable_fault",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "status_actuator_saturation_fault",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "telemetry_valid",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "telemetry_ready",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "telemetry_mode",
+      "direction": "output",
+      "width_expr": "2"
+    },
+    {
+      "name": "telemetry_fault_bits",
+      "direction": "output",
+      "width_expr": "8"
+    },
+    {
+      "name": "telemetry_stale",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "telemetry_req_id",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "telemetry_rsp_id",
+      "direction": "output",
+      "width_expr": "32"
+    },
+    {
+      "name": "telemetry_last_clamped",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "telemetry_last_fallback",
+      "direction": "output",
+      "width_expr": "1"
+    }
+  ]
+}

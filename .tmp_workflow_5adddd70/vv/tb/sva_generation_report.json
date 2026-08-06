@@ -1,0 +1,40 @@
+{
+  "type": "digital_sva_generation",
+  "version": "1.2",
+  "mode": "digital",
+  "top_module": "domino_active_aero_control_wrapper",
+  "spec_path": "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/spec/domino_active_aero_control_wrapper_spec.json",
+  "rtl_file_count": 7,
+  "clock_names": [
+    "clk"
+  ],
+  "reset_names": [
+    "rst_n"
+  ],
+  "primary_clock": "clk",
+  "primary_reset": "rst_n",
+  "primary_reset_active_low": true,
+  "generated_dir": "vv/tb",
+  "sva_module_name": "domino_active_aero_control_wrapper_assertions",
+  "sva_bind_file": "domino_active_aero_control_wrapper_assertions_bind.sv",
+  "assertion_output_signals": [
+    "host_cfg_ready",
+    "host_cfg_rdata",
+    "host_cfg_rvalid",
+    "model_req_valid",
+    "model_req_id",
+    "model_req_epoch",
+    "model_req_geometry_handle",
+    "model_req_stream_velocity_mps",
+    "model_req_timeout_cycles",
+    "actuator_cmd_valid",
+    "actuator_cmd",
+    "actuator_cmd_safe_fallback"
+  ],
+  "artifacts": {
+    "sva_bind_sv": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/domino_active_aero_control_wrapper_assertions_bind.sv",
+    "sva_sv": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/domino_active_aero_control_wrapper_assertions.sv",
+    "sva_spec_json": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/sva_spec.json",
+    "sva_readme": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/SVA_README.md"
+  }
+}

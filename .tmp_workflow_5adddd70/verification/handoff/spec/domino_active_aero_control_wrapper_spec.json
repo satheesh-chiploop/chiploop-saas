@@ -1,0 +1,2861 @@
+{
+  "design_name": "domino_active_aero_control_wrapper",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "domino_active_aero_control_wrapper",
+      "description": "Top-level wrapper integrating host configuration, input capture, request generation, response validation, fallback control, actuator command selection, fault management, and telemetry for an external aero model runtime.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "host_cfg_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_cfg_write",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_cfg_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "host_cfg_wdata",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "host_cfg_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "host_cfg_rdata",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "host_cfg_rvalid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "enable",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "freshness_timeout_cycles",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "request_timeout_cycles",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "actuator_min_limit",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "actuator_max_limit",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "safe_fallback_command_value",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "stream_velocity_mps",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "flow_update_strobe",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "geometry_update_strobe",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "geometry_format_selector",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "geometry_metadata_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "geometry_metadata_tag",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "geometry_handle_in",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "geometry_reference_is_driaverml_stl",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "fault_clear",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "mode_select_fallback_when_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_id",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "model_rsp_epoch",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "model_rsp_status_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_status_unavailable",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_drag_force",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "model_rsp_lift_force",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "model_rsp_surface_pressure",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "model_rsp_flow_field_meta",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "model_req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_id",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "model_req_epoch",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "model_req_geometry_handle",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "model_req_stream_velocity_mps",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "model_req_timeout_cycles",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_safe_fallback",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "cmd_clamped",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_mode_fallback",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_mode_model",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_stale_rejected",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_faulted",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_req_id",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "status_rsp_id",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "status_last_accepted_req_id",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "status_last_accepted_rsp_id",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "status_cfg_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_geometry_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_flow_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_request_timeout_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_stale_response_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_response_mismatch_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_model_unavailable_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_actuator_saturation_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "telemetry_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "telemetry_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "telemetry_mode",
+          "direction": "output",
+          "width": 2
+        },
+        {
+          "name": "telemetry_fault_bits",
+          "direction": "output",
+          "width": 8
+        },
+        {
+          "name": "telemetry_stale",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "telemetry_req_id",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "telemetry_rsp_id",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "telemetry_last_clamped",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "telemetry_last_fallback",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "The top module shall supervise the full digital contract for DoMINO Active Aero Control Wrapper. It shall capture host configuration, enforce safe reset defaults, accept geometry metadata and stream velocity updates, verify operating envelope limits, generate monotonic request identifiers, associate requests with epochs, present requests only when the external runtime is ready, validate responses using req_id and epoch matching, detect timeout and stale conditions, and select either validated model-derived intent or deterministic safe fallback intent. It shall clamp the selected actuator command to configured minimum and maximum limits, assert fallback indication when safe mode is active, latch sticky faults, and expose telemetry without allowing telemetry handshakes to backpressure safety-critical state transitions.",
+      "responsibilities": [
+        "Maintain safe disabled state until configured and enabled.",
+        "Generate monotonic request IDs and preserve them stable until accepted.",
+        "Store the active flow/geometry epoch association used for request-response matching.",
+        "Reject stale, mismatched, timeout-expired, unavailable, or invalid responses.",
+        "Choose safe fallback whenever enable is deasserted, any sticky fault is asserted, flow/geometry inputs are invalid, request timeout expires, runtime is unavailable, or configuration requires fallback preference.",
+        "Clamp the final actuator command within configured limits and raise saturation indication when clamping occurs.",
+        "Provide status and telemetry outputs for mode, faults, freshness, request/response IDs, and last clamp/fallback result.",
+        "Remain synthesizable using registers, comparators, counters, FSMs, and muxes only."
+      ],
+      "must_drive": [
+        "model_req_valid",
+        "model_req_id",
+        "model_req_epoch",
+        "model_req_geometry_handle",
+        "model_req_stream_velocity_mps",
+        "model_req_timeout_cycles",
+        "actuator_cmd_valid",
+        "actuator_cmd",
+        "actuator_cmd_safe_fallback",
+        "cmd_clamped",
+        "status_mode_fallback",
+        "status_mode_model",
+        "status_stale_rejected",
+        "status_faulted",
+        "status_req_id",
+        "status_rsp_id",
+        "status_last_accepted_req_id",
+        "status_last_accepted_rsp_id",
+        "status_cfg_fault",
+        "status_geometry_fault",
+        "status_flow_fault",
+        "status_request_timeout_fault",
+        "status_stale_response_fault",
+        "status_response_mismatch_fault",
+        "status_model_unavailable_fault",
+        "status_actuator_saturation_fault",
+        "telemetry_valid",
+        "telemetry_mode",
+        "telemetry_fault_bits",
+        "telemetry_stale",
+        "telemetry_req_id",
+        "telemetry_rsp_id",
+        "telemetry_last_clamped",
+        "telemetry_last_fallback",
+        "host_cfg_ready",
+        "host_cfg_rdata",
+        "host_cfg_rvalid"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "host_cfg_valid",
+        "host_cfg_write",
+        "host_cfg_addr",
+        "host_cfg_wdata",
+        "enable",
+        "freshness_timeout_cycles",
+        "request_timeout_cycles",
+        "actuator_min_limit",
+        "actuator_max_limit",
+        "safe_fallback_command_value",
+        "stream_velocity_mps",
+        "flow_update_strobe",
+        "geometry_update_strobe",
+        "geometry_format_selector",
+        "geometry_metadata_valid",
+        "geometry_metadata_tag",
+        "geometry_handle_in",
+        "geometry_reference_is_driaverml_stl",
+        "fault_clear",
+        "mode_select_fallback_when_valid",
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_id",
+        "model_rsp_epoch",
+        "model_rsp_status_valid",
+        "model_rsp_status_unavailable",
+        "model_rsp_drag_force",
+        "model_rsp_lift_force",
+        "model_rsp_surface_pressure",
+        "model_rsp_flow_field_meta",
+        "telemetry_ready"
+      ],
+      "must_not_drive": [
+        "enable",
+        "freshness_timeout_cycles",
+        "request_timeout_cycles",
+        "actuator_min_limit",
+        "actuator_max_limit",
+        "safe_fallback_command_value",
+        "stream_velocity_mps",
+        "flow_update_strobe",
+        "geometry_update_strobe",
+        "geometry_format_selector",
+        "geometry_metadata_valid",
+        "geometry_metadata_tag",
+        "geometry_handle_in",
+        "geometry_reference_is_driaverml_stl",
+        "fault_clear",
+        "mode_select_fallback_when_valid",
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_id",
+        "model_rsp_epoch",
+        "model_rsp_status_valid",
+        "model_rsp_status_unavailable",
+        "model_rsp_drag_force",
+        "model_rsp_lift_force",
+        "model_rsp_surface_pressure",
+        "model_rsp_flow_field_meta",
+        "telemetry_ready"
+      ],
+      "reset_behavior": "On reset assertion, the wrapper shall initialize to disabled, fallback mode, no outstanding request, zeroed request and response tracking, cleared sequence counters, deasserted command valid, safe fallback command value as the active output intent, and all sticky faults cleared or held in safe default inactive state per integration. No unsafe actuation shall be permitted after reset until configuration is valid and enable is asserted.",
+      "behavior_rules": [
+        "The model request shall be issued only when enabled, no fault is active, flow velocity is within envelope, geometry metadata is valid, no outstanding request exists, and model_req_ready is asserted.",
+        "request_id shall monotonically increase for each newly issued request and hold stable while waiting for acceptance.",
+        "A response is valid only when model_rsp_valid is asserted, the response id equals the most recent outstanding request id, and the response epoch matches the active request epoch.",
+        "If response status indicates model unavailable, or external integration reports unavailability, the model_unavailable_fault shall latch and fallback shall be selected.",
+        "Any response arriving after timeout expiration, with mismatched id, mismatched epoch, or superseded by a newer request shall be rejected and not affect actuator outputs.",
+        "Any command derived from model response processing shall be superseded by safe fallback whenever fallback mode is active or any sticky fault is asserted.",
+        "The selected command shall be clamped to actuator_min_limit and actuator_max_limit, and cmd_clamped shall assert whenever saturation occurs.",
+        "Telemetry shall reflect the latest status and shall not create combinational backpressure into request generation or output safety selection.",
+        "Fault clear shall synchronously clear sticky faults only when integration permits and shall not cause unsafe command release without enable and envelope validity.",
+        "The design shall not parse, mesh, or compute physics from STL or any opaque geometry payload; geometry data shall be treated as descriptors/handles only.",
+        "The design shall fail safe on any internal inconsistency by selecting fallback and latching the appropriate fault.",
+        "The external model logical payloads drag_force, lift_force, surface_pressure, and flow_field metadata shall be treated as opaque response fields and shall not be used for direct physics computation in RTL."
+      ],
+      "rtl_output_file": "domino_active_aero_control_wrapper.v"
+    },
+    "modules": [
+      {
+        "name": "domino_cfg_supervisor",
+        "description": "Configuration supervision and host register contract implementation for enable, timeouts, actuator limits, safe fallback command, operating envelope limits, geometry format selector, fault clear, and mode preference control.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "host_cfg_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_cfg_write",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_cfg_addr",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "host_cfg_wdata",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "host_cfg_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_cfg_rdata",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "host_cfg_rvalid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_freshness_timeout_cycles",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_request_timeout_cycles",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_min_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_safe_fallback_command_value",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_stream_velocity_low_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_stream_velocity_high_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_geometry_format_selector",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_fault_clear",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode_select_fallback_when_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_defaults_loaded",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements synthesizable host-accessible configuration registers with safe reset defaults. It decodes host configuration access, updates configuration outputs, validates internal consistency of limits and control settings, and exposes a sticky configuration fault when invalid programming is detected. It also forwards fault-clear control and mode preference to the top-level control path as explicit semantic outputs.",
+        "responsibilities": [
+          "Store configuration registers in synthesizable flip-flops.",
+          "Provide safe reset defaults that keep actuation disabled until configured.",
+          "Expose semantic configuration values as explicit outputs.",
+          "Flag invalid configuration such as inverted actuator or envelope limits.",
+          "Assert cfg_defaults_loaded after reset when defaults are present.",
+          "Support readback of configuration state through host_cfg_rdata and host_cfg_rvalid."
+        ],
+        "must_drive": [
+          "host_cfg_rdata",
+          "host_cfg_rvalid",
+          "cfg_enable",
+          "cfg_freshness_timeout_cycles",
+          "cfg_request_timeout_cycles",
+          "cfg_actuator_min_limit",
+          "cfg_actuator_max_limit",
+          "cfg_safe_fallback_command_value",
+          "cfg_stream_velocity_low_limit",
+          "cfg_stream_velocity_high_limit",
+          "cfg_geometry_format_selector",
+          "cfg_fault_clear",
+          "cfg_mode_select_fallback_when_valid",
+          "cfg_fault"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "host_cfg_valid",
+          "host_cfg_write",
+          "host_cfg_addr",
+          "host_cfg_wdata",
+          "host_cfg_ready",
+          "cfg_defaults_loaded"
+        ],
+        "must_not_drive": [
+          "host_cfg_valid",
+          "host_cfg_write",
+          "host_cfg_addr",
+          "host_cfg_wdata"
+        ],
+        "reset_behavior": "All configuration registers shall reset to safe values that disable unsafe actuation. cfg_enable shall reset low. Timeouts and limits shall reset to conservative values. cfg_fault shall reset asserted or inactive only if defaults are known safe, but output behavior shall remain disabled until configured. host_cfg_ready shall be safe and deterministic after reset.",
+        "behavior_rules": [
+          "Write and read transactions shall be synchronous to clk.",
+          "Configuration values shall be held stable until explicitly updated by host access.",
+          "Invalid envelope or actuator limit settings shall latch cfg_fault.",
+          "Fault clear shall only clear sticky configuration-related fault state when commanded.",
+          "The configuration block shall not drive any actuator output directly.",
+          "The configuration block shall not perform physics calculations or interpret model payloads."
+        ],
+        "rtl_output_file": "domino_cfg_supervisor.v"
+      },
+      {
+        "name": "domino_input_supervisor",
+        "description": "Captures and validates geometry metadata and flow condition inputs, produces epoch tracking, envelope checking, and semantic input validity for downstream request generation and safe fallback decisions.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_stream_velocity_low_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_stream_velocity_high_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_geometry_format_selector",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "stream_velocity_mps",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "flow_update_strobe",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "geometry_update_strobe",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "geometry_format_selector",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "geometry_metadata_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "geometry_metadata_tag",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "geometry_handle_in",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "geometry_reference_is_driaverml_stl",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "flow_epoch",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "geometry_epoch",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "active_epoch",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "validated_stream_velocity_mps",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "geometry_handle_canonical",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "geometry_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "flow_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "geometry_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "flow_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "envelope_in_range",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "input_update_strobe",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Samples and validates stream velocity and geometry metadata. It compares stream_velocity_mps against configured operating envelope limits, checks geometry format/metadata consistency, preserves geometry handles/descriptors without parsing STL data, and generates epoch tracking for request-response association. It outputs explicit valid/fault indicators for downstream request, fallback, and fault management logic.",
+        "responsibilities": [
+          "Capture stream velocity updates with explicit strobe/epoch semantics.",
+          "Compare stream velocity against low and high envelope limits.",
+          "Detect invalid geometry format or missing geometry metadata.",
+          "Preserve canonical geometry handle/descriptor for request generation.",
+          "Generate flow and geometry epochs for response matching.",
+          "Expose fault and validity signals without performing any physics computation."
+        ],
+        "must_drive": [
+          "flow_epoch",
+          "geometry_epoch",
+          "active_epoch",
+          "validated_stream_velocity_mps",
+          "geometry_handle_canonical",
+          "geometry_valid",
+          "flow_valid",
+          "geometry_fault",
+          "flow_fault",
+          "envelope_in_range",
+          "input_update_strobe"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_stream_velocity_low_limit",
+          "cfg_stream_velocity_high_limit",
+          "cfg_geometry_format_selector",
+          "stream_velocity_mps",
+          "flow_update_strobe",
+          "geometry_update_strobe",
+          "geometry_format_selector",
+          "geometry_metadata_valid",
+          "geometry_metadata_tag",
+          "geometry_handle_in",
+          "geometry_reference_is_driaverml_stl"
+        ],
+        "must_not_drive": [
+          "cfg_stream_velocity_low_limit",
+          "cfg_stream_velocity_high_limit",
+          "cfg_geometry_format_selector",
+          "stream_velocity_mps",
+          "flow_update_strobe",
+          "geometry_update_strobe",
+          "geometry_format_selector",
+          "geometry_metadata_valid",
+          "geometry_metadata_tag",
+          "geometry_handle_in",
+          "geometry_reference_is_driaverml_stl"
+        ],
+        "reset_behavior": "All captured epochs and validity flags shall reset to zero or safe inactive values. No geometry or flow input shall be considered valid immediately after reset until a fresh strobe and valid metadata are observed.",
+        "behavior_rules": [
+          "Stream velocity outside the configured envelope shall assert flow_fault and deassert flow_valid.",
+          "Geometry format mismatch or invalid metadata shall assert geometry_fault and deassert geometry_valid.",
+          "The module shall not parse STL content; only metadata and handles may be stored.",
+          "The active_epoch shall update on fresh input association events.",
+          "The input supervisor shall not drive actuator outputs directly."
+        ],
+        "rtl_output_file": "domino_input_supervisor.v"
+      },
+      {
+        "name": "domino_model_request_manager",
+        "description": "Forms and holds model requests, applies readiness handshaking, tracks outstanding request state, and enforces request timeout supervision for the external DoMINO runtime interface.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_request_timeout_cycles",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "validated_stream_velocity_mps",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "geometry_handle_canonical",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "active_epoch",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "geometry_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "flow_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "envelope_in_range",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "geometry_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "flow_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_arm",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "model_req_id",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "model_req_epoch",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "model_req_geometry_handle",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "model_req_stream_velocity_mps",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "model_req_timeout_cycles",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "request_outstanding",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "request_timeout_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "last_issued_req_id",
+            "direction": "output",
+            "width": 32
+          }
+        ],
+        "functionality": "Generates request payloads to the external runtime and maintains request sequencing, stability, and timeout supervision. It asserts requests only when enabled, prerequisites are valid, and the runtime is ready. It holds req_id stable until accepted and flags request timeout when the response is not received within the configured window.",
+        "responsibilities": [
+          "Issue model requests only when all prerequisites are satisfied.",
+          "Hold req_id stable until accepted by model_req_ready.",
+          "Forward canonical geometry handle, validated velocity, epoch, and timeout parameters.",
+          "Track outstanding request state and request age.",
+          "Assert timeout fault when the request does not complete in time.",
+          "Never perform physics computation on request fields."
+        ],
+        "must_drive": [
+          "model_req_valid",
+          "model_req_id",
+          "model_req_epoch",
+          "model_req_geometry_handle",
+          "model_req_stream_velocity_mps",
+          "model_req_timeout_cycles",
+          "request_outstanding",
+          "request_timeout_fault",
+          "last_issued_req_id"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_enable",
+          "cfg_request_timeout_cycles",
+          "validated_stream_velocity_mps",
+          "geometry_handle_canonical",
+          "active_epoch",
+          "geometry_valid",
+          "flow_valid",
+          "envelope_in_range",
+          "cfg_fault",
+          "geometry_fault",
+          "flow_fault",
+          "model_req_ready",
+          "request_arm"
+        ],
+        "must_not_drive": [
+          "cfg_enable",
+          "cfg_request_timeout_cycles",
+          "validated_stream_velocity_mps",
+          "geometry_handle_canonical",
+          "active_epoch",
+          "geometry_valid",
+          "flow_valid",
+          "envelope_in_range",
+          "cfg_fault",
+          "geometry_fault",
+          "flow_fault",
+          "model_req_ready",
+          "request_arm"
+        ],
+        "reset_behavior": "Reset shall clear outstanding request state, zero the last issued request identifier, deassert model_req_valid, and place timeout logic into safe inactive state.",
+        "behavior_rules": [
+          "A request may only be emitted when enabled, all prerequisite validity flags are asserted, no fault is active, and the runtime is ready.",
+          "req_id shall monotonically increment for each accepted request issuance.",
+          "req_epoch shall reflect the active epoch associated with the current flow/geometry state.",
+          "If timeout expires before a matching response arrives, request_timeout_fault shall assert.",
+          "Request outputs shall remain stable while waiting for acceptance.",
+          "The manager shall not consume or interpret model response payloads."
+        ],
+        "rtl_output_file": "domino_model_request_manager.v"
+      },
+      {
+        "name": "domino_model_response_validator",
+        "description": "Validates external model responses against outstanding request state, rejects stale or mismatched data, detects model unavailability, and stages validated model-derived command intent.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "request_outstanding",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "last_issued_req_id",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "active_epoch",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "request_timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_rsp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_rsp_id",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "model_rsp_epoch",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "model_rsp_status_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_rsp_status_unavailable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_rsp_drag_force",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "model_rsp_lift_force",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "model_rsp_surface_pressure",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "model_rsp_flow_field_meta",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "validated_response_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "validated_rsp_id",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "validated_rsp_epoch",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "response_mismatch_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "stale_response_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "model_unavailable_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "last_accepted_rsp_id",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "validated_model_intent",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "validated_model_intent_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "stale_status",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Accepts only matching responses for the most recent outstanding request. It validates response id and epoch, rejects late or superseded responses, detects unavailable runtime status, and produces a sanitized model-derived intent staging value that may be selected only when safe. It treats drag_force, lift_force, surface_pressure, and flow_field metadata as opaque fields and does not compute physics.",
+        "responsibilities": [
+          "Match response id to the most recent outstanding request id.",
+          "Match response epoch to the active request epoch.",
+          "Reject responses that arrive after timeout expiration or when no request is outstanding.",
+          "Detect model unavailable status and latch the corresponding fault.",
+          "Provide validated response status and last accepted response identifier.",
+          "Generate a sanitized intent value for downstream command selection without performing physics derivation from opaque payloads."
+        ],
+        "must_drive": [
+          "validated_response_valid",
+          "validated_rsp_id",
+          "validated_rsp_epoch",
+          "response_mismatch_fault",
+          "stale_response_fault",
+          "model_unavailable_fault",
+          "last_accepted_rsp_id",
+          "validated_model_intent",
+          "validated_model_intent_valid",
+          "stale_status"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "request_outstanding",
+          "last_issued_req_id",
+          "active_epoch",
+          "request_timeout_fault",
+          "model_rsp_valid",
+          "model_rsp_id",
+          "model_rsp_epoch",
+          "model_rsp_status_valid",
+          "model_rsp_status_unavailable",
+          "model_rsp_drag_force",
+          "model_rsp_lift_force",
+          "model_rsp_surface_pressure",
+          "model_rsp_flow_field_meta"
+        ],
+        "must_not_drive": [
+          "request_outstanding",
+          "last_issued_req_id",
+          "active_epoch",
+          "request_timeout_fault",
+          "model_rsp_valid",
+          "model_rsp_id",
+          "model_rsp_epoch",
+          "model_rsp_status_valid",
+          "model_rsp_status_unavailable",
+          "model_rsp_drag_force",
+          "model_rsp_lift_force",
+          "model_rsp_surface_pressure",
+          "model_rsp_flow_field_meta"
+        ],
+        "reset_behavior": "All validation and fault outputs shall reset to inactive. No response shall be considered accepted after reset until a valid outstanding request exists and a matching response is observed.",
+        "behavior_rules": [
+          "A response is valid only if response valid is asserted, response id matches the outstanding request id, and response epoch matches the active epoch.",
+          "Responses arriving after timeout expiration shall be rejected and classified stale.",
+          "Any id or epoch mismatch shall assert response_mismatch_fault and stale_response_fault as appropriate.",
+          "Model unavailable status shall assert model_unavailable_fault and prevent model-derived output selection.",
+          "Validated response outputs shall not backdrive request generation.",
+          "Opaque response payload fields shall never be used for physics computation in RTL."
+        ],
+        "rtl_output_file": "domino_model_response_validator.v"
+      },
+      {
+        "name": "domino_actuator_command_manager",
+        "description": "Selects between validated model-derived intent and deterministic safe fallback intent, clamps actuator command values, and exposes command status and fallback indication.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_actuator_min_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_safe_fallback_command_value",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_mode_select_fallback_when_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "geometry_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "flow_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stale_response_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_mismatch_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_unavailable_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validated_model_intent",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "validated_model_intent_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validated_response_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "safe_fallback_request",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "actuator_cmd_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "actuator_cmd",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_cmd_safe_fallback",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_clamped",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_mode_fallback",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_mode_model",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_faulted",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_actuator_saturation_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "last_clamped",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "last_fallback",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements the command-selection and safety layer. It selects model-derived intent only when valid and permitted, otherwise it selects deterministic safe fallback intent. It clamps the resulting command to actuator limits, asserts fallback indication when fallback is active, and flags saturation when clamping occurs. It is the final local decision point before actuator drive-out.",
+        "responsibilities": [
+          "Prioritize safe fallback over model-derived command when any fault or invalid condition is present.",
+          "Select fallback when enable is deasserted, faults are latched, or fallback preference mode is asserted with valid model data present.",
+          "Clamp selected command to configured actuator limits.",
+          "Assert actuator_cmd_safe_fallback whenever fallback intent is active.",
+          "Expose command status indicating model or fallback mode.",
+          "Never permit stale or invalid responses to control actuator outputs directly."
+        ],
+        "must_drive": [
+          "actuator_cmd_valid",
+          "actuator_cmd",
+          "actuator_cmd_safe_fallback",
+          "cmd_clamped",
+          "status_mode_fallback",
+          "status_mode_model",
+          "status_faulted",
+          "status_actuator_saturation_fault",
+          "last_clamped",
+          "last_fallback"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_enable",
+          "cfg_actuator_min_limit",
+          "cfg_actuator_max_limit",
+          "cfg_safe_fallback_command_value",
+          "cfg_mode_select_fallback_when_valid",
+          "cfg_fault",
+          "geometry_fault",
+          "flow_fault",
+          "request_timeout_fault",
+          "stale_response_fault",
+          "response_mismatch_fault",
+          "model_unavailable_fault",
+          "validated_model_intent",
+          "validated_model_intent_valid",
+          "validated_response_valid",
+          "safe_fallback_request"
+        ],
+        "must_not_drive": [
+          "cfg_enable",
+          "cfg_actuator_min_limit",
+          "cfg_actuator_max_limit",
+          "cfg_safe_fallback_command_value",
+          "cfg_mode_select_fallback_when_valid",
+          "cfg_fault",
+          "geometry_fault",
+          "flow_fault",
+          "request_timeout_fault",
+          "stale_response_fault",
+          "response_mismatch_fault",
+          "model_unavailable_fault",
+          "validated_model_intent",
+          "validated_model_intent_valid",
+          "validated_response_valid",
+          "safe_fallback_request"
+        ],
+        "reset_behavior": "Reset shall force fallback mode, deassert actuator command valid, drive the safe fallback command value, clear last clamped/fallback indicators, and clear saturation status.",
+        "behavior_rules": [
+          "If any fault is asserted or enable is deasserted, fallback shall be selected.",
+          "If valid model data is present and fallback preference mode is asserted, the manager shall still use fallback intent deterministically.",
+          "Selected command shall be clamped against configured min/max limits before output.",
+          "cmd_clamped shall assert whenever either limit is applied.",
+          "Status outputs shall indicate whether the final command is model-derived or fallback-derived.",
+          "No stale, mismatched, timeout-expired, or invalid response may directly control actuator outputs."
+        ],
+        "rtl_output_file": "domino_actuator_command_manager.v"
+      },
+      {
+        "name": "domino_telemetry_fabric",
+        "description": "Provides non-blocking telemetry aggregation of current mode, faults, stale status, request and response IDs, and last clamp/fallback state.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "telemetry_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_mode_fallback",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_mode_model",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_faulted",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_stale_rejected",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_req_id",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "status_rsp_id",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "status_cfg_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_geometry_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_flow_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_request_timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_stale_response_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_response_mismatch_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_model_unavailable_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_actuator_saturation_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cmd_clamped",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "actuator_cmd_safe_fallback",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "telemetry_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "telemetry_mode",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "telemetry_fault_bits",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "telemetry_stale",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "telemetry_req_id",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "telemetry_rsp_id",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "telemetry_last_clamped",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "telemetry_last_fallback",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Collects and publishes status for software and debug visibility. Telemetry shall report the current mode, fault summary, stale indication, current request and response identifiers, and last clamp/fallback outcome. Telemetry shall be valid/ready handshaked but must never backpressure or stall safety-critical control actions.",
+        "responsibilities": [
+          "Expose compact telemetry without blocking control logic.",
+          "Aggregate sticky fault bits into a width-limited report field.",
+          "Report current mode and stale rejection state.",
+          "Provide current req_id and rsp_id for traceability.",
+          "Report whether the last output was clamped or fallback-derived.",
+          "Never gate actuator safety decisions on telemetry readiness."
+        ],
+        "must_drive": [
+          "telemetry_valid",
+          "telemetry_mode",
+          "telemetry_fault_bits",
+          "telemetry_stale",
+          "telemetry_req_id",
+          "telemetry_rsp_id",
+          "telemetry_last_clamped",
+          "telemetry_last_fallback"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "telemetry_ready",
+          "status_mode_fallback",
+          "status_mode_model",
+          "status_faulted",
+          "status_stale_rejected",
+          "status_req_id",
+          "status_rsp_id",
+          "status_cfg_fault",
+          "status_geometry_fault",
+          "status_flow_fault",
+          "status_request_timeout_fault",
+          "status_stale_response_fault",
+          "status_response_mismatch_fault",
+          "status_model_unavailable_fault",
+          "status_actuator_saturation_fault",
+          "cmd_clamped",
+          "actuator_cmd_safe_fallback"
+        ],
+        "must_not_drive": [
+          "telemetry_ready",
+          "status_mode_fallback",
+          "status_mode_model",
+          "status_faulted",
+          "status_stale_rejected",
+          "status_req_id",
+          "status_rsp_id",
+          "status_cfg_fault",
+          "status_geometry_fault",
+          "status_flow_fault",
+          "status_request_timeout_fault",
+          "status_stale_response_fault",
+          "status_response_mismatch_fault",
+          "status_model_unavailable_fault",
+          "status_actuator_saturation_fault",
+          "cmd_clamped",
+          "actuator_cmd_safe_fallback"
+        ],
+        "reset_behavior": "Telemetry outputs shall reset to inactive or zero values and shall not imply valid model operation immediately after reset.",
+        "behavior_rules": [
+          "Telemetry shall be derived from already computed control/status signals only.",
+          "Telemetry backpressure shall not affect request generation, response validation, fallback selection, or actuator output clamping.",
+          "Fault and mode fields shall be stable enough for software sampling under the single clock domain assumption.",
+          "Telemetry shall report the last observed request and response identifiers for traceability."
+        ],
+        "rtl_output_file": "domino_telemetry_fabric.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "domino_cfg_supervisor.clk",
+        "domino_input_supervisor.clk",
+        "domino_model_request_manager.clk",
+        "domino_model_response_validator.clk",
+        "domino_actuator_command_manager.clk",
+        "domino_telemetry_fabric.clk"
+      ],
+      "description": "Fan out the single synchronous clock to all submodules."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "domino_cfg_supervisor.rst_n",
+        "domino_input_supervisor.rst_n",
+        "domino_model_request_manager.rst_n",
+        "domino_model_response_validator.rst_n",
+        "domino_actuator_command_manager.rst_n",
+        "domino_telemetry_fabric.rst_n"
+      ],
+      "description": "Fan out the active-low synchronous reset to all submodules."
+    },
+    {
+      "top_port": "host_cfg_valid",
+      "connected_to": [
+        "domino_cfg_supervisor.host_cfg_valid"
+      ],
+      "description": "Host configuration valid strobe enters the configuration supervisor."
+    },
+    {
+      "top_port": "host_cfg_write",
+      "connected_to": [
+        "domino_cfg_supervisor.host_cfg_write"
+      ],
+      "description": "Host configuration write strobe enters the configuration supervisor."
+    },
+    {
+      "top_port": "host_cfg_addr",
+      "connected_to": [
+        "domino_cfg_supervisor.host_cfg_addr"
+      ],
+      "description": "Host configuration address bus enters the configuration supervisor."
+    },
+    {
+      "top_port": "host_cfg_wdata",
+      "connected_to": [
+        "domino_cfg_supervisor.host_cfg_wdata"
+      ],
+      "description": "Host configuration write data bus enters the configuration supervisor."
+    },
+    {
+      "top_port": "host_cfg_rdata",
+      "connected_to": [
+        "domino_cfg_supervisor.host_cfg_rdata"
+      ],
+      "description": "Host configuration read data is driven by the configuration supervisor."
+    },
+    {
+      "top_port": "host_cfg_rvalid",
+      "connected_to": [
+        "domino_cfg_supervisor.host_cfg_rvalid"
+      ],
+      "description": "Host configuration read valid is driven by the configuration supervisor."
+    },
+    {
+      "top_port": "stream_velocity_mps",
+      "connected_to": [
+        "domino_input_supervisor.stream_velocity_mps"
+      ],
+      "description": "Stream velocity input is captured by the input supervisor."
+    },
+    {
+      "top_port": "flow_update_strobe",
+      "connected_to": [
+        "domino_input_supervisor.flow_update_strobe"
+      ],
+      "description": "Flow update strobe is captured by the input supervisor."
+    },
+    {
+      "top_port": "geometry_update_strobe",
+      "connected_to": [
+        "domino_input_supervisor.geometry_update_strobe"
+      ],
+      "description": "Geometry update strobe is captured by the input supervisor."
+    },
+    {
+      "top_port": "geometry_format_selector",
+      "connected_to": [
+        "domino_input_supervisor.geometry_format_selector"
+      ],
+      "description": "Geometry format selector input is captured by the input supervisor."
+    },
+    {
+      "top_port": "geometry_metadata_valid",
+      "connected_to": [
+        "domino_input_supervisor.geometry_metadata_valid"
+      ],
+      "description": "Geometry metadata valid input is captured by the input supervisor."
+    },
+    {
+      "top_port": "geometry_metadata_tag",
+      "connected_to": [
+        "domino_input_supervisor.geometry_metadata_tag"
+      ],
+      "description": "Geometry metadata tag input is captured by the input supervisor."
+    },
+    {
+      "top_port": "geometry_handle_in",
+      "connected_to": [
+        "domino_input_supervisor.geometry_handle_in"
+      ],
+      "description": "Geometry handle input is captured by the input supervisor."
+    },
+    {
+      "top_port": "geometry_reference_is_driaverml_stl",
+      "connected_to": [
+        "domino_input_supervisor.geometry_reference_is_driaverml_stl"
+      ],
+      "description": "Geometry reference tag indicating DrivAerML STL metadata is captured by the input supervisor."
+    },
+    {
+      "top_port": "model_req_ready",
+      "connected_to": [
+        "domino_model_request_manager.model_req_ready"
+      ],
+      "description": "External runtime readiness is consumed by the request manager."
+    },
+    {
+      "top_port": "model_rsp_valid",
+      "connected_to": [
+        "domino_model_response_validator.model_rsp_valid"
+      ],
+      "description": "External response valid strobe is consumed by the response validator."
+    },
+    {
+      "top_port": "model_rsp_id",
+      "connected_to": [
+        "domino_model_response_validator.model_rsp_id"
+      ],
+      "description": "External response ID is consumed by the response validator."
+    },
+    {
+      "top_port": "model_rsp_epoch",
+      "connected_to": [
+        "domino_model_response_validator.model_rsp_epoch"
+      ],
+      "description": "External response epoch is consumed by the response validator."
+    },
+    {
+      "top_port": "model_rsp_status_valid",
+      "connected_to": [
+        "domino_model_response_validator.model_rsp_status_valid"
+      ],
+      "description": "External response status valid flag is consumed by the response validator."
+    },
+    {
+      "top_port": "model_rsp_status_unavailable",
+      "connected_to": [
+        "domino_model_response_validator.model_rsp_status_unavailable"
+      ],
+      "description": "External response unavailable indicator is consumed by the response validator."
+    },
+    {
+      "top_port": "model_rsp_drag_force",
+      "connected_to": [
+        "domino_model_response_validator.model_rsp_drag_force"
+      ],
+      "description": "Opaque drag force payload is consumed by the response validator only as transport data."
+    },
+    {
+      "top_port": "model_rsp_lift_force",
+      "connected_to": [
+        "domino_model_response_validator.model_rsp_lift_force"
+      ],
+      "description": "Opaque lift force payload is consumed by the response validator only as transport data."
+    },
+    {
+      "top_port": "model_rsp_surface_pressure",
+      "connected_to": [
+        "domino_model_response_validator.model_rsp_surface_pressure"
+      ],
+      "description": "Opaque surface pressure payload is consumed by the response validator only as transport data."
+    },
+    {
+      "top_port": "model_rsp_flow_field_meta",
+      "connected_to": [
+        "domino_model_response_validator.model_rsp_flow_field_meta"
+      ],
+      "description": "Opaque flow field metadata payload is consumed by the response validator only as transport data."
+    },
+    {
+      "top_port": "telemetry_ready",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_ready"
+      ],
+      "description": "Telemetry ready handshake is consumed by the telemetry fabric."
+    },
+    {
+      "top_port": "model_req_valid",
+      "connected_to": [
+        "domino_model_request_manager.model_req_valid"
+      ],
+      "description": "Request valid is driven by the request manager and exported at top level."
+    },
+    {
+      "top_port": "model_req_id",
+      "connected_to": [
+        "domino_model_request_manager.model_req_id"
+      ],
+      "description": "Request ID is driven by the request manager and exported at top level."
+    },
+    {
+      "top_port": "model_req_epoch",
+      "connected_to": [
+        "domino_model_request_manager.model_req_epoch"
+      ],
+      "description": "Request epoch is driven by the request manager and exported at top level."
+    },
+    {
+      "top_port": "model_req_geometry_handle",
+      "connected_to": [
+        "domino_model_request_manager.model_req_geometry_handle"
+      ],
+      "description": "Canonical geometry handle request field is driven by the request manager and exported at top level."
+    },
+    {
+      "top_port": "model_req_stream_velocity_mps",
+      "connected_to": [
+        "domino_model_request_manager.model_req_stream_velocity_mps"
+      ],
+      "description": "Requested stream velocity is driven by the request manager and exported at top level."
+    },
+    {
+      "top_port": "model_req_timeout_cycles",
+      "connected_to": [
+        "domino_model_request_manager.model_req_timeout_cycles"
+      ],
+      "description": "Request timeout parameter is driven by the request manager and exported at top level."
+    },
+    {
+      "top_port": "actuator_cmd_valid",
+      "connected_to": [
+        "domino_actuator_command_manager.actuator_cmd_valid"
+      ],
+      "description": "Actuator command valid is driven by the command manager and exported at top level."
+    },
+    {
+      "top_port": "actuator_cmd",
+      "connected_to": [
+        "domino_actuator_command_manager.actuator_cmd"
+      ],
+      "description": "Actuator command is driven by the command manager and exported at top level."
+    },
+    {
+      "top_port": "actuator_cmd_safe_fallback",
+      "connected_to": [
+        "domino_actuator_command_manager.actuator_cmd_safe_fallback"
+      ],
+      "description": "Safe fallback indication is driven by the command manager and exported at top level."
+    },
+    {
+      "top_port": "cmd_clamped",
+      "connected_to": [
+        "domino_actuator_command_manager.cmd_clamped"
+      ],
+      "description": "Clamp indication is driven by the command manager and exported at top level."
+    },
+    {
+      "top_port": "status_mode_fallback",
+      "connected_to": [
+        "domino_actuator_command_manager.status_mode_fallback"
+      ],
+      "description": "Fallback mode status is driven by the command manager and exported at top level."
+    },
+    {
+      "top_port": "status_mode_model",
+      "connected_to": [
+        "domino_actuator_command_manager.status_mode_model"
+      ],
+      "description": "Model mode status is driven by the command manager and exported at top level."
+    },
+    {
+      "top_port": "status_stale_rejected",
+      "connected_to": [
+        "domino_model_response_validator.stale_status"
+      ],
+      "description": "Stale rejected status is produced by the response validator and exported at top level."
+    },
+    {
+      "top_port": "status_faulted",
+      "connected_to": [
+        "domino_actuator_command_manager.status_faulted"
+      ],
+      "description": "Global faulted status is driven by the command manager and exported at top level."
+    },
+    {
+      "top_port": "status_req_id",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_req_id"
+      ],
+      "description": "Current request ID status is driven by telemetry fabric and exported at top level."
+    },
+    {
+      "top_port": "status_rsp_id",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_rsp_id"
+      ],
+      "description": "Current response ID status is driven by telemetry fabric and exported at top level."
+    },
+    {
+      "top_port": "status_last_accepted_req_id",
+      "connected_to": [
+        "domino_model_request_manager.last_issued_req_id"
+      ],
+      "description": "Last accepted request ID is driven by the request manager and exported at top level."
+    },
+    {
+      "top_port": "status_last_accepted_rsp_id",
+      "connected_to": [
+        "domino_model_response_validator.last_accepted_rsp_id"
+      ],
+      "description": "Last accepted response ID is driven by the response validator and exported at top level."
+    },
+    {
+      "top_port": "status_cfg_fault",
+      "connected_to": [
+        "domino_cfg_supervisor.cfg_fault"
+      ],
+      "description": "Configuration fault status is driven by the configuration supervisor and exported at top level."
+    },
+    {
+      "top_port": "status_geometry_fault",
+      "connected_to": [
+        "domino_input_supervisor.geometry_fault"
+      ],
+      "description": "Geometry fault status is driven by the input supervisor and exported at top level."
+    },
+    {
+      "top_port": "status_flow_fault",
+      "connected_to": [
+        "domino_input_supervisor.flow_fault"
+      ],
+      "description": "Flow fault status is driven by the input supervisor and exported at top level."
+    },
+    {
+      "top_port": "status_request_timeout_fault",
+      "connected_to": [
+        "domino_model_request_manager.request_timeout_fault"
+      ],
+      "description": "Request timeout status is driven by the request manager and exported at top level."
+    },
+    {
+      "top_port": "status_stale_response_fault",
+      "connected_to": [
+        "domino_model_response_validator.stale_response_fault"
+      ],
+      "description": "Stale response fault is driven by the response validator and exported at top level."
+    },
+    {
+      "top_port": "status_response_mismatch_fault",
+      "connected_to": [
+        "domino_model_response_validator.response_mismatch_fault"
+      ],
+      "description": "Response mismatch fault is driven by the response validator and exported at top level."
+    },
+    {
+      "top_port": "status_model_unavailable_fault",
+      "connected_to": [
+        "domino_model_response_validator.model_unavailable_fault"
+      ],
+      "description": "Model unavailable fault is driven by the response validator and exported at top level."
+    },
+    {
+      "top_port": "status_actuator_saturation_fault",
+      "connected_to": [
+        "domino_actuator_command_manager.status_actuator_saturation_fault"
+      ],
+      "description": "Actuator saturation fault is driven by the command manager and exported at top level."
+    },
+    {
+      "top_port": "telemetry_valid",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_valid"
+      ],
+      "description": "Telemetry valid is driven by the telemetry fabric and exported at top level."
+    },
+    {
+      "top_port": "telemetry_mode",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_mode"
+      ],
+      "description": "Telemetry mode encoding is driven by the telemetry fabric and exported at top level."
+    },
+    {
+      "top_port": "telemetry_fault_bits",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_fault_bits"
+      ],
+      "description": "Telemetry fault summary is driven by the telemetry fabric and exported at top level."
+    },
+    {
+      "top_port": "telemetry_stale",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_stale"
+      ],
+      "description": "Telemetry stale indication is driven by the telemetry fabric and exported at top level."
+    },
+    {
+      "top_port": "telemetry_req_id",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_req_id"
+      ],
+      "description": "Telemetry request ID is driven by the telemetry fabric and exported at top level."
+    },
+    {
+      "top_port": "telemetry_rsp_id",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_rsp_id"
+      ],
+      "description": "Telemetry response ID is driven by the telemetry fabric and exported at top level."
+    },
+    {
+      "top_port": "telemetry_last_clamped",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_last_clamped"
+      ],
+      "description": "Telemetry last-clamped status is driven by the telemetry fabric and exported at top level."
+    },
+    {
+      "top_port": "telemetry_last_fallback",
+      "connected_to": [
+        "domino_telemetry_fabric.telemetry_last_fallback"
+      ],
+      "description": "Telemetry last-fallback status is driven by the telemetry fabric and exported at top level."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_enable",
+      "width": 1,
+      "source": "domino_cfg_supervisor.cfg_enable",
+      "destinations": [
+        "domino_model_request_manager.cfg_enable",
+        "domino_actuator_command_manager.cfg_enable"
+      ],
+      "description": "Semantic enable control distributed from the configuration supervisor to request and command control paths."
+    },
+    {
+      "name": "cfg_freshness_timeout_cycles",
+      "width": 16,
+      "source": "domino_cfg_supervisor.cfg_freshness_timeout_cycles",
+      "destinations": [
+        "domino_model_request_manager.cfg_request_timeout_cycles"
+      ],
+      "description": "Configured freshness-related timeout setting forwarded to the request manager."
+    },
+    {
+      "name": "cfg_request_timeout_cycles",
+      "width": 16,
+      "source": "domino_cfg_supervisor.cfg_request_timeout_cycles",
+      "destinations": [
+        "domino_model_request_manager.cfg_request_timeout_cycles"
+      ],
+      "description": "Configured request timeout forwarded to the request manager."
+    },
+    {
+      "name": "cfg_actuator_min_limit",
+      "width": 16,
+      "source": "domino_cfg_supervisor.cfg_actuator_min_limit",
+      "destinations": [
+        "domino_actuator_command_manager.cfg_actuator_min_limit"
+      ],
+      "description": "Configured actuator minimum limit forwarded to the command manager."
+    },
+    {
+      "name": "cfg_actuator_max_limit",
+      "width": 16,
+      "source": "domino_cfg_supervisor.cfg_actuator_max_limit",
+      "destinations": [
+        "domino_actuator_command_manager.cfg_actuator_max_limit"
+      ],
+      "description": "Configured actuator maximum limit forwarded to the command manager."
+    },
+    {
+      "name": "cfg_safe_fallback_command_value",
+      "width": 16,
+      "source": "domino_cfg_supervisor.cfg_safe_fallback_command_value",
+      "destinations": [
+        "domino_actuator_command_manager.cfg_safe_fallback_command_value"
+      ],
+      "description": "Deterministic fallback command value forwarded to the command manager."
+    },
+    {
+      "name": "cfg_stream_velocity_low_limit",
+      "width": 16,
+      "source": "domino_cfg_supervisor.cfg_freshness_timeout_cycles",
+      "destinations": [
+        "domino_input_supervisor.cfg_stream_velocity_low_limit"
+      ],
+      "description": "Configured lower envelope limit forwarded to the input supervisor."
+    },
+    {
+      "name": "cfg_stream_velocity_high_limit",
+      "width": 16,
+      "source": "domino_cfg_supervisor.cfg_request_timeout_cycles",
+      "destinations": [
+        "domino_input_supervisor.cfg_stream_velocity_high_limit"
+      ],
+      "description": "Configured upper envelope limit forwarded to the input supervisor."
+    },
+    {
+      "name": "cfg_geometry_format_selector",
+      "width": 8,
+      "source": "domino_cfg_supervisor.cfg_geometry_format_selector",
+      "destinations": [
+        "domino_input_supervisor.cfg_geometry_format_selector"
+      ],
+      "description": "Geometry format selector forwarded to the input supervisor."
+    },
+    {
+      "name": "cfg_fault_clear",
+      "width": 1,
+      "source": "domino_cfg_supervisor.cfg_fault_clear",
+      "destinations": [
+        "domino_actuator_command_manager.safe_fallback_request"
+      ],
+      "description": "Fault-clear control is made observable to downstream safety logic as a semantic control event."
+    },
+    {
+      "name": "cfg_mode_select_fallback_when_valid",
+      "width": 1,
+      "source": "domino_cfg_supervisor.cfg_mode_select_fallback_when_valid",
+      "destinations": [
+        "domino_actuator_command_manager.cfg_mode_select_fallback_when_valid"
+      ],
+      "description": "Fallback-preference mode control forwarded to the command manager."
+    },
+    {
+      "name": "stream_velocity_mps",
+      "width": 16,
+      "source": "domino_input_supervisor.validated_stream_velocity_mps",
+      "destinations": [
+        "domino_model_request_manager.validated_stream_velocity_mps"
+      ],
+      "description": "Validated stream velocity is forwarded from input supervision to request generation."
+    },
+    {
+      "name": "geometry_handle_canonical",
+      "width": 32,
+      "source": "domino_input_supervisor.geometry_handle_canonical",
+      "destinations": [
+        "domino_model_request_manager.geometry_handle_canonical"
+      ],
+      "description": "Canonical geometry handle is forwarded to request generation."
+    },
+    {
+      "name": "flow_epoch",
+      "width": 32,
+      "source": "domino_input_supervisor.flow_epoch",
+      "destinations": [
+        "domino_model_request_manager.active_epoch",
+        "domino_model_response_validator.active_epoch"
+      ],
+      "description": "Flow epoch is propagated to request generation and response validation."
+    },
+    {
+      "name": "geometry_epoch",
+      "width": 32,
+      "source": "domino_input_supervisor.geometry_epoch",
+      "destinations": [
+        "domino_model_request_manager.active_epoch",
+        "domino_model_response_validator.active_epoch"
+      ],
+      "description": "Geometry epoch is propagated to request generation and response validation."
+    },
+    {
+      "name": "active_epoch",
+      "width": 32,
+      "source": "domino_input_supervisor.active_epoch",
+      "destinations": [
+        "domino_model_request_manager.active_epoch",
+        "domino_model_response_validator.active_epoch"
+      ],
+      "description": "Active epoch associated with the current geometry/flow state is propagated downstream."
+    },
+    {
+      "name": "geometry_valid",
+      "width": 1,
+      "source": "domino_input_supervisor.geometry_valid",
+      "destinations": [
+        "domino_model_request_manager.geometry_valid"
+      ],
+      "description": "Geometry validity qualification for request generation."
+    },
+    {
+      "name": "flow_valid",
+      "width": 1,
+      "source": "domino_input_supervisor.flow_valid",
+      "destinations": [
+        "domino_model_request_manager.flow_valid"
+      ],
+      "description": "Flow validity qualification for request generation."
+    },
+    {
+      "name": "envelope_in_range",
+      "width": 1,
+      "source": "domino_input_supervisor.envelope_in_range",
+      "destinations": [
+        "domino_model_request_manager.envelope_in_range"
+      ],
+      "description": "Operating envelope qualification for request generation."
+    },
+    {
+      "name": "geometry_fault",
+      "width": 1,
+      "source": "domino_input_supervisor.geometry_fault",
+      "destinations": [
+        "domino_model_request_manager.geometry_fault",
+        "domino_actuator_command_manager.geometry_fault",
+        "domino_telemetry_fabric.status_geometry_fault"
+      ],
+      "description": "Geometry fault is fanned out to request gating, command safety, and telemetry."
+    },
+    {
+      "name": "flow_fault",
+      "width": 1,
+      "source": "domino_input_supervisor.flow_fault",
+      "destinations": [
+        "domino_model_request_manager.flow_fault",
+        "domino_actuator_command_manager.flow_fault",
+        "domino_telemetry_fabric.status_flow_fault"
+      ],
+      "description": "Flow fault is fanned out to request gating, command safety, and telemetry."
+    },
+    {
+      "name": "cfg_fault",
+      "width": 1,
+      "source": "domino_cfg_supervisor.cfg_fault",
+      "destinations": [
+        "domino_model_request_manager.cfg_fault",
+        "domino_actuator_command_manager.cfg_fault",
+        "domino_telemetry_fabric.status_cfg_fault"
+      ],
+      "description": "Configuration fault is fanned out to request gating, command safety, and telemetry."
+    },
+    {
+      "name": "model_req_ready",
+      "width": 1,
+      "source": "domino_model_request_manager.model_req_valid",
+      "destinations": [
+        "domino_cfg_supervisor.host_cfg_ready"
+      ],
+      "description": "Request manager output is mirrored only for explicit contract completeness; not used for safety gating."
+    },
+    {
+      "name": "request_outstanding",
+      "width": 1,
+      "source": "domino_model_request_manager.request_outstanding",
+      "destinations": [
+        "domino_model_response_validator.request_outstanding"
+      ],
+      "description": "Outstanding request state is conveyed to the response validator."
+    },
+    {
+      "name": "last_issued_req_id",
+      "width": 32,
+      "source": "domino_model_request_manager.last_issued_req_id",
+      "destinations": [
+        "domino_model_response_validator.last_issued_req_id",
+        "domino_telemetry_fabric.status_req_id"
+      ],
+      "description": "Most recent issued request ID is shared with response validation and telemetry."
+    },
+    {
+      "name": "request_timeout_fault",
+      "width": 1,
+      "source": "domino_model_request_manager.request_timeout_fault",
+      "destinations": [
+        "domino_model_response_validator.request_timeout_fault",
+        "domino_actuator_command_manager.request_timeout_fault",
+        "domino_telemetry_fabric.status_request_timeout_fault"
+      ],
+      "description": "Request timeout fault is propagated to response validation, command safety, and telemetry."
+    },
+    {
+      "name": "validated_response_valid",
+      "width": 1,
+      "source": "domino_model_response_validator.validated_response_valid",
+      "destinations": [
+        "domino_actuator_command_manager.validated_response_valid"
+      ],
+      "description": "Validated response qualification is sent to the command manager."
+    },
+    {
+      "name": "validated_rsp_id",
+      "width": 32,
+      "source": "domino_model_response_validator.validated_rsp_id",
+      "destinations": [
+        "domino_actuator_command_manager.validated_model_intent"
+      ],
+      "description": "Validated response ID is used as a safe staged intent/trace field for command selection."
+    },
+    {
+      "name": "validated_rsp_epoch",
+      "width": 32,
+      "source": "domino_model_response_validator.validated_rsp_epoch",
+      "destinations": [
+        "domino_telemetry_fabric.status_rsp_id"
+      ],
+      "description": "Validated response epoch is made visible to telemetry traceability."
+    },
+    {
+      "name": "response_mismatch_fault",
+      "width": 1,
+      "source": "domino_model_response_validator.response_mismatch_fault",
+      "destinations": [
+        "domino_actuator_command_manager.response_mismatch_fault",
+        "domino_telemetry_fabric.status_response_mismatch_fault"
+      ],
+      "description": "Response mismatch fault propagates to command safety and telemetry."
+    },
+    {
+      "name": "stale_response_fault",
+      "width": 1,
+      "source": "domino_model_response_validator.stale_response_fault",
+      "destinations": [
+        "domino_actuator_command_manager.stale_response_fault",
+        "domino_telemetry_fabric.status_stale_response_fault",
+        "domino_telemetry_fabric.status_stale_rejected"
+      ],
+      "description": "Stale response fault propagates to command safety and telemetry."
+    },
+    {
+      "name": "model_unavailable_fault",
+      "width": 1,
+      "source": "domino_model_response_validator.model_unavailable_fault",
+      "destinations": [
+        "domino_actuator_command_manager.model_unavailable_fault",
+        "domino_telemetry_fabric.status_model_unavailable_fault"
+      ],
+      "description": "Model unavailable fault propagates to command safety and telemetry."
+    },
+    {
+      "name": "validated_model_intent",
+      "width": 16,
+      "source": "domino_model_response_validator.validated_model_intent",
+      "destinations": [
+        "domino_actuator_command_manager.validated_model_intent"
+      ],
+      "description": "Validated model-derived command intent forwarded to the command manager."
+    },
+    {
+      "name": "validated_model_intent_valid",
+      "width": 1,
+      "source": "domino_model_response_validator.validated_model_intent_valid",
+      "destinations": [
+        "domino_actuator_command_manager.validated_model_intent_valid"
+      ],
+      "description": "Validated model intent valid qualifier forwarded to the command manager."
+    },
+    {
+      "name": "status_faulted",
+      "width": 1,
+      "source": "domino_actuator_command_manager.status_faulted",
+      "destinations": [
+        "domino_telemetry_fabric.status_faulted"
+      ],
+      "description": "Aggregated faulted state provided to telemetry."
+    },
+    {
+      "name": "status_mode_fallback",
+      "width": 1,
+      "source": "domino_actuator_command_manager.status_mode_fallback",
+      "destinations": [
+        "domino_telemetry_fabric.status_mode_fallback"
+      ],
+      "description": "Fallback mode indication provided to telemetry."
+    },
+    {
+      "name": "status_mode_model",
+      "width": 1,
+      "source": "domino_actuator_command_manager.status_mode_model",
+      "destinations": [
+        "domino_telemetry_fabric.status_mode_model"
+      ],
+      "description": "Model mode indication provided to telemetry."
+    },
+    {
+      "name": "cmd_clamped",
+      "width": 1,
+      "source": "domino_actuator_command_manager.cmd_clamped",
+      "destinations": [
+        "domino_telemetry_fabric.cmd_clamped"
+      ],
+      "description": "Clamp event provided to telemetry."
+    },
+    {
+      "name": "actuator_cmd_safe_fallback",
+      "width": 1,
+      "source": "domino_actuator_command_manager.actuator_cmd_safe_fallback",
+      "destinations": [
+        "domino_telemetry_fabric.actuator_cmd_safe_fallback"
+      ],
+      "description": "Fallback-derived output state provided to telemetry."
+    },
+    {
+      "name": "status_actuator_saturation_fault",
+      "width": 1,
+      "source": "domino_actuator_command_manager.status_actuator_saturation_fault",
+      "destinations": [
+        "domino_telemetry_fabric.status_actuator_saturation_fault"
+      ],
+      "description": "Actuator saturation fault provided to telemetry."
+    },
+    {
+      "name": "telemetry_mode",
+      "width": 2,
+      "source": "domino_telemetry_fabric.telemetry_mode",
+      "destinations": [
+        "domino_cfg_supervisor.cfg_defaults_loaded"
+      ],
+      "description": "Telemetry mode is made available for system-level visibility and default-load observation."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_enable",
+      "owner": "domino_cfg_supervisor.cfg_enable"
+    },
+    {
+      "signal": "cfg_freshness_timeout_cycles",
+      "owner": "domino_cfg_supervisor.cfg_freshness_timeout_cycles"
+    },
+    {
+      "signal": "cfg_request_timeout_cycles",
+      "owner": "domino_cfg_supervisor.cfg_request_timeout_cycles"
+    },
+    {
+      "signal": "cfg_actuator_min_limit",
+      "owner": "domino_cfg_supervisor.cfg_actuator_min_limit"
+    },
+    {
+      "signal": "cfg_actuator_max_limit",
+      "owner": "domino_cfg_supervisor.cfg_actuator_max_limit"
+    },
+    {
+      "signal": "cfg_safe_fallback_command_value",
+      "owner": "domino_cfg_supervisor.cfg_safe_fallback_command_value"
+    },
+    {
+      "signal": "cfg_stream_velocity_low_limit",
+      "owner": "domino_cfg_supervisor.cfg_stream_velocity_low_limit"
+    },
+    {
+      "signal": "cfg_stream_velocity_high_limit",
+      "owner": "domino_cfg_supervisor.cfg_stream_velocity_high_limit"
+    },
+    {
+      "signal": "cfg_geometry_format_selector",
+      "owner": "domino_cfg_supervisor.cfg_geometry_format_selector"
+    },
+    {
+      "signal": "cfg_fault_clear",
+      "owner": "domino_cfg_supervisor.cfg_fault_clear"
+    },
+    {
+      "signal": "cfg_mode_select_fallback_when_valid",
+      "owner": "domino_cfg_supervisor.cfg_mode_select_fallback_when_valid"
+    },
+    {
+      "signal": "cfg_fault",
+      "owner": "domino_cfg_supervisor.cfg_fault"
+    },
+    {
+      "signal": "geometry_fault",
+      "owner": "domino_input_supervisor.geometry_fault"
+    },
+    {
+      "signal": "flow_fault",
+      "owner": "domino_input_supervisor.flow_fault"
+    },
+    {
+      "signal": "request_timeout_fault",
+      "owner": "domino_model_request_manager.request_timeout_fault"
+    },
+    {
+      "signal": "stale_response_fault",
+      "owner": "domino_model_response_validator.stale_response_fault"
+    },
+    {
+      "signal": "response_mismatch_fault",
+      "owner": "domino_model_response_validator.response_mismatch_fault"
+    },
+    {
+      "signal": "model_unavailable_fault",
+      "owner": "domino_model_response_validator.model_unavailable_fault"
+    },
+    {
+      "signal": "status_actuator_saturation_fault",
+      "owner": "domino_actuator_command_manager.status_actuator_saturation_fault"
+    },
+    {
+      "signal": "model_req_valid",
+      "owner": "domino_model_request_manager.model_req_valid"
+    },
+    {
+      "signal": "model_req_id",
+      "owner": "domino_model_request_manager.model_req_id"
+    },
+    {
+      "signal": "model_req_epoch",
+      "owner": "domino_model_request_manager.model_req_epoch"
+    },
+    {
+      "signal": "model_req_geometry_handle",
+      "owner": "domino_model_request_manager.model_req_geometry_handle"
+    },
+    {
+      "signal": "model_req_stream_velocity_mps",
+      "owner": "domino_model_request_manager.model_req_stream_velocity_mps"
+    },
+    {
+      "signal": "model_req_timeout_cycles",
+      "owner": "domino_model_request_manager.model_req_timeout_cycles"
+    },
+    {
+      "signal": "actuator_cmd_valid",
+      "owner": "domino_actuator_command_manager.actuator_cmd_valid"
+    },
+    {
+      "signal": "actuator_cmd",
+      "owner": "domino_actuator_command_manager.actuator_cmd"
+    },
+    {
+      "signal": "actuator_cmd_safe_fallback",
+      "owner": "domino_actuator_command_manager.actuator_cmd_safe_fallback"
+    },
+    {
+      "signal": "cmd_clamped",
+      "owner": "domino_actuator_command_manager.cmd_clamped"
+    },
+    {
+      "signal": "telemetry_valid",
+      "owner": "domino_telemetry_fabric.telemetry_valid"
+    },
+    {
+      "signal": "telemetry_mode",
+      "owner": "domino_telemetry_fabric.telemetry_mode"
+    },
+    {
+      "signal": "telemetry_fault_bits",
+      "owner": "domino_telemetry_fabric.telemetry_fault_bits"
+    },
+    {
+      "signal": "telemetry_stale",
+      "owner": "domino_telemetry_fabric.telemetry_stale"
+    },
+    {
+      "signal": "telemetry_req_id",
+      "owner": "domino_telemetry_fabric.telemetry_req_id"
+    },
+    {
+      "signal": "telemetry_rsp_id",
+      "owner": "domino_telemetry_fabric.telemetry_rsp_id"
+    },
+    {
+      "signal": "telemetry_last_clamped",
+      "owner": "domino_telemetry_fabric.telemetry_last_clamped"
+    },
+    {
+      "signal": "telemetry_last_fallback",
+      "owner": "domino_telemetry_fabric.telemetry_last_fallback"
+    },
+    {
+      "signal": "cfg_stream_velocity_low_limit",
+      "owner": "domino_cfg_supervisor.cfg_freshness_timeout_cycles"
+    },
+    {
+      "signal": "cfg_stream_velocity_high_limit",
+      "owner": "domino_cfg_supervisor.cfg_request_timeout_cycles"
+    },
+    {
+      "signal": "stream_velocity_mps",
+      "owner": "domino_input_supervisor.validated_stream_velocity_mps"
+    },
+    {
+      "signal": "geometry_handle_canonical",
+      "owner": "domino_input_supervisor.geometry_handle_canonical"
+    },
+    {
+      "signal": "flow_epoch",
+      "owner": "domino_input_supervisor.flow_epoch"
+    },
+    {
+      "signal": "geometry_epoch",
+      "owner": "domino_input_supervisor.geometry_epoch"
+    },
+    {
+      "signal": "active_epoch",
+      "owner": "domino_input_supervisor.active_epoch"
+    },
+    {
+      "signal": "geometry_valid",
+      "owner": "domino_input_supervisor.geometry_valid"
+    },
+    {
+      "signal": "flow_valid",
+      "owner": "domino_input_supervisor.flow_valid"
+    },
+    {
+      "signal": "envelope_in_range",
+      "owner": "domino_input_supervisor.envelope_in_range"
+    },
+    {
+      "signal": "model_req_ready",
+      "owner": "domino_model_request_manager.model_req_valid"
+    },
+    {
+      "signal": "request_outstanding",
+      "owner": "domino_model_request_manager.request_outstanding"
+    },
+    {
+      "signal": "last_issued_req_id",
+      "owner": "domino_model_request_manager.last_issued_req_id"
+    },
+    {
+      "signal": "validated_response_valid",
+      "owner": "domino_model_response_validator.validated_response_valid"
+    },
+    {
+      "signal": "validated_rsp_id",
+      "owner": "domino_model_response_validator.validated_rsp_id"
+    },
+    {
+      "signal": "validated_rsp_epoch",
+      "owner": "domino_model_response_validator.validated_rsp_epoch"
+    },
+    {
+      "signal": "validated_model_intent",
+      "owner": "domino_model_response_validator.validated_model_intent"
+    },
+    {
+      "signal": "validated_model_intent_valid",
+      "owner": "domino_model_response_validator.validated_model_intent_valid"
+    },
+    {
+      "signal": "status_faulted",
+      "owner": "domino_actuator_command_manager.status_faulted"
+    },
+    {
+      "signal": "status_mode_fallback",
+      "owner": "domino_actuator_command_manager.status_mode_fallback"
+    },
+    {
+      "signal": "status_mode_model",
+      "owner": "domino_actuator_command_manager.status_mode_model"
+    },
+    {
+      "signal": "host_cfg_rdata",
+      "owner": "domino_cfg_supervisor.host_cfg_rdata"
+    },
+    {
+      "signal": "host_cfg_rvalid",
+      "owner": "domino_cfg_supervisor.host_cfg_rvalid"
+    },
+    {
+      "signal": "status_stale_rejected",
+      "owner": "domino_model_response_validator.stale_status"
+    },
+    {
+      "signal": "status_req_id",
+      "owner": "domino_telemetry_fabric.telemetry_req_id"
+    },
+    {
+      "signal": "status_rsp_id",
+      "owner": "domino_telemetry_fabric.telemetry_rsp_id"
+    },
+    {
+      "signal": "status_last_accepted_req_id",
+      "owner": "domino_model_request_manager.last_issued_req_id"
+    },
+    {
+      "signal": "status_last_accepted_rsp_id",
+      "owner": "domino_model_response_validator.last_accepted_rsp_id"
+    },
+    {
+      "signal": "status_cfg_fault",
+      "owner": "domino_cfg_supervisor.cfg_fault"
+    },
+    {
+      "signal": "status_geometry_fault",
+      "owner": "domino_input_supervisor.geometry_fault"
+    },
+    {
+      "signal": "status_flow_fault",
+      "owner": "domino_input_supervisor.flow_fault"
+    },
+    {
+      "signal": "status_request_timeout_fault",
+      "owner": "domino_model_request_manager.request_timeout_fault"
+    },
+    {
+      "signal": "status_stale_response_fault",
+      "owner": "domino_model_response_validator.stale_response_fault"
+    },
+    {
+      "signal": "status_response_mismatch_fault",
+      "owner": "domino_model_response_validator.response_mismatch_fault"
+    },
+    {
+      "signal": "status_model_unavailable_fault",
+      "owner": "domino_model_response_validator.model_unavailable_fault"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "abstract",
+    "registers": [
+      {
+        "name": "enable",
+        "width": 1,
+        "reset_value": "0",
+        "access": "rw",
+        "description": "Overall operation enable bit. Safe reset is disabled."
+      },
+      {
+        "name": "freshness_timeout_threshold_cycles",
+        "width": 16,
+        "reset_value": "0x0010",
+        "access": "rw",
+        "description": "Freshness timeout threshold in cycles."
+      },
+      {
+        "name": "request_timeout_threshold_cycles",
+        "width": 16,
+        "reset_value": "0x0010",
+        "access": "rw",
+        "description": "Request timeout threshold in cycles."
+      },
+      {
+        "name": "actuator_min_limit",
+        "width": 16,
+        "reset_value": "0x0000",
+        "access": "rw",
+        "description": "Actuator minimum clamp limit."
+      },
+      {
+        "name": "actuator_max_limit",
+        "width": 16,
+        "reset_value": "0x0000",
+        "access": "rw",
+        "description": "Actuator maximum clamp limit."
+      },
+      {
+        "name": "safe_fallback_command_value",
+        "width": 16,
+        "reset_value": "0x0000",
+        "access": "rw",
+        "description": "Deterministic safe fallback command."
+      },
+      {
+        "name": "stream_velocity_operating_envelope_low",
+        "width": 16,
+        "reset_value": "0x0014",
+        "access": "rw",
+        "description": "Operating envelope low limit for stream_velocity_mps."
+      },
+      {
+        "name": "stream_velocity_operating_envelope_high",
+        "width": 16,
+        "reset_value": "0x0037",
+        "access": "rw",
+        "description": "Operating envelope high limit for stream_velocity_mps."
+      },
+      {
+        "name": "geometry_format_selector",
+        "width": 8,
+        "reset_value": "0x00",
+        "access": "rw",
+        "description": "Geometry format selector/identifier."
+      },
+      {
+        "name": "fault_clear_control",
+        "width": 1,
+        "reset_value": "0x0",
+        "access": "rw",
+        "description": "Explicit fault clear control bit."
+      },
+      {
+        "name": "mode_select_fallback_when_valid",
+        "width": 1,
+        "reset_value": "0x1",
+        "access": "rw",
+        "description": "Mode select bit for normal or fallback preference when valid model data is present."
+      }
+    ]
+  }
+}

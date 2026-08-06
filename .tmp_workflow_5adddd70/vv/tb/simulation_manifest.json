@@ -1,0 +1,30 @@
+{
+  "type": "vv_simulation_manifest",
+  "version": "1.1",
+  "top_module": "domino_active_aero_control_wrapper",
+  "spec_path": "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/spec/domino_active_aero_control_wrapper_spec.json",
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/handoff/rtl/domino_cfg_supervisor.v",
+    "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/handoff/rtl/domino_input_supervisor.v",
+    "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/handoff/rtl/domino_telemetry_fabric.v",
+    "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/handoff/rtl/domino_model_request_manager.v",
+    "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/handoff/rtl/domino_actuator_command_manager.v",
+    "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/handoff/rtl/domino_model_response_validator.v",
+    "/root/chiploop-backend/backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/handoff/rtl/domino_active_aero_control_wrapper.v"
+  ],
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity"
+  ],
+  "runner": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/run_regression.py",
+  "makefile": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/Makefile",
+  "testcases_json": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/testcases.json",
+  "tb_contract_json": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/tb_contract.json",
+  "reports_dir": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/reports",
+  "simulator": "verilator",
+  "sva_assertions_path": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/domino_active_aero_control_wrapper_assertions.sv",
+  "sva_bind_path": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/domino_active_aero_control_wrapper_assertions_bind.sv",
+  "coverage_model_py": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/coverage_model.py",
+  "functional_coverage_summary_json": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/reports/functional_coverage_summary.json",
+  "functional_coverage_md": "backend/workflows/5adddd70-6bc8-4bc9-873c-bbfa4e2db295/vv/tb/reports/COVERAGE.md"
+}

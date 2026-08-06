@@ -1,0 +1,301 @@
+{
+  "type": "simulation_summary_coverage",
+  "simulation": {
+    "total": 8,
+    "pass": 8,
+    "fail": 0
+  },
+  "coverage": {
+    "status": "ok",
+    "functional_coverage_pct": 82.81,
+    "bins_hit": 53,
+    "total_bins": 64,
+    "functional": {
+      "status": "ok",
+      "coverage_pct": 82.81,
+      "bins_hit": 53,
+      "total_bins": 64,
+      "gap_count": 11,
+      "gaps": [
+        {
+          "type": "functional_bin_gap",
+          "signal": "actuator_cmd_safe_fallback",
+          "group": "outputs",
+          "coverage_point": "outputs.actuator_cmd_safe_fallback",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "host_cfg_rdata",
+          "group": "outputs",
+          "coverage_point": "outputs.host_cfg_rdata",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "model_req_epoch",
+          "group": "outputs",
+          "coverage_point": "outputs.model_req_epoch",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "model_req_geometry_handle",
+          "group": "outputs",
+          "coverage_point": "outputs.model_req_geometry_handle",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "model_req_id",
+          "group": "outputs",
+          "coverage_point": "outputs.model_req_id",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "model_req_stream_velocity_mps",
+          "group": "outputs",
+          "coverage_point": "outputs.model_req_stream_velocity_mps",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "model_req_valid",
+          "group": "outputs",
+          "coverage_point": "outputs.model_req_valid",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "status_mode_fallback",
+          "group": "outputs",
+          "coverage_point": "outputs.status_mode_fallback",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "status_mode_model",
+          "group": "outputs",
+          "coverage_point": "outputs.status_mode_model",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "clk",
+          "group": "inputs",
+          "coverage_point": "inputs.clk",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "rst_n",
+          "group": "inputs",
+          "coverage_point": "inputs.rst_n",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        }
+      ]
+    },
+    "code": {
+      "status": "ok",
+      "line_coverage_pct": 69.51,
+      "line_hit": 358,
+      "line_found": 515,
+      "branch_coverage_pct": 1.73,
+      "branch_hit": 97,
+      "branch_found": 5623,
+      "condition_coverage_pct": 1.73,
+      "condition_hit": 97,
+      "condition_found": 5623,
+      "condition_source": "verilator_lcov_branch_proxy",
+      "toggle_coverage_pct": 47.27,
+      "toggle_hit": 2580,
+      "toggle_found": 5458,
+      "toggle_source": "verilator_coverage_annotate_points",
+      "missed_toggle_points": [
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=rst_n:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[0]:0->1 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[0]:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[10]:0->1 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[10]:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[11]:0->1 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[11]:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[12]:0->1 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[12]:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[13]:0->1 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[13]:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[14]:0->1 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[14]:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[15]:0->1 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[15]:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[16]:0->1 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[16]:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[17]:0->1 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[17]:1->0 hier=domino_active_aero_control_wrapper"
+        },
+        {
+          "file": "domino_active_aero_control_wrapper.v",
+          "point": "comment=host_cfg_rdata[18]:0->1 hier=domino_active_aero_control_wrapper"
+        }
+      ],
+      "tool": "verilator_coverage"
+    },
+    "assertions": {
+      "status": "ok",
+      "assertions_generated": 13,
+      "assertion_failures": 0,
+      "assertion_pass_pct": 100.0
+    }
+  },
+  "formal": {
+    "status": "not_enabled",
+    "available": null,
+    "attempted": null,
+    "returncode": null,
+    "reason": null
+  },
+  "golden_model": {
+    "status": "not_enabled",
+    "top_module": null
+  },
+  "toolchain": {
+    "simulator": "verilator",
+    "code_coverage": "verilator_coverage",
+    "formal": "none",
+    "formal_solver": null,
+    "golden_model": "none"
+  }
+}
