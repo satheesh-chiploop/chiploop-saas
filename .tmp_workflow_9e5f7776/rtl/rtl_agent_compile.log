@@ -1,0 +1,36 @@
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:72: syntax error
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:77: Syntax in assignment statement l-value.
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:90: syntax error
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:91: error: Invalid module item.
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:92: syntax error
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:92: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:93: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:94: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:95: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:99: syntax error
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:99: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:100: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:101: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:102: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:103: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:104: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:105: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:106: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:107: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:109: syntax error
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:109: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:110: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:113: syntax error
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:113: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:114: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:117: syntax error
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:117: error: Invalid module instantiation
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:119: syntax error
+backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:119: error: Invalid module instantiation
+I give up.
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

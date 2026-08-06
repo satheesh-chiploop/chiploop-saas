@@ -1,0 +1,238 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "domino_automotive_aero_gateway",
+  "design_summary": {
+    "purpose": "Synthesizable automotive active-aerodynamics gateway that packages vehicle geometry and flow-condition inputs into external DoMINO Automotive Aero model requests, validates responses, enforces freshness and envelope checks, generates bounded actuator commands, and guarantees deterministic safe fallback and fault-latch behavior.",
+    "operating_model": "Single-clock-domain RTL with synchronous reset behavior. The external physics surrogate is not implemented in RTL; the block only transports request/response metadata, validates response integrity and age, clamps the control output, and routes either validated control or deterministic safe-state fallback to the actuator interface. A standard CDC wrapper may be used externally if needed, but the core architecture itself is synchronous.",
+    "external_interfaces": [
+      "Vehicle geometry descriptor/payload inputs carried as metadata only, not physically parsed.",
+      "Flow-condition inputs including stream_velocity_mps, flow_density_kgm3, flow_temperature_k, and flow_pressure_pa.",
+      "Bidirectional model request/response channel compatible with future NVIDIA-hosted NIM or ChipLoop GPU worker deployment.",
+      "Actuator command output with valid indication and bounded command range.",
+      "Configuration and diagnostics registers for timeout, command limits, safe state, enable, and fault clear control."
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "domino_request_gateway",
+      "role": "Request-side transaction manager for the external DoMINO Automotive Aero runtime.",
+      "responsibilities": [
+        "Capture geometry and flow descriptors on accepted requests.",
+        "Assign monotonic sequence identifiers to accepted requests.",
+        "Capture request timestamps on acceptance.",
+        "Forward all request metadata fields explicitly and unchanged.",
+        "Provide last_sequence_id for downstream diagnostics and safety correlation.",
+        "Operate without geometry parsing or physical simulation."
+      ],
+      "interface_notes": [
+        "Consumes enable, vehicle_geometry_valid, vehicle_geometry_sequence_ack, vehicle_geometry_format, vehicle_geometry_source_id, vehicle_geometry_payload_valid, vehicle_geometry_payload_ref, stream_velocity_mps, flow_density_kgm3, flow_temperature_k, flow_pressure_pa, flow_conditions_valid, req_ready, request_accept, request_timestamp_in, and request_sequence_id_in.",
+        "Drives req_valid, req_sequence_id, req_timestamp, req_vehicle_geometry_valid, req_vehicle_geometry_sequence_ack, req_vehicle_geometry_format, req_vehicle_geometry_source_id, req_vehicle_geometry_payload_valid, req_vehicle_geometry_payload_ref, req_stream_velocity_mps, req_flow_density_kgm3, req_flow_temperature_k, req_flow_pressure_pa, and last_sequence_id.",
+        "Produces a clean request bundle only when the request is accepted and req_ready is qualified."
+      ],
+      "ownership_notes": [
+        "This module owns the request-side sequence counter and request timestamp capture behavior.",
+        "It must not drive any of its input ports.",
+        "It is the source of req_* request metadata forwarded to the external model runtime."
+      ]
+    },
+    {
+      "name": "domino_response_validator",
+      "role": "Response-side safety validator for external DoMINO model outputs.",
+      "responsibilities": [
+        "Check response framing validity.",
+        "Compare response sequence_id against the stored request context.",
+        "Evaluate response age against timeout_threshold_cycles.",
+        "Check stream_velocity_mps against the 20 to 55 m/s operating envelope.",
+        "Preserve validated response metadata for downstream control and readback.",
+        "Generate stale_reject, timeout, out_of_range, and model_online status outputs.",
+        "Reject stale, malformed, mismatched, missing-field, timeout-exceeded, or out-of-envelope responses."
+      ],
+      "interface_notes": [
+        "Consumes enable, timeout_threshold_cycles, latency_budget_cycles, stream_velocity_mps, req_valid, req_sequence_id, req_timestamp, rsp_valid, rsp_sequence_id, rsp_timestamp, rsp_drag_force, rsp_lift_force, rsp_surface_pressure, rsp_flow_field_valid, rsp_flow_field, rsp_frame_valid, and model_online_in.",
+        "Drives accepted_response_sequence_id, accepted_response_timestamp, accepted_response_age_cycles, accepted_response_drag_force, accepted_response_lift_force, accepted_response_surface_pressure, accepted_response_flow_field_valid, accepted_response_flow_field, response_validated, stale_reject, timeout, out_of_range, and model_online.",
+        "Provides only validated response metadata; unvalidated response fields are not forwarded as accepted metadata."
+      ],
+      "ownership_notes": [
+        "This module owns response qualification results and the accepted-response readback set.",
+        "It must not drive request-side or control-side input fields.",
+        "Its outputs are the sole source for validated response metadata used by control synthesis."
+      ]
+    },
+    {
+      "name": "domino_control_safety_fsm",
+      "role": "Control synthesis and safety state machine.",
+      "responsibilities": [
+        "Implement IDLE, REQUEST_SENT, WAIT_RESPONSE, VALIDATE_RESPONSE, COMPUTE_CONTROL, APPLY_CLAMP, Fallback, and FAULT_LATCH states.",
+        "Translate validated aerodynamic outputs into a nominal control candidate.",
+        "Apply combinational clamping between registered stages using cmd_min and cmd_max.",
+        "Drive safe_state deterministically during fallback.",
+        "Latch faults until clear_fault or reset according to integration policy.",
+        "Block stale or invalid data from reaching actuator_command.",
+        "Emit actuator_command_valid only when nominal validated control or explicit fallback is selected."
+      ],
+      "interface_notes": [
+        "Consumes enable, clear_fault, cmd_min, cmd_max, safe_state, accepted_response_sequence_id, accepted_response_timestamp, accepted_response_age_cycles, accepted_response_drag_force, accepted_response_lift_force, accepted_response_surface_pressure, accepted_response_flow_field_valid, accepted_response_flow_field, response_validated, stale_reject, timeout, and out_of_range.",
+        "Drives actuator_command_next, actuator_command, actuator_command_valid, fallback_active, fault_latched, fsm_state, and compute_control_valid.",
+        "The clamp stage is the only pure combinational transformation explicitly allowed between registered stages."
+      ],
+      "ownership_notes": [
+        "This module owns the safety FSM state register and the actuator output decision path.",
+        "It must not drive configuration or accepted-response input fields.",
+        "It is responsible for ensuring no unvalidated model data can reach the actuator output."
+      ]
+    },
+    {
+      "name": "domino_automotive_aero_gateway",
+      "role": "Top-level integration point and descriptive owner of inter-module contracts.",
+      "responsibilities": [
+        "Instantiate and connect the request gateway, response validator, and control safety FSM.",
+        "Expose the full external model interface and actuator interface.",
+        "Provide diagnostics and status registers including model_online, timeout, stale_reject, fallback_active, fault_latched, last_sequence_id, fsm_state, and accepted-response metadata.",
+        "Maintain deterministic, synthesizable behavior in a single system clock domain."
+      ],
+      "interface_notes": [
+        "Top-level ports connect directly to matching child module ports as defined in the specification.",
+        "Top-owned inter-module signals are used to drive the child module inputs identified in the spec.",
+        "No new ports, modules, filenames, or hierarchy are introduced."
+      ],
+      "ownership_notes": [
+        "The top-level module owns the internal wiring described by top_level_connections and inter_module_signals.",
+        "It is the integration boundary for external hardware, model runtime, and diagnostics software.",
+        "It remains descriptive only and does not redefine the underlying RTL contract."
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "External requester inputs",
+      "to": "domino_request_gateway",
+      "signals": [
+        "enable",
+        "vehicle_geometry_valid",
+        "vehicle_geometry_sequence_ack",
+        "vehicle_geometry_format",
+        "vehicle_geometry_source_id",
+        "vehicle_geometry_payload_valid",
+        "vehicle_geometry_payload_ref",
+        "stream_velocity_mps",
+        "flow_density_kgm3",
+        "flow_temperature_k",
+        "flow_pressure_pa",
+        "flow_conditions_valid",
+        "req_ready",
+        "request_accept",
+        "request_timestamp_in",
+        "request_sequence_id_in"
+      ],
+      "intent": "Accept geometry and flow-condition metadata, qualify request acceptance, and generate a tagged request transaction for the external model runtime."
+    },
+    {
+      "from": "domino_request_gateway",
+      "to": "External model runtime / DoMINO interface",
+      "signals": [
+        "req_valid",
+        "req_sequence_id",
+        "req_timestamp",
+        "req_vehicle_geometry_valid",
+        "req_vehicle_geometry_sequence_ack",
+        "req_vehicle_geometry_format",
+        "req_vehicle_geometry_source_id",
+        "req_vehicle_geometry_payload_valid",
+        "req_vehicle_geometry_payload_ref",
+        "req_stream_velocity_mps",
+        "req_flow_density_kgm3",
+        "req_flow_temperature_k",
+        "req_flow_pressure_pa"
+      ],
+      "intent": "Provide the external DoMINO-compatible request transaction carrying sequence, time, geometry descriptor, and flow condition data."
+    },
+    {
+      "from": "External model runtime / DoMINO interface",
+      "to": "domino_response_validator",
+      "signals": [
+        "rsp_valid",
+        "rsp_sequence_id",
+        "rsp_timestamp",
+        "rsp_drag_force",
+        "rsp_lift_force",
+        "rsp_surface_pressure",
+        "rsp_flow_field_valid",
+        "rsp_flow_field",
+        "rsp_frame_valid",
+        "model_online_in"
+      ],
+      "intent": "Bring back model outputs for validation, freshness checking, and diagnostic qualification before any control use."
+    },
+    {
+      "from": "domino_response_validator",
+      "to": "domino_control_safety_fsm",
+      "signals": [
+        "accepted_response_sequence_id",
+        "accepted_response_timestamp",
+        "accepted_response_age_cycles",
+        "accepted_response_drag_force",
+        "accepted_response_lift_force",
+        "accepted_response_surface_pressure",
+        "accepted_response_flow_field_valid",
+        "accepted_response_flow_field",
+        "response_validated",
+        "stale_reject",
+        "timeout",
+        "out_of_range"
+      ],
+      "intent": "Pass only validated response metadata and safety qualification signals to the control and fallback decision path."
+    },
+    {
+      "from": "domino_control_safety_fsm",
+      "to": "Active-aero actuator domain",
+      "signals": [
+        "actuator_command",
+        "actuator_command_valid",
+        "fallback_active",
+        "fault_latched",
+        "fsm_state"
+      ],
+      "intent": "Emit a bounded actuator command, assert validity only for validated fresh control or fallback, and expose safety state for integration and diagnostics."
+    },
+    {
+      "from": "domino_control_safety_fsm",
+      "to": "Top-level diagnostics and external status",
+      "signals": [
+        "actuator_command",
+        "actuator_command_valid",
+        "fallback_active",
+        "fault_latched",
+        "fsm_state",
+        "compute_control_valid"
+      ],
+      "intent": "Provide readable state and control status while preserving deterministic safe behavior."
+    }
+  ],
+  "data_flow_summary": [
+    "Vehicle geometry descriptors and flow-condition values enter the top level and are forwarded unchanged by the request gateway as metadata for the external model runtime.",
+    "When a request is accepted, the request gateway assigns a monotonically increasing sequence_id, captures the request timestamp, and exposes the request context for downstream correlation.",
+    "The response validator compares incoming model responses against the stored request context, checks framing, sequence matching, freshness, timeout, envelope compliance, and field completeness, and then either accepts metadata or rejects the response.",
+    "Validated aerodynamic outputs are consumed by the control safety FSM, which computes a nominal command candidate and applies combinational clamping to enforce cmd_min and cmd_max bounds.",
+    "If validation fails, a response is stale, out-of-range, malformed, timeout-exceeded, or otherwise invalid, the controller transitions to fallback or fault handling and drives safe_state instead of nominal command data.",
+    "The actuator output is therefore either a validated fresh control command or a deterministic safe fallback command; no unvalidated model data is permitted to reach actuator_command."
+  ],
+  "clock_reset_summary": {
+    "clocking": "All logic is synchronous to a single system clock domain driven by clk. The architecture is intended to be fully synthesizable in a standard-cell ASIC flow and may be integrated with an external CDC wrapper if required by a larger system, but the described core itself remains in one clock domain.",
+    "reset_behavior": "On reset_n assertion, the design enters IDLE with safe fallback output active, req_valid and actuator_command_valid deasserted, counters and metadata cleared, last_sequence_id set to zero, and model_online low until qualified. The fault latch is cleared on reset unless integration policy dictates otherwise, while all registered outputs assume deterministic safe values immediately after reset deassertion."
+  },
+  "integration_notes": [
+    "The external physics surrogate is not implemented in RTL; only the request/response gateway contract is implemented.",
+    "The architecture supports future NVIDIA-hosted NIM or ChipLoop GPU worker deployment through the supplied model interface only.",
+    "stream_velocity_mps is constrained to the 20 to 55 m/s operating envelope, and values outside this range force out_of_range and safety handling.",
+    "Reference-context metadata such as stream_velocity_mps = 38.89, geometry_format = STL, and geometry_source = DrivAerML reference geometry is treated as configuration context only, not as a physical model.",
+    "The request and response metadata are carried, tagged, and validated without geometry parsing or physical simulation.",
+    "Outputs are registered except for the explicitly permitted pure clamp combinational logic between registered stages.",
+    "The command path is deterministic and does not rely on external software scheduling for safety outcomes.",
+    "Assertions implied by the specification include stale-response blocking, actuator bounds enforcement, latency-bounded fallback, fault-latch persistence, and out-of-envelope safety response."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

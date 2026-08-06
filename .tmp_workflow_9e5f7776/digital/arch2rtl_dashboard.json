@@ -1,0 +1,4693 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "domino_automotive_aero_gateway",
+  "rtl_file_count": 4,
+  "module_count": 4,
+  "modules": [
+    {
+      "name": "domino_automotive_aero_gateway",
+      "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_automotive_aero_gateway.v",
+      "input_count": 635,
+      "output_count": 1118,
+      "inout_count": 0,
+      "input_port_count": 35,
+      "output_port_count": 49,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "clear_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_sequence_ack",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_format",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "vehicle_geometry_source_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "vehicle_geometry_payload_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_payload_ref",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "stream_velocity_mps",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "flow_density_kgm3",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "flow_temperature_k",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "flow_pressure_pa",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "flow_conditions_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_sequence_id",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_timestamp",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "rsp_drag_force",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_lift_force",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_surface_pressure",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_flow_field_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_flow_field",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "rsp_frame_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_online_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_command_credit",
+          "direction": "input",
+          "width": "[3:0]"
+        },
+        {
+          "name": "timeout_threshold_cycles",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cmd_min",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cmd_max",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "safe_state",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "latency_budget_cycles",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "actuator_command",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "actuator_command_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_sequence_id",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "req_timestamp",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "req_vehicle_geometry_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_vehicle_geometry_sequence_ack",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_vehicle_geometry_format",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "req_vehicle_geometry_source_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_vehicle_geometry_payload_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_vehicle_geometry_payload_ref",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "req_stream_velocity_mps",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_flow_density_kgm3",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_flow_temperature_k",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_flow_pressure_pa",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "stale_reject",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_latched",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "timeout",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "out_of_range",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "model_online",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "last_sequence_id",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fsm_state",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "accepted_response_sequence_id",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_timestamp",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "accepted_response_age_cycles",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_drag_force",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_lift_force",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_surface_pressure",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_flow_field_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "accepted_response_flow_field",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "domino_request_gateway_request_accept",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "domino_request_gateway_request_timestamp_in",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "domino_request_gateway_request_sequence_id_in",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "domino_response_validator_req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "domino_response_validator_req_sequence_id",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "domino_response_validator_req_timestamp",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "domino_response_validator_response_validated",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "domino_control_safety_fsm_accepted_response_sequence_id",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "domino_control_safety_fsm_accepted_response_timestamp",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "domino_control_safety_fsm_accepted_response_age_cycles",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "domino_control_safety_fsm_accepted_response_drag_force",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "domino_control_safety_fsm_accepted_response_lift_force",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "domino_control_safety_fsm_accepted_response_surface_pressure",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "domino_control_safety_fsm_accepted_response_flow_field_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "domino_control_safety_fsm_accepted_response_flow_field",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "domino_control_safety_fsm_response_validated",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "domino_control_safety_fsm_stale_reject",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "domino_control_safety_fsm_timeout",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "domino_control_safety_fsm_out_of_range",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "domino_control_safety_fsm_actuator_command_next",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "domino_control_safety_fsm_compute_control_valid",
+          "direction": "input",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "domino_control_safety_fsm",
+      "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_control_safety_fsm.v",
+      "input_count": 393,
+      "output_count": 71,
+      "inout_count": 0,
+      "input_port_count": 19,
+      "output_port_count": 7,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "clear_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cmd_min",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cmd_max",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "safe_state",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_sequence_id",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_timestamp",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "accepted_response_age_cycles",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_drag_force",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_lift_force",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_surface_pressure",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_flow_field_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "accepted_response_flow_field",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "response_validated",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "stale_reject",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "timeout",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "out_of_range",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "actuator_command_next",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "actuator_command",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "actuator_command_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_latched",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fsm_state",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "compute_control_valid",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "domino_request_gateway",
+      "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_request_gateway.v",
+      "input_count": 273,
+      "output_count": 300,
+      "inout_count": 0,
+      "input_port_count": 18,
+      "output_port_count": 14,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_sequence_ack",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_format",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "vehicle_geometry_source_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "vehicle_geometry_payload_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "vehicle_geometry_payload_ref",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "stream_velocity_mps",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "flow_density_kgm3",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "flow_temperature_k",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "flow_pressure_pa",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "flow_conditions_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "request_accept",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "request_timestamp_in",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "request_sequence_id_in",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_sequence_id",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "req_timestamp",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "req_vehicle_geometry_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_vehicle_geometry_sequence_ack",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_vehicle_geometry_format",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "req_vehicle_geometry_source_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_vehicle_geometry_payload_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_vehicle_geometry_payload_ref",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "req_stream_velocity_mps",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_flow_density_kgm3",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_flow_temperature_k",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_flow_pressure_pa",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "last_sequence_id",
+          "direction": "output",
+          "width": "[31:0]"
+        }
+      ]
+    },
+    {
+      "name": "domino_response_validator",
+      "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v",
+      "input_count": 440,
+      "output_count": 294,
+      "inout_count": 0,
+      "input_port_count": 19,
+      "output_port_count": 13,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "timeout_threshold_cycles",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "latency_budget_cycles",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "stream_velocity_mps",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_sequence_id",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "req_timestamp",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_sequence_id",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_timestamp",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "rsp_drag_force",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_lift_force",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_surface_pressure",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_flow_field_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_flow_field",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "rsp_frame_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_online_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "accepted_response_sequence_id",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_timestamp",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "accepted_response_age_cycles",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_drag_force",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_lift_force",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_surface_pressure",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "accepted_response_flow_field_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "accepted_response_flow_field",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "response_validated",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "stale_reject",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "timeout",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "out_of_range",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "model_online",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 635,
+    "output_count": 1118,
+    "inout_count": 0,
+    "input_port_count": 35,
+    "output_port_count": 49,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "enable",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "clear_fault",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "vehicle_geometry_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "vehicle_geometry_sequence_ack",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "vehicle_geometry_format",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "vehicle_geometry_source_id",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "vehicle_geometry_payload_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "vehicle_geometry_payload_ref",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "stream_velocity_mps",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "flow_density_kgm3",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "flow_temperature_k",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "flow_pressure_pa",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "flow_conditions_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "req_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "rsp_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "rsp_sequence_id",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "rsp_timestamp",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "rsp_drag_force",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "rsp_lift_force",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "rsp_surface_pressure",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "rsp_flow_field_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "rsp_flow_field",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "rsp_frame_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_online_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_command_credit",
+        "direction": "input",
+        "width": "[3:0]"
+      },
+      {
+        "name": "timeout_threshold_cycles",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "cmd_min",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "cmd_max",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "safe_state",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "latency_budget_cycles",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "actuator_command",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "actuator_command_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "req_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "req_sequence_id",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "req_timestamp",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "req_vehicle_geometry_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "req_vehicle_geometry_sequence_ack",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "req_vehicle_geometry_format",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "req_vehicle_geometry_source_id",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "req_vehicle_geometry_payload_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "req_vehicle_geometry_payload_ref",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "req_stream_velocity_mps",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "req_flow_density_kgm3",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "req_flow_temperature_k",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "req_flow_pressure_pa",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "stale_reject",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fallback_active",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fault_latched",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "timeout",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "out_of_range",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "model_online",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "last_sequence_id",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "fsm_state",
+        "direction": "output",
+        "width": "[2:0]"
+      },
+      {
+        "name": "accepted_response_sequence_id",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "accepted_response_timestamp",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "accepted_response_age_cycles",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "accepted_response_drag_force",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "accepted_response_lift_force",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "accepted_response_surface_pressure",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "accepted_response_flow_field_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "accepted_response_flow_field",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "domino_request_gateway_request_accept",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "domino_request_gateway_request_timestamp_in",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "domino_request_gateway_request_sequence_id_in",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "domino_response_validator_req_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "domino_response_validator_req_sequence_id",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "domino_response_validator_req_timestamp",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "domino_response_validator_response_validated",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "domino_control_safety_fsm_accepted_response_sequence_id",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "domino_control_safety_fsm_accepted_response_timestamp",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "domino_control_safety_fsm_accepted_response_age_cycles",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "domino_control_safety_fsm_accepted_response_drag_force",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "domino_control_safety_fsm_accepted_response_lift_force",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "domino_control_safety_fsm_accepted_response_surface_pressure",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "domino_control_safety_fsm_accepted_response_flow_field_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "domino_control_safety_fsm_accepted_response_flow_field",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "domino_control_safety_fsm_response_validated",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "domino_control_safety_fsm_stale_reject",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "domino_control_safety_fsm_timeout",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "domino_control_safety_fsm_out_of_range",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "domino_control_safety_fsm_actuator_command_next",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "domino_control_safety_fsm_compute_control_valid",
+        "direction": "input",
+        "width": "1"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 665,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 34,
+    "latch_target_count": 0,
+    "sequential_blocks": 6,
+    "posedge_blocks": 3,
+    "negedge_blocks": 3,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "accepted_response_age_cycles",
+      "accepted_response_drag_force",
+      "accepted_response_flow_field",
+      "accepted_response_flow_field_valid",
+      "accepted_response_lift_force",
+      "accepted_response_sequence_id",
+      "accepted_response_surface_pressure",
+      "accepted_response_timestamp",
+      "actuator_command",
+      "actuator_command_valid",
+      "age_calc",
+      "fallback_active",
+      "fault_latched",
+      "fsm_state",
+      "last_sequence_id",
+      "model_online",
+      "out_of_range",
+      "req_flow_density_kgm3",
+      "req_flow_pressure_pa",
+      "req_flow_temperature_k",
+      "req_sequence_id",
+      "req_stream_velocity_mps",
+      "req_timestamp",
+      "req_valid",
+      "req_vehicle_geometry_format",
+      "req_vehicle_geometry_payload_ref",
+      "req_vehicle_geometry_payload_valid",
+      "req_vehicle_geometry_sequence_ack",
+      "req_vehicle_geometry_source_id",
+      "req_vehicle_geometry_valid",
+      "response_validated",
+      "stale_reject",
+      "stream_velocity_mps",
+      "timeout"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 3,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "errors",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 1,
+    "warning_count": 0,
+    "error_count": 8,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "domino_automotive_aero_gateway",
+      "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_automotive_aero_gateway.v",
+      "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_control_safety_fsm.v",
+      "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_request_gateway.v",
+      "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v"
+    ],
+    "stdout_tail": [],
+    "stderr_tail": [
+      "%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:72:5: syntax error, unexpected else, expecting case or casex or casez or if",
+      "   72 |     else",
+      "      |     ^~~~",
+      "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+      "%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:90:9: syntax error, unexpected else",
+      "   90 |     end else begin",
+      "      |         ^~~~",
+      "%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:99:51: syntax error, unexpected <=, expecting '('",
+      "   99 |                     accepted_response_sequence_id <= rsp_sequence_id;",
+      "      |                                                   ^~",
+      "%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:109:29: syntax error, unexpected <=, expecting '('",
+      "  109 |                     timeout <= 1'b1;",
+      "      |                             ^~",
+      "%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:113:30: syntax error, unexpected <=, expecting '('",
+      "  113 |                 out_of_range <= 1'b1;",
+      "      |                              ^~",
+      "%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:117:26: syntax error, unexpected <=, expecting '('",
+      "  117 |             stale_reject <= 1'b1;",
+      "      |                          ^~",
+      "%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:119:30: syntax error, unexpected <=, expecting '('",
+      "  119 |                 stale_reject <= 1'b1;",
+      "      |                              ^~",
+      "%Error: Cannot continue",
+      "        ... This fatal error may be caused by the earlier error(s); resolve those first."
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "domino_automotive_aero_gateway",
+        "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_automotive_aero_gateway.v",
+        "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_control_safety_fsm.v",
+        "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_request_gateway.v",
+        "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v"
+      ],
+      "cwd": null,
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:72:5: syntax error, unexpected else, expecting case or casex or casez or if\n   72 |     else\n      |     ^~~~\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:90:9: syntax error, unexpected else\n   90 |     end else begin\n      |         ^~~~\n%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:99:51: syntax error, unexpected <=, expecting '('\n   99 |                     accepted_response_sequence_id <= rsp_sequence_id;\n      |                                                   ^~\n%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:109:29: syntax error, unexpected <=, expecting '('\n  109 |                     timeout <= 1'b1;\n      |                             ^~\n%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:113:30: syntax error, unexpected <=, expecting '('\n  113 |                 out_of_range <= 1'b1;\n      |                              ^~\n%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:117:26: syntax error, unexpected <=, expecting '('\n  117 |             stale_reject <= 1'b1;\n      |                          ^~\n%Error: backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v:119:30: syntax error, unexpected <=, expecting '('\n  119 |                 stale_reject <= 1'b1;\n      |                              ^~\n%Error: Cannot continue\n        ... This fatal error may be caused by the earlier error(s); resolve those first.\n",
+      "status": "failed",
+      "error": null,
+      "started_at": "2026-08-06T02:27:07.054032+00:00",
+      "ended_at": "2026-08-06T02:27:07.149715+00:00",
+      "elapsed_ms": 95
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 4,
+      "module_count": 4,
+      "modules": [
+        {
+          "name": "domino_automotive_aero_gateway",
+          "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_automotive_aero_gateway.v",
+          "input_count": 635,
+          "output_count": 1118,
+          "inout_count": 0,
+          "input_port_count": 35,
+          "output_port_count": 49,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clear_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_sequence_ack",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_format",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "vehicle_geometry_source_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "vehicle_geometry_payload_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_payload_ref",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "stream_velocity_mps",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_density_kgm3",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_temperature_k",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_pressure_pa",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_conditions_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_sequence_id",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_timestamp",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_drag_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_lift_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_surface_pressure",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_flow_field_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_flow_field",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_frame_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_online_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_command_credit",
+              "direction": "input",
+              "width": "[3:0]"
+            },
+            {
+              "name": "timeout_threshold_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cmd_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cmd_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "safe_state",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "latency_budget_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_command",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_command_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "req_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_sequence_ack",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_format",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_source_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_payload_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_payload_ref",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_stream_velocity_mps",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_density_kgm3",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_temperature_k",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_pressure_pa",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_latched",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "out_of_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_online",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "last_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fsm_state",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "accepted_response_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "accepted_response_age_cycles",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_drag_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_lift_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_surface_pressure",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_flow_field_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "accepted_response_flow_field",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_request_gateway_request_accept",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_request_gateway_request_timestamp_in",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_request_gateway_request_sequence_id_in",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_response_validator_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_response_validator_req_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_response_validator_req_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_response_validator_response_validated",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_age_cycles",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_drag_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_lift_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_surface_pressure",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_flow_field_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_flow_field",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_response_validated",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_out_of_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_actuator_command_next",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_compute_control_valid",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "domino_control_safety_fsm",
+          "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_control_safety_fsm.v",
+          "input_count": 393,
+          "output_count": 71,
+          "inout_count": 0,
+          "input_port_count": 19,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clear_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cmd_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cmd_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "safe_state",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_sequence_id",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_timestamp",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "accepted_response_age_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_drag_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_lift_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_surface_pressure",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_flow_field_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "accepted_response_flow_field",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "response_validated",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_reject",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "out_of_range",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "actuator_command_next",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_command",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_command_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_latched",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fsm_state",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "compute_control_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "domino_request_gateway",
+          "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_request_gateway.v",
+          "input_count": 273,
+          "output_count": 300,
+          "inout_count": 0,
+          "input_port_count": 18,
+          "output_port_count": 14,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_sequence_ack",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_format",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "vehicle_geometry_source_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "vehicle_geometry_payload_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_payload_ref",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "stream_velocity_mps",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_density_kgm3",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_temperature_k",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_pressure_pa",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_conditions_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_timestamp_in",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_sequence_id_in",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "req_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_sequence_ack",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_format",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_source_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_payload_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_payload_ref",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_stream_velocity_mps",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_density_kgm3",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_temperature_k",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_pressure_pa",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "last_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "domino_response_validator",
+          "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/rtl/domino_response_validator.v",
+          "input_count": 440,
+          "output_count": 294,
+          "inout_count": 0,
+          "input_port_count": 19,
+          "output_port_count": 13,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_threshold_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "latency_budget_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "stream_velocity_mps",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_sequence_id",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "req_timestamp",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_sequence_id",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_timestamp",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_drag_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_lift_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_surface_pressure",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_flow_field_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_flow_field",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_frame_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_online_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "accepted_response_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "accepted_response_age_cycles",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_drag_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_lift_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_surface_pressure",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_flow_field_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "accepted_response_flow_field",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "response_validated",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "out_of_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_online",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 635,
+        "output_count": 1118,
+        "inout_count": 0,
+        "input_port_count": 35,
+        "output_port_count": 49,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "enable",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "clear_fault",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_sequence_ack",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_format",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "vehicle_geometry_source_id",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "vehicle_geometry_payload_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_payload_ref",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "stream_velocity_mps",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_density_kgm3",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_temperature_k",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_pressure_pa",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "flow_conditions_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rsp_sequence_id",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rsp_timestamp",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "rsp_drag_force",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rsp_lift_force",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rsp_surface_pressure",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rsp_flow_field_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rsp_flow_field",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "rsp_frame_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_online_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_command_credit",
+            "direction": "input",
+            "width": "[3:0]"
+          },
+          {
+            "name": "timeout_threshold_cycles",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "cmd_min",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "cmd_max",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "safe_state",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "latency_budget_cycles",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "actuator_command",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "actuator_command_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "req_timestamp",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "req_vehicle_geometry_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_vehicle_geometry_sequence_ack",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_vehicle_geometry_format",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "req_vehicle_geometry_source_id",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "req_vehicle_geometry_payload_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_vehicle_geometry_payload_ref",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "req_stream_velocity_mps",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "req_flow_density_kgm3",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "req_flow_temperature_k",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "req_flow_pressure_pa",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "stale_reject",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_latched",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "timeout",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "out_of_range",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_online",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "last_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "fsm_state",
+            "direction": "output",
+            "width": "[2:0]"
+          },
+          {
+            "name": "accepted_response_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_timestamp",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "accepted_response_age_cycles",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_drag_force",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_lift_force",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_surface_pressure",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_flow_field_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "accepted_response_flow_field",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_request_gateway_request_accept",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_request_gateway_request_timestamp_in",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_request_gateway_request_sequence_id_in",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_response_validator_req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_response_validator_req_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_response_validator_req_timestamp",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_response_validator_response_validated",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_timestamp",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_age_cycles",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_drag_force",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_lift_force",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_surface_pressure",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_flow_field_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_flow_field",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_response_validated",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_stale_reject",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_timeout",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_out_of_range",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_actuator_command_next",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_compute_control_valid",
+            "direction": "input",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 665,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 34,
+        "latch_target_count": 0,
+        "sequential_blocks": 6,
+        "posedge_blocks": 3,
+        "negedge_blocks": 3,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "accepted_response_age_cycles",
+          "accepted_response_drag_force",
+          "accepted_response_flow_field",
+          "accepted_response_flow_field_valid",
+          "accepted_response_lift_force",
+          "accepted_response_sequence_id",
+          "accepted_response_surface_pressure",
+          "accepted_response_timestamp",
+          "actuator_command",
+          "actuator_command_valid",
+          "age_calc",
+          "fallback_active",
+          "fault_latched",
+          "fsm_state",
+          "last_sequence_id",
+          "model_online",
+          "out_of_range",
+          "req_flow_density_kgm3",
+          "req_flow_pressure_pa",
+          "req_flow_temperature_k",
+          "req_sequence_id",
+          "req_stream_velocity_mps",
+          "req_timestamp",
+          "req_valid",
+          "req_vehicle_geometry_format",
+          "req_vehicle_geometry_payload_ref",
+          "req_vehicle_geometry_payload_valid",
+          "req_vehicle_geometry_sequence_ack",
+          "req_vehicle_geometry_source_id",
+          "req_vehicle_geometry_valid",
+          "response_validated",
+          "stale_reject",
+          "stream_velocity_mps",
+          "timeout"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 3,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 4,
+      "module_count": 4,
+      "modules": [
+        {
+          "name": "domino_automotive_aero_gateway",
+          "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/handoff/domino_automotive_aero_gateway_ip_package/rtl/domino_automotive_aero_gateway.v",
+          "input_count": 635,
+          "output_count": 1118,
+          "inout_count": 0,
+          "input_port_count": 35,
+          "output_port_count": 49,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clear_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_sequence_ack",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_format",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "vehicle_geometry_source_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "vehicle_geometry_payload_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_payload_ref",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "stream_velocity_mps",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_density_kgm3",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_temperature_k",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_pressure_pa",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_conditions_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_sequence_id",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_timestamp",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_drag_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_lift_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_surface_pressure",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_flow_field_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_flow_field",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_frame_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_online_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_command_credit",
+              "direction": "input",
+              "width": "[3:0]"
+            },
+            {
+              "name": "timeout_threshold_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cmd_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cmd_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "safe_state",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "latency_budget_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_command",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_command_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "req_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_sequence_ack",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_format",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_source_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_payload_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_payload_ref",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_stream_velocity_mps",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_density_kgm3",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_temperature_k",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_pressure_pa",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_latched",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "out_of_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_online",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "last_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fsm_state",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "accepted_response_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "accepted_response_age_cycles",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_drag_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_lift_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_surface_pressure",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_flow_field_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "accepted_response_flow_field",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_request_gateway_request_accept",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_request_gateway_request_timestamp_in",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_request_gateway_request_sequence_id_in",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_response_validator_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_response_validator_req_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_response_validator_req_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_response_validator_response_validated",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_age_cycles",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_drag_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_lift_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_surface_pressure",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_flow_field_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_accepted_response_flow_field",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_response_validated",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_out_of_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "domino_control_safety_fsm_actuator_command_next",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "domino_control_safety_fsm_compute_control_valid",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "domino_control_safety_fsm",
+          "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/handoff/domino_automotive_aero_gateway_ip_package/rtl/domino_control_safety_fsm.v",
+          "input_count": 393,
+          "output_count": 71,
+          "inout_count": 0,
+          "input_port_count": 19,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clear_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cmd_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cmd_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "safe_state",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_sequence_id",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_timestamp",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "accepted_response_age_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_drag_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_lift_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_surface_pressure",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_flow_field_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "accepted_response_flow_field",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "response_validated",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_reject",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "out_of_range",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "actuator_command_next",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_command",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_command_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_latched",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fsm_state",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "compute_control_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "domino_request_gateway",
+          "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/handoff/domino_automotive_aero_gateway_ip_package/rtl/domino_request_gateway.v",
+          "input_count": 273,
+          "output_count": 300,
+          "inout_count": 0,
+          "input_port_count": 18,
+          "output_port_count": 14,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_sequence_ack",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_format",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "vehicle_geometry_source_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "vehicle_geometry_payload_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "vehicle_geometry_payload_ref",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "stream_velocity_mps",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_density_kgm3",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_temperature_k",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "flow_pressure_pa",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_conditions_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_timestamp_in",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_sequence_id_in",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "req_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_sequence_ack",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_format",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_source_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_vehicle_geometry_payload_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_vehicle_geometry_payload_ref",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_stream_velocity_mps",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_density_kgm3",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_temperature_k",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_pressure_pa",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "last_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "domino_response_validator",
+          "file": "backend/workflows/9e5f7776-fb1b-4488-b129-da84e50d5529/handoff/domino_automotive_aero_gateway_ip_package/rtl/domino_response_validator.v",
+          "input_count": 440,
+          "output_count": 294,
+          "inout_count": 0,
+          "input_port_count": 19,
+          "output_port_count": 13,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_threshold_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "latency_budget_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "stream_velocity_mps",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_sequence_id",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "req_timestamp",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_sequence_id",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_timestamp",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_drag_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_lift_force",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_surface_pressure",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_flow_field_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_flow_field",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "rsp_frame_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_online_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "accepted_response_sequence_id",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_timestamp",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "accepted_response_age_cycles",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_drag_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_lift_force",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_surface_pressure",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "accepted_response_flow_field_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "accepted_response_flow_field",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "response_validated",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_reject",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "out_of_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_online",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 635,
+        "output_count": 1118,
+        "inout_count": 0,
+        "input_port_count": 35,
+        "output_port_count": 49,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "enable",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "clear_fault",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_sequence_ack",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_format",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "vehicle_geometry_source_id",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "vehicle_geometry_payload_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "vehicle_geometry_payload_ref",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "stream_velocity_mps",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_density_kgm3",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_temperature_k",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "flow_pressure_pa",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "flow_conditions_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rsp_sequence_id",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rsp_timestamp",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "rsp_drag_force",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rsp_lift_force",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rsp_surface_pressure",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rsp_flow_field_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rsp_flow_field",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "rsp_frame_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_online_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_command_credit",
+            "direction": "input",
+            "width": "[3:0]"
+          },
+          {
+            "name": "timeout_threshold_cycles",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "cmd_min",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "cmd_max",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "safe_state",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "latency_budget_cycles",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "actuator_command",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "actuator_command_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "req_timestamp",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "req_vehicle_geometry_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_vehicle_geometry_sequence_ack",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_vehicle_geometry_format",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "req_vehicle_geometry_source_id",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "req_vehicle_geometry_payload_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_vehicle_geometry_payload_ref",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "req_stream_velocity_mps",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "req_flow_density_kgm3",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "req_flow_temperature_k",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "req_flow_pressure_pa",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "stale_reject",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fault_latched",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "timeout",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "out_of_range",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_online",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "last_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "fsm_state",
+            "direction": "output",
+            "width": "[2:0]"
+          },
+          {
+            "name": "accepted_response_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_timestamp",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "accepted_response_age_cycles",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_drag_force",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_lift_force",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_surface_pressure",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "accepted_response_flow_field_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "accepted_response_flow_field",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_request_gateway_request_accept",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_request_gateway_request_timestamp_in",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_request_gateway_request_sequence_id_in",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_response_validator_req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_response_validator_req_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_response_validator_req_timestamp",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_response_validator_response_validated",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_sequence_id",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_timestamp",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_age_cycles",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_drag_force",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_lift_force",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_surface_pressure",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_flow_field_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_accepted_response_flow_field",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_response_validated",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_stale_reject",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_timeout",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_out_of_range",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "domino_control_safety_fsm_actuator_command_next",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "domino_control_safety_fsm_compute_control_valid",
+            "direction": "input",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 665,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 34,
+        "latch_target_count": 0,
+        "sequential_blocks": 6,
+        "posedge_blocks": 3,
+        "negedge_blocks": 3,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "accepted_response_age_cycles",
+          "accepted_response_drag_force",
+          "accepted_response_flow_field",
+          "accepted_response_flow_field_valid",
+          "accepted_response_lift_force",
+          "accepted_response_sequence_id",
+          "accepted_response_surface_pressure",
+          "accepted_response_timestamp",
+          "actuator_command",
+          "actuator_command_valid",
+          "age_calc",
+          "fallback_active",
+          "fault_latched",
+          "fsm_state",
+          "last_sequence_id",
+          "model_online",
+          "out_of_range",
+          "req_flow_density_kgm3",
+          "req_flow_pressure_pa",
+          "req_flow_temperature_k",
+          "req_sequence_id",
+          "req_stream_velocity_mps",
+          "req_timestamp",
+          "req_valid",
+          "req_vehicle_geometry_format",
+          "req_vehicle_geometry_payload_ref",
+          "req_vehicle_geometry_payload_valid",
+          "req_vehicle_geometry_sequence_ack",
+          "req_vehicle_geometry_source_id",
+          "req_vehicle_geometry_valid",
+          "response_validated",
+          "stale_reject",
+          "stream_velocity_mps",
+          "timeout"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 3,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 104,
+    "registers": [
+      {
+        "name": "CONTROL0",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control register byte 0. Bitfields provide enable, clear_fault, and a software-visible request handshake qualifier if firmware is integrated to drive top-level control sequencing.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-visible enable control. When 0, nominal request/response processing is blocked and safe fallback behavior is expected."
+          },
+          {
+            "name": "CLEAR_FAULT",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Write 1 to request fault latch clear. Self-clears on the next control update if the integration policy permits."
+          },
+          {
+            "name": "REQ_ACCEPT_HINT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Optional software hint for request acceptance qualification; does not override RTL safety checks or top-level handshake signals."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS0",
+        "offset": "0x01",
+        "access": "RO",
+        "description": "Status register byte 0.",
+        "fields": [
+          {
+            "name": "MODEL_ONLINE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirrors model_online status."
+          },
+          {
+            "name": "TIMEOUT",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirrors timeout status."
+          },
+          {
+            "name": "STALE_REJECT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirrors stale_reject status."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 1,
+            "description": "Indicates deterministic safe fallback is active."
+          },
+          {
+            "name": "FAULT_LATCHED",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirrors fault_latched status."
+          },
+          {
+            "name": "OUT_OF_RANGE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirrors out_of_range status."
+          },
+          {
+            "name": "ACTUATOR_COMMAND_VALID",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates actuator_command is valid for the current control cycle."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "FSM_STATE",
+        "offset": "0x02",
+        "access": "RO",
+        "description": "Current FSM state encoding. Encodes the registered safety controller state.",
+        "fields": [
+          {
+            "name": "FSM_STATE_CODE",
+            "lsb": 2,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current state encoding: 0=IDLE, 1=REQUEST_SENT, 2=WAIT_RESPONSE, 3=VALIDATE_RESPONSE, 4=COMPUTE_CONTROL, 5=APPLY_CLAMP, 6=Fallback, 7=FAULT_LATCH."
+          }
+        ]
+      },
+      {
+        "name": "LAST_SEQUENCE_ID0",
+        "offset": "0x03",
+        "access": "RO",
+        "description": "last_sequence_id byte 0, least significant byte.",
+        "fields": [
+          {
+            "name": "LAST_SEQUENCE_ID_BYTE0",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [7:0] of last_sequence_id."
+          }
+        ]
+      },
+      {
+        "name": "LAST_SEQUENCE_ID1",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "last_sequence_id byte 1.",
+        "fields": [
+          {
+            "name": "LAST_SEQUENCE_ID_BYTE1",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [15:8] of last_sequence_id."
+          }
+        ]
+      },
+      {
+        "name": "LAST_SEQUENCE_ID2",
+        "offset": "0x05",
+        "access": "RO",
+        "description": "last_sequence_id byte 2.",
+        "fields": [
+          {
+            "name": "LAST_SEQUENCE_ID_BYTE2",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [23:16] of last_sequence_id."
+          }
+        ]
+      },
+      {
+        "name": "LAST_SEQUENCE_ID3",
+        "offset": "0x06",
+        "access": "RO",
+        "description": "last_sequence_id byte 3, most significant byte.",
+        "fields": [
+          {
+            "name": "LAST_SEQUENCE_ID_BYTE3",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Bits [31:24] of last_sequence_id."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD0",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "timeout_threshold_cycles byte 0, least significant byte.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD_BYTE0",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [7:0] of timeout_threshold_cycles."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD1",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "timeout_threshold_cycles byte 1.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD_BYTE1",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of timeout_threshold_cycles."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD2",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "timeout_threshold_cycles byte 2.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD_BYTE2",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [23:16] of timeout_threshold_cycles."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD3",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "timeout_threshold_cycles byte 3, most significant byte.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD_BYTE3",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [31:24] of timeout_threshold_cycles."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN0",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "cmd_min byte 0, least significant byte.",
+        "fields": [
+          {
+            "name": "CMD_MIN_BYTE0",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [7:0] of cmd_min."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}
