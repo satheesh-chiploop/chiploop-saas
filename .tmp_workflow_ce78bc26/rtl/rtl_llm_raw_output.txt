@@ -1,0 +1,788 @@
+---BEGIN geometry_ingress.v---
+module geometry_ingress (
+    clk,
+    reset_n,
+    vehicle_geometry_valid,
+    geometry_format,
+    geometry_source,
+    geometry_metadata,
+    geometry_valid,
+    geometry_reject,
+    geometry_descriptor
+);
+input clk;
+input reset_n;
+input vehicle_geometry_valid;
+input [2:0] geometry_format;
+input [3:0] geometry_source;
+input [63:0] geometry_metadata;
+output geometry_valid;
+output geometry_reject;
+output [127:0] geometry_descriptor;
+
+reg geometry_valid_r;
+reg geometry_reject_r;
+reg [127:0] geometry_descriptor_r;
+reg [127:0] geometry_descriptor_next;
+
+wire format_ok;
+wire metadata_ok;
+wire accept_pulse;
+wire reject_pulse;
+
+assign format_ok = (geometry_format == 3'b001);
+assign metadata_ok = |geometry_metadata;
+assign accept_pulse = vehicle_geometry_valid & format_ok & metadata_ok;
+assign reject_pulse = vehicle_geometry_valid & ~(format_ok & metadata_ok);
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        geometry_valid_r <= 1'b0;
+        geometry_reject_r <= 1'b0;
+        geometry_descriptor_r <= 128'h00000000000000000000000000000000;
+    end else begin
+        geometry_valid_r <= accept_pulse;
+        geometry_reject_r <= reject_pulse;
+        if (accept_pulse) begin
+            geometry_descriptor_r <= {geometry_source, geometry_format, geometry_metadata, 48'h000000000000};
+        end
+    end
+end
+
+always @(*) begin
+    geometry_descriptor_next = geometry_descriptor_r;
+    if (accept_pulse) begin
+        geometry_descriptor_next = {geometry_source, geometry_format, geometry_metadata, 48'h000000000000};
+    end
+end
+
+assign geometry_valid = geometry_valid_r;
+assign geometry_reject = geometry_reject_r;
+assign geometry_descriptor = geometry_descriptor_r;
+
+endmodule
+---END geometry_ingress.v---
+
+---BEGIN flow_condition_checker.v---
+module flow_condition_checker (
+    clk,
+    reset_n,
+    stream_velocity_mps,
+    flow_metadata,
+    flow_valid,
+    envelope_fault,
+    nominal_condition,
+    flow_descriptor
+);
+input clk;
+input reset_n;
+input [15:0] stream_velocity_mps;
+input [31:0] flow_metadata;
+output flow_valid;
+output envelope_fault;
+output nominal_condition;
+output [63:0] flow_descriptor;
+
+reg flow_valid_r;
+reg envelope_fault_r;
+reg nominal_condition_r;
+reg [63:0] flow_descriptor_r;
+
+wire in_range;
+wire nominal_match;
+
+assign in_range = (stream_velocity_mps >= 16'd20) && (stream_velocity_mps <= 16'd55);
+assign nominal_match = (stream_velocity_mps == 16'd3890);
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        flow_valid_r <= 1'b0;
+        envelope_fault_r <= 1'b0;
+        nominal_condition_r <= 1'b0;
+        flow_descriptor_r <= 64'h0000000000000000;
+    end else begin
+        flow_valid_r <= in_range;
+        envelope_fault_r <= ~in_range;
+        nominal_condition_r <= nominal_match;
+        flow_descriptor_r <= {flow_metadata, stream_velocity_mps, 16'h0000};
+    end
+end
+
+assign flow_valid = flow_valid_r;
+assign envelope_fault = envelope_fault_r;
+assign nominal_condition = nominal_condition_r;
+assign flow_descriptor = flow_descriptor_r;
+
+endmodule
+---END flow_condition_checker.v---
+
+---BEGIN model_txn_mgr.v---
+module model_txn_mgr (
+    clk,
+    reset_n,
+    geometry_valid,
+    geometry_descriptor,
+    flow_valid,
+    flow_descriptor,
+    safe_mode,
+    fallback_active,
+    req_ready,
+    resp_valid,
+    resp_id,
+    resp_timestamp,
+    resp_payload,
+    req_valid,
+    req_id,
+    req_payload,
+    request_outstanding,
+    outstanding_req_id,
+    outstanding_req_timestamp,
+    fresh_response_pulse,
+    response_mismatch,
+    response_fresh,
+    validated_resp_payload
+);
+input clk;
+input reset_n;
+input geometry_valid;
+input [127:0] geometry_descriptor;
+input flow_valid;
+input [63:0] flow_descriptor;
+input safe_mode;
+input fallback_active;
+input req_ready;
+input resp_valid;
+input [15:0] resp_id;
+input [31:0] resp_timestamp;
+input [255:0] resp_payload;
+output req_valid;
+output [15:0] req_id;
+output [319:0] req_payload;
+output request_outstanding;
+output [15:0] outstanding_req_id;
+output [31:0] outstanding_req_timestamp;
+output fresh_response_pulse;
+output response_mismatch;
+output response_fresh;
+output [255:0] validated_resp_payload;
+
+reg [15:0] request_id_r;
+reg req_valid_r;
+reg request_outstanding_r;
+reg [15:0] outstanding_req_id_r;
+reg [31:0] outstanding_req_timestamp_r;
+reg fresh_response_pulse_r;
+reg response_mismatch_r;
+reg response_fresh_r;
+reg [255:0] validated_resp_payload_r;
+reg [31:0] timebase_r;
+reg [319:0] req_payload_r;
+reg [319:0] req_payload_next;
+
+wire request_can_issue;
+wire response_is_match;
+wire response_is_fresh;
+wire response_is_bad;
+wire request_timestamp_match;
+
+assign request_can_issue = geometry_valid & flow_valid & ~safe_mode & ~fallback_active & req_ready & ~request_outstanding_r;
+assign request_timestamp_match = 1'b1;
+assign response_is_match = resp_valid & request_outstanding_r & (resp_id == outstanding_req_id_r);
+assign response_is_fresh = response_is_match & (resp_timestamp >= outstanding_req_timestamp_r);
+assign response_is_bad = resp_valid & (~request_outstanding_r | (resp_id != outstanding_req_id_r) | (resp_timestamp < outstanding_req_timestamp_r));
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        request_id_r <= 16'h0000;
+        req_valid_r <= 1'b0;
+        request_outstanding_r <= 1'b0;
+        outstanding_req_id_r <= 16'h0000;
+        outstanding_req_timestamp_r <= 32'h00000000;
+        fresh_response_pulse_r <= 1'b0;
+        response_mismatch_r <= 1'b0;
+        response_fresh_r <= 1'b0;
+        validated_resp_payload_r <= 256'h0000000000000000000000000000000000000000000000000000000000000000;
+        timebase_r <= 32'h00000000;
+        req_payload_r <= 320'h00000000000000000000000000000000000000000000000000000000000000000000000000000000;
+    end else begin
+        timebase_r <= timebase_r + 32'd1;
+        fresh_response_pulse_r <= 1'b0;
+        if (request_can_issue) begin
+            req_valid_r <= 1'b1;
+            request_outstanding_r <= 1'b1;
+            outstanding_req_id_r <= request_id_r;
+            outstanding_req_timestamp_r <= timebase_r;
+            req_payload_r <= {request_id_r, geometry_descriptor, flow_descriptor, timebase_r};
+            request_id_r <= request_id_r + 16'd1;
+        end else begin
+            req_valid_r <= 1'b0;
+        end
+        response_mismatch_r <= response_is_bad;
+        response_fresh_r <= 1'b0;
+        if (response_is_fresh) begin
+            response_fresh_r <= 1'b1;
+            fresh_response_pulse_r <= 1'b1;
+            validated_resp_payload_r <= resp_payload;
+            request_outstanding_r <= 1'b0;
+        end
+    end
+end
+
+always @(*) begin
+    req_payload_next = req_payload_r;
+    if (request_can_issue) begin
+        req_payload_next = {request_id_r, geometry_descriptor, flow_descriptor, timebase_r};
+    end
+end
+
+assign req_valid = req_valid_r;
+assign req_id = request_id_r;
+assign req_payload = req_payload_r;
+assign request_outstanding = request_outstanding_r;
+assign outstanding_req_id = outstanding_req_id_r;
+assign outstanding_req_timestamp = outstanding_req_timestamp_r;
+assign fresh_response_pulse = fresh_response_pulse_r;
+assign response_mismatch = response_mismatch_r;
+assign response_fresh = response_fresh_r;
+assign validated_resp_payload = validated_resp_payload_r;
+
+endmodule
+---END model_txn_mgr.v---
+
+---BEGIN response_validator.v---
+module response_validator (
+    clk,
+    reset_n,
+    resp_valid,
+    resp_id,
+    resp_timestamp,
+    resp_payload,
+    outstanding_req_id,
+    outstanding_req_timestamp,
+    fresh_response_pulse,
+    response_mismatch,
+    model_output_valid,
+    drag_force,
+    lift_force,
+    surface_pressure,
+    flow_field_metadata,
+    stale_response
+);
+input clk;
+input reset_n;
+input resp_valid;
+input [15:0] resp_id;
+input [31:0] resp_timestamp;
+input [255:0] resp_payload;
+input [15:0] outstanding_req_id;
+input [31:0] outstanding_req_timestamp;
+input fresh_response_pulse;
+input response_mismatch;
+output model_output_valid;
+output [31:0] drag_force;
+output [31:0] lift_force;
+output [31:0] surface_pressure;
+output [127:0] flow_field_metadata;
+output stale_response;
+
+reg model_output_valid_r;
+reg [31:0] drag_force_r;
+reg [31:0] lift_force_r;
+reg [31:0] surface_pressure_r;
+reg [127:0] flow_field_metadata_r;
+reg stale_response_r;
+
+wire response_match;
+wire response_fresh;
+
+assign response_match = resp_valid & (resp_id == outstanding_req_id);
+assign response_fresh = response_match & (resp_timestamp >= outstanding_req_timestamp);
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        model_output_valid_r <= 1'b0;
+        drag_force_r <= 32'h00000000;
+        lift_force_r <= 32'h00000000;
+        surface_pressure_r <= 32'h00000000;
+        flow_field_metadata_r <= 128'h00000000000000000000000000000000;
+        stale_response_r <= 1'b0;
+    end else begin
+        model_output_valid_r <= response_fresh & fresh_response_pulse & ~response_mismatch;
+        stale_response_r <= resp_valid & ~response_fresh;
+        if (response_fresh & fresh_response_pulse & ~response_mismatch) begin
+            drag_force_r <= resp_payload[31:0];
+            lift_force_r <= resp_payload[63:32];
+            surface_pressure_r <= resp_payload[95:64];
+            flow_field_metadata_r <= {resp_payload[255:128]};
+        end
+    end
+end
+
+assign model_output_valid = model_output_valid_r;
+assign drag_force = drag_force_r;
+assign lift_force = lift_force_r;
+assign surface_pressure = surface_pressure_r;
+assign flow_field_metadata = flow_field_metadata_r;
+assign stale_response = stale_response_r;
+
+endmodule
+---END response_validator.v---
+
+---BEGIN aero_control_policy.v---
+module aero_control_policy (
+    clk,
+    reset_n,
+    model_output_valid,
+    drag_force,
+    lift_force,
+    surface_pressure,
+    flow_field_metadata,
+    command_enable,
+    command_vector
+);
+input clk;
+input reset_n;
+input model_output_valid;
+input [31:0] drag_force;
+input [31:0] lift_force;
+input [31:0] surface_pressure;
+input [127:0] flow_field_metadata;
+output command_enable;
+output [63:0] command_vector;
+
+reg command_enable_r;
+reg [63:0] command_vector_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        command_enable_r <= 1'b0;
+        command_vector_r <= 64'h0000000000000000;
+    end else begin
+        command_enable_r <= model_output_valid;
+        if (model_output_valid) begin
+            command_vector_r <= {drag_force[15:0] ^ lift_force[15:0], surface_pressure[15:0] ^ flow_field_metadata[15:0], drag_force[31:16] + lift_force[31:16], surface_pressure[31:16] + flow_field_metadata[31:16]};
+        end
+    end
+end
+
+assign command_enable = command_enable_r;
+assign command_vector = command_vector_r;
+
+endmodule
+---END aero_control_policy.v---
+
+---BEGIN command_saturator.v---
+module command_saturator (
+    clk,
+    reset_n,
+    command_enable,
+    command_vector,
+    supervisor_release,
+    min_bound,
+    max_bound,
+    rate_limit_step,
+    saturated_command,
+    saturated_valid,
+    command_clamped
+);
+input clk;
+input reset_n;
+input command_enable;
+input [63:0] command_vector;
+input supervisor_release;
+input [63:0] min_bound;
+input [63:0] max_bound;
+input [63:0] rate_limit_step;
+output [63:0] saturated_command;
+output saturated_valid;
+output command_clamped;
+
+reg [63:0] saturated_command_r;
+reg saturated_valid_r;
+reg command_clamped_r;
+reg [63:0] previous_command_r;
+reg [63:0] clipped_command_r;
+
+wire [63:0] bounded_low;
+wire [63:0] bounded_high;
+wire [63:0] rate_limited;
+wire low_violation;
+wire high_violation;
+wire rate_violation;
+
+assign low_violation = (command_vector < min_bound);
+assign high_violation = (command_vector > max_bound);
+assign bounded_low = low_violation ? min_bound : command_vector;
+assign bounded_high = high_violation ? max_bound : bounded_low;
+assign rate_violation = (bounded_high > (previous_command_r + rate_limit_step)) | (bounded_high < (previous_command_r - rate_limit_step));
+assign rate_limited = rate_violation ? previous_command_r : bounded_high;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        saturated_command_r <= 64'h0000000000000000;
+        saturated_valid_r <= 1'b0;
+        command_clamped_r <= 1'b0;
+        previous_command_r <= 64'h0000000000000000;
+        clipped_command_r <= 64'h0000000000000000;
+    end else begin
+        saturated_valid_r <= 1'b0;
+        command_clamped_r <= 1'b0;
+        if (command_enable & supervisor_release) begin
+            clipped_command_r <= rate_limited;
+            saturated_command_r <= rate_limited;
+            saturated_valid_r <= 1'b1;
+            command_clamped_r <= low_violation | high_violation | rate_violation;
+            previous_command_r <= rate_limited;
+        end
+    end
+end
+
+assign saturated_command = saturated_command_r;
+assign saturated_valid = saturated_valid_r;
+assign command_clamped = command_clamped_r;
+
+endmodule
+---END command_saturator.v---
+
+---BEGIN safety_supervisor.v---
+module safety_supervisor (
+    clk,
+    reset_n,
+    geometry_reject,
+    envelope_fault,
+    response_mismatch,
+    response_fresh,
+    stale_response,
+    model_output_valid,
+    command_clamped,
+    fault_in,
+    request_outstanding,
+    safe_mode,
+    supervisor_release,
+    fallback_active,
+    stale_command,
+    fault_code
+);
+input clk;
+input reset_n;
+input geometry_reject;
+input envelope_fault;
+input response_mismatch;
+input response_fresh;
+input stale_response;
+input model_output_valid;
+input command_clamped;
+input fault_in;
+input request_outstanding;
+output safe_mode;
+output supervisor_release;
+output fallback_active;
+output stale_command;
+output [3:0] fault_code;
+
+reg safe_mode_r;
+reg supervisor_release_r;
+reg fallback_active_r;
+reg stale_command_r;
+reg [3:0] fault_code_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        safe_mode_r <= 1'b1;
+        supervisor_release_r <= 1'b0;
+        fallback_active_r <= 1'b1;
+        stale_command_r <= 1'b0;
+        fault_code_r <= 4'h0;
+    end else begin
+        safe_mode_r <= geometry_reject | envelope_fault | response_mismatch | stale_response | ~response_fresh | ~model_output_valid | fault_in | command_clamped | request_outstanding;
+        supervisor_release_r <= ~(geometry_reject | envelope_fault | response_mismatch | stale_response | fault_in | command_clamped);
+        fallback_active_r <= geometry_reject | envelope_fault | response_mismatch | stale_response | ~response_fresh | ~model_output_valid | fault_in | request_outstanding;
+        stale_command_r <= request_outstanding & (stale_response | response_mismatch | ~response_fresh);
+        fault_code_r[0] <= geometry_reject;
+        fault_code_r[1] <= envelope_fault;
+        fault_code_r[2] <= stale_response | ~response_fresh;
+        fault_code_r[3] <= response_mismatch | fault_in;
+    end
+end
+
+assign safe_mode = safe_mode_r;
+assign supervisor_release = supervisor_release_r;
+assign fallback_active = fallback_active_r;
+assign stale_command = stale_command_r;
+assign fault_code = fault_code_r;
+
+endmodule
+---END safety_supervisor.v---
+
+---BEGIN fallback_fsm.v---
+module fallback_fsm (
+    clk,
+    reset_n,
+    safe_mode,
+    fallback_setpoint_a,
+    fallback_setpoint_b,
+    fallback_setpoint_c,
+    fallback_setpoint_d,
+    fallback_output,
+    fallback_valid,
+    fallback_active
+);
+input clk;
+input reset_n;
+input safe_mode;
+input [15:0] fallback_setpoint_a;
+input [15:0] fallback_setpoint_b;
+input [15:0] fallback_setpoint_c;
+input [15:0] fallback_setpoint_d;
+output [63:0] fallback_output;
+output fallback_valid;
+output fallback_active;
+
+reg [63:0] fallback_output_r;
+reg fallback_valid_r;
+reg fallback_active_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        fallback_output_r <= 64'h0000000000000000;
+        fallback_valid_r <= 1'b0;
+        fallback_active_r <= 1'b1;
+    end else begin
+        fallback_active_r <= safe_mode;
+        fallback_valid_r <= safe_mode;
+        if (safe_mode) begin
+            fallback_output_r <= {fallback_setpoint_d, fallback_setpoint_c, fallback_setpoint_b, fallback_setpoint_a};
+        end
+    end
+end
+
+assign fallback_output = fallback_output_r;
+assign fallback_valid = fallback_valid_r;
+assign fallback_active = fallback_active_r;
+
+endmodule
+---END fallback_fsm.v---
+
+---BEGIN active_aero_controller_top.v---
+module active_aero_controller_top (
+    clk,
+    reset_n,
+    vehicle_geometry_valid,
+    geometry_format,
+    geometry_source,
+    geometry_metadata,
+    stream_velocity_mps,
+    flow_metadata,
+    req_ready,
+    resp_valid,
+    resp_id,
+    resp_timestamp,
+    resp_payload,
+    fault_in,
+    req_valid,
+    req_id,
+    req_payload,
+    actuator_command,
+    actuator_command_valid,
+    status_telemetry,
+    fault_code
+);
+input clk;
+input reset_n;
+input vehicle_geometry_valid;
+input [2:0] geometry_format;
+input [3:0] geometry_source;
+input [63:0] geometry_metadata;
+input [15:0] stream_velocity_mps;
+input [31:0] flow_metadata;
+input req_ready;
+input resp_valid;
+input [15:0] resp_id;
+input [31:0] resp_timestamp;
+input [255:0] resp_payload;
+input fault_in;
+output req_valid;
+output [15:0] req_id;
+output [319:0] req_payload;
+output [63:0] actuator_command;
+output actuator_command_valid;
+output [15:0] status_telemetry;
+output [3:0] fault_code;
+
+wire geometry_valid;
+wire geometry_reject;
+wire [127:0] geometry_descriptor;
+wire flow_valid;
+wire envelope_fault;
+wire nominal_condition;
+wire [63:0] flow_descriptor;
+wire request_outstanding;
+wire [15:0] outstanding_req_id;
+wire [31:0] outstanding_req_timestamp;
+wire fresh_response_pulse;
+wire response_mismatch;
+wire response_fresh;
+wire [255:0] validated_resp_payload;
+wire model_output_valid;
+wire [31:0] drag_force;
+wire [31:0] lift_force;
+wire [31:0] surface_pressure;
+wire [127:0] flow_field_metadata;
+wire command_enable;
+wire [63:0] command_vector;
+wire supervisor_release;
+wire fallback_active;
+wire stale_command;
+wire [63:0] saturated_command;
+wire saturated_valid;
+wire command_clamped;
+wire [63:0] fallback_output;
+wire fallback_valid;
+
+geometry_ingress u_geometry_ingress (
+    .clk(clk),
+    .reset_n(reset_n),
+    .vehicle_geometry_valid(vehicle_geometry_valid),
+    .geometry_format(geometry_format),
+    .geometry_source(geometry_source),
+    .geometry_metadata(geometry_metadata),
+    .geometry_valid(geometry_valid),
+    .geometry_reject(geometry_reject),
+    .geometry_descriptor(geometry_descriptor)
+);
+
+flow_condition_checker u_flow_condition_checker (
+    .clk(clk),
+    .reset_n(reset_n),
+    .stream_velocity_mps(stream_velocity_mps),
+    .flow_metadata(flow_metadata),
+    .flow_valid(flow_valid),
+    .envelope_fault(envelope_fault),
+    .nominal_condition(nominal_condition),
+    .flow_descriptor(flow_descriptor)
+);
+
+model_txn_mgr u_model_txn_mgr (
+    .clk(clk),
+    .reset_n(reset_n),
+    .geometry_valid(geometry_valid),
+    .geometry_descriptor(geometry_descriptor),
+    .flow_valid(flow_valid),
+    .flow_descriptor(flow_descriptor),
+    .safe_mode(safe_mode),
+    .fallback_active(fallback_active),
+    .req_ready(req_ready),
+    .resp_valid(resp_valid),
+    .resp_id(resp_id),
+    .resp_timestamp(resp_timestamp),
+    .resp_payload(resp_payload),
+    .req_valid(req_valid),
+    .req_id(req_id),
+    .req_payload(req_payload),
+    .request_outstanding(request_outstanding),
+    .outstanding_req_id(outstanding_req_id),
+    .outstanding_req_timestamp(outstanding_req_timestamp),
+    .fresh_response_pulse(fresh_response_pulse),
+    .response_mismatch(response_mismatch),
+    .response_fresh(response_fresh),
+    .validated_resp_payload(validated_resp_payload)
+);
+
+response_validator u_response_validator (
+    .clk(clk),
+    .reset_n(reset_n),
+    .resp_valid(resp_valid),
+    .resp_id(resp_id),
+    .resp_timestamp(resp_timestamp),
+    .resp_payload(validated_resp_payload),
+    .outstanding_req_id(outstanding_req_id),
+    .outstanding_req_timestamp(outstanding_req_timestamp),
+    .fresh_response_pulse(fresh_response_pulse),
+    .response_mismatch(response_mismatch),
+    .model_output_valid(model_output_valid),
+    .drag_force(drag_force),
+    .lift_force(lift_force),
+    .surface_pressure(surface_pressure),
+    .flow_field_metadata(flow_field_metadata),
+    .stale_response(stale_response)
+);
+
+aero_control_policy u_aero_control_policy (
+    .clk(clk),
+    .reset_n(reset_n),
+    .model_output_valid(model_output_valid),
+    .drag_force(drag_force),
+    .lift_force(lift_force),
+    .surface_pressure(surface_pressure),
+    .flow_field_metadata(flow_field_metadata),
+    .command_enable(command_enable),
+    .command_vector(command_vector)
+);
+
+command_saturator u_command_saturator (
+    .clk(clk),
+    .reset_n(reset_n),
+    .command_enable(command_enable),
+    .command_vector(command_vector),
+    .supervisor_release(supervisor_release),
+    .min_bound(64'h0000000000000000),
+    .max_bound(64'hFFFFFFFFFFFFFFFF),
+    .rate_limit_step(64'h0000000000000001),
+    .saturated_command(saturated_command),
+    .saturated_valid(saturated_valid),
+    .command_clamped(command_clamped)
+);
+
+safety_supervisor u_safety_supervisor (
+    .clk(clk),
+    .reset_n(reset_n),
+    .geometry_reject(geometry_reject),
+    .envelope_fault(envelope_fault),
+    .response_mismatch(response_mismatch),
+    .response_fresh(response_fresh),
+    .stale_response(stale_response),
+    .model_output_valid(model_output_valid),
+    .command_clamped(command_clamped),
+    .fault_in(fault_in),
+    .request_outstanding(request_outstanding),
+    .safe_mode(safe_mode),
+    .supervisor_release(supervisor_release),
+    .fallback_active(fallback_active),
+    .stale_command(stale_command),
+    .fault_code(fault_code)
+);
+
+fallback_fsm u_fallback_fsm (
+    .clk(clk),
+    .reset_n(reset_n),
+    .safe_mode(safe_mode),
+    .fallback_setpoint_a(16'h0001),
+    .fallback_setpoint_b(16'h0002),
+    .fallback_setpoint_c(16'h0003),
+    .fallback_setpoint_d(16'h0004),
+    .fallback_output(fallback_output),
+    .fallback_valid(fallback_valid),
+    .fallback_active()
+);
+
+assign actuator_command = safe_mode ? fallback_output : saturated_command;
+assign actuator_command_valid = safe_mode ? fallback_valid : saturated_valid;
+assign status_telemetry[0] = geometry_valid;
+assign status_telemetry[1] = flow_valid;
+assign status_telemetry[2] = request_outstanding;
+assign status_telemetry[3] = response_fresh;
+assign status_telemetry[4] = safe_mode;
+assign status_telemetry[5] = envelope_fault;
+assign status_telemetry[6] = stale_response;
+assign status_telemetry[7] = command_clamped;
+assign status_telemetry[8] = fallback_active;
+assign status_telemetry[9] = model_output_valid;
+assign status_telemetry[10] = geometry_reject;
+assign status_telemetry[11] = response_mismatch;
+assign status_telemetry[12] = nominal_condition;
+assign status_telemetry[13] = fallback_valid;
+assign status_telemetry[14] = command_enable;
+assign status_telemetry[15] = supervisor_release;
+
+endmodule
+---END active_aero_controller_top.v---

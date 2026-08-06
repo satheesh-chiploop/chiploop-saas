@@ -1,0 +1,16 @@
+{
+  "domains": [
+    {
+      "name": "PD_TOP",
+      "elements": [
+        "active_aero_controller_top"
+      ],
+      "primary_power_net": "VDD",
+      "primary_ground_net": "VSS"
+    }
+  ],
+  "isolation": [],
+  "retention": [],
+  "spec_mode": "hierarchical",
+  "top_module": "active_aero_controller_top"
+}

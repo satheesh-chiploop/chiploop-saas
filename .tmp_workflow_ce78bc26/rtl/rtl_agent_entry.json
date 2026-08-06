@@ -1,0 +1,8 @@
+{
+  "workflow_id": "ce78bc26-6750-411b-b91b-3d2897de7fe5",
+  "workflow_dir": "backend/workflows/ce78bc26-6750-411b-b91b-3d2897de7fe5",
+  "digital_spec_json": "backend/workflows/ce78bc26-6750-411b-b91b-3d2897de7fe5/spec/active_aero_controller_top_spec.json",
+  "spec_json": "backend/workflows/ce78bc26-6750-411b-b91b-3d2897de7fe5/spec/active_aero_controller_top_spec.json",
+  "digital_spec_json_exists": true,
+  "spec_json_exists": true
+}

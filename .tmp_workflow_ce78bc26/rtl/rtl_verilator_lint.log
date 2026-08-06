@@ -1,0 +1,70 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.257 MB sources in 10 modules, into 0.054 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.020 s (elab=0.003, cvt=0.009, bld=0.000); cpu 0.020 s on 1 threads; allocated 32.355 MB
+
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: active_aero_controller_top.v:198:6: Instance pin connected by name with empty reference: 'fallback_active'
+  198 |     .fallback_active()
+      |      ^~~~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-IMPLICIT: active_aero_controller_top.v:105:16: Signal definition not found, creating implicitly: 'safe_mode'
+  105 |     .safe_mode(safe_mode),
+      |                ^~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/IMPLICIT?v=5.047
+                   ... Use "/* verilator lint_off IMPLICIT */" and lint_on around source to disable this message.
+%Warning-IMPLICIT: active_aero_controller_top.v:140:21: Signal definition not found, creating implicitly: 'stale_response'
+  140 |     .stale_response(stale_response)
+      |                     ^~~~~~~~~~~~~~
+%Warning-WIDTHEXPAND: model_txn_mgr.v:95:27: Operator ASSIGNDLY expects 320 bits on the Assign RHS, but Assign RHS's REPLICATE generates 240 bits.
+                                           : ... note: In instance 'active_aero_controller_top.u_model_txn_mgr'
+   95 |             req_payload_r <= {request_id_r, geometry_descriptor, flow_descriptor, timebase_r};
+      |                           ^~
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: model_txn_mgr.v:114:26: Operator ASSIGN expects 320 bits on the Assign RHS, but Assign RHS's REPLICATE generates 240 bits.
+                                            : ... note: In instance 'active_aero_controller_top.u_model_txn_mgr'
+  114 |         req_payload_next = {request_id_r, geometry_descriptor, flow_descriptor, timebase_r};
+      |                          ^
+%Warning-WIDTHEXPAND: geometry_ingress.v:45:35: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 119 bits.
+                                              : ... note: In instance 'active_aero_controller_top.u_geometry_ingress'
+   45 |             geometry_descriptor_r <= {geometry_source, geometry_format, geometry_metadata, 48'h000000000000};
+      |                                   ^~
+%Warning-WIDTHEXPAND: geometry_ingress.v:53:34: Operator ASSIGN expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 119 bits.
+                                              : ... note: In instance 'active_aero_controller_top.u_geometry_ingress'
+   53 |         geometry_descriptor_next = {geometry_source, geometry_format, geometry_metadata, 48'h000000000000};
+      |                                  ^
+%Warning-UNUSEDSIGNAL: active_aero_controller_top.v:68:6: Signal is not used: 'stale_command'
+                                                        : ... note: In instance 'active_aero_controller_top'
+   68 | wire stale_command;
+      |      ^~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: aero_control_policy.v:18:15: Bits of signal are not used: 'flow_field_metadata'[127:32]
+                                                  : ... note: In instance 'active_aero_controller_top.u_aero_control_policy'
+   18 | input [127:0] flow_field_metadata;
+      |               ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: command_saturator.v:30:12: Signal is not used: 'clipped_command_r'
+                                                : ... note: In instance 'active_aero_controller_top.u_command_saturator'
+   30 | reg [63:0] clipped_command_r;
+      |            ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: geometry_ingress.v:24:13: Signal is not used: 'geometry_descriptor_next'
+                                               : ... note: In instance 'active_aero_controller_top.u_geometry_ingress'
+   24 | reg [127:0] geometry_descriptor_next;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: model_txn_mgr.v:60:13: Signal is not used: 'req_payload_next'
+                                            : ... note: In instance 'active_aero_controller_top.u_model_txn_mgr'
+   60 | reg [319:0] req_payload_next;
+      |             ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: model_txn_mgr.v:66:6: Signal is not used: 'request_timestamp_match'
+                                           : ... note: In instance 'active_aero_controller_top.u_model_txn_mgr'
+   66 | wire request_timestamp_match;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: response_validator.v:24:15: Bits of signal are not used: 'resp_payload'[127:96]
+                                                 : ... note: In instance 'active_aero_controller_top.u_response_validator'
+   24 | input [255:0] resp_payload;
+      |               ^~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

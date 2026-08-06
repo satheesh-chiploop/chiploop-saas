@@ -1,0 +1,349 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "active_aero_controller_top",
+  "design_summary": {
+    "purpose": "active_aero_controller_top is a synthesizable safety wrapper around an external aerodynamic surrogate service. It accepts geometry and flow metadata, gates transaction issuance, validates surrogate responses, maps validated outputs into deterministic control commands, constrains those commands to safe bounds, and selects a registered safe fallback path whenever supervision requires it.",
+    "operating_model": "The design is fully synchronous to clk with active-low reset_n. Geometry ingress and flow checking qualify inputs before model request issuance. The transaction manager generates monotonically increasing request transactions and tracks freshness against request timestamps. The response validator exposes only structurally valid, fresh model outputs to the deterministic control policy. Command saturation and safety supervision ensure bounded actuator behavior, while the fallback FSM provides a conservative safe configuration whenever safe_mode is asserted or the model path is unavailable.",
+    "external_interfaces": [
+      "Input metadata interfaces for vehicle geometry, flow conditions, and external fault indication.",
+      "Transaction-based request/response handshake to the external aerodynamic surrogate service through req_valid, req_ready, req_id, req_payload, resp_valid, resp_id, resp_timestamp, and resp_payload.",
+      "Registered actuator output interface through actuator_command and actuator_command_valid.",
+      "Status and fault reporting through status_telemetry and fault_code."
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "geometry_ingress",
+      "role": "Synchronously accepts geometry metadata, validates STL-compatible format and metadata structure, and produces a latched geometry descriptor only when the input strobe is qualified.",
+      "responsibilities": [
+        "Sample vehicle geometry only when vehicle_geometry_valid is asserted.",
+        "Reject unsupported geometry_format values and malformed metadata.",
+        "Latch geometry_descriptor only on valid acceptance.",
+        "Provide geometry_valid and geometry_reject as downstream control and safety qualifiers."
+      ],
+      "interface_notes": [
+        "Consumes clk, reset_n, vehicle_geometry_valid, geometry_format, geometry_source, and geometry_metadata.",
+        "Drives geometry_valid, geometry_reject, and geometry_descriptor.",
+        "Does not interact with flow, transaction, control, or actuator signals directly.",
+        "No geometric computation or physics prediction is performed."
+      ],
+      "ownership_notes": [
+        "geometry_valid is owned by geometry_ingress.",
+        "geometry_reject is owned by geometry_ingress.",
+        "geometry_descriptor is owned by geometry_ingress."
+      ]
+    },
+    {
+      "name": "flow_condition_checker",
+      "role": "Validates stream_velocity_mps against the approved operating envelope and emits a registered flow descriptor for transaction gating.",
+      "responsibilities": [
+        "Compare stream_velocity_mps against the fixed envelope of 20 m/s to 55 m/s.",
+        "Assert flow_valid only for values within the approved range.",
+        "Assert envelope_fault for values outside the approved range.",
+        "Indicate nominal_condition when the supplied velocity corresponds to 38.89 m/s in the chosen fixed-point representation.",
+        "Provide flow_descriptor for downstream request packaging."
+      ],
+      "interface_notes": [
+        "Consumes clk, reset_n, stream_velocity_mps, and flow_metadata.",
+        "Drives flow_valid, envelope_fault, nominal_condition, and flow_descriptor.",
+        "Does not generate any model prediction or control output.",
+        "All comparisons are synchronous and fixed-width."
+      ],
+      "ownership_notes": [
+        "flow_valid is owned by flow_condition_checker.",
+        "envelope_fault is owned by flow_condition_checker.",
+        "nominal_condition is owned by flow_condition_checker.",
+        "flow_descriptor is owned by flow_condition_checker."
+      ]
+    },
+    {
+      "name": "model_txn_mgr",
+      "role": "Packages requests for the external DoMINO service, maintains monotonic request identity and outstanding transaction state, and accepts only matching fresh responses.",
+      "responsibilities": [
+        "Generate request packets only when geometry_valid, flow_valid, safe_mode low, fallback_active low, and req_ready high.",
+        "Maintain a monotonically increasing req_id counter.",
+        "Capture request timestamps from an internal free-running cycle counter or equivalent synchronous timebase.",
+        "Track request_outstanding, outstanding_req_id, and outstanding_req_timestamp.",
+        "Detect response mismatch and freshness status.",
+        "Provide validated_resp_payload only after a response has passed matching and freshness checks."
+      ],
+      "interface_notes": [
+        "Consumes geometry_valid, geometry_descriptor, flow_valid, flow_descriptor, safe_mode, fallback_active, req_ready, resp_valid, resp_id, resp_timestamp, and resp_payload.",
+        "Drives req_valid, req_id, req_payload, request_outstanding, outstanding_req_id, outstanding_req_timestamp, fresh_response_pulse, response_mismatch, response_fresh, and validated_resp_payload.",
+        "req_payload carries the accepted geometry descriptor, flow descriptor, and request timestamp with the transaction id.",
+        "No actuator output is driven from this block."
+      ],
+      "ownership_notes": [
+        "req_valid is owned by model_txn_mgr.",
+        "req_id is owned by model_txn_mgr.",
+        "req_payload is owned by model_txn_mgr.",
+        "request_outstanding is owned by model_txn_mgr.",
+        "outstanding_req_id is owned by model_txn_mgr.",
+        "outstanding_req_timestamp is owned by model_txn_mgr.",
+        "fresh_response_pulse is owned by model_txn_mgr.",
+        "response_mismatch is owned by model_txn_mgr.",
+        "response_fresh is owned by model_txn_mgr.",
+        "validated_resp_payload is owned by model_txn_mgr."
+      ]
+    },
+    {
+      "name": "response_validator",
+      "role": "Parses the surrogate response payload into opaque model output fields and asserts model_output_valid only after structural validity, freshness, and transaction match checks pass.",
+      "responsibilities": [
+        "Verify response structure and freshness conditions.",
+        "Expose drag_force, lift_force, surface_pressure, and flow_field_metadata as opaque outputs.",
+        "Suppress invalid or stale responses from reaching the policy stage.",
+        "Assert stale_response for responses that are too old or otherwise not fresh.",
+        "Assert model_output_valid only after all checks pass."
+      ],
+      "interface_notes": [
+        "Consumes resp_valid, resp_id, resp_timestamp, resp_payload, outstanding_req_id, outstanding_req_timestamp, fresh_response_pulse, and response_mismatch.",
+        "Drives model_output_valid, drag_force, lift_force, surface_pressure, flow_field_metadata, and stale_response.",
+        "No assumptions are made about numerical ranges or predictive meaning of returned values.",
+        "No direct actuator path exists from resp_payload."
+      ],
+      "ownership_notes": [
+        "model_output_valid is owned by response_validator.",
+        "drag_force is owned by response_validator.",
+        "lift_force is owned by response_validator.",
+        "surface_pressure is owned by response_validator.",
+        "flow_field_metadata is owned by response_validator.",
+        "stale_response is owned by response_validator."
+      ]
+    },
+    {
+      "name": "aero_control_policy",
+      "role": "Deterministically maps validated surrogate outputs into an intermediate command vector for active aerodynamic actuators.",
+      "responsibilities": [
+        "Convert validated outputs into a deterministic command_vector.",
+        "Use implementation-defined programmable coefficients or lookup tables only.",
+        "Avoid any machine learning inference.",
+        "Assert command_enable only when a new valid command is produced.",
+        "Suppress new command emission when model_output_valid is low."
+      ],
+      "interface_notes": [
+        "Consumes model_output_valid, drag_force, lift_force, surface_pressure, and flow_field_metadata.",
+        "Drives command_enable and command_vector.",
+        "The mapping is synthesizable and fixed-width.",
+        "The block provides an intermediate control representation, not a final actuator drive."
+      ],
+      "ownership_notes": [
+        "command_enable is owned by aero_control_policy.",
+        "command_vector is owned by aero_control_policy."
+      ]
+    },
+    {
+      "name": "command_saturator",
+      "role": "Clamps and rate-limits the intermediate command vector to programmable safe bounds before release to the registered actuator output path.",
+      "responsibilities": [
+        "Clamp each actuator channel to programmable minimum and maximum values.",
+        "Enforce a programmable rate limit on command changes.",
+        "Emit saturated_command and saturated_valid only when command_enable and supervisor_release are asserted.",
+        "Force overflow, underflow, or invalid command values to the nearest safe bound.",
+        "Flag command_clamped when clamping or limiting occurs."
+      ],
+      "interface_notes": [
+        "Consumes command_enable, command_vector, supervisor_release, min_bound, max_bound, and rate_limit_step.",
+        "Drives saturated_command, saturated_valid, and command_clamped.",
+        "No output is emitted when supervisor_release is low.",
+        "This block is the safety-checked command source for the final registered mux."
+      ],
+      "ownership_notes": [
+        "saturated_command is owned by command_saturator.",
+        "saturated_valid is owned by command_saturator.",
+        "command_clamped is owned by command_saturator."
+      ]
+    },
+    {
+      "name": "safety_supervisor",
+      "role": "Continuously evaluates safety conditions and determines safe_mode, release authorization, fallback activity, stale command status, and the encoded fault code.",
+      "responsibilities": [
+        "Monitor geometry_reject, envelope_fault, response_mismatch, response_fresh, stale_response, model_output_valid, command_clamped, fault_in, and request_outstanding.",
+        "Assert safe_mode whenever any monitored safety criterion fails.",
+        "Assert fallback_active whenever the model path is unavailable or unsafe.",
+        "Authorize or withhold command release through supervisor_release.",
+        "Detect stale_command conditions.",
+        "Encode deterministic fault_code information for unsupported geometry, envelope violation, stale response, transaction mismatch, and external fault input."
+      ],
+      "interface_notes": [
+        "Consumes geometry_reject, envelope_fault, response_mismatch, response_fresh, stale_response, model_output_valid, command_clamped, fault_in, and request_outstanding.",
+        "Drives safe_mode, supervisor_release, fallback_active, stale_command, and fault_code.",
+        "safe_mode inhibits new model requests and drives use of the fallback path.",
+        "fault_code is the top-level error summary output."
+      ],
+      "ownership_notes": [
+        "safe_mode is owned by safety_supervisor.",
+        "supervisor_release is owned by safety_supervisor.",
+        "fallback_active is owned by safety_supervisor.",
+        "stale_command is owned by safety_supervisor.",
+        "fault_code is owned by safety_supervisor."
+      ]
+    },
+    {
+      "name": "fallback_fsm",
+      "role": "Generates a deterministic, bounded safe aerodynamic configuration used whenever safe_mode is active or the model path is unavailable.",
+      "responsibilities": [
+        "Produce a conservative fallback_output from programmable setpoints.",
+        "Assert fallback_valid when the fallback output is active and stable.",
+        "Assert fallback_active while safe_mode requires fallback operation.",
+        "Hold the fallback configuration until safety conditions clear and a fresh valid response path is available."
+      ],
+      "interface_notes": [
+        "Consumes clk, reset_n, safe_mode, and fallback_setpoint_a through fallback_setpoint_d.",
+        "Drives fallback_output, fallback_valid, and fallback_active.",
+        "The fallback path is deterministic and non-learned.",
+        "It is the actuator source used under safe_mode."
+      ],
+      "ownership_notes": [
+        "fallback_output is owned by fallback_fsm.",
+        "fallback_valid is owned by fallback_fsm.",
+        "fallback_active is owned by fallback_fsm."
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "top-level inputs",
+      "to": "geometry_ingress and flow_condition_checker",
+      "signals": [
+        "vehicle_geometry_valid",
+        "geometry_format",
+        "geometry_source",
+        "geometry_metadata",
+        "stream_velocity_mps",
+        "flow_metadata"
+      ],
+      "intent": "Capture and qualify geometry and flow metadata before any request is allowed to enter the surrogate-service transaction path."
+    },
+    {
+      "from": "geometry_ingress",
+      "to": "model_txn_mgr and safety_supervisor",
+      "signals": [
+        "geometry_valid",
+        "geometry_reject",
+        "geometry_descriptor"
+      ],
+      "intent": "Forward accepted geometry descriptors into request packaging and propagate geometry rejection into system safety supervision."
+    },
+    {
+      "from": "flow_condition_checker",
+      "to": "model_txn_mgr and safety_supervisor",
+      "signals": [
+        "flow_valid",
+        "envelope_fault",
+        "flow_descriptor",
+        "nominal_condition"
+      ],
+      "intent": "Gate request issuance with operating-envelope approval and propagate violations into safety monitoring and telemetry."
+    },
+    {
+      "from": "model_txn_mgr",
+      "to": "response_validator and top-level request outputs",
+      "signals": [
+        "req_valid",
+        "req_id",
+        "req_payload",
+        "request_outstanding",
+        "outstanding_req_id",
+        "outstanding_req_timestamp",
+        "fresh_response_pulse",
+        "response_mismatch",
+        "response_fresh",
+        "validated_resp_payload"
+      ],
+      "intent": "Manage transaction issuance and response acceptance for the external aerodynamic surrogate service."
+    },
+    {
+      "from": "response_validator",
+      "to": "aero_control_policy and safety_supervisor",
+      "signals": [
+        "model_output_valid",
+        "drag_force",
+        "lift_force",
+        "surface_pressure",
+        "flow_field_metadata",
+        "stale_response"
+      ],
+      "intent": "Expose only valid opaque surrogate outputs to control policy while indicating stale or invalid response conditions to supervision."
+    },
+    {
+      "from": "aero_control_policy",
+      "to": "command_saturator",
+      "signals": [
+        "command_enable",
+        "command_vector"
+      ],
+      "intent": "Map validated outputs to an intermediate control vector suitable for downstream command limiting."
+    },
+    {
+      "from": "safety_supervisor",
+      "to": "model_txn_mgr, command_saturator, fallback_fsm, and top-level fault reporting",
+      "signals": [
+        "safe_mode",
+        "supervisor_release",
+        "fallback_active",
+        "stale_command",
+        "fault_code"
+      ],
+      "intent": "Enforce system-wide safe operation, gate command release, and publish fault status."
+    },
+    {
+      "from": "command_saturator and fallback_fsm",
+      "to": "top-level registered actuator selection",
+      "signals": [
+        "saturated_command",
+        "saturated_valid",
+        "fallback_output",
+        "fallback_valid"
+      ],
+      "intent": "Select between a supervised saturated command and a deterministic fallback actuator configuration through a registered mux."
+    },
+    {
+      "from": "top-level status aggregation",
+      "to": "status_telemetry and fault_code",
+      "signals": [
+        "geometry_accept",
+        "flow_valid",
+        "request_outstanding",
+        "response_fresh",
+        "safe_mode",
+        "envelope_fault",
+        "stale_response",
+        "command_clamped",
+        "fallback_active",
+        "fault_code"
+      ],
+      "intent": "Report system state and fault summary without exposing any raw response-to-actuator combinational path."
+    }
+  ],
+  "data_flow_summary": [
+    "Geometry metadata enters geometry_ingress, where STL compatibility and metadata integrity determine geometry_valid versus geometry_reject.",
+    "Flow metadata enters flow_condition_checker, where the velocity envelope and nominal reference handling produce flow_valid, envelope_fault, and flow_descriptor.",
+    "Model requests are issued by model_txn_mgr only when geometry_valid, flow_valid, and supervisory conditions permit release.",
+    "Request packets include req_id, accepted geometry and flow descriptors, and an internally captured request_timestamp, allowing freshness checks against resp_timestamp.",
+    "Response_validator accepts opaque payload fields only after transaction match and freshness checks, then forwards validated outputs to aero_control_policy.",
+    "Aero_control_policy deterministically maps validated outputs into an intermediate command vector and asserts command_enable only for valid new commands.",
+    "Command_saturator clamps and rate-limits the command vector under supervisor_release control and produces saturated_command plus command_clamped telemetry.",
+    "Safety_supervisor continuously monitors geometry, flow, response, freshness, command clamping, and external fault inputs, then asserts safe_mode and fault_code as needed.",
+    "Fallback_fsm provides a conservative bounded actuator configuration whenever safe_mode is active or the model path is not available.",
+    "The top-level registered actuator selection chooses between saturated_command and fallback_output, ensuring actuator_command is stable for a full cycle before release."
+  ],
+  "clock_reset_summary": {
+    "clocking": "All submodules are clocked by clk. All externally visible and internal state updates are synchronous to clk. Asynchronous inputs are synchronized before use. The design uses fixed-width registers, counters, and comparators suitable for ASIC synthesis.",
+    "reset_behavior": "reset_n is active-low and initializes the entire subsystem to a safe state. request_id resets to zero, outstanding transaction state clears, request outputs deassert, actuator output is disabled, safe_mode asserts, and fallback operation is selected. Geometry, flow, response validation, control policy, saturator state, and telemetry state all return to known safe defaults."
+  },
+  "integration_notes": [
+    "No hierarchy, ports, or filenames differ from digital_spec_json.",
+    "The design is descriptive only and does not introduce any physics model or learned inference.",
+    "The actuator output path must remain registered; raw model response data must not directly drive actuator_command.",
+    "The safety_supervisor provides the control point for safe_mode and release authorization, while fallback_fsm provides the conservative actuator source under fault or unavailable-model conditions.",
+    "status_telemetry is formed from submodule status indications and must reflect geometry_accept, flow_valid, request_outstanding, response_fresh, safe_mode, envelope_fault, stale_response, command_clamped, and fallback_active.",
+    "fault_code is the encoded top-level fault summary and is driven from the safety_supervisor.",
+    "The transaction manager and response validator together enforce request_id matching and timestamp freshness before any model output can influence control policy."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}
