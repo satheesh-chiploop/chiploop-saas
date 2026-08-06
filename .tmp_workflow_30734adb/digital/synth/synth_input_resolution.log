@@ -1,0 +1,21 @@
+[2026-08-06T03:32:40.554506Z] Digital Synthesis Agent
+workflow_id=30734adb-33b9-4000-8b0e-a911961bac0f
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout
+spec_json=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/handoff/spec/digital_spec.json
+top_module=AeroGuard_Active_Aerodynamics_Controller
+rtl_count=5
+request_target_frequency_mhz=100.0
+clock_period_ns=10.0
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/impl_setup/constraints/AeroGuard_Active_Aerodynamics_Controller.sdc
+sdc_basename=AeroGuard_Active_Aerodynamics_Controller.sdc
+synth_sdc_path=artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/synth/constraints/AeroGuard_Active_Aerodynamics_Controller.sdc
+state_constraints_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/impl_setup/constraints/AeroGuard_Active_Aerodynamics_Controller.sdc
+pdk_variant=sky130A
+macro_lib_count=0
+macro_lef_count=0
+macro_gds_count=0
+macro_spice_count=0
+macro_verilog_count=0
+pdk_sram_collateral=[]
+yosys_macro_lib_script=artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/synth/yosys_macro_libs.ys
+pre_synthesis_rtl_repairs={}

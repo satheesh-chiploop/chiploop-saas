@@ -1,0 +1,14 @@
+[2026-08-06T03:49:43.787793Z] Digital DRC Agent
+workflow_id=30734adb-33b9-4000-8b0e-a911961bac0f
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout
+upstream_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/fill/constraints/AeroGuard_Active_Aerodynamics_Controller.sdc
+sdc_basename=AeroGuard_Active_Aerodynamics_Controller.sdc
+stage_sdc=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/drc/constraints/AeroGuard_Active_Aerodynamics_Controller.sdc
+base_cfg_path=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/fill/config.json
+run_work_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/run_work
+run_tag=Digital_Arch2Tapeout_30734adb-33b9-4000-8b0e-a911961bac0f
+top_module=AeroGuard_Active_Aerodynamics_Controller
+netlist_count=1
+macro_placement_cfg=None
+macro_placement_cfg_path=None
+closure_overrides={}

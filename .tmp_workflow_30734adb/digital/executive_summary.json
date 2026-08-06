@@ -1,0 +1,79 @@
+{
+  "workflow_id": "30734adb-33b9-4000-8b0e-a911961bac0f",
+  "digital_run_tag": "Digital_Arch2Tapeout_30734adb-33b9-4000-8b0e-a911961bac0f",
+  "digital_run_work_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/run_work",
+  "cell_count": null,
+  "area": null,
+  "flipflop_count": null,
+  "latch_count": null,
+  "sta_best_stage": "sta_preplace",
+  "worst_slack": 4.5915272883390275,
+  "tns": 0,
+  "drc_violations": null,
+  "drc_status": "failed",
+  "lvs_status": "failed",
+  "tapeout_status": "failed",
+  "tapeout_failure_reasons": [
+    "streamout_command_failed",
+    "drc_not_clean",
+    "lvs_not_clean",
+    "gds_not_produced"
+  ],
+  "tapeout_lec_status": "blocked",
+  "atpg_status": "patterns_generated",
+  "sta_stages": {
+    "sta_preplace": {
+      "worst_slack": 4.5915272883390275,
+      "tns": 0
+    },
+    "sta_postplace": {
+      "worst_slack": null,
+      "tns": null
+    },
+    "sta_postcts": {
+      "worst_slack": null,
+      "tns": null
+    },
+    "sta_postroute": {
+      "worst_slack": null,
+      "tns": null
+    },
+    "sta_postfill": {
+      "worst_slack": null,
+      "tns": null,
+      "setup_wns": null,
+      "setup_tns": null,
+      "hold_wns": null,
+      "hold_tns": null,
+      "setup_violations": null,
+      "hold_violations": null
+    }
+  },
+  "gds_paths": {
+    "klayout": null,
+    "magic": null
+  },
+  "artifact_map": {
+    "synth_metrics": null,
+    "sta_preplace_metrics": "digital/sta_preplace/metrics.json",
+    "sta_postplace_metrics": null,
+    "sta_postcts_metrics": null,
+    "sta_postroute_metrics": null,
+    "sta_postfill_metrics": null,
+    "drc_metrics": null,
+    "lvs_metrics": null,
+    "tapeout_metrics": null
+  },
+  "next_iteration_suggestions": [
+    "If worst_slack < 0: relax constraints or improve synthesis/placement/CTS/route parameters.",
+    "If DRC violations > 0: inspect DRC logs and rerun with adjusted floorplan/route settings.",
+    "If LVS not clean: check extraction/streamout mismatch and netlist naming."
+  ],
+  "blocking_issues": [
+    "tapeout:failed",
+    "drc:failed",
+    "lvs:failed",
+    "tapeout_lec:blocked"
+  ],
+  "status": "failed"
+}

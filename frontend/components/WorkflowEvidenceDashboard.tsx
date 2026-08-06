@@ -1867,6 +1867,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const synthCellTypeSum = Object.values(synthCellTypes).reduce<number>((sum, value) => sum + (typeof value === "number" && Number.isFinite(value) ? value : 0), 0);
       const carryCount = metricValue(synthesisEstimate.carry_cells, synth.carry_cells, synthCellTypes.SB_CARRY);
       const totalMappedCells = metricValue(synthesisEstimate.total_mapped_cells, synth.total_mapped_cells, synth.fabric_mapped_cells, synthCellTypeSum || undefined);
+      const blockRamUsed = finiteNumber(synthesisEstimate.block_ram_blocks_used, synth.block_ram_blocks_used);
+      const blockRamAvailable = finiteNumber(synthesisEstimate.block_ram_blocks_available, synth.block_ram_blocks_available, record(target.resources).block_ram_blocks);
+      const blockRamUtilization = finiteNumber(synthesisEstimate.block_ram_utilization_percent, synth.block_ram_utilization_percent);
+      const blockRamPrimitive = firstString(synthesisEstimate.block_ram_primitive, synth.block_ram_primitive, record(target.resources).block_ram_primitive);
+      const memoryMappingGate = record(firstPresent(synthesisEstimate.memory_mapping_gate, synth.memory_mapping_gate));
       const targetFrequencyMhz = firstNumber(
         timingSummary.target_frequency_mhz,
         timingClosure.target_frequency_mhz,
@@ -2117,6 +2122,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
                 <Stat title="Yosys LUT4 Cells" value={lut4Count} />
                 <Stat title="Yosys Carry Cells" value={carryCount} />
                 <Stat title="Yosys Total Cells" value={totalMappedCells} />
+                <Stat title="Native Block RAM" value={typeof blockRamUsed === "number" && typeof blockRamAvailable === "number" ? `${formatNumber(blockRamUsed)} / ${formatNumber(blockRamAvailable)} ${blockRamPrimitive || "blocks"}` : "not required or not reported"} />
+                <Stat title="Block RAM Utilization" value={typeof blockRamUtilization === "number" ? `${formatNumber(blockRamUtilization)}%` : "not required or not reported"} />
+                <Stat title="Memory Mapping Gate" value={memoryMappingGate.enforced === true ? statusLabel(firstString(memoryMappingGate.status, "not run")) : "not required"} />
                 <Stat title="Routed Logic Cells" value={routedCellsDisplay} />
                 <Stat title="Routing Utilization" value={typeof routedUtilizationPct === "number" ? `${formatNumber(routedUtilizationPct)}%` : metricValue(routedUtilizationPct)} />
                 <Stat title="Routed LUT4 Cells" value={routedLut4Count} />
@@ -2157,6 +2165,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <CheckCard title="Constraints" status={statusLabel(constraints.status)} detail={constraintsDetail} />
               <CheckCard title="RTL Quality Gate" status={statusLabel(rtlQualityStatus)} detail={`pass1 ${statusLabel(rtlQualityPass1Status)}, repair ${rtlQualityRepair.enabled === false ? "disabled" : rtlQualityRepair.applied ? "applied" : "enabled/no fix needed"}, pass2 ${statusLabel(rtlQualityPass2Status)}, tools ${lintToolsDetail}`} />
               <CheckCard title="Yosys Synthesis" status={statusLabel(synth.status)} detail={fileLabel(synth.netlist_json, synth.json_netlist) || firstString(synth.reason)} />
+              <CheckCard title="Native Memory Mapping" status={memoryMappingGate.enforced === true ? statusLabel(firstString(memoryMappingGate.status, "not run")) : "not required"} detail={memoryMappingGate.enforced === true ? `${formatNumber(blockRamUsed || 0)} ${blockRamPrimitive || "native RAM"} block(s) mapped` : "No substantial inferred RTL memory required native block RAM."} />
               <CheckCard title="Synthesis Closure" status={statusLabel(synthClosureStatus)} detail={synthClosureDetail} />
               <CheckCard title="Place & Route" status={statusLabel(pnrStatus)} detail={[pnrTool, pnrDetail, routedUtilizationDetail].filter(Boolean).join(" | ")} />
               <CheckCard title="Timing / DRC" status={statusLabel(timingStatus)} detail={[firstString(timing.timing_source, pnrTool), timingDetail].filter(Boolean).join(" | ")} />

@@ -1,0 +1,35 @@
+{
+  "workflow_id": "30734adb-33b9-4000-8b0e-a911961bac0f",
+  "agent": "Digital Tapeout Agent",
+  "status": "failed",
+  "return_code": 2,
+  "failure_reasons": [
+    "streamout_command_failed",
+    "drc_not_clean",
+    "lvs_not_clean",
+    "gds_not_produced"
+  ],
+  "signoff_inputs": {
+    "drc_status": "failed",
+    "lvs_status": "failed",
+    "xor_status": "not_applicable",
+    "xor_differences": null,
+    "xor_differences_observed": null,
+    "xor_differences_total": null,
+    "xor_layer_counts": {},
+    "xor_nonblocking_layers": [
+      "235/4"
+    ],
+    "gds_produced": false
+  },
+  "outputs": {
+    "sdc": "digital/tapeout/constraints/AeroGuard_Active_Aerodynamics_Controller.sdc",
+    "metrics_json": null,
+    "xor_report_xml": null,
+    "klayout_gds": null,
+    "magic_gds": null,
+    "log": "digital/tapeout/logs/openlane_tapeout.log",
+    "input_resolution_log": "digital/tapeout/logs/tapeout_input_resolution.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/run_work/tapeout/runs/Digital_Arch2Tapeout_30734adb-33b9-4000-8b0e-a911961bac0f"
+  }
+}

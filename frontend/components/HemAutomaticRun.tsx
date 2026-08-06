@@ -307,8 +307,27 @@ export function HemAutomaticRunControls({
   );
 }
 
-export function HemChildDashboardLinks({ logs }: { logs: string | null | undefined }) {
-  const childRuns = useMemo(() => parseHemChildRuns(logs), [logs]);
+type SupabaseHemChildRun = {
+  workflow_id: string;
+  label: string;
+  status?: string | null;
+  dashboard_path: string;
+};
+
+export function HemChildDashboardLinks({ logs, runs }: { logs: string | null | undefined; runs?: SupabaseHemChildRun[] }) {
+  const childRuns = useMemo(() => {
+    const authoritative = (runs || []).map((run) => ({
+      label: run.label,
+      workflowId: run.workflow_id,
+      dashboardPath: run.dashboard_path,
+      status: run.status || "running",
+    }));
+    const byId = new Map(authoritative.map((run) => [run.workflowId, run]));
+    for (const parsed of parseHemChildRuns(logs)) {
+      if (!byId.has(parsed.workflowId)) byId.set(parsed.workflowId, parsed);
+    }
+    return Array.from(byId.values());
+  }, [logs, runs]);
   const workflowIds = useMemo(() => childRuns.map((child) => child.workflowId), [childRuns]);
   const workflowIdKey = workflowIds.join(",");
   const [workflowStatuses, setWorkflowStatuses] = useState<Record<string, string>>({});

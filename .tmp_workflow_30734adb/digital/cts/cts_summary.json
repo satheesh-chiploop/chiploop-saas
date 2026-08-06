@@ -1,0 +1,14 @@
+{
+  "workflow_id": "30734adb-33b9-4000-8b0e-a911961bac0f",
+  "agent": "Digital CTS Agent",
+  "status": "failed",
+  "return_code": 2,
+  "outputs": {
+    "sdc": "digital/cts/constraints/AeroGuard_Active_Aerodynamics_Controller.sdc",
+    "metrics_json": null,
+    "primary_def": null,
+    "cts_netlist": null,
+    "log": "digital/cts/logs/openlane_cts.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/30734adb-33b9-4000-8b0e-a911961bac0f/a3d869e5-ee6f-4838-9460-66c7ab5ff8f1/digital/arch2tapeout/digital/run_work/cts/runs/Digital_Arch2Tapeout_30734adb-33b9-4000-8b0e-a911961bac0f"
+  }
+}

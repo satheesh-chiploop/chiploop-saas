@@ -1,0 +1,11 @@
+{
+  "source_arch2rtl_workflow_id": "a78a20da-d078-430e-8e40-59aa9d6dfc66",
+  "parent_workflow_id": "93511d87-472c-4814-80d4-150af8d6ed1c",
+  "current_workflow_id": "30734adb-33b9-4000-8b0e-a911961bac0f",
+  "current_run_id": "a3d869e5-ee6f-4838-9460-66c7ab5ff8f1",
+  "current_app": "arch2tapeout",
+  "upstream_workflows": {
+    "arch2rtl": "a78a20da-d078-430e-8e40-59aa9d6dfc66",
+    "arch2tapeout": "30734adb-33b9-4000-8b0e-a911961bac0f"
+  }
+}

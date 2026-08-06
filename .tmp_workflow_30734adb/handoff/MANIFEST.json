@@ -1,0 +1,59 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "ag_response_parser",
+  "generated_at": "2026-08-06T03:32:37.868295",
+  "file_count": 10,
+  "files": [
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "1c2309deb0b35c4c4955d98aa9b669bdbee7c5f21dc93742de1101b55eda1b22",
+      "bytes": 43755
+    },
+    {
+      "path": "docs/spec/digital_spec.json",
+      "sha256": "28a2e4bb34b98021a17545c2f7cc9f1e3f92fb302ff25a5c20e7a944b8629db2",
+      "bytes": 64784
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "9a6ba594814f9f5724b864221cf4b618052238b68714cffdec57d0b5cf4c3ec2",
+      "bytes": 2291
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "5139584a01cd29a996cf67484712774771849b2f7d41cee62b3482f7877d4d7b",
+      "bytes": 826
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "22a08228a2003fe27c301067ecda880923b61295e8217aa04ecff341de75be71",
+      "bytes": 370
+    },
+    {
+      "path": "rtl/AeroGuard_Active_Aerodynamics_Controller.v",
+      "sha256": "e028699db22837ce2c91d9dee7d9a32ce29d12dffcd3a8319b5baa6edb73d0de",
+      "bytes": 12708
+    },
+    {
+      "path": "rtl/ag_command_and_safety_fsm.v",
+      "sha256": "e26415c2ef83ca5eca49b10084f326185a5e9a4111ab2239b8ea8e244a4f78ff",
+      "bytes": 6061
+    },
+    {
+      "path": "rtl/ag_input_validation.v",
+      "sha256": "4654ea8c396f09ddd7409dddf7eb71b8dc3c5b65bb9b93ef014d7ddfb7d73a8b",
+      "bytes": 3221
+    },
+    {
+      "path": "rtl/ag_request_sequencer.v",
+      "sha256": "7a3a783fd8a87d351565b54672ca9bfacd06c692f4fd26c73cf0950fd7fe209a",
+      "bytes": 2409
+    },
+    {
+      "path": "rtl/ag_response_parser.v",
+      "sha256": "95935a09dd6fed9a7bde040599ca69a5c5688de48c4a21b0e8c01e014c90377d",
+      "bytes": 2564
+    }
+  ]
+}
