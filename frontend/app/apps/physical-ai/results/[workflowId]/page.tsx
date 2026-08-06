@@ -61,6 +61,20 @@ const plotTitles: Record<string, string> = {
   operating_envelope_plot: "Operating envelope",
 };
 
+function activeAgentFromLogs(logs: string): { agent: string; stage: string } | null {
+  const lines = logs.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    const line = lines[index];
+    if (line.startsWith("AGENT COMPLETED:") || line.startsWith("AGENT FAILED:")) return null;
+    const match = line.match(/^ACTIVE AGENT:\s*(.+?)\s*\|\s*Stage:\s*(.+)$/);
+    if (match) return { agent: match[1].trim(), stage: match[2].trim() };
+    const physicalAiMatch = line.match(/^Physical AI agent started:\s*(.+)$/i);
+    if (physicalAiMatch) return { agent: physicalAiMatch[1].trim(), stage: "Physical AI" };
+    if (/^Physical AI agent (completed|failed):/i.test(line)) return null;
+  }
+  return null;
+}
+
 export default function PhysicalAiResultsPage() {
   const { workflowId } = useParams<{ workflowId: string }>();
   const router = useRouter();
@@ -106,13 +120,14 @@ export default function PhysicalAiResultsPage() {
   }, [router, workflowId]);
 
   const failedCases = useMemo(() => result?.physics_execution.operating_sweep?.cases.filter((item) => !item.feasible) || [], [result]);
+  const activeAgent = useMemo(() => activeAgentFromLogs(logs), [logs]);
 
   function revise() {
     if (result) window.localStorage.setItem("chiploop_physical_ai_rerun", JSON.stringify({ requirements: result.requirements, physics_model_id: result.physics_model.model_id }));
     router.push("/apps/physical-ai?revise=1");
   }
 
-  if (!result) return <main className="min-h-screen bg-slate-950 px-6 py-12 text-white"><div className="mx-auto max-w-5xl"><div className="flex flex-wrap items-end justify-between gap-3"><div><div className="text-xs font-bold uppercase tracking-widest text-violet-300">Physical AI Loop</div><h1 className="mt-3 text-3xl font-bold">Journey is running</h1><p className="mt-2 text-slate-400">This page stays open while agents execute.</p></div><span className="rounded-full bg-cyan-500/15 px-3 py-2 text-xs font-bold uppercase text-cyan-200">{phase.replaceAll("_", " ")}</span></div><section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><h2 className="text-xl font-bold">Running log</h2><pre className="mt-4 max-h-[32rem] overflow-auto whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-xs leading-6 text-slate-300">{logs || "Waiting for the first agent…"}</pre></section>{error && <p className="mt-5 text-red-300">{error}</p>}</div></main>;
+  if (!result) return <main className="min-h-screen bg-slate-950 px-6 py-12 text-white"><div className="mx-auto max-w-5xl"><div className="flex flex-wrap items-end justify-between gap-3"><div><div className="text-xs font-bold uppercase tracking-widest text-violet-300">Physical AI Loop</div><h1 className="mt-3 text-3xl font-bold">Journey is running</h1><p className="mt-2 text-slate-400">This page stays open while agents execute.</p></div><span className="rounded-full bg-cyan-500/15 px-3 py-2 text-xs font-bold uppercase text-cyan-200">{phase.replaceAll("_", " ")}</span></div><section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><h2 className="text-xl font-bold">Running log</h2>{activeAgent && <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3"><span className="h-2.5 w-2.5 animate-pulse rounded-full bg-cyan-300" /><div><div className="text-xs font-bold uppercase tracking-wide text-cyan-300">Active agent</div><div className="mt-1 font-semibold">{activeAgent.agent}</div></div><span className="ml-auto rounded-full bg-slate-950 px-3 py-1 text-xs text-slate-300">{activeAgent.stage}</span></div>}<pre className="mt-4 max-h-[32rem] overflow-auto whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-xs leading-6 text-slate-300">{logs || "Waiting for the first agent…"}</pre></section>{error && <p className="mt-5 text-red-300">{error}</p>}</div></main>;
 
   if (result.physics_execution.execution_mode === "architecture") {
     const execution = result.physics_execution;
