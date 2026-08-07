@@ -1,0 +1,129 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "motor_control_top",
+  "generated_at": "2026-08-07T03:26:21.106319",
+  "file_count": 24,
+  "files": [
+    {
+      "path": "docs/arch/digital_architecture.json",
+      "sha256": "8c159bb63a0d51fc9cc1bf08ae6251802a74b752e05f514cfafdac49a3e325a6",
+      "bytes": 19466
+    },
+    {
+      "path": "docs/microarch/digital_microarchitecture.json",
+      "sha256": "720c8e6255fa26f62c9077d33f0f1b19ed70318612e762dc4483d57218a45f2e",
+      "bytes": 12208
+    },
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "7cad2851553c06fbcd897559958c8e1eade954dd1a9f17c25b37d1d970480f32",
+      "bytes": 22714
+    },
+    {
+      "path": "docs/regmap/digital_regmap_raw_output.txt",
+      "sha256": "7cad2851553c06fbcd897559958c8e1eade954dd1a9f17c25b37d1d970480f32",
+      "bytes": 22714
+    },
+    {
+      "path": "docs/spec/motor_control_top_spec.json",
+      "sha256": "dd79781c1b48e93b9b8e5f468730994ecde7ee82bcb7b363704b32f9a0910f65",
+      "bytes": 115882
+    },
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "3825476d8d8e5d61fe336bd43206894c58f56548c1b3ea4dffb45ac0a9691359",
+      "bytes": 15129
+    },
+    {
+      "path": "docs/spec/spec_agent_normalized.json",
+      "sha256": "dd79781c1b48e93b9b8e5f468730994ecde7ee82bcb7b363704b32f9a0910f65",
+      "bytes": 115882
+    },
+    {
+      "path": "misc/power_intent_findings.json",
+      "sha256": "7fa145e2180b4086fc49a73c3fd5f9021950b98a84dc26b902eddc4f6a7ccf59",
+      "bytes": 289
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "b0032b4166257a88988957b59c90a193d54418681c8684148d34e7a494f8514c",
+      "bytes": 419
+    },
+    {
+      "path": "misc/rtl_agent_preflight.json",
+      "sha256": "90098f66fcf8c49d580b0740df3e5f92f4abf954a2edb83c80e3cf1ab1f71de9",
+      "bytes": 497
+    },
+    {
+      "path": "misc/rtl_quality_gate.json",
+      "sha256": "9c30b9e0d26d0d2420dd3e382db02fe22903dc01c7f3eee9aa57494f92dec1da",
+      "bytes": 159
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "f856eaa76a5353eefd629e11b6818bb83f83fd21eed6aa337649ae1eea8444d8",
+      "bytes": 2221
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "a071cfab6d7a1903b9ad747635fe188e80baa926001226697bf41ab55a5fa21f",
+      "bytes": 776
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "76e75c796fbac581a561c45aca9ca0c22a37f836cf71a6f3bf2e37fbb98acf47",
+      "bytes": 324
+    },
+    {
+      "path": "rtl/command_clamper.v",
+      "sha256": "7aca54ef08ebfa800dc47f1366d76a403729cceb9dacb4d870e8c4bd8f7997ef",
+      "bytes": 1011
+    },
+    {
+      "path": "rtl/freshness_timeout_supervisor.v",
+      "sha256": "679f4799077e8e5c2ac69d8255ddb424cca66d93bf08db45960fddc595df4ce0",
+      "bytes": 1000
+    },
+    {
+      "path": "rtl/motor_control_fsm.v",
+      "sha256": "aa64e794605ea35ac0a6d6c2b8a3058168cf06e1c8987652e5291ac589abec29",
+      "bytes": 2976
+    },
+    {
+      "path": "rtl/motor_control_register_map.v",
+      "sha256": "9ff0bca84e7a00983a2ffacc79a6642e4f42e58effdc1aa3112a80fab768c822",
+      "bytes": 6612
+    },
+    {
+      "path": "rtl/motor_control_top.v",
+      "sha256": "3aa78949ce8840f07845270823d59ffe8349122e55b05fc7a16d048654794bb4",
+      "bytes": 13149
+    },
+    {
+      "path": "rtl/payload_pointer_manager.v",
+      "sha256": "735bbd11e3cdaa5c4b08d2fa7a4abe09c54462a9df83ab8e70b3986a49ed901e",
+      "bytes": 1111
+    },
+    {
+      "path": "rtl/request_packager.v",
+      "sha256": "916f9d8367b04419373fb12fe4ac54439c6c036aa7876bd365b240540aa5d959",
+      "bytes": 1498
+    },
+    {
+      "path": "rtl/response_parser.v",
+      "sha256": "587934d9e344c0e409ffd1973deb922b1e362bdbd39132124923d2bd54393546",
+      "bytes": 1226
+    },
+    {
+      "path": "rtl/safe_fallback_controller.v",
+      "sha256": "a34cc1a7eb711b4f58b3842f44309a478dbe293fe0974c3a2c3cd5e4ee24c90e",
+      "bytes": 1285
+    },
+    {
+      "path": "rtl/transport_controller.v",
+      "sha256": "1d493ae08d39ac4f84c898d6b4f0e8d216784e148adece2e96bb53409fd488b6",
+      "bytes": 1979
+    }
+  ]
+}

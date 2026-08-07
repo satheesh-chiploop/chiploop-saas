@@ -1,0 +1,1060 @@
+---BEGIN motor_control_register_map.v---
+module motor_control_register_map (
+    input clk,
+    input reset_n,
+    input csr_valid,
+    input csr_we,
+    input csr_re,
+    input [7:0] csr_be,
+    input [7:0] csr_addr,
+    input [63:0] csr_wdata,
+    output reg [63:0] csr_rdata,
+    output csr_ready,
+    output reg [15:0] cfg_seq_id,
+    output reg [15:0] cfg_timeout_ticks,
+    output reg [15:0] cfg_freshness_limit,
+    output reg [15:0] cfg_velocity_mps,
+    output reg [31:0] cfg_geometry_base_addr,
+    output reg [15:0] cfg_geometry_length,
+    output reg [7:0] cfg_geometry_format,
+    output reg [15:0] cfg_actuator_min,
+    output reg [15:0] cfg_actuator_max,
+    output reg [15:0] cfg_slew_limit,
+    output reg [31:0] cfg_checkpoint_id,
+    output reg [15:0] cfg_control_flags,
+    output reg launch_pulse,
+    output reg clear_fault_pulse,
+    input status_busy,
+    input status_done,
+    input status_fault,
+    input status_timeout,
+    input status_stale,
+    input status_clamped,
+    input status_fallback_active,
+    input status_transport_error,
+    input status_response_valid,
+    input [63:0] response_summary
+);
+assign csr_ready = 1'b1;
+
+reg [15:0] cfg_valid;
+reg [7:0] ctrl_reg;
+reg [7:0] status_shadow;
+
+wire wr_en;
+wire rd_en;
+assign wr_en = csr_valid & csr_we & csr_ready;
+assign rd_en = csr_valid & csr_re & csr_ready;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        cfg_seq_id <= 16'h0000;
+        cfg_timeout_ticks <= 16'h0020;
+        cfg_freshness_limit <= 16'h0010;
+        cfg_velocity_mps <= 16'h0000;
+        cfg_geometry_base_addr <= 32'h00000000;
+        cfg_geometry_length <= 16'h0000;
+        cfg_geometry_format <= 8'h00;
+        cfg_actuator_min <= 16'h0000;
+        cfg_actuator_max <= 16'h00FF;
+        cfg_slew_limit <= 16'h0000;
+        cfg_checkpoint_id <= 32'h00000000;
+        cfg_control_flags <= 16'h0000;
+        cfg_valid <= 16'h0000;
+        ctrl_reg <= 8'h00;
+        launch_pulse <= 1'b0;
+        clear_fault_pulse <= 1'b0;
+        status_shadow <= 8'h00;
+    end else begin
+        launch_pulse <= 1'b0;
+        clear_fault_pulse <= 1'b0;
+        if (wr_en) begin
+            case (csr_addr)
+                8'h00: begin
+                    if (csr_be[0]) begin
+                        ctrl_reg[0] <= csr_wdata[0];
+                        ctrl_reg[1] <= csr_wdata[1];
+                    end
+                end
+                8'h03: if (csr_be[0]) cfg_seq_id[7:0] <= csr_wdata[7:0];
+                8'h04: if (csr_be[0]) cfg_seq_id[15:8] <= csr_wdata[7:0];
+                8'h05: if (csr_be[0]) cfg_timeout_ticks[7:0] <= csr_wdata[7:0];
+                8'h06: if (csr_be[0]) cfg_timeout_ticks[15:8] <= csr_wdata[7:0];
+                8'h07: if (csr_be[0]) cfg_freshness_limit[7:0] <= csr_wdata[7:0];
+                8'h08: if (csr_be[0]) cfg_freshness_limit[15:8] <= csr_wdata[7:0];
+                8'h09: if (csr_be[0]) cfg_velocity_mps[7:0] <= csr_wdata[7:0];
+                8'h0A: if (csr_be[0]) cfg_velocity_mps[15:8] <= csr_wdata[7:0];
+                8'h0B: if (csr_be[0]) cfg_geometry_base_addr[7:0] <= csr_wdata[7:0];
+                8'h0C: if (csr_be[0]) cfg_geometry_base_addr[15:8] <= csr_wdata[7:0];
+                8'h0D: if (csr_be[0]) cfg_geometry_base_addr[23:16] <= csr_wdata[7:0];
+                8'h0E: if (csr_be[0]) cfg_geometry_base_addr[31:24] <= csr_wdata[7:0];
+                8'h0F: if (csr_be[0]) cfg_geometry_length[7:0] <= csr_wdata[7:0];
+                8'h10: if (csr_be[0]) cfg_geometry_length[15:8] <= csr_wdata[7:0];
+                8'h11: if (csr_be[0]) cfg_geometry_format <= csr_wdata[7:0];
+                8'h12: if (csr_be[0]) cfg_actuator_min[7:0] <= csr_wdata[7:0];
+                8'h13: if (csr_be[0]) cfg_actuator_min[15:8] <= csr_wdata[7:0];
+                8'h14: if (csr_be[0]) cfg_actuator_max[7:0] <= csr_wdata[7:0];
+                8'h15: if (csr_be[0]) cfg_actuator_max[15:8] <= csr_wdata[7:0];
+                8'h16: if (csr_be[0]) cfg_slew_limit[7:0] <= csr_wdata[7:0];
+                8'h17: if (csr_be[0]) cfg_slew_limit[15:8] <= csr_wdata[7:0];
+                8'h18: if (csr_be[0]) cfg_checkpoint_id[7:0] <= csr_wdata[7:0];
+                8'h19: if (csr_be[0]) cfg_checkpoint_id[15:8] <= csr_wdata[7:0];
+                8'h1A: if (csr_be[0]) cfg_checkpoint_id[23:16] <= csr_wdata[7:0];
+                8'h1B: if (csr_be[0]) cfg_checkpoint_id[31:24] <= csr_wdata[7:0];
+                8'h1C: if (csr_be[0]) cfg_control_flags[7:0] <= csr_wdata[7:0];
+                8'h1D: if (csr_be[0]) cfg_control_flags[15:8] <= csr_wdata[7:0];
+                8'h1E: if (csr_be[0] && csr_wdata[0]) launch_pulse <= 1'b1;
+                8'h1F: if (csr_be[0] && csr_wdata[0]) clear_fault_pulse <= 1'b1;
+                default: begin end
+            endcase
+        end
+        ctrl_reg[0] <= cfg_valid[0];
+        ctrl_reg[1] <= cfg_valid[1];
+        status_shadow[0] <= status_busy;
+        status_shadow[1] <= status_done;
+        status_shadow[2] <= status_fault;
+        status_shadow[3] <= status_timeout;
+        status_shadow[4] <= status_stale;
+        status_shadow[5] <= status_clamped;
+        status_shadow[6] <= status_fallback_active;
+        status_shadow[7] <= status_transport_error;
+        if (csr_valid & csr_we & csr_ready & (csr_addr == 8'h00) & csr_be[0]) begin
+            cfg_valid[0] <= csr_wdata[0];
+            cfg_valid[1] <= csr_wdata[1];
+        end
+    end
+end
+
+always @(*) begin
+    csr_rdata = 64'h0000000000000000;
+    case (csr_addr)
+        8'h00: csr_rdata = {56'h0, 6'b0, ctrl_reg[1:0]};
+        8'h01: csr_rdata = {56'h0, 56'h0, status_shadow};
+        8'h02: csr_rdata = {56'h0, 63'h0, status_response_valid};
+        8'h03: csr_rdata = {56'h0, 56'h0, cfg_seq_id[7:0]};
+        8'h04: csr_rdata = {56'h0, 56'h0, cfg_seq_id[15:8]};
+        8'h05: csr_rdata = {56'h0, 56'h0, cfg_timeout_ticks[7:0]};
+        8'h06: csr_rdata = {56'h0, 56'h0, cfg_timeout_ticks[15:8]};
+        8'h07: csr_rdata = {56'h0, 56'h0, cfg_freshness_limit[7:0]};
+        8'h08: csr_rdata = {56'h0, 56'h0, cfg_freshness_limit[15:8]};
+        8'h09: csr_rdata = {56'h0, 56'h0, cfg_velocity_mps[7:0]};
+        8'h0A: csr_rdata = {56'h0, 56'h0, cfg_velocity_mps[15:8]};
+        8'h0B: csr_rdata = {56'h0, 56'h0, cfg_geometry_base_addr[7:0]};
+        8'h0C: csr_rdata = {56'h0, 56'h0, cfg_geometry_base_addr[15:8]};
+        8'h0D: csr_rdata = {56'h0, 56'h0, cfg_geometry_base_addr[23:16]};
+        8'h0E: csr_rdata = {56'h0, 56'h0, cfg_geometry_base_addr[31:24]};
+        8'h0F: csr_rdata = {56'h0, 56'h0, cfg_geometry_length[7:0]};
+        8'h10: csr_rdata = {56'h0, 56'h0, cfg_geometry_length[15:8]};
+        8'h11: csr_rdata = {56'h0, 56'h0, cfg_geometry_format};
+        8'h12: csr_rdata = {56'h0, 56'h0, cfg_actuator_min[7:0]};
+        8'h13: csr_rdata = {56'h0, 56'h0, cfg_actuator_min[15:8]};
+        8'h14: csr_rdata = {56'h0, 56'h0, cfg_actuator_max[7:0]};
+        8'h15: csr_rdata = {56'h0, 56'h0, cfg_actuator_max[15:8]};
+        8'h16: csr_rdata = {56'h0, 56'h0, cfg_slew_limit[7:0]};
+        8'h17: csr_rdata = {56'h0, 56'h0, cfg_slew_limit[15:8]};
+        8'h18: csr_rdata = {56'h0, 56'h0, cfg_checkpoint_id[7:0]};
+        8'h19: csr_rdata = {56'h0, 56'h0, cfg_checkpoint_id[15:8]};
+        8'h1A: csr_rdata = {56'h0, 56'h0, cfg_checkpoint_id[23:16]};
+        8'h1B: csr_rdata = {56'h0, 56'h0, cfg_checkpoint_id[31:24]};
+        8'h1C: csr_rdata = {56'h0, 56'h0, cfg_control_flags[7:0]};
+        8'h1D: csr_rdata = {56'h0, 56'h0, cfg_control_flags[15:8]};
+        8'h20: csr_rdata = {56'h0, response_summary[7:0]};
+        8'h21: csr_rdata = {56'h0, response_summary[15:8]};
+        8'h22: csr_rdata = {56'h0, response_summary[23:16]};
+        8'h23: csr_rdata = {56'h0, response_summary[31:24]};
+        8'h24: csr_rdata = {56'h0, response_summary[39:32]};
+        8'h25: csr_rdata = {56'h0, response_summary[47:40]};
+        8'h26: csr_rdata = {56'h0, response_summary[55:48]};
+        8'h27: csr_rdata = {56'h0, response_summary[63:56]};
+        default: csr_rdata = 64'h0000000000000000;
+    endcase
+end
+
+endmodule
+---END motor_control_register_map.v---
+
+---BEGIN payload_pointer_manager.v---
+module payload_pointer_manager (
+    input clk,
+    input reset_n,
+    input [31:0] cfg_geometry_base_addr,
+    input [15:0] cfg_geometry_length,
+    input [7:0] cfg_geometry_format,
+    input [15:0] cfg_control_flags,
+    output reg [31:0] geometry_base_addr_q,
+    output reg [15:0] geometry_length_q,
+    output reg [7:0] geometry_format_q,
+    output reg geometry_valid,
+    output reg alignment_error
+);
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        geometry_base_addr_q <= 32'h00000000;
+        geometry_length_q <= 16'h0000;
+        geometry_format_q <= 8'h00;
+        geometry_valid <= 1'b0;
+        alignment_error <= 1'b0;
+    end else begin
+        geometry_base_addr_q <= cfg_geometry_base_addr;
+        geometry_length_q <= cfg_geometry_length;
+        geometry_format_q <= cfg_geometry_format;
+        geometry_valid <= (cfg_geometry_length != 16'h0000) && (cfg_geometry_format != 8'h00) && (cfg_control_flags[0] | ~cfg_control_flags[0]);
+        alignment_error <= (cfg_geometry_base_addr[1:0] != 2'b00) | (cfg_geometry_length == 16'h0000);
+    end
+end
+endmodule
+---END payload_pointer_manager.v---
+
+---BEGIN request_packager.v---
+module request_packager (
+    input clk,
+    input reset_n,
+    input start,
+    input [15:0] seq_id_in,
+    input [15:0] cfg_velocity_mps,
+    input [31:0] cfg_checkpoint_id,
+    input [15:0] cfg_control_flags,
+    input [31:0] geometry_base_addr_q,
+    input [15:0] geometry_length_q,
+    input [7:0] geometry_format_q,
+    input freshness_ok,
+    input descriptor_valid,
+    output reg [127:0] req_payload,
+    output reg req_valid,
+    input req_ready,
+    output reg request_accepted,
+    output reg request_error
+);
+reg pending;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        req_payload <= 128'h00000000000000000000000000000000;
+        req_valid <= 1'b0;
+        request_accepted <= 1'b0;
+        request_error <= 1'b0;
+        pending <= 1'b0;
+    end else begin
+        request_accepted <= 1'b0;
+        request_error <= 1'b0;
+        if (start && descriptor_valid && freshness_ok && !req_valid && !pending) begin
+            req_payload <= {seq_id_in, geometry_base_addr_q, geometry_length_q, geometry_format_q, cfg_velocity_mps, 8'hA5, cfg_checkpoint_id[31:0], cfg_control_flags, 32'h00000000};
+            req_valid <= 1'b1;
+            pending <= 1'b1;
+        end
+        if (req_valid && req_ready) begin
+            req_valid <= 1'b0;
+            pending <= 1'b0;
+            request_accepted <= 1'b1;
+        end
+        if (start && (!descriptor_valid || !freshness_ok)) begin
+            request_error <= 1'b1;
+        end
+    end
+end
+endmodule
+---END request_packager.v---
+
+---BEGIN transport_controller.v---
+module transport_controller (
+    input clk,
+    input reset_n,
+    input req_valid,
+    output reg req_ready,
+    input [127:0] req_payload,
+    input rsp_valid,
+    output reg rsp_ready,
+    input [127:0] rsp_payload,
+    input [15:0] timeout_ticks,
+    output reg busy,
+    output reg done,
+    output reg timeout_fault,
+    output reg transport_error,
+    output reg response_valid,
+    output reg [63:0] response_summary
+);
+reg [15:0] timer;
+reg inflight;
+reg [127:0] req_hold;
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        req_ready <= 1'b1;
+        rsp_ready <= 1'b0;
+        busy <= 1'b0;
+        done <= 1'b0;
+        timeout_fault <= 1'b0;
+        transport_error <= 1'b0;
+        response_valid <= 1'b0;
+        response_summary <= 64'h0000000000000000;
+        timer <= 16'h0000;
+        inflight <= 1'b0;
+        req_hold <= 128'h0;
+    end else begin
+        done <= 1'b0;
+        timeout_fault <= 1'b0;
+        transport_error <= 1'b0;
+        response_valid <= 1'b0;
+        if (!inflight && req_valid) begin
+            req_ready <= 1'b1;
+            req_hold <= req_payload;
+            inflight <= 1'b1;
+            busy <= 1'b1;
+            timer <= timeout_ticks;
+            rsp_ready <= 1'b1;
+        end else begin
+            req_ready <= 1'b0;
+        end
+        if (inflight) begin
+            if (rsp_valid && rsp_ready) begin
+                response_valid <= 1'b1;
+                response_summary <= rsp_payload[63:0] ^ req_hold[63:0];
+                done <= 1'b1;
+                busy <= 1'b0;
+                inflight <= 1'b0;
+                rsp_ready <= 1'b0;
+            end else if (timer == 16'h0000) begin
+                timeout_fault <= 1'b1;
+                transport_error <= 1'b1;
+                busy <= 1'b0;
+                inflight <= 1'b0;
+                rsp_ready <= 1'b0;
+            end else begin
+                timer <= timer - 16'h0001;
+            end
+        end
+    end
+end
+endmodule
+---END transport_controller.v---
+
+---BEGIN freshness_timeout_supervisor.v---
+module freshness_timeout_supervisor (
+    input clk,
+    input reset_n,
+    input [15:0] seq_id_in,
+    input [15:0] cmd_age_ticks,
+    input [15:0] cfg_seq_id,
+    input [15:0] freshness_limit,
+    input [15:0] timeout_ticks,
+    output reg [15:0] last_accepted_seq,
+    output reg freshness_ok,
+    output reg stale_fault,
+    output reg timeout_config_valid
+);
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        last_accepted_seq <= 16'h0000;
+        freshness_ok <= 1'b0;
+        stale_fault <= 1'b0;
+        timeout_config_valid <= 1'b0;
+    end else begin
+        timeout_config_valid <= (timeout_ticks != 16'h0000);
+        stale_fault <= 1'b0;
+        if ((cmd_age_ticks > freshness_limit) || (seq_id_in <= last_accepted_seq) || (seq_id_in != cfg_seq_id)) begin
+            freshness_ok <= 1'b0;
+            stale_fault <= 1'b1;
+        end else begin
+            freshness_ok <= 1'b1;
+            last_accepted_seq <= seq_id_in;
+        end
+    end
+end
+endmodule
+---END freshness_timeout_supervisor.v---
+
+---BEGIN response_parser.v---
+module response_parser (
+    input clk,
+    input reset_n,
+    input rsp_valid,
+    input [127:0] rsp_payload,
+    input [15:0] expected_seq_id,
+    output reg response_ok,
+    output reg [15:0] parsed_cmd_value,
+    output reg [15:0] parsed_cmd_rate,
+    output reg [15:0] parsed_flags,
+    output reg response_valid,
+    output reg malformed_response
+);
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        response_ok <= 1'b0;
+        parsed_cmd_value <= 16'h0000;
+        parsed_cmd_rate <= 16'h0000;
+        parsed_flags <= 16'h0000;
+        response_valid <= 1'b0;
+        malformed_response <= 1'b0;
+    end else begin
+        response_valid <= 1'b0;
+        response_ok <= 1'b0;
+        malformed_response <= 1'b0;
+        if (rsp_valid && (rsp_payload[127:112] == expected_seq_id) && (rsp_payload[15:0] != 16'hFFFF)) begin
+            parsed_cmd_value <= rsp_payload[31:16];
+            parsed_cmd_rate <= rsp_payload[47:32];
+            parsed_flags <= rsp_payload[63:48];
+            response_ok <= 1'b1;
+            response_valid <= 1'b1;
+        end else if (rsp_valid) begin
+            malformed_response <= 1'b1;
+            response_valid <= 1'b1;
+        end
+    end
+end
+endmodule
+---END response_parser.v---
+
+---BEGIN command_clamper.v---
+module command_clamper (
+    input clk,
+    input reset_n,
+    input response_ok,
+    input [15:0] parsed_cmd_value,
+    input [15:0] parsed_cmd_rate,
+    input [15:0] actuator_min,
+    input [15:0] actuator_max,
+    input [15:0] slew_limit,
+    output reg [15:0] cmd_value_out,
+    output reg [15:0] cmd_rate_out,
+    output reg clamped
+);
+reg [15:0] prev_value;
+reg [15:0] value_tmp;
+reg [15:0] rate_tmp;
+reg value_hi;
+reg value_lo;
+reg rate_hi;
+reg rate_lo;
+
+always @(*) begin
+    value_tmp = parsed_cmd_value;
+    rate_tmp = parsed_cmd_rate;
+    value_hi = 1'b0;
+    value_lo = 1'b0;
+    rate_hi = 1'b0;
+    rate_lo = 1'b0;
+    if (value_tmp < actuator_min) begin
+        value_tmp = actuator_min;
+        value_lo = 1'b1;
+    end
+    if (value_tmp > actuator_max) begin
+        value_tmp = actuator_max;
+        value_hi = 1'b1;
+    end
+    if (rate_tmp > slew_limit) begin
+        rate_tmp = slew_limit;
+        rate_hi = 1'b1;
+    end
+    if (rate_tmp > prev_value) begin
+        rate_lo = 1'b0;
+    end
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        cmd_value_out <= 16'h0000;
+        cmd_rate_out <= 16'h0000;
+        prev_value <= 16'h0000;
+        clamped <= 1'b0;
+    end else begin
+        if (response_ok) begin
+            cmd_value_out <= value_tmp;
+            cmd_rate_out <= rate_tmp;
+            prev_value <= value_tmp;
+            clamped <= value_hi | value_lo | rate_hi | rate_lo;
+        end else begin
+            clamped <= 1'b0;
+        end
+    end
+end
+endmodule
+---END command_clamper.v---
+
+---BEGIN safe_fallback_controller.v---
+module safe_fallback_controller (
+    input clk,
+    input reset_n,
+    input fault_in,
+    input timeout_fault_in,
+    input stale_fault_in,
+    input transport_error_in,
+    input malformed_response_in,
+    input host_abort_in,
+    input clear_fault_pulse,
+    output reg [15:0] safe_cmd_value,
+    output reg [15:0] safe_cmd_rate,
+    output reg safe_mode,
+    output reg fault_sticky,
+    output reg fallback_active
+);
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        safe_cmd_value <= 16'h0000;
+        safe_cmd_rate <= 16'h0000;
+        safe_mode <= 1'b0;
+        fault_sticky <= 1'b0;
+        fallback_active <= 1'b0;
+    end else begin
+        if (fault_in | timeout_fault_in | stale_fault_in | transport_error_in | malformed_response_in | host_abort_in) begin
+            fault_sticky <= 1'b1;
+            fallback_active <= 1'b1;
+            safe_mode <= 1'b1;
+            safe_cmd_value <= 16'h0000;
+            safe_cmd_rate <= 16'h0000;
+        end
+        if (clear_fault_pulse && !fault_in && !timeout_fault_in && !stale_fault_in && !transport_error_in && !malformed_response_in && !host_abort_in) begin
+            fault_sticky <= 1'b0;
+            fallback_active <= 1'b0;
+            safe_mode <= 1'b0;
+        end
+    end
+end
+endmodule
+---END safe_fallback_controller.v---
+
+---BEGIN motor_control_fsm.v---
+module motor_control_fsm (
+    input clk,
+    input reset_n,
+    input launch_pulse,
+    input clear_fault_pulse,
+    input freshness_ok,
+    input descriptor_valid,
+    input request_accepted,
+    input request_error,
+    input response_ok,
+    input malformed_response,
+    input timeout_fault,
+    input stale_fault,
+    input transport_error,
+    input clamped,
+    output reg busy,
+    output reg done,
+    output reg fault,
+    output reg state_idle,
+    output reg state_issue_req,
+    output reg state_wait_rsp,
+    output reg state_validate,
+    output reg state_clamp,
+    output reg state_apply,
+    output reg state_fallback,
+    output reg state_fault
+);
+localparam S_IDLE = 3'd0;
+localparam S_ISSUE = 3'd1;
+localparam S_WAIT = 3'd2;
+localparam S_VALIDATE = 3'd3;
+localparam S_CLAMP = 3'd4;
+localparam S_APPLY = 3'd5;
+localparam S_FALLBACK = 3'd6;
+localparam S_FAULT = 3'd7;
+
+reg [2:0] state;
+reg [2:0] next_state;
+
+always @(*) begin
+    next_state = state;
+    busy = 1'b0;
+    done = 1'b0;
+    fault = 1'b0;
+    state_idle = 1'b0;
+    state_issue_req = 1'b0;
+    state_wait_rsp = 1'b0;
+    state_validate = 1'b0;
+    state_clamp = 1'b0;
+    state_apply = 1'b0;
+    state_fallback = 1'b0;
+    state_fault = 1'b0;
+    case (state)
+        S_IDLE: begin
+            state_idle = 1'b1;
+            if (launch_pulse && freshness_ok && descriptor_valid) next_state = S_ISSUE;
+        end
+        S_ISSUE: begin
+            busy = 1'b1;
+            state_issue_req = 1'b1;
+            if (request_error) next_state = S_FAULT;
+            else if (request_accepted) next_state = S_WAIT;
+        end
+        S_WAIT: begin
+            busy = 1'b1;
+            state_wait_rsp = 1'b1;
+            if (timeout_fault || stale_fault || transport_error) next_state = S_FALLBACK;
+            else if (response_ok) next_state = S_VALIDATE;
+        end
+        S_VALIDATE: begin
+            busy = 1'b1;
+            state_validate = 1'b1;
+            if (malformed_response) next_state = S_FALLBACK;
+            else if (response_ok) next_state = S_CLAMP;
+        end
+        S_CLAMP: begin
+            busy = 1'b1;
+            state_clamp = 1'b1;
+            if (clamped) next_state = S_APPLY;
+        end
+        S_APPLY: begin
+            done = 1'b1;
+            state_apply = 1'b1;
+            next_state = S_IDLE;
+        end
+        S_FALLBACK: begin
+            fault = 1'b1;
+            state_fallback = 1'b1;
+            next_state = S_FAULT;
+        end
+        S_FAULT: begin
+            fault = 1'b1;
+            state_fault = 1'b1;
+            if (clear_fault_pulse) next_state = S_IDLE;
+        end
+        default: next_state = S_IDLE;
+    endcase
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) state <= S_IDLE;
+    else state <= next_state;
+end
+endmodule
+---END motor_control_fsm.v---
+
+---BEGIN motor_control_top.v---
+module motor_control_top (
+    input clk,
+    input reset_n,
+    input csr_valid,
+    output csr_ready,
+    input csr_we,
+    input csr_re,
+    input [7:0] csr_be,
+    input [7:0] csr_addr,
+    input [63:0] csr_wdata,
+    output [63:0] csr_rdata,
+    input start,
+    input [15:0] seq_id_in,
+    input [15:0] cmd_age_ticks,
+    output model_req_valid,
+    input model_req_ready,
+    output [127:0] model_req_data,
+    input model_rsp_valid,
+    output model_rsp_ready,
+    input [127:0] model_rsp_data,
+    output cmd_valid,
+    output [15:0] cmd_value,
+    output [15:0] cmd_rate,
+    output safe_mode,
+    output busy,
+    output done,
+    output fault,
+    output timeout_fault,
+    output stale_fault,
+    output clamped,
+    output fallback_active,
+    output transport_error,
+    output response_valid,
+    output [15:0] motor_control_register_map_cfg_seq_id,
+    output [15:0] motor_control_register_map_cfg_timeout_ticks,
+    output [15:0] motor_control_register_map_cfg_freshness_limit,
+    output [15:0] motor_control_register_map_cfg_velocity_mps,
+    output [31:0] motor_control_register_map_cfg_geometry_base_addr,
+    output [15:0] motor_control_register_map_cfg_geometry_length,
+    output [7:0] motor_control_register_map_cfg_geometry_format,
+    output [15:0] motor_control_register_map_cfg_actuator_min,
+    output [15:0] motor_control_register_map_cfg_actuator_max,
+    output [15:0] motor_control_register_map_cfg_slew_limit,
+    output [31:0] motor_control_register_map_cfg_checkpoint_id,
+    output [15:0] motor_control_register_map_cfg_control_flags,
+    output motor_control_register_map_launch_pulse,
+    output motor_control_register_map_clear_fault_pulse,
+    input motor_control_register_map_status_busy,
+    input motor_control_register_map_status_done,
+    input motor_control_register_map_status_fault,
+    input motor_control_register_map_status_timeout,
+    input motor_control_register_map_status_stale,
+    input motor_control_register_map_status_clamped,
+    input motor_control_register_map_status_fallback_active,
+    input motor_control_register_map_status_transport_error,
+    input motor_control_register_map_status_response_valid,
+    input [63:0] motor_control_register_map_response_summary,
+    output [31:0] payload_pointer_manager_cfg_geometry_base_addr,
+    output [15:0] payload_pointer_manager_cfg_geometry_length,
+    output [7:0] payload_pointer_manager_cfg_geometry_format,
+    output [15:0] payload_pointer_manager_cfg_control_flags,
+    input [31:0] payload_pointer_manager_geometry_base_addr_q,
+    input [15:0] payload_pointer_manager_geometry_length_q,
+    input [7:0] payload_pointer_manager_geometry_format_q,
+    input payload_pointer_manager_geometry_valid,
+    input payload_pointer_manager_alignment_error,
+    output [15:0] request_packager_cfg_velocity_mps,
+    output [31:0] request_packager_cfg_checkpoint_id,
+    output [15:0] request_packager_cfg_control_flags,
+    output [31:0] request_packager_geometry_base_addr_q,
+    output [15:0] request_packager_geometry_length_q,
+    output [7:0] request_packager_geometry_format_q,
+    output request_packager_freshness_ok,
+    output request_packager_descriptor_valid,
+    input [127:0] request_packager_req_payload,
+    input request_packager_req_valid,
+    output request_packager_req_ready,
+    input request_packager_request_accepted,
+    input request_packager_request_error,
+    output transport_controller_req_valid,
+    input transport_controller_req_ready,
+    output [127:0] transport_controller_req_payload,
+    output transport_controller_rsp_valid,
+    input transport_controller_rsp_ready,
+    output [127:0] transport_controller_rsp_payload,
+    output [15:0] transport_controller_timeout_ticks,
+    input [63:0] transport_controller_response_summary,
+    output [15:0] freshness_timeout_supervisor_cfg_seq_id,
+    output [15:0] freshness_timeout_supervisor_freshness_limit,
+    output [15:0] freshness_timeout_supervisor_timeout_ticks,
+    input [15:0] freshness_timeout_supervisor_last_accepted_seq,
+    input freshness_timeout_supervisor_freshness_ok,
+    input freshness_timeout_supervisor_timeout_config_valid,
+    output response_parser_rsp_valid,
+    output [127:0] response_parser_rsp_payload,
+    output [15:0] response_parser_expected_seq_id,
+    input response_parser_response_ok,
+    input [15:0] response_parser_parsed_cmd_value,
+    input [15:0] response_parser_parsed_cmd_rate,
+    input [15:0] response_parser_parsed_flags,
+    input response_parser_malformed_response,
+    output command_clamper_response_ok,
+    output [15:0] command_clamper_parsed_cmd_value,
+    output [15:0] command_clamper_parsed_cmd_rate,
+    output [15:0] command_clamper_actuator_min,
+    output [15:0] command_clamper_actuator_max,
+    output [15:0] command_clamper_slew_limit,
+    input [15:0] command_clamper_cmd_value_out,
+    input [15:0] command_clamper_cmd_rate_out,
+    output safe_fallback_controller_fault_in,
+    output safe_fallback_controller_timeout_fault_in,
+    output safe_fallback_controller_stale_fault_in,
+    output safe_fallback_controller_transport_error_in,
+    output safe_fallback_controller_malformed_response_in,
+    output safe_fallback_controller_host_abort_in,
+    output safe_fallback_controller_clear_fault_pulse,
+    input [15:0] safe_fallback_controller_safe_cmd_value,
+    input [15:0] safe_fallback_controller_safe_cmd_rate,
+    input safe_fallback_controller_fault_sticky,
+    output motor_control_fsm_launch_pulse,
+    output motor_control_fsm_clear_fault_pulse,
+    output motor_control_fsm_freshness_ok,
+    output motor_control_fsm_descriptor_valid,
+    output motor_control_fsm_request_accepted,
+    output motor_control_fsm_request_error,
+    output motor_control_fsm_response_ok,
+    output motor_control_fsm_malformed_response,
+    output motor_control_fsm_timeout_fault,
+    output motor_control_fsm_stale_fault,
+    output motor_control_fsm_transport_error,
+    output motor_control_fsm_clamped,
+    input motor_control_fsm_state_idle,
+    input motor_control_fsm_state_issue_req,
+    input motor_control_fsm_state_wait_rsp,
+    input motor_control_fsm_state_validate,
+    input motor_control_fsm_state_clamp,
+    input motor_control_fsm_state_apply,
+    input motor_control_fsm_state_fallback,
+    input motor_control_fsm_state_fault
+);
+wire [15:0] rm_seq_id;
+wire [15:0] rm_timeout_ticks;
+wire [15:0] rm_freshness_limit;
+wire [15:0] rm_velocity_mps;
+wire [31:0] rm_geom_base;
+wire [15:0] rm_geom_len;
+wire [7:0] rm_geom_fmt;
+wire [15:0] rm_act_min;
+wire [15:0] rm_act_max;
+wire [15:0] rm_slew;
+wire [31:0] rm_checkpoint;
+wire [15:0] rm_flags;
+wire rm_launch;
+wire rm_clear;
+wire [63:0] rm_rspsum;
+
+assign motor_control_register_map_cfg_seq_id = rm_seq_id;
+assign motor_control_register_map_cfg_timeout_ticks = rm_timeout_ticks;
+assign motor_control_register_map_cfg_freshness_limit = rm_freshness_limit;
+assign motor_control_register_map_cfg_velocity_mps = rm_velocity_mps;
+assign motor_control_register_map_cfg_geometry_base_addr = rm_geom_base;
+assign motor_control_register_map_cfg_geometry_length = rm_geom_len;
+assign motor_control_register_map_cfg_geometry_format = rm_geom_fmt;
+assign motor_control_register_map_cfg_actuator_min = rm_act_min;
+assign motor_control_register_map_cfg_actuator_max = rm_act_max;
+assign motor_control_register_map_cfg_slew_limit = rm_slew;
+assign motor_control_register_map_cfg_checkpoint_id = rm_checkpoint;
+assign motor_control_register_map_cfg_control_flags = rm_flags;
+assign motor_control_register_map_launch_pulse = rm_launch;
+assign motor_control_register_map_clear_fault_pulse = rm_clear;
+
+assign payload_pointer_manager_cfg_geometry_base_addr = rm_geom_base;
+assign payload_pointer_manager_cfg_geometry_length = rm_geom_len;
+assign payload_pointer_manager_cfg_geometry_format = rm_geom_fmt;
+assign payload_pointer_manager_cfg_control_flags = rm_flags;
+
+assign request_packager_cfg_velocity_mps = rm_velocity_mps;
+assign request_packager_cfg_checkpoint_id = rm_checkpoint;
+assign request_packager_cfg_control_flags = rm_flags;
+assign request_packager_geometry_base_addr_q = payload_pointer_manager_geometry_base_addr_q;
+assign request_packager_geometry_length_q = payload_pointer_manager_geometry_length_q;
+assign request_packager_geometry_format_q = payload_pointer_manager_geometry_format_q;
+assign request_packager_freshness_ok = freshness_timeout_supervisor_freshness_ok;
+assign request_packager_descriptor_valid = payload_pointer_manager_geometry_valid & ~payload_pointer_manager_alignment_error;
+
+assign request_packager_req_ready = transport_controller_req_ready;
+assign transport_controller_req_valid = request_packager_req_valid;
+assign transport_controller_req_payload = request_packager_req_payload;
+assign transport_controller_rsp_valid = model_rsp_valid;
+assign transport_controller_rsp_payload = model_rsp_data;
+assign transport_controller_timeout_ticks = rm_timeout_ticks;
+
+assign freshness_timeout_supervisor_cfg_seq_id = rm_seq_id;
+assign freshness_timeout_supervisor_freshness_limit = rm_freshness_limit;
+assign freshness_timeout_supervisor_timeout_ticks = rm_timeout_ticks;
+
+assign response_parser_rsp_valid = transport_controller_response_summary[0] | model_rsp_valid;
+assign response_parser_rsp_payload = model_rsp_data;
+assign response_parser_expected_seq_id = rm_seq_id;
+
+assign command_clamper_response_ok = response_parser_response_ok;
+assign command_clamper_parsed_cmd_value = response_parser_parsed_cmd_value;
+assign command_clamper_parsed_cmd_rate = response_parser_parsed_cmd_rate;
+assign command_clamper_actuator_min = rm_act_min;
+assign command_clamper_actuator_max = rm_act_max;
+assign command_clamper_slew_limit = rm_slew;
+
+assign safe_fallback_controller_fault_in = motor_control_fsm_fault;
+assign safe_fallback_controller_timeout_fault_in = timeout_fault;
+assign safe_fallback_controller_stale_fault_in = stale_fault;
+assign safe_fallback_controller_transport_error_in = transport_error;
+assign safe_fallback_controller_malformed_response_in = response_parser_malformed_response;
+assign safe_fallback_controller_host_abort_in = 1'b0;
+assign safe_fallback_controller_clear_fault_pulse = rm_clear;
+
+assign motor_control_fsm_launch_pulse = rm_launch;
+assign motor_control_fsm_clear_fault_pulse = rm_clear;
+assign motor_control_fsm_freshness_ok = freshness_timeout_supervisor_freshness_ok;
+assign motor_control_fsm_descriptor_valid = request_packager_descriptor_valid;
+assign motor_control_fsm_request_accepted = request_packager_request_accepted;
+assign motor_control_fsm_request_error = request_packager_request_error;
+assign motor_control_fsm_response_ok = response_parser_response_ok;
+assign motor_control_fsm_malformed_response = response_parser_malformed_response;
+assign motor_control_fsm_timeout_fault = timeout_fault;
+assign motor_control_fsm_stale_fault = stale_fault;
+assign motor_control_fsm_transport_error = transport_error;
+assign motor_control_fsm_clamped = clamped;
+
+assign model_req_valid = transport_controller_req_valid;
+assign model_req_data = transport_controller_req_payload;
+assign model_rsp_ready = transport_controller_rsp_ready;
+assign cmd_valid = response_parser_response_ok & ~safe_fallback_controller_fault_sticky;
+assign cmd_value = command_clamper_cmd_value_out;
+assign cmd_rate = command_clamper_cmd_rate_out;
+assign safe_mode = safe_fallback_controller_safe_cmd_value[0] | safe_fallback_controller_fault_sticky;
+assign busy = motor_control_fsm_state_issue_req | motor_control_fsm_state_wait_rsp;
+assign done = motor_control_fsm_state_apply;
+assign fault = motor_control_fsm_state_fault | motor_control_fsm_state_fallback;
+assign timeout_fault = transport_controller_timeout_ticks[0] & transport_controller_response_summary[0] & transport_controller_req_ready;
+assign stale_fault = freshness_timeout_supervisor_freshness_ok ? 1'b0 : 1'b1;
+assign clamped = command_clamper_cmd_value_out[0] ^ command_clamper_cmd_rate_out[0] ^ 1'b0;
+assign fallback_active = safe_fallback_controller_fault_sticky;
+assign transport_error = transport_controller_req_valid & ~transport_controller_req_ready;
+assign response_valid = response_parser_response_ok | transport_controller_response_summary[0];
+
+assign rm_seq_id = motor_control_register_map_cfg_seq_id;
+assign rm_timeout_ticks = motor_control_register_map_cfg_timeout_ticks;
+assign rm_freshness_limit = motor_control_register_map_cfg_freshness_limit;
+assign rm_velocity_mps = motor_control_register_map_cfg_velocity_mps;
+assign rm_geom_base = motor_control_register_map_cfg_geometry_base_addr;
+assign rm_geom_len = motor_control_register_map_cfg_geometry_length;
+assign rm_geom_fmt = motor_control_register_map_cfg_geometry_format;
+assign rm_act_min = motor_control_register_map_cfg_actuator_min;
+assign rm_act_max = motor_control_register_map_cfg_actuator_max;
+assign rm_slew = motor_control_register_map_cfg_slew_limit;
+assign rm_checkpoint = motor_control_register_map_cfg_checkpoint_id;
+assign rm_flags = motor_control_register_map_cfg_control_flags;
+assign rm_launch = motor_control_register_map_launch_pulse;
+assign rm_clear = motor_control_register_map_clear_fault_pulse;
+assign rm_rspsum = transport_controller_response_summary;
+
+motor_control_register_map u_motor_control_register_map (
+    .clk(clk),
+    .reset_n(reset_n),
+    .csr_valid(csr_valid),
+    .csr_we(csr_we),
+    .csr_re(csr_re),
+    .csr_be(csr_be),
+    .csr_addr(csr_addr),
+    .csr_wdata(csr_wdata),
+    .csr_rdata(csr_rdata),
+    .csr_ready(csr_ready),
+    .cfg_seq_id(rm_seq_id),
+    .cfg_timeout_ticks(rm_timeout_ticks),
+    .cfg_freshness_limit(rm_freshness_limit),
+    .cfg_velocity_mps(rm_velocity_mps),
+    .cfg_geometry_base_addr(rm_geom_base),
+    .cfg_geometry_length(rm_geom_len),
+    .cfg_geometry_format(rm_geom_fmt),
+    .cfg_actuator_min(rm_act_min),
+    .cfg_actuator_max(rm_act_max),
+    .cfg_slew_limit(rm_slew),
+    .cfg_checkpoint_id(rm_checkpoint),
+    .cfg_control_flags(rm_flags),
+    .launch_pulse(rm_launch),
+    .clear_fault_pulse(rm_clear),
+    .status_busy(motor_control_register_map_status_busy),
+    .status_done(motor_control_register_map_status_done),
+    .status_fault(motor_control_register_map_status_fault),
+    .status_timeout(motor_control_register_map_status_timeout),
+    .status_stale(motor_control_register_map_status_stale),
+    .status_clamped(motor_control_register_map_status_clamped),
+    .status_fallback_active(motor_control_register_map_status_fallback_active),
+    .status_transport_error(motor_control_register_map_status_transport_error),
+    .status_response_valid(motor_control_register_map_status_response_valid),
+    .response_summary(rm_rspsum)
+);
+
+payload_pointer_manager u_payload_pointer_manager (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_geometry_base_addr(payload_pointer_manager_cfg_geometry_base_addr),
+    .cfg_geometry_length(payload_pointer_manager_cfg_geometry_length),
+    .cfg_geometry_format(payload_pointer_manager_cfg_geometry_format),
+    .cfg_control_flags(payload_pointer_manager_cfg_control_flags),
+    .geometry_base_addr_q(payload_pointer_manager_geometry_base_addr_q),
+    .geometry_length_q(payload_pointer_manager_geometry_length_q),
+    .geometry_format_q(payload_pointer_manager_geometry_format_q),
+    .geometry_valid(payload_pointer_manager_geometry_valid),
+    .alignment_error(payload_pointer_manager_alignment_error)
+);
+
+request_packager u_request_packager (
+    .clk(clk),
+    .reset_n(reset_n),
+    .start(start),
+    .seq_id_in(seq_id_in),
+    .cfg_velocity_mps(request_packager_cfg_velocity_mps),
+    .cfg_checkpoint_id(request_packager_cfg_checkpoint_id),
+    .cfg_control_flags(request_packager_cfg_control_flags),
+    .geometry_base_addr_q(request_packager_geometry_base_addr_q),
+    .geometry_length_q(request_packager_geometry_length_q),
+    .geometry_format_q(request_packager_geometry_format_q),
+    .freshness_ok(request_packager_freshness_ok),
+    .descriptor_valid(request_packager_descriptor_valid),
+    .req_payload(request_packager_req_payload),
+    .req_valid(request_packager_req_valid),
+    .req_ready(request_packager_req_ready),
+    .request_accepted(request_packager_request_accepted),
+    .request_error(request_packager_request_error)
+);
+
+transport_controller u_transport_controller (
+    .clk(clk),
+    .reset_n(reset_n),
+    .req_valid(transport_controller_req_valid),
+    .req_ready(transport_controller_req_ready),
+    .req_payload(transport_controller_req_payload),
+    .rsp_valid(transport_controller_rsp_valid),
+    .rsp_ready(transport_controller_rsp_ready),
+    .rsp_payload(transport_controller_rsp_payload),
+    .timeout_ticks(transport_controller_timeout_ticks),
+    .busy(),
+    .done(),
+    .timeout_fault(),
+    .transport_error(),
+    .response_valid(),
+    .response_summary(transport_controller_response_summary)
+);
+
+freshness_timeout_supervisor u_freshness_timeout_supervisor (
+    .clk(clk),
+    .reset_n(reset_n),
+    .seq_id_in(seq_id_in),
+    .cmd_age_ticks(cmd_age_ticks),
+    .cfg_seq_id(freshness_timeout_supervisor_cfg_seq_id),
+    .freshness_limit(freshness_timeout_supervisor_freshness_limit),
+    .timeout_ticks(freshness_timeout_supervisor_timeout_ticks),
+    .last_accepted_seq(freshness_timeout_supervisor_last_accepted_seq),
+    .freshness_ok(freshness_timeout_supervisor_freshness_ok),
+    .stale_fault(freshness_timeout_supervisor_stale_fault),
+    .timeout_config_valid(freshness_timeout_supervisor_timeout_config_valid)
+);
+
+response_parser u_response_parser (
+    .clk(clk),
+    .reset_n(reset_n),
+    .rsp_valid(response_parser_rsp_valid),
+    .rsp_payload(response_parser_rsp_payload),
+    .expected_seq_id(response_parser_expected_seq_id),
+    .response_ok(response_parser_response_ok),
+    .parsed_cmd_value(response_parser_parsed_cmd_value),
+    .parsed_cmd_rate(response_parser_parsed_cmd_rate),
+    .parsed_flags(response_parser_parsed_flags),
+    .response_valid(),
+    .malformed_response(response_parser_malformed_response)
+);
+
+command_clamper u_command_clamper (
+    .clk(clk),
+    .reset_n(reset_n),
+    .response_ok(command_clamper_response_ok),
+    .parsed_cmd_value(command_clamper_parsed_cmd_value),
+    .parsed_cmd_rate(command_clamper_parsed_cmd_rate),
+    .actuator_min(command_clamper_actuator_min),
+    .actuator_max(command_clamper_actuator_max),
+    .slew_limit(command_clamper_slew_limit),
+    .cmd_value_out(command_clamper_cmd_value_out),
+    .cmd_rate_out(command_clamper_cmd_rate_out),
+    .clamped(command_clamper_clamped)
+);
+
+safe_fallback_controller u_safe_fallback_controller (
+    .clk(clk),
+    .reset_n(reset_n),
+    .fault_in(safe_fallback_controller_fault_in),
+    .timeout_fault_in(safe_fallback_controller_timeout_fault_in),
+    .stale_fault_in(safe_fallback_controller_stale_fault_in),
+    .transport_error_in(safe_fallback_controller_transport_error_in),
+    .malformed_response_in(safe_fallback_controller_malformed_response_in),
+    .host_abort_in(safe_fallback_controller_host_abort_in),
+    .clear_fault_pulse(safe_fallback_controller_clear_fault_pulse),
+    .safe_cmd_value(safe_fallback_controller_safe_cmd_value),
+    .safe_cmd_rate(safe_fallback_controller_safe_cmd_rate),
+    .safe_mode(),
+    .fault_sticky(safe_fallback_controller_fault_sticky),
+    .fallback_active()
+);
+
+motor_control_fsm u_motor_control_fsm (
+    .clk(clk),
+    .reset_n(reset_n),
+    .launch_pulse(motor_control_fsm_launch_pulse),
+    .clear_fault_pulse(motor_control_fsm_clear_fault_pulse),
+    .freshness_ok(motor_control_fsm_freshness_ok),
+    .descriptor_valid(motor_control_fsm_descriptor_valid),
+    .request_accepted(motor_control_fsm_request_accepted),
+    .request_error(motor_control_fsm_request_error),
+    .response_ok(motor_control_fsm_response_ok),
+    .malformed_response(motor_control_fsm_malformed_response),
+    .timeout_fault(motor_control_fsm_timeout_fault),
+    .stale_fault(motor_control_fsm_stale_fault),
+    .transport_error(motor_control_fsm_transport_error),
+    .clamped(motor_control_fsm_clamped),
+    .busy(),
+    .done(),
+    .fault(),
+    .state_idle(motor_control_fsm_state_idle),
+    .state_issue_req(motor_control_fsm_state_issue_req),
+    .state_wait_rsp(motor_control_fsm_state_wait_rsp),
+    .state_validate(motor_control_fsm_state_validate),
+    .state_clamp(motor_control_fsm_state_clamp),
+    .state_apply(motor_control_fsm_state_apply),
+    .state_fallback(motor_control_fsm_state_fallback),
+    .state_fault(motor_control_fsm_state_fault)
+);
+
+endmodule
+---END motor_control_top.v---

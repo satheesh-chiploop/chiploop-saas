@@ -1,0 +1,173 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "motor_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "motor_control_register_map",
+      "implementation_style": "Compact CSR decode and scalar register bank implemented with standard-cell flops and combinational decode only.",
+      "control_strategy": "Accept CSR transactions through the valid/ready handshake, update configuration only when the controller is not busy, and generate launch/clear-fault pulses from dedicated CSR writes. Readback is deterministic and limited to supported CSR addresses.",
+      "state_strategy": "Maintain only small scalar configuration and sticky status registers; reset to benign/unconfigured defaults and clear launch/clear-fault pulses on reset.",
+      "output_strategy": "Drive the downstream semantic configuration signals and CSR read data; no bulk payload, geometry, or model data are stored.",
+      "ownership_notes": [
+        "Owns compact CSR-visible configuration state and deterministic readback only.",
+        "Does not own geometry arrays, tensors, flow fields, or inferred payload memories.",
+        "rtl_output_file: motor_control_register_map.v"
+      ]
+    },
+    {
+      "name": "payload_pointer_manager",
+      "implementation_style": "Small pointer-metadata latch and validity/alignment checker using scalar logic only.",
+      "control_strategy": "Capture only geometry base address, length, format, and control flags; qualify descriptor validity with simple alignment and bounds checks.",
+      "state_strategy": "Store only compact pointer metadata and associated validity state; clear to invalid on reset.",
+      "output_strategy": "Provide a stable, bounded geometry descriptor source for request packaging; do not store or expose bulk geometry content.",
+      "ownership_notes": [
+        "Owns only pointer metadata, size, format, and scalar validity/alignment status.",
+        "Does not store STL geometry, mesh nodes, or payload history.",
+        "rtl_output_file: payload_pointer_manager.v"
+      ]
+    },
+    {
+      "name": "request_packager",
+      "implementation_style": "Fixed-format 128-bit request assembler built from registered scalar fields.",
+      "control_strategy": "Issue a request only when start, descriptor_valid, and freshness_ok are asserted, and when the transport path can accept a launch. Construct the bounded descriptor with seq_id, geometry metadata, velocity, checkpoint tag, service opcode, and control flags.",
+      "state_strategy": "Use minimal launch/accept bookkeeping; no complex sequencing beyond request generation and handshake observation.",
+      "output_strategy": "Drive req_payload and req_valid as a bounded transport request, plus request_accepted/request_error status for upstream control.",
+      "ownership_notes": [
+        "Owns request formatting logic and handshake outcomes only.",
+        "Does not implement physics inference, tensor math, or geometry expansion.",
+        "rtl_output_file: request_packager.v"
+      ]
+    },
+    {
+      "name": "transport_controller",
+      "implementation_style": "Single-outstanding-request transport bridge with valid/ready handshakes and tick-based timeout supervision.",
+      "control_strategy": "Forward request payloads to the external service, wait for response valid, and assert timeout/transport-error locally if the response does not arrive in time or the protocol is violated.",
+      "state_strategy": "Keep minimal busy/done/timeout state for one in-flight transaction; return to idle after response, timeout, or detected error.",
+      "output_strategy": "Expose compact response_summary only, along with handshake outputs and status flags; do not surface full model outputs.",
+      "ownership_notes": [
+        "Owns transport protocol sequencing and timeout indication.",
+        "Does not expose full flow fields, pressure maps, or tensor-like structures.",
+        "rtl_output_file: transport_controller.v"
+      ]
+    },
+    {
+      "name": "freshness_timeout_supervisor",
+      "implementation_style": "Scalar freshness and sequence supervisor with monotonic comparison and age qualification.",
+      "control_strategy": "Reject stale launch requests when cmd_age_ticks exceeds the configured freshness limit or when seq_id_in is not newer than the last accepted sequence number; also validate timeout configuration.",
+      "state_strategy": "Track only the last accepted sequence number and freshness/timeout qualification bits; reset invalidates acceptance until a fresh command is seen.",
+      "output_strategy": "Provide freshness_ok, stale_fault, timeout_config_valid, and last_accepted_seq as bounded scalar supervision outputs.",
+      "ownership_notes": [
+        "Owns scalar freshness qualification and last accepted sequence tracking.",
+        "Does not own transport data, response payloads, or bulk storage.",
+        "rtl_output_file: freshness_timeout_supervisor.v"
+      ]
+    },
+    {
+      "name": "response_parser",
+      "implementation_style": "Bounded fixed-format response checker and compact field extractor using scalar decode only.",
+      "control_strategy": "Accept only responses with expected framing and matching expected_seq_id; reject malformed or mismatched payloads and extract only command-relevant fields.",
+      "state_strategy": "Stateless or near-stateless parse/qualify logic with registered outputs as needed for timing.",
+      "output_strategy": "Drive response_ok, parsed_cmd_value, parsed_cmd_rate, parsed_flags, response_valid, and malformed_response; do not expose full flow fields or pressure maps.",
+      "ownership_notes": [
+        "Owns only fixed-format response checking and compact field extraction.",
+        "Does not surface bulk flow-field content or pressure maps.",
+        "rtl_output_file: response_parser.v"
+      ]
+    },
+    {
+      "name": "command_clamper",
+      "implementation_style": "Pure scalar arithmetic limiter implementing saturation and slew-rate limiting.",
+      "control_strategy": "Apply min/max saturation and slew constraints to parsed command fields whenever a response is present; clamping is applied regardless of response content.",
+      "state_strategy": "Keep only the minimal previous command context required for slew limiting, if needed, using small registers.",
+      "output_strategy": "Drive final cmd_value_out and cmd_rate_out plus clamped indication, all bounded to configured limits.",
+      "ownership_notes": [
+        "Owns only deterministic scalar command limiting.",
+        "Does not perform physics inference or process full model outputs beyond command-relevant fields.",
+        "rtl_output_file: command_clamper.v"
+      ]
+    },
+    {
+      "name": "safe_fallback_controller",
+      "implementation_style": "Deterministic safe-state generator with sticky fault retention using standard-cell logic.",
+      "control_strategy": "Force fallback on any fault, timeout, stale input, malformed response, host abort, or transport error; clear sticky fault only through the explicit clear_fault path when safe.",
+      "state_strategy": "Maintain a minimal sticky-fault/safe-mode state and fixed safe command outputs; reset returns to the predefined safe setting with fallback inactive until needed.",
+      "output_strategy": "Drive safe_cmd_value, safe_cmd_rate, safe_mode, fault_sticky, and fallback_active as the deterministic local safety response.",
+      "ownership_notes": [
+        "Owns deterministic fallback outputs and sticky-fault behavior.",
+        "Does not allow non-deterministic actuator behavior or unsafe model-derived outputs.",
+        "rtl_output_file: safe_fallback_controller.v"
+      ]
+    },
+    {
+      "name": "motor_control_fsm",
+      "implementation_style": "Small synchronous controller FSM that coordinates launch qualification, request issue, response wait, validation, clamping, apply, fallback, and fault handling.",
+      "control_strategy": "Sequence through IDLE, ISSUE_REQ, WAIT_RSP, VALIDATE, CLAMP, APPLY, FALLBACK, and FAULT based on freshness, descriptor validity, request acceptance/errors, response qualification, timeout, transport error, and clamped indication.",
+      "state_strategy": "Implement the named states with registered state bits or encoded state flops; transitions are synchronous to clk and reset-safe, with sticky fault escalation until cleared by the defined host path.",
+      "output_strategy": "Drive busy, done, fault, and state indicators consistently with the local safety policy; never bypass local safety checks when asserting apply behavior.",
+      "ownership_notes": [
+        "Owns sequencing and fault escalation policy only.",
+        "Does not own transport payloads, bulk memories, or physics inference.",
+        "rtl_output_file: motor_control_fsm.v"
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "name": "motor_control_fsm",
+      "present": true,
+      "description": "A minimal synchronous state machine coordinates the top-level launch-to-apply flow and safety escalation. The FSM uses the named states IDLE, ISSUE_REQ, WAIT_RSP, VALIDATE, CLAMP, APPLY, FALLBACK, and FAULT, with transitions driven by launch qualification, request handshake outcomes, response validity, freshness, timeout, transport error, and clamp status. The simplest intent is a one-step-per-condition controller with sticky fault behavior rather than a complex microcoded engine.",
+      "states": [
+        "IDLE",
+        "ISSUE_REQ",
+        "WAIT_RSP",
+        "VALIDATE",
+        "CLAMP",
+        "APPLY",
+        "FALLBACK",
+        "FAULT"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "name": "control_plane_and_descriptor_path",
+      "inputs": [
+        "CSR writes for seq_id, timeout, freshness_limit, velocity_mps, geometry_base_addr, geometry_length, geometry_format, actuator_min, actuator_max, slew_limit, checkpoint_id, control_flags, launch, and clear_fault",
+        "start, seq_id_in, cmd_age_ticks"
+      ],
+      "internal_storage": [
+        "Small scalar CSR registers",
+        "Last accepted sequence number",
+        "Compact geometry pointer metadata",
+        "Minimal transport busy/done/timeout tracking",
+        "Optional small command history needed only for slew limiting",
+        "No bulk geometry or model payload storage"
+      ],
+      "output_mapping": [
+        "csr_rdata returns deterministic CSR/status/summary values",
+        "model_req_data carries a bounded 128-bit descriptor only",
+        "model_req_valid/model_rsp_ready implement transport handshakes",
+        "cmd_value/cmd_rate are produced only after response parsing, clamping, and safety qualification",
+        "safe_mode and fallback_active override actuator behavior on any fault"
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "Host software programs compact CSRs first, then asserts launch/start with seq_id_in and cmd_age_ticks.",
+    "Freshness qualification is performed before request issuance; stale or non-monotonic launches are rejected locally.",
+    "Request packaging occurs only after descriptor validity and freshness checks pass, and only one transport transaction is intended to be active at a time.",
+    "The response path is strictly bounded: validate framing and expected sequence, extract compact command fields, clamp locally, then apply or fallback.",
+    "Sticky fault bits are cleared only through the explicit clear_fault path when safe; otherwise faults persist across subsequent launches."
+  ],
+  "timing_notes": [
+    "All control is synchronous to clk with reset_n active-low.",
+    "External handoffs should be registered where needed to meet timing closure.",
+    "The design should avoid combinational loops by separating CSR decode, descriptor qualification, request packaging, transport control, response parsing, clamping, and fallback into registered or feed-forward stages.",
+    "The top-level I/O remains compact, using a 64-bit CSR window plus bounded 128-bit request/response streams and scalar control/status pins."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

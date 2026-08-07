@@ -1,0 +1,788 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "custom",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control register. Host programs launch policy and safe-clear behavior. Writes are accepted only when the controller is not busy, except clear_fault semantics which are handled by the dedicated pulse register behavior in hardware.",
+        "fields": [
+          {
+            "name": "CFG_VALID",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Configuration-valid indicator. Software may use this as a compact software-managed validity bit for the programmed CSR set."
+          },
+          {
+            "name": "AUTO_CLEAR_FAULT",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Optional host policy bit indicating that software intends to request a clear-fault action when safe. Actual sticky-fault clearing remains controlled by the hardware clear_fault path."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x01",
+        "access": "RO",
+        "description": "Sticky status summary register.",
+        "fields": [
+          {
+            "name": "BUSY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Controller busy."
+          },
+          {
+            "name": "DONE",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Operation completed."
+          },
+          {
+            "name": "FAULT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky fault indicator."
+          },
+          {
+            "name": "TIMEOUT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Timeout fault sticky bit."
+          },
+          {
+            "name": "STALE",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Stale-command fault sticky bit."
+          },
+          {
+            "name": "CLAMPED",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Clamp indicator."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Safe fallback state active."
+          },
+          {
+            "name": "TRANSPORT_ERROR",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Transport protocol error sticky bit."
+          }
+        ]
+      },
+      {
+        "name": "STATUS2",
+        "offset": "0x02",
+        "access": "RO",
+        "description": "Additional status bit for response validity.",
+        "fields": [
+          {
+            "name": "RESPONSE_VALID",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "A bounded response has been accepted and parsed as command-relevant."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_ID_L",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Configured sequence identifier, low byte.",
+        "fields": [
+          {
+            "name": "SEQ_ID[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the configured sequence/tag value used by the launch and freshness path."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_ID_H",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Configured sequence identifier, high byte.",
+        "fields": [
+          {
+            "name": "SEQ_ID[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the configured sequence/tag value."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_L",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Timeout threshold in ticks, low byte.",
+        "fields": [
+          {
+            "name": "TIMEOUT_TICKS[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 32,
+            "description": "Low byte of the timeout watchdog threshold."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_H",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Timeout threshold in ticks, high byte.",
+        "fields": [
+          {
+            "name": "TIMEOUT_TICKS[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the timeout watchdog threshold."
+          }
+        ]
+      },
+      {
+        "name": "FRESHNESS_L",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "Freshness threshold in ticks, low byte.",
+        "fields": [
+          {
+            "name": "FRESHNESS_LIMIT[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 16,
+            "description": "Low byte of the freshness threshold."
+          }
+        ]
+      },
+      {
+        "name": "FRESHNESS_H",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Freshness threshold in ticks, high byte.",
+        "fields": [
+          {
+            "name": "FRESHNESS_LIMIT[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the freshness threshold."
+          }
+        ]
+      },
+      {
+        "name": "VELOCITY_L",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Velocity operating point, low byte.",
+        "fields": [
+          {
+            "name": "VELOCITY_MPS[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the configured velocity operating point."
+          }
+        ]
+      },
+      {
+        "name": "VELOCITY_H",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "Velocity operating point, high byte.",
+        "fields": [
+          {
+            "name": "VELOCITY_MPS[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the configured velocity operating point."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_BASE_0",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "Geometry base address byte 0, least significant.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BASE_ADDR[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least significant byte of the external geometry base address."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_BASE_1",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Geometry base address byte 1.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BASE_ADDR[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 1 of the external geometry base address."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_BASE_2",
+        "offset": "0x0D",
+        "access": "RW",
+        "description": "Geometry base address byte 2.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BASE_ADDR[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 2 of the external geometry base address."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_BASE_3",
+        "offset": "0x0E",
+        "access": "RW",
+        "description": "Geometry base address byte 3, most significant.",
+        "fields": [
+          {
+            "name": "GEOMETRY_BASE_ADDR[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of the external geometry base address."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_LEN_L",
+        "offset": "0x0F",
+        "access": "RW",
+        "description": "Geometry length, low byte.",
+        "fields": [
+          {
+            "name": "GEOMETRY_LENGTH[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the geometry descriptor length."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_LEN_H",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Geometry length, high byte.",
+        "fields": [
+          {
+            "name": "GEOMETRY_LENGTH[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the geometry descriptor length."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_FMT",
+        "offset": "0x11",
+        "access": "RW",
+        "description": "Geometry format tag.",
+        "fields": [
+          {
+            "name": "GEOMETRY_FORMAT",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact geometry format tag used only for descriptor validation and request packaging."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MIN_L",
+        "offset": "0x12",
+        "access": "RW",
+        "description": "Actuator minimum command limit, low byte.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the actuator minimum saturation limit."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MIN_H",
+        "offset": "0x13",
+        "access": "RW",
+        "description": "Actuator minimum command limit, high byte.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the actuator minimum saturation limit."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MAX_L",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Actuator maximum command limit, low byte.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Low byte of the actuator maximum saturation limit."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MAX_H",
+        "offset": "0x15",
+        "access": "RW",
+        "description": "Actuator maximum command limit, high byte.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the actuator maximum saturation limit."
+          }
+        ]
+      },
+      {
+        "name": "SLEW_L",
+        "offset": "0x16",
+        "access": "RW",
+        "description": "Slew-rate limit, low byte.",
+        "fields": [
+          {
+            "name": "SLEW_LIMIT[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the slew-rate limit."
+          }
+        ]
+      },
+      {
+        "name": "SLEW_H",
+        "offset": "0x17",
+        "access": "RW",
+        "description": "Slew-rate limit, high byte.",
+        "fields": [
+          {
+            "name": "SLEW_LIMIT[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the slew-rate limit."
+          }
+        ]
+      },
+      {
+        "name": "CHECKPOINT_0",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Checkpoint/version tag byte 0, least significant.",
+        "fields": [
+          {
+            "name": "CHECKPOINT_ID[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least significant byte of the checkpoint/version tag."
+          }
+        ]
+      },
+      {
+        "name": "CHECKPOINT_1",
+        "offset": "0x19",
+        "access": "RW",
+        "description": "Checkpoint/version tag byte 1.",
+        "fields": [
+          {
+            "name": "CHECKPOINT_ID[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 1 of the checkpoint/version tag."
+          }
+        ]
+      },
+      {
+        "name": "CHECKPOINT_2",
+        "offset": "0x1A",
+        "access": "RW",
+        "description": "Checkpoint/version tag byte 2.",
+        "fields": [
+          {
+            "name": "CHECKPOINT_ID[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 2 of the checkpoint/version tag."
+          }
+        ]
+      },
+      {
+        "name": "CHECKPOINT_3",
+        "offset": "0x1B",
+        "access": "RW",
+        "description": "Checkpoint/version tag byte 3, most significant.",
+        "fields": [
+          {
+            "name": "CHECKPOINT_ID[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most significant byte of the checkpoint/version tag."
+          }
+        ]
+      },
+      {
+        "name": "FLAGS_L",
+        "offset": "0x1C",
+        "access": "RW",
+        "description": "Control flags, low byte.",
+        "fields": [
+          {
+            "name": "CONTROL_FLAGS[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of control flags used for integration policy."
+          }
+        ]
+      },
+      {
+        "name": "FLAGS_H",
+        "offset": "0x1D",
+        "access": "RW",
+        "description": "Control flags, high byte.",
+        "fields": [
+          {
+            "name": "CONTROL_FLAGS[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of control flags used for integration policy."
+          }
+        ]
+      },
+      {
+        "name": "LAUNCH",
+        "offset": "0x1E",
+        "access": "WO",
+        "description": "Launch pulse register. Writing a 1 to bit 0 generates a one-cycle launch event when the controller is not busy and the launch is qualified.",
+        "fields": [
+          {
+            "name": "LAUNCH_PULSE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write-1 pulse to request a new model transaction."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 1,
+            "access": "WO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CLEAR_FAULT",
+        "offset": "0x1F",
+        "access": "WO",
+        "description": "Clear-fault pulse register. Writing a 1 to bit 0 requests sticky-fault clearing under the hardware safety policy.",
+        "fields": [
+          {
+            "name": "CLEAR_FAULT_PULSE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write-1 pulse to request sticky fault clearing when safe."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 1,
+            "access": "WO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "RESP_SUMMARY_0",
+        "offset": "0x20",
+        "access": "RO",
+        "description": "Response summary byte 0.",
+        "fields": [
+          {
+            "name": "RESPONSE_SUMMARY[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low byte of the compact response summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_SUMMARY_1",
+        "offset": "0x21",
+        "access": "RO",
+        "description": "Response summary byte 1.",
+        "fields": [
+          {
+            "name": "RESPONSE_SUMMARY[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 1 of the compact response summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_SUMMARY_2",
+        "offset": "0x22",
+        "access": "RO",
+        "description": "Response summary byte 2.",
+        "fields": [
+          {
+            "name": "RESPONSE_SUMMARY[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 2 of the compact response summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_SUMMARY_3",
+        "offset": "0x23",
+        "access": "RO",
+        "description": "Response summary byte 3.",
+        "fields": [
+          {
+            "name": "RESPONSE_SUMMARY[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 3 of the compact response summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_SUMMARY_4",
+        "offset": "0x24",
+        "access": "RO",
+        "description": "Response summary byte 4.",
+        "fields": [
+          {
+            "name": "RESPONSE_SUMMARY[39:32]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 4 of the compact response summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_SUMMARY_5",
+        "offset": "0x25",
+        "access": "RO",
+        "description": "Response summary byte 5.",
+        "fields": [
+          {
+            "name": "RESPONSE_SUMMARY[47:40]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 5 of the compact response summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_SUMMARY_6",
+        "offset": "0x26",
+        "access": "RO",
+        "description": "Response summary byte 6.",
+        "fields": [
+          {
+            "name": "RESPONSE_SUMMARY[55:48]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 6 of the compact response summary."
+          }
+        ]
+      },
+      {
+        "name": "RESP_SUMMARY_7",
+        "offset": "0x27",
+        "access": "RO",
+        "description": "Response summary byte 7, most significant.",
+        "fields": [
+          {
+            "name": "RESPONSE_SUMMARY[63:56]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most significant byte of the compact response summary."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "FAULT",
+        "description": "Sticky fault indication suitable for optional software interrupt generation if system integration maps it."
+      },
+      {
+        "name": "DONE",
+        "description": "Completion indication suitable for optional software interrupt generation if system integration maps it."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Hold reset_n low, then deassert reset_n.",
+      "Program SEQ_ID, TIMEOUT, FRESHNESS, VELOCITY, GEOMETRY_BASE, GEOMETRY_LENGTH, GEOMETRY_FORMAT, ACT_MIN, ACT_MAX, SLEW, CHECKPOINT, and FLAGS through the byte-wide CSR window.",
+      "Read STATUS and STATUS2 to confirm BUSY=0, FAULT=0, and RESPONSE_VALID=0.",
+      "Write CTRL.CFG_VALID=1 after configuration is complete.",
+      "If needed, request CLEAR_FAULT by writing 1 to CLEAR_FAULT, but only when software has determined the controller is safe to clear."
+    ],
+    "polling_sequence": [
+      "Write LAUNCH=1 to start a transaction once configuration is valid.",
+      "Poll STATUS.BUSY until it clears.",
+      "Poll STATUS.DONE for completion indication.",
+      "Read STATUS, STATUS2, and RESP_SUMMARY[63:0] after completion.",
+      "If FAULT or TIMEOUT or STALE or TRANSPORT_ERROR is set, treat the output as invalid and rely on fallback behavior."
+    ],
+    "irq_sequence": [
+      "If interrupts are enabled by the system integrator, map FAULT to a fault interrupt source and DONE to a completion interrupt source.",
+      "On fault interrupt, read STATUS and clear the fault only through the dedicated CLEAR_FAULT path when the system is safe.",
+      "On completion interrupt, read RESP_SUMMARY and the status bits before consuming cmd_value/cmd_rate outputs."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is byte-wide and fits the preferred custom CSR window behavior described by the specification.",
+    "No additional hierarchy, ports, or external protocol assumptions are introduced.",
+    "Wide values are split across byte registers to match the 8-bit software-visible data path.",
+    "The map exposes only compact control, status, and summary fields and does not surface bulk geometry, flow fields, tensors, or per-point data."
+  ]
+}

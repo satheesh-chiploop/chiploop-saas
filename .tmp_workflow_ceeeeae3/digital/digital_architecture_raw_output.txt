@@ -1,0 +1,373 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "motor_control_top",
+  "design_summary": {
+    "purpose": "motor_control_top is a synthesizable CSR-controlled safety wrapper around an external pretrained automotive-aerodynamics model service. It accepts compact host configuration, launches bounded model requests, supervises freshness and timeout conditions, validates bounded responses, clamps actuator commands, and forces a deterministic safe fallback state on any fault.",
+    "operating_model": "The design operates as a local safety and transport controller rather than a physics engine. Host software programs compact CSRs for checkpoint/version tag, velocity, timeout, freshness, geometry pointer metadata, actuator limits, slew limit, and control flags. A start event with seq_id_in and cmd_age_ticks triggers request packaging only when configuration and freshness checks pass. The transport path uses valid/ready handshakes to an external GPU-hosted service, while RTL-local supervision rejects stale or malformed inputs, enforces timeout, parses only compact command-relevant response fields, clamps outputs, and maintains sticky fault status until explicitly cleared under safe conditions.",
+    "external_interfaces": [
+      "64-bit CSR window with valid/ready, write-enable, read-enable, byte enables, address, wdata, and rdata.",
+      "128-bit request stream with valid/ready to the external model service.",
+      "128-bit response stream with valid/ready from the external model service.",
+      "Compact actuator command outputs cmd_valid, cmd_value, cmd_rate, and safe_mode.",
+      "Sticky status outputs for busy, done, fault, timeout_fault, stale_fault, clamped, fallback_active, transport_error, and response_valid."
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "motor_control_register_map",
+      "role": "CSR decode and compact configuration/status register bank for the top-level control plane.",
+      "responsibilities": [
+        "Implement the required control, status, launch, clear_fault, and response summary registers.",
+        "Provide semantic configuration outputs to downstream control logic.",
+        "Update configuration only when the bus handshake is accepted and the controller is not busy, except for clear_fault semantics.",
+        "Return deterministic read data for all supported CSR addresses.",
+        "Store only compact scalar registers for seq_id, timeout, freshness, velocity, geometry base address, geometry length, geometry format, actuator limits, slew limit, checkpoint_id, and control_flags."
+      ],
+      "interface_notes": [
+        "Uses the top-level 64-bit CSR interface with csr_valid, csr_ready, csr_we, csr_re, csr_be, csr_addr, csr_wdata, and csr_rdata.",
+        "Drives launch_pulse and clear_fault_pulse for downstream sequencing.",
+        "Consumes status and response-summary feedback from the controller path to provide deterministic readback."
+      ],
+      "ownership_notes": [
+        "Owns the compact CSR-visible configuration state and readback values.",
+        "Does not own bulk geometry, flow fields, tensors, or inferred payload memories.",
+        "rtl_output_file: motor_control_register_map.v"
+      ]
+    },
+    {
+      "name": "payload_pointer_manager",
+      "role": "Bounded geometry pointer metadata holder and descriptor validity checker.",
+      "responsibilities": [
+        "Store geometry base address, length, and format tag only.",
+        "Perform alignment checks and flag invalid descriptors.",
+        "Provide a stable geometry descriptor source for request packaging.",
+        "Avoid storage of actual geometry contents in flip-flops or inferred memories."
+      ],
+      "interface_notes": [
+        "Receives compact geometry metadata and control flags from the register map context.",
+        "Exports geometry_base_addr_q, geometry_length_q, geometry_format_q, geometry_valid, and alignment_error."
+      ],
+      "ownership_notes": [
+        "Owns only pointer metadata, size, format, and scalar validity/alignment state.",
+        "Does not store STL geometry, mesh nodes, or payload history.",
+        "rtl_output_file: payload_pointer_manager.v"
+      ]
+    },
+    {
+      "name": "request_packager",
+      "role": "Fixed-format bounded request constructor for the external service contract.",
+      "responsibilities": [
+        "Package the exact request fields required by the external service contract.",
+        "Prevent request launch when descriptor validity or freshness checks fail.",
+        "Provide a request accepted indication for downstream control sequencing.",
+        "Construct a 128-bit bounded request descriptor that includes seq_id, geometry pointer and length, geometry format, velocity, service opcode, checkpoint tag, and control flags."
+      ],
+      "interface_notes": [
+        "Consumes start, seq_id_in, flow-operating-point configuration, geometry descriptor metadata, freshness_ok, descriptor_valid, and req_ready.",
+        "Produces req_payload, req_valid, request_accepted, and request_error for transport bridging."
+      ],
+      "ownership_notes": [
+        "Owns only request formatting logic and handshake outcomes.",
+        "Does not implement physics inference, tensor math, or geometry expansion.",
+        "rtl_output_file: request_packager.v"
+      ]
+    },
+    {
+      "name": "transport_controller",
+      "role": "Valid/ready bridge to the external model service with timeout supervision and compact response summary extraction.",
+      "responsibilities": [
+        "Manage request and response valid-ready handshakes.",
+        "Track timeout expiration in ticks.",
+        "Expose a compact response summary only, not full flow fields or maps.",
+        "Assert transport error and timeout indicators on protocol failures.",
+        "Permit only one in-flight request at a time unless the top-level policy extends it."
+      ],
+      "interface_notes": [
+        "Consumes req_valid, req_payload, rsp_valid, rsp_payload, and timeout_ticks.",
+        "Produces req_ready, rsp_ready, busy, done, timeout_fault, transport_error, response_valid, and response_summary."
+      ],
+      "ownership_notes": [
+        "Owns transport protocol sequencing and timeout indication.",
+        "Does not expose full model outputs or high-dimensional data structures.",
+        "rtl_output_file: transport_controller.v"
+      ]
+    },
+    {
+      "name": "freshness_timeout_supervisor",
+      "role": "Staleness and monotonic-sequence supervisor for launch qualification.",
+      "responsibilities": [
+        "Detect stale command age beyond configured threshold.",
+        "Reject non-newer sequence numbers relative to the last accepted sequence number.",
+        "Provide timeout configuration validity checks.",
+        "Expose freshness qualification as a single-bit control signal."
+      ],
+      "interface_notes": [
+        "Consumes seq_id_in, cmd_age_ticks, cfg_seq_id, freshness_limit, and timeout_ticks.",
+        "Produces last_accepted_seq, freshness_ok, stale_fault, and timeout_config_valid."
+      ],
+      "ownership_notes": [
+        "Owns scalar freshness qualification and last accepted sequence tracking.",
+        "Does not own transport data, response payloads, or bulk storage.",
+        "rtl_output_file: freshness_timeout_supervisor.v"
+      ]
+    },
+    {
+      "name": "response_parser",
+      "role": "Bounded response validator and compact field extractor.",
+      "responsibilities": [
+        "Validate response framing and expected sequence identity.",
+        "Extract bounded command-relevant output fields only.",
+        "Detect malformed or unsupported responses.",
+        "Keep full flow fields, pressure maps, and tensor-like outputs out of the top-level interface."
+      ],
+      "interface_notes": [
+        "Consumes rsp_valid, rsp_payload, and expected_seq_id.",
+        "Produces response_ok, parsed_cmd_value, parsed_cmd_rate, parsed_flags, response_valid, and malformed_response."
+      ],
+      "ownership_notes": [
+        "Owns only fixed-format response checking and compact field extraction.",
+        "Does not surface bulk flow-field content or pressure maps.",
+        "rtl_output_file: response_parser.v"
+      ]
+    },
+    {
+      "name": "command_clamper",
+      "role": "Scalar actuator limiter applying saturation and slew constraints.",
+      "responsibilities": [
+        "Saturate command value between configured min and max.",
+        "Apply slew-rate limiting to the command rate.",
+        "Assert clamped when any clamp condition is applied.",
+        "Clamp outputs regardless of response content."
+      ],
+      "interface_notes": [
+        "Consumes response_ok, parsed_cmd_value, parsed_cmd_rate, actuator_min, actuator_max, and slew_limit.",
+        "Produces cmd_value_out, cmd_rate_out, and clamped."
+      ],
+      "ownership_notes": [
+        "Owns only deterministic scalar command limiting.",
+        "Does not perform physics inference or process full model outputs beyond command-relevant fields.",
+        "rtl_output_file: command_clamper.v"
+      ]
+    },
+    {
+      "name": "safe_fallback_controller",
+      "role": "Deterministic safe-state generator with sticky fault retention.",
+      "responsibilities": [
+        "Generate predefined safe-state actuator outputs.",
+        "Assert fallback_active and safe_mode on any fault condition.",
+        "Maintain sticky fault until explicit clear_fault behavior is permitted.",
+        "Force fallback on fault, timeout, stale input, malformed response, host abort, or transport error."
+      ],
+      "interface_notes": [
+        "Consumes fault_in, timeout_fault_in, stale_fault_in, transport_error_in, malformed_response_in, host_abort_in, and clear_fault_pulse.",
+        "Produces safe_cmd_value, safe_cmd_rate, safe_mode, fault_sticky, and fallback_active."
+      ],
+      "ownership_notes": [
+        "Owns deterministic fallback outputs and sticky-fault behavior.",
+        "Does not allow non-deterministic actuator behavior or unsafe model-derived outputs.",
+        "rtl_output_file: safe_fallback_controller.v"
+      ]
+    },
+    {
+      "name": "motor_control_fsm",
+      "role": "Synchronous top-level sequencing and safety state machine.",
+      "responsibilities": [
+        "Implement the required IDLE, ISSUE_REQ, WAIT_RSP, VALIDATE, CLAMP, APPLY, FALLBACK, and FAULT states.",
+        "Ensure all transitions are synchronous and reset-safe.",
+        "Prevent unsafe application when faults, freshness violations, malformed responses, or transport anomalies are present.",
+        "Coordinate busy, done, and fault indication consistently with the local safety policy."
+      ],
+      "interface_notes": [
+        "Consumes launch_pulse, clear_fault_pulse, freshness_ok, descriptor_valid, request_accepted, request_error, response_ok, malformed_response, timeout_fault, stale_fault, transport_error, and clamped.",
+        "Produces busy, done, fault, and the one-hot state indicators for the eight named states."
+      ],
+      "ownership_notes": [
+        "Owns sequencing and fault escalation policy only.",
+        "Does not own transport payloads, bulk memories, or physics inference.",
+        "rtl_output_file: motor_control_fsm.v"
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "host/software",
+      "to": "motor_control_register_map",
+      "signals": [
+        "csr_valid",
+        "csr_we",
+        "csr_re",
+        "csr_be",
+        "csr_addr",
+        "csr_wdata",
+        "start",
+        "seq_id_in",
+        "cmd_age_ticks"
+      ],
+      "intent": "Program compact configuration registers, request launch, and provide launch-time sequence and age context."
+    },
+    {
+      "from": "motor_control_register_map",
+      "to": "payload_pointer_manager",
+      "signals": [
+        "cfg_geometry_base_addr",
+        "cfg_geometry_length",
+        "cfg_geometry_format",
+        "cfg_control_flags"
+      ],
+      "intent": "Provide compact geometry pointer metadata and control flags for validity checking."
+    },
+    {
+      "from": "payload_pointer_manager",
+      "to": "request_packager",
+      "signals": [
+        "geometry_base_addr_q",
+        "geometry_length_q",
+        "geometry_format_q",
+        "geometry_valid",
+        "alignment_error"
+      ],
+      "intent": "Supply bounded geometry descriptor metadata and scalar validity status for request construction."
+    },
+    {
+      "from": "motor_control_register_map",
+      "to": "request_packager",
+      "signals": [
+        "cfg_velocity_mps",
+        "cfg_checkpoint_id",
+        "cfg_control_flags"
+      ],
+      "intent": "Provide flow operating point, model checkpoint/version tag, and control flags for bounded request formation."
+    },
+    {
+      "from": "freshness_timeout_supervisor",
+      "to": "request_packager",
+      "signals": [
+        "freshness_ok"
+      ],
+      "intent": "Allow request generation only when the launch context is fresh and sequence-qualified."
+    },
+    {
+      "from": "request_packager",
+      "to": "transport_controller",
+      "signals": [
+        "req_valid",
+        "req_payload"
+      ],
+      "intent": "Forward the bounded 128-bit request descriptor onto the transport bridge."
+    },
+    {
+      "from": "transport_controller",
+      "to": "external model service",
+      "signals": [
+        "req_ready",
+        "rsp_ready",
+        "busy",
+        "done",
+        "timeout_fault",
+        "transport_error",
+        "response_valid",
+        "response_summary"
+      ],
+      "intent": "Arbitrate request/response handshakes, supervise timeout, and expose only a compact summary of accepted responses."
+    },
+    {
+      "from": "transport_controller",
+      "to": "response_parser",
+      "signals": [
+        "rsp_valid",
+        "rsp_payload"
+      ],
+      "intent": "Present the bounded fixed-format response for local validation and extraction."
+    },
+    {
+      "from": "response_parser",
+      "to": "command_clamper",
+      "signals": [
+        "response_ok",
+        "parsed_cmd_value",
+        "parsed_cmd_rate"
+      ],
+      "intent": "Provide command-relevant response fields after bounded validation and extraction."
+    },
+    {
+      "from": "motor_control_register_map",
+      "to": "command_clamper",
+      "signals": [
+        "cfg_actuator_min",
+        "cfg_actuator_max",
+        "cfg_slew_limit"
+      ],
+      "intent": "Constrain actuator command saturation and slew-rate limiting."
+    },
+    {
+      "from": "command_clamper",
+      "to": "motor_control_top",
+      "signals": [
+        "cmd_value_out",
+        "cmd_rate_out",
+        "clamped"
+      ],
+      "intent": "Deliver final limited actuator values and clamp indication to top-level control."
+    },
+    {
+      "from": "motor_control_fsm",
+      "to": "motor_control_top",
+      "signals": [
+        "busy",
+        "done",
+        "fault",
+        "state_idle",
+        "state_issue_req",
+        "state_wait_rsp",
+        "state_validate",
+        "state_clamp",
+        "state_apply",
+        "state_fallback",
+        "state_fault"
+      ],
+      "intent": "Expose sequencing status and state encoding for system integration and CSR readback."
+    },
+    {
+      "from": "safe_fallback_controller",
+      "to": "motor_control_top",
+      "signals": [
+        "safe_cmd_value",
+        "safe_cmd_rate",
+        "safe_mode",
+        "fault_sticky",
+        "fallback_active"
+      ],
+      "intent": "Provide deterministic safe actuator outputs and sticky fault behavior for any safety or transport violation."
+    }
+  ],
+  "data_flow_summary": [
+    "Host software programs compact CSRs, including sequence/tag, timeout, freshness, velocity, geometry pointer metadata, actuator limits, slew limit, checkpoint_id, and control_flags.",
+    "A launch event is qualified by freshness_timeout_supervisor, which rejects stale command age and non-monotonic sequence numbers.",
+    "payload_pointer_manager supplies only bounded pointer metadata and alignment/validity status; no bulk geometry is stored internally.",
+    "request_packager forms a fixed-format 128-bit request containing only bounded service descriptors and control metadata, then hands it to transport_controller.",
+    "transport_controller manages valid-ready request/response exchange with the external model service and raises timeout or transport error status locally.",
+    "response_parser accepts only bounded fixed-format responses, checks the expected sequence identity, and extracts compact command-relevant fields.",
+    "command_clamper applies configured min/max saturation and slew-rate limiting before the command can be applied.",
+    "safe_fallback_controller overrides command delivery with deterministic safe values whenever any fault, timeout, stale input, malformed response, host abort, or transport error is present.",
+    "motor_control_fsm coordinates IDLE, ISSUE_REQ, WAIT_RSP, VALIDATE, CLAMP, APPLY, FALLBACK, and FAULT sequencing and keeps fault behavior sticky until cleared through the defined host path."
+  ],
+  "clock_reset_summary": {
+    "clocking": "All modules are synchronous to clk, with explicit handshaking across CSR, request, and response paths. Outputs that hand off externally are expected to be registered where timing closure requires it. The design is intended to be free of combinational loops.",
+    "reset_behavior": "reset_n is active-low and returns the design to IDLE with deterministic safe outputs, handshake deassertion, and cleared sticky status bits. Configuration registers revert to benign or unconfigured defaults until the host writes them. Sticky fault clearing is only allowed through the explicit clear_fault path when safe."
+  },
+  "integration_notes": [
+    "The top-level interface remains compact and uses a 64-bit CSR window together with bounded 128-bit request and response streams, keeping the estimated scalar-equivalent I/O count below the specified limit.",
+    "No top-level geometry arrays, tensors, mesh nodes, flow fields, or per-point payload pins are introduced; only compact scalar descriptors and handshakes are used.",
+    "The design is explicitly descriptive of a local safety wrapper and does not implement physics inference, neural-network layers, tensor math, or surrogate-model internals.",
+    "CSR writes are intended to update configuration only when the bus transaction is accepted and the controller is not busy, except for the dedicated clear_fault semantics.",
+    "Stale input, malformed descriptor, unsupported geometry format, illegal velocity setting, timeout, transport protocol error, or host abort must all force fallback and sticky fault indication locally in RTL.",
+    "The response path surfaces only command-relevant fixed-format fields and a compact summary; it does not expose full flow fields or pressure maps at top level.",
+    "The architecture is compatible with the stated ASIC constraint that disallows inference-based payload memories; if any descriptor/history buffering were needed beyond small control state, the approved Sky130 macro gate would govern that decision.",
+    "This document does not redefine hierarchy, ports, or filenames and remains a description of the supplied specification only."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

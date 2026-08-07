@@ -1,0 +1,55 @@
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: motor_control_top.v:389:6: Instance pin connected by name with empty reference: 'busy'
+  389 |     .busy(),
+      |      ^~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: motor_control_top.v:390:6: Instance pin connected by name with empty reference: 'done'
+  390 |     .done(),
+      |      ^~~~
+%Warning-PINCONNECTEMPTY: motor_control_top.v:391:6: Instance pin connected by name with empty reference: 'timeout_fault'
+  391 |     .timeout_fault(),
+      |      ^~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: motor_control_top.v:392:6: Instance pin connected by name with empty reference: 'transport_error'
+  392 |     .transport_error(),
+      |      ^~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: motor_control_top.v:393:6: Instance pin connected by name with empty reference: 'response_valid'
+  393 |     .response_valid(),
+      |      ^~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: motor_control_top.v:421:6: Instance pin connected by name with empty reference: 'response_valid'
+  421 |     .response_valid(),
+      |      ^~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: motor_control_top.v:451:6: Instance pin connected by name with empty reference: 'safe_mode'
+  451 |     .safe_mode(),
+      |      ^~~~~~~~~
+%Warning-PINCONNECTEMPTY: motor_control_top.v:453:6: Instance pin connected by name with empty reference: 'fallback_active'
+  453 |     .fallback_active()
+      |      ^~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: motor_control_top.v:471:6: Instance pin connected by name with empty reference: 'busy'
+  471 |     .busy(),
+      |      ^~~~
+%Warning-PINCONNECTEMPTY: motor_control_top.v:472:6: Instance pin connected by name with empty reference: 'done'
+  472 |     .done(),
+      |      ^~~~
+%Warning-PINCONNECTEMPTY: motor_control_top.v:473:6: Instance pin connected by name with empty reference: 'fault'
+  473 |     .fault(),
+      |      ^~~~~
+%Error: motor_control_top.v:254:44: Can't find definition of variable: 'motor_control_fsm_fault'
+                                  : ... Suggested alternative: 'motor_control_fsm_stale_fault'
+  254 | assign safe_fallback_controller_fault_in = motor_control_fsm_fault;
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~
+        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.
+%Warning-IMPLICIT: motor_control_top.v:407:18: Signal definition not found, creating implicitly: 'freshness_timeout_supervisor_stale_fault'
+                                             : ... Suggested alternative: 'freshness_timeout_supervisor_cfg_seq_id'
+  407 |     .stale_fault(freshness_timeout_supervisor_stale_fault),
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/IMPLICIT?v=5.047
+                   ... Use "/* verilator lint_off IMPLICIT */" and lint_on around source to disable this message.
+%Warning-IMPLICIT: motor_control_top.v:436:14: Signal definition not found, creating implicitly: 'command_clamper_clamped'
+                                             : ... Suggested alternative: 'command_clamper_slew_limit'
+  436 |     .clamped(command_clamper_clamped)
+      |              ^~~~~~~~~~~~~~~~~~~~~~~
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1

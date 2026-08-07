@@ -1,0 +1,348 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.340 MB sources in 11 modules, into 0.135 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.034 s (elab=0.004, cvt=0.017, bld=0.000); cpu 0.034 s on 1 threads; allocated 33.352 MB
+
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:149:6: Instance pin connected by name with empty reference: 'cfg_seq_id'
+  149 |     .cfg_seq_id(),
+      |      ^~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:150:6: Instance pin connected by name with empty reference: 'cfg_timeout_ticks'
+  150 |     .cfg_timeout_ticks(),
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:151:6: Instance pin connected by name with empty reference: 'cfg_freshness_limit'
+  151 |     .cfg_freshness_limit(),
+      |      ^~~~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:152:6: Instance pin connected by name with empty reference: 'cfg_velocity_mps'
+  152 |     .cfg_velocity_mps(),
+      |      ^~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:153:6: Instance pin connected by name with empty reference: 'cfg_geometry_base_addr'
+  153 |     .cfg_geometry_base_addr(),
+      |      ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:154:6: Instance pin connected by name with empty reference: 'cfg_geometry_length'
+  154 |     .cfg_geometry_length(),
+      |      ^~~~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:155:6: Instance pin connected by name with empty reference: 'cfg_geometry_format'
+  155 |     .cfg_geometry_format(),
+      |      ^~~~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:156:6: Instance pin connected by name with empty reference: 'cfg_actuator_min'
+  156 |     .cfg_actuator_min(),
+      |      ^~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:157:6: Instance pin connected by name with empty reference: 'cfg_actuator_max'
+  157 |     .cfg_actuator_max(),
+      |      ^~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:158:6: Instance pin connected by name with empty reference: 'cfg_slew_limit'
+  158 |     .cfg_slew_limit(),
+      |      ^~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:159:6: Instance pin connected by name with empty reference: 'cfg_checkpoint_id'
+  159 |     .cfg_checkpoint_id(),
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:160:6: Instance pin connected by name with empty reference: 'cfg_control_flags'
+  160 |     .cfg_control_flags(),
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:161:6: Instance pin connected by name with empty reference: 'launch_pulse'
+  161 |     .launch_pulse(),
+      |      ^~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:162:6: Instance pin connected by name with empty reference: 'clear_fault_pulse'
+  162 |     .clear_fault_pulse(),
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:301:6: Instance pin connected by name with empty reference: 'busy'
+  301 |     .busy(),
+      |      ^~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:302:6: Instance pin connected by name with empty reference: 'done'
+  302 |     .done(),
+      |      ^~~~
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:303:6: Instance pin connected by name with empty reference: 'fault'
+  303 |     .fault(),
+      |      ^~~~~
+%Warning-WIDTHTRUNC: pass2/request_packager.v:33:25: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 176 bits.
+                                                   : ... note: In instance 'motor_control_top.u_request_packager'
+   33 |             req_payload <= {seq_id_in, geometry_base_addr_q, geometry_length_q, geometry_format_q, cfg_velocity_mps, 8'hA5, cfg_checkpoint_id[31:0], cfg_control_flags, 32'h00000000};
+      |                         ^~
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:131:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  131 |         8'h01: csr_rdata = {56'h0, 56'h0, status_shadow};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:132:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  132 |         8'h02: csr_rdata = {56'h0, 63'h0, status_response_valid};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:133:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  133 |         8'h03: csr_rdata = {56'h0, 56'h0, cfg_seq_id[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:134:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  134 |         8'h04: csr_rdata = {56'h0, 56'h0, cfg_seq_id[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:135:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  135 |         8'h05: csr_rdata = {56'h0, 56'h0, cfg_timeout_ticks[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:136:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  136 |         8'h06: csr_rdata = {56'h0, 56'h0, cfg_timeout_ticks[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:137:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  137 |         8'h07: csr_rdata = {56'h0, 56'h0, cfg_freshness_limit[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:138:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  138 |         8'h08: csr_rdata = {56'h0, 56'h0, cfg_freshness_limit[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:139:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  139 |         8'h09: csr_rdata = {56'h0, 56'h0, cfg_velocity_mps[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:140:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  140 |         8'h0A: csr_rdata = {56'h0, 56'h0, cfg_velocity_mps[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:141:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  141 |         8'h0B: csr_rdata = {56'h0, 56'h0, cfg_geometry_base_addr[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:142:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  142 |         8'h0C: csr_rdata = {56'h0, 56'h0, cfg_geometry_base_addr[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:143:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  143 |         8'h0D: csr_rdata = {56'h0, 56'h0, cfg_geometry_base_addr[23:16]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:144:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  144 |         8'h0E: csr_rdata = {56'h0, 56'h0, cfg_geometry_base_addr[31:24]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:145:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  145 |         8'h0F: csr_rdata = {56'h0, 56'h0, cfg_geometry_length[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:146:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  146 |         8'h10: csr_rdata = {56'h0, 56'h0, cfg_geometry_length[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:147:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  147 |         8'h11: csr_rdata = {56'h0, 56'h0, cfg_geometry_format};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:148:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  148 |         8'h12: csr_rdata = {56'h0, 56'h0, cfg_actuator_min[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:149:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  149 |         8'h13: csr_rdata = {56'h0, 56'h0, cfg_actuator_min[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:150:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  150 |         8'h14: csr_rdata = {56'h0, 56'h0, cfg_actuator_max[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:151:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  151 |         8'h15: csr_rdata = {56'h0, 56'h0, cfg_actuator_max[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:152:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  152 |         8'h16: csr_rdata = {56'h0, 56'h0, cfg_slew_limit[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:153:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  153 |         8'h17: csr_rdata = {56'h0, 56'h0, cfg_slew_limit[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:154:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  154 |         8'h18: csr_rdata = {56'h0, 56'h0, cfg_checkpoint_id[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:155:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  155 |         8'h19: csr_rdata = {56'h0, 56'h0, cfg_checkpoint_id[15:8]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:156:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  156 |         8'h1A: csr_rdata = {56'h0, 56'h0, cfg_checkpoint_id[23:16]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:157:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  157 |         8'h1B: csr_rdata = {56'h0, 56'h0, cfg_checkpoint_id[31:24]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:158:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  158 |         8'h1C: csr_rdata = {56'h0, 56'h0, cfg_control_flags[7:0]};
+      |                          ^
+%Warning-WIDTHTRUNC: pass2/motor_control_register_map.v:159:26: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+  159 |         8'h1D: csr_rdata = {56'h0, 56'h0, cfg_control_flags[15:8]};
+      |                          ^
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:16:11: Signal is not used: 'model_req_ready'
+                                                      : ... note: In instance 'motor_control_top'
+   16 |     input model_req_ready,
+      |           ^~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNDRIVEN: pass2/motor_control_top.v:63:13: Signal is not driven: 'rm_rspsum'
+                                                  : ... note: In instance 'motor_control_top'
+   63 | wire [63:0] rm_rspsum;
+      |             ^~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047
+                   ... Use "/* verilator lint_off UNDRIVEN */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:64:13: Signal is not used: 'freshness_timeout_supervisor_last_accepted_seq'
+                                                      : ... note: In instance 'motor_control_top'
+   64 | wire [15:0] freshness_timeout_supervisor_last_accepted_seq;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:67:6: Signal is not used: 'freshness_timeout_supervisor_timeout_config_valid'
+                                                     : ... note: In instance 'motor_control_top'
+   67 | wire freshness_timeout_supervisor_timeout_config_valid;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:77:14: Signal is not driven, nor used: 'transport_controller_req_payload'
+                                                      : ... note: In instance 'motor_control_top'
+   77 | wire [127:0] transport_controller_req_payload;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:78:6: Signal is not driven, nor used: 'transport_controller_req_valid'
+                                                     : ... note: In instance 'motor_control_top'
+   78 | wire transport_controller_req_valid;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:80:6: Signal is not driven, nor used: 'transport_controller_rsp_ready'
+                                                     : ... note: In instance 'motor_control_top'
+   80 | wire transport_controller_rsp_ready;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:81:13: Signal is not used: 'transport_controller_response_summary'
+                                                      : ... note: In instance 'motor_control_top'
+   81 | wire [63:0] transport_controller_response_summary;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:86:6: Signal is not used: 'transport_controller_response_valid'
+                                                     : ... note: In instance 'motor_control_top'
+   86 | wire transport_controller_response_valid;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:87:14: Signal is not driven, nor used: 'response_parser_rsp_payload'
+                                                      : ... note: In instance 'motor_control_top'
+   87 | wire [127:0] response_parser_rsp_payload;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:91:13: Signal is not used: 'response_parser_parsed_flags'
+                                                      : ... note: In instance 'motor_control_top'
+   91 | wire [15:0] response_parser_parsed_flags;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:102:6: Signal is not driven, nor used: 'motor_control_fsm_launch_pulse'
+                                                      : ... note: In instance 'motor_control_top'
+  102 | wire motor_control_fsm_launch_pulse;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:103:6: Signal is not driven, nor used: 'motor_control_fsm_clear_fault_pulse'
+                                                      : ... note: In instance 'motor_control_top'
+  103 | wire motor_control_fsm_clear_fault_pulse;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:104:6: Signal is not driven, nor used: 'motor_control_fsm_freshness_ok'
+                                                      : ... note: In instance 'motor_control_top'
+  104 | wire motor_control_fsm_freshness_ok;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:105:6: Signal is not driven, nor used: 'motor_control_fsm_descriptor_valid'
+                                                      : ... note: In instance 'motor_control_top'
+  105 | wire motor_control_fsm_descriptor_valid;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:106:6: Signal is not driven, nor used: 'motor_control_fsm_request_accepted'
+                                                      : ... note: In instance 'motor_control_top'
+  106 | wire motor_control_fsm_request_accepted;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:107:6: Signal is not driven, nor used: 'motor_control_fsm_request_error'
+                                                      : ... note: In instance 'motor_control_top'
+  107 | wire motor_control_fsm_request_error;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:108:6: Signal is not driven, nor used: 'motor_control_fsm_response_ok'
+                                                      : ... note: In instance 'motor_control_top'
+  108 | wire motor_control_fsm_response_ok;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:109:6: Signal is not driven, nor used: 'motor_control_fsm_malformed_response'
+                                                      : ... note: In instance 'motor_control_top'
+  109 | wire motor_control_fsm_malformed_response;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:110:6: Signal is not driven, nor used: 'motor_control_fsm_timeout_fault'
+                                                      : ... note: In instance 'motor_control_top'
+  110 | wire motor_control_fsm_timeout_fault;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:111:6: Signal is not driven, nor used: 'motor_control_fsm_stale_fault'
+                                                      : ... note: In instance 'motor_control_top'
+  111 | wire motor_control_fsm_stale_fault;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:112:6: Signal is not driven, nor used: 'motor_control_fsm_transport_error'
+                                                      : ... note: In instance 'motor_control_top'
+  112 | wire motor_control_fsm_transport_error;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:113:6: Signal is not driven, nor used: 'motor_control_fsm_clamped'
+                                                      : ... note: In instance 'motor_control_top'
+  113 | wire motor_control_fsm_clamped;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:114:6: Signal is not used: 'motor_control_fsm_state_idle'
+                                                      : ... note: In instance 'motor_control_top'
+  114 | wire motor_control_fsm_state_idle;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:115:6: Signal is not used: 'motor_control_fsm_state_issue_req'
+                                                      : ... note: In instance 'motor_control_top'
+  115 | wire motor_control_fsm_state_issue_req;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:116:6: Signal is not used: 'motor_control_fsm_state_wait_rsp'
+                                                      : ... note: In instance 'motor_control_top'
+  116 | wire motor_control_fsm_state_wait_rsp;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:117:6: Signal is not used: 'motor_control_fsm_state_validate'
+                                                      : ... note: In instance 'motor_control_top'
+  117 | wire motor_control_fsm_state_validate;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:118:6: Signal is not used: 'motor_control_fsm_state_clamp'
+                                                      : ... note: In instance 'motor_control_top'
+  118 | wire motor_control_fsm_state_clamp;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:119:6: Signal is not used: 'motor_control_fsm_state_apply'
+                                                      : ... note: In instance 'motor_control_top'
+  119 | wire motor_control_fsm_state_apply;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:120:6: Signal is not used: 'motor_control_fsm_state_fallback'
+                                                      : ... note: In instance 'motor_control_top'
+  120 | wire motor_control_fsm_state_fallback;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:121:6: Signal is not used: 'motor_control_fsm_state_fault'
+                                                      : ... note: In instance 'motor_control_top'
+  121 | wire motor_control_fsm_state_fault;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_register_map.v:7:17: Bits of signal are not used: 'csr_be'[7:1]
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+    7 |     input [7:0] csr_be,
+      |                 ^~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_register_map.v:9:18: Bits of signal are not used: 'csr_wdata'[63:8]
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+    9 |     input [63:0] csr_wdata,
+      |                  ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_register_map.v:39:12: Bits of signal are not used: 'cfg_valid'[15:2]
+                                                               : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+   39 | reg [15:0] cfg_valid;
+      |            ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_register_map.v:40:11: Bits of signal are not used: 'ctrl_reg'[7:2]
+                                                               : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+   40 | reg [7:0] ctrl_reg;
+      |           ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_register_map.v:44:6: Signal is not used: 'rd_en'
+                                                              : ... note: In instance 'motor_control_top.u_motor_control_register_map'
+   44 | wire rd_en;
+      |      ^~~~~
+%Warning-UNUSEDSIGNAL: pass2/payload_pointer_manager.v:7:18: Bits of signal are not used: 'cfg_control_flags'[15:1]
+                                                           : ... note: In instance 'motor_control_top.u_payload_pointer_manager'
+    7 |     input [15:0] cfg_control_flags,
+      |                  ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/response_parser.v:5:19: Bits of signal are not used: 'rsp_payload'[111:64]
+                                                   : ... note: In instance 'motor_control_top.u_response_parser'
+    5 |     input [127:0] rsp_payload,
+      |                   ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/transport_controller.v:9:19: Bits of signal are not used: 'rsp_payload'[127:64]
+                                                        : ... note: In instance 'motor_control_top.u_transport_controller'
+    9 |     input [127:0] rsp_payload,
+      |                   ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/transport_controller.v:20:13: Bits of signal are not used: 'req_hold'[127:64]
+                                                         : ... note: In instance 'motor_control_top.u_transport_controller'
+   20 | reg [127:0] req_hold;
+      |             ^~~~~~~~
+
+=== RETURN CODE ===
+0
