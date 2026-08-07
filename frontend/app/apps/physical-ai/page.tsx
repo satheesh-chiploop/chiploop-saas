@@ -21,7 +21,7 @@ const paths: Array<{ key: ImplementationPath; title: string; body: string }> = [
 ];
 
 type RunSummary = { status?: string; physics_model?: { name?: string }; physics_execution?: { execution_mode?: string; inference_status?: string; implementation_path?: string }; hem?: { enabled?: boolean } };
-type HemChildRun = { workflow_id: string; label: string; status?: string | null; dashboard_path: string };
+type HemChildRun = { workflow_id: string; label: string; status?: string | null; phase?: string | null; logs?: string | null; dashboard_path: string };
 
 function mergeHemChildren(previous: HemChildRun[], incoming: unknown): HemChildRun[] {
   if (!Array.isArray(incoming)) return previous;
@@ -121,7 +121,15 @@ export default function PhysicalAiStudioPage() {
   }, [token, workflowId]);
 
   const selected = models.find((model) => model.model_id === modelId);
-  const activeAgent = useMemo(() => activeAgentFromLogs(runLogs), [runLogs]);
+  const journeyLogs = useMemo(() => {
+    const sections = runLogs.trim() ? [runLogs.trim()] : [];
+    for (const child of hemChildren) {
+      const childLogs = String(child.logs || "").trim();
+      if (childLogs) sections.push(`[${child.label} · ${child.status || "running"}]\n${childLogs}`);
+    }
+    return sections.join("\n\n");
+  }, [hemChildren, runLogs]);
+  const activeAgent = useMemo(() => activeAgentFromLogs(journeyLogs), [journeyLogs]);
   const validatedAvailable = selected?.availability === "ready";
   const stages = useMemo(() => {
     const base = ["Physical AI agents", "Architecture", "RTL generation", "Verification"];
@@ -180,9 +188,9 @@ export default function PhysicalAiStudioPage() {
     return <main className="min-h-screen bg-slate-950 text-white"><div className="mx-auto max-w-7xl px-6 py-10">
       <div className="flex flex-wrap items-center justify-between gap-3"><button onClick={() => { setWorkflowId(null); setRunResult(null); setRunLogs(""); setHemChildren([]); setRunning(false); }} className="rounded-lg border border-slate-700 px-4 py-2 text-sm">Configure another run</button><span className={`rounded-full px-3 py-2 text-xs font-bold uppercase ${runPhase === "hem_failed" || runPhase === "error" ? "bg-red-500/15 text-red-200" : complete ? "bg-lime-500/15 text-lime-200" : "bg-cyan-500/15 text-cyan-200"}`}>{runPhase.replaceAll("_", " ")}</span></div>
       <div className="mt-8 flex flex-wrap items-end justify-between gap-4"><div><div className="text-xs font-bold uppercase tracking-widest text-fuchsia-300">Physical AI reference journey</div><h1 className="mt-2 text-4xl font-extrabold">{complete ? "Run dashboard" : "Physical AI agents are running"}</h1><p className="mt-3 text-slate-400">Workflow {workflowId}</p></div><a href={`/dashboard/${workflowId}?stage=physical_ai&app=PhysicalAI`} target="_blank" rel="noreferrer" className="rounded-xl border border-cyan-400 px-5 py-3 text-sm font-bold text-cyan-200">Open Dashboard ↗</a></div>
-      <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-xl font-bold">Running log</h2><p className="mt-1 text-sm text-slate-400">Agents and automatic child workflows appear here in execution order.</p></div><span className="rounded-full border border-slate-700 px-3 py-1 text-xs font-bold uppercase text-slate-300">{runPhase.replaceAll("_", " ")}</span></div>{activeAgent && <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3"><span className="h-2.5 w-2.5 animate-pulse rounded-full bg-cyan-300" /><div><div className="text-xs font-bold uppercase tracking-wide text-cyan-300">Active agent</div><div className="mt-1 font-semibold text-white">{activeAgent.agent}</div></div><span className="ml-auto rounded-full bg-slate-950 px-3 py-1 text-xs text-slate-300">{activeAgent.stage}</span></div>}<pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-xs leading-6 text-slate-300">{runLogs || "Waiting for the first agent…"}</pre></section>
+      <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-xl font-bold">Running log</h2><p className="mt-1 text-sm text-slate-400">Agents and automatic child workflows appear here in execution order.</p></div><span className="rounded-full border border-slate-700 px-3 py-1 text-xs font-bold uppercase text-slate-300">{runPhase.replaceAll("_", " ")}</span></div>{activeAgent && <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3"><span className="h-2.5 w-2.5 animate-pulse rounded-full bg-cyan-300" /><div><div className="text-xs font-bold uppercase tracking-wide text-cyan-300">Active agent</div><div className="mt-1 font-semibold text-white">{activeAgent.agent}</div></div><span className="ml-auto rounded-full bg-slate-950 px-3 py-1 text-xs text-slate-300">{activeAgent.stage}</span></div>}<pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-xs leading-6 text-slate-300">{journeyLogs || "Waiting for the first agent…"}</pre></section>
       {runResult && <section className="mt-6 grid gap-4 md:grid-cols-3"><div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><div className="text-xs uppercase text-slate-500">Physics model</div><div className="mt-2 font-bold">{runResult.physics_model?.name || "Selected model"}</div></div><div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><div className="text-xs uppercase text-slate-500">Mode</div><div className="mt-2 font-bold capitalize">{(runResult.physics_execution?.execution_mode || "validated").replaceAll("_", " ")}</div></div><div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><div className="text-xs uppercase text-slate-500">Implementation</div><div className="mt-2 font-bold capitalize">{(runResult.physics_execution?.implementation_path || implementationPath).replaceAll("_", " ")}</div></div></section>}
-      <section className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-6"><h2 className="text-xl font-bold">HEM and next workflows</h2><p className="mt-2 text-sm text-slate-400">Automatic child workflows remain available here after completion or failure. If HEM is off, use the evidence dashboard to continue manually.</p><HemChildDashboardLinks logs={runLogs} runs={hemChildren} /></section>
+      <section className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-6"><h2 className="text-xl font-bold">HEM and next workflows</h2><p className="mt-2 text-sm text-slate-400">Automatic child workflows remain available here after completion or failure. If HEM is off, use the evidence dashboard to continue manually.</p><HemChildDashboardLinks logs={journeyLogs} runs={hemChildren} /></section>
       <div className="mt-6"><WorkflowEvidenceDashboard workflowId={workflowId} status={runStatus} stage="physical_ai" logs={runLogs} /></div>
       {error && <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200">{error}</div>}
     </div></main>;

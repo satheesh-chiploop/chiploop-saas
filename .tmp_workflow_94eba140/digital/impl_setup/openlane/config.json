@@ -1,0 +1,20 @@
+{
+  "DESIGN_NAME": "motor_control_top",
+  "PDK": "sky130A",
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 10.0,
+  "VERILOG_FILES": [
+    "dir::../filelist.f"
+  ],
+  "SYNTH_SDC_FILE": "dir::../constraints/motor_control_top.sdc",
+  "PNR_SDC_FILE": "dir::../constraints/motor_control_top.sdc",
+  "CHIPLOOP_SOURCE_SPEC_JSON": null,
+  "CHIPLOOP_FILELIST": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/94eba140-54a6-46d6-8818-df066a3e5763/0ae4c836-91a4-4a16-936a-40745eab4855/digital/arch2tapeout/digital/impl_setup/filelist.f",
+  "CHIPLOOP_UPSTREAM_SDC_SOURCE": "inferred_clock_intent",
+  "FP_CORE_UTIL": 20,
+  "PL_TARGET_DENSITY": 0.25,
+  "FP_SIZING": "absolute",
+  "DIE_AREA": "0 0 400 400",
+  "CHIPLOOP_TOP_LEVEL_IO_BITS": 328,
+  "CHIPLOOP_DIE_SIDE_UM": 400.0
+}

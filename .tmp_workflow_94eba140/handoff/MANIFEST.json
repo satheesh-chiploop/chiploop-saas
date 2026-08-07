@@ -1,0 +1,39 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "motor_control_top",
+  "generated_at": "2026-08-07T01:33:22.783037",
+  "file_count": 6,
+  "files": [
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "d367ef3c3dfcca78826c1a7268feccab86a46d8f3f5932ed837eee5ebb197a96",
+      "bytes": 13493
+    },
+    {
+      "path": "docs/spec/digital_spec.json",
+      "sha256": "02343facf2ffae792a0f474213b7e21e422a85de0ff6be005a922ac77baeded6",
+      "bytes": 11193
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "eba6742dffe531b0234577b2bdc3a15ce3e9a85b391d533ab070c8f85162cb1b",
+      "bytes": 2291
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "5139584a01cd29a996cf67484712774771849b2f7d41cee62b3482f7877d4d7b",
+      "bytes": 826
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "76e75c796fbac581a561c45aca9ca0c22a37f836cf71a6f3bf2e37fbb98acf47",
+      "bytes": 324
+    },
+    {
+      "path": "rtl/motor_control_top.v",
+      "sha256": "99abb75930ec3f64c46abfbdb04e0b02cb4fc4a3c8b083aa432e3e75d8931bf9",
+      "bytes": 16628
+    }
+  ]
+}

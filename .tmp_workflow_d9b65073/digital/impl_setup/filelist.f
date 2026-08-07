@@ -1,4 +1,0 @@
-/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/handoff/rtl/motor_control_top.v
-/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/handoff/rtl/motor_control_cfg_if.v
-/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/handoff/rtl/motor_control_request_packer.v
-/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/handoff/rtl/motor_control_response_guard.v
