@@ -1,9 +1,0 @@
-backend/workflows/6c7c76ea-dc34-40de-8783-030049829e4d/rtl/pass3/response_unpacker.v:8: error: Net data type requires SystemVerilog.
-
-Issues:
-❌ Module 'fault_manager' missing ports vs spec: ['fault_code_in']
-❌ Module 'fault_manager' has extra ports vs spec: ['fault_code_out']
-❌ Icarus Verilog compile failed.
-
-=== VERILATOR LINT FAILURE ===
-Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

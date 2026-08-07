@@ -1,3 +1,0 @@
-❌ RTL generation failed.
-
-RTL failed checks in pass1, pass2, and pass3.

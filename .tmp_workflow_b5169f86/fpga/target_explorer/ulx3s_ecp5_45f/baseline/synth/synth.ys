@@ -1,0 +1,5 @@
+read_verilog -sv /root/chiploop-backend/backend/workflows/b5169f86-3621-4078-b1b6-536ed5391eb2/fpga/src/upstream/adaptive_aero_control_top.v
+read_verilog -sv /root/chiploop-backend/backend/workflows/b5169f86-3621-4078-b1b6-536ed5391eb2/fpga/src/upstream/aero_csr_regs.v
+read_verilog -sv /root/chiploop-backend/backend/workflows/b5169f86-3621-4078-b1b6-536ed5391eb2/fpga/src/upstream/aero_packet_codec.v
+read_verilog -sv /root/chiploop-backend/backend/workflows/b5169f86-3621-4078-b1b6-536ed5391eb2/fpga/src/upstream/aero_transaction_ctrl.v
+synth_ecp5 -top adaptive_aero_control_top -noflatten -json /root/chiploop-backend/backend/workflows/b5169f86-3621-4078-b1b6-536ed5391eb2/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/adaptive_aero_control_top_ecp5.json
