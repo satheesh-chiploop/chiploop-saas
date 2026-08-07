@@ -1,0 +1,67 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.133 MB sources in 6 modules, into 0.045 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.018 s (elab=0.002, cvt=0.009, bld=0.000); cpu 0.018 s on 1 threads; allocated 32.352 MB
+
+=== STDERR ===
+%Warning-WIDTHTRUNC: pass3/motor_control_top.v:155:26: Operator ASSIGNW expects 16 bits on the Assign RHS, but Assign RHS's VARREF 'request_descriptor' generates 32 bits.
+                                                     : ... note: In instance 'motor_control_top'
+  155 | assign validated_command = request_descriptor;
+      |                          ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: pass3/motor_control_top.v:161:28: Operator ASSIGNW expects 8 bits on the Assign RHS, but Assign RHS's VARREF 'fault_flag' generates 1 bits.
+                                                      : ... note: In instance 'motor_control_top'
+  161 | assign status_fault_sticky = fault_flag;
+      |                            ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/motor_control_top.v:29:6: Signal is not used: 'sticky_fault_clear'
+                                                     : ... note: In instance 'motor_control_top'
+   29 | wire sticky_fault_clear;
+      |      ^~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/motor_control_top.v:38:13: Bits of signal are not used: 'request_descriptor'[31:16]
+                                                      : ... note: In instance 'motor_control_top'
+   38 | wire [31:0] request_descriptor;
+      |             ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/csr_block.v:7:18: Bits of signal are not used: 'reg_req_wdata'[31:16]
+                                             : ... note: In instance 'motor_control_top.u_csr_block'
+    7 |     input [31:0] reg_req_wdata,
+      |                  ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/request_packager.v:6:18: Bits of signal are not used: 'cmd_payload'[31:8]
+                                                    : ... note: In instance 'motor_control_top.u_request_packager'
+    6 |     input [31:0] cmd_payload,
+      |                  ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/request_packager.v:12:18: Bits of signal are not used: 'cfg_cmd_min'[15:8]
+                                                     : ... note: In instance 'motor_control_top.u_request_packager'
+   12 |     input [15:0] cfg_cmd_min,
+      |                  ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/request_packager.v:13:18: Bits of signal are not used: 'cfg_cmd_max'[15:8]
+                                                     : ... note: In instance 'motor_control_top.u_request_packager'
+   13 |     input [15:0] cfg_cmd_max,
+      |                  ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/response_validator.v:6:18: Bits of signal are not used: 'resp_payload'[31:16]
+                                                      : ... note: In instance 'motor_control_top.u_response_validator'
+    6 |     input [31:0] resp_payload,
+      |                  ^~~~~~~~~~~~
+%Warning-MULTIDRIVEN: pass3/motor_control_top.v:44:13: Bits [15:0] of signal 'motor_control_top.validated_command' have multiple combinational drivers. This can cause performance degradation.
+                      pass3/motor_control_top.v:155:26: ... Location of offending driver
+  155 | assign validated_command = request_descriptor;
+      |                          ^
+                      pass3/response_validator.v:27:26: ... Location of offending driver
+   27 | assign validated_command = validated_command_r;
+      |                          ^
+                      ... For warning description see https://verilator.org/warn/MULTIDRIVEN?v=5.047
+                      ... Use "/* verilator lint_off MULTIDRIVEN */" and lint_on around source to disable this message.
+%Warning-MULTIDRIVEN: pass3/motor_control_top.v:36:6: Bit [0] of signal 'motor_control_top.request_captured' have multiple combinational drivers. This can cause performance degradation.
+                      pass3/motor_control_top.v:156:25: ... Location of offending driver
+  156 | assign request_captured = request_descriptor_valid;
+      |                         ^
+                      pass3/request_packager.v:25:24: ... Location of offending driver
+   25 | assign capture_request = capture_request_r;
+      |                        ^
+
+=== RETURN CODE ===
+0

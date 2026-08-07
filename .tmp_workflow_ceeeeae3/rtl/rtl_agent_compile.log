@@ -1,9 +1,0 @@
-backend/workflows/ceeeeae3-e7a8-4f49-821e-a3fb686a9b15/rtl/motor_control_top.v:254: error: Unable to bind wire/reg/memory `motor_control_fsm_fault' in `motor_control_top'
-backend/workflows/ceeeeae3-e7a8-4f49-821e-a3fb686a9b15/rtl/motor_control_top.v:254: error: Unable to elaborate r-value: motor_control_fsm_fault
-2 error(s) during elaboration.
-
-Issues:
-❌ Icarus Verilog compile failed.
-
-=== VERILATOR LINT FAILURE ===
-Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

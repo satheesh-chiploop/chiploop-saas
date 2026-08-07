@@ -1,0 +1,8 @@
+{
+  "workflow_id": "a7e56807-b42d-4a34-ad23-6642cf71c38b",
+  "workflow_dir": "backend/workflows/a7e56807-b42d-4a34-ad23-6642cf71c38b",
+  "digital_spec_json": "backend/workflows/a7e56807-b42d-4a34-ad23-6642cf71c38b/spec/motor_control_top_spec.json",
+  "spec_json": "backend/workflows/a7e56807-b42d-4a34-ad23-6642cf71c38b/spec/motor_control_top_spec.json",
+  "digital_spec_json_exists": true,
+  "spec_json_exists": true
+}

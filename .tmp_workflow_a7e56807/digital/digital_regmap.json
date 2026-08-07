@@ -1,0 +1,326 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 32,
+    "registers": [
+      {
+        "name": "CTRL_ENABLE",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Global enable for request acceptance and active supervision.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When 1, request acceptance and supervisory operation are enabled. When 0, new command acceptance is blocked and the design remains in safe fallback behavior."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_FALLBACK_SELECT",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Selects the conservative fallback mode used when safe fallback is active.",
+        "fields": [
+          {
+            "name": "FALLBACK_SELECT",
+            "lsb": 1,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Fallback mode selector. Encodes a small set of deterministic conservative poses/commands."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_TIMEOUT_THRESHOLD",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Timeout window in cycles for an outstanding request.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 100,
+            "description": "Maximum allowed outstanding request age before timeout fault. Value 0 is illegal for normal operation and forces unsafe configuration handling if written."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_CMD_MIN",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Minimum allowed actuator command bound.",
+        "fields": [
+          {
+            "name": "CMD_MIN",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower clamp bound for validated and fallback actuator commands."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_CMD_MAX",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Maximum allowed actuator command bound.",
+        "fields": [
+          {
+            "name": "CMD_MAX",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 4095,
+            "description": "Upper clamp bound for validated and fallback actuator commands."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_FALLBACK_VALUE",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Host-programmed conservative fallback command within configured bounds.",
+        "fields": [
+          {
+            "name": "FALLBACK_VALUE",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Conservative actuator command used in safe fallback if selected and within bounds. If out of bounds, the supervisor clamps or flags configuration fault per safety policy."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_FSM_STATE",
+        "offset": "0x10",
+        "access": "RO",
+        "description": "Current safety supervisor FSM state.",
+        "fields": [
+          {
+            "name": "FSM_STATE",
+            "lsb": 2,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current FSM encoding: 0=RESET, 1=IDLE, 2=ISSUE_REQUEST, 3=WAIT_RESPONSE, 4=APPLY_VALIDATED_COMMAND, 5=SAFE_FALLBACK, 6=FAULT_HOLD. Other encodings reserved."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_OUTSTANDING_SEQ",
+        "offset": "0x11",
+        "access": "RO",
+        "description": "Outstanding request sequence number.",
+        "fields": [
+          {
+            "name": "OUTSTANDING_SEQ",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sequence tag for the currently outstanding request. Zero indicates none or reset baseline depending on state."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_LAST_FAULT_REASON",
+        "offset": "0x12",
+        "access": "RO",
+        "description": "Last fault reason code.",
+        "fields": [
+          {
+            "name": "LAST_FAULT_REASON",
+            "lsb": 3,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Fault reason encoding. Example meanings: 0=none, 1=timeout, 2=stale response, 3=sequence mismatch, 4=range violation, 5=illegal configuration, 6=invalid actuator command, 7=protocol mismatch, others reserved."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_SAFE_FALLBACK_ACTIVE",
+        "offset": "0x13",
+        "access": "RO",
+        "description": "Indicates whether safe fallback is active.",
+        "fields": [
+          {
+            "name": "SAFE_FALLBACK_ACTIVE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 1,
+            "description": "1 when conservative fallback behavior is active; 0 when a validated command is being presented under normal supervision."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_FAULT_STICKY",
+        "offset": "0x14",
+        "access": "RO",
+        "description": "Sticky fault summary bits.",
+        "fields": [
+          {
+            "name": "FAULT_STICKY",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky fault summary. Bits latch until reset or explicit clear. Suggested bit mapping: bit0 timeout/stale, bit1 sequence mismatch, bit2 range violation, bit3 illegal configuration, bit4 invalid actuator command, bit5 protocol mismatch, bit6 reserved, bit7 reserved."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CLEAR",
+        "offset": "0x15",
+        "access": "WO",
+        "description": "Explicit sticky fault clear pulse.",
+        "fields": [
+          {
+            "name": "FAULT_CLEAR",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to clear sticky fault bits. The clear action is synchronous and pulse-like; write 0 has no effect."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 1,
+            "access": "WO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Assert reset and wait for deassertion.",
+      "Write CTRL_CMD_MIN, CTRL_CMD_MAX, CTRL_FALLBACK_VALUE, CTRL_TIMEOUT_THRESHOLD, and CTRL_FALLBACK_SELECT to safe values.",
+      "Write CTRL_ENABLE=1 only after configuration is valid and safe.",
+      "Optionally read back STATUS_* registers to confirm FSM state, fallback activity, and sticky fault state."
+    ],
+    "polling_sequence": [
+      "Poll STATUS_FSM_STATE until IDLE or SAFE_FALLBACK depending on policy.",
+      "Poll STATUS_OUTSTANDING_SEQ to observe the active transaction sequence.",
+      "Poll STATUS_LAST_FAULT_REASON and STATUS_FAULT_STICKY after any anomaly.",
+      "Poll STATUS_SAFE_FALLBACK_ACTIVE to confirm conservative output mode when model service is unavailable or when faulted."
+    ],
+    "irq_sequence": [
+      "No dedicated interrupt line is defined in DIGITAL_SPEC_JSON; use polling of STATUS_* and sticky fault bits."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map uses the existing compact minimal register window and does not invent new hierarchy or ports.",
+    "Field widths are expressed within the 32-bit register contract already defined by the specification.",
+    "No AXI/APB wrapper is implied; the map is a firmware-visible abstract/minimal CSR map only."
+  ]
+}

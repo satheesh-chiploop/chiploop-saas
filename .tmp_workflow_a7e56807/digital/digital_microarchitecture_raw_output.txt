@@ -1,0 +1,214 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "motor_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "csr_block",
+      "implementation_style": "Small synchronous CSR decode/readback block with only scalar registers and status capture; no bulk data storage or inferred memory.",
+      "control_strategy": "Decode 8-bit address transactions on the rising clock edge, perform synchronous writes, and mux readback from the live configuration/status register set.",
+      "state_strategy": "Hold enable, fallback selection, timeout threshold, command limits, fallback value, and sticky fault bits in flops; status fields are sampled from supervisory inputs.",
+      "output_strategy": "Drive register ready/response/error and forward decoded configuration plus sticky-clear pulse to the supervisor; read data reflects current config and status.",
+      "ownership_notes": [
+        "Owns the compact register window behavior only.",
+        "Does not drive actuator outputs directly.",
+        "Does not infer RAM/FIFO/payload storage.",
+        "Keeps sticky fault bits until explicit clear or reset."
+      ]
+    },
+    {
+      "name": "request_packager",
+      "implementation_style": "Minimal request-capture and descriptor-formation logic using compare/mux/sequence increment only.",
+      "control_strategy": "Accept cmd_payload only when enabled, not busy, and not fault-blocked; otherwise deassert cmd_ready to back-pressure the host.",
+      "state_strategy": "Maintain only a small request-sequence value and capture pulse behavior; no history or payload buffering beyond the accepted command intent.",
+      "output_strategy": "Emit a compact metadata-only request descriptor, a one-cycle capture pulse, and the updated sequence tag for external transport use.",
+      "ownership_notes": [
+        "Owns cmd_ready, capture_request, req_sequence, req_descriptor, and req_descriptor_valid.",
+        "Does not package geometry, tensors, flow fields, or physics internals.",
+        "Does not drive actuator outputs."
+      ]
+    },
+    {
+      "name": "response_validator",
+      "implementation_style": "Deterministic comparator-and-range-check block with simple handshake acceptance and fault flag generation.",
+      "control_strategy": "Accept response traffic when ready, then validate sequence match, freshness versus timeout threshold, and command range compliance before allowing the result through.",
+      "state_strategy": "Keep no bulk response storage; use only the current response and the outstanding sequence/age inputs to determine validity and fault cause.",
+      "output_strategy": "Produce a validated 16-bit command candidate only when all checks pass, otherwise suppress application and assert precise fault indicators.",
+      "ownership_notes": [
+        "Owns resp_ready, validated_command, validated_valid, fault_stale, fault_sequence_mismatch, and fault_range_violation.",
+        "Does not drive actuator_setpoint directly.",
+        "Does not accept tensors, geometry arrays, flow fields, or payload FIFOs."
+      ]
+    },
+    {
+      "name": "safety_supervisor",
+      "implementation_style": "Small deterministic FSM plus counters/comparators/muxes for request supervision, timeout tracking, fallback selection, clamping, and fault latching.",
+      "control_strategy": "Arbitrate request issuance, outstanding-transaction tracking, validation acceptance, and fault handling using simple state transitions and guard conditions.",
+      "state_strategy": "Implement the required RESET, IDLE, ISSUE_REQUEST, WAIT_RESPONSE, APPLY_VALIDATED_COMMAND, SAFE_FALLBACK, and FAULT_HOLD states with a single outstanding sequence tracker and timeout age counter behavior.",
+      "output_strategy": "Drive a bounded actuator setpoint and validity flag only when the validated command passes checks and clamping; otherwise drive deterministic conservative fallback and assert fault_flag as required.",
+      "ownership_notes": [
+        "Owns supervisory state, outstanding sequence, last fault reason, fallback activity, fault_flag, and internal actuator outputs.",
+        "Clamps commands to programmed min/max bounds before output.",
+        "Blocks command acceptance when unsafe, faulted, or outstanding work exists.",
+        "Does not implement model inference or any geometric/physics computation."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "module": "safety_supervisor",
+      "present": true,
+      "description": "A simple supervisory FSM coordinates reset, idle acceptance, request issuance, response wait, validated application, conservative fallback, and fault hold. The design should avoid unnecessary sub-states beyond the required set and should use direct conditional transitions driven by enable, outstanding state, timeout age, validation results, and fault conditions.",
+      "states": [
+        "RESET",
+        "IDLE",
+        "ISSUE_REQUEST",
+        "WAIT_RESPONSE",
+        "APPLY_VALIDATED_COMMAND",
+        "SAFE_FALLBACK",
+        "FAULT_HOLD"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "module": "csr_block",
+      "inputs": [
+        "reg_req_valid",
+        "reg_req_write",
+        "reg_req_addr",
+        "reg_req_wdata",
+        "status_fsm_state",
+        "status_outstanding_seq",
+        "status_last_fault_reason",
+        "status_safe_fallback_active",
+        "status_fault_sticky"
+      ],
+      "internal_storage": [
+        "cfg_enable",
+        "cfg_fallback_select",
+        "cfg_timeout_threshold",
+        "cfg_cmd_min",
+        "cfg_cmd_max",
+        "cfg_fallback_value",
+        "sticky_fault_bits"
+      ],
+      "output_mapping": [
+        "reg_req_ready",
+        "reg_rsp_valid",
+        "reg_rsp_rdata",
+        "reg_rsp_error",
+        "cfg_enable",
+        "cfg_fallback_select",
+        "cfg_timeout_threshold",
+        "cfg_cmd_min",
+        "cfg_cmd_max",
+        "cfg_fallback_value",
+        "sticky_fault_clear"
+      ]
+    },
+    {
+      "module": "request_packager",
+      "inputs": [
+        "cmd_valid",
+        "cmd_payload",
+        "cfg_enable",
+        "cfg_cmd_min",
+        "cfg_cmd_max",
+        "outstanding_busy",
+        "fault_block"
+      ],
+      "internal_storage": [
+        "request_sequence",
+        "captured_command_intent"
+      ],
+      "output_mapping": [
+        "cmd_ready",
+        "capture_request",
+        "req_sequence",
+        "req_descriptor",
+        "req_descriptor_valid"
+      ]
+    },
+    {
+      "module": "response_validator",
+      "inputs": [
+        "resp_valid",
+        "resp_payload",
+        "outstanding_seq",
+        "expected_seq",
+        "timeout_age",
+        "timeout_threshold",
+        "cfg_cmd_min",
+        "cfg_cmd_max"
+      ],
+      "internal_storage": [],
+      "output_mapping": [
+        "resp_ready",
+        "validated_command",
+        "validated_valid",
+        "fault_stale",
+        "fault_sequence_mismatch",
+        "fault_range_violation"
+      ]
+    },
+    {
+      "module": "safety_supervisor",
+      "inputs": [
+        "cfg_enable",
+        "cfg_fallback_select",
+        "cfg_timeout_threshold",
+        "cfg_cmd_min",
+        "cfg_cmd_max",
+        "cfg_fallback_value",
+        "request_captured",
+        "request_sequence",
+        "response_validated",
+        "validated_command",
+        "fault_stale",
+        "fault_sequence_mismatch",
+        "fault_range_violation",
+        "timeout_age",
+        "timeout_threshold"
+      ],
+      "internal_storage": [
+        "fsm_state",
+        "outstanding_seq",
+        "timeout_counter",
+        "last_fault_reason",
+        "safe_fallback_active",
+        "fault_latch",
+        "actuator_setpoint_int",
+        "actuator_valid_int"
+      ],
+      "output_mapping": [
+        "cmd_ready_int",
+        "fault_flag",
+        "actuator_setpoint_int",
+        "actuator_valid_int",
+        "fsm_state",
+        "outstanding_seq",
+        "last_fault_reason",
+        "safe_fallback_active"
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "A new command is accepted only when cmd_valid and cmd_ready are both high.",
+    "On each accepted command, the request sequence is updated deterministically and the supervisor marks a transaction outstanding.",
+    "While a transaction is outstanding, timeout monitoring advances and additional requests are back-pressured.",
+    "A response is only eligible for application if its sequence matches the outstanding request, freshness is within threshold, and the returned command is within bounds.",
+    "On completion or timeout, the supervisor clears or re-arms the monitor for the next transaction."
+  ],
+  "timing_notes": [
+    "All control, validation, and CSR behavior is synchronous to clk.",
+    "Writes to CSRs occur on the active clock edge and readback reflects current stored state in a synchronous, deterministic manner.",
+    "Timeout age should be compared against timeout_threshold every cycle or at a fixed deterministic cadence while a request is outstanding.",
+    "No multi-cycle hidden buffering is implied beyond the small control registers and counters already described.",
+    "The output actuator command should be derived from validated or fallback data in the same synchronous supervisory flow."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

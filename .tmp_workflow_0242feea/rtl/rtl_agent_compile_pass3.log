@@ -1,4 +1,0 @@
-backend/workflows/0242feea-dc6c-44a1-81d4-46dbddda7114/rtl/pass3/motor_control_register_map.v:125: warning: Extra digits given for sized hex constant.
-
-=== VERILATOR LINT FAILURE ===
-Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

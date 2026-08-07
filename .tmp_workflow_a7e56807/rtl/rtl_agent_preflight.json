@@ -1,0 +1,15 @@
+{
+  "mode": "hierarchical",
+  "top_module": "motor_control_top",
+  "expected_files": [
+    "motor_control_top.v",
+    "csr_block.v",
+    "request_packager.v",
+    "response_validator.v",
+    "safety_supervisor.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 128514
+}

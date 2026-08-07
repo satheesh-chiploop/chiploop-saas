@@ -1,0 +1,74 @@
+The required synthesizable top module is motor_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must retain the motor-control request/response, safety, timeout, and actuator-command behavior.
+Design a synthesizable ASIC digital IP named AeroSafe DoMINO Actuation Bridge. The RTL shall implement only control, transport, validation, timeout, and actuator-command supervision around an external software/GPU-executed NVIDIA DoMINO automotive-aerodynamics surrogate. The RTL shall not implement the physics model itself, shall not accept tensor payloads, and shall not expose geometry arrays or flow fields as top-level ports.
+
+Top-level interface requirements:
+1) Provide a compact register-memory window for host access. Use a 64-bit or narrower address/data style interface or a valid/ready streaming control interface. The top-level scalar-equivalent I/O must remain below 256 pins.
+2) Required ports: clk, rst_n, compact register access signals, request/response handshake signals, actuator_setpoint, actuator_valid, and fault_flag.
+3) Do not create top-level ports wider than 128 bits. Do not create thousands of discrete pins.
+
+Functional requirements:
+1) CSR block:
+   - Implement a small register file for configuration and status.
+   - Registers shall include enable, fallback_select, timeout_threshold, sequence counter, command min/max limits, status bits, and fault sticky bits.
+   - CSR writes shall be synchronous and synthesizable.
+   - CSR read data shall reflect current configuration and status.
+
+2) Request handling:
+   - When cmd_valid is asserted and cmd_ready is high, capture cmd_payload into internal control registers.
+   - A new request shall increment or otherwise update an internal sequence number.
+   - The request_packager shall form a compact descriptor for software/GPU-side inference transport. The RTL need only package metadata and bounded command intent; it shall not package geometry arrays, STL payloads, pressure fields, or flow fields.
+   - If a request is already outstanding, new requests shall be rejected or back-pressured until the outstanding transaction completes or times out.
+
+3) Response validation:
+   - Validate that each response matches the outstanding request sequence.
+   - Reject any response whose sequence is stale, duplicated, or mismatched.
+   - Validate response freshness against the configured timeout window.
+   - Validate that command fields are within the programmed safe range before applying them.
+
+4) Safety supervision:
+   - Implement a safety_supervisor FSM with at least these states: RESET, IDLE, ISSUE_REQUEST, WAIT_RESPONSE, APPLY_VALIDATED_COMMAND, SAFE_FALLBACK, FAULT_HOLD.
+   - On reset or fault, the design shall transition to SAFE_FALLBACK or FAULT_HOLD and drive a conservative command.
+   - Command clamping shall limit actuator_setpoint to programmable min/max bounds before output.
+   - Stale-command detection shall assert fault_flag and block application of the response.
+   - Timeout detection shall assert a stale fault when the outstanding request age exceeds timeout_threshold.
+   - Safe fallback shall be deterministic and selectable from a small set of predefined conservative poses/commands or a host-programmed conservative value within configured limits.
+
+5) Actuator command output:
+   - actuator_setpoint shall be a bounded digital representation appropriate for active-aerodynamics actuation.
+   - actuator_valid shall assert only when the output has passed validation and clamping.
+   - On fault, actuator_valid shall deassert or remain at a documented fallback-valid behavior consistent with safe output policy.
+
+6) Timing and counters:
+   - Implement a timeout_monitor counter that increments while a request is outstanding.
+   - The counter shall be compared to timeout_threshold each cycle or at a deterministic cadence.
+   - On request completion, the monitor shall clear or re-arm for the next request.
+
+7) Memory and storage constraints:
+   - Do not infer bulk payload storage using reg arrays, inferred RAM, BRAM, or FIFO arrays for geometry/model data.
+   - Small control/status registers and counters are allowed.
+   - For the Sky130 ASIC path, if any payload buffering is required beyond small control registers, instantiate only the hard macro sky130_sram_1kbyte_1rw1r_32x256_8 with ports clk0, csb0, web0, wmask0[3:0], addr0[7:0], din0[31:0], and dout0[31:0]. Bank multiple instances only when more capacity is required.
+   - Before ASIC implementation, require behavioral Verilog, Liberty, LEF, GDS, and SPICE collateral for the Sky130 macro. If the collateral is incomplete or unavailable, stop at the memory-collateral gate and do not map payload storage into standard-cell registers.
+   - For an FPGA-only path, use a platform BRAM abstraction instead of a Sky130 macro; never place a Sky130 macro in FPGA synthesis.
+
+8) Protocol and fault behavior:
+   - cmd_ready shall deassert whenever the module cannot accept a new request.
+   - fault_flag shall assert on timeout, stale response, protocol mismatch, illegal configuration, or invalid actuator command.
+   - Status registers shall expose current FSM state, outstanding sequence number, last fault reason, and whether safe fallback is active.
+   - Sticky fault bits shall remain set until explicitly cleared by CSR write or reset.
+
+9) Implementation guidance:
+   - Use simple synchronous RTL with counters, comparators, muxes, and FSMs only.
+   - Keep the design deterministic and fully synthesizable.
+   - No floating-point arithmetic is required in RTL.
+   - No surrogate-model internals are implemented in RTL; all model inference occurs outside the chip.
+   - The RTL shall support host/software integration with NVIDIA-hosted NIM or ChipLoop GPU worker as the future runtime for inference transport.
+
+10) Reset and default behavior:
+   - On reset, initialize conservative command limits, clear outstanding request state, set fallback active, and assert safe default output.
+   - If the model service is unavailable, the RTL shall remain in safe fallback and reject new commands as required by the safety policy.
+
+11) Notes for Arch2RTL:
+   - Synthesize only the hardware transport/safety shell.
+   - Treat the DoMINO model as an external service endpoint represented by request/response metadata, not as an RTL block.
+   - Avoid any attempt to infer model tensors, GPU execution, or geometric meshing in hardware.
+ASIC MEMORY CONTRACT (mandatory): instantiate sky130_sram_1kbyte_1rw1r_32x256_8 for bulk payload/history/FIFO storage using clk0, csb0, web0, wmask0[3:0], addr0[7:0], din0[31:0], and dout0[31:0]. Do not expand payload, history, FIFO, or telemetry storage into individually named registers, flip-flop arrays, or inferred memories. Small control/status registers are allowed.
