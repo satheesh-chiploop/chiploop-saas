@@ -1,0 +1,5391 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "motor_control_top",
+  "rtl_file_count": 8,
+  "module_count": 8,
+  "modules": [
+    {
+      "name": "clamp_unit",
+      "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/clamp_unit.v",
+      "input_count": 137,
+      "output_count": 97,
+      "inout_count": 0,
+      "input_port_count": 6,
+      "output_port_count": 4,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "validated_summary",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "validated_flags",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_act_min",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_act_max",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_safe_fallback",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cmd_raw",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cmd_clamped",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "clamp_violation",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "safe_cmd",
+          "direction": "output",
+          "width": "[31:0]"
+        }
+      ]
+    },
+    {
+      "name": "fallback_controller",
+      "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/fallback_controller.v",
+      "input_count": 40,
+      "output_count": 4,
+      "inout_count": 0,
+      "input_port_count": 9,
+      "output_port_count": 4,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "timeout_expired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reject_stale",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reject_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "clamp_violation",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_fault_write",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "downstream_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "safe_cmd_in",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cmd_select_safe",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cmd_force_valid",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "motor_control_top",
+      "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v",
+      "input_count": 529,
+      "output_count": 681,
+      "inout_count": 0,
+      "input_port_count": 43,
+      "output_port_count": 55,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bus_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_bus_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "cfg_bus_wen",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bus_ren",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bus_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "cfg_bus_rvalid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "resp_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "resp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "act_cmd_data",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "act_cmd_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "act_cmd_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fault_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_out",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "ister_file_64b_cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "ister_file_64b_cfg_soft_reset",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "register_file_64b_cfg_mode",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "register_file_64b_cfg_timeout_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "register_file_64b_cfg_freshness_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "register_file_64b_cfg_act_min",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "register_file_64b_cfg_act_max",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "register_file_64b_cfg_seq_seed",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "register_file_64b_cfg_safe_fallback",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "ister_file_64b_cfg_status_clear",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "ister_file_64b_cfg_fault_write",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "register_file_64b_status_flags_in",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "ister_file_64b_fault_in",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_fsm_cfg_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_fsm_cfg_soft_reset",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_fsm_cfg_mode",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "request_fsm_cfg_seq_seed",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "request_fsm_cfg_safe_fallback",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "request_fsm_outstanding_seq",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "request_fsm_busy_in",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_fsm_req_seq_out",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "request_fsm_req_geom_handle",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_fsm_req_flow_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_fsm_req_ctrl_flags",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "request_fsm_req_launch",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "response_validator_outstanding_seq",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "response_validator_cfg_freshness_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "response_validator_cfg_timeout_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "response_validator_elapsed_age",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "response_validator_timeout_expired",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "response_validator_validated_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "response_validator_validated_seq_match",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "response_validator_validated_summary",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "response_validator_validated_flags",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "response_validator_reject_stale",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "response_validator_reject_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "timeout_counter_cfg_timeout_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "timeout_counter_cfg_freshness_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "timeout_counter_req_launch",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "timeout_counter_resp_accept",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "timeout_counter_elapsed_age",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "timeout_counter_timeout_expired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "timeout_counter_stale_expired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "clamp_unit_validated_summary",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "clamp_unit_validated_flags",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "clamp_unit_cfg_act_min",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "clamp_unit_cfg_act_max",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "clamp_unit_cfg_safe_fallback",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "clamp_unit_fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "clamp_unit_cmd_raw",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "clamp_unit_cmd_clamped",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "clamp_unit_clamp_violation",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "clamp_unit_safe_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fallback_controller_timeout_expired",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_controller_reject_stale",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_controller_reject_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_controller_clamp_violation",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_controller_cfg_fault_write",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_controller_downstream_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_controller_safe_cmd_in",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fallback_controller_fallback_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fallback_controller_cmd_select_safe",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fallback_controller_cmd_force_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_cfg_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_cfg_soft_reset",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_cfg_mode",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "status_aggregator_cfg_timeout_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "status_aggregator_cfg_freshness_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "status_aggregator_cfg_act_min",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "status_aggregator_cfg_act_max",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "status_aggregator_outstanding_seq",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "status_aggregator_elapsed_age",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "status_aggregator_timeout_expired",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_stale_expired",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_validated_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_reject_stale",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_reject_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_fault_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_aggregator_status_flags_out",
+          "direction": "input",
+          "width": "[31:0]"
+        }
+      ]
+    },
+    {
+      "name": "register_file_64b",
+      "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/register_file_64b.v",
+      "input_count": 109,
+      "output_count": 208,
+      "inout_count": 0,
+      "input_port_count": 8,
+      "output_port_count": 13,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bus_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_bus_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "cfg_bus_wen",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bus_ren",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bus_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "cfg_bus_rvalid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_soft_reset",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_mode",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "cfg_timeout_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_act_min",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_act_max",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_seq_seed",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_safe_fallback",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_status_clear",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_fault_write",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_flags_in",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fault_in",
+          "direction": "input",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "request_fsm",
+      "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/request_fsm.v",
+      "input_count": 57,
+      "output_count": 114,
+      "inout_count": 0,
+      "input_port_count": 10,
+      "output_port_count": 7,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_soft_reset",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_mode",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "cfg_seq_seed",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_safe_fallback",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "outstanding_seq",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "busy_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_seq_out",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "req_geom_handle",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_flow_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_ctrl_flags",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "req_launch",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "response_validator",
+      "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/response_validator.v",
+      "input_count": 124,
+      "output_count": 44,
+      "inout_count": 0,
+      "input_port_count": 9,
+      "output_port_count": 6,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "resp_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "resp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "outstanding_seq",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_freshness_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_timeout_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "elapsed_age",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "timeout_expired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "validated_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "validated_seq_match",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "validated_summary",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "validated_flags",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "reject_stale",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "reject_fault",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "status_aggregator",
+      "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/status_aggregator.v",
+      "input_count": 132,
+      "output_count": 96,
+      "inout_count": 0,
+      "input_port_count": 16,
+      "output_port_count": 2,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_soft_reset",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_mode",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "cfg_timeout_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_act_min",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_act_max",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "outstanding_seq",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "elapsed_age",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "timeout_expired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "stale_expired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "validated_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reject_stale",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reject_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fault_out",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_flags_out",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_bus_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        }
+      ]
+    },
+    {
+      "name": "timeout_counter",
+      "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/timeout_counter.v",
+      "input_count": 36,
+      "output_count": 18,
+      "inout_count": 0,
+      "input_port_count": 6,
+      "output_port_count": 3,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_timeout_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_launch",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "resp_accept",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "elapsed_age",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "timeout_expired",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "stale_expired",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 529,
+    "output_count": 681,
+    "inout_count": 0,
+    "input_port_count": 43,
+    "output_port_count": 55,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "cfg_bus_addr",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "cfg_bus_wdata",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "cfg_bus_wen",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "cfg_bus_ren",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "cfg_bus_rdata",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "cfg_bus_rvalid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "req_data",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "req_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "req_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "resp_data",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "resp_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "act_cmd_data",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "act_cmd_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "act_cmd_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "fault_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_out",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "ister_file_64b_cfg_enable",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "ister_file_64b_cfg_soft_reset",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "register_file_64b_cfg_mode",
+        "direction": "input",
+        "width": "[2:0]"
+      },
+      {
+        "name": "register_file_64b_cfg_timeout_threshold",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "register_file_64b_cfg_freshness_threshold",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "register_file_64b_cfg_act_min",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "register_file_64b_cfg_act_max",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "register_file_64b_cfg_seq_seed",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "register_file_64b_cfg_safe_fallback",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "ister_file_64b_cfg_status_clear",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "ister_file_64b_cfg_fault_write",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "register_file_64b_status_flags_in",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "ister_file_64b_fault_in",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "request_fsm_cfg_enable",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "request_fsm_cfg_soft_reset",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "request_fsm_cfg_mode",
+        "direction": "output",
+        "width": "[2:0]"
+      },
+      {
+        "name": "request_fsm_cfg_seq_seed",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "request_fsm_cfg_safe_fallback",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "request_fsm_outstanding_seq",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "request_fsm_busy_in",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "request_fsm_req_seq_out",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "request_fsm_req_geom_handle",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "request_fsm_req_flow_id",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "request_fsm_req_ctrl_flags",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "request_fsm_req_launch",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "response_validator_outstanding_seq",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "response_validator_cfg_freshness_threshold",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "response_validator_cfg_timeout_threshold",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "response_validator_elapsed_age",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "response_validator_timeout_expired",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "response_validator_validated_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "response_validator_validated_seq_match",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "response_validator_validated_summary",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "response_validator_validated_flags",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "response_validator_reject_stale",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "response_validator_reject_fault",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "timeout_counter_cfg_timeout_threshold",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "timeout_counter_cfg_freshness_threshold",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "timeout_counter_req_launch",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "timeout_counter_resp_accept",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "timeout_counter_elapsed_age",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "timeout_counter_timeout_expired",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "timeout_counter_stale_expired",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "clamp_unit_validated_summary",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "clamp_unit_validated_flags",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "clamp_unit_cfg_act_min",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "clamp_unit_cfg_act_max",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "clamp_unit_cfg_safe_fallback",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "clamp_unit_fallback_active",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "clamp_unit_cmd_raw",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "clamp_unit_cmd_clamped",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "clamp_unit_clamp_violation",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "clamp_unit_safe_cmd",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "fallback_controller_timeout_expired",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fallback_controller_reject_stale",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fallback_controller_reject_fault",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fallback_controller_clamp_violation",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fallback_controller_cfg_fault_write",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fallback_controller_downstream_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "fallback_controller_safe_cmd_in",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "fallback_controller_fallback_active",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "fallback_controller_cmd_select_safe",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "fallback_controller_cmd_force_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_cfg_enable",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_cfg_soft_reset",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_cfg_mode",
+        "direction": "output",
+        "width": "[2:0]"
+      },
+      {
+        "name": "status_aggregator_cfg_timeout_threshold",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "status_aggregator_cfg_freshness_threshold",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "status_aggregator_cfg_act_min",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "status_aggregator_cfg_act_max",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "status_aggregator_outstanding_seq",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "status_aggregator_elapsed_age",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "status_aggregator_timeout_expired",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_stale_expired",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_validated_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_reject_stale",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_reject_fault",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_fallback_active",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_fault_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_aggregator_status_flags_out",
+        "direction": "input",
+        "width": "[31:0]"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "cfg_soft_reset",
+      "ister_file_64b_cfg_soft_reset",
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 184,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 35,
+    "latch_target_count": 0,
+    "sequential_blocks": 10,
+    "posedge_blocks": 5,
+    "negedge_blocks": 5,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "cfg_act_max",
+      "cfg_act_min",
+      "cfg_bus_rdata_r",
+      "cfg_bus_rvalid_r",
+      "cfg_enable",
+      "cfg_fault_write",
+      "cfg_freshness_threshold",
+      "cfg_mode",
+      "cfg_safe_fallback",
+      "cfg_seq_seed",
+      "cfg_soft_reset",
+      "cfg_status_clear",
+      "cfg_timeout_threshold",
+      "cmd_force_valid",
+      "cmd_select_safe",
+      "elapsed_age",
+      "fallback_active",
+      "fault_out",
+      "reject_fault",
+      "reject_stale",
+      "req_ctrl_flags",
+      "req_data",
+      "req_flow_id",
+      "req_geom_handle",
+      "req_launch",
+      "req_seq_out",
+      "req_valid",
+      "seq_reg",
+      "stale_expired",
+      "state",
+      "timeout_expired",
+      "validated_flags",
+      "validated_seq_match",
+      "validated_summary",
+      "validated_valid"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 5,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "errors",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 1,
+    "warning_count": 0,
+    "error_count": 2,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "motor_control_top",
+      "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/clamp_unit.v",
+      "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/fallback_controller.v",
+      "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v",
+      "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/register_file_64b.v",
+      "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/request_fsm.v",
+      "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/response_validator.v",
+      "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/status_aggregator.v",
+      "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/timeout_counter.v"
+    ],
+    "stdout_tail": [],
+    "stderr_tail": [
+      "%Error: backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v:156:38: Can't find definition of variable: 'fallback_controller_fault_out'",
+      "                                                                                             : ... Suggested alternative: 'fallback_controller_reject_fault'",
+      "  156 | assign status_aggregator_fault_out = fallback_controller_fault_out;",
+      "      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+      "%Error: Exiting due to 1 error(s)"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "motor_control_top",
+        "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/clamp_unit.v",
+        "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/fallback_controller.v",
+        "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v",
+        "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/register_file_64b.v",
+        "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/request_fsm.v",
+        "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/response_validator.v",
+        "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/status_aggregator.v",
+        "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/timeout_counter.v"
+      ],
+      "cwd": null,
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "%Error: backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v:156:38: Can't find definition of variable: 'fallback_controller_fault_out'\n                                                                                             : ... Suggested alternative: 'fallback_controller_reject_fault'\n  156 | assign status_aggregator_fault_out = fallback_controller_fault_out;\n      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\n",
+      "status": "failed",
+      "error": null,
+      "started_at": "2026-08-07T01:18:24.675153+00:00",
+      "ended_at": "2026-08-07T01:18:24.779735+00:00",
+      "elapsed_ms": 104
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 8,
+      "module_count": 8,
+      "modules": [
+        {
+          "name": "clamp_unit",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/clamp_unit.v",
+          "input_count": 137,
+          "output_count": 97,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 4,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "validated_summary",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "validated_flags",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_safe_fallback",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cmd_raw",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cmd_clamped",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_violation",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "fallback_controller",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/fallback_controller.v",
+          "input_count": 40,
+          "output_count": 4,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 4,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reject_stale",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reject_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamp_violation",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fault_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "downstream_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_cmd_in",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cmd_select_safe",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cmd_force_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "motor_control_top",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v",
+          "input_count": 529,
+          "output_count": 681,
+          "inout_count": 0,
+          "input_port_count": 43,
+          "output_port_count": 55,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_bus_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_wen",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_ren",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "resp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "act_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_cmd_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fault_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_out",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "ister_file_64b_cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "ister_file_64b_cfg_soft_reset",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "register_file_64b_cfg_mode",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_act_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_act_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_seq_seed",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_safe_fallback",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "ister_file_64b_cfg_status_clear",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "ister_file_64b_cfg_fault_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "register_file_64b_status_flags_in",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "ister_file_64b_fault_in",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fsm_cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fsm_cfg_soft_reset",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fsm_cfg_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "request_fsm_cfg_seq_seed",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_fsm_cfg_safe_fallback",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "request_fsm_outstanding_seq",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_fsm_busy_in",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fsm_req_seq_out",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_fsm_req_geom_handle",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_fsm_req_flow_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_fsm_req_ctrl_flags",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_fsm_req_launch",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_outstanding_seq",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "response_validator_cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_validator_cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_validator_elapsed_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_validator_timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_validated_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_validated_seq_match",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_validated_summary",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "response_validator_validated_flags",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "response_validator_reject_stale",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_reject_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_counter_cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_counter_cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_counter_req_launch",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_counter_resp_accept",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_counter_elapsed_age",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_counter_timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_counter_stale_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamp_unit_validated_summary",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_validated_flags",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "clamp_unit_cfg_act_min",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_cfg_act_max",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_cfg_safe_fallback",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "clamp_unit_cmd_raw",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_cmd_clamped",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_clamp_violation",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamp_unit_safe_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_controller_timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_reject_stale",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_reject_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_clamp_violation",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_cfg_fault_write",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_downstream_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_safe_cmd_in",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_controller_fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_cmd_select_safe",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_cmd_force_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_cfg_soft_reset",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_cfg_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "status_aggregator_cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_aggregator_cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_aggregator_cfg_act_min",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "status_aggregator_cfg_act_max",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "status_aggregator_outstanding_seq",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "status_aggregator_elapsed_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_aggregator_timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_stale_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_validated_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_reject_stale",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_reject_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_fault_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_status_flags_out",
+              "direction": "input",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "register_file_64b",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/register_file_64b.v",
+          "input_count": 109,
+          "output_count": 208,
+          "inout_count": 0,
+          "input_port_count": 8,
+          "output_port_count": 13,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_bus_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_wen",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_ren",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_soft_reset",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_seq_seed",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_safe_fallback",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_status_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fault_write",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_flags_in",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fault_in",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "request_fsm",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/request_fsm.v",
+          "input_count": 57,
+          "output_count": 114,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_soft_reset",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_seq_seed",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_safe_fallback",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "outstanding_seq",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "busy_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_seq_out",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "req_geom_handle",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_ctrl_flags",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "req_launch",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "response_validator",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/response_validator.v",
+          "input_count": 124,
+          "output_count": 44,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "resp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "outstanding_seq",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "elapsed_age",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "validated_seq_match",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "validated_summary",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "validated_flags",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "reject_stale",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "reject_fault",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "status_aggregator",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/status_aggregator.v",
+          "input_count": 132,
+          "output_count": 96,
+          "inout_count": 0,
+          "input_port_count": 16,
+          "output_port_count": 2,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_soft_reset",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "outstanding_seq",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "elapsed_age",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reject_stale",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reject_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fault_out",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_flags_out",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_bus_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            }
+          ]
+        },
+        {
+          "name": "timeout_counter",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/timeout_counter.v",
+          "input_count": 36,
+          "output_count": 18,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_launch",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "elapsed_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_expired",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 529,
+        "output_count": 681,
+        "inout_count": 0,
+        "input_port_count": 43,
+        "output_port_count": 55,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "cfg_bus_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "cfg_bus_wen",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_ren",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "cfg_bus_rvalid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_data",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "resp_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "resp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "act_cmd_data",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "act_cmd_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "act_cmd_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "fault_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_out",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "ister_file_64b_cfg_enable",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "ister_file_64b_cfg_soft_reset",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "register_file_64b_cfg_mode",
+            "direction": "input",
+            "width": "[2:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_timeout_threshold",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_freshness_threshold",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_act_min",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_act_max",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_seq_seed",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_safe_fallback",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "ister_file_64b_cfg_status_clear",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "ister_file_64b_cfg_fault_write",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "register_file_64b_status_flags_in",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "ister_file_64b_fault_in",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_fsm_cfg_enable",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_fsm_cfg_soft_reset",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_fsm_cfg_mode",
+            "direction": "output",
+            "width": "[2:0]"
+          },
+          {
+            "name": "request_fsm_cfg_seq_seed",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "request_fsm_cfg_safe_fallback",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "request_fsm_outstanding_seq",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "request_fsm_busy_in",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_fsm_req_seq_out",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "request_fsm_req_geom_handle",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_fsm_req_flow_id",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_fsm_req_ctrl_flags",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "request_fsm_req_launch",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_outstanding_seq",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "response_validator_cfg_freshness_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "response_validator_cfg_timeout_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "response_validator_elapsed_age",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "response_validator_timeout_expired",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_validated_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_validated_seq_match",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_validated_summary",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "response_validator_validated_flags",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "response_validator_reject_stale",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_reject_fault",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "timeout_counter_cfg_timeout_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "timeout_counter_cfg_freshness_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "timeout_counter_req_launch",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "timeout_counter_resp_accept",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "timeout_counter_elapsed_age",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "timeout_counter_timeout_expired",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "timeout_counter_stale_expired",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "clamp_unit_validated_summary",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_validated_flags",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "clamp_unit_cfg_act_min",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_cfg_act_max",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_cfg_safe_fallback",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "clamp_unit_cmd_raw",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_cmd_clamped",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_clamp_violation",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "clamp_unit_safe_cmd",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "fallback_controller_timeout_expired",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_reject_stale",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_reject_fault",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_clamp_violation",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_cfg_fault_write",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_downstream_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_safe_cmd_in",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "fallback_controller_fallback_active",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_cmd_select_safe",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_cmd_force_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_cfg_enable",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_cfg_soft_reset",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_cfg_mode",
+            "direction": "output",
+            "width": "[2:0]"
+          },
+          {
+            "name": "status_aggregator_cfg_timeout_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "status_aggregator_cfg_freshness_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "status_aggregator_cfg_act_min",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "status_aggregator_cfg_act_max",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "status_aggregator_outstanding_seq",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "status_aggregator_elapsed_age",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "status_aggregator_timeout_expired",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_stale_expired",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_validated_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_reject_stale",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_reject_fault",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_fault_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_status_flags_out",
+            "direction": "input",
+            "width": "[31:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 184,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 35,
+        "latch_target_count": 0,
+        "sequential_blocks": 10,
+        "posedge_blocks": 5,
+        "negedge_blocks": 5,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "cfg_act_max",
+          "cfg_act_min",
+          "cfg_bus_rdata_r",
+          "cfg_bus_rvalid_r",
+          "cfg_enable",
+          "cfg_fault_write",
+          "cfg_freshness_threshold",
+          "cfg_mode",
+          "cfg_safe_fallback",
+          "cfg_seq_seed",
+          "cfg_soft_reset",
+          "cfg_status_clear",
+          "cfg_timeout_threshold",
+          "cmd_force_valid",
+          "cmd_select_safe",
+          "elapsed_age",
+          "fallback_active",
+          "fault_out",
+          "reject_fault",
+          "reject_stale",
+          "req_ctrl_flags",
+          "req_data",
+          "req_flow_id",
+          "req_geom_handle",
+          "req_launch",
+          "req_seq_out",
+          "req_valid",
+          "seq_reg",
+          "stale_expired",
+          "state",
+          "timeout_expired",
+          "validated_flags",
+          "validated_seq_match",
+          "validated_summary",
+          "validated_valid"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 5,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 8,
+      "module_count": 8,
+      "modules": [
+        {
+          "name": "clamp_unit",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/handoff/motor_control_top_ip_package/rtl/clamp_unit.v",
+          "input_count": 137,
+          "output_count": 97,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 4,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "validated_summary",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "validated_flags",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_safe_fallback",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cmd_raw",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cmd_clamped",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_violation",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "fallback_controller",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/handoff/motor_control_top_ip_package/rtl/fallback_controller.v",
+          "input_count": 40,
+          "output_count": 4,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 4,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reject_stale",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reject_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamp_violation",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fault_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "downstream_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_cmd_in",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cmd_select_safe",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cmd_force_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "motor_control_top",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/handoff/motor_control_top_ip_package/rtl/motor_control_top.v",
+          "input_count": 529,
+          "output_count": 681,
+          "inout_count": 0,
+          "input_port_count": 43,
+          "output_port_count": 55,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_bus_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_wen",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_ren",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "resp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "act_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "act_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_cmd_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fault_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_out",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "ister_file_64b_cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "ister_file_64b_cfg_soft_reset",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "register_file_64b_cfg_mode",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_act_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_act_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_seq_seed",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "register_file_64b_cfg_safe_fallback",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "ister_file_64b_cfg_status_clear",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "ister_file_64b_cfg_fault_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "register_file_64b_status_flags_in",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "ister_file_64b_fault_in",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fsm_cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fsm_cfg_soft_reset",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fsm_cfg_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "request_fsm_cfg_seq_seed",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_fsm_cfg_safe_fallback",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "request_fsm_outstanding_seq",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_fsm_busy_in",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_fsm_req_seq_out",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_fsm_req_geom_handle",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_fsm_req_flow_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_fsm_req_ctrl_flags",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_fsm_req_launch",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_outstanding_seq",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "response_validator_cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_validator_cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_validator_elapsed_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_validator_timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_validated_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_validated_seq_match",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_validated_summary",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "response_validator_validated_flags",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "response_validator_reject_stale",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_validator_reject_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_counter_cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_counter_cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_counter_req_launch",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_counter_resp_accept",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_counter_elapsed_age",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_counter_timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_counter_stale_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamp_unit_validated_summary",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_validated_flags",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "clamp_unit_cfg_act_min",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_cfg_act_max",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_cfg_safe_fallback",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "clamp_unit_cmd_raw",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_cmd_clamped",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_unit_clamp_violation",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamp_unit_safe_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_controller_timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_reject_stale",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_reject_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_clamp_violation",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_cfg_fault_write",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_downstream_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_safe_cmd_in",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_controller_fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_cmd_select_safe",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_controller_cmd_force_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_cfg_soft_reset",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_cfg_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "status_aggregator_cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_aggregator_cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_aggregator_cfg_act_min",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "status_aggregator_cfg_act_max",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "status_aggregator_outstanding_seq",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "status_aggregator_elapsed_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_aggregator_timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_stale_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_validated_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_reject_stale",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_reject_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_fault_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_aggregator_status_flags_out",
+              "direction": "input",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "register_file_64b",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/handoff/motor_control_top_ip_package/rtl/register_file_64b.v",
+          "input_count": 109,
+          "output_count": 208,
+          "inout_count": 0,
+          "input_port_count": 8,
+          "output_port_count": 13,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_bus_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_wen",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_ren",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_soft_reset",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_seq_seed",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_safe_fallback",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_status_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fault_write",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_flags_in",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fault_in",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "request_fsm",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/handoff/motor_control_top_ip_package/rtl/request_fsm.v",
+          "input_count": 57,
+          "output_count": 114,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_soft_reset",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_seq_seed",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_safe_fallback",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "outstanding_seq",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "busy_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_seq_out",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "req_geom_handle",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_flow_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_ctrl_flags",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "req_launch",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "response_validator",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/handoff/motor_control_top_ip_package/rtl/response_validator.v",
+          "input_count": 124,
+          "output_count": 44,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "resp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "outstanding_seq",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "elapsed_age",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "validated_seq_match",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "validated_summary",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "validated_flags",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "reject_stale",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "reject_fault",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "status_aggregator",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/handoff/motor_control_top_ip_package/rtl/status_aggregator.v",
+          "input_count": 132,
+          "output_count": 96,
+          "inout_count": 0,
+          "input_port_count": 16,
+          "output_port_count": 2,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_soft_reset",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_act_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_act_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "outstanding_seq",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "elapsed_age",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "validated_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reject_stale",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reject_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fault_out",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_flags_out",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_bus_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            }
+          ]
+        },
+        {
+          "name": "timeout_counter",
+          "file": "backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/handoff/motor_control_top_ip_package/rtl/timeout_counter.v",
+          "input_count": 36,
+          "output_count": 18,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_launch",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "elapsed_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_expired",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 529,
+        "output_count": 681,
+        "inout_count": 0,
+        "input_port_count": 43,
+        "output_port_count": 55,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "cfg_bus_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "cfg_bus_wen",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_ren",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "cfg_bus_rvalid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_data",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "resp_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "resp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "act_cmd_data",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "act_cmd_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "act_cmd_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "fault_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_out",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "ister_file_64b_cfg_enable",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "ister_file_64b_cfg_soft_reset",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "register_file_64b_cfg_mode",
+            "direction": "input",
+            "width": "[2:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_timeout_threshold",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_freshness_threshold",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_act_min",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_act_max",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_seq_seed",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "register_file_64b_cfg_safe_fallback",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "ister_file_64b_cfg_status_clear",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "ister_file_64b_cfg_fault_write",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "register_file_64b_status_flags_in",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "ister_file_64b_fault_in",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_fsm_cfg_enable",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_fsm_cfg_soft_reset",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_fsm_cfg_mode",
+            "direction": "output",
+            "width": "[2:0]"
+          },
+          {
+            "name": "request_fsm_cfg_seq_seed",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "request_fsm_cfg_safe_fallback",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "request_fsm_outstanding_seq",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "request_fsm_busy_in",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "request_fsm_req_seq_out",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "request_fsm_req_geom_handle",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_fsm_req_flow_id",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "request_fsm_req_ctrl_flags",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "request_fsm_req_launch",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_outstanding_seq",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "response_validator_cfg_freshness_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "response_validator_cfg_timeout_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "response_validator_elapsed_age",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "response_validator_timeout_expired",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_validated_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_validated_seq_match",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_validated_summary",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "response_validator_validated_flags",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "response_validator_reject_stale",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "response_validator_reject_fault",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "timeout_counter_cfg_timeout_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "timeout_counter_cfg_freshness_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "timeout_counter_req_launch",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "timeout_counter_resp_accept",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "timeout_counter_elapsed_age",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "timeout_counter_timeout_expired",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "timeout_counter_stale_expired",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "clamp_unit_validated_summary",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_validated_flags",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "clamp_unit_cfg_act_min",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_cfg_act_max",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_cfg_safe_fallback",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "clamp_unit_cmd_raw",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_cmd_clamped",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "clamp_unit_clamp_violation",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "clamp_unit_safe_cmd",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "fallback_controller_timeout_expired",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_reject_stale",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_reject_fault",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_clamp_violation",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_cfg_fault_write",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_downstream_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_safe_cmd_in",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "fallback_controller_fallback_active",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_cmd_select_safe",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "fallback_controller_cmd_force_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_cfg_enable",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_cfg_soft_reset",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_cfg_mode",
+            "direction": "output",
+            "width": "[2:0]"
+          },
+          {
+            "name": "status_aggregator_cfg_timeout_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "status_aggregator_cfg_freshness_threshold",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "status_aggregator_cfg_act_min",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "status_aggregator_cfg_act_max",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "status_aggregator_outstanding_seq",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "status_aggregator_elapsed_age",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "status_aggregator_timeout_expired",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_stale_expired",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_validated_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_reject_stale",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_reject_fault",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_fallback_active",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_fault_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_aggregator_status_flags_out",
+            "direction": "input",
+            "width": "[31:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 184,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 35,
+        "latch_target_count": 0,
+        "sequential_blocks": 10,
+        "posedge_blocks": 5,
+        "negedge_blocks": 5,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "cfg_act_max",
+          "cfg_act_min",
+          "cfg_bus_rdata_r",
+          "cfg_bus_rvalid_r",
+          "cfg_enable",
+          "cfg_fault_write",
+          "cfg_freshness_threshold",
+          "cfg_mode",
+          "cfg_safe_fallback",
+          "cfg_seq_seed",
+          "cfg_soft_reset",
+          "cfg_status_clear",
+          "cfg_timeout_threshold",
+          "cmd_force_valid",
+          "cmd_select_safe",
+          "elapsed_age",
+          "fallback_active",
+          "fault_out",
+          "reject_fault",
+          "reject_stale",
+          "req_ctrl_flags",
+          "req_data",
+          "req_flow_id",
+          "req_geom_handle",
+          "req_launch",
+          "req_seq_out",
+          "req_valid",
+          "seq_reg",
+          "stale_expired",
+          "state",
+          "timeout_expired",
+          "validated_flags",
+          "validated_seq_match",
+          "validated_summary",
+          "validated_valid"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 5,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 34,
+    "registers": [
+      {
+        "name": "CFG_WORD_0",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Low byte of the 64-bit control/status window. Holds enable, soft_reset, mode, and status-clear policy bits.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Master enable for request/response operation. When 0, request issuance is inhibited and safe fallback is maintained."
+          },
+          {
+            "name": "SOFT_RESET",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Synchronous soft reset request sampled by the controller. Clears outstanding transaction state and returns to deterministic safe fallback."
+          },
+          {
+            "name": "MODE",
+            "lsb": 4,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "3-bit mode select for compact operating policy. Mode is implementation-defined within the allowed safety wrapper behavior and does not change top-level protocol shape."
+          },
+          {
+            "name": "STATUS_CLEAR",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Write-1-to-pulse status clear request for clearing sticky status bits that are software-managed."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_1",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Timeout threshold low byte.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 20,
+            "description": "Lower 8 bits of the programmable timeout threshold in cycles. Used by the timeout counter and fallback supervision."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_2",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Timeout threshold high byte.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Upper 8 bits of the programmable timeout threshold in cycles."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_3",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Freshness threshold low byte.",
+        "fields": [
+          {
+            "name": "FRESHNESS_THRESHOLD[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 10,
+            "description": "Lower 8 bits of the programmable freshness threshold in cycles or logical age units."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_4",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Freshness threshold high byte.",
+        "fields": [
+          {
+            "name": "FRESHNESS_THRESHOLD[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Upper 8 bits of the programmable freshness threshold in cycles or logical age units."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_5",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Actuator minimum clamp low byte.",
+        "fields": [
+          {
+            "name": "ACT_MIN[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower 8 bits of the minimum actuator clamp bound."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_6",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Actuator minimum clamp high byte.",
+        "fields": [
+          {
+            "name": "ACT_MIN[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Upper 8 bits of the minimum actuator clamp bound."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_7",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "Actuator minimum clamp upper half low byte.",
+        "fields": [
+          {
+            "name": "ACT_MIN[23:16]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits 23:16 of the minimum actuator clamp bound."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_8",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Actuator minimum clamp upper byte.",
+        "fields": [
+          {
+            "name": "ACT_MIN[31:24]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits 31:24 of the minimum actuator clamp bound."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_9",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Actuator maximum clamp low byte.",
+        "fields": [
+          {
+            "name": "ACT_MAX[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 255,
+            "description": "Lower 8 bits of the maximum actuator clamp bound."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_10",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "Actuator maximum clamp high byte.",
+        "fields": [
+          {
+            "name": "ACT_MAX[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Upper 8 bits of the maximum actuator clamp bound."
+          }
+        ]
+      },
+      {
+        "name": "CFG_WORD_11",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "Actuator maximum clamp upper half low byte.",
+        "fields": [
+          {
+            "name": "ACT_MAX[23:16]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits 23:16 of the maximum actuator clamp bound."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

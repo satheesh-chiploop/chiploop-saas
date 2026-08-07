@@ -1,0 +1,14 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: motor_control_top
+Expected files: ['motor_control_top.v', 'register_file_64b.v', 'request_fsm.v', 'response_validator.v', 'timeout_counter.v', 'clamp_unit.v', 'fallback_controller.v', 'status_aggregator.v']
+Materialized files: ['motor_control_top.v', 'register_file_64b.v', 'request_fsm.v', 'response_validator.v', 'timeout_counter.v', 'clamp_unit.v', 'fallback_controller.v', 'status_aggregator.v']
+Clock ports: ['clk']
+Reset ports: ['cfg_soft_reset', 'register_file_64b_cfg_soft_reset', 'request_fsm_cfg_soft_reset', 'reset_n', 'status_aggregator_cfg_soft_reset']
+Icarus compile: pass
+Verilator lint: fatal
+Issue count: 1
+
+Issues:
+- ❌ Verilator lint failed.

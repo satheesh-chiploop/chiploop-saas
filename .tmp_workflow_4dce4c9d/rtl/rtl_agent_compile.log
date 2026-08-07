@@ -1,0 +1,11 @@
+backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v:156: error: Unable to bind wire/reg/memory `fallback_controller_fault_out' in `motor_control_top'
+backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v:156: error: Unable to elaborate r-value: fallback_controller_fault_out
+backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v:163: error: Unable to bind wire/reg/memory `fallback_controller_fault_out' in `motor_control_top'
+backend/workflows/4dce4c9d-3bea-452c-8e75-a054c111e7ca/rtl/motor_control_top.v:163: error: Unable to elaborate r-value: fallback_controller_fault_out
+4 error(s) during elaboration.
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.
