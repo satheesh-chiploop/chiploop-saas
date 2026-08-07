@@ -1,0 +1,899 @@
+---BEGIN motor_control_top.v---
+module motor_control_top (
+    clk,
+    reset_n,
+    cfg_addr,
+    cfg_wdata,
+    cfg_rdata,
+    cfg_we,
+    cfg_re,
+    cfg_ready,
+    tx_valid,
+    tx_ready,
+    tx_data,
+    rx_valid,
+    rx_ready,
+    rx_data,
+    act_valid,
+    act_ready,
+    act_cmd,
+    fault_out,
+    busy_out,
+    fallback_out
+);
+input clk;
+input reset_n;
+input [31:0] cfg_addr;
+input [63:0] cfg_wdata;
+output [63:0] cfg_rdata;
+input cfg_we;
+input cfg_re;
+output cfg_ready;
+output tx_valid;
+input tx_ready;
+output [127:0] tx_data;
+input rx_valid;
+output rx_ready;
+input [127:0] rx_data;
+output act_valid;
+input act_ready;
+output [31:0] act_cmd;
+output fault_out;
+output busy_out;
+output fallback_out;
+
+wire cfg_enable;
+wire cfg_start_request;
+wire cfg_abort;
+wire cfg_clear_fault;
+wire [15:0] cfg_model_id;
+wire [15:0] cfg_request_seq;
+wire [15:0] cfg_expected_response_seq;
+wire [15:0] cfg_max_response_age;
+wire [31:0] cfg_timeout_cycles;
+wire [31:0] cfg_clamp_min;
+wire [31:0] cfg_clamp_max;
+wire [31:0] cfg_safe_fallback_cmd;
+wire [15:0] cfg_request_flags;
+wire cfg_slew_limit_en;
+wire [31:0] cfg_slew_limit_step;
+
+wire request_outstanding;
+wire request_issued;
+wire [15:0] request_seq_active;
+wire deadline_expired;
+wire [31:0] request_age;
+wire response_valid;
+wire [15:0] response_seq;
+wire [7:0] response_type;
+wire response_integrity_ok;
+wire [31:0] response_cmd_raw;
+wire [7:0] response_status;
+wire response_age_ok;
+wire response_accepted;
+wire response_rejected;
+wire [7:0] rejection_code;
+wire [31:0] approved_cmd_raw;
+wire [7:0] approved_status;
+wire approved_seq_match;
+wire limited_cmd;
+wire clamped_cmd;
+wire fallback_cmd_active;
+wire command_applied;
+wire state_idle;
+wire state_issue_request;
+wire state_wait_response;
+wire state_validate_response;
+wire state_apply_command;
+wire state_fallback;
+wire state_abort;
+wire fault_latched;
+wire status_last_response_ok;
+wire [15:0] status_last_seq;
+wire [31:0] status_last_act_cmd;
+wire [7:0] status_last_error_code;
+wire status_request_outstanding;
+wire status_busy;
+wire status_fault;
+wire status_fallback;
+
+motor_control_register_map u_motor_control_register_map (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_addr(cfg_addr),
+    .cfg_wdata(cfg_wdata),
+    .cfg_rdata(cfg_rdata),
+    .cfg_we(cfg_we),
+    .cfg_re(cfg_re),
+    .cfg_ready(cfg_ready),
+    .cfg_enable(cfg_enable),
+    .cfg_start_request(cfg_start_request),
+    .cfg_abort(cfg_abort),
+    .cfg_clear_fault(cfg_clear_fault),
+    .cfg_model_id(cfg_model_id),
+    .cfg_request_seq(cfg_request_seq),
+    .cfg_expected_response_seq(cfg_expected_response_seq),
+    .cfg_max_response_age(cfg_max_response_age),
+    .cfg_timeout_cycles(cfg_timeout_cycles),
+    .cfg_clamp_min(cfg_clamp_min),
+    .cfg_clamp_max(cfg_clamp_max),
+    .cfg_safe_fallback_cmd(cfg_safe_fallback_cmd),
+    .cfg_request_flags(cfg_request_flags),
+    .cfg_slew_limit_en(cfg_slew_limit_en),
+    .cfg_slew_limit_step(cfg_slew_limit_step),
+    .status_busy(status_busy),
+    .status_fault(status_fault),
+    .status_fallback(status_fallback),
+    .status_request_outstanding(status_request_outstanding),
+    .status_last_response_ok(status_last_response_ok),
+    .status_last_error_code(status_last_error_code),
+    .status_last_act_cmd(status_last_act_cmd),
+    .status_last_seq(status_last_seq)
+);
+
+motor_control_transport_adapter u_motor_control_transport_adapter (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_enable(cfg_enable),
+    .cfg_start_request(cfg_start_request),
+    .cfg_abort(cfg_abort),
+    .cfg_model_id(cfg_model_id),
+    .cfg_request_seq(cfg_request_seq),
+    .cfg_expected_response_seq(cfg_expected_response_seq),
+    .cfg_request_flags(cfg_request_flags),
+    .cfg_timeout_cycles(cfg_timeout_cycles),
+    .cfg_max_response_age(cfg_max_response_age),
+    .request_outstanding(request_outstanding),
+    .request_issued(request_issued),
+    .request_seq_active(request_seq_active),
+    .deadline_expired(deadline_expired),
+    .request_age(request_age),
+    .tx_valid(tx_valid),
+    .tx_ready(tx_ready),
+    .tx_data(tx_data),
+    .rx_valid(rx_valid),
+    .rx_ready(rx_ready),
+    .rx_data(rx_data),
+    .response_valid(response_valid),
+    .response_seq(response_seq),
+    .response_type(response_type),
+    .response_integrity_ok(response_integrity_ok),
+    .response_cmd_raw(response_cmd_raw),
+    .response_status(response_status),
+    .response_age_ok(response_age_ok)
+);
+
+motor_control_response_validator u_motor_control_response_validator (
+    .clk(clk),
+    .reset_n(reset_n),
+    .request_outstanding(request_outstanding),
+    .request_seq_active(request_seq_active),
+    .expected_response_seq(cfg_expected_response_seq),
+    .response_valid(response_valid),
+    .response_seq(response_seq),
+    .response_type(response_type),
+    .response_integrity_ok(response_integrity_ok),
+    .response_cmd_raw(response_cmd_raw),
+    .response_status(response_status),
+    .response_age_ok(response_age_ok),
+    .deadline_expired(deadline_expired),
+    .response_accepted(response_accepted),
+    .response_rejected(response_rejected),
+    .rejection_code(rejection_code),
+    .approved_cmd_raw(approved_cmd_raw),
+    .approved_status(approved_status),
+    .approved_seq_match(approved_seq_match)
+);
+
+motor_control_command_limiter u_motor_control_command_limiter (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_clamp_min(cfg_clamp_min),
+    .cfg_clamp_max(cfg_clamp_max),
+    .cfg_slew_limit_en(cfg_slew_limit_en),
+    .cfg_slew_limit_step(cfg_slew_limit_step),
+    .safe_fallback_cmd(cfg_safe_fallback_cmd),
+    .approved_cmd_raw(approved_cmd_raw),
+    .approved_status(approved_status),
+    .response_accepted(response_accepted),
+    .use_fallback(fallback_out),
+    .act_valid(act_valid),
+    .act_ready(act_ready),
+    .act_cmd(act_cmd),
+    .limited_cmd(limited_cmd),
+    .clamped_cmd(clamped_cmd),
+    .fallback_cmd_active(fallback_cmd_active),
+    .command_applied(command_applied)
+);
+
+motor_control_safety_fsm u_motor_control_safety_fsm (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_enable(cfg_enable),
+    .cfg_start_request(cfg_start_request),
+    .cfg_abort(cfg_abort),
+    .cfg_clear_fault(cfg_clear_fault),
+    .cfg_safe_fallback_cmd(cfg_safe_fallback_cmd),
+    .cfg_timeout_cycles(cfg_timeout_cycles),
+    .request_outstanding(request_outstanding),
+    .request_issued(request_issued),
+    .response_accepted(response_accepted),
+    .response_rejected(response_rejected),
+    .deadline_expired(deadline_expired),
+    .command_applied(command_applied),
+    .fallback_cmd_active(fallback_cmd_active),
+    .act_ready(act_ready),
+    .state_idle(state_idle),
+    .state_issue_request(state_issue_request),
+    .state_wait_response(state_wait_response),
+    .state_validate_response(state_validate_response),
+    .state_apply_command(state_apply_command),
+    .state_fallback(state_fallback),
+    .state_abort(state_abort),
+    .fault_latched(fault_latched),
+    .busy_out(busy_out),
+    .fallback_out(fallback_out),
+    .status_last_error_code(status_last_error_code),
+    .status_request_outstanding(status_request_outstanding),
+    .status_last_response_ok(status_last_response_ok),
+    .status_last_seq(status_last_seq),
+    .status_last_act_cmd(status_last_act_cmd),
+    .status_fault(status_fault),
+    .status_busy(status_busy),
+    .status_fallback(status_fallback)
+);
+
+assign fault_out = fault_latched;
+
+endmodule
+---END motor_control_top.v---
+---BEGIN motor_control_register_map.v---
+module motor_control_register_map (
+    clk,
+    reset_n,
+    cfg_addr,
+    cfg_wdata,
+    cfg_rdata,
+    cfg_we,
+    cfg_re,
+    cfg_ready,
+    cfg_enable,
+    cfg_start_request,
+    cfg_abort,
+    cfg_clear_fault,
+    cfg_model_id,
+    cfg_request_seq,
+    cfg_expected_response_seq,
+    cfg_max_response_age,
+    cfg_timeout_cycles,
+    cfg_clamp_min,
+    cfg_clamp_max,
+    cfg_safe_fallback_cmd,
+    cfg_request_flags,
+    cfg_slew_limit_en,
+    cfg_slew_limit_step,
+    status_busy,
+    status_fault,
+    status_fallback,
+    status_request_outstanding,
+    status_last_response_ok,
+    status_last_error_code,
+    status_last_act_cmd,
+    status_last_seq
+);
+input clk;
+input reset_n;
+input [31:0] cfg_addr;
+input [63:0] cfg_wdata;
+output reg [63:0] cfg_rdata;
+input cfg_we;
+input cfg_re;
+output cfg_ready;
+output reg cfg_enable;
+output reg cfg_start_request;
+output reg cfg_abort;
+output reg cfg_clear_fault;
+output reg [15:0] cfg_model_id;
+output reg [15:0] cfg_request_seq;
+output reg [15:0] cfg_expected_response_seq;
+output reg [15:0] cfg_max_response_age;
+output reg [31:0] cfg_timeout_cycles;
+output reg [31:0] cfg_clamp_min;
+output reg [31:0] cfg_clamp_max;
+output reg [31:0] cfg_safe_fallback_cmd;
+output reg [15:0] cfg_request_flags;
+output reg cfg_slew_limit_en;
+output reg [31:0] cfg_slew_limit_step;
+input status_busy;
+input status_fault;
+input status_fallback;
+input status_request_outstanding;
+input status_last_response_ok;
+input [7:0] status_last_error_code;
+input [31:0] status_last_act_cmd;
+input [15:0] status_last_seq;
+
+assign cfg_ready = 1'b1;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        cfg_enable <= 1'b0;
+        cfg_start_request <= 1'b0;
+        cfg_abort <= 1'b0;
+        cfg_clear_fault <= 1'b0;
+        cfg_model_id <= 16'h0000;
+        cfg_request_seq <= 16'h0000;
+        cfg_expected_response_seq <= 16'h0000;
+        cfg_max_response_age <= 16'h0000;
+        cfg_timeout_cycles <= 32'h00000000;
+        cfg_clamp_min <= 32'h00000000;
+        cfg_clamp_max <= 32'h00000000;
+        cfg_safe_fallback_cmd <= 32'h00000000;
+        cfg_request_flags <= 16'h0000;
+        cfg_slew_limit_en <= 1'b0;
+        cfg_slew_limit_step <= 32'h00000000;
+    end else begin
+        cfg_start_request <= 1'b0;
+        cfg_abort <= 1'b0;
+        cfg_clear_fault <= 1'b0;
+        if (cfg_we) begin
+            case (cfg_addr[7:0])
+                8'h00: begin
+                    cfg_enable <= cfg_wdata[0];
+                    cfg_start_request <= cfg_wdata[1];
+                    cfg_abort <= cfg_wdata[2];
+                    cfg_clear_fault <= cfg_wdata[3];
+                    cfg_slew_limit_en <= cfg_wdata[4];
+                end
+                8'h08: begin
+                    cfg_model_id <= cfg_wdata[15:0];
+                    cfg_request_seq <= cfg_wdata[31:16];
+                    cfg_expected_response_seq <= cfg_wdata[47:32];
+                    cfg_request_flags <= cfg_wdata[63:48];
+                end
+                8'h10: begin
+                    cfg_timeout_cycles <= cfg_wdata[31:0];
+                    cfg_max_response_age <= cfg_wdata[47:32];
+                end
+                8'h18: begin
+                    cfg_clamp_min <= cfg_wdata[31:0];
+                    cfg_clamp_max <= cfg_wdata[63:32];
+                end
+                8'h20: begin
+                    cfg_safe_fallback_cmd <= cfg_wdata[31:0];
+                    cfg_slew_limit_step <= cfg_wdata[63:32];
+                end
+                default: begin
+                end
+            endcase
+        end
+    end
+end
+
+always @(*) begin
+    cfg_rdata = 64'h0000000000000000;
+    case (cfg_addr[7:0])
+        8'h00: cfg_rdata = {48'h000000000000, status_fallback, status_fault, status_busy, cfg_slew_limit_en, cfg_clear_fault, cfg_abort, cfg_start_request, cfg_enable};
+        8'h08: cfg_rdata = {16'h0000, cfg_request_flags, cfg_expected_response_seq, cfg_request_seq, cfg_model_id};
+        8'h10: cfg_rdata = {16'h0000, cfg_max_response_age, cfg_timeout_cycles};
+        8'h18: cfg_rdata = {cfg_clamp_max, cfg_clamp_min};
+        8'h20: cfg_rdata = {cfg_slew_limit_step, cfg_safe_fallback_cmd};
+        8'h38: cfg_rdata = {32'h00000000, status_last_seq, status_last_error_code, status_last_response_ok, status_request_outstanding, status_fallback, status_fault, status_busy, status_last_act_cmd[31:24]};
+        default: cfg_rdata = 64'h0000000000000000;
+    endcase
+end
+
+endmodule
+---END motor_control_register_map.v---
+---BEGIN motor_control_transport_adapter.v---
+module motor_control_transport_adapter (
+    clk,
+    reset_n,
+    cfg_enable,
+    cfg_start_request,
+    cfg_abort,
+    cfg_model_id,
+    cfg_request_seq,
+    cfg_expected_response_seq,
+    cfg_request_flags,
+    cfg_timeout_cycles,
+    cfg_max_response_age,
+    request_outstanding,
+    request_issued,
+    request_seq_active,
+    deadline_expired,
+    request_age,
+    tx_valid,
+    tx_ready,
+    tx_data,
+    rx_valid,
+    rx_ready,
+    rx_data,
+    response_valid,
+    response_seq,
+    response_type,
+    response_integrity_ok,
+    response_cmd_raw,
+    response_status,
+    response_age_ok
+);
+input clk;
+input reset_n;
+input cfg_enable;
+input cfg_start_request;
+input cfg_abort;
+input [15:0] cfg_model_id;
+input [15:0] cfg_request_seq;
+input [15:0] cfg_expected_response_seq;
+input [15:0] cfg_request_flags;
+input [31:0] cfg_timeout_cycles;
+input [15:0] cfg_max_response_age;
+output reg request_outstanding;
+output reg request_issued;
+output reg [15:0] request_seq_active;
+output reg deadline_expired;
+output reg [31:0] request_age;
+output reg tx_valid;
+input tx_ready;
+output reg [127:0] tx_data;
+input rx_valid;
+output reg rx_ready;
+input [127:0] rx_data;
+output reg response_valid;
+output reg [15:0] response_seq;
+output reg [7:0] response_type;
+output reg response_integrity_ok;
+output reg [31:0] response_cmd_raw;
+output reg [7:0] response_status;
+output reg response_age_ok;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        request_outstanding <= 1'b0;
+        request_issued <= 1'b0;
+        request_seq_active <= 16'h0000;
+        deadline_expired <= 1'b0;
+        request_age <= 32'h00000000;
+        tx_valid <= 1'b0;
+        tx_data <= 128'h00000000000000000000000000000000;
+        rx_ready <= 1'b0;
+        response_valid <= 1'b0;
+        response_seq <= 16'h0000;
+        response_type <= 8'h00;
+        response_integrity_ok <= 1'b0;
+        response_cmd_raw <= 32'h00000000;
+        response_status <= 8'h00;
+        response_age_ok <= 1'b0;
+    end else begin
+        request_issued <= 1'b0;
+        response_valid <= 1'b0;
+        if (cfg_abort) begin
+            request_outstanding <= 1'b0;
+            tx_valid <= 1'b0;
+            rx_ready <= 1'b0;
+            request_age <= 32'h00000000;
+            deadline_expired <= 1'b0;
+        end else begin
+            if (cfg_enable && cfg_start_request && !request_outstanding) begin
+                request_outstanding <= 1'b1;
+                request_seq_active <= cfg_request_seq;
+                request_age <= 32'h00000000;
+                tx_valid <= 1'b1;
+                tx_data <= {32'h00000000, cfg_model_id, cfg_request_seq, cfg_expected_response_seq, cfg_request_flags, cfg_timeout_cycles, cfg_max_response_age, 32'h00000000};
+            end
+            if (request_outstanding) begin
+                request_age <= request_age + 32'd1;
+                if (cfg_timeout_cycles != 32'h00000000) begin
+                    if (request_age >= cfg_timeout_cycles) begin
+                        deadline_expired <= 1'b1;
+                    end else begin
+                        deadline_expired <= 1'b0;
+                    end
+                end else begin
+                    deadline_expired <= 1'b0;
+                end
+            end else begin
+                deadline_expired <= 1'b0;
+            end
+            if (tx_valid && tx_ready) begin
+                tx_valid <= 1'b0;
+                request_issued <= 1'b1;
+            end
+            rx_ready <= request_outstanding && cfg_enable && !deadline_expired;
+            if (rx_valid && rx_ready) begin
+                response_valid <= 1'b1;
+                response_seq <= rx_data[15:0];
+                response_type <= rx_data[23:16];
+                response_integrity_ok <= rx_data[24];
+                response_cmd_raw <= rx_data[63:32];
+                response_status <= rx_data[71:64];
+                response_age_ok <= (request_age <= {16'h0000, cfg_max_response_age});
+                request_outstanding <= 1'b0;
+            end
+            if (deadline_expired) begin
+                request_outstanding <= 1'b0;
+                tx_valid <= 1'b0;
+            end
+        end
+    end
+end
+
+endmodule
+---END motor_control_transport_adapter.v---
+---BEGIN motor_control_response_validator.v---
+module motor_control_response_validator (
+    clk,
+    reset_n,
+    request_outstanding,
+    request_seq_active,
+    expected_response_seq,
+    response_valid,
+    response_seq,
+    response_type,
+    response_integrity_ok,
+    response_cmd_raw,
+    response_status,
+    response_age_ok,
+    deadline_expired,
+    response_accepted,
+    response_rejected,
+    rejection_code,
+    approved_cmd_raw,
+    approved_status,
+    approved_seq_match
+);
+input clk;
+input reset_n;
+input request_outstanding;
+input [15:0] request_seq_active;
+input [15:0] expected_response_seq;
+input response_valid;
+input [15:0] response_seq;
+input [7:0] response_type;
+input response_integrity_ok;
+input [31:0] response_cmd_raw;
+input [7:0] response_status;
+input response_age_ok;
+input deadline_expired;
+output reg response_accepted;
+output reg response_rejected;
+output reg [7:0] rejection_code;
+output reg [31:0] approved_cmd_raw;
+output reg [7:0] approved_status;
+output reg approved_seq_match;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        response_accepted <= 1'b0;
+        response_rejected <= 1'b0;
+        rejection_code <= 8'h00;
+        approved_cmd_raw <= 32'h00000000;
+        approved_status <= 8'h00;
+        approved_seq_match <= 1'b0;
+    end else begin
+        response_accepted <= 1'b0;
+        response_rejected <= 1'b0;
+        rejection_code <= 8'h00;
+        approved_cmd_raw <= 32'h00000000;
+        approved_status <= 8'h00;
+        approved_seq_match <= 1'b0;
+        if (response_valid) begin
+            if (request_outstanding && !deadline_expired && response_age_ok && response_integrity_ok && (response_seq == request_seq_active) && (response_seq == expected_response_seq) && (response_type == 8'h01)) begin
+                response_accepted <= 1'b1;
+                approved_cmd_raw <= response_cmd_raw;
+                approved_status <= response_status;
+                approved_seq_match <= 1'b1;
+            end else begin
+                response_rejected <= 1'b1;
+                if (!request_outstanding) rejection_code <= 8'h01;
+                else if (deadline_expired || !response_age_ok) rejection_code <= 8'h02;
+                else if (!response_integrity_ok) rejection_code <= 8'h03;
+                else if (response_seq != request_seq_active) rejection_code <= 8'h04;
+                else if (response_seq != expected_response_seq) rejection_code <= 8'h05;
+                else if (response_type != 8'h01) rejection_code <= 8'h06;
+                else rejection_code <= 8'h7F;
+            end
+        end
+    end
+end
+
+endmodule
+---END motor_control_response_validator.v---
+---BEGIN motor_control_command_limiter.v---
+module motor_control_command_limiter (
+    clk,
+    reset_n,
+    cfg_clamp_min,
+    cfg_clamp_max,
+    cfg_slew_limit_en,
+    cfg_slew_limit_step,
+    safe_fallback_cmd,
+    approved_cmd_raw,
+    approved_status,
+    response_accepted,
+    use_fallback,
+    act_valid,
+    act_ready,
+    act_cmd,
+    limited_cmd,
+    clamped_cmd,
+    fallback_cmd_active,
+    command_applied
+);
+input clk;
+input reset_n;
+input [31:0] cfg_clamp_min;
+input [31:0] cfg_clamp_max;
+input cfg_slew_limit_en;
+input [31:0] cfg_slew_limit_step;
+input [31:0] safe_fallback_cmd;
+input [31:0] approved_cmd_raw;
+input [7:0] approved_status;
+input response_accepted;
+input use_fallback;
+output reg act_valid;
+input act_ready;
+output reg [31:0] act_cmd;
+output reg [31:0] limited_cmd;
+output reg [31:0] clamped_cmd;
+output reg fallback_cmd_active;
+input command_applied;
+
+reg [31:0] prev_cmd;
+reg [31:0] next_cmd;
+reg [31:0] diff_cmd;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        act_valid <= 1'b0;
+        act_cmd <= 32'h00000000;
+        limited_cmd <= 32'h00000000;
+        clamped_cmd <= 32'h00000000;
+        fallback_cmd_active <= 1'b0;
+        prev_cmd <= 32'h00000000;
+        next_cmd <= 32'h00000000;
+        diff_cmd <= 32'h00000000;
+    end else begin
+        if (use_fallback) begin
+            act_cmd <= safe_fallback_cmd;
+            clamped_cmd <= safe_fallback_cmd;
+            limited_cmd <= safe_fallback_cmd;
+            fallback_cmd_active <= 1'b1;
+            act_valid <= 1'b1;
+        end else if (response_accepted) begin
+            next_cmd <= approved_cmd_raw;
+            if (approved_cmd_raw < cfg_clamp_min) next_cmd <= cfg_clamp_min;
+            if (approved_cmd_raw > cfg_clamp_max) next_cmd <= cfg_clamp_max;
+            clamped_cmd <= next_cmd;
+            diff_cmd <= (next_cmd >= prev_cmd) ? (next_cmd - prev_cmd) : (prev_cmd - next_cmd);
+            if (cfg_slew_limit_en && (diff_cmd > cfg_slew_limit_step)) begin
+                if (next_cmd >= prev_cmd) limited_cmd <= prev_cmd + cfg_slew_limit_step;
+                else limited_cmd <= prev_cmd - cfg_slew_limit_step;
+            end else begin
+                limited_cmd <= next_cmd;
+            end
+            act_cmd <= limited_cmd;
+            fallback_cmd_active <= 1'b0;
+            act_valid <= 1'b1;
+        end else if (command_applied && act_ready) begin
+            act_valid <= 1'b0;
+            prev_cmd <= act_cmd;
+        end else begin
+            fallback_cmd_active <= 1'b0;
+            if (act_valid && act_ready) begin
+                act_valid <= 1'b0;
+                prev_cmd <= act_cmd;
+            end
+        end
+    end
+end
+
+endmodule
+---END motor_control_command_limiter.v---
+---BEGIN motor_control_safety_fsm.v---
+module motor_control_safety_fsm (
+    clk,
+    reset_n,
+    cfg_enable,
+    cfg_start_request,
+    cfg_abort,
+    cfg_clear_fault,
+    cfg_safe_fallback_cmd,
+    cfg_timeout_cycles,
+    request_outstanding,
+    request_issued,
+    response_accepted,
+    response_rejected,
+    deadline_expired,
+    command_applied,
+    fallback_cmd_active,
+    act_ready,
+    state_idle,
+    state_issue_request,
+    state_wait_response,
+    state_validate_response,
+    state_apply_command,
+    state_fallback,
+    state_abort,
+    fault_latched,
+    busy_out,
+    fallback_out,
+    status_last_error_code,
+    status_request_outstanding,
+    status_last_response_ok,
+    status_last_seq,
+    status_last_act_cmd,
+    status_fault,
+    status_busy,
+    status_fallback
+);
+input clk;
+input reset_n;
+input cfg_enable;
+input cfg_start_request;
+input cfg_abort;
+input cfg_clear_fault;
+input [31:0] cfg_safe_fallback_cmd;
+input [31:0] cfg_timeout_cycles;
+input request_outstanding;
+input request_issued;
+input response_accepted;
+input response_rejected;
+input deadline_expired;
+input command_applied;
+input fallback_cmd_active;
+input act_ready;
+output reg state_idle;
+output reg state_issue_request;
+output reg state_wait_response;
+output reg state_validate_response;
+output reg state_apply_command;
+output reg state_fallback;
+output reg state_abort;
+output reg fault_latched;
+output reg busy_out;
+output reg fallback_out;
+output reg [7:0] status_last_error_code;
+output reg status_request_outstanding;
+output reg status_last_response_ok;
+output reg [15:0] status_last_seq;
+output reg [31:0] status_last_act_cmd;
+output reg status_fault;
+output reg status_busy;
+output reg status_fallback;
+
+reg [2:0] state;
+localparam ST_IDLE = 3'd0;
+localparam ST_ISSUE = 3'd1;
+localparam ST_WAIT = 3'd2;
+localparam ST_VALIDATE = 3'd3;
+localparam ST_APPLY = 3'd4;
+localparam ST_FALLBACK = 3'd5;
+localparam ST_ABORT = 3'd6;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        state <= ST_IDLE;
+        fault_latched <= 1'b0;
+        busy_out <= 1'b0;
+        fallback_out <= 1'b0;
+        status_last_error_code <= 8'h00;
+        status_request_outstanding <= 1'b0;
+        status_last_response_ok <= 1'b0;
+        status_last_seq <= 16'h0000;
+        status_last_act_cmd <= 32'h00000000;
+        command_applied <= 1'b0;
+        status_fault <= 1'b0;
+        status_busy <= 1'b0;
+        status_fallback <= 1'b0;
+    end else begin
+        command_applied <= 1'b0;
+        state_idle <= 1'b0;
+        state_issue_request <= 1'b0;
+        state_wait_response <= 1'b0;
+        state_validate_response <= 1'b0;
+        state_apply_command <= 1'b0;
+        state_fallback <= 1'b0;
+        state_abort <= 1'b0;
+        case (state)
+            ST_IDLE: begin
+                busy_out <= 1'b0;
+                fallback_out <= (!cfg_enable) ? 1'b1 : 1'b0;
+                status_request_outstanding <= 1'b0;
+                state_idle <= 1'b1;
+                status_busy <= 1'b0;
+                status_fallback <= (!cfg_enable) ? 1'b1 : 1'b0;
+                if (cfg_abort) begin
+                    state <= ST_ABORT;
+                    status_last_error_code <= 8'h10;
+                end else if (!cfg_enable) begin
+                    state <= ST_FALLBACK;
+                    status_last_error_code <= 8'h11;
+                end else if (cfg_start_request && !fault_latched) begin
+                    state <= ST_ISSUE;
+                end
+                if (cfg_clear_fault && !request_outstanding) fault_latched <= 1'b0;
+            end
+            ST_ISSUE: begin
+                busy_out <= 1'b1;
+                status_request_outstanding <= 1'b1;
+                state_issue_request <= 1'b1;
+                status_busy <= 1'b1;
+                if (request_issued) state <= ST_WAIT;
+                if (cfg_abort) state <= ST_ABORT;
+            end
+            ST_WAIT: begin
+                busy_out <= 1'b1;
+                status_request_outstanding <= request_outstanding;
+                state_wait_response <= 1'b1;
+                status_busy <= 1'b1;
+                if (deadline_expired) begin
+                    state <= ST_FALLBACK;
+                    fault_latched <= 1'b1;
+                    status_last_error_code <= 8'h20;
+                end else if (response_rejected) begin
+                    state <= ST_FALLBACK;
+                    fault_latched <= 1'b1;
+                    status_last_error_code <= 8'h21;
+                end else if (response_accepted) begin
+                    state <= ST_VALIDATE;
+                    status_last_response_ok <= 1'b1;
+                end
+                if (cfg_abort) state <= ST_ABORT;
+            end
+            ST_VALIDATE: begin
+                busy_out <= 1'b1;
+                state_validate_response <= 1'b1;
+                status_busy <= 1'b1;
+                state <= ST_APPLY;
+            end
+            ST_APPLY: begin
+                busy_out <= 1'b1;
+                fallback_out <= fallback_cmd_active;
+                state_apply_command <= 1'b1;
+                status_busy <= 1'b1;
+                if (act_ready) begin
+                    command_applied <= 1'b1;
+                    status_last_act_cmd <= cfg_safe_fallback_cmd;
+                    status_last_seq <= status_last_seq + 16'd1;
+                    state <= ST_IDLE;
+                end
+                if (cfg_abort) state <= ST_ABORT;
+            end
+            ST_FALLBACK: begin
+                busy_out <= 1'b1;
+                fallback_out <= 1'b1;
+                state_fallback <= 1'b1;
+                fault_latched <= 1'b1;
+                status_busy <= 1'b1;
+                status_fallback <= 1'b1;
+                if (cfg_clear_fault && !request_outstanding) begin
+                    state <= ST_IDLE;
+                    fallback_out <= 1'b0;
+                end
+                if (cfg_abort) state <= ST_ABORT;
+            end
+            ST_ABORT: begin
+                busy_out <= 1'b0;
+                fallback_out <= 1'b1;
+                state_abort <= 1'b1;
+                status_last_error_code <= 8'h30;
+                status_busy <= 1'b0;
+                status_fallback <= 1'b1;
+                state <= ST_IDLE;
+                if (cfg_clear_fault) fault_latched <= 1'b0;
+            end
+            default: begin
+                state <= ST_IDLE;
+            end
+        endcase
+        status_fault <= fault_latched;
+        if (state == ST_IDLE) begin
+            status_busy <= 1'b0;
+        end
+        status_request_outstanding <= request_outstanding;
+    end
+end
+
+endmodule
+---END motor_control_safety_fsm.v---

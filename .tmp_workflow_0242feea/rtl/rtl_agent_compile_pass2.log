@@ -1,0 +1,14 @@
+backend/workflows/0242feea-dc6c-44a1-81d4-46dbddda7114/rtl/pass2/motor_control_safety_fsm.v:92: error: command_applied is not a valid l-value in motor_control_top.u_motor_control_safety_fsm.
+backend/workflows/0242feea-dc6c-44a1-81d4-46dbddda7114/rtl/pass2/motor_control_safety_fsm.v:50:      : command_applied is declared here as wire.
+backend/workflows/0242feea-dc6c-44a1-81d4-46dbddda7114/rtl/pass2/motor_control_safety_fsm.v:97: error: command_applied is not a valid l-value in motor_control_top.u_motor_control_safety_fsm.
+backend/workflows/0242feea-dc6c-44a1-81d4-46dbddda7114/rtl/pass2/motor_control_safety_fsm.v:50:      : command_applied is declared here as wire.
+backend/workflows/0242feea-dc6c-44a1-81d4-46dbddda7114/rtl/pass2/motor_control_safety_fsm.v:163: error: command_applied is not a valid l-value in motor_control_top.u_motor_control_safety_fsm.
+backend/workflows/0242feea-dc6c-44a1-81d4-46dbddda7114/rtl/pass2/motor_control_safety_fsm.v:50:      : command_applied is declared here as wire.
+3 error(s) during elaboration.
+
+Issues:
+❌ Module 'motor_control_safety_fsm' has extra ports vs spec: ['status_fault', 'status_busy', 'status_fallback']
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.
