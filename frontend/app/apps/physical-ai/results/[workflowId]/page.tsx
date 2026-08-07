@@ -62,6 +62,17 @@ const plotTitles: Record<string, string> = {
 };
 
 type HemChildRun = { workflow_id: string; label: string; status?: string | null; phase?: string | null; logs?: string | null; dashboard_path: string };
+type ApiPayload = { status?: string; phase?: string; logs?: string; hem_children?: unknown; result?: ResultPayload; plots?: Record<string, string>; detail?: string };
+
+async function readApiPayload(response: Response): Promise<ApiPayload> {
+  const body = await response.text();
+  if (!body.trim()) return {};
+  try {
+    return JSON.parse(body) as ApiPayload;
+  } catch {
+    throw new Error(`Physical AI API returned HTTP ${response.status}: ${body.slice(0, 300)}`);
+  }
+}
 
 function mergeHemChildren(previous: HemChildRun[], incoming: unknown): HemChildRun[] {
   if (!Array.isArray(incoming)) return previous;
@@ -107,7 +118,7 @@ export default function PhysicalAiResultsPage() {
       if (!data.session) return router.replace(`/login?next=/apps/physical-ai/results/${workflowId}`);
       try {
         const response = await fetch(`${API_BASE}/apps/physical-ai/${workflowId}/result`, { headers: { Authorization: `Bearer ${data.session.access_token}` }, cache: "no-store" });
-        const payload = await response.json();
+        const payload = await readApiPayload(response);
         if (response.status === 202) {
           setPhase(payload.phase || payload.status || "running");
           setLogs(payload.logs || "");
@@ -117,7 +128,7 @@ export default function PhysicalAiResultsPage() {
         }
         if (!response.ok) throw new Error(payload.detail || payload.logs || "Unable to load Physical AI result");
         if (!stopped) {
-          setResult(payload.result);
+          if (payload.result) setResult(payload.result);
           setPlots(payload.plots || {});
           setPhase(payload.phase || "completed");
           setLogs(payload.logs || "");
@@ -126,7 +137,10 @@ export default function PhysicalAiResultsPage() {
           if (payload.result?.hem?.enabled && !hemTerminal) timer = setTimeout(poll, 2500);
         }
       } catch (e) {
-        if (!stopped) setError(e instanceof Error ? e.message : String(e));
+        if (!stopped) {
+          setError(e instanceof Error ? e.message : String(e));
+          timer = setTimeout(poll, 3000);
+        }
       }
     }
     poll();

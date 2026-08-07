@@ -22,6 +22,17 @@ const paths: Array<{ key: ImplementationPath; title: string; body: string }> = [
 
 type RunSummary = { status?: string; physics_model?: { name?: string }; physics_execution?: { execution_mode?: string; inference_status?: string; implementation_path?: string }; hem?: { enabled?: boolean } };
 type HemChildRun = { workflow_id: string; label: string; status?: string | null; phase?: string | null; logs?: string | null; dashboard_path: string };
+type ApiPayload = { status?: string; phase?: string; logs?: string; hem_children?: unknown; result?: RunSummary; detail?: string; workflow_id?: string };
+
+async function readApiPayload(response: Response): Promise<ApiPayload> {
+  const body = await response.text();
+  if (!body.trim()) return {};
+  try {
+    return JSON.parse(body) as ApiPayload;
+  } catch {
+    throw new Error(`Physical AI API returned HTTP ${response.status}: ${body.slice(0, 300)}`);
+  }
+}
 
 function mergeHemChildren(previous: HemChildRun[], incoming: unknown): HemChildRun[] {
   if (!Array.isArray(incoming)) return previous;
@@ -101,7 +112,7 @@ export default function PhysicalAiStudioPage() {
     const poll = async () => {
       try {
         const response = await fetch(`${API_BASE}/apps/physical-ai/${workflowId}/result`, { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
-        const payload = await response.json();
+        const payload = await readApiPayload(response);
         if (stopped) return;
         setRunStatus(String(payload.status || "running"));
         setRunPhase(String(payload.phase || payload.status || "running"));
@@ -113,7 +124,10 @@ export default function PhysicalAiStudioPage() {
         const terminal = ["hem_complete", "hem_failed", "architecture_complete", "needs_revision", "error"].includes(normalizedPhase) || (!hemIsRunning && normalizedPhase === "digital_design_ready");
         if (!terminal && response.status !== 409) timer = setTimeout(poll, 1500);
       } catch (cause) {
-        if (!stopped) setError(cause instanceof Error ? cause.message : String(cause));
+        if (!stopped) {
+          setError(cause instanceof Error ? cause.message : String(cause));
+          timer = setTimeout(poll, 3000);
+        }
       }
     };
     poll();
@@ -172,8 +186,8 @@ export default function PhysicalAiStudioPage() {
           hem_goal: "product_demo",
         }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "Unable to start Physical AI journey");
+      const data = await readApiPayload(response);
+      if (!response.ok) throw new Error(String(data.detail || `Unable to start Physical AI journey (HTTP ${response.status})`));
       setWorkflowId(String(data.workflow_id));
       setRunStatus("running");
       setRunPhase("queued");
