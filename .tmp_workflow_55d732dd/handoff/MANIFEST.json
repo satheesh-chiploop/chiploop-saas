@@ -1,0 +1,64 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "motor_control_top",
+  "generated_at": "2026-08-07T02:22:30.139864",
+  "file_count": 11,
+  "files": [
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "117d4ae4376b1e9bd73c81ab18883eecf3f58b7c528f403435bf6535503b2daa",
+      "bytes": 11497
+    },
+    {
+      "path": "docs/spec/digital_spec.json",
+      "sha256": "e4c3d1fc300586d0e2b16756a823da3d683fec1b55f708f5495eecd8fb2f9599",
+      "bytes": 50709
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "0f821936335c93218931cd9c3ebad4ab4d46e08b379c8d6362776e63a4b2f40f",
+      "bytes": 2291
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "5139584a01cd29a996cf67484712774771849b2f7d41cee62b3482f7877d4d7b",
+      "bytes": 826
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "76e75c796fbac581a561c45aca9ca0c22a37f836cf71a6f3bf2e37fbb98acf47",
+      "bytes": 324
+    },
+    {
+      "path": "rtl/csr_window_ctrl.v",
+      "sha256": "6016b9d933f24a885f4eeee576b5e7155e50272fe6abfa49e0d745f45c61fd77",
+      "bytes": 3907
+    },
+    {
+      "path": "rtl/motor_control_top.v",
+      "sha256": "c0b1e946b7c850dae2015426b5224d691ff4bcf613cb5d9c2761551ae9ffaad9",
+      "bytes": 5831
+    },
+    {
+      "path": "rtl/request_validation_unit.v",
+      "sha256": "698a9bd6b0eb942551020f27ad5d8681cfa865914e53822668c1653bc77040a8",
+      "bytes": 2274
+    },
+    {
+      "path": "rtl/response_sanitizer.v",
+      "sha256": "aba8e2816b5e2bad4737f2ff195a6f1bd7ac4d5318a131002274de130008ff36",
+      "bytes": 2292
+    },
+    {
+      "path": "rtl/safe_fallback_controller.v",
+      "sha256": "137f33a89da81398f7587ecdf3379fbf7a8289ce97a91697c8df1a58db88cad9",
+      "bytes": 1019
+    },
+    {
+      "path": "rtl/transport_dispatch_fsm.v",
+      "sha256": "5e81103ed9e39b94497446975df39fbf4fe6467699aa37214726c5ebbc190973",
+      "bytes": 5341
+    }
+  ]
+}
