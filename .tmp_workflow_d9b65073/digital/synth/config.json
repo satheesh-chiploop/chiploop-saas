@@ -1,0 +1,27 @@
+{
+  "DESIGN_NAME": "motor_control_top",
+  "VERILOG_FILES": [
+    "rtl/motor_control_top.v",
+    "rtl/motor_control_cfg_if.v",
+    "rtl/motor_control_request_packer.v",
+    "rtl/motor_control_response_guard.v"
+  ],
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 10.0,
+  "SYNTH_STRATEGY": "AREA 0",
+  "SYNTH_SDC_FILE": "constraints/motor_control_top.sdc",
+  "PNR_SDC_FILE": "constraints/motor_control_top.sdc",
+  "EXTRA_LIBS": [],
+  "EXTRA_LEFS": [],
+  "EXTRA_GDS_FILES": [],
+  "CHIPLOOP_WORKFLOW_ID": "d9b65073-212a-4067-abf1-7fce5ff0598e",
+  "CHIPLOOP_GENERATED_BY": "Digital Synthesis Agent",
+  "CHIPLOOP_GENERATED_AT": "2026-08-07T00:46:26.269566Z",
+  "CHIPLOOP_MACRO_LIBS": [],
+  "CHIPLOOP_MACRO_LEFS": [],
+  "CHIPLOOP_MACRO_GDS": [],
+  "CHIPLOOP_MACRO_SPICE": [],
+  "CHIPLOOP_MACRO_VERILOG": [],
+  "CHIPLOOP_YOSYS_MACRO_LIB_SCRIPT": "yosys_macro_libs.ys",
+  "RUN_LINTER": false
+}

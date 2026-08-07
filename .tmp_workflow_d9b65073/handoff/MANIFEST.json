@@ -1,0 +1,54 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "motor_control_top",
+  "generated_at": "2026-08-07T00:46:22.258515",
+  "file_count": 9,
+  "files": [
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "37ffff56833703fe5f7d262ad7c54378bfca0da7ab93760f54a5aa9853e43afa",
+      "bytes": 14102
+    },
+    {
+      "path": "docs/spec/digital_spec.json",
+      "sha256": "6ceecf27b90c0cd3d05e8c7f6e1e6c5fa185ae1561b703b9558f97d25f014c98",
+      "bytes": 55575
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "26e2e847d893230b742200f7aed3aee968952b869029a69a004ec4c3371e5e27",
+      "bytes": 2291
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "5139584a01cd29a996cf67484712774771849b2f7d41cee62b3482f7877d4d7b",
+      "bytes": 826
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "76e75c796fbac581a561c45aca9ca0c22a37f836cf71a6f3bf2e37fbb98acf47",
+      "bytes": 324
+    },
+    {
+      "path": "rtl/motor_control_cfg_if.v",
+      "sha256": "644fc0018ecb8fb0a2018ec6a2947ae00b70f9375d9569338518d683962c86be",
+      "bytes": 5571
+    },
+    {
+      "path": "rtl/motor_control_request_packer.v",
+      "sha256": "3d505a1396243856febc53013c0e420fadfb58111ec86b8fd6d5926a7c7d003a",
+      "bytes": 1127
+    },
+    {
+      "path": "rtl/motor_control_response_guard.v",
+      "sha256": "3bb752a452df9fa1a4bf20e166e5a1c85378cdcd213a83ae806db284e9018748",
+      "bytes": 4839
+    },
+    {
+      "path": "rtl/motor_control_top.v",
+      "sha256": "d3420651526bce7c0dcdf11c6fcd25c119e8160b424d225d91f2f25feebb92cb",
+      "bytes": 10540
+    }
+  ]
+}

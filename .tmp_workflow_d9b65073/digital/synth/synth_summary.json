@@ -1,0 +1,53 @@
+{
+  "workflow_id": "d9b65073-212a-4067-abf1-7fce5ff0598e",
+  "agent": "Digital Synthesis Agent",
+  "status": "failed",
+  "return_code": 2,
+  "inputs": {
+    "rtl_files": [
+      "motor_control_top.v",
+      "motor_control_cfg_if.v",
+      "motor_control_request_packer.v",
+      "motor_control_response_guard.v"
+    ],
+    "pre_synthesis_rtl_repairs": {},
+    "macro_libs": [],
+    "macro_lefs": [],
+    "macro_gds": [],
+    "macro_spice": [],
+    "macro_verilog": [],
+    "pdk_sram_collateral": [],
+    "top_module": "motor_control_top",
+    "clock_port": "clk",
+    "clock_period_ns": 10.0,
+    "synthesis_closure_iteration": 0,
+    "synthesis_closure_timing_repair_enabled": true,
+    "synthesis_closure_optimization_profile": {
+      "enabled": false,
+      "iteration": 0,
+      "clock_margin": 1.0,
+      "strategy": "AREA 0",
+      "allow_retiming": false,
+      "allow_flattening": false,
+      "techniques": []
+    },
+    "synthesis_closure_openlane_overrides": {},
+    "pdk_variant": "sky130A",
+    "openlane_image": "ghcr.io/efabless/openlane2:2.4.0.dev1",
+    "openlane_to_step": "OpenROAD.STAPrePNR",
+    "pdk_root_host": "/root/chiploop-backend/backend/pdk"
+  },
+  "outputs": {
+    "stage_dir": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/digital/synth",
+    "config_json": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/digital/synth/config.json",
+    "sdc": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/digital/synth/constraints/motor_control_top.sdc",
+    "run_sh": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/digital/synth/run.sh",
+    "exec_log": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/digital/synth/logs/openlane_synth.log",
+    "metrics_json": null,
+    "netlist": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/digital/synth/netlist/motor_control_top_synth.v",
+    "netlist_candidates": [
+      "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d9b65073-212a-4067-abf1-7fce5ff0598e/40905826-71fa-42c7-9b3a-4ca02157b2a1/digital/arch2tapeout/digital/synth/runs/Digital_Arch2Tapeout_d9b65073-212a-4067-abf1-7fce5ff0598e/02-yosys-synthesis/motor_control_top.nl.v"
+    ],
+    "enriched_metrics": false
+  }
+}
