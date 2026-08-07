@@ -1,0 +1,438 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "motor_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "motor_control_top",
+      "implementation_style": "Single-clock top-level integration wrapper that ties together MMIO control/status, packetized request/response supervision, timeout handling, safety enforcement, fallback generation, and final actuator command output. The remote service remains opaque; only transport and supervision are implemented.",
+      "control_strategy": "Use CSR-programmed enable, queue, timeout, geometry format, velocity, and safety policy bits to gate request launch, monitor responses, and force fallback on any freshness, integrity, or timeout fault. Keep one outstanding request by default, with an optional bounded queue of at most two entries when explicitly enabled.",
+      "state_strategy": "Maintain only the minimal supervisory state needed for outstanding-request tracking, status reporting, fault persistence, and safe reset recovery. No bulk model state, geometry arrays, or payload memories are implemented in the top.",
+      "output_strategy": "Drive the compact MMIO response path, a 128-bit request stream, a 128-bit response accept path, and a 32-bit actuator command bus. On reset and on fault, prioritize safe fallback and deassert actuator enable.",
+      "ownership_notes": [
+        "Owns system integration only; submodule responsibilities remain unchanged.",
+        "No geometry, flow-field, pressure-tensor, or surrogate payload pins are exposed.",
+        "Reset behavior enters safe fallback, clears outstanding request state, and returns known CSR defaults."
+      ]
+    },
+    {
+      "name": "top_level_bus_adapter",
+      "implementation_style": "Small MMIO front-end that translates the 64-bit register access interface into explicit CSR strobes and returns packed readback data.",
+      "control_strategy": "Issue one CSR transaction per accepted MMIO access, with registered handshake behavior to avoid combinational valid/ready loops.",
+      "state_strategy": "Retain only transient request/response phase information needed to serialize MMIO accesses; do not store bulk data.",
+      "output_strategy": "Provide clean CSR read/write strobes and 64-bit read data back to the top-level MMIO port.",
+      "ownership_notes": [
+        "Owns mmio_ready, mmio_rvalid, mmio_rdata, csr_write_en, csr_read_en, csr_addr, and csr_wdata.",
+        "Does not infer payload storage or model-specific state."
+      ]
+    },
+    {
+      "name": "csr_block",
+      "implementation_style": "Compact CSR file with 32-bit-or-smaller configuration and status registers, packed through the 64-bit MMIO transport.",
+      "control_strategy": "Latch software-programmed enable, bypass, queue, timeout, fallback, actuator limit, sequence seed, geometry format, velocity, and policy bits; expose read-only status reflecting request, response, fault, and fallback state.",
+      "state_strategy": "Keep only register state and status latches permitted by the contract. No bulk model storage, FIFOs, or history arrays are implemented here.",
+      "output_strategy": "Drive semantic control outputs to downstream logic and pack status into csr_rdata for software visibility.",
+      "ownership_notes": [
+        "Owns all listed configuration registers and status-visible packed readback.",
+        "Status remains readable even when the design is disabled.",
+        "Acknowledgment behavior is policy-controlled and limited to status clearing semantics."
+      ]
+    },
+    {
+      "name": "request_packetizer",
+      "implementation_style": "Bounded packet constructor that frames internal control metadata into a fixed-width 128-bit request stream.",
+      "control_strategy": "Launch only when enabled, inputs are valid, and outstanding-request policy allows it. Support one outstanding request by default, or a bounded queue of at most two entries when enabled.",
+      "state_strategy": "Track only sequence progression, outstanding count, and minimal launch bookkeeping. Do not parse or store full geometry contents beyond framing and bounded length validation.",
+      "output_strategy": "Emit req_valid and req_data as a packetized, sequence-numbered request with command type, geometry format, descriptor length, flow tag, and integrity tag fields.",
+      "ownership_notes": [
+        "Consumes validated geometry descriptor metadata only, not geometry payload semantics.",
+        "Velocity outside the reference envelope faults unless clamping policy permits a supervised clamp.",
+        "No inferred memories or flip-flop FIFOs for payload history."
+      ]
+    },
+    {
+      "name": "response_receiver",
+      "implementation_style": "Lightweight 128-bit stream receiver that extracts only the metadata needed for validation.",
+      "control_strategy": "Accept response packets with valid/ready handshake and pass sequence/integrity metadata onward without trusting the payload.",
+      "state_strategy": "Hold only bounded metadata from the currently accepted response; no bulk response history or payload decoding is implemented.",
+      "output_strategy": "Present response_valid, response_sequence_id, response_integrity_tag, and response_payload_valid to the monitor path.",
+      "ownership_notes": [
+        "Does not assume inference success or timely response arrival.",
+        "Handshake behavior must remain free of combinational loops."
+      ]
+    },
+    {
+      "name": "freshness_and_integrity_monitor",
+      "implementation_style": "Comparative supervision block that checks sequence match, integrity tag validity, and timeout freshness against the outstanding request context.",
+      "control_strategy": "Reject mismatched, duplicated, corrupted, or late responses, and classify the resulting fault for status and fallback control.",
+      "state_strategy": "Keep only the minimal comparison context needed for the active request and most recent sequence metadata.",
+      "output_strategy": "Assert fresh_response_accepted only when sequence, integrity, and freshness checks all pass; otherwise assert stale_rejected and/or integrity_error with a fault code.",
+      "ownership_notes": [
+        "Sequence comparison is explicit and synthesizable.",
+        "No payload history beyond required comparison state is stored."
+      ]
+    },
+    {
+      "name": "timeout_watchdog",
+      "implementation_style": "Simple cycle counter watchdog started by request launch and cleared by accepted fresh response.",
+      "control_strategy": "Expire after cfg_timeout_cycles when no matching accepted response occurs and assert timeout status for supervision.",
+      "state_strategy": "Maintain only running/expired timing state and the elapsed counter needed for bounded timeout behavior.",
+      "output_strategy": "Drive timeout_fired, watchdog_running, and watchdog_expired to the rest of the design and CSR status.",
+      "ownership_notes": [
+        "Timeout behavior is independent of payload semantics.",
+        "Liveness is bounded and synthesizable."
+      ]
+    },
+    {
+      "name": "safety_supervisor",
+      "implementation_style": "Registered actuator safety block that enforces position limits, slew-rate limiting, and velocity-envelope policy on advisory commands.",
+      "control_strategy": "Clamp out-of-range advisory values, apply per-update slew limits, and ensure bypass_mode cannot circumvent safety when disabled.",
+      "state_strategy": "Keep only the minimal prior safe/command reference needed for slew limiting and safe-position derivation; no memories or payload storage are used.",
+      "output_strategy": "Provide clamped_position, clamp_event, safety_ok, and safe_position for downstream mapping and fallback selection.",
+      "ownership_notes": [
+        "Velocity outside 20 to 55 m/s raises fault unless explicit clamping is enabled and applied.",
+        "Model advice never directly bypasses safety when bypass_mode is disabled."
+      ]
+    },
+    {
+      "name": "actuator_command_mapper",
+      "implementation_style": "Final command-selection and enable-gating stage that chooses between supervised advisory output and fallback posture.",
+      "control_strategy": "Select fallback_position whenever fallback_active is asserted; otherwise pass the safety-supervised advisory command when valid and enabled.",
+      "state_strategy": "Retain only minimal registered command selection state if needed for clean output timing; no broad storage is used.",
+      "output_strategy": "Drive mapped_cmd_valid, mapped_cmd_data, and actuator_enable to the top-level actuator bus contract.",
+      "ownership_notes": [
+        "cfg_enable low keeps actuator enable low.",
+        "No unsafe bypass around safety_supervisor is permitted when bypass_mode is disabled."
+      ]
+    },
+    {
+      "name": "safe_fallback_controller",
+      "implementation_style": "Fault-latching fallback controller that generates the safe actuator posture used during timeout, stale-response, or integrity faults.",
+      "control_strategy": "Assert fallback_active on any timeout or freshness/integrity fault and hold fault state according to CSR policy until cleared by software or clean transaction completion.",
+      "state_strategy": "Store only minimal latched-fault and fallback selection state. Use either a fixed configured safe position or a hold-last-safe posture as selected by CSR.",
+      "output_strategy": "Provide fallback_active, fallback_position, and fault_latched to force the actuator path into a safe posture.",
+      "ownership_notes": [
+        "Fallback behavior is independent of inference success.",
+        "No bulk storage beyond minimal control state is implemented."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "module": "motor_control_top",
+      "present": true,
+      "description": "Use small explicit enumerated FSMs where needed for request launch, response acceptance, and fault/fallback sequencing. Keep the control flow simple: idle, request_launch, waiting_for_response, response_accepted, fault, and fallback are sufficient if separate FSMs are used per function.",
+      "states": [
+        "IDLE",
+        "LAUNCH_REQUEST",
+        "WAIT_RESPONSE",
+        "ACCEPT_RESPONSE",
+        "FAULT",
+        "FALLBACK"
+      ]
+    },
+    {
+      "module": "top_level_bus_adapter",
+      "present": true,
+      "description": "Serialize MMIO accesses with a minimal read/write transaction FSM or equivalent enumerated handshake states. Avoid combinational dependence from ready back to valid.",
+      "states": [
+        "IDLE",
+        "WRITE_CSR",
+        "READ_CSR"
+      ]
+    },
+    {
+      "module": "csr_block",
+      "present": true,
+      "description": "Use a small register-access FSM or decoded write-enable sequencing only if required by the MMIO protocol; otherwise a simple registered decode is sufficient. No complex control FSM is implied by the spec.",
+      "states": [
+        "IDLE",
+        "WRITE",
+        "READ"
+      ]
+    },
+    {
+      "module": "request_packetizer",
+      "present": true,
+      "description": "Use a small enumerated launch/hold sequence to manage packet emission and bounded outstanding count. Do not create a complex scheduler; the spec only implies simple one-outstanding or two-entry queue behavior.",
+      "states": [
+        "IDLE",
+        "QUEUE",
+        "LAUNCH",
+        "WAIT_READY"
+      ]
+    },
+    {
+      "module": "response_receiver",
+      "present": true,
+      "description": "Use a minimal accept/hold structure for the response handshake and metadata capture. No deep response-processing FSM is required.",
+      "states": [
+        "IDLE",
+        "CAPTURE"
+      ]
+    },
+    {
+      "module": "freshness_and_integrity_monitor",
+      "present": true,
+      "description": "Use straightforward compare-and-classify control, with explicit states only if needed to separate no-response, compare, accept, reject, and timeout handling.",
+      "states": [
+        "IDLE",
+        "COMPARE",
+        "ACCEPT",
+        "REJECT",
+        "TIMEOUT"
+      ]
+    },
+    {
+      "module": "timeout_watchdog",
+      "present": true,
+      "description": "A simple running/expired watchdog FSM or counter-based equivalent is sufficient, with no elaborate state machine beyond idle, running, and expired.",
+      "states": [
+        "IDLE",
+        "RUNNING",
+        "EXPIRED"
+      ]
+    },
+    {
+      "module": "safety_supervisor",
+      "present": true,
+      "description": "Use simple combinational/registered enforcement with explicit safe, clamp, and pass-through behavior; a complex FSM is not implied.",
+      "states": [
+        "SAFE",
+        "PASS_THROUGH",
+        "CLAMP"
+      ]
+    },
+    {
+      "module": "actuator_command_mapper",
+      "present": true,
+      "description": "A small selection FSM is sufficient to choose advisory versus fallback command sources and gate actuator enable.",
+      "states": [
+        "DISABLED",
+        "ADVISORY",
+        "FALLBACK"
+      ]
+    },
+    {
+      "module": "safe_fallback_controller",
+      "present": true,
+      "description": "A minimal fault-latch and fallback-selection FSM is sufficient, with explicit safe and faulted operation.",
+      "states": [
+        "SAFE",
+        "FAULT_LATCHED",
+        "HOLD_LAST_SAFE"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "module": "motor_control_top",
+      "inputs": [
+        "clk",
+        "reset_n",
+        "mmio_valid",
+        "mmio_we",
+        "mmio_addr",
+        "mmio_wdata",
+        "req_ready",
+        "rsp_valid",
+        "rsp_data",
+        "actuator_cmd_ready"
+      ],
+      "internal_storage": [
+        "Minimal supervisory registers and flags only; no bulk payload memories, geometry arrays, or inferred FIFOs."
+      ],
+      "output_mapping": [
+        "Route MMIO through the bus adapter to CSR, then fan out CSR control bits to request, response, safety, timeout, and fallback blocks; route final actuator command outputs from the actuator mapper."
+      ]
+    },
+    {
+      "module": "top_level_bus_adapter",
+      "inputs": [
+        "mmio_valid",
+        "mmio_we",
+        "mmio_addr",
+        "mmio_wdata",
+        "csr_rdata"
+      ],
+      "internal_storage": [
+        "Transient access serialization state only."
+      ],
+      "output_mapping": [
+        "mmio_ready/mmio_rvalid/mmio_rdata from CSR transactions; csr_write_en/csr_read_en/csr_addr/csr_wdata into csr_block."
+      ]
+    },
+    {
+      "module": "csr_block",
+      "inputs": [
+        "csr_write_en",
+        "csr_read_en",
+        "csr_addr",
+        "csr_wdata",
+        "busy",
+        "request_accepted",
+        "response_valid",
+        "stale_rejected",
+        "timeout_fired",
+        "integrity_error",
+        "clamp_event",
+        "fallback_active",
+        "last_sequence_id",
+        "last_fault_code",
+        "status_ack"
+      ],
+      "internal_storage": [
+        "Small configuration and status registers, each 32 bits or smaller; packed readback via 64-bit MMIO only."
+      ],
+      "output_mapping": [
+        "Drive configuration fanout to packetizer, safety, and fallback blocks; pack software-visible status into csr_rdata."
+      ]
+    },
+    {
+      "module": "request_packetizer",
+      "inputs": [
+        "cfg_enable",
+        "cfg_queue_enable",
+        "cfg_sequence_seed",
+        "cfg_geometry_format_id",
+        "cfg_flow_velocity_mps",
+        "geometry_desc_valid",
+        "geometry_desc_length",
+        "geometry_desc_framed",
+        "req_ready"
+      ],
+      "internal_storage": [
+        "Sequence counter, outstanding count, and minimal queue bookkeeping if enabled."
+      ],
+      "output_mapping": [
+        "Compose a fixed-width 128-bit packet and drive req_valid/req_data; report request_accepted and launch_request to status/monitor logic."
+      ]
+    },
+    {
+      "module": "response_receiver",
+      "inputs": [
+        "rsp_valid",
+        "rsp_data"
+      ],
+      "internal_storage": [
+        "Bounded response metadata capture only."
+      ],
+      "output_mapping": [
+        "Extract response_valid, response_sequence_id, response_integrity_tag, and response_payload_valid; drive rsp_ready to the stream."
+      ]
+    },
+    {
+      "module": "freshness_and_integrity_monitor",
+      "inputs": [
+        "launch_request",
+        "outstanding_request_count",
+        "cfg_timeout_cycles",
+        "request_sequence_id",
+        "response_valid",
+        "response_sequence_id",
+        "response_integrity_tag",
+        "watchdog_expired"
+      ],
+      "internal_storage": [
+        "Minimal active-request comparison state and last-sequence metadata."
+      ],
+      "output_mapping": [
+        "Generate sequence_match, integrity_ok, fresh_response_accepted, stale_rejected, integrity_error, fault_code, and last_sequence_id."
+      ]
+    },
+    {
+      "module": "timeout_watchdog",
+      "inputs": [
+        "launch_request",
+        "fresh_response_accepted",
+        "cfg_timeout_cycles",
+        "busy"
+      ],
+      "internal_storage": [
+        "Running/expired timer counter only."
+      ],
+      "output_mapping": [
+        "Generate timeout_fired, watchdog_running, and watchdog_expired."
+      ]
+    },
+    {
+      "module": "safety_supervisor",
+      "inputs": [
+        "cfg_bypass_mode",
+        "cfg_clamp_velocity_enable",
+        "cfg_fallback_hold_last_safe",
+        "cfg_min_actuator_position",
+        "cfg_max_actuator_position",
+        "cfg_max_slew_per_update",
+        "flow_velocity_mps",
+        "flow_velocity_valid",
+        "flow_velocity_in_range",
+        "advisory_position",
+        "advisory_valid",
+        "fault_active"
+      ],
+      "internal_storage": [
+        "Latest safe reference needed for slew limiting."
+      ],
+      "output_mapping": [
+        "Produce clamped_position, clamp_event, safety_ok, and safe_position for command mapping and fallback."
+      ]
+    },
+    {
+      "module": "actuator_command_mapper",
+      "inputs": [
+        "cfg_enable",
+        "cfg_bypass_mode",
+        "advisory_valid",
+        "advisory_position",
+        "safe_position",
+        "fallback_active"
+      ],
+      "internal_storage": [
+        "Minimal source-selection state if registered output timing is used."
+      ],
+      "output_mapping": [
+        "Drive mapped_cmd_valid, mapped_cmd_data, and actuator_enable toward the top-level actuator bus."
+      ]
+    },
+    {
+      "module": "safe_fallback_controller",
+      "inputs": [
+        "cfg_safe_fallback_position",
+        "cfg_fallback_hold_last_safe",
+        "safe_position",
+        "fault_active",
+        "timeout_fired",
+        "integrity_error",
+        "stale_rejected"
+      ],
+      "internal_storage": [
+        "Latched fault state and minimal fallback selection state."
+      ],
+      "output_mapping": [
+        "Drive fallback_active, fallback_position, and fault_latched."
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "Software is expected to configure velocity, geometry format, timeout, limits, and fallback policy before enabling request launch.",
+    "Request launch is blocked until enable and validation conditions are satisfied.",
+    "Only one outstanding request is maintained by default; the optional queue remains bounded to at most two entries.",
+    "Responses are accepted only after sequence and integrity checks pass and before timeout expiration.",
+    "Any stale, duplicated, corrupted, or late response forces safe fallback.",
+    "Fault indication persists according to CSR policy until software acknowledgment or a new clean transaction completes."
+  ],
+  "timing_notes": [
+    "Single synchronous clock fanout from clk to all modules.",
+    "Handshake logic should be registered or otherwise free of combinational ready/valid loops.",
+    "Timeout behavior must be bounded by cfg_timeout_cycles and independent of payload semantics.",
+    "Slew limiting is applied per update cycle in the safety supervisor.",
+    "Reset places the design into safe fallback with actuator enable deasserted and outstanding request state cleared."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json.",
+    "The top-level synthesizable module remains motor_control_top; no substitute top is introduced.",
+    "The design does not implement the surrogate model and does not expose hidden payload interfaces."
+  ]
+}

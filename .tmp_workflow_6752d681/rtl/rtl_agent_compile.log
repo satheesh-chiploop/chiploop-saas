@@ -1,0 +1,8 @@
+backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/request_packetizer.v:69: syntax error
+backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/request_packetizer.v:69: error: Malformed statement
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

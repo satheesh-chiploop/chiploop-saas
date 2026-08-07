@@ -1,0 +1,3680 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "motor_control_top",
+  "rtl_file_count": 10,
+  "module_count": 10,
+  "modules": [
+    {
+      "name": "actuator_command_mapper",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/actuator_command_mapper.v",
+      "input_count": 70,
+      "output_count": 34,
+      "inout_count": 0,
+      "input_port_count": 8,
+      "output_port_count": 3,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bypass_mode",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "advisory_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "advisory_position",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "safe_position",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mapped_cmd_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "mapped_cmd_data",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "actuator_enable",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "csr_block",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/csr_block.v",
+      "input_count": 117,
+      "output_count": 310,
+      "inout_count": 0,
+      "input_port_count": 17,
+      "output_port_count": 15,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "csr_write_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "csr_read_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "csr_addr",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "csr_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "csr_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bypass_mode",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_queue_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_timeout_cycles",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_safe_fallback_position",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_min_actuator_position",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_max_actuator_position",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_max_slew_per_update",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_sequence_seed",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_geometry_format_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_flow_velocity_mps",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_clamp_velocity_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_fallback_hold_last_safe",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_ack_fault_on_read",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "busy",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "request_accepted",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "response_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "stale_rejected",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "timeout_fired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "integrity_error",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "clamp_event",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "last_sequence_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "last_fault_code",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "status_ack",
+          "direction": "input",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "freshness_and_integrity_monitor",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/freshness_and_integrity_monitor.v",
+      "input_count": 87,
+      "output_count": 29,
+      "inout_count": 0,
+      "input_port_count": 10,
+      "output_port_count": 7,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "launch_request",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "outstanding_request_count",
+          "direction": "input",
+          "width": "[1:0]"
+        },
+        {
+          "name": "cfg_timeout_cycles",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "request_sequence_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "response_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "response_sequence_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "response_integrity_tag",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "watchdog_expired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "sequence_match",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "integrity_ok",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fresh_response_accepted",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "stale_rejected",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "integrity_error",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_code",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "last_sequence_id",
+          "direction": "output",
+          "width": "[15:0]"
+        }
+      ]
+    },
+    {
+      "name": "motor_control_top",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/motor_control_top.v",
+      "input_count": 215,
+      "output_count": 229,
+      "inout_count": 0,
+      "input_port_count": 10,
+      "output_port_count": 8,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_we",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_addr",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "mmio_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "mmio_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "mmio_rvalid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "mmio_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": "[127:0]"
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "rsp_data",
+          "direction": "input",
+          "width": "[127:0]"
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "actuator_cmd_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "actuator_cmd_data",
+          "direction": "output",
+          "width": "[31:0]"
+        }
+      ]
+    },
+    {
+      "name": "request_packetizer",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/request_packetizer.v",
+      "input_count": 103,
+      "output_count": 135,
+      "inout_count": 0,
+      "input_port_count": 11,
+      "output_port_count": 7,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_queue_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_sequence_seed",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_geometry_format_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_flow_velocity_mps",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "flow_velocity_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "flow_velocity_in_range",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "geometry_desc_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "geometry_desc_length",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "geometry_desc_framed",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": "[127:0]"
+        },
+        {
+          "name": "request_accepted",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "outstanding_request_count",
+          "direction": "output",
+          "width": "[1:0]"
+        },
+        {
+          "name": "launch_request",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "response_receiver",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/response_receiver.v",
+      "input_count": 131,
+      "output_count": 35,
+      "inout_count": 0,
+      "input_port_count": 4,
+      "output_port_count": 5,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "rsp_data",
+          "direction": "input",
+          "width": "[127:0]"
+        },
+        {
+          "name": "response_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "response_sequence_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "response_integrity_tag",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "response_payload_valid",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "safe_fallback_controller",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/safe_fallback_controller.v",
+      "input_count": 71,
+      "output_count": 34,
+      "inout_count": 0,
+      "input_port_count": 9,
+      "output_port_count": 3,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_safe_fallback_position",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_fallback_hold_last_safe",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "safe_position",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fault_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "timeout_fired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "integrity_error",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "stale_rejected",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_position",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fault_latched",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "safety_supervisor",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/safety_supervisor.v",
+      "input_count": 169,
+      "output_count": 66,
+      "inout_count": 0,
+      "input_port_count": 14,
+      "output_port_count": 4,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bypass_mode",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_clamp_velocity_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_fallback_hold_last_safe",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_min_actuator_position",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_max_actuator_position",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_max_slew_per_update",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "flow_velocity_mps",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "flow_velocity_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "flow_velocity_in_range",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "advisory_position",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "advisory_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fault_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "clamped_position",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "clamp_event",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "safety_ok",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "safe_position",
+          "direction": "output",
+          "width": "[31:0]"
+        }
+      ]
+    },
+    {
+      "name": "timeout_watchdog",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/timeout_watchdog.v",
+      "input_count": 37,
+      "output_count": 3,
+      "inout_count": 0,
+      "input_port_count": 6,
+      "output_port_count": 3,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "launch_request",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fresh_response_accepted",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_timeout_cycles",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "busy",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "timeout_fired",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "watchdog_running",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "watchdog_expired",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "top_level_bus_adapter",
+      "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/top_level_bus_adapter.v",
+      "input_count": 148,
+      "output_count": 148,
+      "inout_count": 0,
+      "input_port_count": 7,
+      "output_port_count": 7,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_we",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_addr",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "mmio_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "mmio_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "mmio_rvalid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "mmio_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "csr_write_en",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "csr_read_en",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "csr_addr",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "csr_wdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "csr_rdata",
+          "direction": "input",
+          "width": "[63:0]"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 215,
+    "output_count": 229,
+    "inout_count": 0,
+    "input_port_count": 10,
+    "output_port_count": 8,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "mmio_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "mmio_we",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "mmio_addr",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "mmio_wdata",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "mmio_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "mmio_rvalid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "mmio_rdata",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "req_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "req_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "req_data",
+        "direction": "output",
+        "width": "[127:0]"
+      },
+      {
+        "name": "rsp_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "rsp_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "rsp_data",
+        "direction": "input",
+        "width": "[127:0]"
+      },
+      {
+        "name": "actuator_cmd_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "actuator_cmd_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "actuator_cmd_data",
+        "direction": "output",
+        "width": "[31:0]"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 890,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 61,
+    "latch_target_count": 0,
+    "sequential_blocks": 18,
+    "posedge_blocks": 9,
+    "negedge_blocks": 9,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "actuator_enable_r",
+      "cfg_ack_fault_on_read_r",
+      "cfg_bypass_mode_r",
+      "cfg_clamp_velocity_enable_r",
+      "cfg_enable_r",
+      "cfg_fallback_hold_last_safe_r",
+      "cfg_flow_velocity_mps_r",
+      "cfg_geometry_format_id_r",
+      "cfg_max_actuator_position_r",
+      "cfg_max_slew_per_update_r",
+      "cfg_min_actuator_position_r",
+      "cfg_queue_enable_r",
+      "cfg_safe_fallback_position_r",
+      "cfg_sequence_seed_r",
+      "cfg_timeout_cycles_r",
+      "clamp_event_r",
+      "clamped_position_r",
+      "csr_addr_r",
+      "csr_read_en_r",
+      "csr_wdata_r",
+      "csr_write_en_r",
+      "fallback_active_r",
+      "fallback_position_r",
+      "fault_code_r",
+      "fault_latched_r",
+      "flow_velocity_in_range_r",
+      "flow_velocity_valid_r",
+      "fresh_response_accepted_r",
+      "hold_position_r",
+      "integrity_error_r",
+      "integrity_ok_r",
+      "last_safe_r",
+      "last_sequence_id_r",
+      "launch_request_r",
+      "mapped_cmd_data_r",
+      "mapped_cmd_valid_r",
+      "mmio_rdata_r",
+      "mmio_ready_r",
+      "mmio_rvalid_r",
+      "outstanding_request_count_r",
+      "req_data_r",
+      "req_valid_r",
+      "request_accepted_r",
+      "response_integrity_tag_r",
+      "response_payload_valid_r",
+      "response_sequence_id_r",
+      "response_valid_r",
+      "rsp_ready_r",
+      "safe_position_r",
+      "safety_ok_r"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 9,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "errors",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 1,
+    "warning_count": 0,
+    "error_count": 2,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "motor_control_top",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/actuator_command_mapper.v",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/csr_block.v",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/freshness_and_integrity_monitor.v",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/motor_control_top.v",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/request_packetizer.v",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/response_receiver.v",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/safe_fallback_controller.v",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/safety_supervisor.v",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/timeout_watchdog.v",
+      "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/top_level_bus_adapter.v"
+    ],
+    "stdout_tail": [],
+    "stderr_tail": [
+      "%Error: backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/request_packetizer.v:69:75: syntax error, unexpected ';', expecting IDENTIFIER-for-type",
+      "   69 |         flow_velocity_in_range_r <= (cfg_flow_velocity_mps >= 32'd20) && (;",
+      "      |                                                                           ^",
+      "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+      "%Error: Exiting due to 1 error(s)"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "motor_control_top",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/actuator_command_mapper.v",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/csr_block.v",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/freshness_and_integrity_monitor.v",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/motor_control_top.v",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/request_packetizer.v",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/response_receiver.v",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/safe_fallback_controller.v",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/safety_supervisor.v",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/timeout_watchdog.v",
+        "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/top_level_bus_adapter.v"
+      ],
+      "cwd": null,
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "%Error: backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/request_packetizer.v:69:75: syntax error, unexpected ';', expecting IDENTIFIER-for-type\n   69 |         flow_velocity_in_range_r <= (cfg_flow_velocity_mps >= 32'd20) && (;\n      |                                                                           ^\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\n",
+      "status": "failed",
+      "error": null,
+      "started_at": "2026-08-07T19:39:57.389578+00:00",
+      "ended_at": "2026-08-07T19:39:57.496928+00:00",
+      "elapsed_ms": 107
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 10,
+      "module_count": 10,
+      "modules": [
+        {
+          "name": "actuator_command_mapper",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/actuator_command_mapper.v",
+          "input_count": 70,
+          "output_count": 34,
+          "inout_count": 0,
+          "input_port_count": 8,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bypass_mode",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "advisory_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "advisory_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "safe_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mapped_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mapped_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_enable",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "csr_block",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/csr_block.v",
+          "input_count": 117,
+          "output_count": 310,
+          "inout_count": 0,
+          "input_port_count": 17,
+          "output_port_count": 15,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csr_write_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csr_read_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csr_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "csr_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "csr_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bypass_mode",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_queue_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_cycles",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_safe_fallback_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_min_actuator_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_actuator_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_slew_per_update",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_sequence_seed",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_geometry_format_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_flow_velocity_mps",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_clamp_velocity_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fallback_hold_last_safe",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_ack_fault_on_read",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_accepted",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_rejected",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "integrity_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamp_event",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "last_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "last_fault_code",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "status_ack",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "freshness_and_integrity_monitor",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/freshness_and_integrity_monitor.v",
+          "input_count": 87,
+          "output_count": 29,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "launch_request",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "outstanding_request_count",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_timeout_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "request_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_integrity_tag",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "watchdog_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sequence_match",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "integrity_ok",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fresh_response_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_rejected",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "integrity_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_code",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "last_sequence_id",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "motor_control_top",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/motor_control_top.v",
+          "input_count": 215,
+          "output_count": 229,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 8,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "mmio_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "actuator_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "request_packetizer",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/request_packetizer.v",
+          "input_count": 103,
+          "output_count": 135,
+          "inout_count": 0,
+          "input_port_count": 11,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_queue_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_sequence_seed",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_geometry_format_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_flow_velocity_mps",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_velocity_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "flow_velocity_in_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geometry_desc_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geometry_desc_length",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geometry_desc_framed",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "request_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "outstanding_request_count",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "launch_request",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "response_receiver",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/response_receiver.v",
+          "input_count": 131,
+          "output_count": 35,
+          "inout_count": 0,
+          "input_port_count": 4,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "response_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_sequence_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_integrity_tag",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_payload_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "safe_fallback_controller",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/safe_fallback_controller.v",
+          "input_count": 71,
+          "output_count": 34,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_safe_fallback_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_fallback_hold_last_safe",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fault_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "integrity_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_rejected",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fault_latched",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "safety_supervisor",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/safety_supervisor.v",
+          "input_count": 169,
+          "output_count": 66,
+          "inout_count": 0,
+          "input_port_count": 14,
+          "output_port_count": 4,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bypass_mode",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_clamp_velocity_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fallback_hold_last_safe",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_min_actuator_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_actuator_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_slew_per_update",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_velocity_mps",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_velocity_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "flow_velocity_in_range",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "advisory_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "advisory_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fault_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamped_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_event",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safety_ok",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_position",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "timeout_watchdog",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/timeout_watchdog.v",
+          "input_count": 37,
+          "output_count": 3,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "launch_request",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fresh_response_accepted",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "watchdog_running",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "watchdog_expired",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "top_level_bus_adapter",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/rtl/top_level_bus_adapter.v",
+          "input_count": 148,
+          "output_count": 148,
+          "inout_count": 0,
+          "input_port_count": 7,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "mmio_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "csr_write_en",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "csr_read_en",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "csr_addr",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "csr_wdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "csr_rdata",
+              "direction": "input",
+              "width": "[63:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 215,
+        "output_count": 229,
+        "inout_count": 0,
+        "input_port_count": 10,
+        "output_port_count": 8,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_we",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_addr",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "mmio_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "mmio_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "mmio_rvalid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "mmio_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "req_data",
+            "direction": "output",
+            "width": "[127:0]"
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rsp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "rsp_data",
+            "direction": "input",
+            "width": "[127:0]"
+          },
+          {
+            "name": "actuator_cmd_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_data",
+            "direction": "output",
+            "width": "[31:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 890,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 61,
+        "latch_target_count": 0,
+        "sequential_blocks": 18,
+        "posedge_blocks": 9,
+        "negedge_blocks": 9,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_enable_r",
+          "cfg_ack_fault_on_read_r",
+          "cfg_bypass_mode_r",
+          "cfg_clamp_velocity_enable_r",
+          "cfg_enable_r",
+          "cfg_fallback_hold_last_safe_r",
+          "cfg_flow_velocity_mps_r",
+          "cfg_geometry_format_id_r",
+          "cfg_max_actuator_position_r",
+          "cfg_max_slew_per_update_r",
+          "cfg_min_actuator_position_r",
+          "cfg_queue_enable_r",
+          "cfg_safe_fallback_position_r",
+          "cfg_sequence_seed_r",
+          "cfg_timeout_cycles_r",
+          "clamp_event_r",
+          "clamped_position_r",
+          "csr_addr_r",
+          "csr_read_en_r",
+          "csr_wdata_r",
+          "csr_write_en_r",
+          "fallback_active_r",
+          "fallback_position_r",
+          "fault_code_r",
+          "fault_latched_r",
+          "flow_velocity_in_range_r",
+          "flow_velocity_valid_r",
+          "fresh_response_accepted_r",
+          "hold_position_r",
+          "integrity_error_r",
+          "integrity_ok_r",
+          "last_safe_r",
+          "last_sequence_id_r",
+          "launch_request_r",
+          "mapped_cmd_data_r",
+          "mapped_cmd_valid_r",
+          "mmio_rdata_r",
+          "mmio_ready_r",
+          "mmio_rvalid_r",
+          "outstanding_request_count_r",
+          "req_data_r",
+          "req_valid_r",
+          "request_accepted_r",
+          "response_integrity_tag_r",
+          "response_payload_valid_r",
+          "response_sequence_id_r",
+          "response_valid_r",
+          "rsp_ready_r",
+          "safe_position_r",
+          "safety_ok_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 9,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 10,
+      "module_count": 10,
+      "modules": [
+        {
+          "name": "actuator_command_mapper",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/actuator_command_mapper.v",
+          "input_count": 70,
+          "output_count": 34,
+          "inout_count": 0,
+          "input_port_count": 8,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bypass_mode",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "advisory_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "advisory_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "safe_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mapped_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mapped_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_enable",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "csr_block",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/csr_block.v",
+          "input_count": 117,
+          "output_count": 310,
+          "inout_count": 0,
+          "input_port_count": 17,
+          "output_port_count": 15,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csr_write_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csr_read_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csr_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "csr_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "csr_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bypass_mode",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_queue_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_cycles",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_safe_fallback_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_min_actuator_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_actuator_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_slew_per_update",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_sequence_seed",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_geometry_format_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_flow_velocity_mps",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_clamp_velocity_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fallback_hold_last_safe",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_ack_fault_on_read",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_accepted",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_rejected",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "integrity_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamp_event",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "last_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "last_fault_code",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "status_ack",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "freshness_and_integrity_monitor",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/freshness_and_integrity_monitor.v",
+          "input_count": 87,
+          "output_count": 29,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "launch_request",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "outstanding_request_count",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_timeout_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "request_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "response_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_integrity_tag",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "watchdog_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sequence_match",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "integrity_ok",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fresh_response_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_rejected",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "integrity_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_code",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "last_sequence_id",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "motor_control_top",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/motor_control_top.v",
+          "input_count": 215,
+          "output_count": 229,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 8,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "mmio_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "actuator_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "request_packetizer",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/request_packetizer.v",
+          "input_count": 103,
+          "output_count": 135,
+          "inout_count": 0,
+          "input_port_count": 11,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_queue_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_sequence_seed",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_geometry_format_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_flow_velocity_mps",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_velocity_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "flow_velocity_in_range",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "geometry_desc_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "geometry_desc_length",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "geometry_desc_framed",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "request_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "outstanding_request_count",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "launch_request",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "response_receiver",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/response_receiver.v",
+          "input_count": 131,
+          "output_count": 35,
+          "inout_count": 0,
+          "input_port_count": 4,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "response_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_sequence_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_integrity_tag",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_payload_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "safe_fallback_controller",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/safe_fallback_controller.v",
+          "input_count": 71,
+          "output_count": 34,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_safe_fallback_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_fallback_hold_last_safe",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fault_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "integrity_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_rejected",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fault_latched",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "safety_supervisor",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/safety_supervisor.v",
+          "input_count": 169,
+          "output_count": 66,
+          "inout_count": 0,
+          "input_port_count": 14,
+          "output_port_count": 4,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bypass_mode",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_clamp_velocity_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fallback_hold_last_safe",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_min_actuator_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_actuator_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_slew_per_update",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_velocity_mps",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "flow_velocity_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "flow_velocity_in_range",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "advisory_position",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "advisory_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fault_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamped_position",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "clamp_event",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safety_ok",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_position",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "timeout_watchdog",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/timeout_watchdog.v",
+          "input_count": 37,
+          "output_count": 3,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "launch_request",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fresh_response_accepted",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_cycles",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "watchdog_running",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "watchdog_expired",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "top_level_bus_adapter",
+          "file": "backend/workflows/6752d681-c89b-4fa7-a948-8318c2ba6f5b/handoff/motor_control_top_ip_package/rtl/top_level_bus_adapter.v",
+          "input_count": 148,
+          "output_count": 148,
+          "inout_count": 0,
+          "input_port_count": 7,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "mmio_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "csr_write_en",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "csr_read_en",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "csr_addr",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "csr_wdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "csr_rdata",
+              "direction": "input",
+              "width": "[63:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 215,
+        "output_count": 229,
+        "inout_count": 0,
+        "input_port_count": 10,
+        "output_port_count": 8,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_we",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_addr",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "mmio_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "mmio_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "mmio_rvalid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "mmio_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "req_data",
+            "direction": "output",
+            "width": "[127:0]"
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rsp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "rsp_data",
+            "direction": "input",
+            "width": "[127:0]"
+          },
+          {
+            "name": "actuator_cmd_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd_data",
+            "direction": "output",
+            "width": "[31:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 954,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 62,
+        "latch_target_count": 0,
+        "sequential_blocks": 18,
+        "posedge_blocks": 9,
+        "negedge_blocks": 9,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_enable_r",
+          "cfg_ack_fault_on_read_r",
+          "cfg_bypass_mode_r",
+          "cfg_clamp_velocity_enable_r",
+          "cfg_enable_r",
+          "cfg_fallback_hold_last_safe_r",
+          "cfg_flow_velocity_mps_r",
+          "cfg_geometry_format_id_r",
+          "cfg_max_actuator_position_r",
+          "cfg_max_slew_per_update_r",
+          "cfg_min_actuator_position_r",
+          "cfg_queue_enable_r",
+          "cfg_safe_fallback_position_r",
+          "cfg_sequence_seed_r",
+          "cfg_timeout_cycles_r",
+          "clamp_event_r",
+          "clamped_position_r",
+          "csr_addr_r",
+          "csr_rdata_r",
+          "csr_read_en_r",
+          "csr_wdata_r",
+          "csr_write_en_r",
+          "fallback_active_r",
+          "fallback_position_r",
+          "fault_code_r",
+          "fault_latched_r",
+          "flow_velocity_in_range_r",
+          "flow_velocity_valid_r",
+          "fresh_response_accepted_r",
+          "hold_position_r",
+          "integrity_error_r",
+          "integrity_ok_r",
+          "last_safe_r",
+          "last_sequence_id_r",
+          "launch_request_r",
+          "mapped_cmd_data_r",
+          "mapped_cmd_valid_r",
+          "mmio_rdata_r",
+          "mmio_ready_r",
+          "mmio_rvalid_r",
+          "outstanding_request_count_r",
+          "req_data_r",
+          "req_valid_r",
+          "request_accepted_r",
+          "response_integrity_tag_r",
+          "response_payload_valid_r",
+          "response_sequence_id_r",
+          "response_valid_r",
+          "rsp_ready_r",
+          "safe_position_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 9,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 48,
+    "registers": [
+      {
+        "name": "CFG0_LO",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Configuration register group 0 low byte. Bit-packed control and policy fields.",
+        "fields": [
+          {
+            "name": "CFG_ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Master enable for request launch and supervised actuation."
+          },
+          {
+            "name": "CFG_BYPASS_MODE",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Policy bit allowing bypass-controlled behavior, but never bypassing safety when disabled."
+          },
+          {
+            "name": "CFG_QUEUE_ENABLE",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables a bounded request queue of at most two entries."
+          },
+          {
+            "name": "CFG_CLAMP_VELOCITY_ENABLE",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Allows out-of-envelope flow velocity to be clamped instead of faulting."
+          },
+          {
+            "name": "CFG_FALLBACK_HOLD_LAST_SAFE",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW",
+            "reset": 0,
+            "description": "Selects hold-last-safe fallback behavior."
+          },
+          {
+            "name": "CFG_ACK_FAULT_ON_READ",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RW",
+            "reset": 0,
+            "description": "Controls whether fault status is acknowledged on CSR read access."
+          }
+        ]
+      },
+      {
+        "name": "CFG0_HI",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Configuration register group 0 high byte. Reserved for future expansion within the same 32-bit word.",
+        "fields": [
+          {
+            "name": "RESERVED",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Reserved; must be written as zero and ignored on read."
+          }
+        ]
+      },
+      {
+        "name": "CFG_TIMEOUT_CYCLES_0",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Timeout cycle count bits [7:0].",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 232,
+            "description": "Lower byte of cfg_timeout_cycles. Full register width is 32 bits across four bytes; default total is 1000 cycles."
+          }
+        ]
+      },
+      {
+        "name": "CFG_TIMEOUT_CYCLES_1",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Timeout cycle count bits [15:8].",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 3,
+            "description": "Second byte of cfg_timeout_cycles."
+          }
+        ]
+      },
+      {
+        "name": "CFG_TIMEOUT_CYCLES_2",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Timeout cycle count bits [23:16].",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Third byte of cfg_timeout_cycles."
+          }
+        ]
+      },
+      {
+        "name": "CFG_TIMEOUT_CYCLES_3",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Timeout cycle count bits [31:24].",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Upper byte of cfg_timeout_cycles."
+          }
+        ]
+      },
+      {
+        "name": "CFG_SAFE_FALLBACK_POSITION_0",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Safe fallback position bits [7:0].",
+        "fields": [
+          {
+            "name": "SAFE_FALLBACK_POSITION",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower byte of cfg_safe_fallback_position."
+          }
+        ]
+      },
+      {
+        "name": "CFG_SAFE_FALLBACK_POSITION_1",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "Safe fallback position bits [15:8].",
+        "fields": [
+          {
+            "name": "SAFE_FALLBACK_POSITION",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Second byte of cfg_safe_fallback_position."
+          }
+        ]
+      },
+      {
+        "name": "CFG_SAFE_FALLBACK_POSITION_2",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Safe fallback position bits [23:16].",
+        "fields": [
+          {
+            "name": "SAFE_FALLBACK_POSITION",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Third byte of cfg_safe_fallback_position."
+          }
+        ]
+      },
+      {
+        "name": "CFG_SAFE_FALLBACK_POSITION_3",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Safe fallback position bits [31:24].",
+        "fields": [
+          {
+            "name": "SAFE_FALLBACK_POSITION",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Upper byte of cfg_safe_fallback_position."
+          }
+        ]
+      },
+      {
+        "name": "CFG_MIN_ACTUATOR_POSITION_0",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "Minimum actuator position bits [7:0].",
+        "fields": [
+          {
+            "name": "MIN_ACTUATOR_POSITION",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower byte of cfg_min_actuator_position."
+          }
+        ]
+      },
+      {
+        "name": "CFG_MIN_ACTUATOR_POSITION_1",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "Minimum actuator position bits [15:8].",
+        "fields": [
+          {
+            "name": "MIN_ACTUATOR_POSITION",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Second byte of cfg_min_actuator_position."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

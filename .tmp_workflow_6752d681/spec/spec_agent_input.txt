@@ -1,0 +1,52 @@
+The required synthesizable top module is motor_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must retain the motor-control request/response, safety, timeout, and actuator-command behavior.
+Design a synthesizable ASIC digital IP block named ai_active_aero_supervisor_top. The block shall not implement the DoMINO surrogate model; it shall only implement transport, validation, safety, timeout, and actuator-command supervision for a remote GPU/NIM service.
+
+1. Top-level microarchitecture
+- The top level shall expose a compact interface only: one register/memory-mapped configuration/status port with maximum 64-bit data width, one request stream and one response stream each with maximum 128-bit payload width, and one actuator command output bus. The design shall not expose geometry arrays, flow fields, pressure tensors, or surrogate payloads as individual pins.
+- The request/response path shall be packetized and sequence-numbered. The hardware shall maintain exactly one outstanding model request at a time unless a configuration bit explicitly enables a small fixed-depth queue of at most 2 entries.
+- The design shall include: CSR block, request_packetizer, response_receiver, freshness_and_integrity_monitor, timeout_watchdog, safety_supervisor, actuator_command_mapper, safe_fallback_controller, and top_level_bus_adapter.
+
+2. CSR/register behavior
+- Implement configuration registers for: enable, bypass_mode, timeout_cycles, safe_fallback_position, min_actuator_position, max_actuator_position, max_slew_per_update, sequence_seed, geometry_format_id, and flow_velocity_mps.
+- Implement status registers for: busy, request_accepted, response_valid, stale_rejected, timeout_fired, integrity_error, clamp_event, fallback_active, last_sequence_id, and last_fault_code.
+- Register widths shall be 32 bits or smaller, except the memory-mapped data path which may be 64 bits wide. No bulk model storage shall be implemented in flip-flops.
+
+3. Request packetization and transport
+- The request_packetizer shall accept a validated geometry descriptor stream and a flow-conditions header from internal control logic, then emit a bounded 128-bit request packet over req_stream using valid/ready handshake.
+- Each request packet shall include at minimum: command type, sequence number, geometry format identifier, geometry length or descriptor length, flow-conditions tag, and integrity tag/CRC field.
+- Geometry data shall be transferred as bounded packets or descriptors only; the RTL shall not parse STL mesh contents beyond basic framing, format, and length validation.
+- The design shall support the reference operating envelope of stream velocity from 20 to 55 m/s. Incoming velocity outside this range shall raise a fault and force safe fallback unless a policy register allows clamping to the envelope.
+
+4. Response handling and stale rejection
+- The response_receiver shall accept a 128-bit valid/ready response stream from the external GPU service.
+- The freshness_and_integrity_monitor shall compare the response sequence number to the outstanding request sequence number, verify response integrity fields, and ensure the response has not exceeded timeout_cycles.
+- If sequence mismatch, duplicated response, corrupted integrity tag, or timeout occurs, the response shall be rejected, stale_rejected or integrity_error shall be asserted, and the actuator path shall transition to safe fallback.
+- The design shall not assume successful inference; response handling must be correct even when no response arrives.
+
+5. Actuator supervision
+- The actuator_command_mapper shall convert accepted advisory outputs into actuator commands using programmable mapping registers.
+- The safety_supervisor shall enforce min/max position limits and slew-rate limiting each update cycle.
+- If an advisory command exceeds limits, the design shall clamp it and assert clamp_event.
+- If bypass_mode is disabled, model advice shall never directly bypass the safety_supervisor.
+- The safe_fallback_controller shall output a programmable safe posture, either a hold-last-safe-command or a fixed default safe position selected by CSR.
+
+6. Timeout and fault policy
+- The timeout_watchdog shall begin when a request is launched and shall expire after timeout_cycles if no matching valid response is accepted.
+- On timeout or any integrity/freshness fault, fallback_active shall assert and actuator outputs shall be driven to the safe fallback controller output.
+- Fault indication shall persist until acknowledged by software or until a new clean request/response transaction completes, based on CSR policy.
+
+7. Implementation and synthesis constraints
+- The design shall be synthesizable in standard-cell ASIC flow.
+- Bulk payload storage shall not be implemented using inferred memories, reg arrays, or flip-flop FIFOs. Any short packet buffering used for stream alignment shall be limited to a small bounded skid buffer or queue and must not store the model payload beyond what is required for protocol staging.
+- If a design variant requires external payload memory in a Sky130 path, only the hard macro sky130_sram_1kbyte_1rw1r_32x256_8 may be used, with ports clk0, csb0, web0, wmask0[3:0], addr0[7:0], din0[31:0], and dout0[31:0]. Instantiate multiple banks as needed. Do not use inferred SRAM or register arrays for bulk storage. Before ASIC implementation, require behavioral Verilog, Liberty, LEF, GDS, and SPICE collateral for the macro; if any are missing, stop at the memory-collateral gate and do not substitute standard-cell storage.
+- For the present architecture-definition deliverable, external bulk storage is optional and not required; the preferred implementation is streaming-only plus minimal control registers.
+
+8. Reset and bring-up
+- On reset, the design shall enter safe fallback, clear outstanding request state, deassert actuator enable, and set status registers to known defaults.
+- Software shall configure velocity, geometry format, timeout, and limits before enabling request launch.
+
+9. Verification-oriented RTL requirements
+- All state transitions shall be encoded in explicit FSMs with enumerated states.
+- Handshake logic shall be free of combinational ready/valid loops.
+- Assertions shall be provided for sequence match, no-double-launch, timeout liveness, clamp correctness, and fallback activation on faults.
+ASIC MEMORY CONTRACT (mandatory): instantiate sky130_sram_1kbyte_1rw1r_32x256_8 for bulk payload/history/FIFO storage using clk0, csb0, web0, wmask0[3:0], addr0[7:0], din0[31:0], and dout0[31:0]. Do not expand payload, history, FIFO, or telemetry storage into individually named registers, flip-flop arrays, or inferred memories. Small control/status registers are allowed.
