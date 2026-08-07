@@ -1,0 +1,11 @@
+
+
+Issues:
+❌ Missing expected RTL files: ['fault_manager.v', 'motor_control_top.v', 'transaction_controller.v']
+⚠ Owned signal 'request_active' from 'transaction_controller.request_active' not found in RTL.
+⚠ Owned signal 'request_permitted' from 'transaction_controller.request_permitted' not found in RTL.
+⚠ Owned signal 'response_permitted' from 'transaction_controller.response_permitted' not found in RTL.
+❌ Top RTL file missing after generation: motor_control_top.v
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

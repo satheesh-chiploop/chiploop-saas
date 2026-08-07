@@ -1,0 +1,10 @@
+
+
+Issues:
+❌ Module 'fault_manager' missing ports vs spec: ['fault_set_in', 'clamp_event', 'control_enable', 'fault_code', 'safe_fallback_active', 'model_ready']
+❌ Module 'fault_manager' has extra ports vs spec: ['fault_set', 'request_active', 'request_permitted', 'response_permitted', 'timeout_active', 'resp_malformed', 'resp_seq_mismatch', 'fault_code_out', 'fault_count']
+❌ Module 'transaction_controller' missing ports vs spec: ['model_ready']
+❌ Module 'transaction_controller' has extra ports vs spec: ['resp_stale', 'resp_malformed', 'resp_seq_mismatch', 'sequence_progress']
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

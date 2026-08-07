@@ -1,0 +1,455 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "abstract",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": [
+      {
+        "name": "CONTROL_ENABLE",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Master enable for request launch and model-derived actuation.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When set, the controller may launch bounded requests and release model-derived actuator commands if safety policy permits."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "STREAM_TIMEOUT_CYCLES",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Programmable timeout in clock cycles, exposed as a 32-bit little-endian value across four 8-bit register bytes.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 80,
+            "description": "Least-significant byte of the timeout budget."
+          }
+        ]
+      },
+      {
+        "name": "STREAM_TIMEOUT_CYCLES_H1",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Byte 1 of the programmable timeout cycle count.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 195,
+            "description": "Second byte of the timeout budget."
+          }
+        ]
+      },
+      {
+        "name": "STREAM_TIMEOUT_CYCLES_H2",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Byte 2 of the programmable timeout cycle count.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES[23:16]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Third byte of the timeout budget."
+          }
+        ]
+      },
+      {
+        "name": "STREAM_TIMEOUT_CYCLES_H3",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "Byte 3 of the programmable timeout cycle count.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES[31:24]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most-significant byte of the timeout budget."
+          }
+        ]
+      },
+      {
+        "name": "MIN_ACTUATOR_CMD",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Lower clamp bound for the actuator command, exposed as a 32-bit little-endian value across four 8-bit register bytes.",
+        "fields": [
+          {
+            "name": "MIN_CMD[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least-significant byte of the minimum actuator command."
+          }
+        ]
+      },
+      {
+        "name": "MIN_ACTUATOR_CMD_H1",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Byte 1 of the minimum actuator command.",
+        "fields": [
+          {
+            "name": "MIN_CMD[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Second byte of the minimum actuator command."
+          }
+        ]
+      },
+      {
+        "name": "MIN_ACTUATOR_CMD_H2",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "Byte 2 of the minimum actuator command.",
+        "fields": [
+          {
+            "name": "MIN_CMD[23:16]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Third byte of the minimum actuator command."
+          }
+        ]
+      },
+      {
+        "name": "MIN_ACTUATOR_CMD_H3",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "Byte 3 of the minimum actuator command.",
+        "fields": [
+          {
+            "name": "MIN_CMD[31:24]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most-significant byte of the minimum actuator command."
+          }
+        ]
+      },
+      {
+        "name": "MAX_ACTUATOR_CMD",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Upper clamp bound for the actuator command, exposed as a 32-bit little-endian value across four 8-bit register bytes.",
+        "fields": [
+          {
+            "name": "MAX_CMD[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 255,
+            "description": "Least-significant byte of the maximum actuator command."
+          }
+        ]
+      },
+      {
+        "name": "MAX_ACTUATOR_CMD_H1",
+        "offset": "0x0D",
+        "access": "RW",
+        "description": "Byte 1 of the maximum actuator command.",
+        "fields": [
+          {
+            "name": "MAX_CMD[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 255,
+            "description": "Second byte of the maximum actuator command."
+          }
+        ]
+      },
+      {
+        "name": "MAX_ACTUATOR_CMD_H2",
+        "offset": "0x0E",
+        "access": "RW",
+        "description": "Byte 2 of the maximum actuator command.",
+        "fields": [
+          {
+            "name": "MAX_CMD[23:16]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 255,
+            "description": "Third byte of the maximum actuator command."
+          }
+        ]
+      },
+      {
+        "name": "MAX_ACTUATOR_CMD_H3",
+        "offset": "0x0F",
+        "access": "RW",
+        "description": "Byte 3 of the maximum actuator command.",
+        "fields": [
+          {
+            "name": "MAX_CMD[31:24]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 255,
+            "description": "Most-significant byte of the maximum actuator command."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_FALLBACK_CMD",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Fallback actuator command used on faults or disable conditions, exposed as a 32-bit little-endian value across four 8-bit register bytes.",
+        "fields": [
+          {
+            "name": "FALLBACK_CMD[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least-significant byte of the safe fallback command."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_FALLBACK_CMD_H1",
+        "offset": "0x11",
+        "access": "RW",
+        "description": "Byte 1 of the safe fallback command.",
+        "fields": [
+          {
+            "name": "FALLBACK_CMD[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Second byte of the safe fallback command."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_FALLBACK_CMD_H2",
+        "offset": "0x12",
+        "access": "RW",
+        "description": "Byte 2 of the safe fallback command.",
+        "fields": [
+          {
+            "name": "FALLBACK_CMD[23:16]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Third byte of the safe fallback command."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_FALLBACK_CMD_H3",
+        "offset": "0x13",
+        "access": "RW",
+        "description": "Byte 3 of the safe fallback command.",
+        "fields": [
+          {
+            "name": "FALLBACK_CMD[31:24]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most-significant byte of the safe fallback command."
+          }
+        ]
+      },
+      {
+        "name": "EXPECTED_SEQ",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Expected transaction sequence number for the next request/response exchange, exposed as a 16-bit little-endian value across two 8-bit register bytes.",
+        "fields": [
+          {
+            "name": "EXPECTED_SEQ[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 1,
+            "description": "Least-significant byte of the expected sequence number."
+          }
+        ]
+      },
+      {
+        "name": "EXPECTED_SEQ_H1",
+        "offset": "0x15",
+        "access": "RW",
+        "description": "Byte 1 of the expected transaction sequence number.",
+        "fields": [
+          {
+            "name": "EXPECTED_SEQ[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most-significant byte of the expected sequence number."
+          }
+        ]
+      },
+      {
+        "name": "MODEL_READY",
+        "offset": "0x18",
+        "access": "RO",
+        "description": "Model-ready status reflecting whether the controller is permitted to issue or accept model-derived actuation.",
+        "fields": [
+          {
+            "name": "READY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates readiness for model-derived operation."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_LATCHED",
+        "offset": "0x1C",
+        "access": "RO",
+        "description": "Latched fault status.",
+        "fields": [
+          {
+            "name": "LATched",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates that at least one fault condition has been latched."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "LAST_SEQ_SEEN",
+        "offset": "0x20",
+        "access": "RO",
+        "description": "Most recent validated sequence number, exposed as a 16-bit little-endian value across two 8-bit register bytes.",
+        "fields": [
+          {
+            "name": "LAST_SEQ[7:0]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Least-significant byte of the last validated sequence number."
+          }
+        ]
+      },
+      {
+        "name": "LAST_SEQ_SEEN_H1",
+        "offset": "0x21",
+        "access": "RO",
+        "description": "Byte 1 of the most recent validated sequence number.",
+        "fields": [
+          {
+            "name": "LAST_SEQ[15:8]",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most-significant byte of the last validated sequence number."
+          }
+        ]
+      },
+      {
+        "name": "LAST_ERROR_CODE",
+        "offset": "0x24",
+        "access": "RO",
+        "description": "Most recent fault/error code.",
+        "fields": [
+          {
+            "name": "CODE",
+            "lsb": 7,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Compact fault code describing the most recent safety or validation failure."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "FAULT_LATCHED",
+        "description": "Asserted when a fault condition is latched and safe fallback behavior is active."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Write STREAM_TIMEOUT_CYCLES to the desired watchdog budget; default reset value corresponds to 0x0000C350.",
+      "Program MIN_ACTUATOR_CMD and MAX_ACTUATOR_CMD to the valid command envelope before enabling actuation.",
+      "Program SAFE_FALLBACK_CMD to the desired fail-safe actuator value.",
+      "Program EXPECTED_SEQ to the starting sequence number for the first transaction.",
+      "Set CONTROL_ENABLE.ENABLE to 1 only after all safety-related configuration is complete."
+    ],
+    "polling_sequence": [
+      "Read MODEL_READY to determine whether model-derived actuation is currently permitted.",
+      "Read FAULT_LATCHED and LAST_ERROR_CODE to determine whether the controller has forced safe fallback.",
+      "Read LAST_SEQ_SEEN after successful responses to confirm progression of the validated sequence number.",
+      "Monitor ACTUATOR output behavior externally; software should not infer payload or CFD details from the register map."
+    ],
+    "irq_sequence": [
+      "On FAULT_LATCHED assertion, immediately stop issuing new requests.",
+      "Read LAST_ERROR_CODE to classify the fault cause.",
+      "Optionally clear the fault by writing the dedicated fault-clear control path if exposed by the implementation contract.",
+      "Reconfigure timeout, sequence, and clamp bounds if needed before re-enabling CONTROL_ENABLE."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is limited to the documented control/status fields and does not introduce new hierarchy or unsupported bus semantics.",
+    "Wider-than-8-bit values are split across byte registers to match the requested firmware-visible map style without changing the top-level RTL ports.",
+    "The design remains hierarchical with motor_control_top as the authoritative synthesis top module."
+  ]
+}

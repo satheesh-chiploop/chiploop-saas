@@ -1,0 +1,119 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "motor_control_top",
+  "generated_at": "2026-08-07T16:51:51.555730",
+  "file_count": 22,
+  "files": [
+    {
+      "path": "docs/arch/digital_architecture.json",
+      "sha256": "19fbfd09509d7808e420c8dddf5b22bf44bc153db4e6113da27d2b430fceef79",
+      "bytes": 21460
+    },
+    {
+      "path": "docs/microarch/digital_microarchitecture.json",
+      "sha256": "1084c11f2411678389283d602915fcc4e352ef2836b0a620daaf2da585e7bdbe",
+      "bytes": 15564
+    },
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "623be969ce1bbecc0aeb2fd5e4fa43ea97a2b1975a6dc77253a662a24d5848fa",
+      "bytes": 14168
+    },
+    {
+      "path": "docs/regmap/digital_regmap_raw_output.txt",
+      "sha256": "623be969ce1bbecc0aeb2fd5e4fa43ea97a2b1975a6dc77253a662a24d5848fa",
+      "bytes": 14168
+    },
+    {
+      "path": "docs/spec/motor_control_top_spec.json",
+      "sha256": "36c0b46c315a0a78825a19a7443635ac2b05689aa69e256eb68bc3db449e6a57",
+      "bytes": 55933
+    },
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "35aa96d9ffda2f50913d3db046550b5ef4ad3deda812d806bd9f785b3a137c50",
+      "bytes": 14315
+    },
+    {
+      "path": "docs/spec/spec_agent_normalized.json",
+      "sha256": "36c0b46c315a0a78825a19a7443635ac2b05689aa69e256eb68bc3db449e6a57",
+      "bytes": 55933
+    },
+    {
+      "path": "misc/power_intent_findings.json",
+      "sha256": "7fa145e2180b4086fc49a73c3fd5f9021950b98a84dc26b902eddc4f6a7ccf59",
+      "bytes": 289
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "d4c02d01a015def7dd09a1d75615d8ed8fec49937de2f33bdf381b6b246b5ea2",
+      "bytes": 419
+    },
+    {
+      "path": "misc/rtl_agent_preflight.json",
+      "sha256": "2f40c4ee92cebe0819bd6979da3d3b746b7d93a90e3ddd6128273c52776e3be4",
+      "bytes": 420
+    },
+    {
+      "path": "misc/rtl_quality_gate.json",
+      "sha256": "9c30b9e0d26d0d2420dd3e382db02fe22903dc01c7f3eee9aa57494f92dec1da",
+      "bytes": 159
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "3ad324bdfb62922cc658c08d81258a32893fa9d4b0f110ad4c9e408afc2c3ad8",
+      "bytes": 2280
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "f41dde14923d5d52a99ca2d7e1373ba2f47fe0e4a714a3eff83b3628e3a86670",
+      "bytes": 776
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "76e75c796fbac581a561c45aca9ca0c22a37f836cf71a6f3bf2e37fbb98acf47",
+      "bytes": 324
+    },
+    {
+      "path": "rtl/command_shaper.v",
+      "sha256": "b27e7f1c41d369db8d7609ad2d3515d1ea5357b20d1508caa0675d2272c192f0",
+      "bytes": 1314
+    },
+    {
+      "path": "rtl/control_status_regfile.v",
+      "sha256": "24931dea07e37e610175e2a5f4463955de727b94cfd7161cd7f863cd1a26d0c3",
+      "bytes": 4523
+    },
+    {
+      "path": "rtl/fault_manager.v",
+      "sha256": "040ca5b09c7cd2ecb241fff9399d87fdf455fabd62ba43cc6411d6bfc2d4629c",
+      "bytes": 766
+    },
+    {
+      "path": "rtl/freshness_timeout_monitor.v",
+      "sha256": "189bb1160e20f89a5a2e81560c2a1428feac9c955b9b72faff155cb018202eb8",
+      "bytes": 2566
+    },
+    {
+      "path": "rtl/motor_control_top.v",
+      "sha256": "25797a370cdbbbbbbc9283958c6c635c7659e271851a8b0db305b86f06542381",
+      "bytes": 5883
+    },
+    {
+      "path": "rtl/request_packer.v",
+      "sha256": "18e2d6430e8a9fee619404c9bbef23b549bd2e7373d1024f2bbdf893e4d556cc",
+      "bytes": 2249
+    },
+    {
+      "path": "rtl/response_unpacker.v",
+      "sha256": "d06548a2eb874412b251f1a9d8b11f1b372c2570b18ff5f5f1250d73e19a25c9",
+      "bytes": 2082
+    },
+    {
+      "path": "rtl/transaction_controller.v",
+      "sha256": "a5a1be596465b848055494f118e7102fdb71f0501dd631780a6df50942deaa15",
+      "bytes": 993
+    }
+  ]
+}

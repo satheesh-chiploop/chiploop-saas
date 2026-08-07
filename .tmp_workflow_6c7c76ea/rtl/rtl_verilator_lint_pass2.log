@@ -1,0 +1,113 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.214 MB sources in 9 modules, into 0.059 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.023 s (elab=0.003, cvt=0.010, bld=0.000); cpu 0.023 s on 1 threads; allocated 32.359 MB
+
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:148:10: Instance pin connected by name with empty reference: 'fault_set'
+  148 |         .fault_set(),
+      |          ^~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: pass2/motor_control_top.v:168:10: Instance pin connected by name with empty reference: 'fault_count'
+  168 |         .fault_count()
+      |          ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:27:17: Signal is not used: 'last_seq_seen'
+                                                      : ... note: In instance 'motor_control_top'
+   27 |     wire [15:0] last_seq_seen;
+      |                 ^~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNDRIVEN: pass2/motor_control_top.v:30:10: Signal is not driven: 'fault_set'
+                                                  : ... note: In instance 'motor_control_top'
+   30 |     wire fault_set;
+      |          ^~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047
+                   ... Use "/* verilator lint_off UNDRIVEN */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:40:10: Signal is not used: 'sequence_progress'
+                                                      : ... note: In instance 'motor_control_top'
+   40 |     wire sequence_progress;
+      |          ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:45:10: Signal is not used: 'resp_integrity_ok'
+                                                      : ... note: In instance 'motor_control_top'
+   45 |     wire resp_integrity_ok;
+      |          ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:46:16: Signal is not used: 'response_status'
+                                                      : ... note: In instance 'motor_control_top'
+   46 |     wire [7:0] response_status;
+      |                ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:47:17: Signal is not used: 'response_seq'
+                                                      : ... note: In instance 'motor_control_top'
+   47 |     wire [15:0] response_seq;
+      |                 ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:49:10: Signal is not used: 'clamp_event'
+                                                      : ... note: In instance 'motor_control_top'
+   49 |     wire clamp_event;
+      |          ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/motor_control_top.v:50:10: Signal is not used: 'packet_valid'
+                                                      : ... note: In instance 'motor_control_top'
+   50 |     wire packet_valid;
+      |          ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/command_shaper.v:8:18: Signal is not used: 'safe_fallback_cmd'
+                                                  : ... note: In instance 'motor_control_top.u_cmd'
+    8 |     input [31:0] safe_fallback_cmd,
+      |                  ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/command_shaper.v:15:16: Signal is not used: 'clipped_cmd'
+                                                   : ... note: In instance 'motor_control_top.u_cmd'
+   15 |     reg [31:0] clipped_cmd;
+      |                ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/command_shaper.v:17:9: Signal is not used: 'clamp_needed'
+                                                  : ... note: In instance 'motor_control_top.u_cmd'
+   17 |     reg clamp_needed;
+      |         ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/fault_manager.v:7:11: Signal is not used: 'request_active'
+                                                 : ... note: In instance 'motor_control_top.u_fault'
+    7 |     input request_active,
+      |           ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/fault_manager.v:8:11: Signal is not used: 'request_permitted'
+                                                 : ... note: In instance 'motor_control_top.u_fault'
+    8 |     input request_permitted,
+      |           ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/fault_manager.v:9:11: Signal is not used: 'response_permitted'
+                                                 : ... note: In instance 'motor_control_top.u_fault'
+    9 |     input response_permitted,
+      |           ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/fault_manager.v:10:11: Signal is not used: 'timeout_active'
+                                                  : ... note: In instance 'motor_control_top.u_fault'
+   10 |     input timeout_active,
+      |           ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/fault_manager.v:11:11: Signal is not used: 'resp_malformed'
+                                                  : ... note: In instance 'motor_control_top.u_fault'
+   11 |     input resp_malformed,
+      |           ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/fault_manager.v:12:11: Signal is not used: 'resp_seq_mismatch'
+                                                  : ... note: In instance 'motor_control_top.u_fault'
+   12 |     input resp_seq_mismatch,
+      |           ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/freshness_timeout_monitor.v:16:17: Signal is not used: 'fault_code'
+                                                              : ... note: In instance 'motor_control_top.u_mon'
+   16 |     input [7:0] fault_code,
+      |                 ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/freshness_timeout_monitor.v:22:15: Signal is not used: 'fault_code_latched'
+                                                              : ... note: In instance 'motor_control_top.u_mon'
+   22 |     reg [7:0] fault_code_latched;
+      |               ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/response_unpacker.v:2:11: Signal is not used: 'clk'
+                                                     : ... note: In instance 'motor_control_top.u_resp'
+    2 |     input clk,
+      |           ^~~
+%Warning-UNUSEDSIGNAL: pass2/response_unpacker.v:3:11: Signal is not used: 'rst_n'
+                                                     : ... note: In instance 'motor_control_top.u_resp'
+    3 |     input rst_n,
+      |           ^~~~~
+%Warning-UNUSEDSIGNAL: pass2/transaction_controller.v:2:11: Signal is not used: 'clk'
+                                                          : ... note: In instance 'motor_control_top.u_txn'
+    2 |     input clk,
+      |           ^~~
+%Warning-UNUSEDSIGNAL: pass2/transaction_controller.v:3:11: Signal is not used: 'rst_n'
+                                                          : ... note: In instance 'motor_control_top.u_txn'
+    3 |     input rst_n,
+      |           ^~~~~
+
+=== RETURN CODE ===
+0
