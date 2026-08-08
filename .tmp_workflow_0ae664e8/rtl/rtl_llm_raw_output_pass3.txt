@@ -1,0 +1,622 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    clk,
+    rst_n,
+    req_valid,
+    req_ready,
+    req_data,
+    resp_valid,
+    resp_ready,
+    resp_data,
+    act_valid,
+    act_ready,
+    act_data,
+    service_busy,
+    service_done,
+    service_error
+);
+input clk;
+input rst_n;
+input req_valid;
+output req_ready;
+input [127:0] req_data;
+output resp_valid;
+input resp_ready;
+output [127:0] resp_data;
+output act_valid;
+input act_ready;
+output [63:0] act_data;
+input service_busy;
+input service_done;
+input service_error;
+
+wire req_ready_int;
+wire pkt_valid;
+wire pkt_error;
+wire [7:0] pkt_opcode;
+wire [15:0] pkt_seq;
+wire [7:0] pkt_velocity;
+wire [23:0] pkt_geom_meta;
+wire [7:0] pkt_ctrl_flags;
+wire [63:0] pkt_summary;
+wire pkt_accept;
+wire service_req;
+wire fresh_ok;
+wire fresh_stale;
+wire timeout;
+wire [15:0] outstanding_seq;
+wire [15:0] age_counter;
+wire [15:0] clamped_value;
+wire [7:0] mode_bits;
+wire clamp_hit;
+wire safe_indicator;
+wire [15:0] safe_value;
+wire [7:0] safe_mode;
+wire fallback_active;
+wire [31:0] fallback_summary;
+wire [3:0] state_code;
+wire [63:0] status_summary;
+wire resp_valid_int;
+wire act_valid_int;
+
+assign req_ready = req_ready_int;
+assign resp_valid = resp_valid_int;
+assign act_valid = act_valid_int;
+assign resp_data = {96'h000000000000000000000000, status_summary};
+assign act_data = {16'h0000, safe_mode, mode_bits, safe_indicator, clamp_hit, clamped_value, safe_value};
+
+adaptive_aero_control_packet_decode u_packet_decode (
+    .clk(clk),
+    .rst_n(rst_n),
+    .req_valid_i(req_valid),
+    .req_data_i(req_data),
+    .req_ready_o(req_ready_int),
+    .pkt_valid_o(pkt_valid),
+    .pkt_error_o(pkt_error),
+    .pkt_opcode_o(pkt_opcode),
+    .pkt_seq_o(pkt_seq),
+    .pkt_velocity_o(pkt_velocity),
+    .pkt_geom_meta_o(pkt_geom_meta),
+    .pkt_ctrl_flags_o(pkt_ctrl_flags),
+    .pkt_summary_o(pkt_summary)
+);
+
+adaptive_aero_control_freshness_checker u_freshness_checker (
+    .clk(clk),
+    .rst_n(rst_n),
+    .req_seq_i(pkt_seq),
+    .req_accept_i(pkt_accept),
+    .resp_seq_i(pkt_seq),
+    .resp_seen_i(resp_valid_int),
+    .timeout_limit_i(16'd256),
+    .timeout_clear_i(fresh_ok),
+    .fresh_ok_o(fresh_ok),
+    .fresh_stale_o(fresh_stale),
+    .timeout_o(timeout),
+    .outstanding_seq_o(outstanding_seq),
+    .age_counter_o(age_counter)
+);
+
+adaptive_aero_control_clamp_block u_clamp_block (
+    .clk(clk),
+    .rst_n(rst_n),
+    .recommendation_i({pkt_ctrl_flags, pkt_seq[7:0], pkt_velocity, pkt_opcode}),
+    .safe_mode_i(fallback_active),
+    .fallback_active_i(fallback_active),
+    .min_limit_i(16'h0000),
+    .max_limit_i(16'h03FF),
+    .clamped_value_o(clamped_value),
+    .mode_bits_o(mode_bits),
+    .clamp_hit_o(clamp_hit),
+    .safe_indicator_o(safe_indicator)
+);
+
+adaptive_aero_control_safe_fallback_controller u_safe_fallback_controller (
+    .clk(clk),
+    .rst_n(rst_n),
+    .trigger_reset_i(~rst_n),
+    .trigger_invalid_i(pkt_error),
+    .trigger_stale_i(fresh_stale),
+    .trigger_timeout_i(timeout),
+    .trigger_service_error_i(service_error),
+    .safe_value_o(safe_value),
+    .safe_mode_o(safe_mode),
+    .fallback_active_o(fallback_active),
+    .fallback_summary_o(fallback_summary)
+);
+
+adaptive_aero_control_fsm u_fsm (
+    .clk(clk),
+    .rst_n(rst_n),
+    .pkt_valid_i(pkt_valid),
+    .pkt_error_i(pkt_error),
+    .pkt_opcode_i(pkt_opcode),
+    .pkt_seq_i(pkt_seq),
+    .pkt_velocity_i(pkt_velocity),
+    .pkt_geom_meta_i(pkt_geom_meta),
+    .pkt_ctrl_flags_i(pkt_ctrl_flags),
+    .pkt_summary_i(pkt_summary),
+    .service_busy_i(service_busy),
+    .service_done_i(service_done),
+    .service_error_i(service_error),
+    .fresh_ok_i(fresh_ok),
+    .fresh_stale_i(fresh_stale),
+    .timeout_i(timeout),
+    .clamp_hit_i(clamp_hit),
+    .pkt_accept_o(pkt_accept),
+    .service_req_o(service_req),
+    .resp_valid_o(resp_valid_int),
+    .resp_accept_o(resp_ready),
+    .act_valid_o(act_valid_int),
+    .act_accept_i(act_ready),
+    .fallback_active_o(),
+    .error_hold_o(),
+    .state_code_o(state_code),
+    .status_summary_o(status_summary)
+);
+
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN adaptive_aero_control_packet_decode.v---
+module adaptive_aero_control_packet_decode (
+    clk,
+    rst_n,
+    req_valid_i,
+    req_data_i,
+    req_ready_o,
+    pkt_valid_o,
+    pkt_error_o,
+    pkt_opcode_o,
+    pkt_seq_o,
+    pkt_velocity_o,
+    pkt_geom_meta_o,
+    pkt_ctrl_flags_o,
+    pkt_summary_o
+);
+input clk;
+input rst_n;
+input req_valid_i;
+input [127:0] req_data_i;
+output req_ready_o;
+output pkt_valid_o;
+output pkt_error_o;
+output [7:0] pkt_opcode_o;
+output [15:0] pkt_seq_o;
+output [7:0] pkt_velocity_o;
+output [23:0] pkt_geom_meta_o;
+output [7:0] pkt_ctrl_flags_o;
+output [63:0] pkt_summary_o;
+
+reg req_ready_r;
+reg pkt_valid_r;
+reg pkt_error_r;
+reg [7:0] pkt_opcode_r;
+reg [15:0] pkt_seq_r;
+reg [7:0] pkt_velocity_r;
+reg [23:0] pkt_geom_meta_r;
+reg [7:0] pkt_ctrl_flags_r;
+reg [63:0] pkt_summary_r;
+
+assign req_ready_o = req_ready_r;
+assign pkt_valid_o = pkt_valid_r;
+assign pkt_error_o = pkt_error_r;
+assign pkt_opcode_o = pkt_opcode_r;
+assign pkt_seq_o = pkt_seq_r;
+assign pkt_velocity_o = pkt_velocity_r;
+assign pkt_geom_meta_o = pkt_geom_meta_r;
+assign pkt_ctrl_flags_o = pkt_ctrl_flags_r;
+assign pkt_summary_o = pkt_summary_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        req_ready_r <= 1'b0;
+        pkt_valid_r <= 1'b0;
+        pkt_error_r <= 1'b0;
+        pkt_opcode_r <= 8'h00;
+        pkt_seq_r <= 16'h0000;
+        pkt_velocity_r <= 8'h00;
+        pkt_geom_meta_r <= 24'h000000;
+        pkt_ctrl_flags_r <= 8'h00;
+        pkt_summary_r <= 64'h0000000000000000;
+    end else begin
+        req_ready_r <= 1'b1;
+        pkt_valid_r <= req_valid_i;
+        pkt_opcode_r <= req_data_i[127:120];
+        pkt_seq_r <= req_data_i[119:104];
+        pkt_velocity_r <= req_data_i[103:96];
+        pkt_geom_meta_r <= req_data_i[95:72];
+        pkt_ctrl_flags_r <= req_data_i[71:64];
+        pkt_summary_r <= {req_data_i[127:120], req_data_i[119:104], req_data_i[103:96], req_data_i[95:72], 8'h00};
+        pkt_error_r <= req_valid_i & (((req_data_i[103:96] < 8'd20) || (req_data_i[103:96] > 8'd55)) || (req_data_i[127:120] == 8'h00));
+    end
+end
+
+endmodule
+---END adaptive_aero_control_packet_decode.v---
+---BEGIN adaptive_aero_control_fsm.v---
+module adaptive_aero_control_fsm (
+    clk,
+    rst_n,
+    pkt_valid_i,
+    pkt_error_i,
+    pkt_opcode_i,
+    pkt_seq_i,
+    pkt_velocity_i,
+    pkt_geom_meta_i,
+    pkt_ctrl_flags_i,
+    pkt_summary_i,
+    service_busy_i,
+    service_done_i,
+    service_error_i,
+    fresh_ok_i,
+    fresh_stale_i,
+    timeout_i,
+    clamp_hit_i,
+    pkt_accept_o,
+    service_req_o,
+    resp_valid_o,
+    resp_accept_o,
+    act_valid_o,
+    act_accept_i,
+    fallback_active_o,
+    error_hold_o,
+    state_code_o,
+    status_summary_o
+);
+input clk;
+input rst_n;
+input pkt_valid_i;
+input pkt_error_i;
+input [7:0] pkt_opcode_i;
+input [15:0] pkt_seq_i;
+input [7:0] pkt_velocity_i;
+input [23:0] pkt_geom_meta_i;
+input [7:0] pkt_ctrl_flags_i;
+input [63:0] pkt_summary_i;
+input service_busy_i;
+input service_done_i;
+input service_error_i;
+input fresh_ok_i;
+input fresh_stale_i;
+input timeout_i;
+input clamp_hit_i;
+output pkt_accept_o;
+output service_req_o;
+output resp_valid_o;
+input resp_accept_o;
+output act_valid_o;
+input act_accept_i;
+output fallback_active_o;
+output error_hold_o;
+output [3:0] state_code_o;
+output [63:0] status_summary_o;
+
+reg pkt_accept_r;
+reg service_req_r;
+reg resp_valid_r;
+reg act_valid_r;
+reg fallback_active_r;
+reg error_hold_r;
+reg [3:0] state_code_r;
+reg [63:0] status_summary_r;
+reg [3:0] state_r;
+reg [3:0] next_state;
+
+localparam STATE_IDLE = 4'd0;
+localparam STATE_CAPTURE_REQUEST = 4'd1;
+localparam STATE_ISSUE_SERVICE_REQUEST = 4'd2;
+localparam STATE_WAIT_SERVICE = 4'd3;
+localparam STATE_VALIDATE_RESPONSE = 4'd4;
+localparam STATE_APPLY_CLAMP = 4'd5;
+localparam STATE_OUTPUT_ACTUATOR = 4'd6;
+localparam STATE_SAFE_FALLBACK = 4'd7;
+localparam STATE_ERROR_HOLD = 4'd8;
+
+assign pkt_accept_o = pkt_accept_r;
+assign service_req_o = service_req_r;
+assign resp_valid_o = resp_valid_r;
+assign act_valid_o = act_valid_r;
+assign fallback_active_o = fallback_active_r;
+assign error_hold_o = error_hold_r;
+assign state_code_o = state_code_r;
+assign status_summary_o = status_summary_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) state_r <= STATE_SAFE_FALLBACK;
+    else state_r <= next_state;
+end
+
+always @(*) begin
+    next_state = state_r;
+    pkt_accept_r = 1'b0;
+    service_req_r = 1'b0;
+    resp_valid_r = 1'b0;
+    act_valid_r = 1'b0;
+    fallback_active_r = 1'b1;
+    error_hold_r = 1'b0;
+    state_code_r = state_r;
+    status_summary_r = {pkt_summary_i[31:0], pkt_seq_i, pkt_opcode_i, pkt_velocity_i};
+
+    case (state_r)
+        STATE_IDLE: begin
+            fallback_active_r = 1'b1;
+            if (pkt_valid_i && !pkt_error_i) begin
+                pkt_accept_r = 1'b1;
+                service_req_r = 1'b1;
+                next_state = STATE_ISSUE_SERVICE_REQUEST;
+            end
+        end
+        STATE_CAPTURE_REQUEST: begin
+            next_state = STATE_ISSUE_SERVICE_REQUEST;
+        end
+        STATE_ISSUE_SERVICE_REQUEST: begin
+            service_req_r = 1'b1;
+            next_state = STATE_WAIT_SERVICE;
+        end
+        STATE_WAIT_SERVICE: begin
+            if (service_error_i || pkt_error_i || timeout_i || fresh_stale_i) begin
+                next_state = STATE_SAFE_FALLBACK;
+            end else if (service_done_i && fresh_ok_i) begin
+                next_state = STATE_VALIDATE_RESPONSE;
+            end else begin
+                next_state = STATE_WAIT_SERVICE;
+            end
+        end
+        STATE_VALIDATE_RESPONSE: begin
+            resp_valid_r = 1'b1;
+            if (resp_accept_o) next_state = STATE_APPLY_CLAMP;
+        end
+        STATE_APPLY_CLAMP: begin
+            act_valid_r = 1'b1;
+            if (act_accept_i) next_state = STATE_OUTPUT_ACTUATOR;
+        end
+        STATE_OUTPUT_ACTUATOR: begin
+            act_valid_r = 1'b1;
+            resp_valid_r = 1'b1;
+            fallback_active_r = 1'b0;
+            if (service_error_i || timeout_i || fresh_stale_i || pkt_error_i) next_state = STATE_SAFE_FALLBACK;
+            else next_state = STATE_IDLE;
+        end
+        STATE_SAFE_FALLBACK: begin
+            fallback_active_r = 1'b1;
+            if (!pkt_error_i && pkt_valid_i && fresh_ok_i) next_state = STATE_IDLE;
+        end
+        STATE_ERROR_HOLD: begin
+            error_hold_r = 1'b1;
+            if (!service_error_i) next_state = STATE_IDLE;
+        end
+        default: begin
+            next_state = STATE_SAFE_FALLBACK;
+        end
+    endcase
+end
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        pkt_accept_r <= 1'b0;
+        service_req_r <= 1'b0;
+        resp_valid_r <= 1'b0;
+        act_valid_r <= 1'b0;
+        fallback_active_r <= 1'b1;
+        error_hold_r <= 1'b0;
+        state_code_r <= STATE_SAFE_FALLBACK;
+        status_summary_r <= 64'h0000000000000000;
+    end else begin
+        state_code_r <= next_state;
+        status_summary_r <= {pkt_summary_i[31:0], pkt_seq_i, pkt_opcode_i, pkt_velocity_i};
+        if (service_error_i) begin
+            error_hold_r <= 1'b1;
+        end
+    end
+end
+
+endmodule
+---END adaptive_aero_control_fsm.v---
+---BEGIN adaptive_aero_control_freshness_checker.v---
+module adaptive_aero_control_freshness_checker (
+    clk,
+    rst_n,
+    req_seq_i,
+    req_accept_i,
+    resp_seq_i,
+    resp_seen_i,
+    timeout_limit_i,
+    timeout_clear_i,
+    fresh_ok_o,
+    fresh_stale_o,
+    timeout_o,
+    outstanding_seq_o,
+    age_counter_o
+);
+input clk;
+input rst_n;
+input [15:0] req_seq_i;
+input req_accept_i;
+input [15:0] resp_seq_i;
+input resp_seen_i;
+input [15:0] timeout_limit_i;
+input timeout_clear_i;
+output fresh_ok_o;
+output fresh_stale_o;
+output timeout_o;
+output [15:0] outstanding_seq_o;
+output [15:0] age_counter_o;
+
+reg fresh_ok_r;
+reg fresh_stale_r;
+reg timeout_r;
+reg [15:0] outstanding_seq_r;
+reg [15:0] age_counter_r;
+
+assign fresh_ok_o = fresh_ok_r;
+assign fresh_stale_o = fresh_stale_r;
+assign timeout_o = timeout_r;
+assign outstanding_seq_o = outstanding_seq_r;
+assign age_counter_o = age_counter_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        fresh_ok_r <= 1'b0;
+        fresh_stale_r <= 1'b0;
+        timeout_r <= 1'b0;
+        outstanding_seq_r <= 16'h0000;
+        age_counter_r <= 16'h0000;
+    end else begin
+        if (timeout_clear_i) begin
+            age_counter_r <= 16'h0000;
+            timeout_r <= 1'b0;
+        end else if (outstanding_seq_r != 16'h0000) begin
+            age_counter_r <= age_counter_r + 16'h0001;
+            timeout_r <= (age_counter_r >= timeout_limit_i);
+        end else begin
+            age_counter_r <= 16'h0000;
+            timeout_r <= 1'b0;
+        end
+
+        fresh_ok_r <= 1'b0;
+        fresh_stale_r <= 1'b0;
+
+        if (req_accept_i) begin
+            outstanding_seq_r <= req_seq_i;
+            age_counter_r <= 16'h0000;
+            timeout_r <= 1'b0;
+        end
+
+        if (resp_seen_i) begin
+            if ((resp_seq_i == outstanding_seq_r) && (outstanding_seq_r != 16'h0000) && (timeout_r == 1'b0)) begin
+                fresh_ok_r <= 1'b1;
+                fresh_stale_r <= 1'b0;
+                outstanding_seq_r <= 16'h0000;
+                age_counter_r <= 16'h0000;
+                timeout_r <= 1'b0;
+            end else begin
+                fresh_ok_r <= 1'b0;
+                fresh_stale_r <= 1'b1;
+            end
+        end
+    end
+end
+
+endmodule
+---END adaptive_aero_control_freshness_checker.v---
+---BEGIN adaptive_aero_control_clamp_block.v---
+module adaptive_aero_control_clamp_block (
+    clk,
+    rst_n,
+    recommendation_i,
+    safe_mode_i,
+    fallback_active_i,
+    min_limit_i,
+    max_limit_i,
+    clamped_value_o,
+    mode_bits_o,
+    clamp_hit_o,
+    safe_indicator_o
+);
+input clk;
+input rst_n;
+input [31:0] recommendation_i;
+input safe_mode_i;
+input fallback_active_i;
+input [15:0] min_limit_i;
+input [15:0] max_limit_i;
+output [15:0] clamped_value_o;
+output [7:0] mode_bits_o;
+output clamp_hit_o;
+output safe_indicator_o;
+
+reg [15:0] clamped_value_r;
+reg [7:0] mode_bits_r;
+reg clamp_hit_r;
+reg safe_indicator_r;
+
+assign clamped_value_o = clamped_value_r;
+assign mode_bits_o = mode_bits_r;
+assign clamp_hit_o = clamp_hit_r;
+assign safe_indicator_o = safe_indicator_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        clamped_value_r <= 16'h0000;
+        mode_bits_r <= 8'h01;
+        clamp_hit_r <= 1'b1;
+        safe_indicator_r <= 1'b1;
+    end else begin
+        if (fallback_active_i || safe_mode_i) begin
+            clamped_value_r <= min_limit_i;
+            mode_bits_r <= 8'h01;
+            clamp_hit_r <= 1'b1;
+            safe_indicator_r <= 1'b1;
+        end else begin
+            if (recommendation_i[15:0] < min_limit_i) begin
+                clamped_value_r <= min_limit_i;
+                clamp_hit_r <= 1'b1;
+            end else if (recommendation_i[15:0] > max_limit_i) begin
+                clamped_value_r <= max_limit_i;
+                clamp_hit_r <= 1'b1;
+            end else begin
+                clamped_value_r <= recommendation_i[15:0];
+                clamp_hit_r <= 1'b0;
+            end
+            mode_bits_r <= recommendation_i[23:16];
+            safe_indicator_r <= 1'b0;
+        end
+    end
+end
+
+endmodule
+---END adaptive_aero_control_clamp_block.v---
+---BEGIN adaptive_aero_control_safe_fallback_controller.v---
+module adaptive_aero_control_safe_fallback_controller (
+    clk,
+    rst_n,
+    trigger_reset_i,
+    trigger_invalid_i,
+    trigger_stale_i,
+    trigger_timeout_i,
+    trigger_service_error_i,
+    safe_value_o,
+    safe_mode_o,
+    fallback_active_o,
+    fallback_summary_o
+);
+input clk;
+input rst_n;
+input trigger_reset_i;
+input trigger_invalid_i;
+input trigger_stale_i;
+input trigger_timeout_i;
+input trigger_service_error_i;
+output [15:0] safe_value_o;
+output [7:0] safe_mode_o;
+output fallback_active_o;
+output [31:0] fallback_summary_o;
+
+reg [15:0] safe_value_r;
+reg [7:0] safe_mode_r;
+reg fallback_active_r;
+reg [31:0] fallback_summary_r;
+
+assign safe_value_o = safe_value_r;
+assign safe_mode_o = safe_mode_r;
+assign fallback_active_o = fallback_active_r;
+assign fallback_summary_o = fallback_summary_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        safe_value_r <= 16'h0000;
+        safe_mode_r <= 8'h01;
+        fallback_active_r <= 1'b1;
+        fallback_summary_r <= 32'h00000001;
+    end else begin
+        if (trigger_reset_i || trigger_invalid_i || trigger_stale_i || trigger_timeout_i || trigger_service_error_i) begin
+            safe_value_r <= 16'h0000;
+            safe_mode_r <= 8'h01;
+            fallback_active_r <= 1'b1;
+            fallback_summary_r <= {27'h0000000, trigger_reset_i, trigger_invalid_i, trigger_stale_i, trigger_timeout_i, trigger_service_error_i};
+        end
+    end
+end
+
+endmodule
+---END adaptive_aero_control_safe_fallback_controller.v---

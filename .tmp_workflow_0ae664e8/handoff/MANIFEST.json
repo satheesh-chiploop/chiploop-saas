@@ -1,0 +1,109 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "adaptive_aero_control_top",
+  "generated_at": "2026-08-08T02:04:24.240138",
+  "file_count": 20,
+  "files": [
+    {
+      "path": "docs/arch/digital_architecture.json",
+      "sha256": "6bb6edcc714ed9710d5d0fae52b085e506d7f3ab2d02a117bba869540d85dc7d",
+      "bytes": 17523
+    },
+    {
+      "path": "docs/microarch/digital_microarchitecture.json",
+      "sha256": "82948055c8f38bad907c86834966e8aa33a4da2507970b468b11c08ca9b47ae6",
+      "bytes": 10871
+    },
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "31133cd40b619896eef37f3b9b1696d8977fc130686e96e1e3a7a37b2a9008c1",
+      "bytes": 27962
+    },
+    {
+      "path": "docs/regmap/digital_regmap_raw_output.txt",
+      "sha256": "f4954da9b0f9dde679e2d494bcf52d6c0618d9bbaf84646df3e5704ae0966a42",
+      "bytes": 17979
+    },
+    {
+      "path": "docs/spec/adaptive_aero_control_top_spec.json",
+      "sha256": "0877f6b42a71c5991d3076c7eea1eaaacf5a096e12db18aeee5200e1356821b6",
+      "bytes": 42527
+    },
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "cb7f6cc6a1407c6e7d6dd0ab2660fd3df85550554901f43a0a66cf5429404f76",
+      "bytes": 11377
+    },
+    {
+      "path": "docs/spec/spec_agent_normalized.json",
+      "sha256": "0877f6b42a71c5991d3076c7eea1eaaacf5a096e12db18aeee5200e1356821b6",
+      "bytes": 42527
+    },
+    {
+      "path": "misc/power_intent_findings.json",
+      "sha256": "0ef50eac0d98366cfa3b1b305ea03c3d9d1d2c62c2b6c7a91b8772435e027a38",
+      "bytes": 305
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "951a262322ddb2e2616f17209ece0d4e326043f7f451cd5c4836cacc0aec16cc",
+      "bytes": 435
+    },
+    {
+      "path": "misc/rtl_agent_preflight.json",
+      "sha256": "ae05a1f843ab1364f083dbfae4720d1d460e1d6205990edb0edb79315577ff71",
+      "bytes": 467
+    },
+    {
+      "path": "misc/rtl_quality_gate.json",
+      "sha256": "9c30b9e0d26d0d2420dd3e382db02fe22903dc01c7f3eee9aa57494f92dec1da",
+      "bytes": 159
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "5cb9d661ea149ef335c7a41aa0402e91b75397443098507ef0c6a0c9d6c8e85f",
+      "bytes": 2221
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "a071cfab6d7a1903b9ad747635fe188e80baa926001226697bf41ab55a5fa21f",
+      "bytes": 776
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "b4999d3e59d3d5a84e35ba3d1ef4ea2a2cfafa5aa922769abbaf7abda67a0d2a",
+      "bytes": 340
+    },
+    {
+      "path": "rtl/adaptive_aero_control_clamp_block.v",
+      "sha256": "6ba00030e28f108daebde46590eda653f6c11d677ae87def7ca833fb522a6846",
+      "bytes": 1741
+    },
+    {
+      "path": "rtl/adaptive_aero_control_freshness_checker.v",
+      "sha256": "5afa4bca8d353cfff40ee5ca3d64e2e7e4c818e3cf93f19d9f9ac7078a5419e5",
+      "bytes": 2197
+    },
+    {
+      "path": "rtl/adaptive_aero_control_fsm.v",
+      "sha256": "4e0f889e3bf7cb1d92c339a7698609bf780bf3be59271b5520271875e9aa6b54",
+      "bytes": 4298
+    },
+    {
+      "path": "rtl/adaptive_aero_control_packet_decode.v",
+      "sha256": "564ede4ebf9179013cf7ac4286e7b08cdb0a763a92cf15358dd449adf1f4aea9",
+      "bytes": 2060
+    },
+    {
+      "path": "rtl/adaptive_aero_control_safe_fallback_controller.v",
+      "sha256": "93c3a71f2ee7f6056cbfc1ff176d6729a305e7681a18c4df722b31901b96092b",
+      "bytes": 1453
+    },
+    {
+      "path": "rtl/adaptive_aero_control_top.v",
+      "sha256": "5c2ff565088b1eacd9be55a3fb1a9e7783ade6de263777ac55db04b017b6b87c",
+      "bytes": 4053
+    }
+  ]
+}

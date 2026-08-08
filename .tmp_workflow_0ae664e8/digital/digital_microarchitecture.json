@@ -1,0 +1,191 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Single-clock streaming orchestrator with compact packet decode, one-transaction-at-a-time supervisory tracking, optional shallow queue support only when parameterized, and safety-first output gating.",
+      "control_strategy": "Accept requests through ready/valid, decode compact metadata, hand off transaction lifecycle control to the supervisory FSM, supervise freshness/timeout through the checker, and force safe fallback whenever reset or fault conditions occur. No model inference or bulk payload handling is performed in the top itself; it coordinates submodules and summary packing only.",
+      "state_strategy": "Use small synchronous control state for occupancy, sequence tracking, outstanding transaction status, timeout supervision, and fallback latch behavior. Any optional depth-2 buffering is constrained to FPGA-friendly BRAM or compact state, never unbounded register FIFOs.",
+      "output_strategy": "Drive resp_valid/resp_data and act_valid/act_data only when the FSM has validated the transaction and clamp/fallback rules permit it. Responses summarize acceptance, freshness, timeout, clamp, and status metadata; actuator data is bounded and may be replaced by conservative safe-fallback content whenever required.",
+      "ownership_notes": [
+        "Owns top-level orchestration and status composition.",
+        "Does not own model computation, mesh storage, or unbounded buffering.",
+        "Delegates decode, sequencing, freshness, clamp, and fallback generation to the named submodules."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_packet_decode",
+      "implementation_style": "Compact synchronous packet parser for the 128-bit inbound request stream.",
+      "control_strategy": "Qualify req_valid with internal readiness, extract fixed-width metadata fields, and flag malformed or out-of-envelope packets without retaining full payloads.",
+      "state_strategy": "Keep only minimal decode registers and error/valid flags; no mesh, tensor, or flow-field storage is inferred.",
+      "output_strategy": "Emit compact opcode, sequence, velocity, geometry metadata, control flags, and summary fields for downstream control and response packaging.",
+      "ownership_notes": [
+        "Owns compact request decode validity and field extraction.",
+        "Does not own service coordination, freshness tracking, or actuator generation."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_fsm",
+      "implementation_style": "Small supervisory transaction FSM with explicitly named states from the spec and synchronous handshaking to the surrounding logic.",
+      "control_strategy": "Sequence request acceptance, service request issuance, wait/validate phases, clamp/application gating, actuator/response enable, and entry into safe fallback or error hold on fault conditions.",
+      "state_strategy": "Use the specified states only: IDLE, CAPTURE_REQUEST, ISSUE_SERVICE_REQUEST, WAIT_SERVICE, VALIDATE_RESPONSE, APPLY_CLAMP, OUTPUT_ACTUATOR, SAFE_FALLBACK, and ERROR_HOLD. Keep transitions simple and synchronous; avoid complex hidden sequencing beyond what the contract implies.",
+      "output_strategy": "Generate status enables, fallback indication, state code, and compact status summary; qualify when response and actuator outputs may be observed externally.",
+      "ownership_notes": [
+        "Owns transaction lifecycle control and output enable qualification.",
+        "Consumes freshness, timeout, and clamp indicators from the dedicated helper blocks.",
+        "Does not compute actuator recommendations or model outputs."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_freshness_checker",
+      "implementation_style": "Exact-width sequence compare and timeout supervision block.",
+      "control_strategy": "Capture the accepted request sequence as the outstanding transaction, compare echoed response sequence against it, and mark late, mismatched, or obsolete responses stale.",
+      "state_strategy": "Maintain only the current outstanding sequence and an age counter; no unbounded history is retained. Optional queueing remains a top-level concern and, if used, is shallow and FPGA-BRAM-backed.",
+      "output_strategy": "Assert fresh_ok only for matching in-time responses, fresh_stale for stale/mismatched responses, and timeout when the configured cycle limit is exceeded; expose outstanding sequence and age for status visibility.",
+      "ownership_notes": [
+        "Owns freshness and timeout qualification only.",
+        "Does not own output clamping or fallback content generation."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_clamp_block",
+      "implementation_style": "Parameter-bound actuator limiter and safe formatting block.",
+      "control_strategy": "Clamp compact recommendation values between parameterized minimum and maximum limits and sanitize mode bits within the declared width.",
+      "state_strategy": "Use only small synchronous registers or pure combinational datapath as needed; no persistent bulk storage is implied.",
+      "output_strategy": "Produce bounded actuator value, mode bits, clamp-hit indication, and safe indicator for packaging into act_data and status summaries.",
+      "ownership_notes": [
+        "Owns actuator bound enforcement.",
+        "Does not own decode, sequencing, or service supervision."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_safe_fallback_controller",
+      "implementation_style": "Conservative fallback synthesizer for reset and fault conditions.",
+      "control_strategy": "Trigger on reset, invalid decode, stale response, timeout, or service error and hold fallback active until superseded by a valid fresh acknowledged command.",
+      "state_strategy": "Maintain a simple fallback-active latch or equivalent minimal synchronous state; no complex FSM is required beyond the trigger/hold semantics clearly implied by the spec.",
+      "output_strategy": "Drive minimum-risk safe_value, safe_mode, fallback_active, and a compact fallback summary used by the top-level safety/status contract.",
+      "ownership_notes": [
+        "Owns conservative fallback content generation.",
+        "Does not own clamp limits, sequence tracking, or request parsing."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "name": "adaptive_aero_control_fsm",
+      "present": true,
+      "description": "The supervisory FSM is intentionally limited to the explicitly named lifecycle states and simple synchronous transitions. It accepts decoded requests when the slot is available, requests external service action, waits for completion, validates freshness/timeout/clamp conditions, then releases response and actuator enables only when the transaction is safe. Reset and all fault conditions transition to safe fallback, with error-hold reserved for persistent or terminal fault retention if the implementation needs it.",
+      "states": [
+        "IDLE",
+        "CAPTURE_REQUEST",
+        "ISSUE_SERVICE_REQUEST",
+        "WAIT_SERVICE",
+        "VALIDATE_RESPONSE",
+        "APPLY_CLAMP",
+        "OUTPUT_ACTUATOR",
+        "SAFE_FALLBACK",
+        "ERROR_HOLD"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "name": "request_decode_path",
+      "inputs": [
+        "req_valid",
+        "req_data"
+      ],
+      "internal_storage": [
+        "compact decoded opcode/sequence/velocity/geometry/control metadata",
+        "decode-valid and decode-error flags"
+      ],
+      "output_mapping": [
+        "req_ready from decoder readiness",
+        "resp/act routing inputs to FSM after compact decode"
+      ]
+    },
+    {
+      "name": "transaction_tracking_path",
+      "inputs": [
+        "decoded request sequence",
+        "packet acceptance pulse",
+        "response sequence",
+        "response seen pulse",
+        "timeout limit",
+        "timeout clear"
+      ],
+      "internal_storage": [
+        "current outstanding sequence",
+        "age counter",
+        "single-transaction occupancy state",
+        "optional shallow queue control state if enabled"
+      ],
+      "output_mapping": [
+        "fresh_ok",
+        "fresh_stale",
+        "timeout",
+        "outstanding_seq",
+        "age_counter"
+      ]
+    },
+    {
+      "name": "safety_and_clamp_path",
+      "inputs": [
+        "validated recommendation content",
+        "safe mode trigger",
+        "fallback active",
+        "min limit",
+        "max limit"
+      ],
+      "internal_storage": [
+        "bounded actuator value",
+        "mode bits",
+        "clamp-hit state as needed"
+      ],
+      "output_mapping": [
+        "act_data bounded actuator command",
+        "clamp status and safe indicator in response/status summaries"
+      ]
+    },
+    {
+      "name": "response_and_actuator_path",
+      "inputs": [
+        "FSM enable signals",
+        "freshness status",
+        "clamp status",
+        "fallback status",
+        "state code",
+        "status summary"
+      ],
+      "internal_storage": [
+        "compact response packet summary fields",
+        "actuator command summary fields"
+      ],
+      "output_mapping": [
+        "resp_valid/resp_data",
+        "act_valid/act_data"
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "Only one outstanding request transaction is active at a time unless the optional queue depth parameter is enabled and implemented with FPGA BRAM or compact control state.",
+    "Each accepted request is assigned a sequence context and tracked until a matching fresh response is validated or timeout occurs.",
+    "Incoming responses are accepted only if the echoed sequence matches the outstanding request and the response arrives before timeout expiration.",
+    "Any response that is late, stale, newer-than-current, or sequence-mismatched must not drive actuators.",
+    "No accepted transaction may be dropped without a corresponding status response.",
+    "Fallback remains active until a valid fresh acknowledged command supersedes it."
+  ],
+  "timing_notes": [
+    "Single-clock synchronous implementation only.",
+    "Ready/valid backpressure must be honored independently on request, response, and actuator streams.",
+    "Timeout counters are parameterized and should cover the expected external service latency with margin.",
+    "Optional queue depth 2 is the maximum permitted shallow buffering depth; no unbounded buffering is allowed.",
+    "Bulk storage, if any, must map to FPGA BRAM or a technology-neutral memory wrapper suitable for native block RAM inference."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

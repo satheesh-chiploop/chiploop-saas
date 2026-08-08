@@ -1,3 +1,0 @@
-read_verilog -sv /root/chiploop-backend/backend/workflows/f8ae2e6f-714d-4d72-aa6c-30d0090a7890/fpga/src/upstream/adaptive_aero_control_top.v
-read_verilog -sv backend/workflows/f8ae2e6f-714d-4d72-aa6c-30d0090a7890/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv
-synth_ecp5 -top adaptive_aero_control_top_spi_fpga_top -noflatten -json /root/chiploop-backend/backend/workflows/f8ae2e6f-714d-4d72-aa6c-30d0090a7890/fpga/target_explorer/orangecrab_ecp5_85f/baseline/synth/adaptive_aero_control_top_spi_fpga_top_ecp5.json

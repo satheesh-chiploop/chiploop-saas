@@ -70,7 +70,7 @@ async function readApiPayload(response: Response): Promise<ApiPayload> {
   try {
     return JSON.parse(body) as ApiPayload;
   } catch {
-    throw new Error(`Physical AI API returned HTTP ${response.status}: ${body.slice(0, 300)}`);
+    return { detail: `Physical AI backend returned HTTP ${response.status}: ${body.slice(0, 300)}` };
   }
 }
 

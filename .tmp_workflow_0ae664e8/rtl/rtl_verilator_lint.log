@@ -1,0 +1,34 @@
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: adaptive_aero_control_top.v:151:6: Instance pin connected by name with empty reference: 'fallback_active_o'
+  151 |     .fallback_active_o(),
+      |      ^~~~~~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: adaptive_aero_control_top.v:152:6: Instance pin connected by name with empty reference: 'error_hold_o'
+  152 |     .error_hold_o(),
+      |      ^~~~~~~~~~~~
+%Warning-WIDTHTRUNC: adaptive_aero_control_packet_decode.v:67:23: Operator ASSIGNDLY expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 72 bits.
+                                                                : ... note: In instance 'adaptive_aero_control_top.u_packet_decode'
+   67 |         pkt_summary_r <= {req_data_i[127:120], req_data_i[119:104], req_data_i[103:96], req_data_i[95:72], req_data_i[71:64], 8'h00};
+      |                       ^~
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: adaptive_aero_control_top.v:64:18: Operator ASSIGNW expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 100 bits.
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   64 | assign resp_data = {96'h000000000000000000000000, state_code};
+      |                  ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: adaptive_aero_control_top.v:65:17: Operator ASSIGNW expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 58 bits.
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   65 | assign act_data = {16'h0000, mode_bits, safe_indicator, clamp_hit, clamped_value, safe_value[15:8], safe_value[7:0]};
+      |                 ^
+%Error-ASSIGNIN: adaptive_aero_control_top.v:157:8: Assigning to input/const variable: 'rst_n'
+                                                  : ... note: In instance 'adaptive_aero_control_top'
+  157 | assign rst_n = fallback_active;
+      |        ^~~~~
+                 ... For error description see https://verilator.org/warn/ASSIGNIN?v=5.047
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1
