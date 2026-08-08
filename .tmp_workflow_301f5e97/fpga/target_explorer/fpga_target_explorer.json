@@ -1,0 +1,226 @@
+{
+  "candidate_count": 2,
+  "continuation": {
+    "app": "fpga-bitstream",
+    "label": "Continue to FPGA Prototyping",
+    "selected_board": null,
+    "source_workflow_id": "301f5e97-a61e-4a44-86b7-2fae8007f22b",
+    "target_frequency_mhz": 50.0,
+    "top_module": "adaptive_aero_control_top_spi_fpga_top",
+    "winning_configuration": {
+      "achieved_frequency_mhz": null,
+      "seed": null,
+      "synthesis_strategy": null,
+      "timing_margin_percent": null,
+      "tool_effort": null
+    }
+  },
+  "design_intent": null,
+  "design_intent_provided": false,
+  "frequency_relaxation_policy": "reported only for candidates that fail the requested target after closure",
+  "preflight_rejected_count": 0,
+  "recommendation_details": {
+    "best_for_growth": null,
+    "best_low_cost": null,
+    "best_overall": null,
+    "best_performance": null
+  },
+  "recommendation_policy": {
+    "best_for_growth": "largest remaining logic headroom",
+    "best_low_cost": "smallest viable FPGA capacity proxy; live board pricing is not assumed",
+    "best_overall": "target met, timing stability, useful headroom, performance, then smallest viable target",
+    "best_performance": "highest robust median Fmax"
+  },
+  "recommendations": {
+    "best_for_growth": null,
+    "best_low_cost": null,
+    "best_overall": null,
+    "best_performance": null
+  },
+  "requested_profile": "best_overall",
+  "results": [
+    {
+      "best_frequency_mhz": null,
+      "board": "orangecrab_ecp5_85f",
+      "board_input_frequency_mhz": 48.0,
+      "capacity_preflight": null,
+      "closure_used": false,
+      "constraint_confidence": "exploration_only",
+      "constraint_scope": "capacity_and_timing_exploration; board pin compatibility must be confirmed in FPGA Prototyping",
+      "device": "85k",
+      "failure_kind": null,
+      "failure_reason": null,
+      "family": "ecp5",
+      "frequency_relaxation": {
+        "eligible": false,
+        "reason": null,
+        "recommended_mhz": null
+      },
+      "implementation_key": "ecp5:85k:CSFBGA285",
+      "label": "Lattice OrangeCrab ECP5-85F",
+      "logic_cells_available": 84000,
+      "logic_cells_used": null,
+      "logic_utilization_percent": null,
+      "mapped_ports": [
+        "clk",
+        "reset_n"
+      ],
+      "median_frequency_mhz": null,
+      "package": "CSFBGA285",
+      "pnr_runs": [],
+      "product_family": "ecp5",
+      "programming_ready": false,
+      "resource_headroom_percent": null,
+      "segments": [],
+      "status": "implementation_failed",
+      "support_tier": "production",
+      "synthesis_runs": [
+        {
+          "command": [
+            "/usr/bin/yosys",
+            "-s",
+            "/root/chiploop-backend/backend/workflows/301f5e97-a61e-4a44-86b7-2fae8007f22b/fpga/target_explorer/orangecrab_ecp5_85f/baseline/synth/synth.ys"
+          ],
+          "core_only_ports_removed": [],
+          "effective_options": [
+            "-noflatten"
+          ],
+          "error": "ERROR: FF adaptive_aero_control_top_spi_fpga_top.$auto$ff.cc:266:slice$4853 (type $_DFFSR_PPP_) cannot be legalized: dffs with async set and reset are not supported\n",
+          "log": "/root/chiploop-backend/backend/workflows/301f5e97-a61e-4a44-86b7-2fae8007f22b/fpga/target_explorer/orangecrab_ecp5_85f/baseline/synth/yosys.log",
+          "memory_intent": {
+            "declarations": [],
+            "estimated_bits": 0,
+            "requires_block_ram": false,
+            "threshold_bits": 4096
+          },
+          "memory_mapping_gate": {
+            "enforced": false,
+            "mapped": false,
+            "primitive": null,
+            "required": false,
+            "status": "pass",
+            "supported": true
+          },
+          "netlist": null,
+          "script": "/root/chiploop-backend/backend/workflows/301f5e97-a61e-4a44-86b7-2fae8007f22b/fpga/target_explorer/orangecrab_ecp5_85f/baseline/synth/synth.ys",
+          "status": "failed",
+          "strategy": "baseline",
+          "tool_version": "Yosys 0.33 (git sha1 2584903a060)"
+        }
+      ],
+      "target_frequency_mhz": 50.0,
+      "target_met": false,
+      "timing_margin_percent": null,
+      "timing_pass_rate": 0.0,
+      "toolchain_confidence": "qualified",
+      "unmapped_ports": [
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ],
+      "vendor": "lattice",
+      "winning_run": null,
+      "winning_seed": null,
+      "worst_frequency_mhz": null
+    },
+    {
+      "best_frequency_mhz": null,
+      "board": "ulx3s_ecp5_45f",
+      "board_input_frequency_mhz": 25.0,
+      "capacity_preflight": null,
+      "closure_used": false,
+      "constraint_confidence": "exploration_only",
+      "constraint_scope": "capacity_and_timing_exploration; board pin compatibility must be confirmed in FPGA Prototyping",
+      "device": "45k",
+      "failure_kind": null,
+      "failure_reason": null,
+      "family": "ecp5",
+      "frequency_relaxation": {
+        "eligible": false,
+        "reason": null,
+        "recommended_mhz": null
+      },
+      "implementation_key": "ecp5:45k:CABGA381",
+      "label": "Lattice ULX3S ECP5-45F",
+      "logic_cells_available": 44000,
+      "logic_cells_used": null,
+      "logic_utilization_percent": null,
+      "mapped_ports": [
+        "clk",
+        "reset_n",
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ],
+      "median_frequency_mhz": null,
+      "package": "CABGA381",
+      "pnr_runs": [],
+      "product_family": "ecp5",
+      "programming_ready": true,
+      "resource_headroom_percent": null,
+      "segments": [],
+      "status": "implementation_failed",
+      "support_tier": "production",
+      "synthesis_runs": [
+        {
+          "command": [
+            "/usr/bin/yosys",
+            "-s",
+            "/root/chiploop-backend/backend/workflows/301f5e97-a61e-4a44-86b7-2fae8007f22b/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/synth.ys"
+          ],
+          "core_only_ports_removed": [],
+          "effective_options": [
+            "-noflatten"
+          ],
+          "error": "ERROR: FF adaptive_aero_control_top_spi_fpga_top.$auto$ff.cc:266:slice$4853 (type $_DFFSR_PPP_) cannot be legalized: dffs with async set and reset are not supported\n",
+          "log": "/root/chiploop-backend/backend/workflows/301f5e97-a61e-4a44-86b7-2fae8007f22b/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/yosys.log",
+          "memory_intent": {
+            "declarations": [],
+            "estimated_bits": 0,
+            "requires_block_ram": false,
+            "threshold_bits": 4096
+          },
+          "memory_mapping_gate": {
+            "enforced": false,
+            "mapped": false,
+            "primitive": null,
+            "required": false,
+            "status": "pass",
+            "supported": true
+          },
+          "netlist": null,
+          "script": "/root/chiploop-backend/backend/workflows/301f5e97-a61e-4a44-86b7-2fae8007f22b/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/synth.ys",
+          "status": "failed",
+          "strategy": "baseline",
+          "tool_version": "Yosys 0.33 (git sha1 2584903a060)"
+        }
+      ],
+      "target_frequency_mhz": 50.0,
+      "target_met": false,
+      "timing_margin_percent": null,
+      "timing_pass_rate": 0.0,
+      "toolchain_confidence": "qualified",
+      "unmapped_ports": [],
+      "vendor": "lattice",
+      "winning_run": null,
+      "winning_seed": null,
+      "worst_frequency_mhz": null
+    }
+  ],
+  "rtl_file_count": 5,
+  "seed_policy": {
+    "baseline_seed_count": 1,
+    "closure_is_conditional": true,
+    "closure_seed_count": 1
+  },
+  "selected_recommendation": null,
+  "status": "completed",
+  "target_frequency_mhz": 50.0,
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "type": "fpga_target_explorer",
+  "unique_implementation_count": 2
+}

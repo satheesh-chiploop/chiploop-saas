@@ -1,0 +1,121 @@
+{
+  "agent": "FPGA Explorer I/O Mapping Agent",
+  "board_count": 2,
+  "fully_mapped_board_count": 1,
+  "interface_adapter": {
+    "core_top_module": "adaptive_aero_control_top",
+    "fpga_top_level_io_bits": 7,
+    "fpga_top_module": "adaptive_aero_control_top_spi_fpga_top",
+    "hardware_readiness": "requires CDC/protocol verification and board pin assignment before programming hardware",
+    "input_bit_map": [
+      {
+        "lsb": 0,
+        "port": "cfg_we",
+        "width": 1
+      },
+      {
+        "lsb": 1,
+        "port": "cfg_re",
+        "width": 1
+      },
+      {
+        "lsb": 2,
+        "port": "cfg_addr",
+        "width": 8
+      },
+      {
+        "lsb": 10,
+        "port": "cfg_wdata",
+        "width": 32
+      },
+      {
+        "lsb": 42,
+        "port": "req_ready",
+        "width": 1
+      },
+      {
+        "lsb": 43,
+        "port": "resp_valid",
+        "width": 1
+      },
+      {
+        "lsb": 44,
+        "port": "resp_data",
+        "width": 128
+      }
+    ],
+    "original_top_level_io_bits": 371,
+    "output_frame_order_msb_first": [
+      "cfg_rdata",
+      "req_valid",
+      "req_data",
+      "resp_ready",
+      "actuator_cmd",
+      "actuator_valid",
+      "safe_fallback_active",
+      "model_timeout"
+    ],
+    "scope": "FPGA only; ASIC uses the original core top module.",
+    "serialized_input_bits": 172,
+    "serialized_output_bits": 197,
+    "status": "generated",
+    "transaction_model": "MSB-first full-duplex frames; command N is committed when CS rises and response N is read in the following frame.",
+    "transport": "spi_mode_0_shift_transport",
+    "wrapper_rtl": "/root/chiploop-backend/backend/workflows/301f5e97-a61e-4a44-86b7-2fae8007f22b/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv"
+  },
+  "mappings": [
+    {
+      "all_ports_mapped": false,
+      "board": "orangecrab_ecp5_85f",
+      "constraint_format": "lpf",
+      "constraint_preview": "# ChipLoop starter LPF for adaptive_aero_control_top_spi_fpga_top\n# target_frequency_mhz 50.0\nLOCATE COMP \"clk\" SITE \"A9\";\nIOBUF PORT \"clk\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"reset_n\" SITE \"V17\";\nIOBUF PORT \"reset_n\" IO_TYPE=LVCMOS33;\nFREQUENCY PORT \"clk\" 50.0 MHz;\n",
+      "exploration_policy": "core_only",
+      "label": "Lattice OrangeCrab ECP5-85F",
+      "mapped_ports": [
+        "clk",
+        "reset_n"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    },
+    {
+      "all_ports_mapped": true,
+      "board": "ulx3s_ecp5_45f",
+      "constraint_format": "lpf",
+      "constraint_preview": "# ChipLoop starter LPF for adaptive_aero_control_top_spi_fpga_top\n# target_frequency_mhz 50.0\nLOCATE COMP \"clk\" SITE \"G2\";\nIOBUF PORT \"clk\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"reset_n\" SITE \"T1\";\nIOBUF PORT \"reset_n\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"spi_sclk\" SITE \"B11\";\nIOBUF PORT \"spi_sclk\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"spi_cs_n\" SITE \"A10\";\nIOBUF PORT \"spi_cs_n\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"spi_mosi\" SITE \"A9\";\nIOBUF PORT \"spi_mosi\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"spi_miso\" SITE \"B9\";\nIOBUF PORT \"spi_miso\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"fault_indicator\" SITE \"B2\";\nIOBUF PORT \"fault_indicator\" IO_TYPE=LVCMOS33;\nFREQUENCY PORT \"clk\" 50.0 MHz;\n",
+      "exploration_policy": "board_mapped_io",
+      "label": "Lattice ULX3S ECP5-45F",
+      "mapped_ports": [
+        "clk",
+        "reset_n",
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ],
+      "note": "All top-level ports have verified ChipLoop board-pin mappings.",
+      "programming_ready": true,
+      "unmapped_ports": []
+    }
+  ],
+  "policy": "Never invent physical pins. Unmapped I/O is explicit; Explorer uses core-only implementation while Prototyping blocks until every physical I/O is verified.",
+  "status": "completed",
+  "top_level_ports": [
+    "clk",
+    "reset_n",
+    "spi_sclk",
+    "spi_cs_n",
+    "spi_mosi",
+    "spi_miso",
+    "fault_indicator"
+  ],
+  "top_module": "adaptive_aero_control_top_spi_fpga_top"
+}
