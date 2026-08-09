@@ -1,0 +1,14 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: adaptive_aero_control_top
+Expected files: ['adaptive_aero_control_top.v', 'aero_mmio_register_window.v', 'aero_request_framer.v', 'aero_response_deframer.v', 'aero_actuator_mapper.v']
+Materialized files: ['adaptive_aero_control_top.v', 'aero_mmio_register_window.v', 'aero_request_framer.v', 'aero_response_deframer.v', 'aero_actuator_mapper.v']
+Clock ports: ['clk']
+Reset ports: ['rst_n']
+Icarus compile: pass
+Verilator lint: fatal
+Issue count: 1
+
+Issues:
+- ❌ Verilator lint failed.

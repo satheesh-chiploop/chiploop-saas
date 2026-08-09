@@ -1,0 +1,48 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, external model request/response transport, validation, safety, timeout, fallback, and bounded actuator-command behavior.
+Module adaptive_aero_control_top shall be a synthesizable FPGA-oriented digital-IP wrapper for an external DoMINO-based automotive aerodynamics runtime. The module shall not implement the surrogate model, CFD, or any large tensor computation. The RTL shall provide: (1) a compact host register window, (2) bounded streaming request/response interfaces, (3) request buffering, (4) response parsing, (5) freshness and timeout checking, (6) actuator command mapping, (7) command clamping, and (8) safe fallback selection.
+
+Top-level interface requirements:
+- clk and rst_n shall clock and reset all sequential logic.
+- A small memory-mapped register window shall be exposed using cfg_valid, cfg_write, cfg_addr[7:0], cfg_wdata[31:0], cfg_rdata[31:0], cfg_ready.
+- The outbound request stream shall use req_valid/req_ready with req_data[127:0]. This bus shall carry framed metadata only; it shall not expose geometry arrays, full flow fields, or model tensors.
+- The inbound response stream shall use rsp_valid/rsp_ready with rsp_data[127:0].
+- The actuator command output shall use act_valid/act_ready with act_data[63:0].
+- fault_o shall assert when the controller is in fallback, timeout, stale, malformed, or operating-condition violation state.
+
+Register map requirements:
+- Provide configuration registers for timeout threshold, freshness threshold, actuator min/max limits, velocity envelope min/max, enable bits, and sequence number seed.
+- Provide status registers indicating busy, request outstanding, response accepted, stale reject, timeout reject, malformed reject, fallback active, and clamp active.
+- Provide a readback of the last accepted sequence number and last issued actuator command.
+- Register writes outside the implemented map shall be ignored and optionally flagged through status.
+
+Streaming request format requirements:
+- Request frames shall include at minimum: request type, sequence number, geometry identifier or geometry payload handle, flow-condition metadata, velocity, and flags.
+- The module shall not deserialize or process STL geometry internally beyond validating external metadata fields and forwarding a compact identifier or handle.
+- The request framer shall hold an outstanding request counter of at most one unless explicitly expanded through configuration.
+- When req_valid is asserted, req_data shall remain stable until req_ready handshake completion.
+
+Streaming response format requirements:
+- Response frames shall include at minimum: sequence number, status code, drag estimate, lift estimate, and actuator hint or control recommendation.
+- The response deframer shall validate packet status, sequence correlation, and freshness prior to command generation.
+- Any response with mismatched sequence, invalid status, or timeout shall be discarded and mapped to safe fallback.
+
+Control and safety requirements:
+- The controller shall compare requested velocity against the configured operating envelope of 20 to 55 m/s and shall reject out-of-range requests.
+- The controller shall clamp each actuator setpoint to configured bounds before asserting act_valid.
+- The controller shall provide a safe fallback actuator pattern on timeout, stale response, malformed response, or external-service-unavailable indication.
+- The controller shall not depend on model inference being executed in hardware; the model is assumed external and asynchronous.
+- All outputs shall be deterministic after reset and during fault conditions.
+
+Implementation guidance:
+- Use simple FSMs, counters, comparators, small registers, and optional FPGA BRAM-backed FIFOs for buffering.
+- Do not infer large register-array payload memories for bulk storage if BRAM/FIFO primitives are available.
+- Keep the architecture compact and implementation-friendly, suitable for an Arch2RTL workflow targeting FPGA prototype integration.
+- Ensure all logic is synthesizable and free of unsized arithmetic or combinational loops.
+- If buffering is implemented, it shall be bounded and shall never expose an unbounded queue.
+
+External runtime assumptions:
+- The external DoMINO model executes in software/GPU via a remote NIM or GPU worker.
+- The FPGA controller communicates with that runtime through the bounded request/response streams defined above.
+- The architecture shall tolerate non-availability of the external runtime by reverting to safe fallback.
+
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.

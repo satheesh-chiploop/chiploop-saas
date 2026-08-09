@@ -1,0 +1,63 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.158 MB sources in 6 modules, into 0.078 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.021 s (elab=0.003, cvt=0.010, bld=0.000); cpu 0.021 s on 1 threads; allocated 32.359 MB
+
+=== STDERR ===
+%Warning-WIDTHTRUNC: pass3/aero_request_framer.v:91:24: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 168 bits.
+                                                      : ... note: In instance 'adaptive_aero_control_top.u_aero_request_framer'
+   91 |             req_data_r <= {8'h01, seq_next_r, 32'h00000001, {16'h0000, cfg_velocity_min}, 16'h0000, 24'h000000, 40'h0000000000};
+      |                        ^~
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: pass3/aero_actuator_mapper.v:82:29: Operator ASSIGNDLY expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 72 bits.
+                                                       : ... note: In instance 'adaptive_aero_control_top.u_aero_actuator_mapper'
+   82 |         candidate_command_r <= {response_sequence_number, response_status_code, velocity_mps, actuator_hint[15:0], 16'h0000};
+      |                             ^~
+%Warning-UNDRIVEN: pass3/adaptive_aero_control_top.v:58:13: Signal is not driven: 'last_sequence_accepted'
+                                                          : ... note: In instance 'adaptive_aero_control_top'
+   58 | wire [15:0] last_sequence_accepted;
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047
+                   ... Use "/* verilator lint_off UNDRIVEN */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/aero_actuator_mapper.v:40:14: Bits of signal are not used: 'actuator_hint'[31:16]
+                                                         : ... note: In instance 'adaptive_aero_control_top.u_aero_actuator_mapper'
+   40 | input [31:0] actuator_hint;
+      |              ^~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/aero_actuator_mapper.v:41:14: Bits of signal are not used: 'lift_estimate'[31:16]
+                                                         : ... note: In instance 'adaptive_aero_control_top.u_aero_actuator_mapper'
+   41 | input [31:0] lift_estimate;
+      |              ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/aero_actuator_mapper.v:42:14: Bits of signal are not used: 'drag_estimate'[31:16]
+                                                         : ... note: In instance 'adaptive_aero_control_top.u_aero_actuator_mapper'
+   42 | input [31:0] drag_estimate;
+      |              ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/aero_actuator_mapper.v:59:12: Signal is not used: 'candidate_command_r'
+                                                         : ... note: In instance 'adaptive_aero_control_top.u_aero_actuator_mapper'
+   59 | reg [63:0] candidate_command_r;
+      |            ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/aero_actuator_mapper.v:62:5: Signal is not used: 'fallback_event_r'
+                                                        : ... note: In instance 'adaptive_aero_control_top.u_aero_actuator_mapper'
+   62 | reg fallback_event_r;
+      |     ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/aero_mmio_register_window.v:37:14: Bits of signal are not used: 'cfg_wdata'[31:8]
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_aero_mmio_register_window'
+   37 | input [31:0] cfg_wdata;
+      |              ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/aero_request_framer.v:24:14: Signal is not used: 'cfg_sequence_seed'
+                                                        : ... note: In instance 'adaptive_aero_control_top.u_aero_request_framer'
+   24 | input [15:0] cfg_sequence_seed;
+      |              ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/aero_response_deframer.v:37:15: Bits of signal are not used: 'rsp_data'[7:0]
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_aero_response_deframer'
+   37 | input [127:0] rsp_data;
+      |               ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/aero_response_deframer.v:52:14: Bits of signal are not used: 'request_flags'[23:1]
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_aero_response_deframer'
+   52 | input [23:0] request_flags;
+      |              ^~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

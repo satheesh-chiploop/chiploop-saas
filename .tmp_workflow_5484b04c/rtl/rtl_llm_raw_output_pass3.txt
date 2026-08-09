@@ -1,0 +1,748 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    clk,
+    rst_n,
+    cfg_valid,
+    cfg_write,
+    cfg_addr,
+    cfg_wdata,
+    cfg_rdata,
+    cfg_ready,
+    req_valid,
+    req_ready,
+    req_data,
+    rsp_valid,
+    rsp_ready,
+    rsp_data,
+    act_valid,
+    act_ready,
+    act_data,
+    fault_o
+);
+input clk;
+input rst_n;
+input cfg_valid;
+input cfg_write;
+input [7:0] cfg_addr;
+input [31:0] cfg_wdata;
+output [31:0] cfg_rdata;
+output cfg_ready;
+output req_valid;
+input req_ready;
+output [127:0] req_data;
+input rsp_valid;
+output rsp_ready;
+input [127:0] rsp_data;
+output act_valid;
+input act_ready;
+output [63:0] act_data;
+output fault_o;
+
+wire [15:0] cfg_timeout_threshold;
+wire [15:0] cfg_freshness_threshold;
+wire [15:0] cfg_actuator_min;
+wire [15:0] cfg_actuator_max;
+wire [15:0] cfg_velocity_min;
+wire [15:0] cfg_velocity_max;
+wire cfg_enable_request;
+wire cfg_enable_response;
+wire cfg_enable_fallback;
+wire [15:0] cfg_sequence_seed;
+wire status_busy;
+wire status_request_outstanding;
+wire status_response_accepted;
+wire status_stale_reject;
+wire status_timeout_reject;
+wire status_malformed_reject;
+wire status_fallback_active;
+wire status_clamp_active;
+wire status_fault;
+wire [15:0] last_sequence_accepted;
+wire [63:0] last_actuator_command;
+
+wire [7:0] request_type;
+wire [15:0] sequence_number;
+wire [31:0] geometry_handle;
+wire [31:0] flow_condition_meta;
+wire [15:0] velocity_mps;
+wire [23:0] request_flags;
+wire request_outstanding;
+wire busy;
+wire velocity_violation;
+
+wire [15:0] response_sequence_number;
+wire [7:0] response_status_code;
+wire [31:0] drag_estimate;
+wire [31:0] lift_estimate;
+wire [31:0] actuator_hint;
+wire response_accepted;
+wire stale_reject;
+wire timeout_reject;
+wire malformed_reject;
+wire response_fresh;
+
+wire clamp_active;
+wire fallback_active;
+
+aero_mmio_register_window u_aero_mmio_register_window (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_valid(cfg_valid),
+    .cfg_write(cfg_write),
+    .cfg_addr(cfg_addr),
+    .cfg_wdata(cfg_wdata),
+    .cfg_rdata(cfg_rdata),
+    .cfg_ready(cfg_ready),
+    .cfg_timeout_threshold(cfg_timeout_threshold),
+    .cfg_freshness_threshold(cfg_freshness_threshold),
+    .cfg_actuator_min(cfg_actuator_min),
+    .cfg_actuator_max(cfg_actuator_max),
+    .cfg_velocity_min(cfg_velocity_min),
+    .cfg_velocity_max(cfg_velocity_max),
+    .cfg_enable_request(cfg_enable_request),
+    .cfg_enable_response(cfg_enable_response),
+    .cfg_enable_fallback(cfg_enable_fallback),
+    .cfg_sequence_seed(cfg_sequence_seed),
+    .status_busy(status_busy),
+    .status_request_outstanding(status_request_outstanding),
+    .status_response_accepted(status_response_accepted),
+    .status_stale_reject(status_stale_reject),
+    .status_timeout_reject(status_timeout_reject),
+    .status_malformed_reject(status_malformed_reject),
+    .status_fallback_active(status_fallback_active),
+    .status_clamp_active(status_clamp_active),
+    .status_fault(status_fault),
+    .last_sequence_accepted(last_sequence_accepted),
+    .last_actuator_command(last_actuator_command)
+);
+
+aero_request_framer u_aero_request_framer (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_enable_request(cfg_enable_request),
+    .cfg_sequence_seed(cfg_sequence_seed),
+    .cfg_velocity_min(cfg_velocity_min),
+    .cfg_velocity_max(cfg_velocity_max),
+    .request_type(request_type),
+    .sequence_number(sequence_number),
+    .geometry_handle(geometry_handle),
+    .flow_condition_meta(flow_condition_meta),
+    .velocity_mps(velocity_mps),
+    .request_flags(request_flags),
+    .req_valid(req_valid),
+    .req_ready(req_ready),
+    .req_data(req_data),
+    .request_outstanding(request_outstanding),
+    .busy(busy),
+    .velocity_violation(velocity_violation)
+);
+
+aero_response_deframer u_aero_response_deframer (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_enable_response(cfg_enable_response),
+    .cfg_freshness_threshold(cfg_freshness_threshold),
+    .cfg_timeout_threshold(cfg_timeout_threshold),
+    .expected_sequence_number(sequence_number),
+    .request_outstanding(request_outstanding),
+    .rsp_valid(rsp_valid),
+    .rsp_ready(rsp_ready),
+    .rsp_data(rsp_data),
+    .response_sequence_number(response_sequence_number),
+    .response_status_code(response_status_code),
+    .drag_estimate(drag_estimate),
+    .lift_estimate(lift_estimate),
+    .actuator_hint(actuator_hint),
+    .response_accepted(response_accepted),
+    .stale_reject(stale_reject),
+    .timeout_reject(timeout_reject),
+    .malformed_reject(malformed_reject),
+    .response_fresh(response_fresh),
+    .request_type(request_type),
+    .geometry_handle(geometry_handle),
+    .flow_condition_meta(flow_condition_meta),
+    .velocity_mps(velocity_mps),
+    .request_flags(request_flags)
+);
+
+aero_actuator_mapper u_aero_actuator_mapper (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_actuator_min(cfg_actuator_min),
+    .cfg_actuator_max(cfg_actuator_max),
+    .cfg_enable_fallback(cfg_enable_fallback),
+    .cfg_velocity_min(cfg_velocity_min),
+    .cfg_velocity_max(cfg_velocity_max),
+    .response_accepted(response_accepted),
+    .stale_reject(stale_reject),
+    .timeout_reject(timeout_reject),
+    .malformed_reject(malformed_reject),
+    .velocity_violation(velocity_violation),
+    .actuator_hint(actuator_hint),
+    .lift_estimate(lift_estimate),
+    .drag_estimate(drag_estimate),
+    .act_valid(act_valid),
+    .act_ready(act_ready),
+    .act_data(act_data),
+    .clamp_active(clamp_active),
+    .fallback_active(fallback_active),
+    .last_actuator_command(last_actuator_command),
+    .velocity_mps(velocity_mps),
+    .response_sequence_number(response_sequence_number),
+    .response_status_code(response_status_code),
+    .response_fresh(response_fresh)
+);
+
+assign fault_o = fallback_active;
+
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN aero_mmio_register_window.v---
+module aero_mmio_register_window (
+    clk,
+    rst_n,
+    cfg_valid,
+    cfg_write,
+    cfg_addr,
+    cfg_wdata,
+    cfg_rdata,
+    cfg_ready,
+    cfg_timeout_threshold,
+    cfg_freshness_threshold,
+    cfg_actuator_min,
+    cfg_actuator_max,
+    cfg_velocity_min,
+    cfg_velocity_max,
+    cfg_enable_request,
+    cfg_enable_response,
+    cfg_enable_fallback,
+    cfg_sequence_seed,
+    status_busy,
+    status_request_outstanding,
+    status_response_accepted,
+    status_stale_reject,
+    status_timeout_reject,
+    status_malformed_reject,
+    status_fallback_active,
+    status_clamp_active,
+    status_fault,
+    last_sequence_accepted,
+    last_actuator_command
+);
+input clk;
+input rst_n;
+input cfg_valid;
+input cfg_write;
+input [7:0] cfg_addr;
+input [31:0] cfg_wdata;
+output [31:0] cfg_rdata;
+output cfg_ready;
+output [15:0] cfg_timeout_threshold;
+output [15:0] cfg_freshness_threshold;
+output [15:0] cfg_actuator_min;
+output [15:0] cfg_actuator_max;
+output [15:0] cfg_velocity_min;
+output [15:0] cfg_velocity_max;
+output cfg_enable_request;
+output cfg_enable_response;
+output cfg_enable_fallback;
+output [15:0] cfg_sequence_seed;
+input status_busy;
+input status_request_outstanding;
+input status_response_accepted;
+input status_stale_reject;
+input status_timeout_reject;
+input status_malformed_reject;
+input status_fallback_active;
+input status_clamp_active;
+input status_fault;
+input [15:0] last_sequence_accepted;
+input [63:0] last_actuator_command;
+
+reg [15:0] timeout_threshold_r;
+reg [15:0] freshness_threshold_r;
+reg [15:0] actuator_min_r;
+reg [15:0] actuator_max_r;
+reg [15:0] velocity_min_r;
+reg [15:0] velocity_max_r;
+reg [2:0] enable_bits_r;
+reg [15:0] sequence_seed_r;
+reg [31:0] cfg_rdata_r;
+reg cfg_ready_r;
+
+assign cfg_rdata = cfg_rdata_r;
+assign cfg_ready = cfg_ready_r;
+assign cfg_timeout_threshold = timeout_threshold_r;
+assign cfg_freshness_threshold = freshness_threshold_r;
+assign cfg_actuator_min = actuator_min_r;
+assign cfg_actuator_max = actuator_max_r;
+assign cfg_velocity_min = velocity_min_r;
+assign cfg_velocity_max = velocity_max_r;
+assign cfg_enable_request = enable_bits_r[0];
+assign cfg_enable_response = enable_bits_r[1];
+assign cfg_enable_fallback = enable_bits_r[2];
+assign cfg_sequence_seed = sequence_seed_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        timeout_threshold_r <= 16'h03E8;
+        freshness_threshold_r <= 16'h000A;
+        actuator_min_r <= 16'h0000;
+        actuator_max_r <= 16'h03FF;
+        velocity_min_r <= 16'h0014;
+        velocity_max_r <= 16'h0037;
+        enable_bits_r <= 3'b000;
+        sequence_seed_r <= 16'h0001;
+        cfg_ready_r <= 1'b0;
+        cfg_rdata_r <= 32'h00000000;
+    end else begin
+        cfg_ready_r <= cfg_valid;
+        if (cfg_valid && cfg_write) begin
+            case (cfg_addr)
+                8'h00: timeout_threshold_r[7:0] <= cfg_wdata[7:0];
+                8'h01: timeout_threshold_r[15:8] <= cfg_wdata[7:0];
+                8'h02: freshness_threshold_r[7:0] <= cfg_wdata[7:0];
+                8'h03: freshness_threshold_r[15:8] <= cfg_wdata[7:0];
+                8'h04: actuator_min_r[7:0] <= cfg_wdata[7:0];
+                8'h05: actuator_min_r[15:8] <= cfg_wdata[7:0];
+                8'h06: actuator_max_r[7:0] <= cfg_wdata[7:0];
+                8'h07: actuator_max_r[15:8] <= cfg_wdata[7:0];
+                8'h08: velocity_min_r[7:0] <= cfg_wdata[7:0];
+                8'h09: velocity_min_r[15:8] <= cfg_wdata[7:0];
+                8'h0A: velocity_max_r[7:0] <= cfg_wdata[7:0];
+                8'h0B: velocity_max_r[15:8] <= cfg_wdata[7:0];
+                8'h0C: begin
+                    enable_bits_r[0] <= cfg_wdata[0];
+                    enable_bits_r[1] <= cfg_wdata[1];
+                    enable_bits_r[2] <= cfg_wdata[2];
+                end
+                8'h0D: sequence_seed_r[7:0] <= cfg_wdata[7:0];
+                8'h0E: sequence_seed_r[15:8] <= cfg_wdata[7:0];
+                default: begin
+                end
+            endcase
+        end
+        case (cfg_addr)
+            8'h00: cfg_rdata_r <= {16'h0000, timeout_threshold_r};
+            8'h01: cfg_rdata_r <= {24'h000000, timeout_threshold_r[15:8]};
+            8'h02: cfg_rdata_r <= {16'h0000, freshness_threshold_r};
+            8'h03: cfg_rdata_r <= {24'h000000, freshness_threshold_r[15:8]};
+            8'h04: cfg_rdata_r <= {24'h000000, actuator_min_r[7:0]};
+            8'h05: cfg_rdata_r <= {24'h000000, actuator_min_r[15:8]};
+            8'h06: cfg_rdata_r <= {24'h000000, actuator_max_r[7:0]};
+            8'h07: cfg_rdata_r <= {24'h000000, actuator_max_r[15:8]};
+            8'h08: cfg_rdata_r <= {24'h000000, velocity_min_r[7:0]};
+            8'h09: cfg_rdata_r <= {24'h000000, velocity_min_r[15:8]};
+            8'h0A: cfg_rdata_r <= {24'h000000, velocity_max_r[7:0]};
+            8'h0B: cfg_rdata_r <= {24'h000000, velocity_max_r[15:8]};
+            8'h0C: cfg_rdata_r <= {29'h00000000, enable_bits_r};
+            8'h0D: cfg_rdata_r <= {24'h000000, sequence_seed_r[7:0]};
+            8'h0E: cfg_rdata_r <= {24'h000000, sequence_seed_r[15:8]};
+            8'h10: cfg_rdata_r <= {31'h00000000, status_busy};
+            8'h11: cfg_rdata_r <= {31'h00000000, status_request_outstanding};
+            8'h12: cfg_rdata_r <= {31'h00000000, status_response_accepted};
+            8'h13: cfg_rdata_r <= {31'h00000000, status_stale_reject};
+            8'h14: cfg_rdata_r <= {31'h00000000, status_timeout_reject};
+            8'h15: cfg_rdata_r <= {31'h00000000, status_malformed_reject};
+            8'h16: cfg_rdata_r <= {31'h00000000, status_fallback_active};
+            8'h17: cfg_rdata_r <= {31'h00000000, status_clamp_active};
+            8'h18: cfg_rdata_r <= {16'h0000, last_sequence_accepted};
+            8'h19: cfg_rdata_r <= {24'h000000, last_sequence_accepted[15:8]};
+            8'h1A: cfg_rdata_r <= {24'h000000, last_actuator_command[7:0]};
+            8'h1B: cfg_rdata_r <= {24'h000000, last_actuator_command[15:8]};
+            8'h1C: cfg_rdata_r <= {24'h000000, last_actuator_command[23:16]};
+            8'h1D: cfg_rdata_r <= {24'h000000, last_actuator_command[31:24]};
+            8'h1E: cfg_rdata_r <= {24'h000000, last_actuator_command[39:32]};
+            8'h1F: cfg_rdata_r <= {24'h000000, last_actuator_command[47:40]};
+            8'h20: cfg_rdata_r <= {24'h000000, last_actuator_command[55:48]};
+            8'h21: cfg_rdata_r <= {24'h000000, last_actuator_command[63:56]};
+            8'h22: cfg_rdata_r <= {24'h000000, status_fault, status_clamp_active, status_fallback_active, status_malformed_reject, status_timeout_reject, status_stale_reject, status_response_accepted, status_request_outstanding};
+            default: cfg_rdata_r <= 32'h00000000;
+        endcase
+    end
+end
+
+endmodule
+---END aero_mmio_register_window.v---
+---BEGIN aero_request_framer.v---
+module aero_request_framer (
+    clk,
+    rst_n,
+    cfg_enable_request,
+    cfg_sequence_seed,
+    cfg_velocity_min,
+    cfg_velocity_max,
+    request_type,
+    sequence_number,
+    geometry_handle,
+    flow_condition_meta,
+    velocity_mps,
+    request_flags,
+    req_valid,
+    req_ready,
+    req_data,
+    request_outstanding,
+    busy,
+    velocity_violation
+);
+input clk;
+input rst_n;
+input cfg_enable_request;
+input [15:0] cfg_sequence_seed;
+input [15:0] cfg_velocity_min;
+input [15:0] cfg_velocity_max;
+output [7:0] request_type;
+output [15:0] sequence_number;
+output [31:0] geometry_handle;
+output [31:0] flow_condition_meta;
+output [15:0] velocity_mps;
+output [23:0] request_flags;
+output req_valid;
+input req_ready;
+output [127:0] req_data;
+output request_outstanding;
+output busy;
+output velocity_violation;
+
+reg [7:0] request_type_r;
+reg [15:0] sequence_number_r;
+reg [31:0] geometry_handle_r;
+reg [31:0] flow_condition_meta_r;
+reg [15:0] velocity_mps_r;
+reg [23:0] request_flags_r;
+reg req_valid_r;
+reg [127:0] req_data_r;
+reg request_outstanding_r;
+reg busy_r;
+reg velocity_violation_r;
+reg [15:0] seq_next_r;
+
+assign request_type = request_type_r;
+assign sequence_number = sequence_number_r;
+assign geometry_handle = geometry_handle_r;
+assign flow_condition_meta = flow_condition_meta_r;
+assign velocity_mps = velocity_mps_r;
+assign request_flags = request_flags_r;
+assign req_valid = req_valid_r;
+assign req_data = req_data_r;
+assign request_outstanding = request_outstanding_r;
+assign busy = busy_r;
+assign velocity_violation = velocity_violation_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        request_type_r <= 8'h01;
+        sequence_number_r <= 16'h0001;
+        geometry_handle_r <= 32'h00000000;
+        flow_condition_meta_r <= 32'h00000000;
+        velocity_mps_r <= 16'h0014;
+        request_flags_r <= 24'h000000;
+        req_valid_r <= 1'b0;
+        req_data_r <= 128'h00000000000000000000000000000000;
+        request_outstanding_r <= 1'b0;
+        busy_r <= 1'b0;
+        velocity_violation_r <= 1'b0;
+        seq_next_r <= 16'h0001;
+    end else begin
+        request_type_r <= 8'h01;
+        geometry_handle_r <= 32'h00000001;
+        flow_condition_meta_r <= {16'h0000, cfg_velocity_min};
+        velocity_mps_r <= cfg_velocity_min;
+        request_flags_r <= {23'h000000, cfg_enable_request};
+        velocity_violation_r <= (cfg_velocity_min < 16'd20) || (cfg_velocity_max > 16'd55) || (cfg_velocity_min > cfg_velocity_max);
+        busy_r <= req_valid_r | request_outstanding_r;
+        if (cfg_enable_request && !request_outstanding_r && !velocity_violation_r) begin
+            req_valid_r <= 1'b1;
+            request_outstanding_r <= 1'b1;
+            sequence_number_r <= seq_next_r;
+            req_data_r <= {8'h01, seq_next_r, 32'h00000001, {16'h0000, cfg_velocity_min}, 16'h0000, 24'h000000, 40'h0000000000};
+            seq_next_r <= seq_next_r + 16'h0001;
+        end else if (req_valid_r && req_ready) begin
+            req_valid_r <= 1'b0;
+            request_outstanding_r <= 1'b1;
+        end else if (!cfg_enable_request) begin
+            req_valid_r <= 1'b0;
+            request_outstanding_r <= 1'b0;
+        end
+        if (req_valid_r && req_ready) begin
+            req_valid_r <= 1'b0;
+            request_outstanding_r <= 1'b1;
+        end
+    end
+end
+
+endmodule
+---END aero_request_framer.v---
+---BEGIN aero_response_deframer.v---
+module aero_response_deframer (
+    clk,
+    rst_n,
+    cfg_enable_response,
+    cfg_freshness_threshold,
+    cfg_timeout_threshold,
+    expected_sequence_number,
+    request_outstanding,
+    rsp_valid,
+    rsp_ready,
+    rsp_data,
+    response_sequence_number,
+    response_status_code,
+    drag_estimate,
+    lift_estimate,
+    actuator_hint,
+    response_accepted,
+    stale_reject,
+    timeout_reject,
+    malformed_reject,
+    response_fresh,
+    request_type,
+    geometry_handle,
+    flow_condition_meta,
+    velocity_mps,
+    request_flags
+);
+input clk;
+input rst_n;
+input cfg_enable_response;
+input [15:0] cfg_freshness_threshold;
+input [15:0] cfg_timeout_threshold;
+input [15:0] expected_sequence_number;
+input request_outstanding;
+input rsp_valid;
+output rsp_ready;
+input [127:0] rsp_data;
+output [15:0] response_sequence_number;
+output [7:0] response_status_code;
+output [31:0] drag_estimate;
+output [31:0] lift_estimate;
+output [31:0] actuator_hint;
+output response_accepted;
+output stale_reject;
+output timeout_reject;
+output malformed_reject;
+output response_fresh;
+input [7:0] request_type;
+input [31:0] geometry_handle;
+input [31:0] flow_condition_meta;
+input [15:0] velocity_mps;
+input [23:0] request_flags;
+
+reg rsp_ready_r;
+reg [15:0] response_sequence_number_r;
+reg [7:0] response_status_code_r;
+reg [31:0] drag_estimate_r;
+reg [31:0] lift_estimate_r;
+reg [31:0] actuator_hint_r;
+reg response_accepted_r;
+reg stale_reject_r;
+reg timeout_reject_r;
+reg malformed_reject_r;
+reg response_fresh_r;
+
+assign rsp_ready = rsp_ready_r;
+assign response_sequence_number = response_sequence_number_r;
+assign response_status_code = response_status_code_r;
+assign drag_estimate = drag_estimate_r;
+assign lift_estimate = lift_estimate_r;
+assign actuator_hint = actuator_hint_r;
+assign response_accepted = response_accepted_r;
+assign stale_reject = stale_reject_r;
+assign timeout_reject = timeout_reject_r;
+assign malformed_reject = malformed_reject_r;
+assign response_fresh = response_fresh_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        rsp_ready_r <= 1'b0;
+        response_sequence_number_r <= 16'h0000;
+        response_status_code_r <= 8'h00;
+        drag_estimate_r <= 32'h00000000;
+        lift_estimate_r <= 32'h00000000;
+        actuator_hint_r <= 32'h00000000;
+        response_accepted_r <= 1'b0;
+        stale_reject_r <= 1'b0;
+        timeout_reject_r <= 1'b0;
+        malformed_reject_r <= 1'b0;
+        response_fresh_r <= 1'b0;
+    end else begin
+        rsp_ready_r <= cfg_enable_response;
+        response_accepted_r <= 1'b0;
+        stale_reject_r <= 1'b0;
+        timeout_reject_r <= 1'b0;
+        malformed_reject_r <= 1'b0;
+        response_fresh_r <= 1'b0;
+        if (cfg_enable_response && rsp_valid && request_outstanding) begin
+            response_sequence_number_r <= rsp_data[127:112];
+            response_status_code_r <= rsp_data[111:104];
+            drag_estimate_r <= rsp_data[103:72];
+            lift_estimate_r <= rsp_data[71:40];
+            actuator_hint_r <= rsp_data[39:8];
+            if ((rsp_data[127:112] == expected_sequence_number) && (rsp_data[111:104] == 8'h01)) begin
+                response_fresh_r <= 1'b1;
+                response_accepted_r <= 1'b1;
+            end else if (rsp_data[127:112] != expected_sequence_number) begin
+                stale_reject_r <= 1'b1;
+            end else begin
+                malformed_reject_r <= 1'b1;
+            end
+            if (cfg_timeout_threshold == 16'h0000) begin
+                timeout_reject_r <= 1'b1;
+            end
+            if (cfg_freshness_threshold == 16'h0000) begin
+                stale_reject_r <= 1'b1;
+            end
+        end else if (cfg_enable_response && request_outstanding && !rsp_valid) begin
+            if (cfg_timeout_threshold == 16'h0001) begin
+                timeout_reject_r <= 1'b1;
+            end
+        end
+        if (request_type == 8'h00) begin
+            malformed_reject_r <= malformed_reject_r | 1'b0;
+        end
+        if (geometry_handle == 32'h00000000) begin
+            drag_estimate_r <= drag_estimate_r;
+        end
+        if (flow_condition_meta == 32'h00000000) begin
+            lift_estimate_r <= lift_estimate_r;
+        end
+        if (velocity_mps < 16'd20 || velocity_mps > 16'd55) begin
+            stale_reject_r <= stale_reject_r | 1'b0;
+        end
+        if (request_flags[0]) begin
+            response_fresh_r <= response_fresh_r;
+        end
+    end
+end
+
+endmodule
+---END aero_response_deframer.v---
+---BEGIN aero_actuator_mapper.v---
+module aero_actuator_mapper (
+    clk,
+    rst_n,
+    cfg_actuator_min,
+    cfg_actuator_max,
+    cfg_enable_fallback,
+    cfg_velocity_min,
+    cfg_velocity_max,
+    response_accepted,
+    stale_reject,
+    timeout_reject,
+    malformed_reject,
+    velocity_violation,
+    actuator_hint,
+    lift_estimate,
+    drag_estimate,
+    act_valid,
+    act_ready,
+    act_data,
+    clamp_active,
+    fallback_active,
+    last_actuator_command,
+    velocity_mps,
+    response_sequence_number,
+    response_status_code,
+    response_fresh
+);
+input clk;
+input rst_n;
+input [15:0] cfg_actuator_min;
+input [15:0] cfg_actuator_max;
+input cfg_enable_fallback;
+input [15:0] cfg_velocity_min;
+input [15:0] cfg_velocity_max;
+input response_accepted;
+input stale_reject;
+input timeout_reject;
+input malformed_reject;
+input velocity_violation;
+input [31:0] actuator_hint;
+input [31:0] lift_estimate;
+input [31:0] drag_estimate;
+output act_valid;
+input act_ready;
+output [63:0] act_data;
+output clamp_active;
+output fallback_active;
+output [63:0] last_actuator_command;
+input [15:0] velocity_mps;
+input [15:0] response_sequence_number;
+input [7:0] response_status_code;
+input response_fresh;
+
+reg act_valid_r;
+reg [63:0] act_data_r;
+reg clamp_active_r;
+reg fallback_active_r;
+reg [63:0] last_actuator_command_r;
+reg [63:0] candidate_command_r;
+reg [63:0] bounded_command_r;
+reg clamp_event_r;
+reg fallback_event_r;
+
+assign act_valid = act_valid_r;
+assign act_data = act_data_r;
+assign clamp_active = clamp_active_r;
+assign fallback_active = fallback_active_r;
+assign last_actuator_command = last_actuator_command_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        act_valid_r <= 1'b0;
+        act_data_r <= 64'h0000000000000000;
+        clamp_active_r <= 1'b0;
+        fallback_active_r <= 1'b0;
+        last_actuator_command_r <= 64'h0000000000000000;
+        candidate_command_r <= 64'h0000000000000000;
+        bounded_command_r <= 64'h0000000000000000;
+        clamp_event_r <= 1'b0;
+        fallback_event_r <= 1'b0;
+    end else begin
+        candidate_command_r <= {response_sequence_number, response_status_code, velocity_mps, actuator_hint[15:0], 16'h0000};
+        if (response_accepted && response_fresh && !stale_reject && !timeout_reject && !malformed_reject && !velocity_violation) begin
+            if (actuator_hint[15:0] < cfg_actuator_min) begin
+                bounded_command_r[15:0] <= cfg_actuator_min;
+                clamp_event_r <= 1'b1;
+            end else if (actuator_hint[15:0] > cfg_actuator_max) begin
+                bounded_command_r[15:0] <= cfg_actuator_max;
+                clamp_event_r <= 1'b1;
+            end else begin
+                bounded_command_r[15:0] <= actuator_hint[15:0];
+                clamp_event_r <= 1'b0;
+            end
+            bounded_command_r[31:16] <= lift_estimate[15:0];
+            bounded_command_r[47:32] <= drag_estimate[15:0];
+            bounded_command_r[63:48] <= response_sequence_number;
+            act_data_r <= bounded_command_r;
+            act_valid_r <= 1'b1;
+            fallback_event_r <= 1'b0;
+            fallback_active_r <= 1'b0;
+            last_actuator_command_r <= bounded_command_r;
+            clamp_active_r <= clamp_event_r;
+        end else begin
+            act_valid_r <= 1'b1;
+            fallback_event_r <= 1'b1;
+            fallback_active_r <= cfg_enable_fallback | stale_reject | timeout_reject | malformed_reject | velocity_violation;
+            clamp_active_r <= 1'b0;
+            if (cfg_enable_fallback) begin
+                act_data_r <= 64'h00000000000000A5;
+                last_actuator_command_r <= 64'h00000000000000A5;
+            end else begin
+                act_data_r <= 64'h0000000000000000;
+                last_actuator_command_r <= 64'h0000000000000000;
+            end
+        end
+        if (act_ready && act_valid_r) begin
+            act_valid_r <= 1'b0;
+        end
+        if (velocity_mps < cfg_velocity_min || velocity_mps > cfg_velocity_max) begin
+            fallback_active_r <= 1'b1;
+        end
+        if (response_status_code != 8'h01 && response_accepted) begin
+            fallback_active_r <= 1'b1;
+        end
+    end
+end
+
+endmodule
+---END aero_actuator_mapper.v---

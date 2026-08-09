@@ -1,0 +1,277 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Compact synthesizable FPGA wrapper that wires together MMIO configuration/status, bounded request framing, response validation, actuator mapping, and fallback supervision for an external asynchronous aerodynamics runtime.",
+      "control_strategy": "Use simple synchronous control with small counters, comparators, flag registers, and handshake gating. The top-level behavior is largely supervisory and routes semantic signals between submodules without introducing new protocol layers or hidden interfaces.",
+      "state_strategy": "Maintain only minimal control state for outstanding-request tracking, sequence correlation, timeout/freshness supervision, status aggregation, and deterministic reset/fallback defaults. Any buffering remains bounded and finite; bulk payload/history storage, if needed, is expected to map through technology-neutral memory wrapper semantics rather than flat registers.",
+      "output_strategy": "Drive cfg_rdata/cfg_ready from the MMIO window, req_valid/req_data from the request framer, rsp_ready from the response deframer, act_valid/act_data from the actuator mapper, and fault_o from fallback activity. All outputs remain deterministic after reset and during fault conditions.",
+      "ownership_notes": [
+        "Top-level owns integration only; it does not implement surrogate inference, CFD, or large tensor computation.",
+        "Top-level ports remain exactly as specified and are not renamed or expanded.",
+        "fault_o reflects the supervisory fallback/fault condition and is not repurposed for telemetry."
+      ]
+    },
+    {
+      "name": "aero_mmio_register_window",
+      "implementation_style": "Small memory-mapped register block with decoded read/write accesses and deterministic readback.",
+      "control_strategy": "Decode cfg_valid/cfg_write/cfg_addr/cfg_wdata against the implemented register map, ignore unmapped accesses without corrupting state, and expose configuration/status as stable semantic outputs. Readback is direct and simple, with no complex banking behavior.",
+      "state_strategy": "Store only the implemented configuration and status fields: timeout threshold, freshness threshold, actuator min/max, velocity min/max, enable bits, sequence seed, and readback values for last accepted sequence and last actuator command. No bulk payload or history is stored as flat registers.",
+      "output_strategy": "Return cfg_rdata and cfg_ready for host access, and forward configuration fields to the control submodules. Status inputs are sampled synchronously and reflected in the register window readback.",
+      "ownership_notes": [
+        "Owns cfg_rdata, cfg_ready, and the semantic configuration outputs listed in the spec.",
+        "Must not drive request, response, or actuator data paths.",
+        "Unmapped writes remain safely ignored or defined by ready/readback behavior."
+      ]
+    },
+    {
+      "name": "aero_request_framer",
+      "implementation_style": "Bounded metadata-only request formatter for an external asynchronous runtime.",
+      "control_strategy": "Construct a compact 128-bit request frame from request type, sequence number, geometry handle, flow-condition metadata, velocity, and flags. Hold req_valid and req_data stable until req_ready completes the handshake. Maintain at most one outstanding request by default.",
+      "state_strategy": "Keep minimal request-sequencing and outstanding-request state, plus a busy indication and velocity-violation flag. Sequence initialization comes from the configured seed; no large queue or payload storage is inferred.",
+      "output_strategy": "Emit req_valid/req_data only when request generation is enabled and the frame is ready. Provide request_type, sequence_number, geometry_handle, flow_condition_meta, velocity_mps, request_flags, request_outstanding, busy, and velocity_violation as supervisory metadata.",
+      "ownership_notes": [
+        "Owns req_valid and req_data.",
+        "Does not deserialize STL or process large geometry arrays internally.",
+        "Request buffering, if any, remains bounded and finite."
+      ]
+    },
+    {
+      "name": "aero_response_deframer",
+      "implementation_style": "Compact inbound response parser and validator for asynchronous external model output.",
+      "control_strategy": "Sample rsp_valid/rsp_data when enabled, parse the fixed response fields, and validate sequence correlation, packet status, freshness, and timeout policy before acknowledging acceptance. Reject stale, malformed, mismatched, or timed-out responses deterministically.",
+      "state_strategy": "Track the expected sequence number, response freshness/acceptance flags, and reject indicators. The logic is supervisory and does not infer any model-compute behavior.",
+      "output_strategy": "Assert rsp_ready when the controller can accept responses, and produce response_sequence_number, response_status_code, drag_estimate, lift_estimate, actuator_hint, response_accepted, stale_reject, timeout_reject, malformed_reject, and response_fresh.",
+      "ownership_notes": [
+        "Owns rsp_ready and the parsed semantic response outputs.",
+        "Must not drive req_data or act_data.",
+        "Any invalid response is discarded and translated into reject/fallback supervision."
+      ]
+    },
+    {
+      "name": "aero_actuator_mapper",
+      "implementation_style": "Simple validated-response-to-actuator-command mapper with clamping and deterministic fallback selection.",
+      "control_strategy": "Use accepted response hints and estimates to form a 64-bit actuator command, clamp the command to configured min/max bounds, and override with a safe fallback pattern whenever response acceptance fails or supervision flags a violation.",
+      "state_strategy": "Hold only the last issued actuator command plus clamp/fallback status. The output behavior is deterministic on reset and under all fault conditions.",
+      "output_strategy": "Drive act_valid/act_data toward the downstream plant interface, with clamp_active and fallback_active reflecting the current command path. The last_actuator_command is retained for MMIO readback.",
+      "ownership_notes": [
+        "Owns act_valid and act_data.",
+        "Fallback is selected on timeout, stale, malformed, velocity violation, or external-service-unavailable indications.",
+        "Command clamping occurs before act_valid assertion."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "module": "adaptive_aero_control_top",
+      "present": true,
+      "description": "Only a small supervisory sequencing intent is implied: idle, request-issued/outstanding, response-waiting, response-accepted, and fallback/faulted behavior. This is intentionally kept simple and may be implemented as flag-based control rather than a deeply encoded FSM.",
+      "states": [
+        "RESET",
+        "IDLE",
+        "REQUEST_PENDING",
+        "WAIT_RESPONSE",
+        "ACCEPT_RESPONSE",
+        "FALLBACK"
+      ]
+    },
+    {
+      "module": "aero_request_framer",
+      "present": true,
+      "description": "A minimal handshake-oriented request issuance sequence is implied to manage a single outstanding request and stable req_data until completion.",
+      "states": [
+        "IDLE",
+        "ISSUE",
+        "HOLD_VALID",
+        "WAIT_ACCEPT"
+      ]
+    },
+    {
+      "module": "aero_response_deframer",
+      "present": true,
+      "description": "A lightweight response-accept/reject sequencing intent is implied, centered on validating one response frame at a time against the expected sequence and freshness policy.",
+      "states": [
+        "IDLE",
+        "CAPTURE",
+        "VALIDATE",
+        "ACCEPT",
+        "REJECT"
+      ]
+    },
+    {
+      "module": "aero_actuator_mapper",
+      "present": true,
+      "description": "A small command-selection intent is implied between validated command generation and deterministic fallback emission.",
+      "states": [
+        "IDLE",
+        "MAP",
+        "CLAMP",
+        "EMIT",
+        "FALLBACK"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "module": "adaptive_aero_control_top",
+      "inputs": [
+        "clk",
+        "rst_n",
+        "cfg_valid",
+        "cfg_write",
+        "cfg_addr",
+        "cfg_wdata",
+        "req_ready",
+        "rsp_valid",
+        "rsp_data",
+        "act_ready"
+      ],
+      "internal_storage": [
+        "Configuration registers for timeout, freshness, actuator min/max, velocity min/max, enable bits, and sequence seed",
+        "Status flags for busy, request outstanding, response accepted, stale reject, timeout reject, malformed reject, fallback active, clamp active, and fault",
+        "Outstanding request sequencing and response correlation state",
+        "Last accepted sequence number and last actuator command readback"
+      ],
+      "output_mapping": [
+        "cfg_rdata and cfg_ready are driven by the MMIO register window",
+        "req_valid and req_data are driven by the request framer",
+        "rsp_ready is driven by the response deframer",
+        "act_valid and act_data are driven by the actuator mapper",
+        "fault_o is driven from fallback activity and supervisory fault intent"
+      ]
+    },
+    {
+      "module": "aero_mmio_register_window",
+      "inputs": [
+        "cfg_valid",
+        "cfg_write",
+        "cfg_addr",
+        "cfg_wdata",
+        "status_busy",
+        "status_request_outstanding",
+        "status_response_accepted",
+        "status_stale_reject",
+        "status_timeout_reject",
+        "status_malformed_reject",
+        "status_fallback_active",
+        "status_clamp_active",
+        "status_fault",
+        "last_sequence_accepted",
+        "last_actuator_command"
+      ],
+      "internal_storage": [
+        "Small register set for implemented map entries only",
+        "Defined reset values and current configuration state"
+      ],
+      "output_mapping": [
+        "cfg_rdata and cfg_ready for host bus access",
+        "cfg_timeout_threshold, cfg_freshness_threshold, cfg_actuator_min, cfg_actuator_max, cfg_velocity_min, cfg_velocity_max, cfg_enable_request, cfg_enable_response, cfg_enable_fallback, cfg_sequence_seed to downstream blocks"
+      ]
+    },
+    {
+      "module": "aero_request_framer",
+      "inputs": [
+        "cfg_enable_request",
+        "cfg_sequence_seed",
+        "cfg_velocity_min",
+        "cfg_velocity_max",
+        "req_ready"
+      ],
+      "internal_storage": [
+        "Sequence counter initialized from seed",
+        "Outstanding-request flag",
+        "Stable frame shadow register for req_data while waiting for handshake"
+      ],
+      "output_mapping": [
+        "request_type, sequence_number, geometry_handle, flow_condition_meta, velocity_mps, request_flags as frame fields",
+        "req_valid and req_data as the outbound transport frame",
+        "request_outstanding and busy as supervision flags",
+        "velocity_violation when requested velocity falls outside the configured envelope"
+      ]
+    },
+    {
+      "module": "aero_response_deframer",
+      "inputs": [
+        "cfg_enable_response",
+        "cfg_freshness_threshold",
+        "cfg_timeout_threshold",
+        "expected_sequence_number",
+        "request_outstanding",
+        "rsp_valid",
+        "rsp_data",
+        "request_type",
+        "geometry_handle",
+        "flow_condition_meta",
+        "velocity_mps",
+        "request_flags"
+      ],
+      "internal_storage": [
+        "Parsed response fields",
+        "Freshness/timeout supervision flags",
+        "Sequence correlation state"
+      ],
+      "output_mapping": [
+        "rsp_ready as inbound acceptance control",
+        "response_sequence_number, response_status_code, drag_estimate, lift_estimate, actuator_hint as parsed semantics",
+        "response_accepted, stale_reject, timeout_reject, malformed_reject, response_fresh as validation outcomes"
+      ]
+    },
+    {
+      "module": "aero_actuator_mapper",
+      "inputs": [
+        "cfg_actuator_min",
+        "cfg_actuator_max",
+        "cfg_enable_fallback",
+        "cfg_velocity_min",
+        "cfg_velocity_max",
+        "response_accepted",
+        "stale_reject",
+        "timeout_reject",
+        "malformed_reject",
+        "velocity_violation",
+        "actuator_hint",
+        "lift_estimate",
+        "drag_estimate",
+        "act_ready",
+        "velocity_mps",
+        "response_sequence_number",
+        "response_status_code",
+        "response_fresh"
+      ],
+      "internal_storage": [
+        "Last issued actuator command",
+        "Clamp/fallback status bits",
+        "Deterministic safe fallback command pattern"
+      ],
+      "output_mapping": [
+        "act_valid and act_data as the downstream command stream",
+        "clamp_active to indicate bound enforcement",
+        "fallback_active to indicate safe-mode selection",
+        "last_actuator_command for MMIO readback"
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "All sequential behavior is synchronous to clk with active-low reset rst_n.",
+    "Reset establishes deterministic safe values for request, response, and actuator paths.",
+    "The request framer should not update req_data while req_valid is high and req_ready is low.",
+    "The response deframer only promotes a response when sequence, status, freshness, and timeout checks pass.",
+    "The actuator mapper emits commands only after validation and clamps before asserting act_valid.",
+    "Fallback is selected deterministically whenever the external runtime is unavailable or any supervision condition fails.",
+    "The register window should provide stable readback between writes and ignore unmapped accesses without X-propagation."
+  ],
+  "timing_notes": [
+    "No unsized arithmetic or combinational feedback loops should be introduced.",
+    "Handshake logic should remain simple and bounded for FPGA synthesis.",
+    "Any buffering or history storage should remain finite and technology-neutral, suitable for block RAM mapping if needed.",
+    "The top-level fault indication may be derived from registered fallback activity to preserve determinism.",
+    "Freshness and timeout checks should rely on small counters/comparators rather than complex timekeeping structures."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}
