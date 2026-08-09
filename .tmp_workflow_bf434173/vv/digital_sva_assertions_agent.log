@@ -1,0 +1,26 @@
+Digital Assertions (SVA) Agent Log
+[2026-08-09T19:11:44.592276] [INFO] Starting Digital Assertions (SVA) Agent...
+[2026-08-09T19:11:44.592660] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/bf434173-b47d-4407-865d-8a369997c048/spec/fpga_verification_source_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 1,
+  "top_module": "pwm_fpga_demo",
+  "soc_mode": false
+}
+[2026-08-09T19:11:44.592893] [INFO] resolved_mode=digital
+[2026-08-09T19:11:44.592964] [INFO] spec_path=/root/chiploop-backend/backend/workflows/bf434173-b47d-4407-865d-8a369997c048/spec/fpga_verification_source_spec.json
+[2026-08-09T19:11:44.593031] [INFO] top_module=pwm_fpga_demo
+[2026-08-09T19:11:44.593092] [INFO] rtl_file_count=1
+[2026-08-09T19:11:44.593168] [INFO] clock_candidates=[]
+[2026-08-09T19:11:44.593278] [INFO] reset_candidates=[]
+[2026-08-09T19:11:44.593430] [INFO] sva_ports={
+  "port_names": [],
+  "input_count": 0,
+  "output_count": 0
+}
+[2026-08-09T19:11:44.593625] [INFO] LLM SVA expansion disabled; using deterministic scaffold.
+[2026-08-09T19:11:44.713466] [INFO] Generated pwm_fpga_demo_assertions.sv
+[2026-08-09T19:11:44.713777] [INFO] Generated sva_spec.json
+[2026-08-09T19:11:44.713870] [INFO] Generated SVA_README.md

@@ -1,0 +1,24 @@
+{
+  "type": "vv_simulation_manifest",
+  "version": "1.1",
+  "top_module": "pwm_fpga_demo",
+  "spec_path": "/root/chiploop-backend/backend/workflows/bf434173-b47d-4407-865d-8a369997c048/spec/fpga_verification_source_spec.json",
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/bf434173-b47d-4407-865d-8a369997c048/handoff/rtl/pwm_fpga_demo.v"
+  ],
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity"
+  ],
+  "runner": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/run_regression.py",
+  "makefile": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/Makefile",
+  "testcases_json": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/testcases.json",
+  "tb_contract_json": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/tb_contract.json",
+  "reports_dir": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/reports",
+  "simulator": "verilator",
+  "sva_assertions_path": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/pwm_fpga_demo_assertions.sv",
+  "sva_bind_path": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/pwm_fpga_demo_assertions_bind.sv",
+  "coverage_model_py": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/coverage_model.py",
+  "functional_coverage_summary_json": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/reports/functional_coverage_summary.json",
+  "functional_coverage_md": "backend/workflows/bf434173-b47d-4407-865d-8a369997c048/vv/tb/reports/COVERAGE.md"
+}

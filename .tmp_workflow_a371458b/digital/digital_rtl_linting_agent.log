@@ -1,4 +1,0 @@
-RTL Linting Agent Log
-[2026-08-09T15:28:56.112910] Discovered 1 RTL files under backend/workflows/a371458b-e094-4745-8b94-94125198585e
-[2026-08-09T15:28:56.115146] Running via ChipLoop tool profile: iverilog -g2012 -tnull /root/chiploop-backend/backend/workflows/a371458b-e094-4745-8b94-94125198585e/rtl/pwm_fpga_demo.v
-[2026-08-09T15:28:56.129034] Running via ChipLoop tool profile: verilator --lint-only -Wall -Wno-fatal /root/chiploop-backend/backend/workflows/a371458b-e094-4745-8b94-94125198585e/rtl/pwm_fpga_demo.v

@@ -1,3 +1,0 @@
-read_verilog -sv /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv
-read_verilog -sv /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv
-synth_ecp5 -top minirv_edge_controller_spi_fpga_top -noflatten -json /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/colorlight_5a_75b/baseline/synth/minirv_edge_controller_spi_fpga_top_ecp5.json

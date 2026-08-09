@@ -1,0 +1,40 @@
+{
+  "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+  "command": {
+    "cmd": [
+      "/usr/bin/yosys",
+      "-s",
+      "/root/chiploop-backend/backend/workflows/bf434173-b47d-4407-865d-8a369997c048/fpga/lec/fpga_rtl_to_netlist_lec.ys"
+    ],
+    "error": null,
+    "executable": "/usr/bin/yosys",
+    "log": "/root/chiploop-backend/backend/workflows/bf434173-b47d-4407-865d-8a369997c048/fpga/lec/fpga_rtl_to_netlist_lec.log",
+    "ok": false,
+    "profile_id": "chiploop_saas_default",
+    "returncode": 1,
+    "status": "failed",
+    "stderr_tail": "ERROR: Found 10 unproven $equiv cells in 'equiv_status -assert'.\n",
+    "stdout_tail": "3 clauses over 492241 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 34. (1324194 clauses over 492241 variables)\n  Proving induction step 34. (1363199 clauses over 506739 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 35. (1363200 clauses over 506739 variables)\n  Proving induction step 35. (1402205 clauses over 521237 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 36. (1402206 clauses over 521237 variables)\n  Proving induction step 36. (1441211 clauses over 535735 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 37. (1441212 clauses over 535735 variables)\n  Proving induction step 37. (1480217 clauses over 550233 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 38. (1480218 clauses over 550233 variables)\n  Proving induction step 38. (1519223 clauses over 564731 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 39. (1519224 clauses over 564731 variables)\n  Proving induction step 39. (1558229 clauses over 579229 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 40. (1558230 clauses over 579229 variables)\n  Proving induction step 40. (1597235 clauses over 593727 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 41. (1597236 clauses over 593727 variables)\n  Proving induction step 41. (1636241 clauses over 608225 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 42. (1636242 clauses over 608225 variables)\n  Proving induction step 42. (1675247 clauses over 622723 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 43. (1675248 clauses over 622723 variables)\n  Proving induction step 43. (1714253 clauses over 637221 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 44. (1714254 clauses over 637221 variables)\n  Proving induction step 44. (1753259 clauses over 651719 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 45. (1753260 clauses over 651719 variables)\n  Proving induction step 45. (1792265 clauses over 666217 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 46. (1792266 clauses over 666217 variables)\n  Proving induction step 46. (1831271 clauses over 680715 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 47. (1831272 clauses over 680715 variables)\n  Proving induction step 47. (1870277 clauses over 695213 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 48. (1870278 clauses over 695213 variables)\n  Proving induction step 48. (1909283 clauses over 709711 variables)\n  Proof for induction step failed. Trying to prove individual $equiv from workset.\n  Trying to prove $equiv for \\led: failed.\n  Trying to prove $equiv for \\pwm_led: failed.\n  Trying to prove $equiv for \\duty_cycle [2]: failed.\n  Trying to prove $equiv for \\duty_cycle [3]: failed.\n  Trying to prove $equiv for \\duty_cycle [4]: failed.\n  Trying to prove $equiv for \\duty_cycle [5]: failed.\n  Trying to prove $equiv for \\duty_cycle [7]: failed.\n  Trying to prove $equiv for \\duty_cycle [0]: failed.\n  Trying to prove $equiv for \\duty_cycle [1]: failed.\n  Trying to prove $equiv for \\duty_cycle [6]: failed.\nProved 0 previously unproven $equiv cells.\n\n12. Executing EQUIV_STATUS pass.\n"
+  },
+  "comparison": "approved_rtl_vs_synthesis_netlist",
+  "enabled": true,
+  "failure_kind": "proof_incomplete",
+  "family": "ice40",
+  "induction_depth": 12,
+  "induction_depths_attempted": [
+    12,
+    24,
+    48
+  ],
+  "log": "/root/chiploop-backend/backend/workflows/bf434173-b47d-4407-865d-8a369997c048/fpga/lec/fpga_rtl_to_netlist_lec.log",
+  "netlist": "/root/chiploop-backend/backend/workflows/bf434173-b47d-4407-865d-8a369997c048/fpga/synth/pwm_fpga_demo_ice40_netlist.v",
+  "proven": false,
+  "reason": "Yosys could not prove 10 equivalence points after induction depths 12, 24, 48.",
+  "required": true,
+  "rtl_file_count": 1,
+  "script": "/root/chiploop-backend/backend/workflows/bf434173-b47d-4407-865d-8a369997c048/fpga/lec/fpga_rtl_to_netlist_lec.ys",
+  "status": "inconclusive",
+  "tool": "Yosys",
+  "top_module": "pwm_fpga_demo",
+  "unproven_points": 10
+}

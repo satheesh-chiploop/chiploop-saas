@@ -1,0 +1,75 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "top_module": "pwm_fpga_demo",
+  "design_summary": {
+    "purpose": "Single-clock FPGA-friendly PWM LED demo for board prototyping on Lattice FPGA open-source flows, producing a visible breathing/fading indicator on one LED.",
+    "operating_model": "The top module samples the single board clock input clk, advances an internal slow counter and an 8-bit free-running PWM counter, compares the PWM counter against an 8-bit duty-cycle register, and drives led according to the comparison result. The duty cycle updates only on slow update events and ramps up and down under control of a direction bit to create a continuous breathing pattern. The design is intended to remain synthesizable and portable for lint, Yosys synthesis, nextpnr place-and-route, timing review, and bitstream handoff.",
+    "external_interfaces": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": 1,
+        "description": "Single synchronous board clock input for the entire design."
+      },
+      {
+        "name": "led",
+        "direction": "output",
+        "width": 1,
+        "description": "Board-level LED indicator driven by the PWM comparison result, treated as active-high unless board-level polarity review requires otherwise."
+      }
+    ]
+  },
+  "module_architecture": {
+    "name": "pwm_fpga_demo",
+    "role": "Single top-level demo controller and output driver.",
+    "responsibilities": [
+      "Provide the top-level single-clock interface for the demo.",
+      "Generate the slow update timing for visible brightness changes.",
+      "Generate an 8-bit PWM carrier counter.",
+      "Maintain an 8-bit duty-cycle register that smoothly ramps up and down.",
+      "Maintain a direction bit that selects increasing or decreasing brightness.",
+      "Drive the LED output with the PWM result.",
+      "Remain portable across supported Lattice FPGA synthesis and place-and-route flows."
+    ],
+    "interface_notes": [
+      "Consumes clk only; no reset port is present.",
+      "Drives led only; no additional outputs or internal contract ports are defined.",
+      "The design relies on synthesizable FPGA-safe initialization where supported, with benign startup values for duty cycle, direction, slow counter, and PWM counter.",
+      "Board-specific starter pin constraints are not part of RTL and are generated externally after board selection using PCF for iCE40 and LPF for ECP5."
+    ],
+    "ownership_notes": [
+      "The slow counter owns update pacing for human-visible brightness changes.",
+      "The PWM counter owns the 8-bit sawtooth carrier used for duty comparison.",
+      "The duty-cycle register owns the current brightness threshold.",
+      "The direction bit owns the ramp polarity and toggles at the endpoints.",
+      "The LED output owns the final visible breathing/fading behavior at the board pin."
+    ]
+  },
+  "data_flow_summary": [
+    "clk enters the top module and clocks all internal sequential state in a single synchronous domain.",
+    "The slow counter advances on each rising edge of clk and periodically emits a slow update event.",
+    "The 8-bit PWM counter advances continuously on each rising edge of clk and provides the time base for pulse-width modulation.",
+    "The duty-cycle register is compared against the PWM counter; the comparison result determines led assertion.",
+    "On each slow update event, the duty-cycle register increments when direction indicates rising brightness and decrements when direction indicates falling brightness.",
+    "When the duty-cycle register reaches 8'hFF, the direction bit switches to falling brightness on the next update event.",
+    "When the duty-cycle register reaches 8'h00, the direction bit switches to rising brightness on the next update event.",
+    "The output led reflects the PWM comparison result continuously, producing the visible breathing/fading effect.",
+    "Starter constraints are selected outside the RTL after the target board is chosen, with PCF used for iCE40 boards and LPF used for ECP5 boards."
+  ],
+  "clock_reset_summary": {
+    "clocking": "A single synchronous clock domain is used throughout, driven by the top-level input clk at the specified 50.0 MHz nominal board clock. All counters, the duty-cycle register, and the direction bit are updated on rising edges of clk.",
+    "reset_behavior": "No explicit reset port is present. Internal registers are intended to power up in a benign demo state suitable for FPGA flows: duty cycle at minimum brightness, direction set to increasing, slow counter at zero, and PWM counter at zero where initialization is supported. If a flow or device does not honor initialization, the design must still converge safely to the breathing pattern without unsafe behavior."
+  },
+  "integration_notes": [
+    "The top module is a single-module design with no required internal hierarchy.",
+    "The LED polarity should be reviewed against the selected board and any external circuitry before programming hardware.",
+    "The implementation must avoid ASIC-only constructs, delays, real-number types, DPI, memories, vendor primitives, and testbench-only code in the top module.",
+    "Starter pin constraints are external artifacts for bring-up only and must be reviewed before physical hardware programming."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "Hierarchy, ports, and filenames are inherited from digital_spec_json.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

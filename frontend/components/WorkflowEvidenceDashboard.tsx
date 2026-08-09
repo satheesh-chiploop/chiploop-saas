@@ -1661,13 +1661,37 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const ev = (...keys: string[]) => firstPresent(...keys.map((key) => evidence[key]));
       const explorer = record(ev("fpga_target_explorer.json", "fpga/target_explorer/fpga_target_explorer.json"));
       const results = array(explorer.results).map(record);
-      const recommendations = record(explorer.recommendations);
+      const storedRecommendations = record(explorer.recommendations);
       const recommendationDetails = record(explorer.recommendation_details);
       const continuation = record(explorer.continuation);
       const ioMapping = record(ev("fpga_explorer_io_mapping.json", "fpga/target_explorer/fpga_explorer_io_mapping.json"));
       const ioMappings = array(ioMapping.mappings).map(record);
       const targetMhz = firstNumber(explorer.target_frequency_mhz);
       const maxFmax = Math.max(...results.map((item) => firstNumber(item.best_frequency_mhz) || 0), targetMhz || 1);
+      // Older Explorer artifacts filtered out timing-valid boards when their
+      // physical pin map was incomplete, leaving every recommendation card as
+      // "Unavailable". Derive a read-only dashboard fallback from measured
+      // implementation results; pin readiness remains a separate gate.
+      const routedResults = results.filter((item) => (firstNumber(item.best_frequency_mhz) || 0) > 0);
+      const targetMetResults = routedResults.filter((item) => item.target_met === true);
+      const recommendationPool = targetMetResults.length ? targetMetResults : routedResults;
+      const byPerformance = [...recommendationPool].sort((a, b) => (firstNumber(b.median_frequency_mhz, b.best_frequency_mhz) || 0) - (firstNumber(a.median_frequency_mhz, a.best_frequency_mhz) || 0))[0];
+      const byGrowth = [...recommendationPool].sort((a, b) => (firstNumber(b.resource_headroom_percent) || 0) - (firstNumber(a.resource_headroom_percent) || 0))[0];
+      const byLowCost = [...recommendationPool].sort((a, b) => (firstNumber(a.logic_cells_available) || Number.MAX_SAFE_INTEGER) - (firstNumber(b.logic_cells_available) || Number.MAX_SAFE_INTEGER))[0];
+      const byOverall = [...recommendationPool].sort((a, b) => {
+        const readiness = Number(b.programming_ready === true) - Number(a.programming_ready === true);
+        if (readiness) return readiness;
+        const passRate = (firstNumber(b.timing_pass_rate) || 0) - (firstNumber(a.timing_pass_rate) || 0);
+        if (passRate) return passRate;
+        return (firstNumber(b.resource_headroom_percent) || 0) - (firstNumber(a.resource_headroom_percent) || 0);
+      })[0];
+      const recommendations = {
+        ...storedRecommendations,
+        best_overall: firstString(storedRecommendations.best_overall, byOverall?.board),
+        best_performance: firstString(storedRecommendations.best_performance, byPerformance?.board),
+        best_low_cost: firstString(storedRecommendations.best_low_cost, byLowCost?.board),
+        best_for_growth: firstString(storedRecommendations.best_for_growth, byGrowth?.board),
+      };
       const recommendationItems = [
         ["Best Overall", recommendations.best_overall, "Balanced timing reliability, headroom, performance, and target size."],
         ["Best Performance", recommendations.best_performance, "Highest robust median implementation frequency."],
@@ -1721,7 +1745,7 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
                   <div className="mt-2 text-lg font-bold text-white">{firstString(result?.label, boardKey, "Unavailable")}</div>
                   <div className="mt-1 text-sm text-slate-300">{result ? `${formatNumber(firstNumber(result.best_frequency_mhz))} MHz | ${firstNumber(result.timing_margin_percent) >= 0 ? "+" : ""}${formatNumber(firstNumber(result.timing_margin_percent))}% timing margin | ${formatNumber(firstNumber(result.resource_headroom_percent))}% headroom` : "No viable target"}</div>
                   <div className="mt-2 text-xs leading-5 text-slate-400">{firstString(detail.why, description)}</div>
-                  {result ? <div className="mt-2 text-[11px] text-slate-500">Toolchain {firstString(result.toolchain_confidence, "qualified")} · board pins verified during FPGA Prototyping</div> : null}
+                  {result ? <div className="mt-2 text-[11px] text-slate-500">Toolchain {firstString(result.toolchain_confidence, "qualified")} · {result.programming_ready === true ? "physical pin map is programming-ready" : `${array(result.unmapped_ports).length} physical pin mapping(s) must be verified during FPGA Prototyping`}</div> : null}
                   {boardKey ? <button type="button" onClick={() => continueToPrototype(boardKey, result || {})} className="mt-3 w-full rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-sm font-semibold text-cyan-100 hover:border-cyan-300">Continue with this board</button> : null}
                 </div>
               );
