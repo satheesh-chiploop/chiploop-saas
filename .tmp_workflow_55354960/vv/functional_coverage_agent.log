@@ -1,0 +1,52 @@
+Digital Functional Coverage Agent Log
+[2026-08-09T19:44:01.345636] [INFO] Starting Digital Functional Coverage Agent...
+[2026-08-09T19:44:01.345859] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/55354960-e951-42a6-95bc-dffb4e4dd8b7/spec/fpga_verification_source_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 1,
+  "top_module": "adaptive_aero_control_top",
+  "soc_mode": false
+}
+[2026-08-09T19:44:01.349171] [INFO] resolved_mode=digital
+[2026-08-09T19:44:01.349271] [INFO] spec_path=/root/chiploop-backend/backend/workflows/55354960-e951-42a6-95bc-dffb4e4dd8b7/spec/fpga_verification_source_spec.json
+[2026-08-09T19:44:01.349342] [INFO] top_module=adaptive_aero_control_top
+[2026-08-09T19:44:01.349408] [INFO] rtl_file_count=1
+[2026-08-09T19:44:01.349473] [INFO] port_source=rtl_fallback
+[2026-08-09T19:44:01.349572] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-08-09T19:44:01.349684] [INFO] reset_candidates=[
+  {
+    "name": "reset_n",
+    "active_low": true,
+    "async": false
+  }
+]
+[2026-08-09T19:44:01.349774] [INFO] coverage_points={
+  "output_points": [
+    "reg_rdata",
+    "_ready",
+    "model_req_valid",
+    "model_req_data",
+    "model_rsp_ready",
+    "actuator_cmd",
+    "safe_state"
+  ],
+  "input_points": [
+    "clk",
+    "reset_n",
+    "reg_addr",
+    "reg_wdata",
+    "_we",
+    "_re",
+    "model_req_ready",
+    "model_rsp_valid",
+    "model_rsp_data"
+  ],
+  "user_coverage_plan_points": []
+}
+[2026-08-09T19:44:01.350663] [INFO] Generated coverage_model.py
+[2026-08-09T19:44:01.350739] [INFO] Generated coverage_spec.json
+[2026-08-09T19:44:01.350838] [INFO] Generated COVERAGE.md

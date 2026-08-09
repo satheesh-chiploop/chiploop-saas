@@ -1,0 +1,7 @@
+# ChipLoop starter LPF for adaptive_aero_control_top
+# target_frequency_mhz 50.0
+LOCATE COMP "clk" SITE "A9";
+IOBUF PORT "clk" IO_TYPE=LVCMOS33;
+LOCATE COMP "reset_n" SITE "V17";
+IOBUF PORT "reset_n" IO_TYPE=LVCMOS33;
+FREQUENCY PORT "clk" 50.0 MHz;
