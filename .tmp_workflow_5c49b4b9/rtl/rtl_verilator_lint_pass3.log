@@ -1,0 +1,109 @@
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:23:6: Signal is not used: 'cfg_clear_faults'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   23 | wire cfg_clear_faults;
+      |      ^~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:31:12: Signal is not used: 'last_error_code'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   31 | wire [7:0] last_error_code;
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:32:13: Signal is not used: 'last_request_id'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   32 | wire [15:0] last_request_id;
+      |             ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:33:13: Signal is not used: 'last_response_id'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   33 | wire [15:0] last_response_id;
+      |             ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:34:12: Bits of signal are not used: 'status_summary_bits'[7:4]
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   34 | wire [7:0] status_summary_bits;
+      |            ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:38:6: Signal is not used: 'request_stale_flag'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   38 | wire request_stale_flag;
+      |      ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:40:13: Signal is not used: 'parsed_response_seq_id'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   40 | wire [15:0] parsed_response_seq_id;
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:41:13: Signal is not used: 'parsed_command_payload'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   41 | wire [31:0] parsed_command_payload;
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:42:6: Signal is not used: 'parsed_response_valid'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   42 | wire parsed_response_valid;
+      |      ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:44:13: Signal is not used: 'parsed_freshness_meta'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   44 | wire [15:0] parsed_freshness_meta;
+      |             ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:46:6: Signal is not used: 'response_reject_pulse'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   46 | wire response_reject_pulse;
+      |      ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:52:6: Signal is not used: 'safe_fallback_active'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   52 | wire safe_fallback_active;
+      |      ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_mmio.v:5:11: Signal is not used: 'csr_re'
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_mmio'
+    5 |     input csr_re,
+      |           ^~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_mmio.v:7:18: Bits of signal are not used: 'csr_wdata'[31:16]
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_mmio'
+    7 |     input [31:0] csr_wdata,
+      |                  ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_request_mgr.v:9:17: Signal is not used: 'local_mode_in'
+                                                                     : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_request_mgr'
+    9 |     input [3:0] local_mode_in,
+      |                 ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_request_mgr.v:22:12: Signal is not used: 'velocity_scaled'
+                                                                      : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_request_mgr'
+   22 | reg [15:0] velocity_scaled;
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_request_mgr.v:23:11: Signal is not used: 'geometry_meta'
+                                                                      : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_request_mgr'
+   23 | reg [7:0] geometry_meta;
+      |           ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_response_mgr.v:5:19: Bits of signal are not used: 'rsp_data'[127:66]
+                                                                      : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_response_mgr'
+    5 |     input [127:0] rsp_data,
+      |                   ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_response_mgr.v:25:12: Signal is not used: 'rsp_seq_shadow'
+                                                                       : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_response_mgr'
+   25 | reg [15:0] rsp_seq_shadow;
+      |            ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_response_mgr.v:26:12: Signal is not used: 'rsp_cmd_shadow'
+                                                                       : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_response_mgr'
+   26 | reg [31:0] rsp_cmd_shadow;
+      |            ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_response_mgr.v:27:12: Signal is not used: 'rsp_fresh_shadow'
+                                                                       : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_response_mgr'
+   27 | reg [15:0] rsp_fresh_shadow;
+      |            ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_response_mgr.v:28:5: Signal is not used: 'rsp_valid_shadow'
+                                                                      : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_response_mgr'
+   28 | reg rsp_valid_shadow;
+      |     ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_response_mgr.v:29:5: Signal is not used: 'rsp_health_shadow'
+                                                                      : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_control_response_mgr'
+   29 | reg rsp_health_shadow;
+      |     ^~~~~~~~~~~~~~~~~
+%Error-BLKANDNBLK: pass3/adaptive_aero_control_top.v:50:6: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'adaptive_aero_control_top.health_fault_flag'
+   50 | wire health_fault_flag;
+      |      ^~~~~~~~~~~~~~~~~
+                   pass3/adaptive_aero_control_top.v:154:26: ... Location of blocking assignment (bits [0:0])
+  154 | assign health_fault_flag = parsed_health_indicator;
+      |                          ^
+                   pass3/adaptive_aero_control_response_mgr.v:76:17: ... Location of nonblocking assignment (bits [0:0])
+   76 |                 health_fault_flag <= 1'b0;
+      |                 ^~~~~~~~~~~~~~~~~
+                   ... For error description see https://verilator.org/warn/BLKANDNBLK?v=5.047
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1

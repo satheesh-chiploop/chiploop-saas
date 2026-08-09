@@ -1,0 +1,4 @@
+
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

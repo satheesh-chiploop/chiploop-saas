@@ -1,0 +1,551 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": [
+      {
+        "name": "ENABLE",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Global enable control for request issuance, response qualification, and safety-controlled actuator behavior.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When 1, enables normal control-wrapper operation. When 0, suppresses unsafe request issuance and forces safe fallback behavior."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "CLEAR_FAULTS",
+        "offset": "0x04",
+        "access": "WO",
+        "description": "Write-one action to clear latched fault, stale, and timeout indicators and return the control wrapper to a clean safe state.",
+        "fields": [
+          {
+            "name": "CLEAR_FAULTS",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to clear sticky fault/status indicators. Reads are not required for WO semantics."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, ignored on write."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD_L",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Low byte of the programmable timeout threshold in request-response cycles.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 16,
+            "description": "Lower 8 bits of the timeout counter reload threshold."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD_H",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "High byte of the programmable timeout threshold in request-response cycles.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Upper 8 bits of the timeout counter reload threshold."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MIN_0",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Byte 0 of the minimum actuator clamp value.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least-significant byte of the minimum allowable actuator command."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MIN_1",
+        "offset": "0x0D",
+        "access": "RW",
+        "description": "Byte 1 of the minimum actuator clamp value.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 1 of the minimum allowable actuator command."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MIN_2",
+        "offset": "0x0E",
+        "access": "RW",
+        "description": "Byte 2 of the minimum actuator clamp value.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 2 of the minimum allowable actuator command."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MIN_3",
+        "offset": "0x0F",
+        "access": "RW",
+        "description": "Byte 3 of the minimum actuator clamp value.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most-significant byte of the minimum allowable actuator command."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MAX_0",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Byte 0 of the maximum actuator clamp value.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Least-significant byte of the maximum allowable actuator command."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MAX_1",
+        "offset": "0x11",
+        "access": "RW",
+        "description": "Byte 1 of the maximum actuator clamp value.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Byte 1 of the maximum allowable actuator command."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MAX_2",
+        "offset": "0x12",
+        "access": "RW",
+        "description": "Byte 2 of the maximum actuator clamp value.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Byte 2 of the maximum allowable actuator command."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MAX_3",
+        "offset": "0x13",
+        "access": "RW",
+        "description": "Byte 3 of the maximum actuator clamp value.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Most-significant byte of the maximum allowable actuator command."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_COMMAND_0",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Byte 0 of the deterministic safe fallback actuator command.",
+        "fields": [
+          {
+            "name": "FALLBACK_COMMAND[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Least-significant byte of the safe fallback actuator command."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_COMMAND_1",
+        "offset": "0x15",
+        "access": "RW",
+        "description": "Byte 1 of the deterministic safe fallback actuator command.",
+        "fields": [
+          {
+            "name": "FALLBACK_COMMAND[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 1 of the safe fallback actuator command."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_COMMAND_2",
+        "offset": "0x16",
+        "access": "RW",
+        "description": "Byte 2 of the deterministic safe fallback actuator command.",
+        "fields": [
+          {
+            "name": "FALLBACK_COMMAND[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 2 of the safe fallback actuator command."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_COMMAND_3",
+        "offset": "0x17",
+        "access": "RW",
+        "description": "Byte 3 of the deterministic safe fallback actuator command.",
+        "fields": [
+          {
+            "name": "FALLBACK_COMMAND[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Most-significant byte of the safe fallback actuator command."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_VALID_POLICY",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Policy bit controlling whether fallback command may be presented as a valid actuator command.",
+        "fields": [
+          {
+            "name": "FALLBACK_VALID_POLICY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When 1, fallback command may be emitted with actuator_cmd_valid asserted. When 0, fallback command is driven but actuator_cmd_valid is deasserted unless a validated command is available."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "VELOCITY_SCALE_L",
+        "offset": "0x1C",
+        "access": "RW",
+        "description": "Low byte of the velocity scaling factor used to derive the request velocity field.",
+        "fields": [
+          {
+            "name": "VELOCITY_SCALE[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 1,
+            "description": "Lower 8 bits of the velocity scaling parameter."
+          }
+        ]
+      },
+      {
+        "name": "VELOCITY_SCALE_H",
+        "offset": "0x1D",
+        "access": "RW",
+        "description": "High byte of the velocity scaling factor used to derive the request velocity field.",
+        "fields": [
+          {
+            "name": "VELOCITY_SCALE[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Upper 8 bits of the velocity scaling parameter."
+          }
+        ]
+      },
+      {
+        "name": "GEOMETRY_META_DEFAULT",
+        "offset": "0x20",
+        "access": "RW",
+        "description": "Default geometry metadata identifier used in outbound request assembly.",
+        "fields": [
+          {
+            "name": "GEOMETRY_META_DEFAULT",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Default reference-geometry metadata value inserted into request packets unless overridden by local selector semantics."
+          }
+        ]
+      },
+      {
+        "name": "LAST_ERROR",
+        "offset": "0x24",
+        "access": "RO",
+        "description": "Sticky last error code for software diagnosis.",
+        "fields": [
+          {
+            "name": "LAST_ERROR",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Encoded last error condition. Representative meanings are implementation-defined but must include timeout, stale response, invalid response, health fault, and sequence mismatch."
+          }
+        ]
+      },
+      {
+        "name": "LAST_REQUEST_ID_L",
+        "offset": "0x28",
+        "access": "RO",
+        "description": "Low byte of the most recent accepted request sequence ID.",
+        "fields": [
+          {
+            "name": "LAST_REQUEST_ID[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of the last accepted request sequence."
+          }
+        ]
+      },
+      {
+        "name": "LAST_REQUEST_ID_H",
+        "offset": "0x29",
+        "access": "RO",
+        "description": "High byte of the most recent accepted request sequence ID.",
+        "fields": [
+          {
+            "name": "LAST_REQUEST_ID[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of the last accepted request sequence."
+          }
+        ]
+      },
+      {
+        "name": "LAST_RESPONSE_ID_L",
+        "offset": "0x2C",
+        "access": "RO",
+        "description": "Low byte of the most recent accepted response sequence ID.",
+        "fields": [
+          {
+            "name": "LAST_RESPONSE_ID[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 8 bits of the last accepted response sequence."
+          }
+        ]
+      },
+      {
+        "name": "LAST_RESPONSE_ID_H",
+        "offset": "0x2D",
+        "access": "RO",
+        "description": "High byte of the most recent accepted response sequence ID.",
+        "fields": [
+          {
+            "name": "LAST_RESPONSE_ID[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of the last accepted response sequence."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_SUMMARY",
+        "offset": "0x30",
+        "access": "RO",
+        "description": "Compact status summary bits.",
+        "fields": [
+          {
+            "name": "TIMEOUT_FLAG",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky timeout indicator; set when the programmable timeout expires."
+          },
+          {
+            "name": "STALE_FLAG",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky stale-response indicator; set when a response is late or otherwise stale."
+          },
+          {
+            "name": "FALLBACK_FLAG",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 1,
+            "description": "Indicates safe fallback behavior is active."
+          },
+          {
+            "name": "FAULT_FLAG",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky fault indicator for invalid, unhealthy, or mismatched response conditions."
+          },
+          {
+            "name": "VALID_CMD_FLAG",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a validated current command is available for clamped issuance."
+          },
+          {
+            "name": "ENABLE_SEEN",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reflects the current enable state for software observability."
+          },
+          {
+            "name": "OUTSTANDING_REQ",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates there is an outstanding unacknowledged request."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved, reads as zero."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "STATUS_TIMEOUT_FLAG",
+        "description": "Sticky timeout condition suitable for software polling or optional interrupt wiring in system integration."
+      },
+      {
+        "name": "STATUS_FAULT_FLAG",
+        "description": "Sticky fault condition suitable for software polling or optional interrupt wiring in system integration."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Write ACTUATOR_MIN and ACTUATOR_MAX to conservative safe clamp bounds.",
+      "Write FALLBACK_COMMAND to a deterministic safe actuator position.",
+      "Set FALLBACK_VALID_POLICY according to system policy.",
+      "Program VELOCITY_SCALE and GEOMETRY_META_DEFAULT.",
+      "Program TIMEOUT_THRESHOLD to a nonzero service-appropriate value.",
+      "Write CLEAR_FAULTS with 1 to clear any sticky safety state.",
+      "Write ENABLE to 1 to start normal operation."
+    ],
+    "polling_sequence": [
+      "Read STATUS_SUMMARY to detect timeout, stale, fallback, fault, valid-command, enable, and outstanding-request state.",
+      "Read LAST_REQUEST_ID and LAST_RESPONSE_ID for transaction observability.",
+      "Read LAST_ERROR after any fault indication to determine the most recent rejection cause.",
+      "Optionally read CSR configuration registers to confirm programmed limits and policy."
+    ],
+    "irq_sequence": [
+      "If STATUS_TIMEOUT_FLAG or STATUS_FAULT_FLAG asserts, service the condition in software.",
+      "Read LAST_ERROR, LAST_REQUEST_ID, and LAST_RESPONSE_ID to correlate the fault with the most recent transaction.",
+      "Write CLEAR_FAULTS with 1 after the underlying issue is resolved.",
+      "Revalidate configuration and re-enable operation if needed."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map uses a minimal custom byte-addressed CSR view compatible with the specified csr_we/csr_re/csr_addr/csr_wdata/csr_rdata interface.",
+    "No new hierarchy, ports, or incompatible bus protocol is introduced.",
+    "Multi-byte fields are split into byte registers because the visible CSR read/write path is 32-bit wide in the top-level specification but the requested firmware-visible map is byte-addressed and minimal.",
+    "The map exposes only compact configuration, status, and bookkeeping fields; no bulk payload storage is implied.",
+    "The design remains a control wrapper around an external inference service and does not implement aerodynamics computation."
+  ]
+}
