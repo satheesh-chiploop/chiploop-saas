@@ -1,0 +1,23 @@
+{
+  "type": "digital_sva_generation",
+  "version": "1.2",
+  "mode": "digital",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "spec_path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/spec/fpga_verification_source_spec.json",
+  "rtl_file_count": 4,
+  "clock_names": [],
+  "reset_names": [],
+  "primary_clock": null,
+  "primary_reset": null,
+  "primary_reset_active_low": false,
+  "generated_dir": "vv/tb",
+  "sva_module_name": "adaptive_aero_control_top_spi_fpga_top_assertions",
+  "sva_bind_file": "adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+  "assertion_output_signals": [],
+  "artifacts": {
+    "sva_bind_sv": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+    "sva_sv": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+    "sva_spec_json": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/sva_spec.json",
+    "sva_readme": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/SVA_README.md"
+  }
+}

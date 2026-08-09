@@ -1,0 +1,193 @@
+{
+  "agent": "FPGA RTL Handoff Ingest Agent",
+  "core_top_module": "adaptive_aero_control_top",
+  "ignored_rtl_file_count": 9,
+  "ignored_rtl_files": [
+    {
+      "matches": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/adaptive_request_response_controller.v",
+      "path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_request_response_controller.v",
+      "reason": "duplicate_content"
+    },
+    {
+      "matches": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/adaptive_aero_control_top.v",
+      "path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_top.v",
+      "reason": "duplicate_content"
+    },
+    {
+      "matches": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/cfg_window_decoder.v",
+      "path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/handoff/adaptive_aero_control_top_ip_package/rtl/cfg_window_decoder.v",
+      "reason": "duplicate_content"
+    },
+    {
+      "matches": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/adaptive_request_response_controller.v",
+      "path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/adaptive_request_response_controller.v",
+      "reason": "duplicate_content"
+    },
+    {
+      "matches": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/adaptive_aero_control_top.v",
+      "path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/adaptive_aero_control_top.v",
+      "reason": "duplicate_content"
+    },
+    {
+      "matches": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/cfg_window_decoder.v",
+      "path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/cfg_window_decoder.v",
+      "reason": "duplicate_content"
+    },
+    {
+      "matches": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/adaptive_request_response_controller.v",
+      "path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_request_response_controller.v",
+      "reason": "duplicate_content"
+    },
+    {
+      "matches": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/adaptive_aero_control_top.v",
+      "path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v",
+      "reason": "duplicate_content"
+    },
+    {
+      "matches": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/cfg_window_decoder.v",
+      "path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/cfg_window_decoder.v",
+      "reason": "duplicate_content"
+    }
+  ],
+  "interface_adapter": {
+    "core_top_module": "adaptive_aero_control_top",
+    "fpga_top_level_io_bits": 7,
+    "fpga_top_module": "adaptive_aero_control_top_spi_fpga_top",
+    "hardware_readiness": "requires CDC/protocol verification and board pin assignment before programming hardware",
+    "input_bit_map": [
+      {
+        "lsb": 0,
+        "port": "cfg_addr",
+        "width": 6
+      },
+      {
+        "lsb": 6,
+        "port": "cfg_wdata",
+        "width": 64
+      },
+      {
+        "lsb": 70,
+        "port": "cfg_we",
+        "width": 1
+      },
+      {
+        "lsb": 71,
+        "port": "cfg_re",
+        "width": 1
+      },
+      {
+        "lsb": 72,
+        "port": "cmd_rsp_ready",
+        "width": 1
+      },
+      {
+        "lsb": 73,
+        "port": "resp_valid",
+        "width": 1
+      },
+      {
+        "lsb": 74,
+        "port": "resp_data",
+        "width": 128
+      }
+    ],
+    "original_top_level_io_bits": 430,
+    "output_frame_order_msb_first": [
+      "cfg_rdata",
+      "cmd_rsp_valid",
+      "cmd_rsp_data",
+      "resp_ready",
+      "actuator_out",
+      "status_out"
+    ],
+    "scope": "FPGA only; ASIC uses the original core top module.",
+    "serialized_input_bits": 202,
+    "serialized_output_bits": 226,
+    "status": "generated",
+    "transaction_model": "MSB-first full-duplex frames; command N is committed when CS rises and response N is read in the following frame.",
+    "transport": "spi_mode_0_shift_transport",
+    "wrapper_rtl": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv"
+  },
+  "rtl_file_count": 4,
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/adaptive_aero_control_top.v",
+    "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/adaptive_request_response_controller.v",
+    "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/upstream/cfg_window_decoder.v",
+    "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv"
+  ],
+  "status": "ok",
+  "target": {
+    "bitstream_ext": ".bit",
+    "bitstream_tool": "ecppack",
+    "board": "orangecrab_ecp5_85f",
+    "constraint_format": "lpf",
+    "default_frequency_mhz": 48.0,
+    "device": "85k",
+    "family": "ecp5",
+    "label": "Lattice OrangeCrab ECP5-85F",
+    "nextpnr_device_flag": "--85k",
+    "nextpnr_package": "CSFBGA285",
+    "nextpnr_tool": "nextpnr-ecp5",
+    "package": "CSFBGA285",
+    "pnr_output_ext": ".config",
+    "programmer_board": "orangeCrab",
+    "resources": {
+      "block_ram_bits": 3744000,
+      "block_ram_blocks": 208,
+      "block_ram_primitive": "DP16KD",
+      "dsp_blocks": 156,
+      "io_cells": 365,
+      "logic_cells": 84000
+    },
+    "support_tier": "production",
+    "supported": true,
+    "vendor": "lattice"
+  },
+  "tools": {
+    "ecppack": {
+      "available": true,
+      "path": "/usr/bin/ecppack"
+    },
+    "gowin_pack": {
+      "available": true,
+      "path": "/root/chiploop-backend/venv/bin/gowin_pack"
+    },
+    "icepack": {
+      "available": true,
+      "path": "/usr/bin/icepack"
+    },
+    "icetime": {
+      "available": true,
+      "path": "/usr/bin/icetime"
+    },
+    "nextpnr-ecp5": {
+      "available": true,
+      "path": "/usr/bin/nextpnr-ecp5"
+    },
+    "nextpnr-himbaechel": {
+      "available": true,
+      "path": "/opt/chiploop-eda/bin/nextpnr-himbaechel"
+    },
+    "nextpnr-ice40": {
+      "available": true,
+      "path": "/usr/bin/nextpnr-ice40"
+    },
+    "nextpnr-nexus": {
+      "available": true,
+      "path": "/opt/chiploop-eda/bin/nextpnr-nexus"
+    },
+    "openFPGALoader": {
+      "available": false,
+      "path": null
+    },
+    "prjoxide": {
+      "available": true,
+      "path": "/opt/chiploop-eda/bin/prjoxide"
+    },
+    "yosys": {
+      "available": true,
+      "path": "/usr/bin/yosys"
+    }
+  },
+  "top_module": "adaptive_aero_control_top_spi_fpga_top"
+}

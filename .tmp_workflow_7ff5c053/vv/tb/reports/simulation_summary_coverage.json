@@ -1,0 +1,203 @@
+{
+  "type": "simulation_summary_coverage",
+  "simulation": {
+    "total": 2,
+    "pass": 2,
+    "fail": 0
+  },
+  "coverage": {
+    "status": "ok",
+    "functional_coverage_pct": 71.43,
+    "bins_hit": 10,
+    "total_bins": 14,
+    "functional": {
+      "status": "ok",
+      "coverage_pct": 71.43,
+      "bins_hit": 10,
+      "total_bins": 14,
+      "gap_count": 4,
+      "gaps": [
+        {
+          "type": "functional_bin_gap",
+          "signal": "fault_indicator",
+          "group": "outputs",
+          "coverage_point": "outputs.fault_indicator",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "spi_miso",
+          "group": "outputs",
+          "coverage_point": "outputs.spi_miso",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "clk",
+          "group": "inputs",
+          "coverage_point": "inputs.clk",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "reset_n",
+          "group": "inputs",
+          "coverage_point": "inputs.reset_n",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        }
+      ]
+    },
+    "code": {
+      "status": "ok",
+      "line_coverage_pct": 44.6,
+      "line_hit": 124,
+      "line_found": 278,
+      "branch_coverage_pct": 0.42,
+      "branch_hit": 29,
+      "branch_found": 6953,
+      "condition_coverage_pct": 0.42,
+      "condition_hit": 29,
+      "condition_found": 6953,
+      "condition_source": "verilator_lcov_branch_proxy",
+      "toggle_coverage_pct": 5.07,
+      "toggle_hit": 349,
+      "toggle_found": 6890,
+      "toggle_source": "verilator_coverage_annotate_points",
+      "missed_toggle_points": [
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=rst_n:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=cfg_enable:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=cfg_enable:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[0]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[0]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[10]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[10]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[11]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[11]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[12]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[12]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[13]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[13]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[14]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[14]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[15]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[15]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[1]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[1]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        },
+        {
+          "file": "adaptive_request_response_controller.v",
+          "point": "comment=operating_velocity_mps[2]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller"
+        }
+      ],
+      "tool": "verilator_coverage"
+    },
+    "assertions": {
+      "status": "missing",
+      "assertions_generated": 0,
+      "assertion_failures": 0,
+      "assertion_pass_pct": null
+    }
+  },
+  "formal": {
+    "status": "not_enabled",
+    "available": null,
+    "attempted": null,
+    "returncode": null,
+    "reason": null
+  },
+  "golden_model": {
+    "status": "not_enabled",
+    "top_module": null
+  },
+  "toolchain": {
+    "simulator": "verilator",
+    "code_coverage": "verilator_coverage",
+    "formal": "none",
+    "formal_solver": null,
+    "golden_model": "none"
+  }
+}

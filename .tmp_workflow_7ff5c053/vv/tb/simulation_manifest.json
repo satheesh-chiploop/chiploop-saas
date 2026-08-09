@@ -1,0 +1,27 @@
+{
+  "type": "vv_simulation_manifest",
+  "version": "1.1",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "spec_path": "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/spec/fpga_verification_source_spec.json",
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/handoff/rtl/adaptive_aero_control_top.v",
+    "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/handoff/rtl/adaptive_request_response_controller.v",
+    "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/handoff/rtl/cfg_window_decoder.v",
+    "/root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv"
+  ],
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity"
+  ],
+  "runner": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/run_regression.py",
+  "makefile": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/Makefile",
+  "testcases_json": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/testcases.json",
+  "tb_contract_json": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/tb_contract.json",
+  "reports_dir": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/reports",
+  "simulator": "verilator",
+  "sva_assertions_path": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+  "sva_bind_path": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+  "coverage_model_py": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/coverage_model.py",
+  "functional_coverage_summary_json": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/reports/functional_coverage_summary.json",
+  "functional_coverage_md": "backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/vv/tb/reports/COVERAGE.md"
+}

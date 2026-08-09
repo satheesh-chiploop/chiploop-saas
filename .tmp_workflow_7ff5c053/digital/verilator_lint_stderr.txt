@@ -1,0 +1,105 @@
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:95:10: Instance pin connected by name with empty reference: 'transaction_id_echo'
+   95 |         .transaction_id_echo(),
+      |          ^~~~~~~~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:96:10: Instance pin connected by name with empty reference: 'busy'
+   96 |         .busy(),
+      |          ^~~~
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:97:10: Instance pin connected by name with empty reference: 'request_pending'
+   97 |         .request_pending(),
+      |          ^~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:98:10: Instance pin connected by name with empty reference: 'response_valid'
+   98 |         .response_valid(),
+      |          ^~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:99:10: Instance pin connected by name with empty reference: 'stale_reject'
+   99 |         .stale_reject(),
+      |          ^~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:100:10: Instance pin connected by name with empty reference: 'timeout_fault'
+  100 |         .timeout_fault(),
+      |          ^~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:101:10: Instance pin connected by name with empty reference: 'clamp_active'
+  101 |         .clamp_active(),
+      |          ^~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:102:10: Instance pin connected by name with empty reference: 'fallback_active'
+  102 |         .fallback_active()
+      |          ^~~~~~~~~~~~~~~
+%Warning-WIDTHEXPAND: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_request_response_controller.v:134:36: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 124 bits.
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller'
+  134 |                     cmd_rsp_data_r <= {8'hA5, transaction_id_r + 16'd1, operating_velocity_mps, 8'h00, geometry_ref_id, response_timeout_cycles, {8'h00, mode_select, 4'h0, 4'h0}, 32'h00000000};
+      |                                    ^~
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:44:13: Signal is not driven, nor used: 'cfg_window_decoder_actuator_max_limit'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   44 | wire [15:0] cfg_window_decoder_actuator_max_limit;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:45:13: Signal is not driven, nor used: 'cfg_window_decoder_actuator_min_limit'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   45 | wire [15:0] cfg_window_decoder_actuator_min_limit;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:46:6: Signal is not driven, nor used: 'cfg_window_decoder_cfg_enable'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   46 | wire cfg_window_decoder_cfg_enable;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:47:6: Signal is not driven, nor used: 'cfg_window_decoder_config_error'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   47 | wire cfg_window_decoder_config_error;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:48:12: Signal is not driven, nor used: 'cfg_window_decoder_geometry_ref_id'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   48 | wire [7:0] cfg_window_decoder_geometry_ref_id;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:49:12: Signal is not driven, nor used: 'cfg_window_decoder_mode_select'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   49 | wire [3:0] cfg_window_decoder_mode_select;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:50:13: Signal is not driven, nor used: 'cfg_window_decoder_operating_velocity_mps'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   50 | wire [15:0] cfg_window_decoder_operating_velocity_mps;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:51:13: Signal is not driven, nor used: 'cfg_window_decoder_request_age_limit_cycles'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   51 | wire [15:0] cfg_window_decoder_request_age_limit_cycles;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:52:13: Signal is not driven, nor used: 'cfg_window_decoder_response_timeout_cycles'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   52 | wire [15:0] cfg_window_decoder_response_timeout_cycles;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_aero_control_top.v:53:13: Signal is not driven, nor used: 'cfg_window_decoder_safe_fallback_setpoint'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   53 | wire [15:0] cfg_window_decoder_safe_fallback_setpoint;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_request_response_controller.v:36:18: Signal is not used: 'request_age_limit_cycles'
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller'
+   36 |     input [15:0] request_age_limit_cycles;
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_request_response_controller.v:43:11: Signal is not used: 'cmd_rsp_ready'
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller'
+   43 |     input cmd_rsp_ready;
+      |           ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/adaptive_request_response_controller.v:47:19: Bits of signal are not used: 'resp_data'[102:16]
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_adaptive_request_response_controller'
+   47 |     input [127:0] resp_data;
+      |                   ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/cfg_window_decoder.v:25:11: Signal is not used: 'cfg_re'
+                                                                                                                                                  : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cfg_window_decoder'
+   25 |     input cfg_re;
+      |           ^~~~~~
+%Warning-CMPCONST: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/src/rtl/pass2/cfg_window_decoder.v:120:46: Comparison is constant due to limited range
+                                                                                                                                               : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cfg_window_decoder'
+  120 |                               (mode_select_r > 4'd15);
+      |                                              ^
+                   ... For warning description see https://verilator.org/warn/CMPCONST?v=5.047
+                   ... Use "/* verilator lint_off CMPCONST */" and lint_on around source to disable this message.
+%Warning-SYNCASYNCNET: /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:7:16: Signal flopped as both synchronous and async: 'spi_cs_n'
+                       /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:43:9: ... Location of async usage
+   43 |     if (spi_cs_n) spi_active <= 1'b0;
+      |         ^~~~~~~~
+                       /root/chiploop-backend/backend/workflows/7ff5c053-2e86-4401-b297-fef120bbd52d/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:47:10: ... Location of sync usage
+   47 |     if (!spi_cs_n) begin
+      |          ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.
