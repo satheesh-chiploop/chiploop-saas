@@ -1,0 +1,175 @@
+{
+  "type": "functional_coverage_summary",
+  "top_module": "adaptive_aero_control_top",
+  "outputs": {
+    "geometry_ready_out": {
+      "samples": 30,
+      "seen_values": [
+        0
+      ],
+      "hit_bins": 1,
+      "total_bins": 2
+    },
+    "geometry_summary_out": {
+      "samples": 30,
+      "seen_values": [
+        0,
+        669,
+        4887,
+        8306,
+        10863,
+        17184,
+        20070,
+        20490,
+        30811,
+        34292,
+        38499,
+        42699,
+        43855,
+        45818,
+        47009,
+        47079,
+        47324,
+        47756,
+        48825,
+        53420,
+        55395,
+        57269,
+        58026,
+        64149,
+        65397
+      ],
+      "hit_bins": 2,
+      "total_bins": 2
+    },
+    "mem_addr": {
+      "samples": 30,
+      "seen_values": [
+        0
+      ],
+      "hit_bins": 1,
+      "total_bins": 2
+    },
+    "mem_csb": {
+      "samples": 30,
+      "seen_values": [
+        1
+      ],
+      "hit_bins": 1,
+      "total_bins": 2
+    },
+    "mem_din": {
+      "samples": 30,
+      "seen_values": [
+        0
+      ],
+      "hit_bins": 1,
+      "total_bins": 2
+    },
+    "mem_we": {
+      "samples": 30,
+      "seen_values": [
+        0
+      ],
+      "hit_bins": 1,
+      "total_bins": 2
+    }
+  },
+  "inputs": {
+    "clk": {
+      "samples": 30,
+      "seen_values": [
+        1
+      ],
+      "hit_bins": 1,
+      "total_bins": 2
+    },
+    "geometry_ref_in": {
+      "samples": 30,
+      "seen_values": [
+        0,
+        39534911,
+        92297589,
+        109289145,
+        124729223,
+        403123852,
+        506456969,
+        939657385,
+        1363349907,
+        1484771968,
+        1630434966,
+        1637259727,
+        1858720390,
+        1912923437,
+        1930549411,
+        2129497364,
+        2444712010,
+        3280070799,
+        3280387012,
+        3294916953,
+        3443818037,
+        3836767462,
+        3935348976,
+        4059906722,
+        4089858807,
+        4161997890
+      ],
+      "hit_bins": 2,
+      "total_bins": 2
+    },
+    "geometry_valid_in": {
+      "samples": 30,
+      "seen_values": [
+        0,
+        1
+      ],
+      "hit_bins": 2,
+      "total_bins": 2
+    },
+    "mem_dout": {
+      "samples": 30,
+      "seen_values": [
+        0,
+        95872739,
+        121751464,
+        577090037,
+        901749037,
+        930287327,
+        952158461,
+        1001090105,
+        1095513148,
+        1674216077,
+        1973981844,
+        2325348894,
+        2538984641,
+        2798570523,
+        2907042365,
+        2988579416,
+        3098990846,
+        3117513184,
+        3268308804,
+        3273968005,
+        3445702192,
+        3597370014,
+        3784870617,
+        3871601465,
+        3979315673,
+        4033691631
+      ],
+      "hit_bins": 2,
+      "total_bins": 2
+    },
+    "rst_n": {
+      "samples": 30,
+      "seen_values": [
+        1
+      ],
+      "hit_bins": 1,
+      "total_bins": 2
+    }
+  },
+  "bins_hit": 15,
+  "total_bins": 22,
+  "functional_coverage_pct": 68.18,
+  "aggregated_run_count": 2
+}

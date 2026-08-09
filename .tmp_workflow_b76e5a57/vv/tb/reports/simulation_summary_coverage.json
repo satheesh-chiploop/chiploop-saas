@@ -1,0 +1,245 @@
+{
+  "type": "simulation_summary_coverage",
+  "simulation": {
+    "total": 2,
+    "pass": 2,
+    "fail": 0
+  },
+  "coverage": {
+    "status": "ok",
+    "functional_coverage_pct": 68.18,
+    "bins_hit": 15,
+    "total_bins": 22,
+    "functional": {
+      "status": "ok",
+      "coverage_pct": 68.18,
+      "bins_hit": 15,
+      "total_bins": 22,
+      "gap_count": 7,
+      "gaps": [
+        {
+          "type": "functional_bin_gap",
+          "signal": "geometry_ready_out",
+          "group": "outputs",
+          "coverage_point": "outputs.geometry_ready_out",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "mem_addr",
+          "group": "outputs",
+          "coverage_point": "outputs.mem_addr",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "mem_csb",
+          "group": "outputs",
+          "coverage_point": "outputs.mem_csb",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "mem_din",
+          "group": "outputs",
+          "coverage_point": "outputs.mem_din",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "mem_we",
+          "group": "outputs",
+          "coverage_point": "outputs.mem_we",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "clk",
+          "group": "inputs",
+          "coverage_point": "inputs.clk",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "rst_n",
+          "group": "inputs",
+          "coverage_point": "inputs.rst_n",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        }
+      ]
+    },
+    "code": {
+      "status": "ok",
+      "line_coverage_pct": 66.67,
+      "line_hit": 16,
+      "line_found": 24,
+      "branch_coverage_pct": 0.69,
+      "branch_hit": 3,
+      "branch_found": 434,
+      "condition_coverage_pct": 0.69,
+      "condition_hit": 3,
+      "condition_found": 434,
+      "condition_source": "verilator_lcov_branch_proxy",
+      "toggle_coverage_pct": 45.85,
+      "toggle_hit": 199,
+      "toggle_found": 434,
+      "toggle_source": "verilator_coverage_annotate_points",
+      "missed_toggle_points": [
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=rst_n:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_csb:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_we:0->1 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_we:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[0]:0->1 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[0]:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[1]:0->1 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[1]:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[2]:0->1 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[2]:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[3]:0->1 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[3]:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[4]:0->1 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[4]:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[5]:0->1 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[5]:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[6]:0->1 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[6]:1->0 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[7]:0->1 hier=adaptive_aero_control_top"
+        },
+        {
+          "file": "adaptive_aero_control_top.v",
+          "point": "comment=mem_addr[7]:1->0 hier=adaptive_aero_control_top"
+        }
+      ],
+      "tool": "verilator_coverage"
+    },
+    "assertions": {
+      "status": "missing",
+      "assertions_generated": 0,
+      "assertion_failures": 0,
+      "assertion_pass_pct": null
+    }
+  },
+  "formal": {
+    "status": "not_enabled",
+    "available": null,
+    "attempted": null,
+    "returncode": null,
+    "reason": null
+  },
+  "golden_model": {
+    "status": "not_enabled",
+    "top_module": null
+  },
+  "toolchain": {
+    "simulator": "verilator",
+    "code_coverage": "verilator_coverage",
+    "formal": "none",
+    "formal_solver": null,
+    "golden_model": "none"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "type": "synthesis_readiness",
+  "version": "1.0",
+  "top_module": "adaptive_aero_control_top",
+  "spec_path": "backend/workflows/b76e5a57-a5ad-4da8-8d36-c7bd3277df2d/digital/spec.json",
+  "rtl_file_count": 5,
+  "score": 45,
+  "intent_findings": [
+    {
+      "type": "timing_intent",
+      "severity": "info",
+      "message": "No clocks found in spec. If synchronous, include clock intent (name + freq/period)."
+    },
+    {
+      "type": "perf_intent",
+      "severity": "info",
+      "message": "No performance/timing intent section found (latency/throughput/constraints)."
+    },
+    {
+      "type": "area_intent",
+      "severity": "info",
+      "message": "No area/gatecount intent found. Provide rough bounds if needed."
+    }
+  ],
+  "synthesizable_subset_findings": [],
+  "yosys": {
+    "available": true,
+    "errors": [
+      "ERROR: Can't open input file `backend/workflows/b76e5a57-a5ad-4da8-8d36-c7bd3277df2d/fpga/src/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_top.v' for reading: No such file or directory"
+    ],
+    "warnings": [],
+    "log_path": "backend/workflows/b76e5a57-a5ad-4da8-8d36-c7bd3277df2d/synth/yosys_synth.log"
+  },
+  "tools_detected": {
+    "yosys": true,
+    "iverilog": true,
+    "verilator": true
+  }
+}

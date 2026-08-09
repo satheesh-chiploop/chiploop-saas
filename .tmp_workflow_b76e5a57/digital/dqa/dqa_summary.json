@@ -1,0 +1,36 @@
+{
+  "workflow_id": "b76e5a57-a5ad-4da8-8d36-c7bd3277df2d",
+  "agent": "Digital DQA Summary Agent",
+  "status": "failed",
+  "blocking_issues": [
+    "rtl_lint_failed",
+    "yosys_synthesis_errors"
+  ],
+  "warning_count": 1,
+  "rtl_file_count": 1,
+  "reports": {
+    "rtl_lint": "/root/chiploop-backend/backend/workflows/b76e5a57-a5ad-4da8-8d36-c7bd3277df2d/digital/rtl_lint_report.json",
+    "cdc": "/root/chiploop-backend/backend/workflows/b76e5a57-a5ad-4da8-8d36-c7bd3277df2d/digital/cdc_findings.json",
+    "reset_integrity": "/root/chiploop-backend/backend/workflows/b76e5a57-a5ad-4da8-8d36-c7bd3277df2d/digital/reset_integrity_findings.json",
+    "synthesis_readiness": "/root/chiploop-backend/backend/workflows/b76e5a57-a5ad-4da8-8d36-c7bd3277df2d/signoff/synthesis_readiness_findings.json"
+  },
+  "stages": {
+    "rtl_lint": {
+      "status": "fail",
+      "heuristic_issue_count": 0
+    },
+    "cdc": {
+      "status": "pass",
+      "findings": 0
+    },
+    "reset_integrity": {
+      "status": "warning",
+      "findings": 1
+    },
+    "synthesis_readiness": {
+      "status": "failed",
+      "score": 45,
+      "yosys_warning_count": 0
+    }
+  }
+}

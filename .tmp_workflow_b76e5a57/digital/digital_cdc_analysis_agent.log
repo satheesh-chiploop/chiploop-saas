@@ -1,0 +1,3 @@
+CDC Analysis Agent Log
+[2026-08-09T01:42:02.015959] No clock/reset intent found. Using heuristic-only mode.
+[2026-08-09T01:42:02.016289] Discovered 5 RTL files.
