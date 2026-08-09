@@ -1,0 +1,7 @@
+{
+  "name": "pwm_fpga_demo",
+  "source": "fpga_current_workflow",
+  "target": "fpga",
+  "test_intent": "Run smoke verification for the FPGA RTL before synthesis. Check reset behavior, basic functional behavior, assertions, and coverage readiness.",
+  "verification_plan": null
+}

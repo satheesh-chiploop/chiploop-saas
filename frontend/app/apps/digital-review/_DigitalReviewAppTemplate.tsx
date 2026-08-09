@@ -47,6 +47,7 @@ function parseLogLines(logs: string | null | undefined): string[] {
 export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPath, dashboardStage, fields, defaultSourceMode, sourceModeLabel, closureRunPath, fpgaMode, referenceRtl }: Props) {
   const router = useRouter();
   const logsRef = useRef<HTMLDivElement | null>(null);
+  const [followLogs, setFollowLogs] = useState(true);
 
   const [sessionUserId, setSessionUserId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -125,9 +126,13 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   ]);
 
   useEffect(() => {
-    if (!logsRef.current) return;
+    if (!logsRef.current || !followLogs) return;
     logsRef.current.scrollTop = logsRef.current.scrollHeight;
-  }, [logLines.length]);
+  }, [followLogs, logLines.length]);
+
+  useEffect(() => {
+    setFollowLogs(true);
+  }, [workflowId]);
 
   useEffect(() => {
     (async () => {
@@ -912,11 +917,35 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between border-b border-slate-900 bg-black/45 px-4 py-3 sm:px-5">
+              <div className="flex items-center justify-between gap-3 border-b border-slate-900 bg-black/45 px-4 py-3 sm:px-5">
                 <div className="text-sm font-bold text-white">Run log</div>
-                <div className="text-xs text-slate-500">{logLines.length ? `${logLines.length} lines` : "Waiting to start"}</div>
+                <div className="flex items-center gap-3">
+                  <div className="text-xs text-slate-500">{logLines.length ? `${logLines.length} lines` : "Waiting to start"}</div>
+                  {!followLogs ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFollowLogs(true);
+                        requestAnimationFrame(() => {
+                          if (logsRef.current) logsRef.current.scrollTop = logsRef.current.scrollHeight;
+                        });
+                      }}
+                      className="rounded-md border border-cyan-800/70 bg-cyan-950/40 px-2.5 py-1 text-xs font-semibold text-cyan-200 hover:border-cyan-500"
+                    >
+                      Jump to latest
+                    </button>
+                  ) : null}
+                </div>
               </div>
-              <div ref={logsRef} className="h-[280px] overflow-auto bg-[#03070d] p-4 font-mono text-xs leading-6 text-slate-300 sm:h-[360px] sm:p-5 lg:h-[440px]">
+              <div
+                ref={logsRef}
+                onScroll={(event) => {
+                  const element = event.currentTarget;
+                  const nearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 48;
+                  setFollowLogs(nearBottom);
+                }}
+                className="h-[280px] overflow-y-scroll overscroll-contain bg-[#03070d] p-4 font-mono text-xs leading-6 text-slate-300 sm:h-[360px] sm:p-5 lg:h-[440px]"
+              >
                 {logLines.length ? logLines.map((line, idx) => <div className="border-b border-slate-900/60 py-0.5 last:border-0" key={`${idx}-${line}`}>{line}</div>) : <div className="flex h-full items-center justify-center text-center text-slate-500">Run activity will appear here after you start {title}.</div>}
               </div>
             </aside>

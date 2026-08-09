@@ -1,0 +1,275 @@
+{
+  "agent": "FPGA Explorer I/O Mapping Agent",
+  "board_count": 10,
+  "fully_mapped_board_count": 1,
+  "interface_adapter": {
+    "core_top_module": "minirv_edge_controller",
+    "fpga_top_level_io_bits": 7,
+    "fpga_top_module": "minirv_edge_controller_spi_fpga_top",
+    "hardware_readiness": "requires CDC/protocol verification and board pin assignment before programming hardware",
+    "input_bit_map": [
+      {
+        "lsb": 0,
+        "port": "debug_addr_a",
+        "width": 4
+      },
+      {
+        "lsb": 4,
+        "port": "debug_addr_b",
+        "width": 4
+      },
+      {
+        "lsb": 8,
+        "port": "sensor_data",
+        "width": 32
+      },
+      {
+        "lsb": 40,
+        "port": "sensor_valid",
+        "width": 1
+      },
+      {
+        "lsb": 41,
+        "port": "uart_rx",
+        "width": 1
+      }
+    ],
+    "original_top_level_io_bits": 82,
+    "output_frame_order_msb_first": [
+      "uart_tx",
+      "pwm_out",
+      "debug_data",
+      "interrupt"
+    ],
+    "scope": "FPGA only; ASIC uses the original core top module.",
+    "serialized_input_bits": 42,
+    "serialized_output_bits": 38,
+    "status": "generated",
+    "transaction_model": "MSB-first full-duplex frames; command N is committed when CS rises and response N is read in the following frame.",
+    "transport": "spi_mode_0_shift_transport",
+    "wrapper_rtl": "/root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv"
+  },
+  "mappings": [
+    {
+      "all_ports_mapped": false,
+      "board": "icebreaker",
+      "constraint_format": "pcf",
+      "constraint_preview": "# ChipLoop starter PCF for minirv_edge_controller_spi_fpga_top\n# target_frequency_mhz 75.0\nset_io -nowarn clk 35\nset_io -nowarn reset_n 10\n",
+      "exploration_policy": "core_only",
+      "label": "Lattice iCEBreaker",
+      "mapped_ports": [
+        "clk",
+        "reset_n"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    },
+    {
+      "all_ports_mapped": false,
+      "board": "upduino_v3",
+      "constraint_format": "pcf",
+      "constraint_preview": "# ChipLoop starter PCF for minirv_edge_controller_spi_fpga_top\n# target_frequency_mhz 75.0\nset_io -nowarn clk 20\nset_io -nowarn reset_n 19\n",
+      "exploration_policy": "core_only",
+      "label": "Lattice UPduino v3",
+      "mapped_ports": [
+        "clk",
+        "reset_n"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    },
+    {
+      "all_ports_mapped": false,
+      "board": "icestick",
+      "constraint_format": "pcf",
+      "constraint_preview": "# ChipLoop starter PCF for minirv_edge_controller_spi_fpga_top\n# target_frequency_mhz 75.0\nset_io -nowarn clk 21\nset_io -nowarn reset_n 44\n",
+      "exploration_policy": "core_only",
+      "label": "Lattice iCEstick",
+      "mapped_ports": [
+        "clk",
+        "reset_n"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    },
+    {
+      "all_ports_mapped": false,
+      "board": "ice40_hx8k_breakout",
+      "constraint_format": "pcf",
+      "constraint_preview": "# ChipLoop starter PCF for minirv_edge_controller_spi_fpga_top\n# target_frequency_mhz 75.0\nset_io -nowarn clk J3\n",
+      "exploration_policy": "core_only",
+      "label": "Lattice iCE40 HX8K Breakout",
+      "mapped_ports": [
+        "clk"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "reset_n",
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    },
+    {
+      "all_ports_mapped": false,
+      "board": "colorlight_5a_75b",
+      "constraint_format": "lpf",
+      "constraint_preview": "# ChipLoop starter LPF for minirv_edge_controller_spi_fpga_top\n# target_frequency_mhz 75.0\nLOCATE COMP \"clk\" SITE \"P6\";\nIOBUF PORT \"clk\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"reset_n\" SITE \"P11\";\nIOBUF PORT \"reset_n\" IO_TYPE=LVCMOS33;\nFREQUENCY PORT \"clk\" 75.0 MHz;\n",
+      "exploration_policy": "core_only",
+      "label": "Lattice Colorlight 5A-75B ECP5-25F",
+      "mapped_ports": [
+        "clk",
+        "reset_n"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    },
+    {
+      "all_ports_mapped": true,
+      "board": "ulx3s_ecp5_45f",
+      "constraint_format": "lpf",
+      "constraint_preview": "# ChipLoop starter LPF for minirv_edge_controller_spi_fpga_top\n# target_frequency_mhz 75.0\nLOCATE COMP \"clk\" SITE \"G2\";\nIOBUF PORT \"clk\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"reset_n\" SITE \"T1\";\nIOBUF PORT \"reset_n\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"spi_sclk\" SITE \"B11\";\nIOBUF PORT \"spi_sclk\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"spi_cs_n\" SITE \"A10\";\nIOBUF PORT \"spi_cs_n\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"spi_mosi\" SITE \"A9\";\nIOBUF PORT \"spi_mosi\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"spi_miso\" SITE \"B9\";\nIOBUF PORT \"spi_miso\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"fault_indicator\" SITE \"B2\";\nIOBUF PORT \"fault_indicator\" IO_TYPE=LVCMOS33;\nFREQUENCY PORT \"clk\" 75.0 MHz;\n",
+      "exploration_policy": "board_mapped_io",
+      "label": "Lattice ULX3S ECP5-45F",
+      "mapped_ports": [
+        "clk",
+        "reset_n",
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ],
+      "note": "All top-level ports have verified ChipLoop board-pin mappings.",
+      "programming_ready": true,
+      "unmapped_ports": []
+    },
+    {
+      "all_ports_mapped": false,
+      "board": "orangecrab_ecp5_85f",
+      "constraint_format": "lpf",
+      "constraint_preview": "# ChipLoop starter LPF for minirv_edge_controller_spi_fpga_top\n# target_frequency_mhz 75.0\nLOCATE COMP \"clk\" SITE \"A9\";\nIOBUF PORT \"clk\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"reset_n\" SITE \"V17\";\nIOBUF PORT \"reset_n\" IO_TYPE=LVCMOS33;\nFREQUENCY PORT \"clk\" 75.0 MHz;\n",
+      "exploration_policy": "core_only",
+      "label": "Lattice OrangeCrab ECP5-85F",
+      "mapped_ports": [
+        "clk",
+        "reset_n"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    },
+    {
+      "all_ports_mapped": false,
+      "board": "gowin_tang_nano_9k",
+      "constraint_format": "cst",
+      "constraint_preview": "// ChipLoop starter CST for minirv_edge_controller_spi_fpga_top\n// target_frequency_mhz 75.0\nIO_LOC \"clk\" 52;\nIO_PORT \"clk\" IO_TYPE=LVCMOS33;\n",
+      "exploration_policy": "core_only",
+      "label": "Gowin Tang Nano 9K (LittleBee GW1NR-9)",
+      "mapped_ports": [
+        "clk"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "reset_n",
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    },
+    {
+      "all_ports_mapped": false,
+      "board": "gowin_tang_nano_20k",
+      "constraint_format": "cst",
+      "constraint_preview": "// ChipLoop starter CST for minirv_edge_controller_spi_fpga_top\n// target_frequency_mhz 75.0\nIO_LOC \"clk\" 4;\nIO_PORT \"clk\" IO_TYPE=LVCMOS33;\n",
+      "exploration_policy": "core_only",
+      "label": "Gowin Tang Nano 20K (Arora II GW2AR-18C)",
+      "mapped_ports": [
+        "clk"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "reset_n",
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    },
+    {
+      "all_ports_mapped": false,
+      "board": "gowin_tang_primer_20k",
+      "constraint_format": "cst",
+      "constraint_preview": "// ChipLoop starter CST for minirv_edge_controller_spi_fpga_top\n// target_frequency_mhz 75.0\nIO_LOC \"clk\" H11;\nIO_PORT \"clk\" IO_TYPE=LVCMOS33;\n",
+      "exploration_policy": "core_only",
+      "label": "Gowin Tang Primer 20K (Arora II GW2A-18)",
+      "mapped_ports": [
+        "clk"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "reset_n",
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ]
+    }
+  ],
+  "policy": "Never invent physical pins. Unmapped I/O is explicit; Explorer uses core-only implementation while Prototyping blocks until every physical I/O is verified.",
+  "status": "completed",
+  "top_level_ports": [
+    "clk",
+    "reset_n",
+    "spi_sclk",
+    "spi_cs_n",
+    "spi_mosi",
+    "spi_miso",
+    "fault_indicator"
+  ],
+  "top_module": "minirv_edge_controller_spi_fpga_top"
+}

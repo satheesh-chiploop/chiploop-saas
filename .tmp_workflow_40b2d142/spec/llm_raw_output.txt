@@ -1,0 +1,1392 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "Synthesizable FPGA control wrapper for active-aerodynamics applications. It exchanges compact 128-bit request/response transactions with an external software/GPU surrogate service, maintains request sequencing and freshness tracking, validates response format and safety bounds, clamps and shapes actuator commands, enforces timeout and fallback behavior, and exposes a compact register window plus sticky fault/status reporting. The RTL does not implement the surrogate model and does not expose raw tensors, flow fields, pressure grids, or geometry arrays at the top level.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "reset_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "Single-clock synchronous RTL only.",
+      "External surrogate service returns 128-bit responses on rsp_* and accepts 128-bit requests on req_*.",
+      "Compact register-window transport is limited to 64 bits per transaction and is used only for configuration and status access.",
+      "Geometry is represented internally only as a bounded reference token/hash for the DrivAerML STL reference geometry; raw STL is never exposed on pins.",
+      "Bulk history/freshness tracking storage is implemented via a technology-neutral memory wrapper that may map to native FPGA block RAM."
+    ]
+  },
+  "memory_macros": [
+    {
+      "name": "tech_neutral_bram_wrapper",
+      "kind": "fpga_bram_wrapper",
+      "depth": 64,
+      "data_width": 64,
+      "addr_width": 6,
+      "instance_name": "u_history_mem",
+      "ports": {
+        "clk": "clk",
+        "csb": "mem_csb",
+        "we": "mem_we",
+        "addr": "mem_addr",
+        "din": "mem_din",
+        "dout": "mem_dout"
+      },
+      "requires_mbist": false
+    }
+  ],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level RTL wrapper that provides the complete Physical AI control contract: request packetization, response depacketization, register-window control/status, sequence and freshness monitoring, timeout watchdog, safety supervision, actuator command shaping, and sticky fault reporting. The top-level owns the external streaming interfaces and the compact register transport while delegating internal register decode, protocol handling, safety filtering, and command formation to submodules.",
+      "ports": [
+        {"name": "clk", "direction": "input", "width": 1},
+        {"name": "reset_n", "direction": "input", "width": 1, "active_low": true},
+        {"name": "req_valid", "direction": "output", "width": 1},
+        {"name": "req_ready", "direction": "input", "width": 1},
+        {"name": "req_data", "direction": "output", "width": 128},
+        {"name": "rsp_valid", "direction": "input", "width": 1},
+        {"name": "rsp_ready", "direction": "output", "width": 1},
+        {"name": "rsp_data", "direction": "input", "width": 128},
+        {"name": "reg_valid", "direction": "input", "width": 1},
+        {"name": "reg_ready", "direction": "output", "width": 1},
+        {"name": "reg_we", "direction": "input", "width": 1},
+        {"name": "reg_addr", "direction": "input", "width": 32},
+        {"name": "reg_wdata", "direction": "input", "width": 32},
+        {"name": "reg_rdata", "direction": "output", "width": 32},
+        {"name": "reg_rvalid", "direction": "output", "width": 1},
+        {"name": "act_cmd_valid", "direction": "output", "width": 1},
+        {"name": "act_cmd_data", "direction": "output", "width": 32},
+        {"name": "fault_valid", "direction": "output", "width": 1},
+        {"name": "fault_code", "direction": "output", "width": 8},
+        {"name": "fault_flags", "direction": "output", "width": 16}
+      ],
+      "functionality": "Implements the complete deterministic control wrapper for adaptive active-aerodynamics. The module accepts compact register-window transactions for configuration and status, packetizes outbound surrogate requests containing sequence, mode, velocity setpoint, geometry token, and validity markers, accepts and validates 128-bit surrogate responses, checks freshness and replay/duplicate/out-of-order conditions, times out missing responses, clamps/filters control intent, and produces bounded actuator commands. On reset the design enters safe fallback, deasserts or conservatively defaults actuator commands, clears outstanding request tracking, invalidates pending responses, and asserts disable/safe status as appropriate.",
+      "responsibilities": [
+        "Own the top-level control, request/response, register, command, and fault interfaces.",
+        "Guarantee that requests are only emitted when enabled, downstream transport is ready, and no blocking fault is active.",
+        "Guarantee that responses are accepted only when format-valid, sequence-matching, fresh, and not duplicated or replayed.",
+        "Provide sticky fault telemetry for stale response, timeout, invalid payload, clamp event, fallback active, and disable state.",
+        "Drive deterministic safe-fallback behavior under reset, disable, invalid data, stale data, missing response, or timeout conditions.",
+        "Enforce actuator command bounds and optional slew/rate limiting for safe behavior.",
+        "Carry only bounded geometry reference information and not raw STL or surrogate internals."
+      ],
+      "must_drive": [
+        "req_valid",
+        "req_data",
+        "reg_ready",
+        "reg_rdata",
+        "reg_rvalid",
+        "rsp_ready",
+        "act_cmd_valid",
+        "act_cmd_data",
+        "fault_valid",
+        "fault_code",
+        "fault_flags"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "req_ready",
+        "rsp_valid",
+        "rsp_data",
+        "reg_valid",
+        "reg_we",
+        "reg_addr",
+        "reg_wdata"
+      ],
+      "must_not_drive": [
+        "surface_pressure",
+        "flow_field",
+        "geometry_array",
+        "tensor_payload",
+        "raw_stl",
+        "bulk_physics_state"
+      ],
+      "reset_behavior": "Synchronous reset forces safe fallback, clears outstanding request sequence and age counters, clears pending response state, deasserts active command issuance, sets actuator output to a conservative default or holds last-safe value per configuration, and clears non-sticky transient decode state while preserving only the documented sticky fault policy if required by implementation choice. The controller must not emit a non-conservative actuator command until enable is asserted and a fresh validated response has been accepted.",
+      "behavior_rules": [
+        "All sequential behavior shall be synchronous to clk with active-low reset_n.",
+        "req_valid may assert only when global enable is set, no blocking fault is active, and req_ready is high for a new transfer opportunity.",
+        "rsp_ready may be asserted whenever the response sink can accept incoming data, but acceptance must be ignored unless the response header/format and sequence checks pass.",
+        "Every accepted request increments the request sequence number and starts the timeout watchdog.",
+        "A response is valid only if its transaction sequence matches the outstanding request and its freshness metadata indicates a new, non-duplicate, non-replayed response.",
+        "Stale, late, duplicate, replayed, malformed, or sequence-mismatched responses must be rejected and shall set sticky fault flags.",
+        "Timeout expiry before a valid response forces fallback and sets timeout and fallback sticky flags.",
+        "Actuator commands must be clamped between configured minimum and maximum bounds and may be slewed or rate-limited for safety.",
+        "If the controller is disabled, in reset, or in any blocking fault state, command issuance shall remain in fallback mode and request traffic shall be suppressed.",
+        "Register window transactions shall use no more than 64 bits of addressing/transport semantics per transaction and must be suitable for configuration and readback of enable, timeout, velocity setpoint, clamp bounds, and status.",
+        "The design shall not expose raw model tensors, internal surrogate state, or geometry arrays on any top-level pin."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "aero_regfile_mmio",
+        "description": "Compact register-file and control/status decode block for the external register window. It accepts 32-bit address/data transactions plus read/write control, stores configuration registers, and exposes semantic control/status signals to the rest of the design. It implements enable, soft reset, mode select, request sequence seed/numbering support, last-accepted sequence tracking interface, stream_velocity_mps setpoint, timeout threshold, actuator clamp bounds, and safe-fallback selection, plus readable status words.",
+        "ports": [
+          {"name": "clk", "direction": "input", "width": 1},
+          {"name": "reset_n", "direction": "input", "width": 1, "active_low": true},
+          {"name": "reg_valid", "direction": "input", "width": 1},
+          {"name": "reg_ready", "direction": "output", "width": 1},
+          {"name": "reg_we", "direction": "input", "width": 1},
+          {"name": "reg_addr", "direction": "input", "width": 32},
+          {"name": "reg_wdata", "direction": "input", "width": 32},
+          {"name": "reg_rdata", "direction": "output", "width": 32},
+          {"name": "reg_rvalid", "direction": "output", "width": 1},
+          {"name": "cfg_enable", "direction": "output", "width": 1},
+          {"name": "cfg_soft_reset", "direction": "output", "width": 1},
+          {"name": "cfg_mode_select", "direction": "output", "width": 3},
+          {"name": "cfg_req_seq_seed", "direction": "output", "width": 16},
+          {"name": "status_last_accepted_seq", "direction": "input", "width": 16},
+          {"name": "cfg_stream_velocity_mps", "direction": "output", "width": 16},
+          {"name": "cfg_timeout_threshold", "direction": "output", "width": 16},
+          {"name": "cfg_actuator_min", "direction": "output", "width": 16},
+          {"name": "cfg_actuator_max", "direction": "output", "width": 16},
+          {"name": "cfg_safe_fallback_select", "direction": "output", "width": 2},
+          {"name": "status_word", "direction": "input", "width": 32},
+          {"name": "status_fault_flags", "direction": "input", "width": 16}
+        ],
+        "functionality": "Decodes the compact control/status register window, stores configuration state, and provides semantically named configuration outputs to the controller. Readback returns current configuration and status information in a compact 32-bit word form. The register block may be implemented with standard flip-flops and simple decode logic; it must not expose any raw tensors or payload arrays.",
+        "responsibilities": [
+          "Decode 32-bit register address and data transactions from the top-level compact register transport.",
+          "Implement control registers for enable, soft reset, mode select, sequence seed, timeout threshold, actuator clamp values, and safe-fallback selection.",
+          "Provide readable status words and sticky fault flag visibility.",
+          "Maintain configuration coherence and simple host-facing readback semantics."
+        ],
+        "must_drive": [
+          "reg_ready",
+          "reg_rdata",
+          "reg_rvalid",
+          "cfg_enable",
+          "cfg_soft_reset",
+          "cfg_mode_select",
+          "cfg_req_seq_seed",
+          "cfg_stream_velocity_mps",
+          "cfg_timeout_threshold",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_safe_fallback_select"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "reg_valid",
+          "reg_we",
+          "reg_addr",
+          "reg_wdata",
+          "status_last_accepted_seq",
+          "status_word",
+          "status_fault_flags"
+        ],
+        "must_not_drive": [
+          "req_valid",
+          "req_data",
+          "rsp_ready",
+          "act_cmd_valid",
+          "act_cmd_data",
+          "surface_pressure",
+          "flow_field",
+          "raw_stl"
+        ],
+        "reset_behavior": "On reset, clear configuration to safe values: disable output asserted low, soft reset deasserted after reset handling, conservative mode select, nominal sequence seed, conservative timeout, actuator clamp range set to safe defaults, and safe-fallback selection asserted. Readback must reflect safe defaults after reset.",
+        "behavior_rules": [
+          "Register-window transport is compact and must remain within a 64-bit-per-transaction semantic footprint.",
+          "Writes shall update configuration registers only when reg_valid and reg_we are asserted and the address decodes to a valid writable register.",
+          "Reads shall place the selected status/configuration word on reg_rdata and assert reg_rvalid as a response indication.",
+          "status_last_accepted_seq and status_word are inputs used only for readback/status composition; they are not writable by host.",
+          "If a soft reset control write is observed, the overall controller reset/fallback policy shall be engaged in a safe manner consistent with synchronous operation."
+        ],
+        "rtl_output_file": "aero_regfile_mmio.v"
+      },
+      {
+        "name": "aero_request_packetizer",
+        "description": "Constructs outbound 128-bit surrogate request packets from semantic control inputs. It embeds transaction sequence ID, control mode, geometry reference token, encoded stream velocity or flow-condition descriptor, and validity markers. It only emits requests when enabled, transport-ready, and not blocked by fault or fallback conditions.",
+        "ports": [
+          {"name": "clk", "direction": "input", "width": 1},
+          {"name": "reset_n", "direction": "input", "width": 1, "active_low": true},
+          {"name": "cfg_enable", "direction": "input", "width": 1},
+          {"name": "cfg_mode_select", "direction": "input", "width": 3},
+          {"name": "cfg_req_seq_seed", "direction": "input", "width": 16},
+          {"name": "cfg_stream_velocity_mps", "direction": "input", "width": 16},
+          {"name": "cfg_safe_fallback_select", "direction": "input", "width": 2},
+          {"name": "blocking_fault", "direction": "input", "width": 1},
+          {"name": "req_ready", "direction": "input", "width": 1},
+          {"name": "req_valid", "direction": "output", "width": 1},
+          {"name": "req_data", "direction": "output", "width": 128},
+          {"name": "outstanding_seq", "direction": "output", "width": 16},
+          {"name": "request_issued", "direction": "output", "width": 1}
+        ],
+        "functionality": "Builds compact 128-bit requests for the external surrogate service. The packet format shall contain a transaction sequence field, mode field, bounded geometry reference token/hash for the DrivAerML reference geometry, velocity setpoint or scaled flow-condition field, and validity markers or parity/format bits sufficient for downstream response correlation. The block must not carry raw STL geometry or any bulk physics tensor. The output request is emitted only when the controller is enabled, no blocking fault is active, and the downstream transport indicates ready.",
+        "responsibilities": [
+          "Encode outbound request fields into a 128-bit transaction word.",
+          "Gate request emission by enable, fault, and ready conditions.",
+          "Track and present the outstanding request sequence identifier.",
+          "Expose a single-cycle request_issued indication to the sequence/timeout logic."
+        ],
+        "must_drive": [
+          "req_valid",
+          "req_data",
+          "outstanding_seq",
+          "request_issued"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_enable",
+          "cfg_mode_select",
+          "cfg_req_seq_seed",
+          "cfg_stream_velocity_mps",
+          "cfg_safe_fallback_select",
+          "blocking_fault",
+          "req_ready"
+        ],
+        "must_not_drive": [
+          "rsp_valid",
+          "rsp_data",
+          "act_cmd_valid",
+          "act_cmd_data",
+          "surface_pressure",
+          "flow_field",
+          "raw_stl"
+        ],
+        "reset_behavior": "Reset clears the outstanding sequence, deasserts request_valid, forces request data to a deterministic benign value, and suppresses request issuance until enable is asserted and blocking faults are cleared.",
+        "behavior_rules": [
+          "Requests shall include a bounded reference token for the DrivAerML STL geometry rather than any raw geometry payload.",
+          "Sequence generation must be deterministic and monotonically track issued requests.",
+          "If cfg_enable is low or blocking_fault is high, req_valid must remain low.",
+          "If req_ready is low, the request packetizer must hold off emission without losing deterministic sequence state.",
+          "request_issued shall only pulse when a request handshake is successfully completed."
+        ],
+        "rtl_output_file": "aero_request_packetizer.v"
+      },
+      {
+        "name": "aero_response_depacketizer",
+        "description": "Accepts 128-bit responses from the external surrogate service, validates packet format and response markers, extracts compact control-relevant outputs, and presents a structured response intent to the safety and command path. It does not depend on raw pressure fields or full flow-field payloads.",
+        "ports": [
+          {"name": "clk", "direction": "input", "width": 1},
+          {"name": "reset_n", "direction": "input", "width": 1, "active_low": true},
+          {"name": "rsp_valid", "direction": "input", "width": 1},
+          {"name": "rsp_ready", "direction": "output", "width": 1},
+          {"name": "rsp_data", "direction": "input", "width": 128},
+          {"name": "expected_seq", "direction": "input", "width": 16},
+          {"name": "response_valid", "direction": "output", "width": 1},
+          {"name": "response_seq", "direction": "output", "width": 16},
+          {"name": "drag_estimate", "direction": "output", "width": 16},
+          {"name": "lift_estimate", "direction": "output", "width": 16},
+          {"name": "freshness_meta", "direction": "output", "width": 8},
+          {"name": "payload_malformed", "direction": "output", "width": 1},
+          {"name": "payload_fresh", "direction": "output", "width": 1}
+        ],
+        "functionality": "Validates inbound 128-bit surrogate responses and extracts compact fields such as response sequence ID, drag estimate, lift estimate, and freshness metadata. It rejects malformed headers, format errors, and nonconforming payloads. The block shall not require or expose any full surface_pressure or flow_field payloads to make control decisions.",
+        "responsibilities": [
+          "Perform format/header validity checks on inbound responses.",
+          "Extract compact control-relevant estimates and metadata.",
+          "Indicate malformed, fresh, and response_valid conditions to downstream logic.",
+          "Provide response sequence for freshness and replay monitoring."
+        ],
+        "must_drive": [
+          "rsp_ready",
+          "response_valid",
+          "response_seq",
+          "drag_estimate",
+          "lift_estimate",
+          "freshness_meta",
+          "payload_malformed",
+          "payload_fresh"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "rsp_valid",
+          "rsp_data",
+          "expected_seq"
+        ],
+        "must_not_drive": [
+          "req_valid",
+          "req_data",
+          "act_cmd_valid",
+          "act_cmd_data",
+          "surface_pressure",
+          "flow_field",
+          "geometry_array"
+        ],
+        "reset_behavior": "Reset clears response acceptance state, deasserts response_valid, and causes malformed/fresh indicators to default to inactive until a new response is observed.",
+        "behavior_rules": [
+          "Only responses with a valid format/header may be accepted.",
+          "Response sequence must be exposed for correlation with the outstanding request.",
+          "Malformed responses are rejected and shall not contribute to accepted control decisions.",
+          "The depacketizer must not require bulk physics payloads to perform its function.",
+          "payload_fresh may only assert when freshness metadata indicates a new non-duplicate response."
+        ],
+        "rtl_output_file": "aero_response_depacketizer.v"
+      },
+      {
+        "name": "aero_sequence_watchdog",
+        "description": "Tracks outstanding request sequence IDs, detects stale/duplicate/replayed/mismatched responses, and enforces timeout-based fallback. It also maintains age counters relative to the configured timeout threshold and provides blocking-fault and sticky status outputs.",
+        "ports": [
+          {"name": "clk", "direction": "input", "width": 1},
+          {"name": "reset_n", "direction": "input", "width": 1, "active_low": true},
+          {"name": "request_issued", "direction": "input", "width": 1},
+          {"name": "outstanding_seq", "direction": "input", "width": 16},
+          {"name": "response_valid", "direction": "input", "width": 1},
+          {"name": "response_seq", "direction": "input", "width": 16},
+          {"name": "payload_fresh", "direction": "input", "width": 1},
+          {"name": "cfg_timeout_threshold", "direction": "input", "width": 16},
+          {"name": "blocking_fault", "direction": "output", "width": 1},
+          {"name": "stale_response_fault", "direction": "output", "width": 1},
+          {"name": "timeout_fault", "direction": "output", "width": 1},
+          {"name": "duplicate_response_fault", "direction": "output", "width": 1},
+          {"name": "replay_response_fault", "direction": "output", "width": 1},
+          {"name": "sequence_mismatch_fault", "direction": "output", "width": 1},
+          {"name": "accepted_seq", "direction": "output", "width": 16},
+          {"name": "response_age", "direction": "output", "width": 16}
+        ],
+        "functionality": "Maintains outstanding request state and cycle-based age tracking. Detects and flags stale, late, duplicate, replayed, and sequence-mismatched responses. Applies timeout threshold enforcement and emits a blocking_fault indicator that suppresses normal command issuance when the control loop is not healthy.",
+        "responsibilities": [
+          "Track the current outstanding request sequence and age.",
+          "Detect and flag stale, duplicate, replayed, or mismatched responses.",
+          "Assert timeout fault when valid response acceptance does not occur within the configured threshold.",
+          "Provide the accepted sequence identifier to the status path.",
+          "Generate a unified blocking_fault indication for the request and command paths."
+        ],
+        "must_drive": [
+          "blocking_fault",
+          "stale_response_fault",
+          "timeout_fault",
+          "duplicate_response_fault",
+          "replay_response_fault",
+          "sequence_mismatch_fault",
+          "accepted_seq",
+          "response_age"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "request_issued",
+          "outstanding_seq",
+          "response_valid",
+          "response_seq",
+          "payload_fresh",
+          "cfg_timeout_threshold"
+        ],
+        "must_not_drive": [
+          "req_valid",
+          "req_data",
+          "rsp_ready",
+          "act_cmd_valid",
+          "act_cmd_data",
+          "surface_pressure",
+          "flow_field"
+        ],
+        "reset_behavior": "Reset clears outstanding transaction tracking, zeroes age counters, deasserts blocking_fault until a faulting condition is observed, and clears non-sticky sequence error indications if the design chooses transient behavior for those outputs.",
+        "behavior_rules": [
+          "A response must match the outstanding request sequence and be marked fresh to qualify as accepted.",
+          "Any stale or replayed response shall cause corresponding sticky fault flags to assert.",
+          "If the response age exceeds cfg_timeout_threshold before a valid acceptance, timeout_fault shall assert.",
+          "blocking_fault shall remain high when any timeout, sequence mismatch, stale, duplicate, replay, or malformed condition is active.",
+          "accepted_seq shall only update on valid acceptance of a matching response."
+        ],
+        "rtl_output_file": "aero_sequence_watchdog.v"
+      },
+      {
+        "name": "aero_safety_supervisor",
+        "description": "Implements the safety policy for model outputs and actuator intents. It validates response-derived control intent against configured bounds and safe operating envelopes, chooses fallback behavior when responses are invalid or missing, and produces bounded command intent and sticky safety flags.",
+        "ports": [
+          {"name": "clk", "direction": "input", "width": 1},
+          {"name": "reset_n", "direction": "input", "width": 1, "active_low": true},
+          {"name": "cfg_enable", "direction": "input", "width": 1},
+          {"name": "cfg_actuator_min", "direction": "input", "width": 16},
+          {"name": "cfg_actuator_max", "direction": "input", "width": 16},
+          {"name": "cfg_safe_fallback_select", "direction": "input", "width": 2},
+          {"name": "response_valid", "direction": "input", "width": 1},
+          {"name": "payload_malformed", "direction": "input", "width": 1},
+          {"name": "blocking_fault", "direction": "input", "width": 1},
+          {"name": "drag_estimate", "direction": "input", "width": 16},
+          {"name": "lift_estimate", "direction": "input", "width": 16},
+          {"name": "safe_intent", "direction": "output", "width": 16},
+          {"name": "valid_intent", "direction": "output", "width": 1},
+          {"name": "clamp_event", "direction": "output", "width": 1},
+          {"name": "fallback_active", "direction": "output", "width": 1},
+          {"name": "invalid_payload_fault", "direction": "output", "width": 1},
+          {"name": "disable_state", "direction": "output", "width": 1}
+        ],
+        "functionality": "Applies conservative safety rules to the extracted surrogate estimates. It determines whether a control intent is acceptable, clamps or rejects values outside configured actuator limits, and selects deterministic fallback behavior when disabled, blocked, invalid, stale, or missing data conditions occur. It produces a bounded safe intent for downstream command shaping.",
+        "responsibilities": [
+          "Validate model outputs against configured safety bounds and known-safe envelope logic.",
+          "Clamp or reject unsafe actuator intents.",
+          "Select deterministic conservative fallback or hold-last-safe behavior according to configuration.",
+          "Propagate disable and fallback state indicators.",
+          "Assert invalid payload and clamp event flags when appropriate."
+        ],
+        "must_drive": [
+          "safe_intent",
+          "valid_intent",
+          "clamp_event",
+          "fallback_active",
+          "invalid_payload_fault",
+          "disable_state"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_enable",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_safe_fallback_select",
+          "response_valid",
+          "payload_malformed",
+          "blocking_fault",
+          "drag_estimate",
+          "lift_estimate"
+        ],
+        "must_not_drive": [
+          "req_valid",
+          "req_data",
+          "rsp_ready",
+          "surface_pressure",
+          "flow_field",
+          "raw_stl"
+        ],
+        "reset_behavior": "Reset forces fallback_active high, valid_intent low, disable_state high if cfg_enable is not yet asserted, and safe_intent to a conservative deterministic default. Sticky invalid or clamp indications may be cleared or held per implementation policy, but the reset state must remain conservative.",
+        "behavior_rules": [
+          "If cfg_enable is low, disable_state shall assert and valid_intent shall deassert.",
+          "If payload is malformed, blocking_fault is active, or response_valid is low, the supervisor shall enter fallback handling.",
+          "safe_intent must remain within cfg_actuator_min and cfg_actuator_max after any clamp operation.",
+          "clamp_event shall assert whenever requested intent exceeds configured bounds.",
+          "fallback_active shall assert whenever the control loop is not safe for normal command issuance.",
+          "The supervisor must not rely on full flow fields or raw tensors."
+        ],
+        "rtl_output_file": "aero_safety_supervisor.v"
+      },
+      {
+        "name": "aero_actuator_command_shaper",
+        "description": "Converts validated safe intent into a compact 32-bit actuator command word with bounded slew/rate behavior and deterministic fallback output. It preserves command range limits and ensures that output remains safe under disable or fault conditions.",
+        "ports": [
+          {"name": "clk", "direction": "input", "width": 1},
+          {"name": "reset_n", "direction": "input", "width": 1, "active_low": true},
+          {"name": "safe_intent", "direction": "input", "width": 16},
+          {"name": "valid_intent", "direction": "input", "width": 1},
+          {"name": "fallback_active", "direction": "input", "width": 1},
+          {"name": "cfg_actuator_min", "direction": "input", "width": 16},
+          {"name": "cfg_actuator_max", "direction": "input", "width": 16},
+          {"name": "act_cmd_valid", "direction": "output", "width": 1},
+          {"name": "act_cmd_data", "direction": "output", "width": 32},
+          {"name": "last_safe_cmd", "direction": "output", "width": 16},
+          {"name": "slew_limited", "direction": "output", "width": 1},
+          {"name": "clamped_cmd", "direction": "output", "width": 16}
+        ],
+        "functionality": "Shapes validated safe intent into the final 32-bit actuator command word. It may encode a compact actuator position, trim, or active-aerodynamics mode command and may implement bounded slew control. Output is deterministic and conservative when fallback is active or valid intent is absent. The final command shall remain within the configured min/max bounds.",
+        "responsibilities": [
+          "Convert safe intent to a compact actuator command word.",
+          "Apply optional rate limiting or slew control for safe actuation.",
+          "Clamp command output to configured actuator limits.",
+          "Hold or drive conservative fallback command when safe operation is not available.",
+          "Expose the last safe command and clamp/slew indications."
+        ],
+        "must_drive": [
+          "act_cmd_valid",
+          "act_cmd_data",
+          "last_safe_cmd",
+          "slew_limited",
+          "clamped_cmd"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "safe_intent",
+          "valid_intent",
+          "fallback_active",
+          "cfg_actuator_min",
+          "cfg_actuator_max"
+        ],
+        "must_not_drive": [
+          "req_valid",
+          "req_data",
+          "rsp_ready",
+          "surface_pressure",
+          "flow_field",
+          "geometry_array"
+        ],
+        "reset_behavior": "Reset clears command valid, sets act_cmd_data to a deterministic conservative default, and invalidates any prior command state while preserving safe behavior.",
+        "behavior_rules": [
+          "act_cmd_data must be kept within cfg_actuator_min and cfg_actuator_max after shaping and clamping.",
+          "When valid_intent is low or fallback_active is high, the command shaper shall output a conservative deterministic command.",
+          "slew control may be applied to avoid abrupt actuator movement.",
+          "last_safe_cmd shall only update on a command deemed safe for actuation."
+        ],
+        "rtl_output_file": "aero_actuator_command_shaper.v"
+      },
+      {
+        "name": "aero_status_telemetry",
+        "description": "Collects sticky fault bits and produces the readable status/fault outputs for host software. It consolidates sequence, timeout, malformed payload, clamp, fallback, and disable indications into a compact status word and exposed fault fields.",
+        "ports": [
+          {"name": "clk", "direction": "input", "width": 1},
+          {"name": "reset_n", "direction": "input", "width": 1, "active_low": true},
+          {"name": "stale_response_fault", "direction": "input", "width": 1},
+          {"name": "timeout_fault", "direction": "input", "width": 1},
+          {"name": "invalid_payload_fault", "direction": "input", "width": 1},
+          {"name": "clamp_event", "direction": "input", "width": 1},
+          {"name": "fallback_active", "direction": "input", "width": 1},
+          {"name": "disable_state", "direction": "input", "width": 1},
+          {"name": "accepted_seq", "direction": "input", "width": 16},
+          {"name": "status_word", "direction": "output", "width": 32},
+          {"name": "fault_valid", "direction": "output", "width": 1},
+          {"name": "fault_code", "direction": "output", "width": 8},
+          {"name": "fault_flags", "direction": "output", "width": 16},
+          {"name": "sticky_fault_summary", "direction": "output", "width": 1}
+        ],
+        "functionality": "Aggregates all safety and sequencing indications into a host-readable telemetry block. It drives a compact status word, fault code, and sticky fault flags for software visibility. The telemetry is intended to be readable by the register file and optionally by the top-level fault outputs.",
+        "responsibilities": [
+          "Expose sticky fault bits for stale response, timeout, invalid payload, clamp event, fallback active, and disable state.",
+          "Generate a compact readable status word for host software.",
+          "Provide a single fault_valid indication when any blocking or sticky fault is active.",
+          "Summarize controller health for the register readback path."
+        ],
+        "must_drive": [
+          "status_word",
+          "fault_valid",
+          "fault_code",
+          "fault_flags",
+          "sticky_fault_summary"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "stale_response_fault",
+          "timeout_fault",
+          "invalid_payload_fault",
+          "clamp_event",
+          "fallback_active",
+          "disable_state",
+          "accepted_seq"
+        ],
+        "must_not_drive": [
+          "req_valid",
+          "req_data",
+          "rsp_ready",
+          "act_cmd_valid",
+          "act_cmd_data",
+          "surface_pressure",
+          "flow_field"
+        ],
+        "reset_behavior": "Reset clears telemetry outputs to conservative values, with the status word reflecting safe fallback/disable as appropriate after reset and fault_valid deasserted until a fault condition is present.",
+        "behavior_rules": [
+          "fault_flags shall encode the documented sticky conditions in a compact 16-bit field.",
+          "fault_code shall provide a readable summary code derived from the active conditions.",
+          "status_word shall be suitable for register readback without exposing any hidden payload or tensor data.",
+          "accepted_seq may be reflected for host observability but shall not be modifiable through telemetry outputs."
+        ],
+        "rtl_output_file": "aero_status_telemetry.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "aero_regfile_mmio.clk",
+        "aero_request_packetizer.clk",
+        "aero_response_depacketizer.clk",
+        "aero_sequence_watchdog.clk",
+        "aero_safety_supervisor.clk",
+        "aero_actuator_command_shaper.clk",
+        "aero_status_telemetry.clk"
+      ],
+      "description": "Primary synchronous clock fanout to all submodules."
+    },
+    {
+      "top_port": "reset_n",
+      "connected_to": [
+        "aero_regfile_mmio.reset_n",
+        "aero_request_packetizer.reset_n",
+        "aero_response_depacketizer.reset_n",
+        "aero_sequence_watchdog.reset_n",
+        "aero_safety_supervisor.reset_n",
+        "aero_actuator_command_shaper.reset_n",
+        "aero_status_telemetry.reset_n"
+      ],
+      "description": "Active-low synchronous reset fanout to all submodules."
+    },
+    {
+      "top_port": "req_ready",
+      "connected_to": [
+        "aero_request_packetizer.req_ready"
+      ],
+      "description": "External request transport readiness is observed by the request packetizer."
+    },
+    {
+      "top_port": "rsp_valid",
+      "connected_to": [
+        "aero_response_depacketizer.rsp_valid"
+      ],
+      "description": "External response valid handshake is observed by the response depacketizer."
+    },
+    {
+      "top_port": "rsp_data",
+      "connected_to": [
+        "aero_response_depacketizer.rsp_data"
+      ],
+      "description": "Inbound 128-bit response payload is delivered to the depacketizer."
+    },
+    {
+      "top_port": "reg_valid",
+      "connected_to": [
+        "aero_regfile_mmio.reg_valid"
+      ],
+      "description": "Compact register-window transaction valid qualifier."
+    },
+    {
+      "top_port": "reg_we",
+      "connected_to": [
+        "aero_regfile_mmio.reg_we"
+      ],
+      "description": "Register-window write enable qualifier."
+    },
+    {
+      "top_port": "reg_addr",
+      "connected_to": [
+        "aero_regfile_mmio.reg_addr"
+      ],
+      "description": "Compact register-window address."
+    },
+    {
+      "top_port": "reg_wdata",
+      "connected_to": [
+        "aero_regfile_mmio.reg_wdata"
+      ],
+      "description": "Compact register-window write data."
+    },
+    {
+      "top_port": "req_valid",
+      "connected_to": [
+        "aero_request_packetizer.req_valid"
+      ],
+      "description": "Outbound request valid is driven by the request packetizer."
+    },
+    {
+      "top_port": "req_data",
+      "connected_to": [
+        "aero_request_packetizer.req_data"
+      ],
+      "description": "Outbound 128-bit request payload is driven by the request packetizer."
+    },
+    {
+      "top_port": "rsp_ready",
+      "connected_to": [
+        "aero_response_depacketizer.rsp_ready"
+      ],
+      "description": "Inbound response ready is driven by the response depacketizer."
+    },
+    {
+      "top_port": "reg_ready",
+      "connected_to": [
+        "aero_regfile_mmio.reg_ready"
+      ],
+      "description": "Register interface ready is driven by the MMIO block."
+    },
+    {
+      "top_port": "reg_rdata",
+      "connected_to": [
+        "aero_regfile_mmio.reg_rdata"
+      ],
+      "description": "Register read data is returned from the MMIO block."
+    },
+    {
+      "top_port": "reg_rvalid",
+      "connected_to": [
+        "aero_regfile_mmio.reg_rvalid"
+      ],
+      "description": "Register read valid is returned from the MMIO block."
+    },
+    {
+      "top_port": "act_cmd_valid",
+      "connected_to": [
+        "aero_actuator_command_shaper.act_cmd_valid"
+      ],
+      "description": "Final actuator command valid comes from the command shaper."
+    },
+    {
+      "top_port": "act_cmd_data",
+      "connected_to": [
+        "aero_actuator_command_shaper.act_cmd_data"
+      ],
+      "description": "Final actuator command word comes from the command shaper."
+    },
+    {
+      "top_port": "fault_valid",
+      "connected_to": [
+        "aero_status_telemetry.fault_valid"
+      ],
+      "description": "Top-level fault valid is driven by telemetry aggregation."
+    },
+    {
+      "top_port": "fault_code",
+      "connected_to": [
+        "aero_status_telemetry.fault_code"
+      ],
+      "description": "Top-level fault code is driven by telemetry aggregation."
+    },
+    {
+      "top_port": "fault_flags",
+      "connected_to": [
+        "aero_status_telemetry.fault_flags"
+      ],
+      "description": "Top-level fault flags are driven by telemetry aggregation."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_enable",
+      "width": 1,
+      "source": "aero_regfile_mmio.cfg_enable",
+      "destinations": [
+        "aero_request_packetizer.cfg_enable",
+        "aero_safety_supervisor.cfg_enable"
+      ],
+      "description": "Global controller enable from the register file to request generation and safety supervision."
+    },
+    {
+      "name": "cfg_soft_reset",
+      "width": 1,
+      "source": "aero_regfile_mmio.cfg_soft_reset",
+      "destinations": [
+        "aero_regfile_mmio.cfg_soft_reset"
+      ],
+      "description": "Soft-reset control is retained within the register file semantics and may be used internally for synchronous safe reset sequencing."
+    },
+    {
+      "name": "cfg_mode_select",
+      "width": 3,
+      "source": "aero_regfile_mmio.cfg_mode_select",
+      "destinations": [
+        "aero_request_packetizer.cfg_mode_select"
+      ],
+      "description": "Mode select forwarded to request packetization."
+    },
+    {
+      "name": "cfg_req_seq_seed",
+      "width": 16,
+      "source": "aero_regfile_mmio.cfg_req_seq_seed",
+      "destinations": [
+        "aero_request_packetizer.cfg_req_seq_seed"
+      ],
+      "description": "Sequence seed forwarded to the request packetizer."
+    },
+    {
+      "name": "cfg_stream_velocity_mps",
+      "width": 16,
+      "source": "aero_regfile_mmio.cfg_stream_velocity_mps",
+      "destinations": [
+        "aero_request_packetizer.cfg_stream_velocity_mps"
+      ],
+      "description": "Velocity setpoint forwarded to the request packetizer."
+    },
+    {
+      "name": "cfg_timeout_threshold",
+      "width": 16,
+      "source": "aero_regfile_mmio.cfg_timeout_threshold",
+      "destinations": [
+        "aero_sequence_watchdog.cfg_timeout_threshold"
+      ],
+      "description": "Response timeout threshold forwarded to the watchdog."
+    },
+    {
+      "name": "cfg_actuator_min",
+      "width": 16,
+      "source": "aero_regfile_mmio.cfg_actuator_min",
+      "destinations": [
+        "aero_safety_supervisor.cfg_actuator_min",
+        "aero_actuator_command_shaper.cfg_actuator_min"
+      ],
+      "description": "Minimum actuator clamp bound shared by safety and command shaping."
+    },
+    {
+      "name": "cfg_actuator_max",
+      "width": 16,
+      "source": "aero_regfile_mmio.cfg_actuator_max",
+      "destinations": [
+        "aero_safety_supervisor.cfg_actuator_max",
+        "aero_actuator_command_shaper.cfg_actuator_max"
+      ],
+      "description": "Maximum actuator clamp bound shared by safety and command shaping."
+    },
+    {
+      "name": "cfg_safe_fallback_select",
+      "width": 2,
+      "source": "aero_regfile_mmio.cfg_safe_fallback_select",
+      "destinations": [
+        "aero_request_packetizer.cfg_safe_fallback_select",
+        "aero_safety_supervisor.cfg_safe_fallback_select"
+      ],
+      "description": "Fallback policy selection forwarded to request construction and safety supervision."
+    },
+    {
+      "name": "request_issued",
+      "width": 1,
+      "source": "aero_request_packetizer.request_issued",
+      "destinations": [
+        "aero_sequence_watchdog.request_issued"
+      ],
+      "description": "Handshake pulse indicating a request was issued."
+    },
+    {
+      "name": "outstanding_seq",
+      "width": 16,
+      "source": "aero_request_packetizer.outstanding_seq",
+      "destinations": [
+        "aero_sequence_watchdog.outstanding_seq"
+      ],
+      "description": "Current outstanding request sequence forwarded to the watchdog."
+    },
+    {
+      "name": "blocking_fault",
+      "width": 1,
+      "source": "aero_sequence_watchdog.blocking_fault",
+      "destinations": [
+        "aero_request_packetizer.blocking_fault",
+        "aero_safety_supervisor.blocking_fault"
+      ],
+      "description": "Unified blocking fault from watchdog to request gating and safety supervision."
+    },
+    {
+      "name": "response_valid",
+      "width": 1,
+      "source": "aero_response_depacketizer.response_valid",
+      "destinations": [
+        "aero_sequence_watchdog.response_valid",
+        "aero_safety_supervisor.response_valid"
+      ],
+      "description": "Validated response indication to freshness monitoring and safety supervision."
+    },
+    {
+      "name": "response_seq",
+      "width": 16,
+      "source": "aero_response_depacketizer.response_seq",
+      "destinations": [
+        "aero_sequence_watchdog.response_seq"
+      ],
+      "description": "Response sequence identifier forwarded to freshness and replay monitoring."
+    },
+    {
+      "name": "drag_estimate",
+      "width": 16,
+      "source": "aero_response_depacketizer.drag_estimate",
+      "destinations": [
+        "aero_safety_supervisor.drag_estimate"
+      ],
+      "description": "Compact drag estimate forwarded to safety supervision."
+    },
+    {
+      "name": "lift_estimate",
+      "width": 16,
+      "source": "aero_response_depacketizer.lift_estimate",
+      "destinations": [
+        "aero_safety_supervisor.lift_estimate"
+      ],
+      "description": "Compact lift estimate forwarded to safety supervision."
+    },
+    {
+      "name": "payload_malformed",
+      "width": 1,
+      "source": "aero_response_depacketizer.payload_malformed",
+      "destinations": [
+        "aero_safety_supervisor.payload_malformed"
+      ],
+      "description": "Malformed response flag forwarded to safety supervision."
+    },
+    {
+      "name": "payload_fresh",
+      "width": 1,
+      "source": "aero_response_depacketizer.payload_fresh",
+      "destinations": [
+        "aero_sequence_watchdog.payload_fresh"
+      ],
+      "description": "Freshness metadata forwarded to the sequence watchdog."
+    },
+    {
+      "name": "stale_response_fault",
+      "width": 1,
+      "source": "aero_sequence_watchdog.stale_response_fault",
+      "destinations": [
+        "aero_status_telemetry.stale_response_fault"
+      ],
+      "description": "Sticky stale-response fault forwarded to telemetry."
+    },
+    {
+      "name": "timeout_fault",
+      "width": 1,
+      "source": "aero_sequence_watchdog.timeout_fault",
+      "destinations": [
+        "aero_status_telemetry.timeout_fault"
+      ],
+      "description": "Sticky timeout fault forwarded to telemetry."
+    },
+    {
+      "name": "duplicate_response_fault",
+      "width": 1,
+      "source": "aero_sequence_watchdog.duplicate_response_fault",
+      "destinations": [
+        "aero_status_telemetry.fault_flags"
+      ],
+      "description": "Duplicate response fault contributes to telemetry fault flag encoding."
+    },
+    {
+      "name": "replay_response_fault",
+      "width": 1,
+      "source": "aero_sequence_watchdog.replay_response_fault",
+      "destinations": [
+        "aero_status_telemetry.fault_flags"
+      ],
+      "description": "Replay fault contributes to telemetry fault flag encoding."
+    },
+    {
+      "name": "sequence_mismatch_fault",
+      "width": 1,
+      "source": "aero_sequence_watchdog.sequence_mismatch_fault",
+      "destinations": [
+        "aero_status_telemetry.fault_flags"
+      ],
+      "description": "Sequence mismatch fault contributes to telemetry fault flag encoding."
+    },
+    {
+      "name": "accepted_seq",
+      "width": 16,
+      "source": "aero_sequence_watchdog.accepted_seq",
+      "destinations": [
+        "aero_regfile_mmio.status_last_accepted_seq",
+        "aero_status_telemetry.accepted_seq"
+      ],
+      "description": "Last accepted sequence number forwarded to register readback and telemetry."
+    },
+    {
+      "name": "response_age",
+      "width": 16,
+      "source": "aero_sequence_watchdog.response_age",
+      "destinations": [
+        "aero_status_telemetry.status_word"
+      ],
+      "description": "Response age contributes to telemetry readback status composition."
+    },
+    {
+      "name": "valid_intent",
+      "width": 1,
+      "source": "aero_safety_supervisor.valid_intent",
+      "destinations": [
+        "aero_actuator_command_shaper.valid_intent"
+      ],
+      "description": "Validated intent qualifier forwarded to the command shaper."
+    },
+    {
+      "name": "safe_intent",
+      "width": 16,
+      "source": "aero_safety_supervisor.safe_intent",
+      "destinations": [
+        "aero_actuator_command_shaper.safe_intent"
+      ],
+      "description": "Safe bounded intent forwarded to command shaping."
+    },
+    {
+      "name": "clamp_event",
+      "width": 1,
+      "source": "aero_safety_supervisor.clamp_event",
+      "destinations": [
+        "aero_actuator_command_shaper.slew_limited",
+        "aero_status_telemetry.clamp_event"
+      ],
+      "description": "Clamp indication forwarded to command shaping and telemetry."
+    },
+    {
+      "name": "fallback_active",
+      "width": 1,
+      "source": "aero_safety_supervisor.fallback_active",
+      "destinations": [
+        "aero_actuator_command_shaper.fallback_active",
+        "aero_status_telemetry.fallback_active"
+      ],
+      "description": "Fallback active indication forwarded to command shaping and telemetry."
+    },
+    {
+      "name": "invalid_payload_fault",
+      "width": 1,
+      "source": "aero_safety_supervisor.invalid_payload_fault",
+      "destinations": [
+        "aero_status_telemetry.invalid_payload_fault"
+      ],
+      "description": "Invalid payload fault forwarded to telemetry."
+    },
+    {
+      "name": "disable_state",
+      "width": 1,
+      "source": "aero_safety_supervisor.disable_state",
+      "destinations": [
+        "aero_status_telemetry.disable_state"
+      ],
+      "description": "Disable state forwarded to telemetry."
+    },
+    {
+      "name": "status_word",
+      "width": 32,
+      "source": "aero_status_telemetry.status_word",
+      "destinations": [
+        "aero_regfile_mmio.status_word"
+      ],
+      "description": "Readable status word returned to the register file for host access."
+    },
+    {
+      "name": "fault_valid",
+      "width": 1,
+      "source": "aero_status_telemetry.fault_valid",
+      "destinations": [
+        "adaptive_aero_control_top.fault_valid"
+      ],
+      "description": "Aggregated fault-valid indication to the top-level fault output."
+    },
+    {
+      "name": "fault_code",
+      "width": 8,
+      "source": "aero_status_telemetry.fault_code",
+      "destinations": [
+        "adaptive_aero_control_top.fault_code"
+      ],
+      "description": "Aggregated fault code to the top-level fault output."
+    },
+    {
+      "name": "fault_flags",
+      "width": 16,
+      "source": "aero_status_telemetry.fault_flags",
+      "destinations": [
+        "adaptive_aero_control_top.fault_flags",
+        "aero_regfile_mmio.status_fault_flags"
+      ],
+      "description": "Sticky fault flags to top-level outputs and register readback."
+    },
+    {
+      "name": "reg_rdata",
+      "width": 32,
+      "source": "aero_regfile_mmio.reg_rdata",
+      "destinations": [
+        "adaptive_aero_control_top.reg_rdata"
+      ],
+      "description": "Register read data returned to the top-level register window."
+    },
+    {
+      "name": "reg_rvalid",
+      "width": 1,
+      "source": "aero_regfile_mmio.reg_rvalid",
+      "destinations": [
+        "adaptive_aero_control_top.reg_rvalid"
+      ],
+      "description": "Register read valid returned to the top-level register window."
+    },
+    {
+      "name": "reg_ready",
+      "width": 1,
+      "source": "aero_regfile_mmio.reg_ready",
+      "destinations": [
+        "adaptive_aero_control_top.reg_ready"
+      ],
+      "description": "Register ready returned to the top-level register window."
+    },
+    {
+      "name": "act_cmd_valid",
+      "width": 1,
+      "source": "aero_actuator_command_shaper.act_cmd_valid",
+      "destinations": [
+        "adaptive_aero_control_top.act_cmd_valid"
+      ],
+      "description": "Final actuator command valid drives the top-level actuator interface."
+    },
+    {
+      "name": "act_cmd_data",
+      "width": 32,
+      "source": "aero_actuator_command_shaper.act_cmd_data",
+      "destinations": [
+        "adaptive_aero_control_top.act_cmd_data"
+      ],
+      "description": "Final actuator command word drives the top-level actuator interface."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_enable",
+      "owner": "aero_regfile_mmio.cfg_enable"
+    },
+    {
+      "signal": "cfg_soft_reset",
+      "owner": "aero_regfile_mmio.cfg_soft_reset"
+    },
+    {
+      "signal": "cfg_mode_select",
+      "owner": "aero_regfile_mmio.cfg_mode_select"
+    },
+    {
+      "signal": "cfg_req_seq_seed",
+      "owner": "aero_regfile_mmio.cfg_req_seq_seed"
+    },
+    {
+      "signal": "cfg_stream_velocity_mps",
+      "owner": "aero_regfile_mmio.cfg_stream_velocity_mps"
+    },
+    {
+      "signal": "cfg_timeout_threshold",
+      "owner": "aero_regfile_mmio.cfg_timeout_threshold"
+    },
+    {
+      "signal": "cfg_actuator_min",
+      "owner": "aero_regfile_mmio.cfg_actuator_min"
+    },
+    {
+      "signal": "cfg_actuator_max",
+      "owner": "aero_regfile_mmio.cfg_actuator_max"
+    },
+    {
+      "signal": "cfg_safe_fallback_select",
+      "owner": "aero_regfile_mmio.cfg_safe_fallback_select"
+    },
+    {
+      "signal": "request_issued",
+      "owner": "aero_request_packetizer.request_issued"
+    },
+    {
+      "signal": "outstanding_seq",
+      "owner": "aero_request_packetizer.outstanding_seq"
+    },
+    {
+      "signal": "req_valid",
+      "owner": "aero_request_packetizer.req_valid"
+    },
+    {
+      "signal": "req_data",
+      "owner": "aero_request_packetizer.req_data"
+    },
+    {
+      "signal": "response_valid",
+      "owner": "aero_response_depacketizer.response_valid"
+    },
+    {
+      "signal": "response_seq",
+      "owner": "aero_response_depacketizer.response_seq"
+    },
+    {
+      "signal": "drag_estimate",
+      "owner": "aero_response_depacketizer.drag_estimate"
+    },
+    {
+      "signal": "lift_estimate",
+      "owner": "aero_response_depacketizer.lift_estimate"
+    },
+    {
+      "signal": "payload_malformed",
+      "owner": "aero_response_depacketizer.payload_malformed"
+    },
+    {
+      "signal": "payload_fresh",
+      "owner": "aero_response_depacketizer.payload_fresh"
+    },
+    {
+      "signal": "blocking_fault",
+      "owner": "aero_sequence_watchdog.blocking_fault"
+    },
+    {
+      "signal": "stale_response_fault",
+      "owner": "aero_sequence_watchdog.stale_response_fault"
+    },
+    {
+      "signal": "timeout_fault",
+      "owner": "aero_sequence_watchdog.timeout_fault"
+    },
+    {
+      "signal": "duplicate_response_fault",
+      "owner": "aero_sequence_watchdog.duplicate_response_fault"
+    },
+    {
+      "signal": "replay_response_fault",
+      "owner": "aero_sequence_watchdog.replay_response_fault"
+    },
+    {
+      "signal": "sequence_mismatch_fault",
+      "owner": "aero_sequence_watchdog.sequence_mismatch_fault"
+    },
+    {
+      "signal": "accepted_seq",
+      "owner": "aero_sequence_watchdog.accepted_seq"
+    },
+    {
+      "signal": "response_age",
+      "owner": "aero_sequence_watchdog.response_age"
+    },
+    {
+      "signal": "safe_intent",
+      "owner": "aero_safety_supervisor.safe_intent"
+    },
+    {
+      "signal": "valid_intent",
+      "owner": "aero_safety_supervisor.valid_intent"
+    },
+    {
+      "signal": "clamp_event",
+      "owner": "aero_safety_supervisor.clamp_event"
+    },
+    {
+      "signal": "fallback_active",
+      "owner": "aero_safety_supervisor.fallback_active"
+    },
+    {
+      "signal": "invalid_payload_fault",
+      "owner": "aero_safety_supervisor.invalid_payload_fault"
+    },
+    {
+      "signal": "disable_state",
+      "owner": "aero_safety_supervisor.disable_state"
+    },
+    {
+      "signal": "act_cmd_valid",
+      "owner": "aero_actuator_command_shaper.act_cmd_valid"
+    },
+    {
+      "signal": "act_cmd_data",
+      "owner": "aero_actuator_command_shaper.act_cmd_data"
+    },
+    {
+      "signal": "last_safe_cmd",
+      "owner": "aero_actuator_command_shaper.last_safe_cmd"
+    },
+    {
+      "signal": "slew_limited",
+      "owner": "aero_actuator_command_shaper.slew_limited"
+    },
+    {
+      "signal": "clamped_cmd",
+      "owner": "aero_actuator_command_shaper.clamped_cmd"
+    },
+    {
+      "signal": "status_word",
+      "owner": "aero_status_telemetry.status_word"
+    },
+    {
+      "signal": "fault_valid",
+      "owner": "aero_status_telemetry.fault_valid"
+    },
+    {
+      "signal": "fault_code",
+      "owner": "aero_status_telemetry.fault_code"
+    },
+    {
+      "signal": "fault_flags",
+      "owner": "aero_status_telemetry.fault_flags"
+    },
+    {
+      "signal": "sticky_fault_summary",
+      "owner": "aero_status_telemetry.sticky_fault_summary"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "minimal",
+    "registers": [
+      {
+        "name": "CTRL_ENABLE",
+        "address": "0x00",
+        "width": 1,
+        "access": "rw",
+        "reset_value": "0x0",
+        "description": "Global enable."
+      },
+      {
+        "name": "CTRL_SOFT_RESET",
+        "address": "0x04",
+        "width": 1,
+        "access": "rw",
+        "reset_value": "0x0",
+        "description": "Soft reset control."
+      },
+      {
+        "name": "CTRL_MODE_SELECT",
+        "address": "0x08",
+        "width": 3,
+        "access": "rw",
+        "reset_value": "0x0",
+        "description": "Mode select."
+      },
+      {
+        "name": "CTRL_REQ_SEQ_SEED",
+        "address": "0x0C",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x0001",
+        "description": "Request sequence seed."
+      },
+      {
+        "name": "CTRL_STREAM_VELOCITY_MPS",
+        "address": "0x10",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x26C5",
+        "description": "Stream velocity setpoint in m/s fixed-point or scaled integer form."
+      },
+      {
+        "name": "CTRL_TIMEOUT_THRESHOLD",
+        "address": "0x14",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x03E8",
+        "description": "Response timeout threshold in cycles or ticks."
+      },
+      {
+        "name": "CTRL_ACTUATOR_MIN",
+        "address": "0x18",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x0000",
+        "description": "Actuator minimum clamp."
+      },
+      {
+        "name": "CTRL_ACTUATOR_MAX",
+        "address": "0x1C",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0xFFFF",
+        "description": "Actuator maximum clamp."
+      },
+      {
+        "name": "CTRL_SAFE_FALLBACK_SELECT",
+        "address": "0x20",
+        "width": 2,
+        "access": "rw",
+        "reset_value": "0x1",
+        "description": "Safe fallback selection."
+      },
+      {
+        "name": "STATUS_WORD",
+        "address": "0x24",
+        "width": 32,
+        "access": "ro",
+        "reset_value": "0x00000000",
+        "description": "Readable status summary."
+      },
+      {
+        "name": "STATUS_FAULT_FLAGS",
+        "address": "0x28",
+        "width": 16,
+        "access": "ro",
+        "reset_value": "0x0000",
+        "description": "Sticky fault flags."
+      },
+      {
+        "name": "STATUS_LAST_ACCEPTED_SEQ",
+        "address": "0x2C",
+        "width": 16,
+        "access": "ro",
+        "reset_value": "0x0000",
+        "description": "Last accepted response sequence."
+      }
+    ]
+  }
+}

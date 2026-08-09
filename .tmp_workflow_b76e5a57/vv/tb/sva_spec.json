@@ -1,7 +1,0 @@
-{
-  "top_module": "adaptive_aero_control_top",
-  "soc_mode": false,
-  "clock_names": [],
-  "reset_signals": [],
-  "ports": []
-}

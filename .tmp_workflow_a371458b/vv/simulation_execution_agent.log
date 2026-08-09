@@ -1,0 +1,39 @@
+Digital Simulation Execution Agent Log
+[2026-08-09T15:29:05.830797] [INFO] Starting Digital Simulation Execution Agent...
+[2026-08-09T15:29:05.830914] [INFO] manifest_path=backend/workflows/a371458b-e094-4745-8b94-94125198585e/vv/tb/simulation_manifest.json
+[2026-08-09T15:29:05.831142] [INFO] tests=[
+  "smoke_test",
+  "constrained_random_sanity"
+]
+[2026-08-09T15:29:05.831237] [INFO] seeds=[
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10
+]
+[2026-08-09T15:29:05.831315] [INFO] Running testcase=smoke_test seed=1
+[2026-08-09T15:29:10.406921] [INFO] Running testcase=smoke_test seed=2
+[2026-08-09T15:29:12.779890] [INFO] Running testcase=smoke_test seed=3
+[2026-08-09T15:29:15.084148] [INFO] Running testcase=smoke_test seed=4
+[2026-08-09T15:29:17.655276] [INFO] Running testcase=smoke_test seed=5
+[2026-08-09T15:29:20.122848] [INFO] Running testcase=smoke_test seed=6
+[2026-08-09T15:29:22.707269] [INFO] Running testcase=smoke_test seed=7
+[2026-08-09T15:29:25.174846] [INFO] Running testcase=smoke_test seed=8
+[2026-08-09T15:29:27.590380] [INFO] Running testcase=smoke_test seed=9
+[2026-08-09T15:29:30.061413] [INFO] Running testcase=smoke_test seed=10
+[2026-08-09T15:29:32.578499] [INFO] Running testcase=constrained_random_sanity seed=1
+[2026-08-09T15:29:35.101872] [INFO] Running testcase=constrained_random_sanity seed=2
+[2026-08-09T15:29:37.566165] [INFO] Running testcase=constrained_random_sanity seed=3
+[2026-08-09T15:29:39.952360] [INFO] Running testcase=constrained_random_sanity seed=4
+[2026-08-09T15:29:42.299369] [INFO] Running testcase=constrained_random_sanity seed=5
+[2026-08-09T15:29:44.875520] [INFO] Running testcase=constrained_random_sanity seed=6
+[2026-08-09T15:29:47.229966] [INFO] Running testcase=constrained_random_sanity seed=7
+[2026-08-09T15:29:49.565478] [INFO] Running testcase=constrained_random_sanity seed=8
+[2026-08-09T15:29:51.879351] [INFO] Running testcase=constrained_random_sanity seed=9
+[2026-08-09T15:29:54.295895] [INFO] Running testcase=constrained_random_sanity seed=10

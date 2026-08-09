@@ -1,0 +1,32 @@
+Digital Functional Coverage Agent Log
+[2026-08-09T15:29:00.369542] [INFO] Starting Digital Functional Coverage Agent...
+[2026-08-09T15:29:00.369794] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/a371458b-e094-4745-8b94-94125198585e/spec/fpga_verification_source_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 1,
+  "top_module": "pwm_fpga_demo",
+  "soc_mode": false
+}
+[2026-08-09T15:29:00.370157] [INFO] resolved_mode=digital
+[2026-08-09T15:29:00.370229] [INFO] spec_path=/root/chiploop-backend/backend/workflows/a371458b-e094-4745-8b94-94125198585e/spec/fpga_verification_source_spec.json
+[2026-08-09T15:29:00.370295] [INFO] top_module=pwm_fpga_demo
+[2026-08-09T15:29:00.370442] [INFO] rtl_file_count=1
+[2026-08-09T15:29:00.370518] [INFO] port_source=rtl_fallback
+[2026-08-09T15:29:00.370629] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-08-09T15:29:00.370709] [INFO] reset_candidates=[]
+[2026-08-09T15:29:00.370787] [INFO] coverage_points={
+  "output_points": [
+    "led"
+  ],
+  "input_points": [
+    "clk"
+  ],
+  "user_coverage_plan_points": []
+}
+[2026-08-09T15:29:00.371666] [INFO] Generated coverage_model.py
+[2026-08-09T15:29:00.371772] [INFO] Generated coverage_spec.json
+[2026-08-09T15:29:00.371845] [INFO] Generated COVERAGE.md

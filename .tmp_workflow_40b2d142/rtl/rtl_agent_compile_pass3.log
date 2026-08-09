@@ -1,0 +1,11 @@
+backend/workflows/40b2d142-ee6f-4df7-8f4d-b9ef1fcff068/rtl/pass3/aero_request_packetizer.v:41: warning: Extra digits given for sized hex constant.
+backend/workflows/40b2d142-ee6f-4df7-8f4d-b9ef1fcff068/rtl/pass3/adaptive_aero_control_top.v:179: warning: Port 6 (cfg_safe_fallback_select) of aero_safety_supervisor expects 2 bits, got 1.
+backend/workflows/40b2d142-ee6f-4df7-8f4d-b9ef1fcff068/rtl/pass3/adaptive_aero_control_top.v:179:        : Padding 1 high bits of the port.
+
+Structural port width mismatch warnings are treated as RTL failures.
+
+Issues:
+Structural port width mismatch warnings reported by Icarus Verilog.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

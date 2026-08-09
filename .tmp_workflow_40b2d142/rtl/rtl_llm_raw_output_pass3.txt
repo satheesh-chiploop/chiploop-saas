@@ -1,0 +1,1277 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    input         clk,
+    input         reset_n,
+    output        req_valid,
+    input         req_ready,
+    output [127:0] req_data,
+    input         rsp_valid,
+    output        rsp_ready,
+    input  [127:0] rsp_data,
+    input         reg_valid,
+    output        reg_ready,
+    input         reg_we,
+    input  [31:0] reg_addr,
+    input  [31:0] reg_wdata,
+    output [31:0] reg_rdata,
+    output        reg_rvalid,
+    output        act_cmd_valid,
+    output [31:0] act_cmd_data,
+    output        fault_valid,
+    output [7:0]  fault_code,
+    output [15:0] fault_flags
+);
+
+wire        cfg_enable;
+wire        cfg_soft_reset;
+wire [2:0]  cfg_mode_select;
+wire [15:0] cfg_req_seq_seed;
+wire [15:0] status_last_accepted_seq;
+wire [15:0] cfg_stream_velocity_mps;
+wire [15:0] cfg_timeout_threshold;
+wire [15:0] cfg_actuator_min;
+wire [15:0] cfg_actuator_max;
+wire [1:0]  cfg_safe_fallback_select;
+wire [31:0] status_word;
+wire [15:0] status_fault_flags;
+
+wire        req_valid_i;
+wire [127:0] req_data_i;
+wire        rsp_ready_i;
+wire        reg_ready_i;
+wire [31:0] reg_rdata_i;
+wire        reg_rvalid_i;
+wire        act_cmd_valid_i;
+wire [31:0] act_cmd_data_i;
+wire        fault_valid_i;
+wire [7:0]  fault_code_i;
+wire [15:0] fault_flags_i;
+
+wire [15:0] outstanding_seq;
+wire        request_issued;
+wire        blocking_fault;
+wire        stale_response_fault;
+wire        timeout_fault;
+wire        duplicate_response_fault;
+wire        replay_response_fault;
+wire        sequence_mismatch_fault;
+wire [15:0] accepted_seq;
+wire [15:0] response_age;
+wire        fallback_active;
+wire        invalid_payload_fault;
+wire        disable_state;
+wire [15:0] safe_intent;
+wire        valid_intent;
+wire        clamp_event;
+wire        payload_malformed;
+wire        response_valid;
+wire [15:0] response_seq;
+wire [15:0] drag_estimate;
+wire [15:0] lift_estimate;
+wire [7:0]  freshness_meta;
+wire        payload_fresh;
+wire [15:0] last_safe_cmd;
+wire        slew_limited;
+wire [15:0] clamped_cmd;
+wire        sticky_fault_summary;
+wire [31:0] status_word_i;
+
+aero_regfile_mmio u_aero_regfile_mmio (
+    .clk(clk),
+    .reset_n(reset_n),
+    .reg_valid(reg_valid),
+    .reg_ready(reg_ready_i),
+    .reg_we(reg_we),
+    .reg_addr(reg_addr),
+    .reg_wdata(reg_wdata),
+    .reg_rdata(reg_rdata_i),
+    .reg_rvalid(reg_rvalid_i),
+    .cfg_enable(cfg_enable),
+    .cfg_soft_reset(cfg_soft_reset),
+    .cfg_mode_select(cfg_mode_select),
+    .cfg_req_seq_seed(cfg_req_seq_seed),
+    .status_last_accepted_seq(status_last_accepted_seq),
+    .cfg_stream_velocity_mps(cfg_stream_velocity_mps),
+    .cfg_timeout_threshold(cfg_timeout_threshold),
+    .cfg_actuator_min(cfg_actuator_min),
+    .cfg_actuator_max(cfg_actuator_max),
+    .cfg_safe_fallback_select(cfg_safe_fallback_select),
+    .status_word(status_word),
+    .status_fault_flags(status_fault_flags)
+);
+
+aero_request_packetizer u_aero_request_packetizer (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_enable(cfg_enable),
+    .cfg_mode_select(cfg_mode_select),
+    .cfg_req_seq_seed(cfg_req_seq_seed),
+    .cfg_stream_velocity_mps(cfg_stream_velocity_mps),
+    .cfg_safe_fallback_select(cfg_safe_fallback_select),
+    .blocking_fault(blocking_fault),
+    .req_ready(req_ready),
+    .req_valid(req_valid_i),
+    .req_data(req_data_i),
+    .outstanding_seq(outstanding_seq),
+    .request_issued(request_issued)
+);
+
+aero_response_depacketizer u_aero_response_depacketizer (
+    .clk(clk),
+    .reset_n(reset_n),
+    .rsp_valid(rsp_valid),
+    .rsp_ready(rsp_ready_i),
+    .rsp_data(rsp_data),
+    .expected_seq(outstanding_seq),
+    .response_valid(response_valid),
+    .response_seq(response_seq),
+    .drag_estimate(drag_estimate),
+    .lift_estimate(lift_estimate),
+    .freshness_meta(freshness_meta),
+    .payload_malformed(payload_malformed),
+    .payload_fresh(payload_fresh)
+);
+
+aero_sequence_watchdog u_aero_sequence_watchdog (
+    .clk(clk),
+    .reset_n(reset_n),
+    .request_issued(request_issued),
+    .outstanding_seq(outstanding_seq),
+    .response_valid(response_valid),
+    .response_seq(response_seq),
+    .payload_fresh(payload_fresh),
+    .cfg_timeout_threshold(cfg_timeout_threshold),
+    .blocking_fault(blocking_fault),
+    .stale_response_fault(stale_response_fault),
+    .timeout_fault(timeout_fault),
+    .duplicate_response_fault(duplicate_response_fault),
+    .replay_response_fault(replay_response_fault),
+    .sequence_mismatch_fault(sequence_mismatch_fault),
+    .accepted_seq(accepted_seq),
+    .response_age(response_age)
+);
+
+aero_safety_supervisor u_aero_safety_supervisor (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_enable(cfg_enable),
+    .cfg_actuator_min(cfg_actuator_min),
+    .cfg_actuator_max(cfg_actuator_max),
+    .cfg_safe_fallback_select(cfg_safe_fallback_select[0]),
+    .response_valid(response_valid),
+    .payload_malformed(payload_malformed),
+    .blocking_fault(blocking_fault),
+    .drag_estimate(drag_estimate),
+    .lift_estimate(lift_estimate),
+    .safe_intent(safe_intent),
+    .valid_intent(valid_intent),
+    .clamp_event(clamp_event),
+    .fallback_active(fallback_active),
+    .invalid_payload_fault(invalid_payload_fault),
+    .disable_state(disable_state)
+);
+
+aero_actuator_command_shaper u_aero_actuator_command_shaper (
+    .clk(clk),
+    .reset_n(reset_n),
+    .safe_intent(safe_intent),
+    .valid_intent(valid_intent),
+    .fallback_active(fallback_active),
+    .cfg_actuator_min(cfg_actuator_min),
+    .cfg_actuator_max(cfg_actuator_max),
+    .act_cmd_valid(act_cmd_valid_i),
+    .act_cmd_data(act_cmd_data_i),
+    .last_safe_cmd(last_safe_cmd),
+    .slew_limited(slew_limited),
+    .clamped_cmd(clamped_cmd)
+);
+
+aero_status_telemetry u_aero_status_telemetry (
+    .clk(clk),
+    .reset_n(reset_n),
+    .stale_response_fault(stale_response_fault),
+    .timeout_fault(timeout_fault),
+    .invalid_payload_fault(invalid_payload_fault),
+    .clamp_event(clamp_event),
+    .fallback_active(fallback_active),
+    .disable_state(disable_state),
+    .accepted_seq(accepted_seq),
+    .status_word(status_word_i),
+    .fault_valid(fault_valid_i),
+    .fault_code(fault_code_i),
+    .fault_flags(fault_flags_i),
+    .sticky_fault_summary(sticky_fault_summary)
+);
+
+assign req_valid = req_valid_i;
+assign req_data = req_data_i;
+assign rsp_ready = rsp_ready_i;
+assign reg_ready = reg_ready_i;
+assign reg_rdata = reg_rdata_i;
+assign reg_rvalid = reg_rvalid_i;
+assign act_cmd_valid = act_cmd_valid_i;
+assign act_cmd_data = act_cmd_data_i;
+assign fault_valid = fault_valid_i;
+assign fault_code = fault_code_i;
+assign fault_flags = fault_flags_i;
+
+endmodule
+
+module aero_regfile_mmio (
+    input         clk,
+    input         reset_n,
+    input         reg_valid,
+    output        reg_ready,
+    input         reg_we,
+    input  [31:0] reg_addr,
+    input  [31:0] reg_wdata,
+    output [31:0] reg_rdata,
+    output        reg_rvalid,
+    output        cfg_enable,
+    output        cfg_soft_reset,
+    output [2:0]  cfg_mode_select,
+    output [15:0] cfg_req_seq_seed,
+    input  [15:0] status_last_accepted_seq,
+    output [15:0] cfg_stream_velocity_mps,
+    output [15:0] cfg_timeout_threshold,
+    output [15:0] cfg_actuator_min,
+    output [15:0] cfg_actuator_max,
+    output [1:0]  cfg_safe_fallback_select,
+    input  [31:0] status_word,
+    input  [15:0] status_fault_flags
+);
+
+reg        cfg_enable_r;
+reg        cfg_soft_reset_r;
+reg [2:0]  cfg_mode_select_r;
+reg [15:0] cfg_req_seq_seed_r;
+reg [15:0] cfg_stream_velocity_mps_r;
+reg [15:0] cfg_timeout_threshold_r;
+reg [15:0] cfg_actuator_min_r;
+reg [15:0] cfg_actuator_max_r;
+reg [1:0]  cfg_safe_fallback_select_r;
+reg [31:0] reg_rdata_r;
+reg        reg_rvalid_r;
+reg [31:0] status_word_shadow;
+reg [15:0] status_fault_flags_shadow;
+reg [31:0] read_data;
+reg        read_valid;
+
+assign cfg_enable = cfg_enable_r;
+assign cfg_soft_reset = cfg_soft_reset_r;
+assign cfg_mode_select = cfg_mode_select_r;
+assign cfg_req_seq_seed = cfg_req_seq_seed_r;
+assign cfg_stream_velocity_mps = cfg_stream_velocity_mps_r;
+assign cfg_timeout_threshold = cfg_timeout_threshold_r;
+assign cfg_actuator_min = cfg_actuator_min_r;
+assign cfg_actuator_max = cfg_actuator_max_r;
+assign cfg_safe_fallback_select = cfg_safe_fallback_select_r;
+assign reg_rdata = reg_rdata_r;
+assign reg_rvalid = reg_rvalid_r;
+assign reg_ready = 1'b1;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        cfg_enable_r <= 1'b0;
+        cfg_soft_reset_r <= 1'b0;
+        cfg_mode_select_r <= 3'b000;
+        cfg_req_seq_seed_r <= 16'h0000;
+        cfg_stream_velocity_mps_r <= 16'h0000;
+        cfg_timeout_threshold_r <= 16'd100;
+        cfg_actuator_min_r <= 16'h0000;
+        cfg_actuator_max_r <= 16'h00ff;
+        cfg_safe_fallback_select_r <= 2'b01;
+        reg_rdata_r <= 32'h00000000;
+        reg_rvalid_r <= 1'b0;
+        status_word_shadow <= 32'h00000000;
+        status_fault_flags_shadow <= 16'h0000;
+    end else begin
+        cfg_soft_reset_r <= 1'b0;
+        status_word_shadow <= status_word;
+        status_fault_flags_shadow <= status_fault_flags;
+        reg_rvalid_r <= 1'b0;
+        if (reg_valid && reg_we) begin
+            case (reg_addr[7:0])
+                8'h00: begin
+                    cfg_enable_r <= reg_wdata[0];
+                    cfg_soft_reset_r <= reg_wdata[1];
+                    cfg_mode_select_r <= reg_wdata[4:2];
+                    cfg_safe_fallback_select_r <= reg_wdata[6:5];
+                end
+                8'h01: cfg_req_seq_seed_r[7:0] <= reg_wdata[7:0];
+                8'h02: cfg_req_seq_seed_r[15:8] <= reg_wdata[7:0];
+                8'h03: cfg_stream_velocity_mps_r[7:0] <= reg_wdata[7:0];
+                8'h04: cfg_stream_velocity_mps_r[15:8] <= reg_wdata[7:0];
+                8'h05: cfg_timeout_threshold_r[7:0] <= reg_wdata[7:0];
+                8'h06: cfg_timeout_threshold_r[15:8] <= reg_wdata[7:0];
+                8'h07: cfg_actuator_min_r[7:0] <= reg_wdata[7:0];
+                8'h08: cfg_actuator_min_r[15:8] <= reg_wdata[7:0];
+                8'h09: cfg_actuator_max_r[7:0] <= reg_wdata[7:0];
+                8'h0A: cfg_actuator_max_r[15:8] <= reg_wdata[7:0];
+                default: begin
+                end
+            endcase
+        end
+        if (reg_valid && !reg_we) begin
+            reg_rdata_r <= read_data;
+            reg_rvalid_r <= read_valid;
+        end
+    end
+end
+
+always @(*) begin
+    read_data = 32'h00000000;
+    read_valid = 1'b1;
+    case (reg_addr[7:0])
+        8'h00: read_data = {24'h000000, 1'b0, cfg_safe_fallback_select_r, cfg_mode_select_r, 1'b0, cfg_enable_r};
+        8'h01: read_data = {24'h000000, cfg_req_seq_seed_r[7:0]};
+        8'h02: read_data = {24'h000000, cfg_req_seq_seed_r[15:8]};
+        8'h03: read_data = {24'h000000, cfg_stream_velocity_mps_r[7:0]};
+        8'h04: read_data = {24'h000000, cfg_stream_velocity_mps_r[15:8]};
+        8'h05: read_data = {24'h000000, cfg_timeout_threshold_r[7:0]};
+        8'h06: read_data = {24'h000000, cfg_timeout_threshold_r[15:8]};
+        8'h07: read_data = {24'h000000, cfg_actuator_min_r[7:0]};
+        8'h08: read_data = {24'h000000, cfg_actuator_min_r[15:8]};
+        8'h09: read_data = {24'h000000, cfg_actuator_max_r[7:0]};
+        8'h0A: read_data = {24'h000000, cfg_actuator_max_r[15:8]};
+        8'h0B: read_data = {24'h000000, status_fault_flags_shadow[7:0]};
+        8'h0C: read_data = {24'h000000, status_fault_flags_shadow[15:8]};
+        8'h0D: read_data = {24'h000000, status_last_accepted_seq[7:0]};
+        8'h0E: read_data = {24'h000000, status_last_accepted_seq[15:8]};
+        8'h0F: read_data = status_word_shadow;
+        default: begin
+            read_data = 32'h00000000;
+        end
+    endcase
+end
+
+endmodule
+
+module aero_request_packetizer (
+    input         clk,
+    input         reset_n,
+    input         cfg_enable,
+    input  [2:0]  cfg_mode_select,
+    input  [15:0] cfg_req_seq_seed,
+    input  [15:0] cfg_stream_velocity_mps,
+    input  [1:0]  cfg_safe_fallback_select,
+    input         blocking_fault,
+    input         req_ready,
+    output        req_valid,
+    output [127:0] req_data,
+    output [15:0] outstanding_seq,
+    output        request_issued
+);
+
+reg [15:0] outstanding_seq_r;
+reg        req_valid_r;
+reg [127:0] req_data_r;
+reg        request_issued_r;
+reg [15:0] seq_counter;
+
+assign outstanding_seq = outstanding_seq_r;
+assign req_valid = req_valid_r;
+assign req_data = req_data_r;
+assign request_issued = request_issued_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        outstanding_seq_r <= 16'h0000;
+        req_valid_r <= 1'b0;
+        req_data_r <= 128'h00000000000000000000000000000000;
+        request_issued_r <= 1'b0;
+        seq_counter <= 16'h0000;
+    end else begin
+        request_issued_r <= 1'b0;
+        if (cfg_enable && !blocking_fault && req_ready) begin
+            seq_counter <= seq_counter + 16'h0001;
+            outstanding_seq_r <= cfg_req_seq_seed + seq_counter + 16'h0001;
+            req_valid_r <= 1'b1;
+            req_data_r <= {cfg_req_seq_seed + seq_counter + 16'h0001, cfg_mode_select, cfg_safe_fallback_select, cfg_stream_velocity_mps, 92'h0000000000000000000000000};
+            request_issued_r <= 1'b1;
+        end else begin
+            req_valid_r <= 1'b0;
+        end
+    end
+end
+
+endmodule
+
+module aero_response_depacketizer (
+    input         clk,
+    input         reset_n,
+    input         rsp_valid,
+    output        rsp_ready,
+    input  [127:0] rsp_data,
+    input  [15:0] expected_seq,
+    output        response_valid,
+    output [15:0] response_seq,
+    output [15:0] drag_estimate,
+    output [15:0] lift_estimate,
+    output [7:0]  freshness_meta,
+    output        payload_malformed,
+    output        payload_fresh
+);
+
+reg        rsp_ready_r;
+reg        response_valid_r;
+reg [15:0] response_seq_r;
+reg [15:0] drag_estimate_r;
+reg [15:0] lift_estimate_r;
+reg [7:0]  freshness_meta_r;
+reg        payload_malformed_r;
+reg        payload_fresh_r;
+
+assign rsp_ready = rsp_ready_r;
+assign response_valid = response_valid_r;
+assign response_seq = response_seq_r;
+assign drag_estimate = drag_estimate_r;
+assign lift_estimate = lift_estimate_r;
+assign freshness_meta = freshness_meta_r;
+assign payload_malformed = payload_malformed_r;
+assign payload_fresh = payload_fresh_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        rsp_ready_r <= 1'b1;
+        response_valid_r <= 1'b0;
+        response_seq_r <= 16'h0000;
+        drag_estimate_r <= 16'h0000;
+        lift_estimate_r <= 16'h0000;
+        freshness_meta_r <= 8'h00;
+        payload_malformed_r <= 1'b0;
+        payload_fresh_r <= 1'b0;
+    end else begin
+        response_valid_r <= 1'b0;
+        payload_malformed_r <= 1'b0;
+        payload_fresh_r <= 1'b0;
+        if (rsp_valid) begin
+            response_seq_r <= rsp_data[127:112];
+            drag_estimate_r <= rsp_data[111:96];
+            lift_estimate_r <= rsp_data[95:80];
+            freshness_meta_r <= rsp_data[79:72];
+            if (rsp_data[71:64] == expected_seq[7:0]) begin
+                response_valid_r <= 1'b1;
+                payload_fresh_r <= rsp_data[72];
+            end else begin
+                payload_malformed_r <= 1'b1;
+            end
+        end
+    end
+end
+
+endmodule
+
+module aero_sequence_watchdog (
+    input         clk,
+    input         reset_n,
+    input         request_issued,
+    input  [15:0] outstanding_seq,
+    input         response_valid,
+    input  [15:0] response_seq,
+    input         payload_fresh,
+    input  [15:0] cfg_timeout_threshold,
+    output        blocking_fault,
+    output        stale_response_fault,
+    output        timeout_fault,
+    output        duplicate_response_fault,
+    output        replay_response_fault,
+    output        sequence_mismatch_fault,
+    output [15:0] accepted_seq,
+    output [15:0] response_age
+);
+
+reg blocking_fault_r;
+reg stale_response_fault_r;
+reg timeout_fault_r;
+reg duplicate_response_fault_r;
+reg replay_response_fault_r;
+reg sequence_mismatch_fault_r;
+reg [15:0] accepted_seq_r;
+reg [15:0] response_age_r;
+reg [15:0] outstanding_seq_r;
+reg [15:0] age_counter;
+reg seen_response;
+
+assign blocking_fault = blocking_fault_r;
+assign stale_response_fault = stale_response_fault_r;
+assign timeout_fault = timeout_fault_r;
+assign duplicate_response_fault = duplicate_response_fault_r;
+assign replay_response_fault = replay_response_fault_r;
+assign sequence_mismatch_fault = sequence_mismatch_fault_r;
+assign accepted_seq = accepted_seq_r;
+assign response_age = response_age_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        blocking_fault_r <= 1'b0;
+        stale_response_fault_r <= 1'b0;
+        timeout_fault_r <= 1'b0;
+        duplicate_response_fault_r <= 1'b0;
+        replay_response_fault_r <= 1'b0;
+        sequence_mismatch_fault_r <= 1'b0;
+        accepted_seq_r <= 16'h0000;
+        response_age_r <= 16'h0000;
+        outstanding_seq_r <= 16'h0000;
+        age_counter <= 16'h0000;
+        seen_response <= 1'b0;
+    end else begin
+        if (request_issued) begin
+            outstanding_seq_r <= outstanding_seq;
+            age_counter <= 16'h0000;
+            seen_response <= 1'b0;
+        end else if (age_counter != 16'hffff) begin
+            age_counter <= age_counter + 16'h0001;
+        end
+        response_age_r <= age_counter;
+        if (response_valid) begin
+            if (response_seq != outstanding_seq_r) begin
+                sequence_mismatch_fault_r <= 1'b1;
+                stale_response_fault_r <= 1'b1;
+            end else if (!payload_fresh) begin
+                duplicate_response_fault_r <= 1'b1;
+                replay_response_fault_r <= 1'b1;
+                stale_response_fault_r <= 1'b1;
+            end else if (seen_response) begin
+                duplicate_response_fault_r <= 1'b1;
+                replay_response_fault_r <= 1'b1;
+                stale_response_fault_r <= 1'b1;
+            end else begin
+                accepted_seq_r <= response_seq;
+                seen_response <= 1'b1;
+            end
+        end
+        if (age_counter >= cfg_timeout_threshold && cfg_timeout_threshold != 16'h0000 && !seen_response) begin
+            timeout_fault_r <= 1'b1;
+        end
+        blocking_fault_r <= timeout_fault_r | stale_response_fault_r | duplicate_response_fault_r | replay_response_fault_r | sequence_mismatch_fault_r;
+    end
+end
+
+endmodule
+
+module aero_safety_supervisor (
+    input         clk,
+    input         reset_n,
+    input         cfg_enable,
+    input  [15:0] cfg_actuator_min,
+    input  [15:0] cfg_actuator_max,
+    input         cfg_safe_fallback_select,
+    input         response_valid,
+    input         payload_malformed,
+    input         blocking_fault,
+    input  [15:0] drag_estimate,
+    input  [15:0] lift_estimate,
+    output [15:0] safe_intent,
+    output        valid_intent,
+    output        clamp_event,
+    output        fallback_active,
+    output        invalid_payload_fault,
+    output        disable_state
+);
+
+reg [15:0] safe_intent_r;
+reg        valid_intent_r;
+reg        clamp_event_r;
+reg        fallback_active_r;
+reg        invalid_payload_fault_r;
+reg        disable_state_r;
+
+assign safe_intent = safe_intent_r;
+assign valid_intent = valid_intent_r;
+assign clamp_event = clamp_event_r;
+assign fallback_active = fallback_active_r;
+assign invalid_payload_fault = invalid_payload_fault_r;
+assign disable_state = disable_state_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        safe_intent_r <= 16'h0000;
+        valid_intent_r <= 1'b0;
+        clamp_event_r <= 1'b0;
+        fallback_active_r <= 1'b1;
+        invalid_payload_fault_r <= 1'b0;
+        disable_state_r <= 1'b1;
+    end else begin
+        disable_state_r <= ~cfg_enable;
+        invalid_payload_fault_r <= payload_malformed;
+        clamp_event_r <= 1'b0;
+        if (!cfg_enable || blocking_fault || payload_malformed || !response_valid) begin
+            fallback_active_r <= cfg_safe_fallback_select;
+            valid_intent_r <= 1'b0;
+            if (cfg_safe_fallback_select == 1'b0) begin
+                safe_intent_r <= cfg_actuator_min;
+            end else begin
+                safe_intent_r <= cfg_actuator_max;
+            end
+        end else begin
+            fallback_active_r <= 1'b0;
+            valid_intent_r <= 1'b1;
+            if (drag_estimate < cfg_actuator_min) begin
+                safe_intent_r <= cfg_actuator_min;
+                clamp_event_r <= 1'b1;
+            end else if (lift_estimate > cfg_actuator_max) begin
+                safe_intent_r <= cfg_actuator_max;
+                clamp_event_r <= 1'b1;
+            end else begin
+                safe_intent_r <= lift_estimate;
+            end
+        end
+    end
+end
+
+endmodule
+
+module aero_actuator_command_shaper (
+    input         clk,
+    input         reset_n,
+    input  [15:0] safe_intent,
+    input         valid_intent,
+    input         fallback_active,
+    input  [15:0] cfg_actuator_min,
+    input  [15:0] cfg_actuator_max,
+    output        act_cmd_valid,
+    output [31:0] act_cmd_data,
+    output [15:0] last_safe_cmd,
+    output        slew_limited,
+    output [15:0] clamped_cmd
+);
+
+reg        act_cmd_valid_r;
+reg [31:0] act_cmd_data_r;
+reg [15:0] last_safe_cmd_r;
+reg        slew_limited_r;
+reg [15:0] clamped_cmd_r;
+reg [15:0] prev_cmd;
+reg [15:0] shaped_cmd;
+
+assign act_cmd_valid = act_cmd_valid_r;
+assign act_cmd_data = act_cmd_data_r;
+assign last_safe_cmd = last_safe_cmd_r;
+assign slew_limited = slew_limited_r;
+assign clamped_cmd = clamped_cmd_r;
+
+always @(*) begin
+    shaped_cmd = safe_intent;
+    if (shaped_cmd < cfg_actuator_min) begin
+        shaped_cmd = cfg_actuator_min;
+    end else if (shaped_cmd > cfg_actuator_max) begin
+        shaped_cmd = cfg_actuator_max;
+    end
+    if (fallback_active != 1'b0 || !valid_intent) begin
+        shaped_cmd = cfg_actuator_min;
+    end
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        act_cmd_valid_r <= 1'b0;
+        act_cmd_data_r <= 32'h00000000;
+        last_safe_cmd_r <= 16'h0000;
+        slew_limited_r <= 1'b0;
+        clamped_cmd_r <= 16'h0000;
+        prev_cmd <= 16'h0000;
+    end else begin
+        if (shaped_cmd != prev_cmd) begin
+            slew_limited_r <= 1'b1;
+        end else begin
+            slew_limited_r <= 1'b0;
+        end
+        prev_cmd <= shaped_cmd;
+        clamped_cmd_r <= shaped_cmd;
+        last_safe_cmd_r <= shaped_cmd;
+        act_cmd_valid_r <= valid_intent && (fallback_active == 1'b0);
+        act_cmd_data_r <= {16'h0000, shaped_cmd};
+    end
+end
+
+endmodule
+
+module aero_status_telemetry (
+    input         clk,
+    input         reset_n,
+    input         stale_response_fault,
+    input         timeout_fault,
+    input         invalid_payload_fault,
+    input         clamp_event,
+    input         fallback_active,
+    input         disable_state,
+    input  [15:0] accepted_seq,
+    output [31:0] status_word,
+    output        fault_valid,
+    output [7:0]  fault_code,
+    output [15:0] fault_flags,
+    output        sticky_fault_summary
+);
+
+reg [31:0] status_word_r;
+reg        fault_valid_r;
+reg [7:0]  fault_code_r;
+reg [15:0] fault_flags_r;
+reg        sticky_fault_summary_r;
+
+assign status_word = status_word_r;
+assign fault_valid = fault_valid_r;
+assign fault_code = fault_code_r;
+assign fault_flags = fault_flags_r;
+assign sticky_fault_summary = sticky_fault_summary_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        status_word_r <= 32'h00000000;
+        fault_valid_r <= 1'b0;
+        fault_code_r <= 8'h00;
+        fault_flags_r <= 16'h0000;
+        sticky_fault_summary_r <= 1'b0;
+    end else begin
+        fault_flags_r[0] <= stale_response_fault;
+        fault_flags_r[1] <= timeout_fault;
+        fault_flags_r[2] <= invalid_payload_fault;
+        fault_flags_r[3] <= clamp_event;
+        fault_flags_r[4] <= fallback_active;
+        fault_flags_r[5] <= disable_state;
+        fault_flags_r[15:6] <= 10'h000;
+        fault_valid_r <= stale_response_fault | timeout_fault | invalid_payload_fault | clamp_event | fallback_active | disable_state;
+        sticky_fault_summary_r <= fault_valid_r;
+        fault_code_r <= {2'b00, stale_response_fault, timeout_fault, invalid_payload_fault, clamp_event, fallback_active, disable_state};
+        status_word_r <= {accepted_seq, fault_flags_r};
+    end
+end
+
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN aero_regfile_mmio.v---
+module aero_regfile_mmio (
+    input         clk,
+    input         reset_n,
+    input         reg_valid,
+    output        reg_ready,
+    input         reg_we,
+    input  [31:0] reg_addr,
+    input  [31:0] reg_wdata,
+    output [31:0] reg_rdata,
+    output        reg_rvalid,
+    output        cfg_enable,
+    output        cfg_soft_reset,
+    output [2:0]  cfg_mode_select,
+    output [15:0] cfg_req_seq_seed,
+    input  [15:0] status_last_accepted_seq,
+    output [15:0] cfg_stream_velocity_mps,
+    output [15:0] cfg_timeout_threshold,
+    output [15:0] cfg_actuator_min,
+    output [15:0] cfg_actuator_max,
+    output [1:0]  cfg_safe_fallback_select,
+    input  [31:0] status_word,
+    input  [15:0] status_fault_flags
+);
+
+reg        cfg_enable_r;
+reg        cfg_soft_reset_r;
+reg [2:0]  cfg_mode_select_r;
+reg [15:0] cfg_req_seq_seed_r;
+reg [15:0] cfg_stream_velocity_mps_r;
+reg [15:0] cfg_timeout_threshold_r;
+reg [15:0] cfg_actuator_min_r;
+reg [15:0] cfg_actuator_max_r;
+reg [1:0]  cfg_safe_fallback_select_r;
+reg [31:0] reg_rdata_r;
+reg        reg_rvalid_r;
+reg [31:0] status_word_shadow;
+reg [15:0] status_fault_flags_shadow;
+reg [31:0] read_data;
+reg        read_valid;
+
+assign cfg_enable = cfg_enable_r;
+assign cfg_soft_reset = cfg_soft_reset_r;
+assign cfg_mode_select = cfg_mode_select_r;
+assign cfg_req_seq_seed = cfg_req_seq_seed_r;
+assign cfg_stream_velocity_mps = cfg_stream_velocity_mps_r;
+assign cfg_timeout_threshold = cfg_timeout_threshold_r;
+assign cfg_actuator_min = cfg_actuator_min_r;
+assign cfg_actuator_max = cfg_actuator_max_r;
+assign cfg_safe_fallback_select = cfg_safe_fallback_select_r;
+assign reg_rdata = reg_rdata_r;
+assign reg_rvalid = reg_rvalid_r;
+assign reg_ready = 1'b1;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        cfg_enable_r <= 1'b0;
+        cfg_soft_reset_r <= 1'b0;
+        cfg_mode_select_r <= 3'b000;
+        cfg_req_seq_seed_r <= 16'h0000;
+        cfg_stream_velocity_mps_r <= 16'h0000;
+        cfg_timeout_threshold_r <= 16'd100;
+        cfg_actuator_min_r <= 16'h0000;
+        cfg_actuator_max_r <= 16'h00ff;
+        cfg_safe_fallback_select_r <= 2'b01;
+        reg_rdata_r <= 32'h00000000;
+        reg_rvalid_r <= 1'b0;
+        status_word_shadow <= 32'h00000000;
+        status_fault_flags_shadow <= 16'h0000;
+    end else begin
+        cfg_soft_reset_r <= 1'b0;
+        status_word_shadow <= status_word;
+        status_fault_flags_shadow <= status_fault_flags;
+        reg_rvalid_r <= 1'b0;
+        if (reg_valid && reg_we) begin
+            case (reg_addr[7:0])
+                8'h00: begin
+                    cfg_enable_r <= reg_wdata[0];
+                    cfg_soft_reset_r <= reg_wdata[1];
+                    cfg_mode_select_r <= reg_wdata[4:2];
+                    cfg_safe_fallback_select_r <= reg_wdata[6:5];
+                end
+                8'h01: cfg_req_seq_seed_r[7:0] <= reg_wdata[7:0];
+                8'h02: cfg_req_seq_seed_r[15:8] <= reg_wdata[7:0];
+                8'h03: cfg_stream_velocity_mps_r[7:0] <= reg_wdata[7:0];
+                8'h04: cfg_stream_velocity_mps_r[15:8] <= reg_wdata[7:0];
+                8'h05: cfg_timeout_threshold_r[7:0] <= reg_wdata[7:0];
+                8'h06: cfg_timeout_threshold_r[15:8] <= reg_wdata[7:0];
+                8'h07: cfg_actuator_min_r[7:0] <= reg_wdata[7:0];
+                8'h08: cfg_actuator_min_r[15:8] <= reg_wdata[7:0];
+                8'h09: cfg_actuator_max_r[7:0] <= reg_wdata[7:0];
+                8'h0A: cfg_actuator_max_r[15:8] <= reg_wdata[7:0];
+                default: begin
+                end
+            endcase
+        end
+        if (reg_valid && !reg_we) begin
+            reg_rdata_r <= read_data;
+            reg_rvalid_r <= read_valid;
+        end
+    end
+end
+
+always @(*) begin
+    read_data = 32'h00000000;
+    read_valid = 1'b1;
+    case (reg_addr[7:0])
+        8'h00: read_data = {24'h000000, 1'b0, cfg_safe_fallback_select_r, cfg_mode_select_r, 1'b0, cfg_enable_r};
+        8'h01: read_data = {24'h000000, cfg_req_seq_seed_r[7:0]};
+        8'h02: read_data = {24'h000000, cfg_req_seq_seed_r[15:8]};
+        8'h03: read_data = {24'h000000, cfg_stream_velocity_mps_r[7:0]};
+        8'h04: read_data = {24'h000000, cfg_stream_velocity_mps_r[15:8]};
+        8'h05: read_data = {24'h000000, cfg_timeout_threshold_r[7:0]};
+        8'h06: read_data = {24'h000000, cfg_timeout_threshold_r[15:8]};
+        8'h07: read_data = {24'h000000, cfg_actuator_min_r[7:0]};
+        8'h08: read_data = {24'h000000, cfg_actuator_min_r[15:8]};
+        8'h09: read_data = {24'h000000, cfg_actuator_max_r[7:0]};
+        8'h0A: read_data = {24'h000000, cfg_actuator_max_r[15:8]};
+        8'h0B: read_data = {24'h000000, status_fault_flags_shadow[7:0]};
+        8'h0C: read_data = {24'h000000, status_fault_flags_shadow[15:8]};
+        8'h0D: read_data = {24'h000000, status_last_accepted_seq[7:0]};
+        8'h0E: read_data = {24'h000000, status_last_accepted_seq[15:8]};
+        8'h0F: read_data = status_word_shadow;
+        default: begin
+            read_data = 32'h00000000;
+        end
+    endcase
+end
+
+endmodule
+---END aero_regfile_mmio.v---
+---BEGIN aero_request_packetizer.v---
+module aero_request_packetizer (
+    input         clk,
+    input         reset_n,
+    input         cfg_enable,
+    input  [2:0]  cfg_mode_select,
+    input  [15:0] cfg_req_seq_seed,
+    input  [15:0] cfg_stream_velocity_mps,
+    input  [1:0]  cfg_safe_fallback_select,
+    input         blocking_fault,
+    input         req_ready,
+    output        req_valid,
+    output [127:0] req_data,
+    output [15:0] outstanding_seq,
+    output        request_issued
+);
+
+reg [15:0] outstanding_seq_r;
+reg        req_valid_r;
+reg [127:0] req_data_r;
+reg        request_issued_r;
+reg [15:0] seq_counter;
+wire [15:0] next_seq;
+wire [91:0] req_tail;
+
+assign next_seq = cfg_req_seq_seed + seq_counter + 16'h0001;
+assign req_tail = {cfg_mode_select, cfg_safe_fallback_select, cfg_stream_velocity_mps, 68'h00000000000000000};
+
+assign outstanding_seq = outstanding_seq_r;
+assign req_valid = req_valid_r;
+assign req_data = req_data_r;
+assign request_issued = request_issued_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        outstanding_seq_r <= 16'h0000;
+        req_valid_r <= 1'b0;
+        req_data_r <= 128'h00000000000000000000000000000000;
+        request_issued_r <= 1'b0;
+        seq_counter <= 16'h0000;
+    end else begin
+        request_issued_r <= 1'b0;
+        if (cfg_enable && !blocking_fault && req_ready) begin
+            seq_counter <= seq_counter + 16'h0001;
+            outstanding_seq_r <= next_seq;
+            req_valid_r <= 1'b1;
+            req_data_r <= {next_seq, req_tail};
+            request_issued_r <= 1'b1;
+        end else begin
+            req_valid_r <= 1'b0;
+        end
+    end
+end
+
+endmodule
+---END aero_request_packetizer.v---
+---BEGIN aero_response_depacketizer.v---
+module aero_response_depacketizer (
+    input         clk,
+    input         reset_n,
+    input         rsp_valid,
+    output        rsp_ready,
+    input  [127:0] rsp_data,
+    input  [15:0] expected_seq,
+    output        response_valid,
+    output [15:0] response_seq,
+    output [15:0] drag_estimate,
+    output [15:0] lift_estimate,
+    output [7:0]  freshness_meta,
+    output        payload_malformed,
+    output        payload_fresh
+);
+
+reg        rsp_ready_r;
+reg        response_valid_r;
+reg [15:0] response_seq_r;
+reg [15:0] drag_estimate_r;
+reg [15:0] lift_estimate_r;
+reg [7:0]  freshness_meta_r;
+reg        payload_malformed_r;
+reg        payload_fresh_r;
+
+assign rsp_ready = rsp_ready_r;
+assign response_valid = response_valid_r;
+assign response_seq = response_seq_r;
+assign drag_estimate = drag_estimate_r;
+assign lift_estimate = lift_estimate_r;
+assign freshness_meta = freshness_meta_r;
+assign payload_malformed = payload_malformed_r;
+assign payload_fresh = payload_fresh_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        rsp_ready_r <= 1'b1;
+        response_valid_r <= 1'b0;
+        response_seq_r <= 16'h0000;
+        drag_estimate_r <= 16'h0000;
+        lift_estimate_r <= 16'h0000;
+        freshness_meta_r <= 8'h00;
+        payload_malformed_r <= 1'b0;
+        payload_fresh_r <= 1'b0;
+    end else begin
+        response_valid_r <= 1'b0;
+        payload_malformed_r <= 1'b0;
+        payload_fresh_r <= 1'b0;
+        if (rsp_valid) begin
+            response_seq_r <= rsp_data[127:112];
+            drag_estimate_r <= rsp_data[111:96];
+            lift_estimate_r <= rsp_data[95:80];
+            freshness_meta_r <= rsp_data[79:72];
+            if (rsp_data[71:64] == expected_seq[7:0]) begin
+                response_valid_r <= 1'b1;
+                payload_fresh_r <= rsp_data[72];
+            end else begin
+                payload_malformed_r <= 1'b1;
+            end
+        end
+    end
+end
+
+endmodule
+---END aero_response_depacketizer.v---
+---BEGIN aero_sequence_watchdog.v---
+module aero_sequence_watchdog (
+    input         clk,
+    input         reset_n,
+    input         request_issued,
+    input  [15:0] outstanding_seq,
+    input         response_valid,
+    input  [15:0] response_seq,
+    input         payload_fresh,
+    input  [15:0] cfg_timeout_threshold,
+    output        blocking_fault,
+    output        stale_response_fault,
+    output        timeout_fault,
+    output        duplicate_response_fault,
+    output        replay_response_fault,
+    output        sequence_mismatch_fault,
+    output [15:0] accepted_seq,
+    output [15:0] response_age
+);
+
+reg blocking_fault_r;
+reg stale_response_fault_r;
+reg timeout_fault_r;
+reg duplicate_response_fault_r;
+reg replay_response_fault_r;
+reg sequence_mismatch_fault_r;
+reg [15:0] accepted_seq_r;
+reg [15:0] response_age_r;
+reg [15:0] outstanding_seq_r;
+reg [15:0] age_counter;
+reg seen_response;
+
+assign blocking_fault = blocking_fault_r;
+assign stale_response_fault = stale_response_fault_r;
+assign timeout_fault = timeout_fault_r;
+assign duplicate_response_fault = duplicate_response_fault_r;
+assign replay_response_fault = replay_response_fault_r;
+assign sequence_mismatch_fault = sequence_mismatch_fault_r;
+assign accepted_seq = accepted_seq_r;
+assign response_age = response_age_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        blocking_fault_r <= 1'b0;
+        stale_response_fault_r <= 1'b0;
+        timeout_fault_r <= 1'b0;
+        duplicate_response_fault_r <= 1'b0;
+        replay_response_fault_r <= 1'b0;
+        sequence_mismatch_fault_r <= 1'b0;
+        accepted_seq_r <= 16'h0000;
+        response_age_r <= 16'h0000;
+        outstanding_seq_r <= 16'h0000;
+        age_counter <= 16'h0000;
+        seen_response <= 1'b0;
+    end else begin
+        if (request_issued) begin
+            outstanding_seq_r <= outstanding_seq;
+            age_counter <= 16'h0000;
+            seen_response <= 1'b0;
+        end else if (age_counter != 16'hffff) begin
+            age_counter <= age_counter + 16'h0001;
+        end
+        response_age_r <= age_counter;
+        if (response_valid) begin
+            if (response_seq != outstanding_seq_r) begin
+                sequence_mismatch_fault_r <= 1'b1;
+                stale_response_fault_r <= 1'b1;
+            end else if (!payload_fresh) begin
+                duplicate_response_fault_r <= 1'b1;
+                replay_response_fault_r <= 1'b1;
+                stale_response_fault_r <= 1'b1;
+            end else if (seen_response) begin
+                duplicate_response_fault_r <= 1'b1;
+                replay_response_fault_r <= 1'b1;
+                stale_response_fault_r <= 1'b1;
+            end else begin
+                accepted_seq_r <= response_seq;
+                seen_response <= 1'b1;
+            end
+        end
+        if (age_counter >= cfg_timeout_threshold && cfg_timeout_threshold != 16'h0000 && !seen_response) begin
+            timeout_fault_r <= 1'b1;
+        end
+        blocking_fault_r <= timeout_fault_r | stale_response_fault_r | duplicate_response_fault_r | replay_response_fault_r | sequence_mismatch_fault_r;
+    end
+end
+
+endmodule
+---END aero_sequence_watchdog.v---
+---BEGIN aero_safety_supervisor.v---
+module aero_safety_supervisor (
+    input         clk,
+    input         reset_n,
+    input         cfg_enable,
+    input  [15:0] cfg_actuator_min,
+    input  [15:0] cfg_actuator_max,
+    input         cfg_safe_fallback_select,
+    input         response_valid,
+    input         payload_malformed,
+    input         blocking_fault,
+    input  [15:0] drag_estimate,
+    input  [15:0] lift_estimate,
+    output [15:0] safe_intent,
+    output        valid_intent,
+    output        clamp_event,
+    output        fallback_active,
+    output        invalid_payload_fault,
+    output        disable_state
+);
+
+reg [15:0] safe_intent_r;
+reg        valid_intent_r;
+reg        clamp_event_r;
+reg        fallback_active_r;
+reg        invalid_payload_fault_r;
+reg        disable_state_r;
+
+assign safe_intent = safe_intent_r;
+assign valid_intent = valid_intent_r;
+assign clamp_event = clamp_event_r;
+assign fallback_active = fallback_active_r;
+assign invalid_payload_fault = invalid_payload_fault_r;
+assign disable_state = disable_state_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        safe_intent_r <= 16'h0000;
+        valid_intent_r <= 1'b0;
+        clamp_event_r <= 1'b0;
+        fallback_active_r <= 1'b1;
+        invalid_payload_fault_r <= 1'b0;
+        disable_state_r <= 1'b1;
+    end else begin
+        disable_state_r <= ~cfg_enable;
+        invalid_payload_fault_r <= payload_malformed;
+        clamp_event_r <= 1'b0;
+        if (!cfg_enable || blocking_fault || payload_malformed || !response_valid) begin
+            fallback_active_r <= cfg_safe_fallback_select;
+            valid_intent_r <= 1'b0;
+            if (cfg_safe_fallback_select == 1'b0) begin
+                safe_intent_r <= cfg_actuator_min;
+            end else begin
+                safe_intent_r <= cfg_actuator_max;
+            end
+        end else begin
+            fallback_active_r <= 1'b0;
+            valid_intent_r <= 1'b1;
+            if (drag_estimate < cfg_actuator_min) begin
+                safe_intent_r <= cfg_actuator_min;
+                clamp_event_r <= 1'b1;
+            end else if (lift_estimate > cfg_actuator_max) begin
+                safe_intent_r <= cfg_actuator_max;
+                clamp_event_r <= 1'b1;
+            end else begin
+                safe_intent_r <= lift_estimate;
+            end
+        end
+    end
+end
+
+endmodule
+---END aero_safety_supervisor.v---
+---BEGIN aero_actuator_command_shaper.v---
+module aero_actuator_command_shaper (
+    input         clk,
+    input         reset_n,
+    input  [15:0] safe_intent,
+    input         valid_intent,
+    input         fallback_active,
+    input  [15:0] cfg_actuator_min,
+    input  [15:0] cfg_actuator_max,
+    output        act_cmd_valid,
+    output [31:0] act_cmd_data,
+    output [15:0] last_safe_cmd,
+    output        slew_limited,
+    output [15:0] clamped_cmd
+);
+
+reg        act_cmd_valid_r;
+reg [31:0] act_cmd_data_r;
+reg [15:0] last_safe_cmd_r;
+reg        slew_limited_r;
+reg [15:0] clamped_cmd_r;
+reg [15:0] prev_cmd;
+reg [15:0] shaped_cmd;
+
+assign act_cmd_valid = act_cmd_valid_r;
+assign act_cmd_data = act_cmd_data_r;
+assign last_safe_cmd = last_safe_cmd_r;
+assign slew_limited = slew_limited_r;
+assign clamped_cmd = clamped_cmd_r;
+
+always @(*) begin
+    shaped_cmd = safe_intent;
+    if (shaped_cmd < cfg_actuator_min) begin
+        shaped_cmd = cfg_actuator_min;
+    end else if (shaped_cmd > cfg_actuator_max) begin
+        shaped_cmd = cfg_actuator_max;
+    end
+    if (fallback_active != 1'b0 || !valid_intent) begin
+        shaped_cmd = cfg_actuator_min;
+    end
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        act_cmd_valid_r <= 1'b0;
+        act_cmd_data_r <= 32'h00000000;
+        last_safe_cmd_r <= 16'h0000;
+        slew_limited_r <= 1'b0;
+        clamped_cmd_r <= 16'h0000;
+        prev_cmd <= 16'h0000;
+    end else begin
+        if (shaped_cmd != prev_cmd) begin
+            slew_limited_r <= 1'b1;
+        end else begin
+            slew_limited_r <= 1'b0;
+        end
+        prev_cmd <= shaped_cmd;
+        clamped_cmd_r <= shaped_cmd;
+        last_safe_cmd_r <= shaped_cmd;
+        act_cmd_valid_r <= valid_intent && (fallback_active == 1'b0);
+        act_cmd_data_r <= {16'h0000, shaped_cmd};
+    end
+end
+
+endmodule
+---END aero_actuator_command_shaper.v---
+---BEGIN aero_status_telemetry.v---
+module aero_status_telemetry (
+    input         clk,
+    input         reset_n,
+    input         stale_response_fault,
+    input         timeout_fault,
+    input         invalid_payload_fault,
+    input         clamp_event,
+    input         fallback_active,
+    input         disable_state,
+    input  [15:0] accepted_seq,
+    output [31:0] status_word,
+    output        fault_valid,
+    output [7:0]  fault_code,
+    output [15:0] fault_flags,
+    output        sticky_fault_summary
+);
+
+reg [31:0] status_word_r;
+reg        fault_valid_r;
+reg [7:0]  fault_code_r;
+reg [15:0] fault_flags_r;
+reg        sticky_fault_summary_r;
+
+assign status_word = status_word_r;
+assign fault_valid = fault_valid_r;
+assign fault_code = fault_code_r;
+assign fault_flags = fault_flags_r;
+assign sticky_fault_summary = sticky_fault_summary_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        status_word_r <= 32'h00000000;
+        fault_valid_r <= 1'b0;
+        fault_code_r <= 8'h00;
+        fault_flags_r <= 16'h0000;
+        sticky_fault_summary_r <= 1'b0;
+    end else begin
+        fault_flags_r[0] <= stale_response_fault;
+        fault_flags_r[1] <= timeout_fault;
+        fault_flags_r[2] <= invalid_payload_fault;
+        fault_flags_r[3] <= clamp_event;
+        fault_flags_r[4] <= fallback_active;
+        fault_flags_r[5] <= disable_state;
+        fault_flags_r[15:6] <= 10'h000;
+        fault_valid_r <= stale_response_fault | timeout_fault | invalid_payload_fault | clamp_event | fallback_active | disable_state;
+        sticky_fault_summary_r <= fault_valid_r;
+        fault_code_r <= {2'b00, stale_response_fault, timeout_fault, invalid_payload_fault, clamp_event, fallback_active, disable_state};
+        status_word_r <= {accepted_seq, fault_flags_r};
+    end
+end
+
+endmodule
+---END aero_status_telemetry.v---

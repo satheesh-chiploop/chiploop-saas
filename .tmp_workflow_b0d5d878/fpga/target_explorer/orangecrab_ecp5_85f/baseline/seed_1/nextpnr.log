@@ -1,0 +1,516 @@
+Info: Logic utilisation before packing:
+Info:     Total LUT4s:      4099/83640     4%
+Info:         logic LUTs:   3607/83640     4%
+Info:         carry LUTs:    492/83640     0%
+Info:           RAM LUTs:      0/10455     0%
+Info:          RAMW LUTs:      0/20910     0%
+
+Info:      Total DFFs:       962/83640     1%
+
+Info: Packing IOs..
+Info: Packing constants..
+Info: Packing carries...
+Info: Packing LUTs...
+Info: Packing LUT5-7s...
+Info: Packing FFs...
+Info:     199 FFs paired with LUTs.
+Info: Generating derived timing constraints...
+Info: Promoting globals...
+Info:     promoting clock net clk$TRELLIS_IO_IN to global network
+Info:     promoting clock net spi_sclk$TRELLIS_IO_IN to global network
+Info: Checksum: 0x8dd787d4
+
+Info: Device utilisation:
+Info: 	          TRELLIS_IO:     7/  365     1%
+Info: 	                DCCA:     2/   56     3%
+Info: 	              DP16KD:     0/  208     0%
+Info: 	          MULT18X18D:     4/  156     2%
+Info: 	              ALU54B:     0/   78     0%
+Info: 	             EHXPLLL:     0/    4     0%
+Info: 	             EXTREFB:     0/    2     0%
+Info: 	                DCUA:     0/    2     0%
+Info: 	           PCSCLKDIV:     0/    2     0%
+Info: 	             IOLOGIC:     0/  224     0%
+Info: 	            SIOLOGIC:     0/  141     0%
+Info: 	                 GSR:     0/    1     0%
+Info: 	               JTAGG:     0/    1     0%
+Info: 	                OSCG:     0/    1     0%
+Info: 	               SEDGA:     0/    1     0%
+Info: 	                 DTR:     0/    1     0%
+Info: 	             USRMCLK:     0/    1     0%
+Info: 	             CLKDIVF:     0/    4     0%
+Info: 	           ECLKSYNCB:     0/   10     0%
+Info: 	             DLLDELD:     0/    8     0%
+Info: 	              DDRDLL:     0/    4     0%
+Info: 	             DQSBUFM:     0/   14     0%
+Info: 	     TRELLIS_ECLKBUF:     0/    8     0%
+Info: 	        ECLKBRIDGECS:     0/    2     0%
+Info: 	                DCSC:     0/    2     0%
+Info: 	          TRELLIS_FF:   962/83640     1%
+Info: 	        TRELLIS_COMB:  4191/83640     5%
+Info: 	        TRELLIS_RAMW:     0/10455     0%
+
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 3323 cells, random placement wirelen = 350393.
+Info:     at initial placer iter 0, wirelen = 1520
+Info:     at initial placer iter 1, wirelen = 1764
+Info:     at initial placer iter 2, wirelen = 1768
+Info:     at initial placer iter 3, wirelen = 1823
+Info: Running main analytical placer, max placement attempts per cell = 3335944.
+Info:     at iteration #1, type ALL: wirelen solved = 1756, spread = 33251, legal = 41869; time = 0.31s
+Info:     at iteration #2, type ALL: wirelen solved = 3112, spread = 25678, legal = 37928; time = 0.34s
+Info:     at iteration #3, type ALL: wirelen solved = 5246, spread = 24150, legal = 33908; time = 0.29s
+Info:     at iteration #4, type ALL: wirelen solved = 6506, spread = 23466, legal = 35579; time = 0.35s
+Info:     at iteration #5, type ALL: wirelen solved = 8062, spread = 23582, legal = 34153; time = 0.31s
+Info:     at iteration #6, type ALL: wirelen solved = 10204, spread = 22285, legal = 32203; time = 0.28s
+Info:     at iteration #7, type ALL: wirelen solved = 10831, spread = 22287, legal = 31345; time = 0.26s
+Info:     at iteration #8, type ALL: wirelen solved = 12057, spread = 22131, legal = 30916; time = 0.26s
+Info:     at iteration #9, type ALL: wirelen solved = 12787, spread = 21368, legal = 30598; time = 0.26s
+Info:     at iteration #10, type ALL: wirelen solved = 13305, spread = 23103, legal = 29531; time = 0.22s
+Info:     at iteration #11, type ALL: wirelen solved = 14822, spread = 21707, legal = 30368; time = 0.25s
+Info:     at iteration #12, type ALL: wirelen solved = 14698, spread = 21856, legal = 30502; time = 0.24s
+Info:     at iteration #13, type ALL: wirelen solved = 15121, spread = 21255, legal = 30125; time = 0.26s
+Info:     at iteration #14, type ALL: wirelen solved = 15289, spread = 20157, legal = 30085; time = 0.26s
+Info:     at iteration #15, type ALL: wirelen solved = 15150, spread = 20461, legal = 30532; time = 0.26s
+Info: HeAP Placer Time: 5.17s
+Info:   of which solving equations: 1.40s
+Info:   of which spreading cells: 0.28s
+Info:   of which strict legalisation: 2.71s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 1562, wirelen = 29531
+Info:   at iteration #5: temp = 0.000000, timing cost = 1540, wirelen = 23842
+Info:   at iteration #10: temp = 0.000000, timing cost = 1466, wirelen = 22769
+Info:   at iteration #15: temp = 0.000000, timing cost = 1413, wirelen = 22204
+Info:   at iteration #20: temp = 0.000000, timing cost = 1370, wirelen = 21756
+Info:   at iteration #25: temp = 0.000000, timing cost = 1509, wirelen = 21589
+Info:   at iteration #30: temp = 0.000000, timing cost = 1560, wirelen = 21494
+Info:   at iteration #33: temp = 0.000000, timing cost = 1558, wirelen = 21484 
+Info: SA placement time 11.25s
+
+Info: Max frequency for clock '$glbnet$spi_sclk$TRELLIS_IO_IN': 181.65 MHz (PASS at 75.00 MHz)
+Info: Max frequency for clock      '$glbnet$clk$TRELLIS_IO_IN': 39.88 MHz (FAIL at 75.00 MHz)
+
+Info: Max delay <async>                                -> posedge $glbnet$clk$TRELLIS_IO_IN     : 12.30 ns
+Info: Max delay <async>                                -> posedge $glbnet$spi_sclk$TRELLIS_IO_IN: 7.68 ns
+Info: Max delay posedge $glbnet$clk$TRELLIS_IO_IN      -> <async>                               : 4.60 ns
+Info: Max delay posedge $glbnet$clk$TRELLIS_IO_IN      -> posedge $glbnet$spi_sclk$TRELLIS_IO_IN: 2.80 ns
+Info: Max delay posedge $glbnet$spi_sclk$TRELLIS_IO_IN -> <async>                               : 8.80 ns
+Info: Max delay posedge $glbnet$spi_sclk$TRELLIS_IO_IN -> posedge $glbnet$clk$TRELLIS_IO_IN     : 2.57 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 3 endpoint(s)
+Info:          + represents [1,3) endpoint(s)
+Info: [-11740, -10524) |*************************+
+Info: [-10524,  -9308) |*************************************************+
+Info: [ -9308,  -8092) |********************************************************+
+Info: [ -8092,  -6876) |**************************+
+Info: [ -6876,  -5660) |***********+
+Info: [ -5660,  -4444) |********+
+Info: [ -4444,  -3228) |***+
+Info: [ -3228,  -2012) |******+
+Info: [ -2012,   -796) |***************+
+Info: [  -796,    420) |******************************************************* 
+Info: [   420,   1636) |************************************************************ 
+Info: [  1636,   2852) |**************************************+
+Info: [  2852,   4068) |*******************+
+Info: [  4068,   5284) |**+
+Info: [  5284,   6500) |************+
+Info: [  6500,   7716) |*********************+
+Info: [  7716,   8932) |***************+
+Info: [  8932,  10148) |*******************************+
+Info: [ 10148,  11364) |************+
+Info: [ 11364,  12580) |**************+
+Info: Checksum: 0xbdd1001b
+Info: Routing globals...
+Info:     routing clock net $glbnet$spi_sclk$TRELLIS_IO_IN using global 0
+Info:     routing clock net $glbnet$clk$TRELLIS_IO_IN using global 1
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 14149 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:       1000 |      318        681 |  318   681 |     13651|       0.45       0.45|
+Info:       2000 |      555       1444 |  237   763 |     13262|       0.20       0.65|
+Info:       3000 |      861       2138 |  306   694 |     12817|       0.26       0.91|
+Info:       4000 |     1158       2841 |  297   703 |     12362|       0.22       1.13|
+Info:       5000 |     1469       3530 |  311   689 |     11991|       0.26       1.39|
+Info:       6000 |     1776       4223 |  307   693 |     11607|       0.21       1.61|
+Info:       7000 |     2174       4825 |  398   602 |     11342|       0.21       1.82|
+Info:       8000 |     2674       5325 |  500   500 |     11184|       0.24       2.05|
+Info:       9000 |     3046       5953 |  372   628 |     10821|       0.28       2.33|
+Info:      10000 |     3467       6532 |  421   579 |     10436|       0.21       2.54|
+Info:      11000 |     4041       6958 |  574   426 |     10289|       0.30       2.84|
+Info:      12000 |     4477       7522 |  436   564 |     10046|       0.26       3.11|
+Info:      13000 |     4812       8187 |  335   665 |      9768|       0.22       3.33|
+Info:      14000 |     5226       8773 |  414   586 |      9494|       0.26       3.59|
+Info:      15000 |     5870       9129 |  644   356 |      9405|       0.38       3.97|
+Info:      16000 |     6458       9541 |  588   412 |      9245|       0.39       4.36|
+Info:      17000 |     6785      10214 |  327   673 |      8758|       0.27       4.64|
+Info:      18000 |     7206      10793 |  421   579 |      8376|       0.27       4.91|
+Info:      19000 |     7634      11365 |  428   572 |      8130|       0.34       5.25|
+Info:      20000 |     7982      12017 |  348   652 |      7777|       0.26       5.51|
+Info:      21000 |     8341      12658 |  359   641 |      7581|       0.24       5.74|
+Info:      22000 |     8771      13228 |  430   570 |      7269|       0.33       6.07|
+Info:      23000 |     9156      13843 |  385   615 |      6969|       0.27       6.35|
+Info:      24000 |     9559      14440 |  403   597 |      6734|       0.25       6.60|
+Info:      25000 |     9888      15028 |  329   588 |      6193|       0.24       6.84|
+Info:      26000 |    10269      15620 |  381   592 |      5831|       0.26       7.09|
+Info:      27000 |    10603      16194 |  334   574 |      5227|       0.21       7.31|
+Info:      28000 |    10971      16714 |  368   520 |      4791|       0.23       7.54|
+Info:      29000 |    11298      17205 |  327   491 |      4245|       0.22       7.76|
+Info:      30000 |    11705      17662 |  407   457 |      3689|       0.22       7.98|
+Info:      31000 |    12106      18217 |  401   555 |      3160|       0.23       8.21|
+Info:      32000 |    12330      18891 |  224   674 |      2409|       0.20       8.41|
+Info:      33000 |    12445      19687 |  115   796 |      1573|       0.25       8.66|
+Info:      34000 |    12600      20445 |  155   758 |       779|       0.31       8.97|
+Info:      34956 |    12735      21184 |  135   739 |         0|       0.30       9.26|
+Info: Routing complete.
+Info: Router1 time 9.26s
+Info: Checksum: 0xce9fc37d
+
+Info: Critical path report for clock '$glbnet$spi_sclk$TRELLIS_IO_IN' (posedge -> posedge):
+Info: curr total
+Info:  0.5  0.5  Source spi_active_TRELLIS_FF_Q.Q
+Info:  2.0  2.5    Net spi_active (90,16) -> (80,26)
+Info:                Sink tx_shift_TRELLIS_FF_Q_LSR_LUT4_Z.D
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv:16.9-16.19
+Info:  0.2  2.7  Source tx_shift_TRELLIS_FF_Q_LSR_LUT4_Z.F
+Info:  0.3  3.1    Net tx_shift_TRELLIS_FF_Q_LSR (80,26) -> (80,26)
+Info:                Sink tx_shift_TRELLIS_FF_Q.LSR
+Info:  0.4  3.5  Setup tx_shift_TRELLIS_FF_Q.LSR
+Info: 1.2 ns logic, 2.3 ns routing
+
+Info: Critical path report for clock '$glbnet$clk$TRELLIS_IO_IN' (posedge -> posedge):
+Info: curr total
+Info:  0.5  0.5  Source u_core.operand_b_TRELLIS_FF_Q_16.Q
+Info:  2.0  2.5    Net u_core.debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_1_SD_L6MUX21_Z_1_SD_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_8_S1_L6MUX21_SD_Z[0] (81,13) -> (88,10)
+Info:                Sink u_core.full_product_MULT18X18D_P0.B15
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:18.14-18.23
+Info:  3.9  6.5  Source u_core.full_product_MULT18X18D_P0.P25
+Info:  1.8  8.2    Net u_core.full_product_MULT18X18D_P0_P18[7] (88,10) -> (90,13)
+Info:                Sink u_core.full_product_MULT18X18D_P0_P18_CCU2C_A0_1$CCU2_COMB1.A
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:30.22-30.23
+Info:  0.4  8.7  Source u_core.full_product_MULT18X18D_P0_P18_CCU2C_A0_1$CCU2_COMB1.FCO
+Info:  0.0  8.7    Net u_core.full_product_CCU2C_S0_B0_CCU2C_S0_6_COUT[8] (90,13) -> (90,13)
+Info:                Sink u_core.full_product_MULT18X18D_P0_P18_CCU2C_A0$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:38.23-38.25
+Info:  0.1  8.7  Source u_core.full_product_MULT18X18D_P0_P18_CCU2C_A0$CCU2_COMB0.FCO
+Info:  0.0  8.7    Net u_core.full_product_MULT18X18D_P0_P18_CCU2C_A0$CCU2_FCI_INT (90,13) -> (90,13)
+Info:                Sink u_core.full_product_MULT18X18D_P0_P18_CCU2C_A0$CCU2_COMB1.FCI
+Info:  0.0  8.7  Source u_core.full_product_MULT18X18D_P0_P18_CCU2C_A0$CCU2_COMB1.FCO
+Info:  0.0  8.7    Net u_core.full_product_CCU2C_S0_B0_CCU2C_S0_6_COUT[10] (90,13) -> (90,13)
+Info:                Sink u_core.full_product_MULT18X18D_P0_P18_CCU2C_A0_7$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:38.23-38.25
+Info:  0.4  9.2  Source u_core.full_product_MULT18X18D_P0_P18_CCU2C_A0_7$CCU2_COMB0.F
+Info:  1.6 10.8    Net u_core.full_product_CCU2C_S0_B0[10] (90,13) -> (93,15)
+Info:                Sink u_core.full_product_CCU2C_S0_21$CCU2_COMB0.B
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:148.7-152.6
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:230.32-230.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:34.26-34.27
+Info:  0.4 11.2  Source u_core.full_product_CCU2C_S0_21$CCU2_COMB0.FCO
+Info:  0.0 11.2    Net u_core.full_product_CCU2C_S0_21$CCU2_FCI_INT (93,15) -> (93,15)
+Info:                Sink u_core.full_product_CCU2C_S0_21$CCU2_COMB1.FCI
+Info:  0.0 11.2  Source u_core.full_product_CCU2C_S0_21$CCU2_COMB1.FCO
+Info:  0.0 11.2    Net u_core.full_product_CCU2C_S0_3_COUT[11] (93,15) -> (93,15)
+Info:                Sink u_core.full_product_CCU2C_S0_20$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.3  Source u_core.full_product_CCU2C_S0_20$CCU2_COMB0.FCO
+Info:  0.0 11.3    Net u_core.full_product_CCU2C_S0_20$CCU2_FCI_INT (93,15) -> (93,15)
+Info:                Sink u_core.full_product_CCU2C_S0_20$CCU2_COMB1.FCI
+Info:  0.0 11.3  Source u_core.full_product_CCU2C_S0_20$CCU2_COMB1.FCO
+Info:  0.0 11.3    Net u_core.full_product_CCU2C_S0_3_COUT[13] (93,15) -> (94,15)
+Info:                Sink u_core.full_product_CCU2C_S0_19$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.4  Source u_core.full_product_CCU2C_S0_19$CCU2_COMB0.FCO
+Info:  0.0 11.4    Net u_core.full_product_CCU2C_S0_19$CCU2_FCI_INT (94,15) -> (94,15)
+Info:                Sink u_core.full_product_CCU2C_S0_19$CCU2_COMB1.FCI
+Info:  0.0 11.4  Source u_core.full_product_CCU2C_S0_19$CCU2_COMB1.FCO
+Info:  0.0 11.4    Net u_core.full_product_CCU2C_S0_3_COUT[15] (94,15) -> (94,15)
+Info:                Sink u_core.full_product_CCU2C_S0_18$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.4  Source u_core.full_product_CCU2C_S0_18$CCU2_COMB0.FCO
+Info:  0.0 11.4    Net u_core.full_product_CCU2C_S0_18$CCU2_FCI_INT (94,15) -> (94,15)
+Info:                Sink u_core.full_product_CCU2C_S0_18$CCU2_COMB1.FCI
+Info:  0.0 11.4  Source u_core.full_product_CCU2C_S0_18$CCU2_COMB1.FCO
+Info:  0.0 11.4    Net u_core.full_product_CCU2C_S0_3_COUT[17] (94,15) -> (94,15)
+Info:                Sink u_core.full_product_CCU2C_S0_17$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.5  Source u_core.full_product_CCU2C_S0_17$CCU2_COMB0.FCO
+Info:  0.0 11.5    Net u_core.full_product_CCU2C_S0_17$CCU2_FCI_INT (94,15) -> (94,15)
+Info:                Sink u_core.full_product_CCU2C_S0_17$CCU2_COMB1.FCI
+Info:  0.0 11.5  Source u_core.full_product_CCU2C_S0_17$CCU2_COMB1.FCO
+Info:  0.0 11.5    Net u_core.full_product_CCU2C_S0_3_COUT[19] (94,15) -> (94,15)
+Info:                Sink u_core.full_product_CCU2C_S0_16$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.6  Source u_core.full_product_CCU2C_S0_16$CCU2_COMB0.FCO
+Info:  0.0 11.6    Net u_core.full_product_CCU2C_S0_16$CCU2_FCI_INT (94,15) -> (94,15)
+Info:                Sink u_core.full_product_CCU2C_S0_16$CCU2_COMB1.FCI
+Info:  0.0 11.6  Source u_core.full_product_CCU2C_S0_16$CCU2_COMB1.FCO
+Info:  0.0 11.6    Net u_core.full_product_CCU2C_S0_3_COUT[21] (94,15) -> (95,15)
+Info:                Sink u_core.full_product_CCU2C_S0_15$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.7  Source u_core.full_product_CCU2C_S0_15$CCU2_COMB0.FCO
+Info:  0.0 11.7    Net u_core.full_product_CCU2C_S0_15$CCU2_FCI_INT (95,15) -> (95,15)
+Info:                Sink u_core.full_product_CCU2C_S0_15$CCU2_COMB1.FCI
+Info:  0.0 11.7  Source u_core.full_product_CCU2C_S0_15$CCU2_COMB1.FCO
+Info:  0.0 11.7    Net u_core.full_product_CCU2C_S0_3_COUT[23] (95,15) -> (95,15)
+Info:                Sink u_core.full_product_CCU2C_S0_14$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.7  Source u_core.full_product_CCU2C_S0_14$CCU2_COMB0.FCO
+Info:  0.0 11.7    Net u_core.full_product_CCU2C_S0_14$CCU2_FCI_INT (95,15) -> (95,15)
+Info:                Sink u_core.full_product_CCU2C_S0_14$CCU2_COMB1.FCI
+Info:  0.0 11.7  Source u_core.full_product_CCU2C_S0_14$CCU2_COMB1.FCO
+Info:  0.0 11.7    Net u_core.full_product_CCU2C_S0_3_COUT[25] (95,15) -> (95,15)
+Info:                Sink u_core.full_product_CCU2C_S0_13$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.8  Source u_core.full_product_CCU2C_S0_13$CCU2_COMB0.FCO
+Info:  0.0 11.8    Net u_core.full_product_CCU2C_S0_13$CCU2_FCI_INT (95,15) -> (95,15)
+Info:                Sink u_core.full_product_CCU2C_S0_13$CCU2_COMB1.FCI
+Info:  0.0 11.8  Source u_core.full_product_CCU2C_S0_13$CCU2_COMB1.FCO
+Info:  0.0 11.8    Net u_core.full_product_CCU2C_S0_3_COUT[27] (95,15) -> (95,15)
+Info:                Sink u_core.full_product_CCU2C_S0_12$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.9  Source u_core.full_product_CCU2C_S0_12$CCU2_COMB0.FCO
+Info:  0.0 11.9    Net u_core.full_product_CCU2C_S0_12$CCU2_FCI_INT (95,15) -> (95,15)
+Info:                Sink u_core.full_product_CCU2C_S0_12$CCU2_COMB1.FCI
+Info:  0.0 11.9  Source u_core.full_product_CCU2C_S0_12$CCU2_COMB1.FCO
+Info:  0.0 11.9    Net u_core.full_product_CCU2C_S0_3_COUT[29] (95,15) -> (96,15)
+Info:                Sink u_core.full_product_CCU2C_S0_10$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 11.9  Source u_core.full_product_CCU2C_S0_10$CCU2_COMB0.FCO
+Info:  0.0 11.9    Net u_core.full_product_CCU2C_S0_10$CCU2_FCI_INT (96,15) -> (96,15)
+Info:                Sink u_core.full_product_CCU2C_S0_10$CCU2_COMB1.FCI
+Info:  0.0 11.9  Source u_core.full_product_CCU2C_S0_10$CCU2_COMB1.FCO
+Info:  0.0 11.9    Net u_core.full_product_CCU2C_S0_3_COUT[31] (96,15) -> (96,15)
+Info:                Sink u_core.full_product_CCU2C_S0_9$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 12.0  Source u_core.full_product_CCU2C_S0_9$CCU2_COMB0.FCO
+Info:  0.0 12.0    Net u_core.full_product_CCU2C_S0_9$CCU2_FCI_INT (96,15) -> (96,15)
+Info:                Sink u_core.full_product_CCU2C_S0_9$CCU2_COMB1.FCI
+Info:  0.0 12.0  Source u_core.full_product_CCU2C_S0_9$CCU2_COMB1.FCO
+Info:  0.0 12.0    Net u_core.full_product_CCU2C_S0_3_COUT[33] (96,15) -> (96,15)
+Info:                Sink u_core.full_product_CCU2C_S0_8$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 12.1  Source u_core.full_product_CCU2C_S0_8$CCU2_COMB0.FCO
+Info:  0.0 12.1    Net u_core.full_product_CCU2C_S0_8$CCU2_FCI_INT (96,15) -> (96,15)
+Info:                Sink u_core.full_product_CCU2C_S0_8$CCU2_COMB1.FCI
+Info:  0.0 12.1  Source u_core.full_product_CCU2C_S0_8$CCU2_COMB1.FCO
+Info:  0.0 12.1    Net u_core.full_product_CCU2C_S0_3_COUT[35] (96,15) -> (96,15)
+Info:                Sink u_core.full_product_CCU2C_S0_7$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.30-37.51
+Info:                  /usr/bin/../share/yosys/mul2dsp.v:173.32-173.125
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.4 12.5  Source u_core.full_product_CCU2C_S0_7$CCU2_COMB0.F
+Info:  1.0 13.6    Net u_core.debug_data_LUT4_Z_3_A_LUT4_Z_B_LUT4_Z_A_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_D_LUT4_B_Z_PFUMX_BLUT_Z_LUT4_A_Z_PFUMX_Z_C0_LUT4_Z_A_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_D0_PFUMX_Z_C0_CCU2C_S0_S1_CCU2C_S1_COUT_CCU2C_COUT_3_S0[2] (96,15) -> (99,16)
+Info:                Sink u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.C
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/src/rtl/review_input.sv:37.15-37.27
+Info:  0.4 14.0  Source u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.OFX
+Info:  0.0 14.0    Net u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1 (99,16) -> (99,16)
+Info:                Sink u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.FXB
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:157.54-157.56
+Info:  0.2 14.2  Source u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:  0.0 14.2    Net u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D0 (99,16) -> (99,16)
+Info:                Sink u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.FXA
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:157.66-157.68
+Info:  0.2 14.4  Source u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_SD_L6MUX21_Z_2_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:  1.0 15.5    Net u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_SD[3] (99,16) -> (109,16)
+Info:                Sink u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.D
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 15.7  Source u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.F
+Info:  0.0 15.7    Net u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT (109,16) -> (109,16)
+Info:                Sink u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.F1
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:141.30-141.32
+Info:  0.2 15.9  Source u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.OFX
+Info:  0.0 15.9    Net u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_D1 (109,16) -> (109,16)
+Info:                Sink u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.FXB
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:141.38-141.40
+Info:  0.2 16.1  Source u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:  0.6 16.6    Net u_core.debug_data_LUT4_Z_7_A_LUT4_Z_B[2] (109,16) -> (109,16)
+Info:                Sink u_core.debug_data_LUT4_Z_7_A_LUT4_Z.D
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 16.9  Source u_core.debug_data_LUT4_Z_7_A_LUT4_Z.F
+Info:  1.6 18.5    Net u_core.debug_data_LUT4_Z_7_A[1] (109,16) -> (112,3)
+Info:                Sink u_core.debug_data_LUT4_Z_7_A_LUT4_A.A
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 18.8  Source u_core.debug_data_LUT4_Z_7_A_LUT4_A.F
+Info:  1.0 19.8    Net u_core.debug_data_LUT4_Z_7_A_LUT4_A_Z (112,3) -> (115,4)
+Info:                Sink u_core.register_bank[0]_TRELLIS_FF_Q_9.M
+Info:  0.0 19.8  Setup u_core.register_bank[0]_TRELLIS_FF_Q_9.M
+Info: 9.2 ns logic, 10.6 ns routing
+
+Info: Critical path report for cross-domain path '<async>' -> 'posedge $glbnet$clk$TRELLIS_IO_IN':
+Info: curr total
+Info:  0.0  0.0  Source reset_n$tr_io.O
+Info:  5.3  5.3    Net reset_n$TRELLIS_IO_IN (65,0) -> (115,29)
+Info:                Sink u_core.timer_count_TRELLIS_FF_Q_5_LSR_LUT4_Z.D
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv:5.16-5.23
+Info:  0.2  5.6  Source u_core.timer_count_TRELLIS_FF_Q_5_LSR_LUT4_Z.F
+Info:  0.6  6.2    Net u_core.timer_count_TRELLIS_FF_Q_5_LSR (115,29) -> (115,28)
+Info:                Sink u_core.timer_count_TRELLIS_FF_Q_5.LSR
+Info:  0.4  6.6  Setup u_core.timer_count_TRELLIS_FF_Q_5.LSR
+Info: 0.7 ns logic, 5.9 ns routing
+
+Info: Critical path report for cross-domain path '<async>' -> 'posedge $glbnet$spi_sclk$TRELLIS_IO_IN':
+Info: curr total
+Info:  0.0  0.0  Source spi_cs_n$tr_io.O
+Info:  2.8  2.8    Net spi_cs_n$TRELLIS_IO_IN (87,0) -> (80,26)
+Info:                Sink tx_shift_TRELLIS_FF_Q_LSR_LUT4_Z.C
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv:7.16-7.24
+Info:  0.2  3.0  Source tx_shift_TRELLIS_FF_Q_LSR_LUT4_Z.F
+Info:  0.3  3.4    Net tx_shift_TRELLIS_FF_Q_LSR (80,26) -> (80,26)
+Info:                Sink tx_shift_TRELLIS_FF_Q.LSR
+Info:  0.4  3.8  Setup tx_shift_TRELLIS_FF_Q.LSR
+Info: 0.7 ns logic, 3.1 ns routing
+
+Info: Critical path report for cross-domain path 'posedge $glbnet$clk$TRELLIS_IO_IN' -> '<async>':
+Info: curr total
+Info:  0.5  0.5  Source tx_snapshot_TRELLIS_FF_Q.Q
+Info:  0.5  1.0    Net tx_snapshot[37] (106,26) -> (107,26)
+Info:                Sink spi_miso_LUT4_Z.C
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv:15.37-15.48
+Info:  0.2  1.2  Source spi_miso_LUT4_Z.F
+Info:  1.9  3.1    Net spi_miso$TRELLIS_IO_OUT (107,26) -> (126,26)
+Info:                Sink spi_miso$tr_io.I
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv:9.16-9.24
+Info: 0.8 ns logic, 2.3 ns routing
+
+Info: Critical path report for cross-domain path 'posedge $glbnet$clk$TRELLIS_IO_IN' -> 'posedge $glbnet$spi_sclk$TRELLIS_IO_IN':
+Info: curr total
+Info:  0.5  0.5  Source tx_snapshot_TRELLIS_FF_Q_23.Q
+Info:  1.3  1.9    Net tx_snapshot[14] (92,16) -> (94,11)
+Info:                Sink tx_shift_TRELLIS_FF_Q_23_DI_LUT4_Z.C
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv:15.37-15.48
+Info:  0.2  2.1  Source tx_shift_TRELLIS_FF_Q_23_DI_LUT4_Z.F
+Info:  0.1  2.2    Net tx_shift_TRELLIS_FF_Q_23_DI (94,11) -> (94,11)
+Info:                Sink tx_shift_TRELLIS_FF_Q_23.DI
+Info:  0.0  2.2  Setup tx_shift_TRELLIS_FF_Q_23.DI
+Info: 0.8 ns logic, 1.5 ns routing
+
+Info: Critical path report for cross-domain path 'posedge $glbnet$spi_sclk$TRELLIS_IO_IN' -> '<async>':
+Info: curr total
+Info:  0.5  0.5  Source spi_active_TRELLIS_FF_Q.Q
+Info:  2.6  3.2    Net spi_active (90,16) -> (107,26)
+Info:                Sink spi_miso_LUT4_Z.D
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv:16.9-16.19
+Info:  0.2  3.4  Source spi_miso_LUT4_Z.F
+Info:  1.9  5.3    Net spi_miso$TRELLIS_IO_OUT (107,26) -> (126,26)
+Info:                Sink spi_miso$tr_io.I
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv:9.16-9.24
+Info: 0.8 ns logic, 4.5 ns routing
+
+Info: Critical path report for cross-domain path 'posedge $glbnet$spi_sclk$TRELLIS_IO_IN' -> 'posedge $glbnet$clk$TRELLIS_IO_IN':
+Info: curr total
+Info:  0.5  0.5  Source rx_shift_TRELLIS_FF_Q_37.Q
+Info:  1.3  1.8    Net rx_shift[4] (92,8) -> (91,13)
+Info:                Sink rx_active_TRELLIS_FF_Q_35.M
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/b0d5d878-2439-4037-8b8d-844b7f66f3cc/fpga/target_explorer/interface_adapter/minirv_edge_controller_spi_fpga_top.sv:14.26-14.34
+Info:  0.0  1.8  Setup rx_active_TRELLIS_FF_Q_35.M
+Info: 0.5 ns logic, 1.3 ns routing
+
+Info: Max frequency for clock '$glbnet$spi_sclk$TRELLIS_IO_IN': 286.04 MHz (PASS at 75.00 MHz)
+Warning: Max frequency for clock      '$glbnet$clk$TRELLIS_IO_IN': 50.63 MHz (FAIL at 75.00 MHz)
+
+Info: Max delay <async>                                -> posedge $glbnet$clk$TRELLIS_IO_IN     : 6.59 ns
+Info: Max delay <async>                                -> posedge $glbnet$spi_sclk$TRELLIS_IO_IN: 3.79 ns
+Info: Max delay posedge $glbnet$clk$TRELLIS_IO_IN      -> <async>                               : 3.09 ns
+Info: Max delay posedge $glbnet$clk$TRELLIS_IO_IN      -> posedge $glbnet$spi_sclk$TRELLIS_IO_IN: 2.23 ns
+Info: Max delay posedge $glbnet$spi_sclk$TRELLIS_IO_IN -> <async>                               : 5.26 ns
+Info: Max delay posedge $glbnet$spi_sclk$TRELLIS_IO_IN -> posedge $glbnet$clk$TRELLIS_IO_IN     : 1.79 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 5 endpoint(s)
+Info:          + represents [1,5) endpoint(s)
+Info: [ -6417,  -5476) |****************+
+Info: [ -5476,  -4535) |**********************************************+
+Info: [ -4535,  -3594) |*******************************+
+Info: [ -3594,  -2653) |*****+
+Info: [ -2653,  -1712) | 
+Info: [ -1712,   -771) | 
+Info: [  -771,    170) |***+
+Info: [   170,   1111) |****+
+Info: [  1111,   2052) |***+
+Info: [  2052,   2993) |**+
+Info: [  2993,   3934) |+
+Info: [  3934,   4875) |***********+
+Info: [  4875,   5816) |************************************************************ 
+Info: [  5816,   6757) |*******************************+
+Info: [  6757,   7698) |**+
+Info: [  7698,   8639) |*******+
+Info: [  8639,   9580) |*******************+
+Info: [  9580,  10521) |****************+
+Info: [ 10521,  11462) |**************+
+Info: [ 11462,  12403) |*********+
+1 warning, 0 errors
+
+Info: Program finished normally.

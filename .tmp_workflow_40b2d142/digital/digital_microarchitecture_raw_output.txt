@@ -1,0 +1,132 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Synchronous top-level FPGA RTL wrapper that instantiates the defined control, protocol, safety, watchdog, command, and telemetry submodules and wires them with simple control/status interconnects. The top owns the external streaming and register interfaces and performs no surrogate inference internally.",
+      "control_strategy": "Use the register file to capture enable, soft reset, mode, sequence seed, timeout, clamp bounds, velocity setpoint, and fallback selection. Gate request emission with enable and blocking-fault status, accept only validated and fresh responses, and route validated intent through safety supervision before command shaping.",
+      "state_strategy": "Keep only compact controller state: configuration registers, outstanding request tracking, timeout age, freshness/fault indicators, fallback status, and last-safe command state. On reset enter safe fallback, clear outstanding transaction context, and suppress non-conservative actuator behavior.",
+      "output_strategy": "Drive the outbound request stream, inbound response ready, register readback, 32-bit actuator command, and fault/status outputs from the child blocks. The top-level output behavior remains deterministic and conservative under reset, disable, malformed data, stale/late responses, or timeout.",
+      "ownership_notes": [
+        "Owns the top-level external pins and integration of all child blocks.",
+        "Must not expose raw tensors, flow fields, surface pressure grids, geometry arrays, or raw STL data.",
+        "Must not rename modules, ports, or filenames.",
+        "rtl_output_file is adaptive_aero_control_top.v."
+      ]
+    },
+    {
+      "name": "aero_regfile_mmio",
+      "implementation_style": "Compact register-window decode and readback block implemented with standard RTL flops and decode logic. The register map is bounded and host-facing only, with no payload storage beyond configuration and status words.",
+      "control_strategy": "Accept reg_valid/reg_we/reg_addr/reg_wdata transactions, update writable configuration registers on valid writes, and return compact readback words for configuration and status. Use soft reset and safe defaults to force conservative controller behavior.",
+      "state_strategy": "Store enable, soft reset, mode select, request-sequence seed, stream velocity setpoint, timeout threshold, actuator min/max clamp values, and safe-fallback selection. Maintain only register-state and simple readback composition logic.",
+      "output_strategy": "Drive semantic configuration outputs to downstream modules and return reg_rdata/reg_rvalid for host reads. Readback should reflect safe defaults after reset and current controller status via status_word and fault flags.",
+      "ownership_notes": [
+        "Owns the compact control/status register file and decode semantics.",
+        "Does not own streaming request/response or actuator command paths.",
+        "Register transport remains within a 64-bit-per-transaction semantic footprint.",
+        "rtl_output_file is aero_regfile_mmio.v."
+      ]
+    },
+    {
+      "name": "aero_request_packetizer",
+      "implementation_style": "Single-transaction outbound packet formatter with handshake gating. The block is a simple request encoder rather than a protocol FSM, using deterministic field packing into 128-bit request words.",
+      "control_strategy": "Emit a request only when enabled, no blocking fault is active, and req_ready is asserted. Advance or seed the request sequence deterministically on successful emission and hold off otherwise.",
+      "state_strategy": "Track the outstanding sequence identifier and any minimal internal issuance state needed to keep request encoding deterministic across stalls. Do not retain raw model or physics payloads.",
+      "output_strategy": "Drive req_valid and req_data with compact request content including sequence, mode, bounded geometry reference token, and velocity/setpoint context. Keep req_valid low during reset, disable, or blocking fault conditions.",
+      "ownership_notes": [
+        "Owns request packet construction and request issuance indication.",
+        "Must carry only bounded geometry reference information, not raw STL.",
+        "Does not own response acceptance or command generation.",
+        "rtl_output_file is aero_request_packetizer.v."
+      ]
+    },
+    {
+      "name": "aero_response_depacketizer",
+      "implementation_style": "Compact response parser and format checker that validates inbound 128-bit responses and extracts only control-relevant fields. The block avoids any dependence on full physics payloads.",
+      "control_strategy": "Accept and parse responses when rsp_valid is asserted and the packet header/format is acceptable. Reject malformed packets and expose only validated, compact estimates and metadata.",
+      "state_strategy": "Keep minimal response parse/acceptance state for current-cycle validation and extraction. No bulk buffering is implied by the interface description.",
+      "output_strategy": "Drive rsp_ready, response_valid, response_seq, drag_estimate, lift_estimate, freshness_meta, payload_malformed, and payload_fresh. Only fresh, format-valid responses are forwarded for downstream acceptance.",
+      "ownership_notes": [
+        "Owns response format checking and compact extraction.",
+        "Does not require surface-pressure or flow-field payloads.",
+        "Does not own sequence watchdog or safety policy.",
+        "rtl_output_file is aero_response_depacketizer.v."
+      ]
+    },
+    {
+      "name": "aero_sequence_watchdog",
+      "implementation_style": "Small synchronous monitor that correlates the outstanding request sequence with inbound responses and tracks age toward timeout. The logic is intentionally simple and deterministic.",
+      "control_strategy": "Start age tracking on request_issued, compare response_seq against outstanding_seq, require payload_fresh for acceptance, and assert blocking fault on timeout or any sequence/freshness violation.",
+      "state_strategy": "Maintain outstanding request sequence, response age counter, accepted sequence, and sticky fault indicators for stale, timeout, duplicate, replay, and mismatch conditions. No FIFO or payload history arrays are implied.",
+      "output_strategy": "Drive blocking_fault and the sequence/freshness fault flags, plus accepted_seq and response_age for telemetry and register readback support.",
+      "ownership_notes": [
+        "Owns freshness, duplication, replay, mismatch, and timeout monitoring.",
+        "Supplies blocking-fault gating for request and safety paths.",
+        "Does not own actuator command logic or register decode.",
+        "rtl_output_file is aero_sequence_watchdog.v."
+      ]
+    },
+    {
+      "name": "aero_safety_supervisor",
+      "implementation_style": "Conservative safety filter that converts validated response estimates into a bounded actuator intent. It favors deterministic fallback and simple clamping over aggressive control.",
+      "control_strategy": "If enabled and the response is valid and not blocked, generate a safe intent from compact estimates; otherwise select fallback behavior. Clamp or reject unsafe intents against configured actuator limits and known-safe envelope logic.",
+      "state_strategy": "Retain only minimal safe-intent and fallback-related state needed to support deterministic behavior and optional hold-last-safe behavior, as selected by configuration.",
+      "output_strategy": "Drive safe_intent and valid_intent when control is acceptable, otherwise assert fallback_active and invalid_payload_fault/disable_state as appropriate. Clamp_event should reflect any bound enforcement.",
+      "ownership_notes": [
+        "Owns the validated-to-safe-intent transformation.",
+        "Does not own final command encoding or transport interfaces.",
+        "Must not rely on raw tensors or full flow fields.",
+        "rtl_output_file is aero_safety_supervisor.v."
+      ]
+    },
+    {
+      "name": "aero_actuator_command_shaper",
+      "implementation_style": "Bounded final command formatter with optional slew/rate limiting and conservative fallback output. The implementation is intended to be straightforward and FPGA-friendly.",
+      "control_strategy": "Map safe_intent to a compact 32-bit actuator command only when valid_intent is asserted and fallback is inactive. Otherwise output a deterministic conservative command or hold-last-safe behavior per configuration.",
+      "state_strategy": "Keep last_safe_cmd and minimal shaping state for slew limiting or command holding. Clamp the shaped command to configured min/max bounds before output.",
+      "output_strategy": "Drive act_cmd_valid and act_cmd_data as the final actuator command interface, and expose last_safe_cmd, slew_limited, and clamped_cmd for observability.",
+      "ownership_notes": [
+        "Owns the final actuator command word and safe-command state.",
+        "Does not own request/response handling or telemetry aggregation.",
+        "rtl_output_file is aero_actuator_command_shaper.v."
+      ]
+    },
+    {
+      "name": "aero_status_telemetry",
+      "implementation_style": "Sticky fault and status aggregation block using compact synchronous logic. It combines health indicators from the watchdog and safety path into host-readable outputs.",
+      "control_strategy": "Consolidate stale, timeout, invalid-payload, clamp, fallback-active, and disable-state indications into a readable fault/status summary. Present a single fault_valid when any blocking or sticky condition is active.",
+      "state_strategy": "Maintain sticky fault visibility and status summarization state only; do not retain any bulk history or payload data.",
+      "output_strategy": "Drive status_word, fault_valid, fault_code, fault_flags, and sticky_fault_summary for host software and register readback.",
+      "ownership_notes": [
+        "Owns the consolidated telemetry outputs.",
+        "Feeds register readback status but does not own register decode.",
+        "rtl_output_file is aero_status_telemetry.v."
+      ]
+    }
+  ],
+  "fsm_intent": [],
+  "datapath_intent": [],
+  "sequencing_notes": [
+    "All sequential behavior is synchronous to clk with active-low reset_n.",
+    "On reset, the controller clears outstanding transaction state, invalidates pending responses, zeroes age counters, and enters safe fallback.",
+    "A request may be emitted only when cfg_enable is asserted, blocking_fault is low, and req_ready indicates transport availability.",
+    "Every accepted request starts the timeout watchdog and establishes a new outstanding sequence context.",
+    "A response is accepted only if it is format-valid, sequence-matching, fresh, and non-duplicate/non-replayed.",
+    "Stale, late, duplicate, replayed, malformed, or mismatched responses are rejected and reflected in sticky fault reporting.",
+    "The command path shall not produce a non-conservative actuator command until a fresh validated response has been accepted and safety supervision has approved the intent."
+  ],
+  "timing_notes": [
+    "The design is intended to be fully synthesizable on FPGA using standard RTL constructs only.",
+    "No complex FSM is implied beyond simple handshake, validation, and timeout sequencing.",
+    "Timeout is counted in clock cycles or equivalent timebase ticks from request issuance until valid response acceptance.",
+    "Register-window transactions remain compact and bounded to 32-bit address/data semantics with no more than 64 bits of transaction transport semantics.",
+    "Bulk payload/history/FIFO storage, if ever needed by implementation, must be described through a technology-neutral memory wrapper that maps to native block RAM rather than flattened registers.",
+    "The design should preserve deterministic behavior over throughput or control aggressiveness."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

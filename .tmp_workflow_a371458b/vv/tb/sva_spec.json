@@ -1,0 +1,7 @@
+{
+  "top_module": "pwm_fpga_demo",
+  "soc_mode": false,
+  "clock_names": [],
+  "reset_signals": [],
+  "ports": []
+}

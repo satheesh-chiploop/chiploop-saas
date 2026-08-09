@@ -1,0 +1,35 @@
+{
+  "advisories": [
+    "No reset signal detected by heuristic. Consider providing explicit reset intent in spec."
+  ],
+  "agent": "FPGA Constraint and CDC/RDC Signoff Agent",
+  "cdc_rdc_findings": [
+    {
+      "msg": "No reset signal detected by heuristic. Consider providing explicit reset intent in spec.",
+      "severity": "warning",
+      "source": "rdc",
+      "type": "no_reset_detected"
+    }
+  ],
+  "constraint_format": "pcf",
+  "constraint_path": "/root/chiploop-backend/backend/workflows/a371458b-e094-4745-8b94-94125198585e/fpga/constraints/pwm_fpga_demo.pcf",
+  "detected_async_resets": [],
+  "detected_clocks": [
+    "clk"
+  ],
+  "enabled": true,
+  "errors": [],
+  "required": true,
+  "rtl_file_count": 1,
+  "signoff": {
+    "all_clocks_defined": true,
+    "all_top_level_ports_constrained": true,
+    "cdc_rdc_review_complete": true
+  },
+  "status": "pass",
+  "target_frequency_mhz": 12.0,
+  "tool": "ChipLoop structural RTL/constraint analysis",
+  "unconstrained_ports": [],
+  "unsafe_crossing_count": 0,
+  "warnings": []
+}

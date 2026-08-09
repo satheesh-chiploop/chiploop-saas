@@ -1,8 +1,0 @@
-{
-  "workflow_id": "0f32cf12-a986-4392-a158-d858b28a166a",
-  "workflow_dir": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a",
-  "digital_spec_json": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/spec/adaptive_aero_control_top_spec.json",
-  "spec_json": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/spec/adaptive_aero_control_top_spec.json",
-  "digital_spec_json_exists": true,
-  "spec_json_exists": true
-}

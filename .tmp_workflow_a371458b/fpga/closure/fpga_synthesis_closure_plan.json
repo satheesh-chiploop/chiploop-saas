@@ -1,0 +1,12 @@
+{
+  "actions": [],
+  "agent": "FPGA Synthesis Closure Agent",
+  "closure_complete": true,
+  "iteration": 0,
+  "selected_restart_stage": null,
+  "settings_for_next_iteration": {
+    "fpga_yosys_flatten": false
+  },
+  "status": "clean",
+  "synthesis_status": "completed"
+}
