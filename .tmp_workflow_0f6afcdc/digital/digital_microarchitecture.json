@@ -1,0 +1,70 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_regfile",
+      "implementation_style": "Compact FPGA-friendly register window with synchronous decode and stateful configuration flops; no bulk geometry or tensor storage.",
+      "control_strategy": "Decode software writes into stable configuration and control strobes; expose status and latest command snapshot for readback; use explicit status-clear and issue-request controls.",
+      "state_strategy": "Store only scalar configuration, metadata tokens, and telemetry-related controls in flops; geometry remains an external descriptor/token rather than an on-chip model.",
+      "output_strategy": "Drive configuration outputs, read data, issue/status strobes, and metadata descriptors used by downstream request packaging and safety logic.",
+      "ownership_notes": [
+        "Owns the software-visible control-plane state for enable, soft reset, pipelined mode, sequence seed, timeout thresholds, actuator bounds, fallback command, stream velocity, flow-condition metadata, geometry metadata, status clear, and issue-request strobes.",
+        "Readback is limited to compact register-window data and command/status snapshots; no tensor, mesh, or flow-field content is stored or exposed."
+      ]
+    },
+    {
+      "name": "adaptive_aero_request_packager",
+      "implementation_style": "Fixed-width transport composer that concatenates control metadata into a 128-bit request word.",
+      "control_strategy": "Launch a request only when enabled, explicitly issued, and not blocked by outstanding inflight state in default single-transaction mode; hold payload stable until handshake acceptance.",
+      "state_strategy": "Maintain only request-launch hold, transaction/sequence bookkeeping, and inflight control; no deep buffering or payload memory.",
+      "output_strategy": "Present req_data and req_valid as a bounded valid/ready stream toward the external worker; keep the packet stable while req_valid is asserted and req_ready is low.",
+      "ownership_notes": [
+        "Owns outbound request composition and launch arbitration.",
+        "Carries transaction ID, sequence counter, configuration snapshot, flow-condition fields, and a compact geometry token/descriptor only; it does not interpret geometry or compute physics."
+      ]
+    },
+    {
+      "name": "adaptive_aero_response_validator",
+      "implementation_style": "Lightweight inbound checker with identity, freshness, and enable/model gating; accepts only matching responses.",
+      "control_strategy": "Compare response transaction ID and sequence against the outstanding request, then apply watchdog timeout and response-age checks before allowing acceptance.",
+      "state_strategy": "Retain only minimal control-oriented watchdog/acceptance context; do not buffer full responses beyond what is needed to qualify acceptance.",
+      "output_strategy": "Assert acceptance and forward accepted_model_data only for valid, matching, non-stale responses; otherwise raise validation, stale, or timeout indicators and keep the safe path unchanged.",
+      "ownership_notes": [
+        "Owns response qualification, rejection, and acceptance indicators.",
+        "Acts only as a gate for model-present/model-enabled and freshness constraints; it does not perform model interpretation or physics computation."
+      ]
+    },
+    {
+      "name": "adaptive_aero_command_mapper",
+      "implementation_style": "Abstract fixed-width command translator from accepted model output to a 32-bit actuator command word.",
+      "control_strategy": "Use configuration-driven mapping rules that are agnostic to actuator type and mechanical package; provide a valid mapped command only when a response has been accepted.",
+      "state_strategy": "Keep mapping state minimal and synchronous; no geometry, tensor, or surrogate computation state is retained.",
+      "output_strategy": "Produce mapped_cmd and mapped_cmd_valid for downstream safety gating; the command encoding is left to software/integration definition.",
+      "ownership_notes": [
+        "Owns the abstract translation from accepted model output fields to a deterministic 32-bit command word.",
+        "Does not hardcode spoiler/flap/grille/diffuser semantics beyond software-defined encoding."
+      ]
+    },
+    {
+      "name": "adaptive_aero_safety_gate",
+      "implementation_style": "Final bounded-output authority that clamps commands, applies fallback policy, and aggregates telemetry.",
+      "control_strategy": "Select fallback whenever validation fails, timeout occurs, enable is deasserted, or stale data is detected; otherwise pass the mapped command through min/max saturation logic.",
+      "state_strategy": "Hold only status and fallback/saturation latches needed for software-visible telemetry and deterministic safe behavior; reset returns to fallback-active state.",
+      "output_strategy": "Drive act_cmd, act_cmd_valid, and a 32-bit status word; clamp to configured bounds before output and assert saturation when limiting occurs.",
+      "ownership_notes": [
+        "Owns the final actuator command validity and safety policy.",
+        "Publishes busy, ready-for-request, response-pending, response-accepted, validation-failed, stale-rejected, timeout, saturation, fallback-active, and enable status bits."
+      ]
+    }
+  ],
+  "fsm_intent": [],
+  "datapath_intent": [],
+  "sequencing_notes": [],
+  "timing_notes": [],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

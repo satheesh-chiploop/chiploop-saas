@@ -1,0 +1,1363 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level synthesizable control and transport block that exposes a compact register window and one bounded request/response path to an external DoMINO worker. It composes outbound requests, validates inbound responses, enforces timeout and age limits, clamps actuator commands, and drives deterministic fallback behavior on invalid or stale outcomes.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "reg_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "reg_wdata",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "reg_rdata",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "reg_wr_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reg_rd_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rsp_data",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rsp_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "act_cmd",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "act_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status",
+          "direction": "output",
+          "width": 32
+        }
+      ],
+      "functionality": "Implements the complete control contract for external aero-model offload. The top-level accepts register writes and reads, maintains configuration state, packages requests containing transaction ID, sequence counter, control snapshot, flow-condition fields, and geometry descriptor token, and presents the request on a bounded valid/ready streaming path. It accepts only matching responses with correct transaction ID and sequence, rejects malformed or stale data, and enforces watchdog and response-age checks. Accepted model results are mapped to a 32-bit actuator command word and clamped to configured minimum and maximum bounds. Invalid, late, unexpected, disabled, or timed-out transactions force deterministic fallback command behavior until a fresh valid response is accepted. Status telemetry reports busy, ready-for-request, response-pending, response-accepted, validation-failed, stale-rejected, timeout, saturation, fallback-active, and enable bits, along with related control health indicators.",
+      "responsibilities": [
+        "Expose a compact register window for session setup, metadata configuration, thresholds, command bounds, and fault control.",
+        "Compose outbound 128-bit request packets with fixed-width encoding defined by integration software.",
+        "Hold req_data stable until req_ready is observed.",
+        "Prevent a second request from launching while one is outstanding unless pipelined mode is enabled.",
+        "Validate response transaction identity and sequence against the outstanding request.",
+        "Discard invalid, malformed, late, stale, or unexpected responses without disturbing the safe command path.",
+        "Start and manage the watchdog timer on request issue.",
+        "Implement response-age limit checking independent of the base timeout.",
+        "Transform accepted model output fields into a deterministic 32-bit actuator command.",
+        "Clamp actuator commands to configured min/max bounds and assert saturation status when limiting occurs.",
+        "Drive fallback command behavior deterministically when validation fails, timeout expires, enable is deasserted, or stale response is detected.",
+        "Provide synthesized status telemetry suitable for host software monitoring and fault clearing.",
+        "Avoid all geometry, flow-field, tensor, and surrogate physics computation in RTL."
+      ],
+      "must_drive": [
+        "req_data",
+        "req_valid",
+        "rsp_ready",
+        "act_cmd",
+        "act_cmd_valid",
+        "status",
+        "reg_rdata"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "reg_addr",
+        "reg_wdata",
+        "reg_wr_en",
+        "reg_rd_en",
+        "req_ready",
+        "rsp_data",
+        "rsp_valid"
+      ],
+      "must_not_drive": [
+        "req_ready",
+        "rsp_data",
+        "rsp_valid",
+        "clk",
+        "rst_n",
+        "reg_addr",
+        "reg_wdata",
+        "reg_wr_en",
+        "reg_rd_en"
+      ],
+      "reset_behavior": "On rst_n deassertion, the top-level enters safe fallback state, clears outstanding request state, clears timeout, stale, validation-failed, and saturation flags, deasserts act_cmd_valid, deasserts req_valid, asserts fallback-active status, and keeps the command path disabled until enable is configured and a valid command is available.",
+      "behavior_rules": [
+        "Default operation is single-outstanding-transaction mode; a second request must not issue until the current transaction is accepted or explicitly permitted by pipelined mode register control.",
+        "req_valid may assert only when a request is fully composed, the module is enabled, no blocking fault is active, and the external bridge is available or the request can be safely held stable.",
+        "Outbound request payload must include transaction ID, sequence counter, configuration snapshot, flow-condition values, and a compact geometry descriptor or token.",
+        "The request payload encoding is fixed-width and software-defined; the RTL shall not interpret geometry content beyond handling its token fields.",
+        "rsp_data is accepted only when rsp_valid is asserted, the transaction ID matches, the sequence matches, and the response has not exceeded either the base timeout or the response age limit.",
+        "Any invalid, malformed, unexpected, stale, or late response must be discarded without changing the current safe command path.",
+        "A response that fails validation must set validation-failed or stale-rejected status bits as applicable.",
+        "Watchdog timer counting begins on request issue and ends only on valid matching response acceptance or timeout.",
+        "On timeout, mark timeout status, discard later responses for that transaction, and force fallback command output until a fresh valid response is accepted.",
+        "Command mapping must remain abstract and configuration-driven, supporting actuator word encodings for spoiler, flap, grille shutter, diffuser, or other aero actuators without hardcoding a mechanical package.",
+        "Before act_cmd is presented, clamp to configured minimum and maximum actuator command bounds and assert saturation status when clipping occurs.",
+        "Fallback command remains active until a fresh valid response is accepted and mapped to a command that passes all safety checks.",
+        "Status output must include busy, ready-for-request, response-pending, response-accepted, validation-failed, stale-rejected, timeout, saturation, fallback-active, and enable bits."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_control_regfile",
+        "description": "Register-window and configuration decoder. Provides the compact software-visible control and telemetry map for enable, soft reset, sequence seed, request timeout threshold, command bounds, fallback command, stream velocity setpoint, flow-condition metadata, response age limit, status clear controls, and session metadata fields including geometry format and geometry source descriptors.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "reg_addr",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "reg_wdata",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "reg_wr_en",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reg_rd_en",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reg_rdata",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_soft_reset",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_pipelined_mode",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_seq_seed",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_request_timeout",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_response_age_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_max_act_cmd",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_min_act_cmd",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_fallback_cmd",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_stream_velocity_mps",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_flow_condition",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_geometry_format",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_geometry_source",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_geom_token",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_status_clear",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_issue_request",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_in",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "command_in",
+            "direction": "input",
+            "width": 32
+          }
+        ],
+        "functionality": "Implements the control-plane register file and configuration snapshot source for the top-level. Decodes software writes, exposes readable telemetry, and holds all configuration values needed by the request packager, validator, command mapper, and safety gate. It keeps the geometry as a metadata/token handle rather than on-chip geometry storage and supports explicit status clearing and request issuance control.",
+        "responsibilities": [
+          "Decode register writes and produce stable configuration outputs.",
+          "Expose enable, soft reset, pipelined mode, sequence seed, timeout threshold, response age limit, actuator limits, fallback command, stream velocity, flow-condition metadata, geometry format, geometry source, and geometry token fields.",
+          "Provide software-readable status and latest accepted command snapshot via register read path.",
+          "Generate explicit status-clear and issue-request control strobes.",
+          "Treat geometry as external metadata/token rather than an on-chip geometry array.",
+          "Support supplied reference metadata values for stream_velocity_mps=38.89, geometry_format=STL, and geometry_source=DrivAerML reference geometry."
+        ],
+        "must_drive": [
+          "cfg_enable",
+          "cfg_soft_reset",
+          "cfg_pipelined_mode",
+          "cfg_seq_seed",
+          "cfg_request_timeout",
+          "cfg_response_age_limit",
+          "cfg_max_act_cmd",
+          "cfg_min_act_cmd",
+          "cfg_fallback_cmd",
+          "cfg_stream_velocity_mps",
+          "cfg_flow_condition",
+          "cfg_geometry_format",
+          "cfg_geometry_source",
+          "cfg_geom_token",
+          "cfg_status_clear",
+          "cfg_issue_request",
+          "reg_rdata"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "reg_addr",
+          "reg_wdata",
+          "reg_wr_en",
+          "reg_rd_en",
+          "status_in",
+          "command_in"
+        ],
+        "must_not_drive": [
+          "clk",
+          "rst_n",
+          "reg_addr",
+          "reg_wdata",
+          "reg_wr_en",
+          "reg_rd_en",
+          "status_in",
+          "command_in"
+        ],
+        "reset_behavior": "On reset, clears configuration strobes, initializes outputs to safe defaults, deasserts cfg_enable and cfg_issue_request, and returns read data to a defined reset value. Status-related writes may clear latched faults when commanded after reset release.",
+        "behavior_rules": [
+          "All configuration outputs must be fixed-width and stable between register writes.",
+          "Register decoding must remain compact and synthesizable.",
+          "The readback path shall not expose any tensor, geometry mesh, or flow-field content.",
+          "cfg_geom_token and related metadata are control-plane descriptors only and shall not imply on-chip geometry storage.",
+          "status_in and command_in are snapshot inputs from the top-level control datapath for software observability."
+        ],
+        "rtl_output_file": "adaptive_aero_control_regfile.v"
+      },
+      {
+        "name": "adaptive_aero_request_packager",
+        "description": "Outbound request composer for the external GPU/NIM worker. Constructs a fixed-width 128-bit request packet containing transaction ID, sequence counter, configuration snapshot, flow-condition values, and a compact geometry descriptor or memory token. Holds request data stable until accepted by the downstream bridge.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_pipelined_mode",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_seq_seed",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_stream_velocity_mps",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_flow_condition",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_geometry_format",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_geometry_source",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_geom_token",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "issue_request",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "transaction_id_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "sequence_counter_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "request_inflight",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_data",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "request_issued",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Packages outbound offload requests and arbitrates request launch based on enable, issue control, inflight status, and bridge availability. It must keep the request payload stable while req_valid is asserted and req_ready is low. It does not interpret or compute aero physics; it only concatenates configured fields into the agreed request format.",
+        "responsibilities": [
+          "Compose the 128-bit outbound request packet.",
+          "Include transaction ID, sequence counter, configuration snapshot, flow-condition values, geometry metadata, and geometry token fields.",
+          "Assert req_valid only when a request is ready and the external bridge is available.",
+          "Hold req_data stable until req_ready is observed.",
+          "Do not launch a second request while one is outstanding in default single-outstanding mode.",
+          "Support pipelined mode only when explicitly enabled by configuration."
+        ],
+        "must_drive": [
+          "req_data",
+          "req_valid",
+          "request_issued"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_enable",
+          "cfg_pipelined_mode",
+          "cfg_seq_seed",
+          "cfg_stream_velocity_mps",
+          "cfg_flow_condition",
+          "cfg_geometry_format",
+          "cfg_geometry_source",
+          "cfg_geom_token",
+          "req_ready",
+          "issue_request",
+          "transaction_id_in",
+          "sequence_counter_in",
+          "request_inflight"
+        ],
+        "must_not_drive": [
+          "clk",
+          "rst_n",
+          "cfg_enable",
+          "cfg_pipelined_mode",
+          "cfg_seq_seed",
+          "cfg_stream_velocity_mps",
+          "cfg_flow_condition",
+          "cfg_geometry_format",
+          "cfg_geometry_source",
+          "cfg_geom_token",
+          "req_ready",
+          "issue_request",
+          "transaction_id_in",
+          "sequence_counter_in",
+          "request_inflight"
+        ],
+        "reset_behavior": "On reset, deasserts req_valid and request_issued, clears any internal launch hold, and returns request output to a deterministic idle state.",
+        "behavior_rules": [
+          "The request format is fixed-width and implementation-defined by integration software.",
+          "Payload contents are metadata/control descriptors only and must not include raw geometry storage or tensor data.",
+          "Request generation must be deterministic for a given configuration snapshot and sequence state.",
+          "The request remains asserted until accepted by req_ready."
+        ],
+        "rtl_output_file": "adaptive_aero_request_packager.v"
+      },
+      {
+        "name": "adaptive_aero_response_validator",
+        "description": "Inbound response checking and acceptance stage. Verifies that each response is associated with the outstanding transaction by matching transaction ID and sequence, checks timeout and response-age constraints, and only forwards accepted model outputs to the command mapping path. Late, stale, malformed, or unexpected responses are rejected without disturbing the safe command path.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "rsp_data",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "transaction_id_expected",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "sequence_counter_expected",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "watchdog_count",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_request_timeout",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_response_age_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_present",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "accepted",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "validation_failed",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "stale_rejected",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "timeout_hit",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "accepted_model_data",
+            "direction": "output",
+            "width": 128
+          }
+        ],
+        "functionality": "Evaluates inbound model response validity against the outstanding transaction identity, configuration, watchdog, and response age constraints. It gates acceptance to the command mapper only when the model is present and enabled, and otherwise flags invalid, stale, or timed-out responses while keeping the safe command path unchanged.",
+        "responsibilities": [
+          "Compare response transaction ID and sequence with the outstanding request.",
+          "Reject responses that arrive after timeout or beyond the response age limit.",
+          "Gate acceptance on model-present and model-enabled status bits.",
+          "Preserve safe fallback behavior when validation fails.",
+          "Emit explicit validation-failed, stale-rejected, and timeout-hit indicators.",
+          "Provide accepted model response data only when the response passes all checks."
+        ],
+        "must_drive": [
+          "rsp_ready",
+          "accepted",
+          "validation_failed",
+          "stale_rejected",
+          "timeout_hit",
+          "accepted_model_data"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "rsp_data",
+          "rsp_valid",
+          "transaction_id_expected",
+          "sequence_counter_expected",
+          "watchdog_count",
+          "cfg_request_timeout",
+          "cfg_response_age_limit",
+          "cfg_enable",
+          "model_present"
+        ],
+        "must_not_drive": [
+          "clk",
+          "rst_n",
+          "rsp_data",
+          "rsp_valid",
+          "transaction_id_expected",
+          "sequence_counter_expected",
+          "watchdog_count",
+          "cfg_request_timeout",
+          "cfg_response_age_limit",
+          "cfg_enable",
+          "model_present"
+        ],
+        "reset_behavior": "On reset, deasserts acceptance and all error flags, asserts a ready-to-receive idle stance only as permitted by the top-level, and clears any retained response state.",
+        "behavior_rules": [
+          "Only valid, matching, non-stale responses may be accepted.",
+          "Late or stale responses must be discarded without affecting act_cmd output selection.",
+          "Validation failure must not directly alter the actuator output except by forcing the fallback path through the top-level safety gate.",
+          "The accepted_model_data output is a forwarding path for model output fields, not a physics computation."
+        ],
+        "rtl_output_file": "adaptive_aero_response_validator.v"
+      },
+      {
+        "name": "adaptive_aero_command_mapper",
+        "description": "Abstract command mapping stage that converts accepted model output fields into a deterministic 32-bit actuator command word. The mapping is configuration-driven and agnostic to the specific mechanical aero package; it supports software-defined encodings for spoiler, flap, grille shutter, diffuser, or other actuator sets.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "accepted",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "accepted_model_data",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "cfg_max_act_cmd",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_min_act_cmd",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_fallback_cmd",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "mapped_cmd",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "mapped_cmd_valid",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Transforms accepted model outputs into a deterministic actuator command word using integration-defined encoding rules. It does not assume a specific actuator topology, geometry, or physics model. The command produced here is later bounded by the safety gate before being presented as an actuator output.",
+        "responsibilities": [
+          "Convert accepted model output fields into a 32-bit command word.",
+          "Remain abstract and configuration-driven.",
+          "Avoid any physics surrogate or geometry inference in RTL.",
+          "Provide a valid mapped command only when input response acceptance is asserted."
+        ],
+        "must_drive": [
+          "mapped_cmd",
+          "mapped_cmd_valid"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "accepted",
+          "accepted_model_data",
+          "cfg_max_act_cmd",
+          "cfg_min_act_cmd",
+          "cfg_fallback_cmd"
+        ],
+        "must_not_drive": [
+          "clk",
+          "rst_n",
+          "accepted",
+          "accepted_model_data",
+          "cfg_max_act_cmd",
+          "cfg_min_act_cmd",
+          "cfg_fallback_cmd"
+        ],
+        "reset_behavior": "On reset, clears mapped command state and deasserts mapped_cmd_valid.",
+        "behavior_rules": [
+          "The command encoding is defined by software/integration registers rather than hardwired mechanical assumptions.",
+          "The mapper must not modify or interpret geometry data.",
+          "The mapper may pass through fallback command configuration when no accepted response is present."
+        ],
+        "rtl_output_file": "adaptive_aero_command_mapper.v"
+      },
+      {
+        "name": "adaptive_aero_safety_gate",
+        "description": "Final safety, saturation, fallback, and telemetry aggregation stage. Clamps mapped commands to configured min/max limits, asserts saturation status when limiting occurs, drives deterministic fallback command on invalid or timed-out conditions, and assembles the 32-bit status output.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validation_failed",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stale_rejected",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_hit",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "accepted",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "mapped_cmd",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "mapped_cmd_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_min_act_cmd",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_max_act_cmd",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_fallback_cmd",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_soft_reset",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_clear",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_issue_request",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "busy",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "ready_for_request",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_pending",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_accepted",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "saturation",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fallback_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_word",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "act_cmd_out",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "act_cmd_valid_out",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Applies the final safety policy to command outputs. It clamps commands to the configured min/max window, substitutes fallback command on invalid, disabled, stale, or timed-out conditions, maintains fallback-active until a fresh valid response is accepted, and produces the combined status telemetry word and actuation valid signal for the top-level.",
+        "responsibilities": [
+          "Clamp mapped commands to configured min/max bounds.",
+          "Assert saturation when limiting occurs.",
+          "Drive fallback command when validation fails, timeout expires, enable is deasserted, or stale response is detected.",
+          "Hold fallback-active until a fresh valid response is accepted.",
+          "Generate status telemetry with busy, ready-for-request, response-pending, response-accepted, validation-failed, stale-rejected, timeout, saturation, fallback-active, and enable bits.",
+          "Deassert act_cmd_valid when the module is disabled or no valid command is available."
+        ],
+        "must_drive": [
+          "saturation",
+          "fallback_active",
+          "status_word",
+          "act_cmd_out",
+          "act_cmd_valid_out"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "enable",
+          "validation_failed",
+          "stale_rejected",
+          "timeout_hit",
+          "accepted",
+          "mapped_cmd",
+          "mapped_cmd_valid",
+          "cfg_min_act_cmd",
+          "cfg_max_act_cmd",
+          "cfg_fallback_cmd",
+          "cfg_soft_reset",
+          "cfg_enable",
+          "cfg_status_clear",
+          "cfg_issue_request",
+          "busy",
+          "ready_for_request",
+          "response_pending",
+          "response_accepted"
+        ],
+        "must_not_drive": [
+          "clk",
+          "rst_n",
+          "enable",
+          "validation_failed",
+          "stale_rejected",
+          "timeout_hit",
+          "accepted",
+          "mapped_cmd",
+          "mapped_cmd_valid",
+          "cfg_min_act_cmd",
+          "cfg_max_act_cmd",
+          "cfg_fallback_cmd",
+          "cfg_soft_reset",
+          "cfg_enable",
+          "cfg_status_clear",
+          "cfg_issue_request",
+          "busy",
+          "ready_for_request",
+          "response_pending",
+          "response_accepted"
+        ],
+        "reset_behavior": "On reset, asserts fallback-active, clears saturation and latched fault conditions, drives act_cmd_out to the configured fallback-safe behavior, and deasserts act_cmd_valid_out until a valid enabled command is available.",
+        "behavior_rules": [
+          "Command clamping must be deterministic and fixed-width.",
+          "Fallback command must be applied whenever validation fails, timeout occurs, enable is deasserted, or stale response is detected.",
+          "Status telemetry must remain stable and software-readable.",
+          "The safety gate is the final authority on actuator output validity."
+        ],
+        "rtl_output_file": "adaptive_aero_safety_gate.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_regfile.clk",
+        "adaptive_aero_request_packager.clk",
+        "adaptive_aero_response_validator.clk",
+        "adaptive_aero_command_mapper.clk",
+        "adaptive_aero_safety_gate.clk"
+      ],
+      "description": "Top-level port clk connected to matching child module port(s)."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "adaptive_aero_control_regfile.rst_n",
+        "adaptive_aero_request_packager.rst_n",
+        "adaptive_aero_response_validator.rst_n",
+        "adaptive_aero_command_mapper.rst_n",
+        "adaptive_aero_safety_gate.rst_n"
+      ],
+      "description": "Top-level port rst_n connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_addr",
+      "connected_to": [
+        "adaptive_aero_control_regfile.reg_addr"
+      ],
+      "description": "Top-level port reg_addr connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_wdata",
+      "connected_to": [
+        "adaptive_aero_control_regfile.reg_wdata"
+      ],
+      "description": "Top-level port reg_wdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_rdata",
+      "connected_to": [
+        "adaptive_aero_control_regfile.reg_rdata"
+      ],
+      "description": "Top-level port reg_rdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_wr_en",
+      "connected_to": [
+        "adaptive_aero_control_regfile.reg_wr_en"
+      ],
+      "description": "Top-level port reg_wr_en connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_rd_en",
+      "connected_to": [
+        "adaptive_aero_control_regfile.reg_rd_en"
+      ],
+      "description": "Top-level port reg_rd_en connected to matching child module port(s)."
+    },
+    {
+      "top_port": "req_data",
+      "connected_to": [
+        "adaptive_aero_request_packager.req_data"
+      ],
+      "description": "Top-level port req_data connected to matching child module port(s)."
+    },
+    {
+      "top_port": "req_valid",
+      "connected_to": [
+        "adaptive_aero_request_packager.req_valid"
+      ],
+      "description": "Top-level port req_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "req_ready",
+      "connected_to": [
+        "adaptive_aero_request_packager.req_ready"
+      ],
+      "description": "Top-level port req_ready connected to matching child module port(s)."
+    },
+    {
+      "top_port": "rsp_data",
+      "connected_to": [
+        "adaptive_aero_response_validator.rsp_data"
+      ],
+      "description": "Top-level port rsp_data connected to matching child module port(s)."
+    },
+    {
+      "top_port": "rsp_valid",
+      "connected_to": [
+        "adaptive_aero_response_validator.rsp_valid"
+      ],
+      "description": "Top-level port rsp_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "rsp_ready",
+      "connected_to": [
+        "adaptive_aero_response_validator.rsp_ready"
+      ],
+      "description": "Top-level port rsp_ready connected to matching child module port(s)."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "adaptive_aero_response_validator_accepted",
+      "width": 1,
+      "source": "adaptive_aero_response_validator.accepted",
+      "destinations": [
+        "adaptive_aero_command_mapper.accepted",
+        "adaptive_aero_safety_gate.accepted"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_response_validator.accepted."
+    },
+    {
+      "name": "adaptive_aero_response_validator_accepted_model_data",
+      "width": 128,
+      "source": "adaptive_aero_response_validator.accepted_model_data",
+      "destinations": [
+        "adaptive_aero_command_mapper.accepted_model_data"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_response_validator.accepted_model_data."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_enable",
+      "width": 1,
+      "source": "adaptive_aero_control_regfile.cfg_enable",
+      "destinations": [
+        "adaptive_aero_request_packager.cfg_enable",
+        "adaptive_aero_response_validator.cfg_enable",
+        "adaptive_aero_safety_gate.cfg_enable"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_enable."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_fallback_cmd",
+      "width": 32,
+      "source": "adaptive_aero_control_regfile.cfg_fallback_cmd",
+      "destinations": [
+        "adaptive_aero_command_mapper.cfg_fallback_cmd",
+        "adaptive_aero_safety_gate.cfg_fallback_cmd"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_fallback_cmd."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_flow_condition",
+      "width": 32,
+      "source": "adaptive_aero_control_regfile.cfg_flow_condition",
+      "destinations": [
+        "adaptive_aero_request_packager.cfg_flow_condition"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_flow_condition."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_geom_token",
+      "width": 32,
+      "source": "adaptive_aero_control_regfile.cfg_geom_token",
+      "destinations": [
+        "adaptive_aero_request_packager.cfg_geom_token"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_geom_token."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_geometry_format",
+      "width": 8,
+      "source": "adaptive_aero_control_regfile.cfg_geometry_format",
+      "destinations": [
+        "adaptive_aero_request_packager.cfg_geometry_format"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_geometry_format."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_geometry_source",
+      "width": 32,
+      "source": "adaptive_aero_control_regfile.cfg_geometry_source",
+      "destinations": [
+        "adaptive_aero_request_packager.cfg_geometry_source"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_geometry_source."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_issue_request",
+      "width": 1,
+      "source": "adaptive_aero_control_regfile.cfg_issue_request",
+      "destinations": [
+        "adaptive_aero_safety_gate.cfg_issue_request"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_issue_request."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_max_act_cmd",
+      "width": 32,
+      "source": "adaptive_aero_control_regfile.cfg_max_act_cmd",
+      "destinations": [
+        "adaptive_aero_command_mapper.cfg_max_act_cmd",
+        "adaptive_aero_safety_gate.cfg_max_act_cmd"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_max_act_cmd."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_min_act_cmd",
+      "width": 32,
+      "source": "adaptive_aero_control_regfile.cfg_min_act_cmd",
+      "destinations": [
+        "adaptive_aero_command_mapper.cfg_min_act_cmd",
+        "adaptive_aero_safety_gate.cfg_min_act_cmd"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_min_act_cmd."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_pipelined_mode",
+      "width": 1,
+      "source": "adaptive_aero_control_regfile.cfg_pipelined_mode",
+      "destinations": [
+        "adaptive_aero_request_packager.cfg_pipelined_mode"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_pipelined_mode."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_request_timeout",
+      "width": 16,
+      "source": "adaptive_aero_control_regfile.cfg_request_timeout",
+      "destinations": [
+        "adaptive_aero_response_validator.cfg_request_timeout"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_request_timeout."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_response_age_limit",
+      "width": 16,
+      "source": "adaptive_aero_control_regfile.cfg_response_age_limit",
+      "destinations": [
+        "adaptive_aero_response_validator.cfg_response_age_limit"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_response_age_limit."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_seq_seed",
+      "width": 16,
+      "source": "adaptive_aero_control_regfile.cfg_seq_seed",
+      "destinations": [
+        "adaptive_aero_request_packager.cfg_seq_seed"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_seq_seed."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_soft_reset",
+      "width": 1,
+      "source": "adaptive_aero_control_regfile.cfg_soft_reset",
+      "destinations": [
+        "adaptive_aero_safety_gate.cfg_soft_reset"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_soft_reset."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_status_clear",
+      "width": 1,
+      "source": "adaptive_aero_control_regfile.cfg_status_clear",
+      "destinations": [
+        "adaptive_aero_safety_gate.cfg_status_clear"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_status_clear."
+    },
+    {
+      "name": "adaptive_aero_control_regfile_cfg_stream_velocity_mps",
+      "width": 32,
+      "source": "adaptive_aero_control_regfile.cfg_stream_velocity_mps",
+      "destinations": [
+        "adaptive_aero_request_packager.cfg_stream_velocity_mps"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regfile.cfg_stream_velocity_mps."
+    },
+    {
+      "name": "adaptive_aero_command_mapper_mapped_cmd",
+      "width": 32,
+      "source": "adaptive_aero_command_mapper.mapped_cmd",
+      "destinations": [
+        "adaptive_aero_safety_gate.mapped_cmd"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_command_mapper.mapped_cmd."
+    },
+    {
+      "name": "adaptive_aero_command_mapper_mapped_cmd_valid",
+      "width": 1,
+      "source": "adaptive_aero_command_mapper.mapped_cmd_valid",
+      "destinations": [
+        "adaptive_aero_safety_gate.mapped_cmd_valid"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_command_mapper.mapped_cmd_valid."
+    },
+    {
+      "name": "adaptive_aero_response_validator_stale_rejected",
+      "width": 1,
+      "source": "adaptive_aero_response_validator.stale_rejected",
+      "destinations": [
+        "adaptive_aero_safety_gate.stale_rejected"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_response_validator.stale_rejected."
+    },
+    {
+      "name": "adaptive_aero_response_validator_timeout_hit",
+      "width": 1,
+      "source": "adaptive_aero_response_validator.timeout_hit",
+      "destinations": [
+        "adaptive_aero_safety_gate.timeout_hit"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_response_validator.timeout_hit."
+    },
+    {
+      "name": "adaptive_aero_response_validator_validation_failed",
+      "width": 1,
+      "source": "adaptive_aero_response_validator.validation_failed",
+      "destinations": [
+        "adaptive_aero_safety_gate.validation_failed"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_response_validator.validation_failed."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "adaptive_aero_response_validator_accepted",
+      "owner": "adaptive_aero_response_validator.accepted"
+    },
+    {
+      "signal": "adaptive_aero_response_validator_accepted_model_data",
+      "owner": "adaptive_aero_response_validator.accepted_model_data"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_enable",
+      "owner": "adaptive_aero_control_regfile.cfg_enable"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_fallback_cmd",
+      "owner": "adaptive_aero_control_regfile.cfg_fallback_cmd"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_flow_condition",
+      "owner": "adaptive_aero_control_regfile.cfg_flow_condition"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_geom_token",
+      "owner": "adaptive_aero_control_regfile.cfg_geom_token"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_geometry_format",
+      "owner": "adaptive_aero_control_regfile.cfg_geometry_format"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_geometry_source",
+      "owner": "adaptive_aero_control_regfile.cfg_geometry_source"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_issue_request",
+      "owner": "adaptive_aero_control_regfile.cfg_issue_request"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_max_act_cmd",
+      "owner": "adaptive_aero_control_regfile.cfg_max_act_cmd"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_min_act_cmd",
+      "owner": "adaptive_aero_control_regfile.cfg_min_act_cmd"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_pipelined_mode",
+      "owner": "adaptive_aero_control_regfile.cfg_pipelined_mode"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_request_timeout",
+      "owner": "adaptive_aero_control_regfile.cfg_request_timeout"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_response_age_limit",
+      "owner": "adaptive_aero_control_regfile.cfg_response_age_limit"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_seq_seed",
+      "owner": "adaptive_aero_control_regfile.cfg_seq_seed"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_soft_reset",
+      "owner": "adaptive_aero_control_regfile.cfg_soft_reset"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_status_clear",
+      "owner": "adaptive_aero_control_regfile.cfg_status_clear"
+    },
+    {
+      "signal": "adaptive_aero_control_regfile_cfg_stream_velocity_mps",
+      "owner": "adaptive_aero_control_regfile.cfg_stream_velocity_mps"
+    },
+    {
+      "signal": "adaptive_aero_command_mapper_mapped_cmd",
+      "owner": "adaptive_aero_command_mapper.mapped_cmd"
+    },
+    {
+      "signal": "adaptive_aero_command_mapper_mapped_cmd_valid",
+      "owner": "adaptive_aero_command_mapper.mapped_cmd_valid"
+    },
+    {
+      "signal": "adaptive_aero_response_validator_stale_rejected",
+      "owner": "adaptive_aero_response_validator.stale_rejected"
+    },
+    {
+      "signal": "adaptive_aero_response_validator_timeout_hit",
+      "owner": "adaptive_aero_response_validator.timeout_hit"
+    },
+    {
+      "signal": "adaptive_aero_response_validator_validation_failed",
+      "owner": "adaptive_aero_response_validator.validation_failed"
+    },
+    {
+      "signal": "reg_rdata",
+      "owner": "adaptive_aero_control_regfile.reg_rdata"
+    },
+    {
+      "signal": "req_data",
+      "owner": "adaptive_aero_request_packager.req_data"
+    },
+    {
+      "signal": "req_valid",
+      "owner": "adaptive_aero_request_packager.req_valid"
+    },
+    {
+      "signal": "rsp_ready",
+      "owner": "adaptive_aero_response_validator.rsp_ready"
+    }
+  ],
+  "register_contract": {}
+}

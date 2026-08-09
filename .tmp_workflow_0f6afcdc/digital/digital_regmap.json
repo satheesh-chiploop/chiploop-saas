@@ -1,0 +1,1043 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "custom",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control and mode register.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables request issuance, response acceptance, and actuator command generation."
+          },
+          {
+            "name": "SOFT_RESET",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-requested soft reset pulse; self-clears after being sampled by the control logic."
+          },
+          {
+            "name": "PIPELINED_MODE",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Allows more than one request to be in flight when explicitly enabled; default 0 enforces single-outstanding-transaction behavior."
+          },
+          {
+            "name": "STATUS_CLEAR",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Write 1 to clear latched fault/status bits in the safety and telemetry path; self-clears after being sampled."
+          },
+          {
+            "name": "ISSUE_REQUEST",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW",
+            "reset": 0,
+            "description": "Write 1 to request outbound packet launch when the transport path is ready; self-clears after being sampled."
+          },
+          {
+            "name": "MODEL_PRESENT",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-visible presence indicator for the external model worker/session; used as a validation gate."
+          },
+          {
+            "name": "MODEL_ENABLED",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables response acceptance and command mapping from the external model path."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_SEED_L",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Sequence counter seed, low byte.",
+        "fields": [
+          {
+            "name": "SEQ_SEED[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low 8 bits of the 16-bit sequence counter seed."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_SEED_H",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Sequence counter seed, high byte.",
+        "fields": [
+          {
+            "name": "SEQ_SEED[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of the 16-bit sequence counter seed."
+          }
+        ]
+      },
+      {
+        "name": "REQ_TIMEOUT_L",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Request watchdog timeout threshold, low byte.",
+        "fields": [
+          {
+            "name": "REQ_TIMEOUT[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low 8 bits of the 16-bit request timeout threshold in control-clock cycles."
+          }
+        ]
+      },
+      {
+        "name": "REQ_TIMEOUT_H",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Request watchdog timeout threshold, high byte.",
+        "fields": [
+          {
+            "name": "REQ_TIMEOUT[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of the 16-bit request timeout threshold in control-clock cycles."
+          }
+        ]
+      },
+      {
+        "name": "RESP_AGE_LIMIT_L",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Response age limit, low byte.",
+        "fields": [
+          {
+            "name": "RESP_AGE_LIMIT[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low 8 bits of the 16-bit maximum acceptable response age."
+          }
+        ]
+      },
+      {
+        "name": "RESP_AGE_LIMIT_H",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Response age limit, high byte.",
+        "fields": [
+          {
+            "name": "RESP_AGE_LIMIT[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High 8 bits of the 16-bit maximum acceptable response age."
+          }
+        ]
+      },
+      {
+        "name": "ACT_CMD_MIN_0",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "Minimum actuator command bound, byte 0 (LSB).",
+        "fields": [
+          {
+            "name": "ACT_CMD_MIN[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum allowable actuator command, byte 0."
+          }
+        ]
+      },
+      {
+        "name": "ACT_CMD_MIN_1",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Minimum actuator command bound, byte 1.",
+        "fields": [
+          {
+            "name": "ACT_CMD_MIN[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum allowable actuator command, byte 1."
+          }
+        ]
+      },
+      {
+        "name": "ACT_CMD_MIN_2",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Minimum actuator command bound, byte 2.",
+        "fields": [
+          {
+            "name": "ACT_CMD_MIN[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum allowable actuator command, byte 2."
+          }
+        ]
+      },
+      {
+        "name": "ACT_CMD_MIN_3",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "Minimum actuator command bound, byte 3 (MSB).",
+        "fields": [
+          {
+            "name": "ACT_CMD_MIN[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum allowable actuator command, byte 3."
+          }
+        ]
+      },
+      {
+        "name": "ACT_CMD_MAX_0",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "Maximum actuator command bound, byte 0 (LSB).",
+        "fields": [
+          {
+            "name": "ACT_CMD_MAX[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Maximum allowable actuator command, byte 0."
+          }
+        ]
+      },
+      {
+        "name": "ACT_CMD_MAX_1",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Maximum actuator command bound, byte 1.",
+        "fields": [
+          {
+            "name": "ACT_CMD_MAX[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Maximum allowable actuator command, byte 1."
+          }
+        ]
+      },
+      {
+        "name": "ACT_CMD_MAX_2",
+        "offset": "0x0D",
+        "access": "RW",
+        "description": "Maximum actuator command bound, byte 2.",
+        "fields": [
+          {
+            "name": "ACT_CMD_MAX[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Maximum allowable actuator command, byte 2."
+          }
+        ]
+      },
+      {
+        "name": "ACT_CMD_MAX_3",
+        "offset": "0x0E",
+        "access": "RW",
+        "description": "Maximum actuator command bound, byte 3 (MSB).",
+        "fields": [
+          {
+            "name": "ACT_CMD_MAX[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Maximum allowable actuator command, byte 3."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_CMD_0",
+        "offset": "0x0F",
+        "access": "RW",
+        "description": "Deterministic fallback actuator command, byte 0 (LSB).",
+        "fields": [
+          {
+            "name": "FALLBACK_CMD[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Fallback command byte 0."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_CMD_1",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Deterministic fallback actuator command, byte 1.",
+        "fields": [
+          {
+            "name": "FALLBACK_CMD[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Fallback command byte 1."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_CMD_2",
+        "offset": "0x11",
+        "access": "RW",
+        "description": "Deterministic fallback actuator command, byte 2.",
+        "fields": [
+          {
+            "name": "FALLBACK_CMD[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Fallback command byte 2."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_CMD_3",
+        "offset": "0x12",
+        "access": "RW",
+        "description": "Deterministic fallback actuator command, byte 3 (MSB).",
+        "fields": [
+          {
+            "name": "FALLBACK_CMD[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Fallback command byte 3."
+          }
+        ]
+      },
+      {
+        "name": "STREAM_VEL_0",
+        "offset": "0x13",
+        "access": "RW",
+        "description": "Stream velocity setpoint, byte 0 (LSB).",
+        "fields": [
+          {
+            "name": "STREAM_VELOCITY_MPS[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 30,
+            "description": "Low 8 bits of stream velocity setpoint. Software should program the full 32-bit fixed-point/encoded value for the reference operating point of 38.89 m/s."
+          }
+        ]
+      },
+      {
+        "name": "STREAM_VEL_1",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Stream velocity setpoint, byte 1.",
+        "fields": [
+          {
+            "name": "STREAM_VELOCITY_MPS[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 1 of stream velocity setpoint."
+          }
+        ]
+      },
+      {
+        "name": "STREAM_VEL_2",
+        "offset": "0x15",
+        "access": "RW",
+        "description": "Stream velocity setpoint, byte 2.",
+        "fields": [
+          {
+            "name": "STREAM_VELOCITY_MPS[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 2 of stream velocity setpoint."
+          }
+        ]
+      },
+      {
+        "name": "STREAM_VEL_3",
+        "offset": "0x16",
+        "access": "RW",
+        "description": "Stream velocity setpoint, byte 3 (MSB).",
+        "fields": [
+          {
+            "name": "STREAM_VELOCITY_MPS[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 3 of stream velocity setpoint."
+          }
+        ]
+      },
+      {
+        "name": "FLOW_COND_0",
+        "offset": "0x17",
+        "access": "RW",
+        "description": "Flow-condition configuration field, byte 0 (LSB).",
+        "fields": [
+          {
+            "name": "FLOW_CONDITION[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of software-defined flow-condition configuration."
+          }
+        ]
+      },
+      {
+        "name": "FLOW_COND_1",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Flow-condition configuration field, byte 1.",
+        "fields": [
+          {
+            "name": "FLOW_CONDITION[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 1 of flow-condition configuration."
+          }
+        ]
+      },
+      {
+        "name": "FLOW_COND_2",
+        "offset": "0x19",
+        "access": "RW",
+        "description": "Flow-condition configuration field, byte 2.",
+        "fields": [
+          {
+            "name": "FLOW_CONDITION[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 2 of flow-condition configuration."
+          }
+        ]
+      },
+      {
+        "name": "FLOW_COND_3",
+        "offset": "0x1A",
+        "access": "RW",
+        "description": "Flow-condition configuration field, byte 3 (MSB).",
+        "fields": [
+          {
+            "name": "FLOW_CONDITION[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 3 of flow-condition configuration."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_META",
+        "offset": "0x1B",
+        "access": "RW",
+        "description": "Geometry metadata descriptor byte. Geometry is not stored on-chip; this register only carries integration metadata and tokenization control.",
+        "fields": [
+          {
+            "name": "GEOMETRY_FORMAT",
+            "lsb": 0,
+            "msb": 3,
+            "access": "RW",
+            "reset": 1,
+            "description": "Geometry format descriptor. Default encoding value shall represent STL."
+          },
+          {
+            "name": "GEOMETRY_SOURCE",
+            "lsb": 4,
+            "msb": 7,
+            "access": "RW",
+            "reset": 1,
+            "description": "Geometry source descriptor nibble. Software shall map this field to DrivAerML reference geometry according to system integration rules."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_TOKEN_0",
+        "offset": "0x1C",
+        "access": "RW",
+        "description": "Compact geometry descriptor or memory token, byte 0 (LSB).",
+        "fields": [
+          {
+            "name": "GEOM_TOKEN[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of compact external geometry descriptor/token."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_TOKEN_1",
+        "offset": "0x1D",
+        "access": "RW",
+        "description": "Compact geometry descriptor or memory token, byte 1.",
+        "fields": [
+          {
+            "name": "GEOM_TOKEN[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 1 of compact external geometry descriptor/token."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_TOKEN_2",
+        "offset": "0x1E",
+        "access": "RW",
+        "description": "Compact geometry descriptor or memory token, byte 2.",
+        "fields": [
+          {
+            "name": "GEOM_TOKEN[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 2 of compact external geometry descriptor/token."
+          }
+        ]
+      },
+      {
+        "name": "GEOM_TOKEN_3",
+        "offset": "0x1F",
+        "access": "RW",
+        "description": "Compact geometry descriptor or memory token, byte 3 (MSB).",
+        "fields": [
+          {
+            "name": "GEOM_TOKEN[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Byte 3 of compact external geometry descriptor/token."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_0",
+        "offset": "0x20",
+        "access": "RO",
+        "description": "Live status telemetry, low byte.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reflects current enable state."
+          },
+          {
+            "name": "BUSY",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "A request is outstanding or the transport path is occupied."
+          },
+          {
+            "name": "READY_FOR_REQUEST",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Request packager may launch a new request if configured and not blocked."
+          },
+          {
+            "name": "RESPONSE_PENDING",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Response for the current transaction is pending."
+          },
+          {
+            "name": "RESPONSE_ACCEPTED",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most recent response was accepted."
+          },
+          {
+            "name": "VALIDATION_FAILED",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response failed validation."
+          },
+          {
+            "name": "STALE_REJECTED",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response was rejected for freshness/age reasons."
+          },
+          {
+            "name": "TIMEOUT",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Watchdog timeout occurred for the current transaction."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_1",
+        "offset": "0x21",
+        "access": "RO",
+        "description": "Live status telemetry, high byte.",
+        "fields": [
+          {
+            "name": "SATURATION",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Actuator command was clamped to configured bounds."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 1,
+            "description": "Fallback command is currently driving the actuator output."
+          },
+          {
+            "name": "REQUEST_ISSUED",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "A request launch was issued by the request packager."
+          },
+          {
+            "name": "COMMAND_VALID",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current actuator command is valid and present on the output."
+          },
+          {
+            "name": "MODEL_PRESENT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched or reflected model-present indicator."
+          },
+          {
+            "name": "MODEL_ENABLED",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched or reflected model-enabled indicator."
+          },
+          {
+            "name": "SOFT_RESET_SEEN",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Soft reset request has been sampled or is pending clear."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_2",
+        "offset": "0x22",
+        "access": "RO",
+        "description": "Watchdog and transaction bookkeeping, low byte.",
+        "fields": [
+          {
+            "name": "WATCHDOG_COUNT[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low byte of watchdog timer count for the outstanding transaction."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_3",
+        "offset": "0x23",
+        "access": "RO",
+        "description": "Watchdog and transaction bookkeeping, high byte.",
+        "fields": [
+          {
+            "name": "WATCHDOG_COUNT[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "High byte of watchdog timer count for the outstanding transaction."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_4",
+        "offset": "0x24",
+        "access": "RO",
+        "description": "Current transaction identifier, low byte.",
+        "fields": [
+          {
+            "name": "TRANSACTION_ID[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low byte of the current or last-issued transaction ID."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_5",
+        "offset": "0x25",
+        "access": "RO",
+        "description": "Current transaction identifier, high byte.",
+        "fields": [
+          {
+            "name": "TRANSACTION_ID[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "High byte of the current or last-issued transaction ID."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_6",
+        "offset": "0x26",
+        "access": "RO",
+        "description": "Current sequence counter, low byte.",
+        "fields": [
+          {
+            "name": "SEQUENCE_COUNTER[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low byte of the current or last-issued sequence counter."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_7",
+        "offset": "0x27",
+        "access": "RO",
+        "description": "Current sequence counter, high byte.",
+        "fields": [
+          {
+            "name": "SEQUENCE_COUNTER[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "High byte of the current or last-issued sequence counter."
+          }
+        ]
+      },
+      {
+        "name": "LAST_ACT_CMD_0",
+        "offset": "0x28",
+        "access": "RO",
+        "description": "Most recently accepted actuator command, byte 0 (LSB).",
+        "fields": [
+          {
+            "name": "LAST_ACCEPTED_ACT_CMD[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Low byte of the last accepted and safety-checked actuator command."
+          }
+        ]
+      },
+      {
+        "name": "LAST_ACT_CMD_1",
+        "offset": "0x29",
+        "access": "RO",
+        "description": "Most recently accepted actuator command, byte 1.",
+        "fields": [
+          {
+            "name": "LAST_ACCEPTED_ACT_CMD[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 1 of the last accepted and safety-checked actuator command."
+          }
+        ]
+      },
+      {
+        "name": "LAST_ACT_CMD_2",
+        "offset": "0x2A",
+        "access": "RO",
+        "description": "Most recently accepted actuator command, byte 2.",
+        "fields": [
+          {
+            "name": "LAST_ACCEPTED_ACT_CMD[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 2 of the last accepted and safety-checked actuator command."
+          }
+        ]
+      },
+      {
+        "name": "LAST_ACT_CMD_3",
+        "offset": "0x2B",
+        "access": "RO",
+        "description": "Most recently accepted actuator command, byte 3 (MSB).",
+        "fields": [
+          {
+            "name": "LAST_ACCEPTED_ACT_CMD[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Byte 3 of the last accepted and safety-checked actuator command."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CLEAR",
+        "offset": "0x2C",
+        "access": "WO",
+        "description": "Fault and status clear register.",
+        "fields": [
+          {
+            "name": "CLEAR_VALIDATION_FAILED",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to clear the validation-failed latch."
+          },
+          {
+            "name": "CLEAR_STALE_REJECTED",
+            "lsb": 1,
+            "msb": 1,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to clear the stale-rejected latch."
+          },
+          {
+            "name": "CLEAR_TIMEOUT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to clear the timeout latch."
+          },
+          {
+            "name": "CLEAR_SATURATION",
+            "lsb": 3,
+            "msb": 3,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to clear the saturation latch."
+          },
+          {
+            "name": "CLEAR_FALLBACK",
+            "lsb": 4,
+            "msb": 4,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to clear the fallback-active latch where permitted by control state."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 5,
+            "msb": 7,
+            "access": "WO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "SESSION_INFO_0",
+        "offset": "0x2D",
+        "access": "RW",
+        "description": "Session metadata, byte 0 (LSB).",
+        "fields": [
+          {
+            "name": "SESSION_INFO[7:0]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-defined session metadata byte 0."
+          }
+        ]
+      },
+      {
+        "name": "SESSION_INFO_1",
+        "offset": "0x2E",
+        "access": "RW",
+        "description": "Session metadata, byte 1.",
+        "fields": [
+          {
+            "name": "SESSION_INFO[15:8]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-defined session metadata byte 1."
+          }
+        ]
+      },
+      {
+        "name": "SESSION_INFO_2",
+        "offset": "0x2F",
+        "access": "RW",
+        "description": "Session metadata, byte 2.",
+        "fields": [
+          {
+            "name": "SESSION_INFO[23:16]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-defined session metadata byte 2."
+          }
+        ]
+      },
+      {
+        "name": "SESSION_INFO_3",
+        "offset": "0x30",
+        "access": "RW",
+        "description": "Session metadata, byte 3 (MSB).",
+        "fields": [
+          {
+            "name": "SESSION_INFO[31:24]",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-defined session metadata byte 3."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Assert reset externally, then program ACT_CMD_MIN and ACT_CMD_MAX bounds.",
+      "Program FALLBACK_CMD to a deterministic safe command.",
+      "Program REQ_TIMEOUT and RESP_AGE_LIMIT according to expected worker latency.",
+      "Program SEQ_SEED with a nonzero transaction sequence seed if desired by software.",
+      "Program FLOW_COND, STREAM_VEL, GEOM_META, GEOM_TOKEN, and SESSION_INFO with session metadata.",
+      "Set MODEL_PRESENT and MODEL_ENABLED as appropriate for the attached worker session.",
+      "Set ENABLE=1 and PIPELINED_MODE=0 for default single-outstanding-transaction operation.",
+      "Optionally pulse ISSUE_REQUEST to launch the first outbound request.",
+      "Verify STATUS_FALLBACK_ACTIVE remains set until the first accepted command is produced."
+    ],
+    "polling_sequence": [
+      "Poll STATUS_0/STATUS_1 for BUSY, READY_FOR_REQUEST, RESPONSE_PENDING, RESPONSE_ACCEPTED, VALIDATION_FAILED, STALE_REJECTED, TIMEOUT, SATURATION, FALLBACK_ACTIVE, and ENABLE.",
+      "Poll STATUS_2..STATUS_7 for watchdog count and current transaction/sequence context.",
+      "Read LAST_ACT_CMD_0..3 to observe the latest accepted actuator command.",
+      "If VALIDATION_FAILED, STALE_REJECTED, TIMEOUT, or SATURATION is set, write the corresponding bits in FAULT_CLEAR after the root cause is corrected.",
+      "If a new operating point is required, update the configuration registers and pulse ISSUE_REQUEST again when READY_FOR_REQUEST is asserted."
+    ],
+    "irq_sequence": []
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is custom and byte-addressed to match the 8-bit register address and 32-bit data bus contract.",
+    "No incompatible hierarchy, ports, or bus protocol were introduced.",
+    "Wider software-visible values are split into multiple 8-bit registers.",
+    "Geometry is represented only as metadata/token fields; no on-chip geometry storage is implied."
+  ]
+}

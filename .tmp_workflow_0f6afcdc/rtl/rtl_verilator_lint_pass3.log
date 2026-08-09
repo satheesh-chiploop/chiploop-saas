@@ -1,0 +1,197 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.203 MB sources in 7 modules, into 0.097 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.042 s (elab=0.006, cvt=0.020, bld=0.000); cpu 0.042 s on 1 threads; allocated 33.359 MB
+
+=== STDERR ===
+%Warning-WIDTHEXPAND: pass3/adaptive_aero_request_packager.v:60:27: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_request_packager'
+   60 |             hold_packet_r <= {transaction_id_in, sequence_counter_in, cfg_seq_seed, cfg_geometry_format, cfg_geometry_source[15:0], cfg_stream_velocity_mps[15:0], cfg_flow_condition[15:0], cfg_geom_token[15:0]};
+      |                           ^~
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: pass3/adaptive_aero_request_packager.v:63:24: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 120 bits.
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_request_packager'
+   63 |             req_data_r <= {transaction_id_in, sequence_counter_in, cfg_seq_seed, cfg_geometry_format, cfg_geometry_source[15:0], cfg_stream_velocity_mps[15:0], cfg_flow_condition[15:0], cfg_geom_token[15:0]};
+      |                        ^~
+%Warning-WIDTHEXPAND: pass3/adaptive_aero_control_regfile.v:201:36: Operator ASSIGNDLY expects 32 bits on the Assign RHS, but Assign RHS's REPLICATE generates 31 bits.
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+  201 |                 8'h21: reg_rdata_r <= {24'h000000, 1'b0, 1'b0, 1'b0, 1'b0, status_in[4], status_in[5], 1'b0};
+      |                                    ^~
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:113:51: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_seq_seed' generates 16 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  113 | assign adaptive_aero_control_regfile_cfg_seq_seed = cfg_seq_seed;
+      |                                                   ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:114:58: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_request_timeout' generates 16 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  114 | assign adaptive_aero_control_regfile_cfg_request_timeout = cfg_request_timeout;
+      |                                                          ^
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:115:61: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_response_age_limit' generates 16 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  115 | assign adaptive_aero_control_regfile_cfg_response_age_limit = cfg_response_age_limit;
+      |                                                             ^
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:116:54: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_max_act_cmd' generates 32 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  116 | assign adaptive_aero_control_regfile_cfg_max_act_cmd = cfg_max_act_cmd;
+      |                                                      ^
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:117:54: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_min_act_cmd' generates 32 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  117 | assign adaptive_aero_control_regfile_cfg_min_act_cmd = cfg_min_act_cmd;
+      |                                                      ^
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:118:55: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_fallback_cmd' generates 32 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  118 | assign adaptive_aero_control_regfile_cfg_fallback_cmd = cfg_fallback_cmd;
+      |                                                       ^
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:119:62: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_stream_velocity_mps' generates 32 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  119 | assign adaptive_aero_control_regfile_cfg_stream_velocity_mps = cfg_stream_velocity_mps;
+      |                                                              ^
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:120:57: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_flow_condition' generates 32 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  120 | assign adaptive_aero_control_regfile_cfg_flow_condition = cfg_flow_condition;
+      |                                                         ^
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:121:58: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_geometry_format' generates 8 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  121 | assign adaptive_aero_control_regfile_cfg_geometry_format = cfg_geometry_format;
+      |                                                          ^
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:122:58: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_geometry_source' generates 32 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  122 | assign adaptive_aero_control_regfile_cfg_geometry_source = cfg_geometry_source;
+      |                                                          ^
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:123:53: Operator ASSIGNW expects 1 bits on the Assign RHS, but Assign RHS's VARREF 'cfg_geom_token' generates 32 bits.
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+  123 | assign adaptive_aero_control_regfile_cfg_geom_token = cfg_geom_token;
+      |                                                     ^
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:56:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_enable'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   56 | wire adaptive_aero_control_regfile_cfg_enable;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:57:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_fallback_cmd'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   57 | wire adaptive_aero_control_regfile_cfg_fallback_cmd;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:58:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_flow_condition'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   58 | wire adaptive_aero_control_regfile_cfg_flow_condition;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:59:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_geom_token'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   59 | wire adaptive_aero_control_regfile_cfg_geom_token;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:60:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_geometry_format'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   60 | wire adaptive_aero_control_regfile_cfg_geometry_format;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:61:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_geometry_source'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   61 | wire adaptive_aero_control_regfile_cfg_geometry_source;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:62:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_issue_request'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   62 | wire adaptive_aero_control_regfile_cfg_issue_request;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:63:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_max_act_cmd'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   63 | wire adaptive_aero_control_regfile_cfg_max_act_cmd;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:64:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_min_act_cmd'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   64 | wire adaptive_aero_control_regfile_cfg_min_act_cmd;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:65:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_pipelined_mode'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   65 | wire adaptive_aero_control_regfile_cfg_pipelined_mode;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:66:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_request_timeout'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   66 | wire adaptive_aero_control_regfile_cfg_request_timeout;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:67:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_response_age_limit'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   67 | wire adaptive_aero_control_regfile_cfg_response_age_limit;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:68:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_seq_seed'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   68 | wire adaptive_aero_control_regfile_cfg_seq_seed;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:69:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_soft_reset'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   69 | wire adaptive_aero_control_regfile_cfg_soft_reset;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:70:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_status_clear'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   70 | wire adaptive_aero_control_regfile_cfg_status_clear;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:71:6: Signal is not used: 'adaptive_aero_control_regfile_cfg_stream_velocity_mps'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   71 | wire adaptive_aero_control_regfile_cfg_stream_velocity_mps;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: pass3/adaptive_aero_control_top.v:80:6: Signal is not driven: 'request_inflight'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+   80 | wire request_inflight;
+      |      ^~~~~~~~~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047
+                   ... Use "/* verilator lint_off UNDRIVEN */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:81:6: Signal is not used: 'request_issued'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   81 | wire request_issued;
+      |      ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:88:6: Signal is not used: 'saturation'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   88 | wire saturation;
+      |      ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:89:6: Signal is not used: 'fallback_active'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   89 | wire fallback_active;
+      |      ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_command_mapper.v:16:14: Signal is not used: 'cfg_max_act_cmd'
+                                                                 : ... note: In instance 'adaptive_aero_control_top.u_command_mapper'
+   16 | input [31:0] cfg_max_act_cmd;
+      |              ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_command_mapper.v:17:14: Signal is not used: 'cfg_min_act_cmd'
+                                                                 : ... note: In instance 'adaptive_aero_control_top.u_command_mapper'
+   17 | input [31:0] cfg_min_act_cmd;
+      |              ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_regfile.v:31:14: Bits of signal are not used: 'reg_wdata'[31:8]
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+   31 | input [31:0] reg_wdata;
+      |              ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_regfile.v:70:12: Signal is not used: 'last_status_r'
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+   70 | reg [31:0] last_status_r;
+      |            ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_regfile.v:71:12: Signal is not used: 'last_command_r'
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+   71 | reg [31:0] last_command_r;
+      |            ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_request_packager.v:26:14: Bits of signal are not used: 'cfg_stream_velocity_mps'[31:16]
+                                                                   : ... note: In instance 'adaptive_aero_control_top.u_request_packager'
+   26 | input [31:0] cfg_stream_velocity_mps;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_request_packager.v:27:14: Bits of signal are not used: 'cfg_flow_condition'[31:16]
+                                                                   : ... note: In instance 'adaptive_aero_control_top.u_request_packager'
+   27 | input [31:0] cfg_flow_condition;
+      |              ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_request_packager.v:29:14: Bits of signal are not used: 'cfg_geometry_source'[31:16]
+                                                                   : ... note: In instance 'adaptive_aero_control_top.u_request_packager'
+   29 | input [31:0] cfg_geometry_source;
+      |              ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_request_packager.v:30:14: Bits of signal are not used: 'cfg_geom_token'[31:16]
+                                                                   : ... note: In instance 'adaptive_aero_control_top.u_request_packager'
+   30 | input [31:0] cfg_geom_token;
+      |              ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_request_packager.v:41:5: Signal is not used: 'req_valid_r'
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_request_packager'
+   41 | reg req_valid_r;
+      |     ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_response_validator.v:37:5: Signal is not used: 'rsp_ready_r'
+                                                                    : ... note: In instance 'adaptive_aero_control_top.u_response_validator'
+   37 | reg rsp_ready_r;
+      |     ^~~~~~~~~~~
+
+=== RETURN CODE ===
+0
