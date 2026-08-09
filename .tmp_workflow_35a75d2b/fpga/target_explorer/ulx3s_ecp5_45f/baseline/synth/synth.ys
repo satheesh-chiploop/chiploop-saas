@@ -1,0 +1,2 @@
+read_verilog -sv /root/chiploop-backend/backend/workflows/35a75d2b-5db9-447d-beae-1788447742a4/fpga/src/upstream/adaptive_aero_control_top.v
+synth_ecp5 -top adaptive_aero_control_top -noflatten -json /root/chiploop-backend/backend/workflows/35a75d2b-5db9-447d-beae-1788447742a4/fpga/target_explorer/ulx3s_ecp5_45f/baseline/synth/adaptive_aero_control_top_ecp5.json

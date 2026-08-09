@@ -1,0 +1,89 @@
+{
+  "agent": "FPGA Explorer I/O Mapping Agent",
+  "board_count": 2,
+  "fully_mapped_board_count": 0,
+  "interface_adapter": null,
+  "mappings": [
+    {
+      "all_ports_mapped": false,
+      "board": "orangecrab_ecp5_85f",
+      "constraint_format": "lpf",
+      "constraint_preview": "# ChipLoop starter LPF for adaptive_aero_control_top\n# target_frequency_mhz 50.0\nLOCATE COMP \"clk\" SITE \"A9\";\nIOBUF PORT \"clk\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"rst_n\" SITE \"V17\";\nIOBUF PORT \"rst_n\" IO_TYPE=LVCMOS33;\nFREQUENCY PORT \"clk\" 50.0 MHz;\n",
+      "exploration_policy": "core_only",
+      "label": "Lattice OrangeCrab ECP5-85F",
+      "mapped_ports": [
+        "clk",
+        "rst_n"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "cfg_wr_en",
+        "cfg_rd_en",
+        "cfg_addr",
+        "cfg_wdata",
+        "cfg_rdata",
+        "req_valid",
+        "req_ready",
+        "req_data",
+        "resp_valid",
+        "resp_ready",
+        "resp_data",
+        "actuator_cmd",
+        "actuator_valid",
+        "fault"
+      ]
+    },
+    {
+      "all_ports_mapped": false,
+      "board": "ulx3s_ecp5_45f",
+      "constraint_format": "lpf",
+      "constraint_preview": "# ChipLoop starter LPF for adaptive_aero_control_top\n# target_frequency_mhz 50.0\nLOCATE COMP \"clk\" SITE \"G2\";\nIOBUF PORT \"clk\" IO_TYPE=LVCMOS33;\nLOCATE COMP \"rst_n\" SITE \"T1\";\nIOBUF PORT \"rst_n\" IO_TYPE=LVCMOS33;\nFREQUENCY PORT \"clk\" 50.0 MHz;\n",
+      "exploration_policy": "core_only",
+      "label": "Lattice ULX3S ECP5-45F",
+      "mapped_ports": [
+        "clk",
+        "rst_n"
+      ],
+      "note": "Explorer will compare core capacity and timing without I/O pads. FPGA Prototyping will require verified pins for every unmapped port.",
+      "programming_ready": false,
+      "unmapped_ports": [
+        "cfg_wr_en",
+        "cfg_rd_en",
+        "cfg_addr",
+        "cfg_wdata",
+        "cfg_rdata",
+        "req_valid",
+        "req_ready",
+        "req_data",
+        "resp_valid",
+        "resp_ready",
+        "resp_data",
+        "actuator_cmd",
+        "actuator_valid",
+        "fault"
+      ]
+    }
+  ],
+  "policy": "Never invent physical pins. Unmapped I/O is explicit; Explorer uses core-only implementation while Prototyping blocks until every physical I/O is verified.",
+  "status": "completed",
+  "top_level_ports": [
+    "clk",
+    "rst_n",
+    "cfg_wr_en",
+    "cfg_rd_en",
+    "cfg_addr",
+    "cfg_wdata",
+    "cfg_rdata",
+    "req_valid",
+    "req_ready",
+    "req_data",
+    "resp_valid",
+    "resp_ready",
+    "resp_data",
+    "actuator_cmd",
+    "actuator_valid",
+    "fault"
+  ],
+  "top_module": "adaptive_aero_control_top"
+}
