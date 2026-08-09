@@ -1,0 +1,4 @@
+Digital Power Intent (UPF-Lite) Agent Report
+Spec mode: hierarchical
+Top module: adaptive_aero_control_top
+Domains: ['PD_TOP']

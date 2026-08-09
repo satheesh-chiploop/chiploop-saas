@@ -1,0 +1,46 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Single-clock synthesizable top-level transport-and-guard controller with a small scalar MMIO register window and a compact valid/ready model transport interface. The top integrates the internal MMIO/register block and the internal transport/FSM block only; it does not contain or expose any local surrogate-model implementation.",
+      "control_strategy": "Software programs scalar control and safety registers through the register window. The top-level control behavior is delegated to the transport block: issue at most one request when enabled and configuration-valid, hold req_valid until handshake or cancellation, accept only matching timely responses, and force deterministic fallback on reset, disable, timeout, invalid configuration, or protocol error.",
+      "state_strategy": "Use only small synthesizable state: configuration registers, status bits, a transaction ID counter, a freshness counter, and simple request/outstanding tracking. No bulk payload, geometry, mesh, or flow storage is implemented in flip-flops. Any required bulk/history storage is external to this contract and not part of this top-level intent.",
+      "output_strategy": "Drive req_valid/req_data and resp_ready from the transport logic, reg_rdata from the MMIO logic, and act_cmd_valid/act_cmd_data from the transport logic after validation or safe-fallback selection. All actuator outputs are subject to deterministic clamping when configuration is valid."
+    },
+    {
+      "name": "adaptive_aero_control_top_mmio",
+      "implementation_style": "Minimal scalar register decode and readback block. It stores only compact configuration fields and status-visible scalars, with geometry information reduced to descriptors/flags.",
+      "control_strategy": "Decode reg_we/reg_re/reg_addr/reg_wdata into writable control registers for enable, mode, velocity setpoint, freshness timeout, actuator min/max, safe fallback command, transaction ID seed, geometry format selector, and reference-geometry enable. Derive config_valid from scalar consistency rules, especially actuator_min <= actuator_max.",
+      "state_strategy": "Retain only small control/status registers and readable last-transaction fields. Do not implement any bulk geometry arrays, mesh data, pressure fields, or flow fields in registers or flip-flop storage.",
+      "output_strategy": "Provide semantically named configuration outputs to the transport controller and return readable status/configuration data via reg_rdata. Status inputs from transport are mirrored into the register view without side effects unless explicitly defined elsewhere in the spec.",
+      "ownership_notes": [
+        "Owns reg_rdata and all cfg_* configuration outputs plus config_valid.",
+        "Consumes transport status inputs for readable status reporting only.",
+        "Does not drive external request/response or actuator outputs."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_top_transport",
+      "implementation_style": "Compact request/response controller implemented as a simple FSM plus counters/comparators/saturation logic. It sequences request issuance, response validation, freshness expiration, fallback, and actuator clamping.",
+      "control_strategy": "When cfg_enable is asserted and config_valid is true, issue one request at a time and increment transaction ID monotonically per issuance. Maintain req_valid until req_ready handshake or cancellation by reset/disable. Assert resp_ready only while expecting a response. Accept resp_data only on resp_valid and resp_ready handshake with matching transaction ID and unexpired freshness window.",
+      "state_strategy": "Use a small number of control states consistent with the spec intent: idle/wait-to-issue, request-outstanding wait, response validation, command apply, and fallback. Avoid unnecessary complexity; keep the implementation simple and directly implied by the contract.",
+      "output_strategy": "Encode request metadata into req_data, including transaction ID, velocity setpoint, geometry descriptor flags, and control flags for DrivAerML reference geometry and STL format. Clamp both response-derived commands and safe-fallback commands to actuator min/max when configuration is valid. Emit act_cmd_valid with the selected bounded command and drive status bits for busy, outstanding, accepted, stale rejected, clamp applied, fallback active, protocol error, and last transaction IDs.",
+      "ownership_notes": [
+        "Owns req_valid, req_data, resp_ready, act_cmd_valid, act_cmd_data, and all transport/status outputs to MMIO.",
+        "Consumes only scalar configuration inputs and external req_ready/resp_valid/resp_data handshakes.",
+        "Does not drive any configuration inputs or external inbound signals."
+      ]
+    }
+  ],
+  "fsm_intent": [],
+  "datapath_intent": [],
+  "sequencing_notes": [],
+  "timing_notes": [],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

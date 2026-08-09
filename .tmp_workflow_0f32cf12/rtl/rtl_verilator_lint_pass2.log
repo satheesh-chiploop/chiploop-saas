@@ -1,0 +1,37 @@
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top_mmio.v:33:7: Signal is not used: 'reg_re'
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_mmio'
+   33 | input reg_re;
+      |       ^~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top_transport.v:43:13: Signal is not used: 'cfg_geometry_format'
+                                                                        : ... note: In instance 'adaptive_aero_control_top.u_transport'
+   43 | input [1:0] cfg_geometry_format;
+      |             ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top_transport.v:51:15: Bits of signal are not used: 'resp_data'[127:65,31:16]
+                                                                        : ... note: In instance 'adaptive_aero_control_top.u_transport'
+   51 | input [127:0] resp_data;
+      |               ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top_transport.v:88:12: Signal is not used: 'next_tx_id_r'
+                                                                        : ... note: In instance 'adaptive_aero_control_top.u_transport'
+   88 | reg [15:0] next_tx_id_r;
+      |            ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top_transport.v:90:12: Signal is not used: 'resp_cmd_r'
+                                                                        : ... note: In instance 'adaptive_aero_control_top.u_transport'
+   90 | reg [31:0] resp_cmd_r;
+      |            ^~~~~~~~~~
+%Error-BLKANDNBLK: pass2/adaptive_aero_control_top_transport.v:79:5: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'adaptive_aero_control_top.u_transport.status_clamp_applied_r'
+   79 | reg status_clamp_applied_r;
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+                   pass2/adaptive_aero_control_top_transport.v:141:59: ... Location of blocking assignment (bits [0:0])
+  141 |                     if (clamped_cmd_r != unclamped_cmd_r) status_clamp_applied_r = 1'b1;
+      |                                                           ^~~~~~~~~~~~~~~~~~~~~~
+                   pass2/adaptive_aero_control_top_transport.v:174:9: ... Location of nonblocking assignment (bits [0:0])
+  174 |         status_clamp_applied_r <= 1'b0;
+      |         ^~~~~~~~~~~~~~~~~~~~~~
+                   ... For error description see https://verilator.org/warn/BLKANDNBLK?v=5.047
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1

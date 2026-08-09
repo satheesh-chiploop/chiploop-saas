@@ -1,0 +1,81 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, external model request/response transport, validation, safety, timeout, fallback, and bounded actuator-command behavior.
+Implement a synthesizable FPGA digital IP block named adaptive_aero_control_top for an automotive active-aerodynamics controller. The block shall not implement the DoMINO surrogate model itself; it shall act as a request/response controller between a system CPU/software stack and the external GPU-hosted DoMINO service.
+
+Top-level architecture:
+- Single clock domain: clk, active-low reset rst_n.
+- Use a compact streaming interface for model transport with valid/ready handshake.
+- Use a small register window for configuration, control, and status.
+- Keep top-level I/O count below 256 scalar-equivalent pins.
+- Do not expose vehicle geometry arrays, mesh data, pressure fields, or flow fields as top-level pins.
+
+Required top-level ports:
+- Input clk, rst_n.
+- Outbound request stream: req_valid, req_ready, req_data[127:0].
+- Inbound response stream: resp_valid, resp_ready, resp_data[127:0].
+- Register window: reg_we, reg_re, reg_addr[7:0], reg_wdata[31:0], reg_rdata[31:0].
+- Actuator output: act_cmd_valid, act_cmd_data[31:0].
+
+Functional requirements:
+1) Configuration register file
+   - Implement small scalar registers for enable, mode, velocity setpoint, freshness timeout, actuator minimum, actuator maximum, safe-fallback command, and transaction ID seed.
+   - Store geometry metadata only as compact descriptors/flags, such as geometry format selector and reference-geometry source enable. Do not store bulk geometry data in flip-flop arrays.
+   - Registers shall be readable and writable via the register window.
+
+2) Request generation
+   - When enabled and not busy, package a request into req_data and assert req_valid.
+   - The request packet shall include: transaction ID, selected velocity setpoint, geometry reference metadata, and control flags indicating the use of the DrivAerML reference geometry and STL format.
+   - req_valid shall remain asserted until req_ready handshakes or the request is canceled by reset/disable.
+   - Transaction IDs shall increment monotonically for each new request.
+
+3) Response handling
+   - Accept resp_data only when resp_valid and resp_ready handshake occurs.
+   - Parse transaction ID, response validity, and compact command summary fields.
+   - Reject responses whose transaction ID does not match the most recent outstanding request.
+   - Reject responses arriving after the freshness timeout.
+   - On valid and timely response, advance toward actuator command update.
+
+4) Freshness and timeout
+   - Implement a cycle counter or timestamp-based freshness monitor.
+   - Start timing at request issuance and expire the request after the configured timeout.
+   - On timeout, clear outstanding-request state, assert fallback, and mark status accordingly.
+
+5) Safety and fallback
+   - Safety fallback shall force act_cmd_data to the configured safe-fallback command or to a deterministic safe default if the safe-fallback register is invalid.
+   - Fallback shall be entered on reset, timeout, malformed response, invalid status, disabled enable bit, or other protocol error.
+   - Once in fallback, the block shall continue to accept configuration writes and may exit fallback only when a valid configuration and new request are present.
+
+6) Actuator clamping
+   - Implement saturation logic to constrain command values to the programmed actuator min/max window.
+   - Clamp regardless of whether the source command comes from model response or safe-fallback path.
+   - If min > max in configuration, the block shall treat the configuration as invalid and remain in safe fallback until corrected.
+
+7) Status reporting
+   - Provide readable status bits for busy, request outstanding, response accepted, stale response rejected, clamp applied, fallback active, and protocol error.
+   - Provide last-accepted transaction ID and last-rejected transaction ID fields as compact registers.
+
+8) Reset behavior
+   - After reset, all outputs shall be deasserted, request state cleared, and fallback active until a valid enable and configuration are written.
+
+9) Synthesizability
+   - Use synthesizable RTL only: FSMs, counters, comparators, small register file, handshake logic, and saturation logic.
+   - Do not infer bulk storage as register arrays for payloads; only small control/status registers and state bits are allowed.
+   - Do not instantiate any ASIC hard macro in the FPGA prototype.
+
+Suggested internal state machines:
+- IDLE: waiting for enable and valid configuration.
+- ISSUE_REQ: drive req_valid and wait for req_ready.
+- WAIT_RESP: monitor resp_valid, transaction match, and timeout.
+- VALIDATE_RESP: check response status and freshness.
+- APPLY_CMD: clamp and emit act_cmd_valid/data.
+- FALLBACK: drive safe command and wait for recovery.
+
+Suggested internal datapath:
+- 32-bit command path for actuator command summary.
+- 16- or 32-bit cycle timer for freshness monitoring.
+- 16- or 32-bit transaction ID counter.
+- Status flags and small configuration registers.
+
+System integration assumptions:
+- The external software/GPU service performs the actual DoMINO inference using vehicle geometry and flow conditions.
+- The FPGA block is responsible for deterministic transport, guarding, and command enforcement for automotive aerodynamics control.
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.

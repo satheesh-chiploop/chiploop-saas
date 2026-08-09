@@ -1,0 +1,2129 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "adaptive_aero_control_top",
+  "rtl_file_count": 3,
+  "module_count": 3,
+  "modules": [
+    {
+      "name": "adaptive_aero_control_top",
+      "file": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top.v",
+      "input_count": 174,
+      "output_count": 195,
+      "inout_count": 0,
+      "input_port_count": 9,
+      "output_port_count": 6,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": "[127:0]"
+        },
+        {
+          "name": "resp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "resp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "resp_data",
+          "direction": "input",
+          "width": "[127:0]"
+        },
+        {
+          "name": "_we",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "_re",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reg_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "reg_wdata",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "reg_rdata",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "act_cmd_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "act_cmd_data",
+          "direction": "output",
+          "width": "[31:0]"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_top_mmio",
+      "file": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_mmio.v",
+      "input_count": 83,
+      "output_count": 183,
+      "inout_count": 0,
+      "input_port_count": 15,
+      "output_port_count": 12,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "_we",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "_re",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reg_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "reg_wdata",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "reg_rdata",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_mode",
+          "direction": "output",
+          "width": "[1:0]"
+        },
+        {
+          "name": "cfg_velocity_setpoint",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_timeout",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_actuator_min",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_actuator_max",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_safe_fallback_cmd",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_tx_id_seed",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geometry_format",
+          "direction": "output",
+          "width": "[1:0]"
+        },
+        {
+          "name": "cfg_ref_geometry_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_busy",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_req_outstanding",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_resp_accepted",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_stale_resp_rejected",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_clamp_applied",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_fallback_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_protocol_error",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_last_accepted_txid",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "status_last_rejected_txid",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "config_valid",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_top_transport",
+      "file": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v",
+      "input_count": 283,
+      "output_count": 202,
+      "inout_count": 0,
+      "input_port_count": 16,
+      "output_port_count": 14,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_mode",
+          "direction": "input",
+          "width": "[1:0]"
+        },
+        {
+          "name": "cfg_velocity_setpoint",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_timeout",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_actuator_min",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_actuator_max",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_safe_fallback_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_tx_id_seed",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geometry_format",
+          "direction": "input",
+          "width": "[1:0]"
+        },
+        {
+          "name": "cfg_ref_geometry_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "config_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": "[127:0]"
+        },
+        {
+          "name": "resp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "resp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "resp_data",
+          "direction": "input",
+          "width": "[127:0]"
+        },
+        {
+          "name": "act_cmd_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "act_cmd_data",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "status_busy",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_req_outstanding",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_resp_accepted",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_stale_resp_rejected",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_clamp_applied",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_protocol_error",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_last_accepted_txid",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "status_last_rejected_txid",
+          "direction": "output",
+          "width": "[15:0]"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 174,
+    "output_count": 195,
+    "inout_count": 0,
+    "input_port_count": 9,
+    "output_port_count": 6,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "rst_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "req_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "req_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "req_data",
+        "direction": "output",
+        "width": "[127:0]"
+      },
+      {
+        "name": "resp_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "resp_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "resp_data",
+        "direction": "input",
+        "width": "[127:0]"
+      },
+      {
+        "name": "_we",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "_re",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reg_addr",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "reg_wdata",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "reg_rdata",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "act_cmd_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "act_cmd_data",
+        "direction": "output",
+        "width": "[31:0]"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "rst_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "rst_n"
+  },
+  "storage": {
+    "flipflop_count": 387,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 28,
+    "latch_target_count": 0,
+    "sequential_blocks": 4,
+    "posedge_blocks": 2,
+    "negedge_blocks": 2,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "act_cmd_data_r",
+      "act_cmd_valid_r",
+      "cfg_actuator_max_r",
+      "cfg_actuator_min_r",
+      "cfg_enable_r",
+      "cfg_freshness_timeout_r",
+      "cfg_geometry_format_r",
+      "cfg_mode_r",
+      "cfg_ref_geometry_enable_r",
+      "cfg_safe_fallback_cmd_r",
+      "cfg_tx_id_seed_r",
+      "cfg_velocity_setpoint_r",
+      "config_valid_r",
+      "issue_age_r",
+      "req_data_r",
+      "req_valid_r",
+      "resp_ready_r",
+      "state",
+      "status_busy_r",
+      "status_clamp_applied_r",
+      "status_fallback_active_r",
+      "status_last_accepted_txid_r",
+      "status_last_rejected_txid_r",
+      "status_protocol_error_r",
+      "status_req_outstanding_r",
+      "status_resp_accepted_r",
+      "status_stale_resp_rejected_r",
+      "tx_id_r"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 2,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "errors",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 1,
+    "warning_count": 5,
+    "error_count": 2,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "adaptive_aero_control_top",
+      "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top.v",
+      "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_mmio.v",
+      "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v"
+    ],
+    "stdout_tail": [],
+    "stderr_tail": [
+      "%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_mmio.v:33:7: Signal is not used: 'reg_re'",
+      "                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_mmio'",
+      "   33 | input reg_re;",
+      "      |       ^~~~~~",
+      "                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047",
+      "                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:42:14: Signal is not used: 'cfg_tx_id_seed'",
+      "                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_transport'",
+      "   42 | input [15:0] cfg_tx_id_seed;",
+      "      |              ^~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:43:13: Signal is not used: 'cfg_geometry_format'",
+      "                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_transport'",
+      "   43 | input [1:0] cfg_geometry_format;",
+      "      |             ^~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:51:15: Bits of signal are not used: 'resp_data'[127:65,31:16]",
+      "                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_transport'",
+      "   51 | input [127:0] resp_data;",
+      "      |               ^~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:90:12: Signal is not used: 'resp_cmd_r'",
+      "                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_transport'",
+      "   90 | reg [31:0] resp_cmd_r;",
+      "      |            ^~~~~~~~~~",
+      "%Error-BLKANDNBLK: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:79:5: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'adaptive_aero_control_top.u_transport.status_clamp_applied_r'",
+      "   79 | reg status_clamp_applied_r;",
+      "      |     ^~~~~~~~~~~~~~~~~~~~~~",
+      "                   backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:141:59: ... Location of blocking assignment (bits [0:0])",
+      "  141 |                     if (clamped_cmd_r != unclamped_cmd_r) status_clamp_applied_r = 1'b1;",
+      "      |                                                           ^~~~~~~~~~~~~~~~~~~~~~",
+      "                   backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:174:9: ... Location of nonblocking assignment (bits [0:0])",
+      "  174 |         status_clamp_applied_r <= 1'b0;",
+      "      |         ^~~~~~~~~~~~~~~~~~~~~~",
+      "                   ... For error description see https://verilator.org/warn/BLKANDNBLK?v=5.047",
+      "%Error: Exiting due to 1 error(s)"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "adaptive_aero_control_top",
+        "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top.v",
+        "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_mmio.v",
+        "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v"
+      ],
+      "cwd": null,
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_mmio.v:33:7: Signal is not used: 'reg_re'\n                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_mmio'\n   33 | input reg_re;\n      |       ^~~~~~\n                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047\n                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:42:14: Signal is not used: 'cfg_tx_id_seed'\n                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_transport'\n   42 | input [15:0] cfg_tx_id_seed;\n      |              ^~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:43:13: Signal is not used: 'cfg_geometry_format'\n                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_transport'\n   43 | input [1:0] cfg_geometry_format;\n      |             ^~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:51:15: Bits of signal are not used: 'resp_data'[127:65,31:16]\n                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_transport'\n   51 | input [127:0] resp_data;\n      |               ^~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:90:12: Signal is not used: 'resp_cmd_r'\n                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_transport'\n   90 | reg [31:0] resp_cmd_r;\n      |            ^~~~~~~~~~\n%Error-BLKANDNBLK: backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:79:5: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'adaptive_aero_control_top.u_transport.status_clamp_applied_r'\n   79 | reg status_clamp_applied_r;\n      |     ^~~~~~~~~~~~~~~~~~~~~~\n                   backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:141:59: ... Location of blocking assignment (bits [0:0])\n  141 |                     if (clamped_cmd_r != unclamped_cmd_r) status_clamp_applied_r = 1'b1;\n      |                                                           ^~~~~~~~~~~~~~~~~~~~~~\n                   backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v:174:9: ... Location of nonblocking assignment (bits [0:0])\n  174 |         status_clamp_applied_r <= 1'b0;\n      |         ^~~~~~~~~~~~~~~~~~~~~~\n                   ... For error description see https://verilator.org/warn/BLKANDNBLK?v=5.047\n%Error: Exiting due to 1 error(s)\n",
+      "status": "failed",
+      "error": null,
+      "started_at": "2026-08-09T01:56:25.745535+00:00",
+      "ended_at": "2026-08-09T01:56:25.841562+00:00",
+      "elapsed_ms": 96
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 3,
+      "module_count": 3,
+      "modules": [
+        {
+          "name": "adaptive_aero_control_top",
+          "file": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top.v",
+          "input_count": 174,
+          "output_count": 195,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "resp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "resp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_re",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "reg_wdata",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "reg_rdata",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "act_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_top_mmio",
+          "file": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_mmio.v",
+          "input_count": 83,
+          "output_count": 183,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 12,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_re",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "reg_wdata",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "reg_rdata",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_velocity_setpoint",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_timeout",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_min",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_actuator_max",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_safe_fallback_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_tx_id_seed",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_format",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_ref_geometry_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_req_outstanding",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_resp_accepted",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_resp_rejected",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_clamp_applied",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_protocol_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_last_accepted_txid",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_last_rejected_txid",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "config_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_top_transport",
+          "file": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/rtl/adaptive_aero_control_top_transport.v",
+          "input_count": 283,
+          "output_count": 202,
+          "inout_count": 0,
+          "input_port_count": 16,
+          "output_port_count": 14,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_velocity_setpoint",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_timeout",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_actuator_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_safe_fallback_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_tx_id_seed",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_format",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_ref_geometry_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "config_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "resp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "resp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "act_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "status_busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_req_outstanding",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_resp_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_resp_rejected",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_clamp_applied",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_protocol_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_last_accepted_txid",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_last_rejected_txid",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 174,
+        "output_count": 195,
+        "inout_count": 0,
+        "input_port_count": 9,
+        "output_port_count": 6,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "req_data",
+            "direction": "output",
+            "width": "[127:0]"
+          },
+          {
+            "name": "resp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "resp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "resp_data",
+            "direction": "input",
+            "width": "[127:0]"
+          },
+          {
+            "name": "_we",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "_re",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reg_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "reg_wdata",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "reg_rdata",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "act_cmd_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "act_cmd_data",
+            "direction": "output",
+            "width": "[31:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 387,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 28,
+        "latch_target_count": 0,
+        "sequential_blocks": 4,
+        "posedge_blocks": 2,
+        "negedge_blocks": 2,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "act_cmd_data_r",
+          "act_cmd_valid_r",
+          "cfg_actuator_max_r",
+          "cfg_actuator_min_r",
+          "cfg_enable_r",
+          "cfg_freshness_timeout_r",
+          "cfg_geometry_format_r",
+          "cfg_mode_r",
+          "cfg_ref_geometry_enable_r",
+          "cfg_safe_fallback_cmd_r",
+          "cfg_tx_id_seed_r",
+          "cfg_velocity_setpoint_r",
+          "config_valid_r",
+          "issue_age_r",
+          "req_data_r",
+          "req_valid_r",
+          "resp_ready_r",
+          "state",
+          "status_busy_r",
+          "status_clamp_applied_r",
+          "status_fallback_active_r",
+          "status_last_accepted_txid_r",
+          "status_last_rejected_txid_r",
+          "status_protocol_error_r",
+          "status_req_outstanding_r",
+          "status_resp_accepted_r",
+          "status_stale_resp_rejected_r",
+          "tx_id_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 2,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 3,
+      "module_count": 3,
+      "modules": [
+        {
+          "name": "adaptive_aero_control_top",
+          "file": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_top.v",
+          "input_count": 174,
+          "output_count": 195,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "resp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "resp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_re",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "reg_wdata",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "reg_rdata",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "act_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_top_mmio",
+          "file": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_top_mmio.v",
+          "input_count": 83,
+          "output_count": 183,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 12,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_re",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "reg_wdata",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "reg_rdata",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_velocity_setpoint",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_timeout",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_min",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_actuator_max",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_safe_fallback_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_tx_id_seed",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_format",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_ref_geometry_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_req_outstanding",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_resp_accepted",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_resp_rejected",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_clamp_applied",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_protocol_error",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_last_accepted_txid",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_last_rejected_txid",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "config_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_top_transport",
+          "file": "backend/workflows/0f32cf12-a986-4392-a158-d858b28a166a/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_top_transport.v",
+          "input_count": 283,
+          "output_count": 202,
+          "inout_count": 0,
+          "input_port_count": 16,
+          "output_port_count": 14,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_velocity_setpoint",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_timeout",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_min",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_actuator_max",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_safe_fallback_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_tx_id_seed",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_format",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_ref_geometry_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "config_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "resp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "resp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "resp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "act_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "act_cmd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "status_busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_req_outstanding",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_resp_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_resp_rejected",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_clamp_applied",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_protocol_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_last_accepted_txid",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_last_rejected_txid",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 174,
+        "output_count": 195,
+        "inout_count": 0,
+        "input_port_count": 9,
+        "output_port_count": 6,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "req_data",
+            "direction": "output",
+            "width": "[127:0]"
+          },
+          {
+            "name": "resp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "resp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "resp_data",
+            "direction": "input",
+            "width": "[127:0]"
+          },
+          {
+            "name": "_we",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "_re",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reg_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "reg_wdata",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "reg_rdata",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "act_cmd_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "act_cmd_data",
+            "direction": "output",
+            "width": "[31:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 387,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 28,
+        "latch_target_count": 0,
+        "sequential_blocks": 4,
+        "posedge_blocks": 2,
+        "negedge_blocks": 2,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "act_cmd_data_r",
+          "act_cmd_valid_r",
+          "cfg_actuator_max_r",
+          "cfg_actuator_min_r",
+          "cfg_enable_r",
+          "cfg_freshness_timeout_r",
+          "cfg_geometry_format_r",
+          "cfg_mode_r",
+          "cfg_ref_geometry_enable_r",
+          "cfg_safe_fallback_cmd_r",
+          "cfg_tx_id_seed_r",
+          "cfg_velocity_setpoint_r",
+          "config_valid_r",
+          "issue_age_r",
+          "req_data_r",
+          "req_valid_r",
+          "resp_ready_r",
+          "state",
+          "status_busy_r",
+          "status_clamp_applied_r",
+          "status_fallback_active_r",
+          "status_last_accepted_txid_r",
+          "status_last_rejected_txid_r",
+          "status_protocol_error_r",
+          "status_req_outstanding_r",
+          "status_resp_accepted_r",
+          "status_stale_resp_rejected_r",
+          "tx_id_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 2,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 13,
+    "registers": [
+      {
+        "name": "CTRL_ENABLE",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Enable bit for request generation and response processing.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When 1, the transport controller may issue requests and process responses. When 0, the controller cancels outstanding activity and enters safe fallback behavior."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_MODE",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Mode selector for transport/control behavior.",
+        "fields": [
+          {
+            "name": "MODE",
+            "lsb": 1,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Operational mode selector forwarded to the transport FSM."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_VELOCITY_SETPOINT",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Vehicle velocity setpoint used in request generation.",
+        "fields": [
+          {
+            "name": "VELOCITY_SETPOINT",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Selected vehicle velocity setpoint encoded into outbound requests."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_FRESHNESS_TIMEOUT",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Freshness timeout in cycles for outstanding requests.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum number of clock cycles allowed for a request to remain outstanding before timing out."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_ACTUATOR_MIN",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Minimum allowed actuator command.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower saturation bound for all emitted actuator commands."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_ACTUATOR_MAX",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Maximum allowed actuator command.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RW",
+            "reset": 2147483647,
+            "description": "Upper saturation bound for all emitted actuator commands."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_SAFE_FALLBACK_CMD",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Safe fallback actuator command used when no valid response is available.",
+        "fields": [
+          {
+            "name": "SAFE_FALLBACK_CMD",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Deterministic safe command used on reset, disable, timeout, invalid response, malformed response, protocol error, or invalid configuration."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_TX_ID_SEED",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "Transaction ID seed loaded into the request counter.",
+        "fields": [
+          {
+            "name": "TX_ID_SEED",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 1,
+            "description": "Initial transaction ID value used after reset and for request transaction sequencing."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_GEOMETRY_FORMAT",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Geometry format selector; compact descriptor only.",
+        "fields": [
+          {
+            "name": "GEOMETRY_FORMAT",
+            "lsb": 1,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact geometry format selector used in request packets."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_REF_GEOMETRY_ENABLE",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Reference-geometry source enable flag.",
+        "fields": [
+          {
+            "name": "REF_GEOMETRY_ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When 1, the request packet indicates use of the DrivAerML reference geometry source."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_WORD0",
+        "offset": "0x10",
+        "access": "RO",
+        "description": "Status bits including busy, request outstanding, response accepted, stale rejected, clamp applied, fallback active, and protocol error.",
+        "fields": [
+          {
+            "name": "BUSY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Controller is actively issuing a request, awaiting a response, or handling a transport transaction."
+          },
+          {
+            "name": "REQ_OUTSTANDING",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "A request has been issued and has not yet been completed or canceled."
+          },
+          {
+            "name": "RESP_ACCEPTED",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response was accepted on a valid and timely handshake."
+          },
+          {
+            "name": "STALE_RESP_REJECTED",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response was rejected because it was stale or outside the freshness window."
+          },
+          {
+            "name": "CLAMP_APPLIED",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "The emitted actuator command was saturated to the configured min/max window."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 1,
+            "description": "Deterministic safe fallback behavior is currently active."
+          },
+          {
+            "name": "PROTOCOL_ERROR",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "A protocol error, malformed response, ID mismatch, or invalid transaction condition has been detected."
+          },
+          {
+            "name": "CONFIG_VALID",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Derived configuration validity; asserted only when scalar bounds and required control fields are consistent."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_LAST_ACCEPTED_TXID",
+        "offset": "0x11",
+        "access": "RO",
+        "description": "Last accepted transaction ID.",
+        "fields": [
+          {
+            "name": "LAST_ACCEPTED_TXID",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Transaction ID associated with the most recent accepted response."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

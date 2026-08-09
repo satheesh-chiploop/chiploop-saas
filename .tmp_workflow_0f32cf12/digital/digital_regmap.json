@@ -1,0 +1,385 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 32,
+    "registers": [
+      {
+        "name": "CTRL_ENABLE",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Enable bit for request generation and response processing.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When 1, the transport controller may issue requests and process responses. When 0, the controller cancels outstanding activity and enters safe fallback behavior."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_MODE",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Mode selector for transport/control behavior.",
+        "fields": [
+          {
+            "name": "MODE",
+            "lsb": 1,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Operational mode selector forwarded to the transport FSM."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_VELOCITY_SETPOINT",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Vehicle velocity setpoint used in request generation.",
+        "fields": [
+          {
+            "name": "VELOCITY_SETPOINT",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Selected vehicle velocity setpoint encoded into outbound requests."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_FRESHNESS_TIMEOUT",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Freshness timeout in cycles for outstanding requests.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum number of clock cycles allowed for a request to remain outstanding before timing out."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_ACTUATOR_MIN",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Minimum allowed actuator command.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower saturation bound for all emitted actuator commands."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_ACTUATOR_MAX",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Maximum allowed actuator command.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RW",
+            "reset": 2147483647,
+            "description": "Upper saturation bound for all emitted actuator commands."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_SAFE_FALLBACK_CMD",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Safe fallback actuator command used when no valid response is available.",
+        "fields": [
+          {
+            "name": "SAFE_FALLBACK_CMD",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Deterministic safe command used on reset, disable, timeout, invalid response, malformed response, protocol error, or invalid configuration."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_TX_ID_SEED",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "Transaction ID seed loaded into the request counter.",
+        "fields": [
+          {
+            "name": "TX_ID_SEED",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 1,
+            "description": "Initial transaction ID value used after reset and for request transaction sequencing."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_GEOMETRY_FORMAT",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Geometry format selector; compact descriptor only.",
+        "fields": [
+          {
+            "name": "GEOMETRY_FORMAT",
+            "lsb": 1,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact geometry format selector used in request packets."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_REF_GEOMETRY_ENABLE",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Reference-geometry source enable flag.",
+        "fields": [
+          {
+            "name": "REF_GEOMETRY_ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When 1, the request packet indicates use of the DrivAerML reference geometry source."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; write as zero."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_WORD0",
+        "offset": "0x10",
+        "access": "RO",
+        "description": "Status bits including busy, request outstanding, response accepted, stale rejected, clamp applied, fallback active, and protocol error.",
+        "fields": [
+          {
+            "name": "BUSY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Controller is actively issuing a request, awaiting a response, or handling a transport transaction."
+          },
+          {
+            "name": "REQ_OUTSTANDING",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "A request has been issued and has not yet been completed or canceled."
+          },
+          {
+            "name": "RESP_ACCEPTED",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response was accepted on a valid and timely handshake."
+          },
+          {
+            "name": "STALE_RESP_REJECTED",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response was rejected because it was stale or outside the freshness window."
+          },
+          {
+            "name": "CLAMP_APPLIED",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "The emitted actuator command was saturated to the configured min/max window."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 1,
+            "description": "Deterministic safe fallback behavior is currently active."
+          },
+          {
+            "name": "PROTOCOL_ERROR",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "A protocol error, malformed response, ID mismatch, or invalid transaction condition has been detected."
+          },
+          {
+            "name": "CONFIG_VALID",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Derived configuration validity; asserted only when scalar bounds and required control fields are consistent."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_LAST_ACCEPTED_TXID",
+        "offset": "0x11",
+        "access": "RO",
+        "description": "Last accepted transaction ID.",
+        "fields": [
+          {
+            "name": "LAST_ACCEPTED_TXID",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Transaction ID associated with the most recent accepted response."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_LAST_REJECTED_TXID",
+        "offset": "0x12",
+        "access": "RO",
+        "description": "Last rejected transaction ID.",
+        "fields": [
+          {
+            "name": "LAST_REJECTED_TXID",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Transaction ID associated with the most recent rejected response or protocol fault."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Write CTRL_ACTUATOR_MIN and CTRL_ACTUATOR_MAX first, then verify CTRL_ACTUATOR_MIN <= CTRL_ACTUATOR_MAX.",
+      "Write CTRL_SAFE_FALLBACK_CMD with a deterministic safe value.",
+      "Write CTRL_TX_ID_SEED with the desired starting transaction ID seed.",
+      "Write CTRL_GEOMETRY_FORMAT and CTRL_REF_GEOMETRY_ENABLE as compact geometry descriptors only.",
+      "Write CTRL_VELOCITY_SETPOINT and CTRL_FRESHNESS_TIMEOUT.",
+      "Write CTRL_MODE if required by the application.",
+      "Write CTRL_ENABLE with ENABLE=1 as the final step to allow request generation."
+    ],
+    "polling_sequence": [
+      "Poll STATUS_WORD0.BUSY and STATUS_WORD0.REQ_OUTSTANDING to determine whether a model transaction is active.",
+      "Poll STATUS_WORD0.RESP_ACCEPTED for a successful response event.",
+      "Poll STATUS_WORD0.STALE_RESP_REJECTED and STATUS_WORD0.PROTOCOL_ERROR for transport contract violations.",
+      "Poll STATUS_WORD0.FALLBACK_ACTIVE to confirm fallback behavior during reset, disable, timeout, or invalid configuration.",
+      "Read STATUS_LAST_ACCEPTED_TXID and STATUS_LAST_REJECTED_TXID to track transaction outcome history."
+    ],
+    "irq_sequence": []
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is scalar-only and does not expose bulk geometry, mesh, pressure, or flow fields.",
+    "The bus description follows the spec's minimal custom register window intent and does not imply AXI/APB behavior.",
+    "Status and control fields map directly to the specified top-level and internal MMIO contract.",
+    "No new hierarchy, ports, or unsupported interfaces are introduced."
+  ]
+}

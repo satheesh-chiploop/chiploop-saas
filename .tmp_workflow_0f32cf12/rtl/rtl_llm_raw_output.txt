@@ -1,0 +1,584 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top(
+    clk,
+    rst_n,
+    req_valid,
+    req_ready,
+    req_data,
+    resp_valid,
+    resp_ready,
+    resp_data,
+    reg_we,
+    reg_re,
+    reg_addr,
+    reg_wdata,
+    reg_rdata,
+    act_cmd_valid,
+    act_cmd_data
+);
+input clk;
+input rst_n;
+output req_valid;
+input req_ready;
+output [127:0] req_data;
+input resp_valid;
+output resp_ready;
+input [127:0] resp_data;
+input reg_we;
+input reg_re;
+input [7:0] reg_addr;
+input [31:0] reg_wdata;
+output [31:0] reg_rdata;
+output act_cmd_valid;
+output [31:0] act_cmd_data;
+
+wire cfg_enable;
+wire [1:0] cfg_mode;
+wire [15:0] cfg_velocity_setpoint;
+wire [15:0] cfg_freshness_timeout;
+wire [31:0] cfg_actuator_min;
+wire [31:0] cfg_actuator_max;
+wire [31:0] cfg_safe_fallback_cmd;
+wire [15:0] cfg_tx_id_seed;
+wire [1:0] cfg_geometry_format;
+wire cfg_ref_geometry_enable;
+wire status_busy;
+wire status_req_outstanding;
+wire status_resp_accepted;
+wire status_stale_resp_rejected;
+wire status_clamp_applied;
+wire status_fallback_active;
+wire status_protocol_error;
+wire [15:0] status_last_accepted_txid;
+wire [15:0] status_last_rejected_txid;
+wire config_valid;
+
+adaptive_aero_control_top_mmio u_mmio (
+    .clk(clk),
+    .rst_n(rst_n),
+    .reg_we(reg_we),
+    .reg_re(reg_re),
+    .reg_addr(reg_addr),
+    .reg_wdata(reg_wdata),
+    .reg_rdata(reg_rdata),
+    .cfg_enable(cfg_enable),
+    .cfg_mode(cfg_mode),
+    .cfg_velocity_setpoint(cfg_velocity_setpoint),
+    .cfg_freshness_timeout(cfg_freshness_timeout),
+    .cfg_actuator_min(cfg_actuator_min),
+    .cfg_actuator_max(cfg_actuator_max),
+    .cfg_safe_fallback_cmd(cfg_safe_fallback_cmd),
+    .cfg_tx_id_seed(cfg_tx_id_seed),
+    .cfg_geometry_format(cfg_geometry_format),
+    .cfg_ref_geometry_enable(cfg_ref_geometry_enable),
+    .status_busy(status_busy),
+    .status_req_outstanding(status_req_outstanding),
+    .status_resp_accepted(status_resp_accepted),
+    .status_stale_resp_rejected(status_stale_resp_rejected),
+    .status_clamp_applied(status_clamp_applied),
+    .status_fallback_active(status_fallback_active),
+    .status_protocol_error(status_protocol_error),
+    .status_last_accepted_txid(status_last_accepted_txid),
+    .status_last_rejected_txid(status_last_rejected_txid),
+    .config_valid(config_valid)
+);
+
+adaptive_aero_control_top_transport u_transport (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_enable(cfg_enable),
+    .cfg_mode(cfg_mode),
+    .cfg_velocity_setpoint(cfg_velocity_setpoint),
+    .cfg_freshness_timeout(cfg_freshness_timeout),
+    .cfg_actuator_min(cfg_actuator_min),
+    .cfg_actuator_max(cfg_actuator_max),
+    .cfg_safe_fallback_cmd(cfg_safe_fallback_cmd),
+    .cfg_tx_id_seed(cfg_tx_id_seed),
+    .cfg_geometry_format(cfg_geometry_format),
+    .cfg_ref_geometry_enable(cfg_ref_geometry_enable),
+    .config_valid(config_valid),
+    .req_ready(req_ready),
+    .req_valid(req_valid),
+    .req_data(req_data),
+    .resp_valid(resp_valid),
+    .resp_ready(resp_ready),
+    .resp_data(resp_data),
+    .act_cmd_valid(act_cmd_valid),
+    .act_cmd_data(act_cmd_data),
+    .status_busy(status_busy),
+    .status_req_outstanding(status_req_outstanding),
+    .status_resp_accepted(status_resp_accepted),
+    .status_stale_resp_rejected(status_stale_resp_rejected),
+    .status_clamp_applied(status_clamp_applied),
+    .status_fallback_active(status_fallback_active),
+    .status_protocol_error(status_protocol_error),
+    .status_last_accepted_txid(status_last_accepted_txid),
+    .status_last_rejected_txid(status_last_rejected_txid)
+);
+
+endmodule
+
+module adaptive_aero_control_top_mmio(
+    clk,
+    rst_n,
+    reg_we,
+    reg_re,
+    reg_addr,
+    reg_wdata,
+    reg_rdata,
+    cfg_enable,
+    cfg_mode,
+    cfg_velocity_setpoint,
+    cfg_freshness_timeout,
+    cfg_actuator_min,
+    cfg_actuator_max,
+    cfg_safe_fallback_cmd,
+    cfg_tx_id_seed,
+    cfg_geometry_format,
+    cfg_ref_geometry_enable,
+    status_busy,
+    status_req_outstanding,
+    status_resp_accepted,
+    status_stale_resp_rejected,
+    status_clamp_applied,
+    status_fallback_active,
+    status_protocol_error,
+    status_last_accepted_txid,
+    status_last_rejected_txid,
+    config_valid
+);
+input clk;
+input rst_n;
+input reg_we;
+input reg_re;
+input [7:0] reg_addr;
+input [31:0] reg_wdata;
+output [31:0] reg_rdata;
+output cfg_enable;
+output [1:0] cfg_mode;
+output [15:0] cfg_velocity_setpoint;
+output [15:0] cfg_freshness_timeout;
+output [31:0] cfg_actuator_min;
+output [31:0] cfg_actuator_max;
+output [31:0] cfg_safe_fallback_cmd;
+output [15:0] cfg_tx_id_seed;
+output [1:0] cfg_geometry_format;
+output cfg_ref_geometry_enable;
+input status_busy;
+input status_req_outstanding;
+input status_resp_accepted;
+input status_stale_resp_rejected;
+input status_clamp_applied;
+input status_fallback_active;
+input status_protocol_error;
+input [15:0] status_last_accepted_txid;
+input [15:0] status_last_rejected_txid;
+output config_valid;
+
+reg cfg_enable_r;
+reg [1:0] cfg_mode_r;
+reg [15:0] cfg_velocity_setpoint_r;
+reg [15:0] cfg_freshness_timeout_r;
+reg [31:0] cfg_actuator_min_r;
+reg [31:0] cfg_actuator_max_r;
+reg [31:0] cfg_safe_fallback_cmd_r;
+reg [15:0] cfg_tx_id_seed_r;
+reg [1:0] cfg_geometry_format_r;
+reg cfg_ref_geometry_enable_r;
+reg [31:0] reg_rdata_r;
+reg config_valid_r;
+reg [31:0] status_word0_r;
+reg [31:0] status_last_accepted_word_r;
+reg [31:0] status_last_rejected_word_r;
+
+assign cfg_enable = cfg_enable_r;
+assign cfg_mode = cfg_mode_r;
+assign cfg_velocity_setpoint = cfg_velocity_setpoint_r;
+assign cfg_freshness_timeout = cfg_freshness_timeout_r;
+assign cfg_actuator_min = cfg_actuator_min_r;
+assign cfg_actuator_max = cfg_actuator_max_r;
+assign cfg_safe_fallback_cmd = cfg_safe_fallback_cmd_r;
+assign cfg_tx_id_seed = cfg_tx_id_seed_r;
+assign cfg_geometry_format = cfg_geometry_format_r;
+assign cfg_ref_geometry_enable = cfg_ref_geometry_enable_r;
+assign reg_rdata = reg_rdata_r;
+assign config_valid = config_valid_r;
+
+always @(*) begin
+    status_word0_r = 32'h00000000;
+    status_word0_r[0] = status_busy;
+    status_word0_r[1] = status_req_outstanding;
+    status_word0_r[2] = status_resp_accepted;
+    status_word0_r[3] = status_stale_resp_rejected;
+    status_word0_r[4] = status_clamp_applied;
+    status_word0_r[5] = status_fallback_active;
+    status_word0_r[6] = status_protocol_error;
+    status_word0_r[7] = config_valid_r;
+    status_last_accepted_word_r = 32'h00000000;
+    status_last_accepted_word_r[15:0] = status_last_accepted_txid;
+    status_last_rejected_word_r = 32'h00000000;
+    status_last_rejected_word_r[15:0] = status_last_rejected_txid;
+    reg_rdata_r = 32'h00000000;
+    case (reg_addr)
+        8'h00: reg_rdata_r = {31'b0, cfg_enable_r};
+        8'h01: reg_rdata_r = {30'b0, cfg_mode_r};
+        8'h02: reg_rdata_r = {16'b0, cfg_velocity_setpoint_r};
+        8'h03: reg_rdata_r = {16'b0, cfg_freshness_timeout_r};
+        8'h04: reg_rdata_r = cfg_actuator_min_r;
+        8'h05: reg_rdata_r = cfg_actuator_max_r;
+        8'h06: reg_rdata_r = cfg_safe_fallback_cmd_r;
+        8'h07: reg_rdata_r = {16'b0, cfg_tx_id_seed_r};
+        8'h08: reg_rdata_r = {30'b0, cfg_geometry_format_r};
+        8'h09: reg_rdata_r = {31'b0, cfg_ref_geometry_enable_r};
+        8'h10: reg_rdata_r = status_word0_r;
+        8'h11: reg_rdata_r = status_last_accepted_word_r;
+        8'h12: reg_rdata_r = status_last_rejected_word_r;
+        default: reg_rdata_r = 32'h00000000;
+    endcase
+end
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        cfg_enable_r <= 1'b0;
+        cfg_mode_r <= 2'b00;
+        cfg_velocity_setpoint_r <= 16'h0000;
+        cfg_freshness_timeout_r <= 16'h0000;
+        cfg_actuator_min_r <= 32'h00000000;
+        cfg_actuator_max_r <= 32'h7fffffff;
+        cfg_safe_fallback_cmd_r <= 32'h00000000;
+        cfg_tx_id_seed_r <= 16'h0001;
+        cfg_geometry_format_r <= 2'b00;
+        cfg_ref_geometry_enable_r <= 1'b0;
+        config_valid_r <= 1'b0;
+    end else begin
+        if (reg_we) begin
+            case (reg_addr)
+                8'h00: cfg_enable_r <= reg_wdata[0];
+                8'h01: cfg_mode_r <= reg_wdata[1:0];
+                8'h02: cfg_velocity_setpoint_r <= reg_wdata[15:0];
+                8'h03: cfg_freshness_timeout_r <= reg_wdata[15:0];
+                8'h04: cfg_actuator_min_r <= reg_wdata;
+                8'h05: cfg_actuator_max_r <= reg_wdata;
+                8'h06: cfg_safe_fallback_cmd_r <= reg_wdata;
+                8'h07: cfg_tx_id_seed_r <= reg_wdata[15:0];
+                8'h08: cfg_geometry_format_r <= reg_wdata[1:0];
+                8'h09: cfg_ref_geometry_enable_r <= reg_wdata[0];
+                default: begin
+                end
+            endcase
+        end
+        config_valid_r <= cfg_enable_r & (cfg_actuator_min_r <= cfg_actuator_max_r);
+    end
+end
+
+endmodule
+
+module adaptive_aero_control_top_transport(
+    clk,
+    rst_n,
+    cfg_enable,
+    cfg_mode,
+    cfg_velocity_setpoint,
+    cfg_freshness_timeout,
+    cfg_actuator_min,
+    cfg_actuator_max,
+    cfg_safe_fallback_cmd,
+    cfg_tx_id_seed,
+    cfg_geometry_format,
+    cfg_ref_geometry_enable,
+    config_valid,
+    req_ready,
+    req_valid,
+    req_data,
+    resp_valid,
+    resp_ready,
+    resp_data,
+    act_cmd_valid,
+    act_cmd_data,
+    status_busy,
+    status_req_outstanding,
+    status_resp_accepted,
+    status_stale_resp_rejected,
+    status_clamp_applied,
+    status_fallback_active,
+    status_protocol_error,
+    status_last_accepted_txid,
+    status_last_rejected_txid
+);
+input clk;
+input rst_n;
+input cfg_enable;
+input [1:0] cfg_mode;
+input [15:0] cfg_velocity_setpoint;
+input [15:0] cfg_freshness_timeout;
+input [31:0] cfg_actuator_min;
+input [31:0] cfg_actuator_max;
+input [31:0] cfg_safe_fallback_cmd;
+input [15:0] cfg_tx_id_seed;
+input [1:0] cfg_geometry_format;
+input cfg_ref_geometry_enable;
+input config_valid;
+input req_ready;
+output req_valid;
+output [127:0] req_data;
+input resp_valid;
+output resp_ready;
+input [127:0] resp_data;
+output act_cmd_valid;
+output [31:0] act_cmd_data;
+output status_busy;
+output status_req_outstanding;
+output status_resp_accepted;
+output status_stale_resp_rejected;
+output status_clamp_applied;
+output status_fallback_active;
+output status_protocol_error;
+output [15:0] status_last_accepted_txid;
+output [15:0] status_last_rejected_txid;
+
+localparam S_IDLE = 2'd0;
+localparam S_REQ = 2'd1;
+localparam S_WAIT = 2'd2;
+
+reg [1:0] state;
+reg [15:0] tx_id_r;
+reg [15:0] issue_age_r;
+reg req_valid_r;
+reg resp_ready_r;
+reg [127:0] req_data_r;
+reg act_cmd_valid_r;
+reg [31:0] act_cmd_data_r;
+reg status_busy_r;
+reg status_req_outstanding_r;
+reg status_resp_accepted_r;
+reg status_stale_resp_rejected_r;
+reg status_clamp_applied_r;
+reg status_fallback_active_r;
+reg status_protocol_error_r;
+reg [15:0] status_last_accepted_txid_r;
+reg [15:0] status_last_rejected_txid_r;
+reg [31:0] unclamped_cmd_r;
+reg [31:0] clamped_cmd_r;
+reg [31:0] fallback_cmd_r;
+reg [15:0] timeout_limit_r;
+reg [15:0] next_tx_id_r;
+reg [15:0] resp_tx_id_r;
+reg [31:0] resp_cmd_r;
+reg resp_ok_r;
+reg resp_match_r;
+reg timeout_hit_r;
+reg [31:0] min_cmd_r;
+reg [31:0] max_cmd_r;
+
+assign req_valid = req_valid_r;
+assign req_data = req_data_r;
+assign resp_ready = resp_ready_r;
+assign act_cmd_valid = act_cmd_valid_r;
+assign act_cmd_data = act_cmd_data_r;
+assign status_busy = status_busy_r;
+assign status_req_outstanding = status_req_outstanding_r;
+assign status_resp_accepted = status_resp_accepted_r;
+assign status_stale_resp_rejected = status_stale_resp_rejected_r;
+assign status_clamp_applied = status_clamp_applied_r;
+assign status_fallback_active = status_fallback_active_r;
+assign status_protocol_error = status_protocol_error_r;
+assign status_last_accepted_txid = status_last_accepted_txid_r;
+assign status_last_rejected_txid = status_last_rejected_txid_r;
+
+always @(*) begin
+    timeout_limit_r = cfg_freshness_timeout;
+    min_cmd_r = cfg_actuator_min;
+    max_cmd_r = cfg_actuator_max;
+    fallback_cmd_r = cfg_safe_fallback_cmd;
+    if (fallback_cmd_r < min_cmd_r) fallback_cmd_r = min_cmd_r;
+    if (fallback_cmd_r > max_cmd_r) fallback_cmd_r = max_cmd_r;
+    next_tx_id_r = tx_id_r + 16'h0001;
+    req_data_r = 128'h00000000000000000000000000000000;
+    req_data_r[15:0] = tx_id_r;
+    req_data_r[31:16] = cfg_velocity_setpoint;
+    req_data_r[33:32] = cfg_mode;
+    req_data_r[35:34] = cfg_geometry_format;
+    req_data_r[36] = cfg_ref_geometry_enable;
+    req_data_r[37] = cfg_enable;
+    req_data_r[127:38] = 90'b0;
+    unclamped_cmd_r = {16'b0, cfg_velocity_setpoint};
+    unclamped_cmd_r = unclamped_cmd_r + {30'b0, cfg_mode};
+    unclamped_cmd_r = unclamped_cmd_r + {31'b0, cfg_ref_geometry_enable};
+    resp_tx_id_r = resp_data[15:0];
+    resp_cmd_r = resp_data[63:32];
+    resp_ok_r = resp_data[64];
+    resp_match_r = (resp_tx_id_r == tx_id_r);
+    timeout_hit_r = (issue_age_r >= timeout_limit_r) && status_req_outstanding_r;
+    clamped_cmd_r = unclamped_cmd_r;
+    if (clamped_cmd_r < min_cmd_r) clamped_cmd_r = min_cmd_r;
+    if (clamped_cmd_r > max_cmd_r) clamped_cmd_r = max_cmd_r;
+    req_valid_r = 1'b0;
+    resp_ready_r = 1'b0;
+    act_cmd_valid_r = 1'b0;
+    act_cmd_data_r = fallback_cmd_r;
+    status_busy_r = 1'b0;
+    status_req_outstanding_r = 1'b0;
+    status_resp_accepted_r = 1'b0;
+    status_stale_resp_rejected_r = 1'b0;
+    status_clamp_applied_r = 1'b0;
+    status_fallback_active_r = 1'b1;
+    status_protocol_error_r = 1'b0;
+    case (state)
+        S_IDLE: begin
+            if (cfg_enable && config_valid) begin
+                req_valid_r = 1'b1;
+                req_data_r[15:0] = tx_id_r;
+                req_data_r[31:16] = cfg_velocity_setpoint;
+                req_data_r[33:32] = cfg_mode;
+                req_data_r[35:34] = cfg_geometry_format;
+                req_data_r[36] = cfg_ref_geometry_enable;
+                req_data_r[37] = cfg_enable;
+                req_data_r[127:38] = 90'b0;
+                status_busy_r = 1'b1;
+                status_req_outstanding_r = 1'b1;
+                status_fallback_active_r = 1'b0;
+            end
+        end
+        S_REQ: begin
+            req_valid_r = 1'b1;
+            req_data_r[15:0] = tx_id_r;
+            req_data_r[31:16] = cfg_velocity_setpoint;
+            req_data_r[33:32] = cfg_mode;
+            req_data_r[35:34] = cfg_geometry_format;
+            req_data_r[36] = cfg_ref_geometry_enable;
+            req_data_r[37] = cfg_enable;
+            req_data_r[127:38] = 90'b0;
+            status_busy_r = 1'b1;
+            status_req_outstanding_r = 1'b1;
+            status_fallback_active_r = 1'b0;
+        end
+        S_WAIT: begin
+            status_busy_r = 1'b1;
+            status_req_outstanding_r = 1'b1;
+            resp_ready_r = 1'b1;
+            status_fallback_active_r = 1'b0;
+            if (resp_valid && resp_ready_r) begin
+                if (resp_match_r && resp_ok_r && !timeout_hit_r) begin
+                    act_cmd_valid_r = 1'b1;
+                    act_cmd_data_r = clamped_cmd_r;
+                    status_resp_accepted_r = 1'b1;
+                    status_last_accepted_txid_r = tx_id_r;
+                    if (clamped_cmd_r != unclamped_cmd_r) status_clamp_applied_r = 1'b1;
+                end else begin
+                    act_cmd_valid_r = 1'b1;
+                    act_cmd_data_r = fallback_cmd_r;
+                    status_protocol_error_r = 1'b1;
+                    status_last_rejected_txid_r = resp_tx_id_r;
+                end
+            end else if (timeout_hit_r) begin
+                act_cmd_valid_r = 1'b1;
+                act_cmd_data_r = fallback_cmd_r;
+                status_stale_resp_rejected_r = 1'b1;
+                status_last_rejected_txid_r = tx_id_r;
+                status_fallback_active_r = 1'b1;
+            end
+        end
+        default: begin
+            req_valid_r = 1'b0;
+            resp_ready_r = 1'b0;
+            act_cmd_valid_r = 1'b0;
+            act_cmd_data_r = fallback_cmd_r;
+            status_fallback_active_r = 1'b1;
+        end
+    endcase
+end
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        state <= S_IDLE;
+        tx_id_r <= 16'h0001;
+        issue_age_r <= 16'h0000;
+        req_valid_r <= 1'b0;
+        resp_ready_r <= 1'b0;
+        req_data_r <= 128'h00000000000000000000000000000000;
+        act_cmd_valid_r <= 1'b0;
+        act_cmd_data_r <= 32'h00000000;
+        status_busy_r <= 1'b0;
+        status_req_outstanding_r <= 1'b0;
+        status_resp_accepted_r <= 1'b0;
+        status_stale_resp_rejected_r <= 1'b0;
+        status_clamp_applied_r <= 1'b0;
+        status_fallback_active_r <= 1'b1;
+        status_protocol_error_r <= 1'b0;
+        status_last_accepted_txid_r <= 16'h0000;
+        status_last_rejected_txid_r <= 16'h0000;
+    end else begin
+        status_resp_accepted_r <= 1'b0;
+        status_stale_resp_rejected_r <= 1'b0;
+        status_clamp_applied_r <= 1'b0;
+        if (!cfg_enable || !config_valid) begin
+            state <= S_IDLE;
+            issue_age_r <= 16'h0000;
+            status_fallback_active_r <= 1'b1;
+            status_busy_r <= 1'b0;
+            status_req_outstanding_r <= 1'b0;
+            req_valid_r <= 1'b0;
+            resp_ready_r <= 1'b0;
+            act_cmd_valid_r <= 1'b1;
+            act_cmd_data_r <= fallback_cmd_r;
+            if (!config_valid) status_protocol_error_r <= 1'b1;
+        end else begin
+            case (state)
+                S_IDLE: begin
+                    act_cmd_valid_r <= 1'b0;
+                    if (req_ready) begin
+                        state <= S_WAIT;
+                        tx_id_r <= next_tx_id_r;
+                        issue_age_r <= 16'h0000;
+                    end else begin
+                        state <= S_REQ;
+                    end
+                end
+                S_REQ: begin
+                    if (req_ready) begin
+                        state <= S_WAIT;
+                        tx_id_r <= next_tx_id_r;
+                        issue_age_r <= 16'h0000;
+                    end
+                end
+                S_WAIT: begin
+                    if (issue_age_r != 16'hffff) issue_age_r <= issue_age_r + 16'h0001;
+                    if (resp_valid && resp_ready_r) begin
+                        if (resp_match_r && resp_ok_r && !timeout_hit_r) begin
+                            act_cmd_valid_r <= 1'b1;
+                            act_cmd_data_r <= clamped_cmd_r;
+                            status_resp_accepted_r <= 1'b1;
+                            status_last_accepted_txid_r <= tx_id_r;
+                            state <= S_IDLE;
+                            tx_id_r <= next_tx_id_r;
+                            issue_age_r <= 16'h0000;
+                            if (clamped_cmd_r != unclamped_cmd_r) status_clamp_applied_r <= 1'b1;
+                        end else begin
+                            act_cmd_valid_r <= 1'b1;
+                            act_cmd_data_r <= fallback_cmd_r;
+                            status_protocol_error_r <= 1'b1;
+                            status_last_rejected_txid_r <= resp_tx_id_r;
+                            state <= S_IDLE;
+                            tx_id_r <= next_tx_id_r;
+                            issue_age_r <= 16'h0000;
+                        end
+                    end else if (timeout_hit_r) begin
+                        act_cmd_valid_r <= 1'b1;
+                        act_cmd_data_r <= fallback_cmd_r;
+                        status_stale_resp_rejected_r <= 1'b1;
+                        status_last_rejected_txid_r <= tx_id_r;
+                        status_fallback_active_r <= 1'b1;
+                        state <= S_IDLE;
+                        issue_age_r <= 16'h0000;
+                    end
+                end
+                default: begin
+                    state <= S_IDLE;
+                end
+            endcase
+        end
+    end
+end
+
+endmodule
+---END adaptive_aero_control_top.v---

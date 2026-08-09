@@ -1,0 +1,1090 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level synthesizable FPGA controller that exposes request/response streaming ports and a small register window, sequences outbound DoMINO model requests, validates inbound responses, manages freshness timeout and protocol errors, and outputs a clamped actuator command or deterministic safe fallback command.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "resp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "resp_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "resp_data",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "reg_we",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reg_re",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reg_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "reg_wdata",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "reg_rdata",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "act_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "act_cmd_data",
+          "direction": "output",
+          "width": 32
+        }
+      ],
+      "functionality": "Implements an active-aerodynamics transport-and-guard controller. It accepts software configuration through a small register window, issues one outstanding DoMINO request at a time when enabled and configuration is valid, embeds transaction ID, selected velocity setpoint, geometry metadata, and request flags into req_data, and waits for a matching response. It accepts responses only when resp_valid and resp_ready handshake, rejects stale, mismatched, malformed, or invalid-status responses, and updates the actuator command only after validation. It clamps any command to programmed actuator min/max bounds and falls back to a safe command on reset, disable, timeout, protocol error, invalid configuration, or invalid response. It reports status and last transaction IDs through readable registers.",
+      "responsibilities": [
+        "Provide the sole top-level integration point for request/response streaming, register access, and actuator command emission.",
+        "Maintain one outstanding transaction ID and monotonically increment it for each new request issuance.",
+        "Encode compact model request packets with transaction ID, velocity setpoint, geometry source flags, and format selector flags.",
+        "Monitor freshness timeout from request issuance and expire the outstanding request when the configured limit is exceeded.",
+        "Validate response transaction ID, response-valid flag, and freshness before accepting command summary fields.",
+        "Clamp actuator commands to configured min/max bounds and mark clamp-applied status when saturation occurs.",
+        "Force deterministic safe fallback command on reset, timeout, disable, invalid configuration, malformed response, or protocol error.",
+        "Continue accepting register writes during fallback and permit recovery only after configuration becomes valid and a new request can be issued."
+      ],
+      "must_drive": [
+        "req_valid",
+        "req_data",
+        "resp_ready",
+        "reg_rdata",
+        "act_cmd_valid",
+        "act_cmd_data"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "req_ready",
+        "resp_valid",
+        "resp_data",
+        "reg_we",
+        "reg_re",
+        "reg_addr",
+        "reg_wdata"
+      ],
+      "must_not_drive": [
+        "req_ready",
+        "resp_valid",
+        "resp_data",
+        "reg_we",
+        "reg_re",
+        "reg_addr",
+        "reg_wdata"
+      ],
+      "reset_behavior": "On reset deassertion of rst_n or during reset assertion, clear all outstanding request state, clear busy and protocol status, deassert req_valid and resp_ready until the controller is ready, and drive act_cmd_valid low while forcing actuator command behavior to deterministic fallback on the next eligible update. Fallback remains active after reset until a valid configuration is present and enable is set.",
+      "behavior_rules": [
+        "req_valid must remain asserted once a request is issued until req_ready handshakes or the request is canceled by reset or disable.",
+        "A new request may be issued only when enabled, configuration is valid, no request is outstanding, and the controller is not blocked by timeout or protocol error recovery requirements.",
+        "Transaction IDs must increment monotonically for each new request and the latest outstanding ID must be used to validate responses.",
+        "Responses shall be accepted only on resp_valid and resp_ready handshake, with matching transaction ID and within freshness timeout.",
+        "If actuator minimum is greater than actuator maximum, configuration is invalid and the controller shall remain in safe fallback until corrected.",
+        "All commands, including safe fallback command, must be clamped to the programmed actuator min/max window when the configuration is valid; if the configuration is invalid, clamp behavior shall not escape safe fallback.",
+        "Status bits shall include busy, request outstanding, response accepted, stale response rejected, clamp applied, fallback active, and protocol error, and shall retain last accepted and last rejected transaction IDs until overwritten by subsequent events.",
+        "Geometry metadata shall be stored only as compact descriptors/flags including geometry format selector and reference-geometry source enable; bulk geometry data shall not be stored in flip-flops.",
+        "No top-level port shall expose vehicle geometry arrays, mesh data, pressure fields, or flow fields."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_control_top_mmio",
+        "description": "Internal MMIO/register and control-sequencing wrapper that decodes the external register window, maintains configuration/state/status registers, generates semantic control signals for the transport controller, and returns readable register data. This module is conceptually internal to the top-level contract and is not a separate top-level endpoint.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "reg_we",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reg_re",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reg_addr",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "reg_wdata",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "reg_rdata",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "cfg_velocity_setpoint",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_freshness_timeout",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_min",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_actuator_max",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_safe_fallback_cmd",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_tx_id_seed",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_geometry_format",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "cfg_ref_geometry_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_busy",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_req_outstanding",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_resp_accepted",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_stale_resp_rejected",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_clamp_applied",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_protocol_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_last_accepted_txid",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_last_rejected_txid",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "config_valid",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Decodes register read/write transactions, stores scalar control registers, exposes compact semantic configuration outputs, and assembles readable status words. It must not store bulk geometry, mesh, or flow payloads in flip-flop arrays. It only manages scalar configuration fields and status bookkeeping for the top-level controller.",
+        "responsibilities": [
+          "Accept external writes to enable, mode, velocity setpoint, freshness timeout, actuator min/max, safe fallback command, transaction ID seed, geometry format selector, and reference-geometry enable flag.",
+          "Provide readback of configuration, status, and last transaction ID fields through reg_rdata.",
+          "Generate explicit semantic configuration outputs used by the transport controller.",
+          "Expose config_valid based on programmed scalar register consistency, including actuator_min <= actuator_max and valid enable/configuration combinations.",
+          "Retain register contents across cycles and update only on reg_we transactions.",
+          "Supply register-derived status readback without requiring any bulk storage of model data."
+        ],
+        "must_drive": [
+          "reg_rdata",
+          "cfg_enable",
+          "cfg_mode",
+          "cfg_velocity_setpoint",
+          "cfg_freshness_timeout",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_safe_fallback_cmd",
+          "cfg_tx_id_seed",
+          "cfg_geometry_format",
+          "cfg_ref_geometry_enable",
+          "config_valid"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "reg_we",
+          "reg_re",
+          "reg_addr",
+          "reg_wdata",
+          "status_busy",
+          "status_req_outstanding",
+          "status_resp_accepted",
+          "status_stale_resp_rejected",
+          "status_clamp_applied",
+          "status_fallback_active",
+          "status_protocol_error",
+          "status_last_accepted_txid",
+          "status_last_rejected_txid"
+        ],
+        "must_not_drive": [
+          "reg_we",
+          "reg_re",
+          "reg_addr",
+          "reg_wdata",
+          "status_busy",
+          "status_req_outstanding",
+          "status_resp_accepted",
+          "status_stale_resp_rejected",
+          "status_clamp_applied",
+          "status_fallback_active",
+          "status_protocol_error",
+          "status_last_accepted_txid",
+          "status_last_rejected_txid"
+        ],
+        "reset_behavior": "Reset all configuration registers to deterministic safe values or zeros as defined by implementation policy, deassert register outputs until reset release, and preserve the requirement that the overall top-level controller enters fallback until a valid enable and configuration are present.",
+        "behavior_rules": [
+          "All writable fields shall be readable through the register window.",
+          "Geometry metadata shall be limited to compact descriptors/flags and shall not include bulk arrays or packet histories.",
+          "Config validity shall be asserted only when scalar bounds and required control fields are internally consistent.",
+          "Register reads shall be side-effect free unless the implementation explicitly documents status-clear behavior, which this contract does not require.",
+          "Status inputs from the controller shall be directly reflected into readable status fields using explicit scalar mapping."
+        ],
+        "rtl_output_file": "adaptive_aero_control_top_mmio.v"
+      },
+      {
+        "name": "adaptive_aero_control_top_transport",
+        "description": "Internal transport and control FSM that issues outbound requests, monitors response freshness, validates transaction IDs and response status, clamps commanded output, and manages fallback and recovery sequencing.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "cfg_velocity_setpoint",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_freshness_timeout",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_min",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_actuator_max",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_safe_fallback_cmd",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_tx_id_seed",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_geometry_format",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "cfg_ref_geometry_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "config_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "req_data",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "resp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "resp_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "resp_data",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "act_cmd_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "act_cmd_data",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "status_busy",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_req_outstanding",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_resp_accepted",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_stale_resp_rejected",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_clamp_applied",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_fallback_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_protocol_error",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_last_accepted_txid",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "status_last_rejected_txid",
+            "direction": "output",
+            "width": 16
+          }
+        ],
+        "functionality": "Implements the request/response FSM, including ID generation, request issuance, response handshake acceptance, transaction matching, timeout expiration, safe fallback, and actuator saturation. It packages the required metadata into 128-bit request words, parses response words, and emits bounded actuator commands only after valid and timely responses.",
+        "responsibilities": [
+          "Assemble outbound req_data with transaction ID, velocity setpoint, geometry reference metadata, geometry format selector, and control flags for DrivAerML reference geometry and STL format.",
+          "Assert req_valid until req_ready handshake occurs or request is canceled by reset or disable.",
+          "Assert resp_ready only when expecting a response and able to consume resp_data on handshake.",
+          "Reject mismatched, stale, malformed, or invalid-status responses and set protocol-error or stale-rejected status accordingly.",
+          "Maintain a freshness counter started at request issuance and expire the request at the configured timeout.",
+          "Force safe fallback command on reset, disable, timeout, invalid configuration, or protocol error.",
+          "Clamp all outgoing commands to the actuator min/max range when configuration is valid.",
+          "Drive status outputs for busy, request outstanding, response accepted, stale response rejected, clamp applied, fallback active, protocol error, and last transaction IDs."
+        ],
+        "must_drive": [
+          "req_valid",
+          "req_data",
+          "resp_ready",
+          "act_cmd_valid",
+          "act_cmd_data",
+          "status_busy",
+          "status_req_outstanding",
+          "status_resp_accepted",
+          "status_stale_resp_rejected",
+          "status_clamp_applied",
+          "status_fallback_active",
+          "status_protocol_error",
+          "status_last_accepted_txid",
+          "status_last_rejected_txid"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_enable",
+          "cfg_mode",
+          "cfg_velocity_setpoint",
+          "cfg_freshness_timeout",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_safe_fallback_cmd",
+          "cfg_tx_id_seed",
+          "cfg_geometry_format",
+          "cfg_ref_geometry_enable",
+          "config_valid",
+          "req_ready",
+          "resp_valid",
+          "resp_data"
+        ],
+        "must_not_drive": [
+          "cfg_enable",
+          "cfg_mode",
+          "cfg_velocity_setpoint",
+          "cfg_freshness_timeout",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_safe_fallback_cmd",
+          "cfg_tx_id_seed",
+          "cfg_geometry_format",
+          "cfg_ref_geometry_enable",
+          "config_valid",
+          "req_ready",
+          "resp_valid",
+          "resp_data"
+        ],
+        "reset_behavior": "Reset clears all FSM state, outstanding request tracking, freshness counter, response acceptance state, last transaction ID outputs, and deasserts req_valid, resp_ready, and act_cmd_valid. Fallback becomes active after reset and remains active until enable is asserted with valid configuration and a new request can be issued.",
+        "behavior_rules": [
+          "Only one outstanding request may exist at a time.",
+          "Transaction ID increments monotonically for each new issued request and the seed register sets the initial value after reset or reconfiguration as allowed by implementation.",
+          "The request packet must include compact geometry reference metadata and flags indicating use of DrivAerML reference geometry and STL format.",
+          "resp_data must be examined only on resp_valid and resp_ready handshake, and the embedded transaction ID must match the most recent outstanding request.",
+          "If the freshness timer exceeds cfg_freshness_timeout, the request shall be canceled, fallback asserted, and the response path shall reject any late response.",
+          "If cfg_actuator_min > cfg_actuator_max or config_valid is low, the controller shall remain in safe fallback until corrected.",
+          "Safe fallback command must be used when no valid response is available or when protocol errors occur.",
+          "Command clamping shall be applied regardless of whether the source command is from the response path or fallback path, subject to invalid-configuration handling requiring deterministic safe fallback.",
+          "Protocol error shall be asserted for malformed response status, mismatched transaction ID, invalid transaction semantics, or other transport contract violations.",
+          "Response accepted status shall pulse or update according to implementation policy on each accepted response, but must be readable through the register block."
+        ],
+        "rtl_output_file": "adaptive_aero_control_top_transport.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.clk",
+        "adaptive_aero_control_top_transport.clk"
+      ],
+      "description": "Distribute the single synchronous clock to MMIO and transport/control logic."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.rst_n",
+        "adaptive_aero_control_top_transport.rst_n"
+      ],
+      "description": "Distribute the active-low reset to MMIO and transport/control logic."
+    },
+    {
+      "top_port": "req_ready",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.req_ready"
+      ],
+      "description": "Outbound request backpressure from external GPU-hosted service into the transport FSM."
+    },
+    {
+      "top_port": "resp_valid",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.resp_valid"
+      ],
+      "description": "Inbound response valid from the external GPU-hosted service into the transport FSM."
+    },
+    {
+      "top_port": "resp_data",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.resp_data"
+      ],
+      "description": "Inbound 128-bit response payload from the external GPU-hosted service into the transport FSM."
+    },
+    {
+      "top_port": "reg_we",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.reg_we"
+      ],
+      "description": "External register write enable into the MMIO block."
+    },
+    {
+      "top_port": "reg_re",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.reg_re"
+      ],
+      "description": "External register read enable into the MMIO block."
+    },
+    {
+      "top_port": "reg_addr",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.reg_addr"
+      ],
+      "description": "External register address into the MMIO block."
+    },
+    {
+      "top_port": "reg_wdata",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.reg_wdata"
+      ],
+      "description": "External register write data into the MMIO block."
+    },
+    {
+      "top_port": "req_valid",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.req_valid"
+      ],
+      "description": "Outbound request valid driven by the transport FSM."
+    },
+    {
+      "top_port": "req_data",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.req_data"
+      ],
+      "description": "Outbound request packet driven by the transport FSM."
+    },
+    {
+      "top_port": "resp_ready",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.resp_ready"
+      ],
+      "description": "Inbound response ready driven by the transport FSM."
+    },
+    {
+      "top_port": "reg_rdata",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.reg_rdata"
+      ],
+      "description": "Readable register data returned from the MMIO block."
+    },
+    {
+      "top_port": "act_cmd_valid",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.act_cmd_valid"
+      ],
+      "description": "Actuator command valid driven by the transport FSM after validation or fallback emission."
+    },
+    {
+      "top_port": "act_cmd_data",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.act_cmd_data"
+      ],
+      "description": "Actuator command data driven by the transport FSM after clamping or fallback selection."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_enable",
+      "width": 1,
+      "source": "adaptive_aero_control_top_mmio.cfg_enable",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_enable"
+      ],
+      "description": "Semantic enable control from MMIO to transport FSM."
+    },
+    {
+      "name": "cfg_mode",
+      "width": 2,
+      "source": "adaptive_aero_control_top_mmio.cfg_mode",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_mode"
+      ],
+      "description": "Operational mode selector from MMIO to transport FSM."
+    },
+    {
+      "name": "cfg_velocity_setpoint",
+      "width": 16,
+      "source": "adaptive_aero_control_top_mmio.cfg_velocity_setpoint",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_velocity_setpoint"
+      ],
+      "description": "Requested vehicle velocity setpoint forwarded to request packet assembly."
+    },
+    {
+      "name": "cfg_freshness_timeout",
+      "width": 16,
+      "source": "adaptive_aero_control_top_mmio.cfg_freshness_timeout",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_freshness_timeout"
+      ],
+      "description": "Freshness timeout budget forwarded to transport timeout monitor."
+    },
+    {
+      "name": "cfg_actuator_min",
+      "width": 32,
+      "source": "adaptive_aero_control_top_mmio.cfg_actuator_min",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_actuator_min"
+      ],
+      "description": "Lower actuator saturation bound from MMIO to transport logic."
+    },
+    {
+      "name": "cfg_actuator_max",
+      "width": 32,
+      "source": "adaptive_aero_control_top_mmio.cfg_actuator_max",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_actuator_max"
+      ],
+      "description": "Upper actuator saturation bound from MMIO to transport logic."
+    },
+    {
+      "name": "cfg_safe_fallback_cmd",
+      "width": 32,
+      "source": "adaptive_aero_control_top_mmio.cfg_safe_fallback_cmd",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_safe_fallback_cmd"
+      ],
+      "description": "Deterministic safe fallback command from MMIO to transport logic."
+    },
+    {
+      "name": "cfg_tx_id_seed",
+      "width": 16,
+      "source": "adaptive_aero_control_top_mmio.cfg_tx_id_seed",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_tx_id_seed"
+      ],
+      "description": "Initial transaction ID seed from MMIO to transport logic."
+    },
+    {
+      "name": "cfg_geometry_format",
+      "width": 2,
+      "source": "adaptive_aero_control_top_mmio.cfg_geometry_format",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_geometry_format"
+      ],
+      "description": "Compact geometry format selector used in the request packet."
+    },
+    {
+      "name": "cfg_ref_geometry_enable",
+      "width": 1,
+      "source": "adaptive_aero_control_top_mmio.cfg_ref_geometry_enable",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_ref_geometry_enable"
+      ],
+      "description": "Compact reference-geometry source enable flag used in the request packet."
+    },
+    {
+      "name": "config_valid",
+      "width": 1,
+      "source": "adaptive_aero_control_top_mmio.config_valid",
+      "destinations": [
+        "adaptive_aero_control_top_transport.config_valid"
+      ],
+      "description": "Configuration validity indicator from MMIO to transport FSM."
+    },
+    {
+      "name": "status_busy",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.status_busy",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_busy"
+      ],
+      "description": "Busy status from transport FSM to MMIO readback."
+    },
+    {
+      "name": "status_req_outstanding",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.status_req_outstanding",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_req_outstanding"
+      ],
+      "description": "Outstanding-request status from transport FSM to MMIO readback."
+    },
+    {
+      "name": "status_resp_accepted",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.status_resp_accepted",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_resp_accepted"
+      ],
+      "description": "Response-accepted status from transport FSM to MMIO readback."
+    },
+    {
+      "name": "status_stale_resp_rejected",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.status_stale_resp_rejected",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_stale_resp_rejected"
+      ],
+      "description": "Stale-response rejection indicator from transport FSM to MMIO readback."
+    },
+    {
+      "name": "status_clamp_applied",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.status_clamp_applied",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_clamp_applied"
+      ],
+      "description": "Clamp-applied indicator from transport FSM to MMIO readback."
+    },
+    {
+      "name": "status_fallback_active",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.status_fallback_active",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_fallback_active"
+      ],
+      "description": "Fallback-active indicator from transport FSM to MMIO readback."
+    },
+    {
+      "name": "status_protocol_error",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.status_protocol_error",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_protocol_error"
+      ],
+      "description": "Protocol-error indicator from transport FSM to MMIO readback."
+    },
+    {
+      "name": "status_last_accepted_txid",
+      "width": 16,
+      "source": "adaptive_aero_control_top_transport.status_last_accepted_txid",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_last_accepted_txid"
+      ],
+      "description": "Last accepted transaction ID from transport FSM to MMIO readback."
+    },
+    {
+      "name": "status_last_rejected_txid",
+      "width": 16,
+      "source": "adaptive_aero_control_top_transport.status_last_rejected_txid",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_last_rejected_txid"
+      ],
+      "description": "Last rejected transaction ID from transport FSM to MMIO readback."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "req_valid",
+      "owner": "adaptive_aero_control_top_transport.req_valid"
+    },
+    {
+      "signal": "req_data",
+      "owner": "adaptive_aero_control_top_transport.req_data"
+    },
+    {
+      "signal": "resp_ready",
+      "owner": "adaptive_aero_control_top_transport.resp_ready"
+    },
+    {
+      "signal": "reg_rdata",
+      "owner": "adaptive_aero_control_top_mmio.reg_rdata"
+    },
+    {
+      "signal": "act_cmd_valid",
+      "owner": "adaptive_aero_control_top_transport.act_cmd_valid"
+    },
+    {
+      "signal": "act_cmd_data",
+      "owner": "adaptive_aero_control_top_transport.act_cmd_data"
+    },
+    {
+      "signal": "cfg_enable",
+      "owner": "adaptive_aero_control_top_mmio.cfg_enable"
+    },
+    {
+      "signal": "cfg_mode",
+      "owner": "adaptive_aero_control_top_mmio.cfg_mode"
+    },
+    {
+      "signal": "cfg_velocity_setpoint",
+      "owner": "adaptive_aero_control_top_mmio.cfg_velocity_setpoint"
+    },
+    {
+      "signal": "cfg_freshness_timeout",
+      "owner": "adaptive_aero_control_top_mmio.cfg_freshness_timeout"
+    },
+    {
+      "signal": "cfg_actuator_min",
+      "owner": "adaptive_aero_control_top_mmio.cfg_actuator_min"
+    },
+    {
+      "signal": "cfg_actuator_max",
+      "owner": "adaptive_aero_control_top_mmio.cfg_actuator_max"
+    },
+    {
+      "signal": "cfg_safe_fallback_cmd",
+      "owner": "adaptive_aero_control_top_mmio.cfg_safe_fallback_cmd"
+    },
+    {
+      "signal": "cfg_tx_id_seed",
+      "owner": "adaptive_aero_control_top_mmio.cfg_tx_id_seed"
+    },
+    {
+      "signal": "cfg_geometry_format",
+      "owner": "adaptive_aero_control_top_mmio.cfg_geometry_format"
+    },
+    {
+      "signal": "cfg_ref_geometry_enable",
+      "owner": "adaptive_aero_control_top_mmio.cfg_ref_geometry_enable"
+    },
+    {
+      "signal": "config_valid",
+      "owner": "adaptive_aero_control_top_mmio.config_valid"
+    },
+    {
+      "signal": "status_busy",
+      "owner": "adaptive_aero_control_top_transport.status_busy"
+    },
+    {
+      "signal": "status_req_outstanding",
+      "owner": "adaptive_aero_control_top_transport.status_req_outstanding"
+    },
+    {
+      "signal": "status_resp_accepted",
+      "owner": "adaptive_aero_control_top_transport.status_resp_accepted"
+    },
+    {
+      "signal": "status_stale_resp_rejected",
+      "owner": "adaptive_aero_control_top_transport.status_stale_resp_rejected"
+    },
+    {
+      "signal": "status_clamp_applied",
+      "owner": "adaptive_aero_control_top_transport.status_clamp_applied"
+    },
+    {
+      "signal": "status_fallback_active",
+      "owner": "adaptive_aero_control_top_transport.status_fallback_active"
+    },
+    {
+      "signal": "status_protocol_error",
+      "owner": "adaptive_aero_control_top_transport.status_protocol_error"
+    },
+    {
+      "signal": "status_last_accepted_txid",
+      "owner": "adaptive_aero_control_top_transport.status_last_accepted_txid"
+    },
+    {
+      "signal": "status_last_rejected_txid",
+      "owner": "adaptive_aero_control_top_transport.status_last_rejected_txid"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "minimal",
+    "registers": [
+      {
+        "name": "CTRL_ENABLE",
+        "addr": 0,
+        "width": 1,
+        "access": "rw",
+        "reset": 0,
+        "description": "Enable bit for request generation and response processing."
+      },
+      {
+        "name": "CTRL_MODE",
+        "addr": 1,
+        "width": 2,
+        "access": "rw",
+        "reset": 0,
+        "description": "Mode selector for transport/control behavior."
+      },
+      {
+        "name": "CTRL_VELOCITY_SETPOINT",
+        "addr": 2,
+        "width": 16,
+        "access": "rw",
+        "reset": 0,
+        "description": "Vehicle velocity setpoint used in request generation."
+      },
+      {
+        "name": "CTRL_FRESHNESS_TIMEOUT",
+        "addr": 3,
+        "width": 16,
+        "access": "rw",
+        "reset": 0,
+        "description": "Freshness timeout in cycles for outstanding requests."
+      },
+      {
+        "name": "CTRL_ACTUATOR_MIN",
+        "addr": 4,
+        "width": 32,
+        "access": "rw",
+        "reset": 0,
+        "description": "Minimum allowed actuator command."
+      },
+      {
+        "name": "CTRL_ACTUATOR_MAX",
+        "addr": 5,
+        "width": 32,
+        "access": "rw",
+        "reset": 2147483647,
+        "description": "Maximum allowed actuator command."
+      },
+      {
+        "name": "CTRL_SAFE_FALLBACK_CMD",
+        "addr": 6,
+        "width": 32,
+        "access": "rw",
+        "reset": 0,
+        "description": "Safe fallback actuator command used when no valid response is available."
+      },
+      {
+        "name": "CTRL_TX_ID_SEED",
+        "addr": 7,
+        "width": 16,
+        "access": "rw",
+        "reset": 1,
+        "description": "Transaction ID seed loaded into the request counter."
+      },
+      {
+        "name": "CTRL_GEOMETRY_FORMAT",
+        "addr": 8,
+        "width": 2,
+        "access": "rw",
+        "reset": 0,
+        "description": "Geometry format selector; compact descriptor only."
+      },
+      {
+        "name": "CTRL_REF_GEOMETRY_ENABLE",
+        "addr": 9,
+        "width": 1,
+        "access": "rw",
+        "reset": 0,
+        "description": "Reference-geometry source enable flag."
+      },
+      {
+        "name": "STATUS_WORD0",
+        "addr": 16,
+        "width": 32,
+        "access": "ro",
+        "reset": 0,
+        "description": "Status bits including busy, outstanding, accepted, stale rejected, clamp applied, fallback active, and protocol error."
+      },
+      {
+        "name": "STATUS_LAST_ACCEPTED_TXID",
+        "addr": 17,
+        "width": 16,
+        "access": "ro",
+        "reset": 0,
+        "description": "Last accepted transaction ID."
+      },
+      {
+        "name": "STATUS_LAST_REJECTED_TXID",
+        "addr": 18,
+        "width": 16,
+        "access": "ro",
+        "reset": 0,
+        "description": "Last rejected transaction ID."
+      }
+    ]
+  }
+}
