@@ -979,7 +979,7 @@ export default function SystemSimAppPage() {
                   ]}
                 />
               </div>
-              <HemChildDashboardLinks logs={workflowRow?.logs} />
+              <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
               {closureWorkflowId ? (
                 <div className="mt-4 rounded-xl border border-cyan-900/60 bg-cyan-950/15 p-3">
                   <div className="font-semibold text-cyan-200">System Sim Closure Analysis</div>

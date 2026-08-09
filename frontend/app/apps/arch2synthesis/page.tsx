@@ -737,7 +737,7 @@ export default function Arch2SynthesisAppPage() {
                   disabled={workflowRow?.status !== "completed"}
                 />
               </div>
-              <HemChildDashboardLinks logs={workflowRow?.logs} />
+              <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
             </div>
             <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="synthesis" logs={workflowRow?.logs} />
             <AskThisRunPanel workflowId={workflowId} compact />

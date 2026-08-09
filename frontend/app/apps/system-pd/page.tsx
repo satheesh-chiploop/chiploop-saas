@@ -720,7 +720,7 @@ export default function SystemPDAppPage() {
                   Source System RTL: <span className="break-all text-slate-200">{systemRtlWorkflowId.trim() || workflowId}</span>
                 </div>
               </div>
-              <HemChildDashboardLinks logs={workflowRow?.logs} />
+              <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
               <div className="mt-4 w-full">
                 <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
               </div>

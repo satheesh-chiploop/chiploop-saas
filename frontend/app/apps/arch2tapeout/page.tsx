@@ -829,7 +829,7 @@ export default function Arch2TapeoutAppPage() {
                   disabled={workflowRow?.status !== "completed"}
                 />
               </div>
-              <HemChildDashboardLinks logs={workflowRow?.logs} />
+              <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
             </div>
             <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="tapeout" logs={workflowRow?.logs} />
             <AskThisRunPanel workflowId={workflowId} compact />

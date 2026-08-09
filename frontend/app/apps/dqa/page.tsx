@@ -411,7 +411,7 @@ export default function DQAAppPage() {
                     disabled={workflowRow?.status !== "completed"}
                   />
                 </div>
-                <HemChildDashboardLinks logs={workflowRow?.logs} />
+                <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
               </div>
               <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="dqa" logs={workflowRow?.logs} />
               <AskThisRunPanel workflowId={workflowId} compact />

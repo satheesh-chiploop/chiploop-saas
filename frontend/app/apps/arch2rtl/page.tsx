@@ -652,7 +652,7 @@ export default function Arch2RTLAppPage() {
                 <div className="mt-1">
                   status: <span className="text-slate-100">{arch2rtlReady ? "completed" : workflowRow?.status || "queued"}</span>
                 </div>
-                <HemChildDashboardLinks logs={workflowRow?.logs} />
+                <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button onClick={downloadZip} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                     {guidedOnboarding ? "Download ZIP and finish" : "Download ZIP (full=1)"}

@@ -314,9 +314,48 @@ type SupabaseHemChildRun = {
   dashboard_path: string;
 };
 
-export function HemChildDashboardLinks({ logs, runs }: { logs: string | null | undefined; runs?: SupabaseHemChildRun[] }) {
+export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: string | null | undefined; runs?: SupabaseHemChildRun[]; rootWorkflowId?: string | null }) {
+  const [linkedRuns, setLinkedRuns] = useState<SupabaseHemChildRun[]>([]);
+  const supabase = useMemo(() => createClientComponentClient(), []);
+
+  useEffect(() => {
+    if (!rootWorkflowId) {
+      setLinkedRuns([]);
+      return;
+    }
+    let active = true;
+    let interval: number | null = null;
+    const fetchLinkedRuns = async () => {
+      const { data, error } = await supabase
+        .from("workflows")
+        .select("id,name,status,definitions")
+        .contains("definitions", { hem_root_workflow_id: rootWorkflowId });
+      if (!active || error || !data) return;
+      const next = (data as Array<{ id: string; name?: string | null; status?: string | null; definitions?: Record<string, unknown> | null }>)
+        .filter((row) => Boolean(row.id))
+        .map((row) => {
+          const definitions = row.definitions || {};
+          const stage = String(definitions.hem_stage || "");
+          const dashboardStage = String(definitions.hem_dashboard_stage || stage || "run");
+          return {
+            workflow_id: row.id,
+            label: String(definitions.hem_stage_label || row.name || labelFromStage(stage)),
+            status: row.status || "running",
+            dashboard_path: `/dashboard/${row.id}?stage=${encodeURIComponent(dashboardStage)}&app=HEM`,
+          };
+        });
+      setLinkedRuns(next);
+    };
+    void fetchLinkedRuns();
+    interval = window.setInterval(() => void fetchLinkedRuns(), 2500);
+    return () => {
+      active = false;
+      if (interval) window.clearInterval(interval);
+    };
+  }, [rootWorkflowId, supabase]);
+
   const childRuns = useMemo(() => {
-    const authoritative = (runs || []).map((run) => ({
+    const authoritative = [...(runs || []), ...linkedRuns].map((run) => ({
       label: run.label,
       workflowId: run.workflow_id,
       dashboardPath: run.dashboard_path,
@@ -324,15 +363,17 @@ export function HemChildDashboardLinks({ logs, runs }: { logs: string | null | u
     }));
     const byId = new Map(authoritative.map((run) => [run.workflowId, run]));
     for (const parsed of parseHemChildRuns(logs)) {
-      if (!byId.has(parsed.workflowId)) byId.set(parsed.workflowId, parsed);
+      if (!byId.has(parsed.workflowId)) byId.set(parsed.workflowId, { ...parsed, status: parsed.status || "running" });
     }
-    return Array.from(byId.values());
-  }, [logs, runs]);
+    return Array.from(byId.values()).sort((a, b) => {
+      const aIndex = HEM_STAGE_ORDER.indexOf(stageFromLabel(a.label));
+      const bIndex = HEM_STAGE_ORDER.indexOf(stageFromLabel(b.label));
+      return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+    });
+  }, [linkedRuns, logs, runs]);
   const workflowIds = useMemo(() => childRuns.map((child) => child.workflowId), [childRuns]);
   const workflowIdKey = workflowIds.join(",");
   const [workflowStatuses, setWorkflowStatuses] = useState<Record<string, string>>({});
-  const supabase = useMemo(() => createClientComponentClient(), []);
-
   useEffect(() => {
     const ids = workflowIdKey.split(",").filter(Boolean);
     if (!ids.length) {
@@ -341,7 +382,7 @@ export function HemChildDashboardLinks({ logs, runs }: { logs: string | null | u
     }
 
     let active = true;
-    let interval: ReturnType<typeof window.setInterval> | null = null;
+    let interval: number | null = null;
     const fetchStatuses = async () => {
       const { data, error } = await supabase
         .from("workflows")

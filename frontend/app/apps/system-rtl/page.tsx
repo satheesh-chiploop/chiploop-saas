@@ -419,7 +419,7 @@ export default function SystemRTLAppPage() {
                       Open System Firmware
                     </button>
                   </div>
-                  <HemChildDashboardLinks logs={workflowRow?.logs} />
+                  <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
                 </div>
               ) : null}
             </div>

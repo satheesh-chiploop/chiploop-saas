@@ -79,6 +79,7 @@ class BackendQueryBuilder<T = any> implements PromiseLike<QueryResult<T | T[]>> 
   lte(column: string, value: any) { return this.filter("lte", column, value); }
   in(column: string, value: any[]) { return this.filter("in_", column, value); }
   is(column: string, value: any) { return this.filter("is_", column, value); }
+  contains(column: string, value: any) { return this.filter("contains", column, value); }
   or(expression: string) { this.spec.filters.push({ method: "or_", value: expression }); return this; }
 
   order(column: string, options?: { ascending?: boolean }) {

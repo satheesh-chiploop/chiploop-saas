@@ -306,7 +306,7 @@ export default function SystemDQAAppPage() {
                     Source System RTL: <span className="break-all text-slate-200">{systemRtlWorkflowId.trim() || workflowId}</span>
                   </div>
                 </div>
-                <HemChildDashboardLinks logs={workflowRow?.logs} />
+                <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
               </div>
               <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowRow?.status} stage="dqa" logs={workflowRow?.logs} />
               <AskThisRunPanel workflowId={workflowId} compact />

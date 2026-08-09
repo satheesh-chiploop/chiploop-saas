@@ -1177,7 +1177,7 @@ export default function VerifyAppPage() {
                         />
                       </div>
                     ) : null}
-                    <HemChildDashboardLinks logs={workflowRow?.logs} />
+                    <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
                   </div>
 
                   <WorkflowEvidenceDashboard
