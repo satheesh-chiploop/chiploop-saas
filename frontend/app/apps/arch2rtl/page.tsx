@@ -242,6 +242,11 @@ export default function Arch2RTLAppPage() {
     setSensorChainDemo(params.get("sensor_chain") === "1");
     setSecureChainDemo(params.get("secure_chain") === "1");
     setSafetyChainDemo(params.get("safety_chain") === "1");
+    const referenceChain = [
+      "pwm_chain", "uart_chain", "image_chain", "mbist_chain",
+      "sensor_chain", "secure_chain", "safety_chain",
+    ].some((key) => params.get(key) === "1");
+    if (referenceChain) setHemEnabled(true);
     let demo = ARCH2RTL_ONBOARDING_DEFAULTS;
     const raw = window.localStorage.getItem(ONBOARDING_DEMO_KEY);
 
@@ -652,13 +657,19 @@ export default function Arch2RTLAppPage() {
                 <div className="mt-1">
                   status: <span className="text-slate-100">{arch2rtlReady ? "completed" : workflowRow?.status || "queued"}</span>
                 </div>
-                <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
+                {hemEnabled ? (
+                  <HemChildDashboardLinks logs={workflowRow?.logs} rootWorkflowId={workflowId} />
+                ) : (
+                  <div className="mt-3 rounded-xl border border-slate-800 bg-black/20 p-3 text-xs text-slate-400">
+                    Automatic HEM is off for this run. Continue manually with Run Next Workflow.
+                  </div>
+                )}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button onClick={downloadZip} className="rounded-xl bg-slate-800 px-4 py-2 hover:bg-slate-700">
                     {guidedOnboarding ? "Download ZIP and finish" : "Download ZIP (full=1)"}
                   </button>
                 </div>
-                <div className="mt-4">
+                {!hemEnabled ? <div className="mt-4">
                   <NextWorkflowLauncher
                     currentStage="arch2rtl"
                     currentWorkflowId={workflowId}
@@ -693,7 +704,7 @@ Collect register readback, memory access, BIST status, assertion, and coverage e
                     }
                     verifyQuerySuffix={`${pwmChainDemo ? "&pwm_chain=1" : ""}${uartChainDemo ? "&uart_chain=1" : ""}${imageChainDemo ? "&image_chain=1" : ""}${mbistChainDemo ? "&mbist_chain=1" : ""}${sensorChainDemo ? "&sensor_chain=1" : ""}${secureChainDemo ? "&secure_chain=1" : ""}${safetyChainDemo ? "&safety_chain=1" : ""}`}
                   />
-                </div>
+                </div> : null}
               </div>
 
               <WorkflowEvidenceDashboard workflowId={workflowId} status={arch2rtlReady ? "completed" : workflowRow?.status} stage="arch2rtl" logs={workflowRow?.logs} />
@@ -719,8 +730,4 @@ Collect register readback, memory access, BIST status, assertion, and coverage e
     </main>
   );
 }
-
-
-
-
 

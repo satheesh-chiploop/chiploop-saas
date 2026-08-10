@@ -1,0 +1,8 @@
+backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/pass2/adaptive_aero_response_guard.v:135: syntax error
+backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/pass2/adaptive_aero_response_guard.v:135: error: Malformed statement
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

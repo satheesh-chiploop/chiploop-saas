@@ -1,0 +1,2772 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "adaptive_aero_control_top",
+  "rtl_file_count": 4,
+  "module_count": 4,
+  "modules": [
+    {
+      "name": "adaptive_aero_control_regs",
+      "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_control_regs.v",
+      "input_count": 380,
+      "output_count": 223,
+      "inout_count": 0,
+      "input_port_count": 19,
+      "output_port_count": 16,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reg_addr",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "_wr_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "_rd_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reg_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "reg_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "_rvalid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_mode",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "cfg_seq_seed",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_timeout_thresh",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_thresh",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_actuator_min",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_actuator_max",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_fallback_cmd",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_safe_cmd",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_velocity_ref",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geometry_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_queue_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_status_clear",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "sticky_fault_w1c",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "telemetry_requests_issued",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "telemetry_responses_accepted",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "telemetry_stale_rejects",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "telemetry_timeout_events",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "telemetry_clamp_events",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "telemetry_fallback_activations",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "telemetry_protocol_errors",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "telemetry_queue_occupancy",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "telemetry_last_error_code",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "telemetry_last_rsp_sequence",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "telemetry_last_rsp_age",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "telemetry_seq_counter",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "fault_summary",
+          "direction": "input",
+          "width": "[15:0]"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_top",
+      "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_control_top.v",
+      "input_count": 150,
+      "output_count": 149,
+      "inout_count": 0,
+      "input_port_count": 9,
+      "output_port_count": 8,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reg_addr",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "_wr_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "_rd_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reg_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "reg_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "_rvalid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "model_req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "model_req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_req_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "model_rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_rsp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "model_rsp_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "safe_mode",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_request_fsm",
+      "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_request_fsm.v",
+      "input_count": 57,
+      "output_count": 124,
+      "inout_count": 0,
+      "input_port_count": 10,
+      "output_port_count": 9,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_mode",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "cfg_seq_seed",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_queue_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_velocity_ref",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geometry_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "start_request",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "model_req_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "request_sequence",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_launch_cycle",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_outstanding",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "request_queue_occupancy",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "request_accepted_pulse",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "seq_counter",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "busy_reject",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_response_guard",
+      "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_response_guard.v",
+      "input_count": 221,
+      "output_count": 74,
+      "inout_count": 0,
+      "input_port_count": 16,
+      "output_port_count": 15,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_timeout_thresh",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_thresh",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_actuator_min",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_actuator_max",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_fallback_cmd",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_safe_cmd",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_velocity_ref",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_sequence",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_launch_cycle",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_outstanding",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "model_rsp_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "model_rsp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cycle_count",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "resp_accept_pulse",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "resp_reject_pulse",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "resp_stale_pulse",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "timeout_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "protocol_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "sticky_fault_bits",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "safe_mode",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "clamp_event",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "last_rsp_sequence",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "last_rsp_age",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "last_error_code",
+          "direction": "output",
+          "width": "[7:0]"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 150,
+    "output_count": 149,
+    "inout_count": 0,
+    "input_port_count": 9,
+    "output_port_count": 8,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reg_addr",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "_wr_en",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "_rd_en",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reg_wdata",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "reg_rdata",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "_rvalid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "model_req_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "model_req_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_req_data",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "model_rsp_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "model_rsp_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "model_rsp_data",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "actuator_cmd",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "actuator_cmd_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "safe_mode",
+        "direction": "output",
+        "width": "1"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 485,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 44,
+    "latch_target_count": 0,
+    "sequential_blocks": 6,
+    "posedge_blocks": 3,
+    "negedge_blocks": 3,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "actuator_cmd_r",
+      "actuator_cmd_valid_r",
+      "age_calc",
+      "busy_reject_r",
+      "cfg_actuator_max_r",
+      "cfg_actuator_min_r",
+      "cfg_enable_r",
+      "cfg_fallback_cmd_r",
+      "cfg_freshness_thresh_r",
+      "cfg_geometry_id_r",
+      "cfg_mode_r",
+      "cfg_queue_enable_r",
+      "cfg_safe_cmd_r",
+      "cfg_seq_seed_r",
+      "cfg_status_clear_r",
+      "cfg_timeout_thresh_r",
+      "cfg_velocity_ref_r",
+      "clamp_event_r",
+      "fallback_active_r",
+      "last_error_code_r",
+      "last_rsp_age_r",
+      "last_rsp_sequence_r",
+      "launch_cycle_cnt",
+      "model_req_data_r",
+      "model_req_valid_r",
+      "model_rsp_ready_r",
+      "protocol_fault_r",
+      "reg_rdata_r",
+      "reg_rvalid",
+      "request_accepted_pulse_r",
+      "request_launch_cycle_r",
+      "request_outstanding_r",
+      "request_queue_occupancy_r",
+      "request_sequence_r",
+      "resp_accept_pulse_r",
+      "resp_cmd_raw",
+      "resp_reject_pulse_r",
+      "resp_seq",
+      "resp_stale_pulse_r",
+      "safe_mode_r",
+      "seq_counter_r",
+      "sticky_fault_bits_r",
+      "sticky_fault_w1c_r",
+      "timeout_fault_r"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 3,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "errors",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 1,
+    "warning_count": 0,
+    "error_count": 2,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "adaptive_aero_control_top",
+      "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_control_regs.v",
+      "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_control_top.v",
+      "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_request_fsm.v",
+      "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_response_guard.v"
+    ],
+    "stdout_tail": [],
+    "stderr_tail": [
+      "%Error: backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_response_guard.v:134:67: syntax error, unexpected '['",
+      "  134 |             last_rsp_age_r <= (cycle_count - request_launch_cycle)[7:0];",
+      "      |                                                                   ^",
+      "        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.",
+      "%Error: Exiting due to 1 error(s)"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "adaptive_aero_control_top",
+        "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_control_regs.v",
+        "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_control_top.v",
+        "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_request_fsm.v",
+        "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_response_guard.v"
+      ],
+      "cwd": null,
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "%Error: backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_response_guard.v:134:67: syntax error, unexpected '['\n  134 |             last_rsp_age_r <= (cycle_count - request_launch_cycle)[7:0];\n      |                                                                   ^\n        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.\n%Error: Exiting due to 1 error(s)\n",
+      "status": "failed",
+      "error": null,
+      "started_at": "2026-08-09T21:35:09.213554+00:00",
+      "ended_at": "2026-08-09T21:35:09.310048+00:00",
+      "elapsed_ms": 96
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 4,
+      "module_count": 4,
+      "modules": [
+        {
+          "name": "adaptive_aero_control_regs",
+          "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_control_regs.v",
+          "input_count": 380,
+          "output_count": 223,
+          "inout_count": 0,
+          "input_port_count": 19,
+          "output_port_count": 16,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "_wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "reg_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_seq_seed",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_timeout_thresh",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_thresh",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_actuator_min",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_max",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_safe_cmd",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_velocity_ref",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_queue_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_status_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sticky_fault_w1c",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_requests_issued",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_responses_accepted",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_stale_rejects",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_timeout_events",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_clamp_events",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_fallback_activations",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_protocol_errors",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_queue_occupancy",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "telemetry_last_error_code",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "telemetry_last_rsp_sequence",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_last_rsp_age",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "telemetry_seq_counter",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "fault_summary",
+              "direction": "input",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_top",
+          "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_control_top.v",
+          "input_count": 150,
+          "output_count": 149,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 8,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "_wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "reg_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "model_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "actuator_cmd",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_mode",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_request_fsm",
+          "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_request_fsm.v",
+          "input_count": 57,
+          "output_count": 124,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 9,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_seq_seed",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_queue_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_velocity_ref",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "start_request",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_sequence",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_launch_cycle",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_outstanding",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_queue_occupancy",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_accepted_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "seq_counter",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "busy_reject",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_response_guard",
+          "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/rtl/adaptive_aero_response_guard.v",
+          "input_count": 221,
+          "output_count": 74,
+          "inout_count": 0,
+          "input_port_count": 16,
+          "output_port_count": 15,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_thresh",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_thresh",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_actuator_min",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_max",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_safe_cmd",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_velocity_ref",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_sequence",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_launch_cycle",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_outstanding",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "model_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cycle_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "resp_accept_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "resp_reject_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "resp_stale_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "protocol_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sticky_fault_bits",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_cmd",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_mode",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "clamp_event",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "last_rsp_sequence",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "last_rsp_age",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "last_error_code",
+              "direction": "output",
+              "width": "[7:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 150,
+        "output_count": 149,
+        "inout_count": 0,
+        "input_port_count": 9,
+        "output_port_count": 8,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reg_addr",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "_wr_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "_rd_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reg_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "reg_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "_rvalid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_req_data",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "model_rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_rsp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_rsp_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "actuator_cmd",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_cmd_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "safe_mode",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 485,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 44,
+        "latch_target_count": 0,
+        "sequential_blocks": 6,
+        "posedge_blocks": 3,
+        "negedge_blocks": 3,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_cmd_r",
+          "actuator_cmd_valid_r",
+          "age_calc",
+          "busy_reject_r",
+          "cfg_actuator_max_r",
+          "cfg_actuator_min_r",
+          "cfg_enable_r",
+          "cfg_fallback_cmd_r",
+          "cfg_freshness_thresh_r",
+          "cfg_geometry_id_r",
+          "cfg_mode_r",
+          "cfg_queue_enable_r",
+          "cfg_safe_cmd_r",
+          "cfg_seq_seed_r",
+          "cfg_status_clear_r",
+          "cfg_timeout_thresh_r",
+          "cfg_velocity_ref_r",
+          "clamp_event_r",
+          "fallback_active_r",
+          "last_error_code_r",
+          "last_rsp_age_r",
+          "last_rsp_sequence_r",
+          "launch_cycle_cnt",
+          "model_req_data_r",
+          "model_req_valid_r",
+          "model_rsp_ready_r",
+          "protocol_fault_r",
+          "reg_rdata_r",
+          "reg_rvalid",
+          "request_accepted_pulse_r",
+          "request_launch_cycle_r",
+          "request_outstanding_r",
+          "request_queue_occupancy_r",
+          "request_sequence_r",
+          "resp_accept_pulse_r",
+          "resp_cmd_raw",
+          "resp_reject_pulse_r",
+          "resp_seq",
+          "resp_stale_pulse_r",
+          "safe_mode_r",
+          "seq_counter_r",
+          "sticky_fault_bits_r",
+          "sticky_fault_w1c_r",
+          "timeout_fault_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 3,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 4,
+      "module_count": 4,
+      "modules": [
+        {
+          "name": "adaptive_aero_control_regs",
+          "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_regs.v",
+          "input_count": 380,
+          "output_count": 223,
+          "inout_count": 0,
+          "input_port_count": 19,
+          "output_port_count": 16,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "_wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "reg_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_seq_seed",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_timeout_thresh",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_thresh",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_actuator_min",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_max",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_safe_cmd",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_velocity_ref",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_queue_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_status_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sticky_fault_w1c",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_requests_issued",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_responses_accepted",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_stale_rejects",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_timeout_events",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_clamp_events",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_fallback_activations",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_protocol_errors",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "telemetry_queue_occupancy",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "telemetry_last_error_code",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "telemetry_last_rsp_sequence",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_last_rsp_age",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "telemetry_seq_counter",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "fault_summary",
+              "direction": "input",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_top",
+          "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_top.v",
+          "input_count": 150,
+          "output_count": 149,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 8,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_addr",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "_wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "_rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reg_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "reg_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "model_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "actuator_cmd",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_mode",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_request_fsm",
+          "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_request_fsm.v",
+          "input_count": 57,
+          "output_count": 124,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 9,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_seq_seed",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_queue_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_velocity_ref",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "start_request",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "request_sequence",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_launch_cycle",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_outstanding",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_queue_occupancy",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "request_accepted_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "seq_counter",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "busy_reject",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_response_guard",
+          "file": "backend/workflows/711a5e0e-7ba8-46af-9dd6-027f87283bf4/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_response_guard.v",
+          "input_count": 221,
+          "output_count": 74,
+          "inout_count": 0,
+          "input_port_count": 16,
+          "output_port_count": 15,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_thresh",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_thresh",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_actuator_min",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_max",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_safe_cmd",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_velocity_ref",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_sequence",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_launch_cycle",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_outstanding",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "model_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cycle_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "resp_accept_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "resp_reject_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "resp_stale_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "protocol_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sticky_fault_bits",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_cmd",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "actuator_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "safe_mode",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "clamp_event",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "last_rsp_sequence",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "last_rsp_age",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "last_error_code",
+              "direction": "output",
+              "width": "[7:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 150,
+        "output_count": 149,
+        "inout_count": 0,
+        "input_port_count": 9,
+        "output_port_count": 8,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reg_addr",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "_wr_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "_rd_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reg_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "reg_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "_rvalid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_req_data",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "model_rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "model_rsp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "model_rsp_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "actuator_cmd",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "actuator_cmd_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "safe_mode",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 493,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 45,
+        "latch_target_count": 0,
+        "sequential_blocks": 6,
+        "posedge_blocks": 3,
+        "negedge_blocks": 3,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_cmd_r",
+          "actuator_cmd_valid_r",
+          "age_calc16",
+          "age_calc8",
+          "busy_reject_r",
+          "cfg_actuator_max_r",
+          "cfg_actuator_min_r",
+          "cfg_enable_r",
+          "cfg_fallback_cmd_r",
+          "cfg_freshness_thresh_r",
+          "cfg_geometry_id_r",
+          "cfg_mode_r",
+          "cfg_queue_enable_r",
+          "cfg_safe_cmd_r",
+          "cfg_seq_seed_r",
+          "cfg_status_clear_r",
+          "cfg_timeout_thresh_r",
+          "cfg_velocity_ref_r",
+          "clamp_event_r",
+          "fallback_active_r",
+          "last_error_code_r",
+          "last_rsp_age_r",
+          "last_rsp_sequence_r",
+          "launch_cycle_cnt",
+          "model_req_data_r",
+          "model_req_valid_r",
+          "model_rsp_ready_r",
+          "protocol_fault_r",
+          "reg_rdata_r",
+          "reg_rvalid",
+          "request_accepted_pulse_r",
+          "request_launch_cycle_r",
+          "request_outstanding_r",
+          "request_queue_occupancy_r",
+          "request_sequence_r",
+          "resp_accept_pulse_r",
+          "resp_cmd_raw",
+          "resp_reject_pulse_r",
+          "resp_seq",
+          "resp_stale_pulse_r",
+          "safe_mode_r",
+          "seq_counter_r",
+          "sticky_fault_bits_r",
+          "sticky_fault_w1c_r",
+          "timeout_fault_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 3,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 18,
+    "registers": [
+      {
+        "name": "CTRL0",
+        "offset": "0x0000",
+        "access": "RW",
+        "description": "Core control and status-clear register.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Controller enable. When 0, request issuance is blocked and safe fallback behavior is asserted."
+          },
+          {
+            "name": "MODE",
+            "lsb": 3,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Operating mode selector. Encoded mode value consumed by request formatting and policy logic."
+          },
+          {
+            "name": "QUEUE_ENABLE",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW",
+            "reset": 0,
+            "description": "Allows bounded queueing of request descriptors when set; otherwise only one outstanding request is permitted."
+          },
+          {
+            "name": "STATUS_CLEAR",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RW",
+            "reset": 0,
+            "description": "Synchronous status-clear request. Write 1 to request clear of non-sticky status/control indicators as implemented by the register bank."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_SEED",
+        "offset": "0x0001",
+        "access": "RW",
+        "description": "Sequence seed and request sequencing control.",
+        "fields": [
+          {
+            "name": "SEQ_SEED",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Initial sequence counter seed used after reset or explicit re-initialization."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "REQ_POLICY",
+        "offset": "0x0002",
+        "access": "RW",
+        "description": "Request policy and reference conditions.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESH",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Timeout threshold in cycles. A request that remains outstanding longer than this value forces timeout fallback."
+          },
+          {
+            "name": "FRESHNESS_THRESH",
+            "lsb": 23,
+            "msb": 16,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum allowed response age in cycles/relative age units for stale-response rejection."
+          },
+          {
+            "name": "VELOCITY_REF",
+            "lsb": 39,
+            "msb": 24,
+            "access": "RW",
+            "reset": 3889,
+            "description": "Reference velocity setpoint in centi-m/s units. Default corresponds to 38.89 m/s."
+          },
+          {
+            "name": "GEOMETRY_ID",
+            "lsb": 55,
+            "msb": 40,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact geometry descriptor ID/pointer tag passed into request formatting."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 56,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_LIMITS",
+        "offset": "0x0003",
+        "access": "RW",
+        "description": "Actuator bounds and fallback commands.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Programmable minimum bounded actuator command."
+          },
+          {
+            "name": "ACTUATOR_MAX",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RW",
+            "reset": 65535,
+            "description": "Programmable maximum bounded actuator command."
+          },
+          {
+            "name": "FALLBACK_CMD",
+            "lsb": 47,
+            "msb": 32,
+            "access": "RW",
+            "reset": 0,
+            "description": "Fallback actuator command used when safe fallback is active."
+          },
+          {
+            "name": "SAFE_CMD",
+            "lsb": 63,
+            "msb": 48,
+            "access": "RW",
+            "reset": 0,
+            "description": "Deterministic conservative safe-state actuator command."
+          }
+        ]
+      },
+      {
+        "name": "STATUS0",
+        "offset": "0x0004",
+        "access": "RO",
+        "description": "Core live status.",
+        "fields": [
+          {
+            "name": "SAFE_MODE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 1,
+            "description": "Indicates safe fallback mode is active."
+          },
+          {
+            "name": "OUTSTANDING",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates at least one request is currently outstanding."
+          },
+          {
+            "name": "REQ_BUSY_REJECT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a launch attempt was rejected because resources were busy and queueing was not available."
+          },
+          {
+            "name": "TIMEOUT_FAULT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates timeout watchdog fault is active or latched."
+          },
+          {
+            "name": "PROTOCOL_FAULT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates response protocol or validation fault is active or latched."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates fallback command path is currently driving the actuator output."
+          },
+          {
+            "name": "CLAMP_EVENT",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the latest actuator command required clamping to configured min/max."
+          },
+          {
+            "name": "QUEUE_OCCUPANCY",
+            "lsb": 15,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current bounded request queue occupancy."
+          },
+          {
+            "name": "LAST_ERROR_CODE",
+            "lsb": 23,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most recent error classification code."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 24,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "STATUS1",
+        "offset": "0x0005",
+        "access": "RO",
+        "description": "Last response metadata.",
+        "fields": [
+          {
+            "name": "LAST_RSP_SEQUENCE",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last observed response sequence value."
+          },
+          {
+            "name": "LAST_RSP_AGE",
+            "lsb": 23,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Age of last observed response at evaluation time."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 24,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_COUNTER",
+        "offset": "0x0006",
+        "access": "RO",
+        "description": "Current sequence counter.",
+        "fields": [
+          {
+            "name": "SEQ_COUNTER",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current request sequence counter value."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_SUMMARY",
+        "offset": "0x0007",
+        "access": "RW1C",
+        "description": "Sticky fault summary register with write-one-to-clear semantics.",
+        "fields": [
+          {
+            "name": "FAULT_BITS",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Sticky fault bits. Write 1s to clear selected sticky fault conditions; write 0s have no effect."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTR_REQ_ISSUED",
+        "offset": "0x0008",
+        "access": "RO",
+        "description": "Telemetry counter: requests issued.",
+        "fields": [
+          {
+            "name": "COUNT",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Total number of accepted request issuances."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTR_RSP_ACCEPTED",
+        "offset": "0x0009",
+        "access": "RO",
+        "description": "Telemetry counter: responses accepted.",
+        "fields": [
+          {
+            "name": "COUNT",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Total number of accepted model responses."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTR_STALE_REJECTS",
+        "offset": "0x000A",
+        "access": "RO",
+        "description": "Telemetry counter: stale response rejects.",
+        "fields": [
+          {
+            "name": "COUNT",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Total number of stale responses rejected by freshness or age policy."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTR_TIMEOUTS",
+        "offset": "0x000B",
+        "access": "RO",
+        "description": "Telemetry counter: timeout events.",
+        "fields": [
+          {
+            "name": "COUNT",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Total number of timeout watchdog expirations."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; read as zero."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

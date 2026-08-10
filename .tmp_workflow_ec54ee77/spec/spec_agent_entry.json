@@ -1,0 +1,40 @@
+{
+  "workflow_id": "ec54ee77-b77e-42fa-ab44-ffafa8bc6a43",
+  "workflow_dir": "backend/workflows/ec54ee77-b77e-42fa-ab44-ffafa8bc6a43",
+  "spec_dir": "backend/workflows/ec54ee77-b77e-42fa-ab44-ffafa8bc6a43/spec",
+  "state_keys": [
+    "_agent_runtime_active",
+    "_participating_agents",
+    "app_name",
+    "artifact_dir",
+    "artifact_prefix",
+    "current_agent",
+    "design_language",
+    "hem_enabled",
+    "hem_mode",
+    "hem_stage_toggles",
+    "loop_type",
+    "project_name",
+    "run_id",
+    "spec",
+    "spec_text",
+    "supabase_client",
+    "template_workflow",
+    "template_workflow_name",
+    "toggles",
+    "top_module",
+    "user_id",
+    "workflow_chain",
+    "workflow_id",
+    "workflow_name"
+  ],
+  "input_candidates": {
+    "spec": "Design a parameterized PWM controller.\n\nThis version is controlled by firmware through a memory-mapped register interface.\n\nInputs:\n- clk\n- reset_n\n- wr_en\n- wr_addr[7:0]\n- wr_data[7:0]\n- rd_en\n- rd_addr[7:0]\n\nOutputs:\n- rd_data[7:0]\n- pwm_out\n- counter_value[7:0]\n\nRegister map:\n- 0x00 CONTROL: bit 0 ENABLE, read/write\n- 0x04 DUTY_CYCLE: duty_cycle[7:0], read/write\n- 0x08 PERIOD: period[7:0], read/write\n- 0x0C COUNTER_VALUE: counter_value[7:0], read-only status\n\nBehavior:\n- All registers and outputs reset to zero when reset_n is low.\n- Counter increments every clock while CONTROL.ENABLE is high and PERIOD is nonzero.\n- Counter wraps to zero when it reaches PERIOD.\n- pwm_out is high while enabled and counter_value is less than duty_cycle[7:0].\n- Reads return the addressed register value, including live COUNTER_VALUE status.\n\nGenerate synthesizable SystemVerilog, a register map, assertions, a simulation testbench, UPF-lite collateral, and a packaging manifest.",
+    "spec_text": "Design a parameterized PWM controller.\n\nThis version is controlled by firmware through a memory-mapped register interface.\n\nInputs:\n- clk\n- reset_n\n- wr_en\n- wr_addr[7:0]\n- wr_data[7:0]\n- rd_en\n- rd_addr[7:0]\n\nOutputs:\n- rd_data[7:0]\n- pwm_out\n- counter_value[7:0]\n\nRegister map:\n- 0x00 CONTROL: bit 0 ENABLE, read/write\n- 0x04 DUTY_CYCLE: duty_cycle[7:0], read/write\n- 0x08 PERIOD: period[7:0], read/write\n- 0x0C COUNTER_VALUE: counter_value[7:0], read-only status\n\nBehavior:\n- All registers and outputs reset to zero when reset_n is low.\n- Counter increments every clock while CONTROL.ENABLE is high and PERIOD is nonzero.\n- Counter wraps to zero when it reaches PERIOD.\n- pwm_out is high while enabled and counter_value is less than duty_cycle[7:0].\n- Reads return the addressed register value, including live COUNTER_VALUE status.\n\nGenerate synthesizable SystemVerilog, a register map, assertions, a simulation testbench, UPF-lite collateral, and a packaging manifest.",
+    "digital_spec": null,
+    "digital_spec_text": null,
+    "soc_spec": null,
+    "system_spec": null,
+    "description": null
+  }
+}

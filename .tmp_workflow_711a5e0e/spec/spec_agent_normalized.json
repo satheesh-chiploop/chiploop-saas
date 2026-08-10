@@ -1,0 +1,1177 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level adaptive aero control controller integrating MMIO register access, transport to an external DoMINO service, safety arbitration, actuator command generation, and telemetry exposure.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reg_addr",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "reg_wr_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reg_rd_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reg_wdata",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "reg_rdata",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "reg_rvalid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_req_data",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "model_rsp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_data",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "safe_mode",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "Implements a compact register window for configuration and telemetry, encodes and issues a 64-bit model request word when commanded, tracks one outstanding request or a bounded queue of descriptors, validates and accepts 64-bit model responses, times out stale or missing responses, clamps actuator output to programmable limits, and forces deterministic safe fallback behavior under reset, disable, protocol error, timeout, stale response, or invalid response conditions.",
+      "responsibilities": [
+        "Provide the single authoritative FPGA top module named adaptive_aero_control_top.",
+        "Expose a 64-bit register-mapped interface with 16-bit address space for configuration and telemetry.",
+        "Drive external model request valid and request data as outputs, and receive request ready as an input.",
+        "Receive external model response valid and response data as inputs, and drive response ready as an output.",
+        "Emit bounded actuator command output and valid strobe.",
+        "Assert safe_mode whenever fallback control is active or controller is disabled or recovering from reset.",
+        "Preserve deterministic behavior across reset and fault recovery.",
+        "Reject stale, mismatched, invalid, or policy-violating responses.",
+        "Clamp actuator outputs to configured min/max limits.",
+        "Maintain readable counters and sticky faults with write-one-to-clear semantics."
+      ],
+      "must_drive": [
+        "reg_rdata",
+        "reg_rvalid",
+        "model_req_valid",
+        "model_req_data",
+        "model_rsp_ready",
+        "actuator_cmd",
+        "actuator_cmd_valid",
+        "safe_mode"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "reg_addr",
+        "reg_wr_en",
+        "reg_rd_en",
+        "reg_wdata",
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_data"
+      ],
+      "must_not_drive": [
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_data",
+        "reg_addr",
+        "reg_wr_en",
+        "reg_rd_en",
+        "reg_wdata",
+        "clk",
+        "reset_n"
+      ],
+      "reset_behavior": "On reset assertion, clear outstanding request state, deassert model_req_valid, deassert actuator_cmd_valid, assert safe_mode, load the configured fallback command into the actuator path, clear non-sticky control state, and preserve or clear sticky telemetry only according to explicit write-one-to-clear register behavior after reset deassertion.",
+      "behavior_rules": [
+        "All writes are ignored while reset is asserted.",
+        "Request launches occur only when enabled, resource availability allows it, and start-request command is observed.",
+        "Sequence counter increments only on accepted request issuance.",
+        "At most one outstanding request is active unless queueing is explicitly enabled by configuration.",
+        "Timeout watchdog counts from launch cycle and forces fallback when threshold is exceeded.",
+        "Response acceptance requires valid handshake, matching sequence metadata, non-stale age, and policy-compliant numeric limits.",
+        "Invalid, stale, mismatched, or timeout responses increment telemetry counters and may force fallback.",
+        "Actuator commands are clamped to programmable min/max before driving outputs.",
+        "safe_mode dominates non-safe outputs under all fault conditions.",
+        "Status registers shall be readable through the same register window.",
+        "Sticky fault summary supports write-one-to-clear behavior only.",
+        "The controller must support an operating velocity range of 20 to 55 m/s and a current reference setpoint of 38.89 m/s via configuration and validation, but shall not hardcode model outputs."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_control_regs",
+        "description": "MMIO register-bank and telemetry decode module for configuration, status readback, and write-one-to-clear fault handling.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reg_addr",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "reg_wr_en",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reg_rd_en",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reg_wdata",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "reg_rdata",
+            "direction": "output",
+            "width": 64
+          },
+          {
+            "name": "reg_rvalid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode",
+            "direction": "output",
+            "width": 3
+          },
+          {
+            "name": "cfg_seq_seed",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_timeout_thresh",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_freshness_thresh",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_actuator_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_cmd",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_safe_cmd",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_velocity_ref",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_geometry_id",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_queue_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_clear",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "sticky_fault_w1c",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "telemetry_requests_issued",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "telemetry_responses_accepted",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "telemetry_stale_rejects",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "telemetry_timeout_events",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "telemetry_clamp_events",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "telemetry_fallback_activations",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "telemetry_protocol_errors",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "telemetry_queue_occupancy",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "telemetry_last_error_code",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "telemetry_last_rsp_sequence",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "telemetry_last_rsp_age",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "telemetry_seq_counter",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "fault_summary",
+            "direction": "input",
+            "width": 16
+          }
+        ],
+        "functionality": "Synchronous configuration register bank with readable status and counters. Provides enable, mode, sequence seed, request timeout threshold, freshness threshold, actuator minimum, actuator maximum, fallback command, safe fallback command, reference velocity, geometry descriptor ID/pointer, queue enable, and status-clear control. Exposes sticky fault write-one-to-clear semantics and readable telemetry counters. Decodes register accesses from a compact 64-bit data path and 16-bit address window.",
+        "responsibilities": [
+          "Latch configuration writes on reg_wr_en when reset_n is deasserted.",
+          "Present read data and read-valid strobe for status and configuration window accesses.",
+          "Drive semantic configuration outputs consumed by control, request, response, and safety logic.",
+          "Capture write-one-to-clear fault control via sticky_fault_w1c and cfg_status_clear.",
+          "Expose readable counters for requests, accepted responses, stale rejects, timeout events, clamp events, fallback activations, protocol errors, queue occupancy, last error code, last response sequence, last response age, and sequence counter.",
+          "Reject writes during reset.",
+          "Keep all register outputs synchronous and deterministic."
+        ],
+        "must_drive": [
+          "reg_rdata",
+          "reg_rvalid",
+          "cfg_enable",
+          "cfg_mode",
+          "cfg_seq_seed",
+          "cfg_timeout_thresh",
+          "cfg_freshness_thresh",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_fallback_cmd",
+          "cfg_safe_cmd",
+          "cfg_velocity_ref",
+          "cfg_geometry_id",
+          "cfg_queue_enable",
+          "cfg_status_clear",
+          "sticky_fault_w1c"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "reg_addr",
+          "reg_wr_en",
+          "reg_rd_en",
+          "reg_wdata",
+          "telemetry_requests_issued",
+          "telemetry_responses_accepted",
+          "telemetry_stale_rejects",
+          "telemetry_timeout_events",
+          "telemetry_clamp_events",
+          "telemetry_fallback_activations",
+          "telemetry_protocol_errors",
+          "telemetry_queue_occupancy",
+          "telemetry_last_error_code",
+          "telemetry_last_rsp_sequence",
+          "telemetry_last_rsp_age",
+          "telemetry_seq_counter",
+          "fault_summary"
+        ],
+        "must_not_drive": [
+          "clk",
+          "reset_n",
+          "reg_addr",
+          "reg_wr_en",
+          "reg_rd_en",
+          "reg_wdata",
+          "telemetry_requests_issued",
+          "telemetry_responses_accepted",
+          "telemetry_stale_rejects",
+          "telemetry_timeout_events",
+          "telemetry_clamp_events",
+          "telemetry_fallback_activations",
+          "telemetry_protocol_errors",
+          "telemetry_queue_occupancy",
+          "telemetry_last_error_code",
+          "telemetry_last_rsp_sequence",
+          "telemetry_last_rsp_age",
+          "telemetry_seq_counter",
+          "fault_summary"
+        ],
+        "reset_behavior": "Clear outputs, deassert read-valid, and return configuration outputs to safe defaults on reset. Writes are ignored while reset_n is low. Sticky fault clear and status clear actions take effect only after reset release and on explicit write access.",
+        "behavior_rules": [
+          "Every semantic configuration field must be a real output port.",
+          "Readback shall include configuration and status counters in a deterministic address map.",
+          "Write-one-to-clear semantics shall only clear the specified sticky fault bits.",
+          "No grouped or implicit control bundles are allowed; each configuration field is explicit.",
+          "Telemetry inputs are sampled synchronously and reported without combinational loops.",
+          "The register bank does not implement the model or actuator policy; it only exposes and captures control and status state."
+        ],
+        "rtl_output_file": "adaptive_aero_control_regs.v"
+      },
+      {
+        "name": "adaptive_aero_request_fsm",
+        "description": "Request formatter and outstanding-request controller that captures request metadata, encodes the 64-bit request word, and manages issue handshakes with the external model transport.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "cfg_seq_seed",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_queue_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_velocity_ref",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_geometry_id",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "start_request",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "model_req_data",
+            "direction": "output",
+            "width": 64
+          },
+          {
+            "name": "request_sequence",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "request_launch_cycle",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "request_outstanding",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "request_queue_occupancy",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "request_accepted_pulse",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "seq_counter",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "busy_reject",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Captures the current sequence counter, programmed velocity reference, geometry descriptor ID, and mode on a start-request command. Encodes a compact 64-bit request word and asserts model_req_valid until model_req_ready is observed. Increments the sequence counter only when request issuance is accepted. Maintains a bounded one-deep outstanding state or optional small queue when enabled. Rejects new launches while busy unless queueing is configured.",
+        "responsibilities": [
+          "Generate the external model request payload and valid strobe.",
+          "Hold request valid until ready is seen.",
+          "Track outstanding request metadata with flip-flops and optional small queue control.",
+          "Drive request sequence and launch metadata to downstream watchdog and telemetry logic.",
+          "Prevent uncontrolled request flooding.",
+          "Reject launches while resources are busy unless queueing is enabled.",
+          "Ensure only one accepted issuance increments the sequence counter."
+        ],
+        "must_drive": [
+          "model_req_valid",
+          "model_req_data",
+          "request_sequence",
+          "request_launch_cycle",
+          "request_outstanding",
+          "request_queue_occupancy",
+          "request_accepted_pulse",
+          "seq_counter",
+          "busy_reject"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_enable",
+          "cfg_mode",
+          "cfg_seq_seed",
+          "cfg_queue_enable",
+          "cfg_velocity_ref",
+          "cfg_geometry_id",
+          "start_request",
+          "model_req_ready"
+        ],
+        "must_not_drive": [
+          "clk",
+          "reset_n",
+          "cfg_enable",
+          "cfg_mode",
+          "cfg_seq_seed",
+          "cfg_queue_enable",
+          "cfg_velocity_ref",
+          "cfg_geometry_id",
+          "start_request",
+          "model_req_ready"
+        ],
+        "reset_behavior": "Deassert model_req_valid, clear outstanding state, clear queue occupancy, clear busy reject, initialize sequence control from cfg_seq_seed handling in a deterministic manner, and hold request outputs benign until reset_n is released.",
+        "behavior_rules": [
+          "Request word width shall not exceed 64 bits.",
+          "Request encoding shall include sequence, reference velocity, geometry ID, and mode in compact form.",
+          "No new request may be issued while an older request is outstanding unless queueing is explicitly enabled.",
+          "Sequence counter increments only on accepted request issuance.",
+          "Busy rejection is asserted when a launch is attempted and resources are unavailable.",
+          "All control is synchronous and synthesizable.",
+          "No model inference or solver behavior is implemented in this module."
+        ],
+        "rtl_output_file": "adaptive_aero_request_fsm.v"
+      },
+      {
+        "name": "adaptive_aero_response_guard",
+        "description": "Response validator, timeout watchdog, stale-response filter, and actuator policy/clamp manager for accepted external model responses.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_timeout_thresh",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_freshness_thresh",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_actuator_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_cmd",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_safe_cmd",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_velocity_ref",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "request_sequence",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "request_launch_cycle",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "request_outstanding",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_rsp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_rsp_data",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "model_rsp_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cycle_count",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "resp_accept_pulse",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "resp_reject_pulse",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "resp_stale_pulse",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "timeout_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "protocol_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "sticky_fault_bits",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_cmd",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_cmd_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "safe_mode",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fallback_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "clamp_event",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "last_rsp_sequence",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "last_rsp_age",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "last_error_code",
+            "direction": "output",
+            "width": 8
+          }
+        ],
+        "functionality": "Consumes model responses only when valid/ready semantics permit and the response sequence matches the outstanding request. Recomputes age from launch metadata and current cycle count, rejects stale responses beyond freshness threshold, rejects invalid or policy-violating data, detects timeout expiration, applies deterministic fallback, clamps actuator commands to configured min/max, and asserts safe_mode under disabled, reset-recovery, timeout, invalid, stale, or protocol-fault conditions.",
+        "responsibilities": [
+          "Validate response sequence, age, and encoded policy constraints.",
+          "Generate model response ready and accept only when an outstanding request exists and the response is current.",
+          "Set timeout and protocol fault indicators on watchdog or validation violations.",
+          "Drive actuator command and valid strobe only for accepted or safe fallback updates.",
+          "Clamp accepted or fallback command to programmable bounds before output.",
+          "Force safe_mode whenever fallback is active or controller is disabled or recovering from reset.",
+          "Export last response sequence, age, and error code for telemetry.",
+          "Keep behavior deterministic and synthesizable without hidden memory dependencies."
+        ],
+        "must_drive": [
+          "model_rsp_ready",
+          "resp_accept_pulse",
+          "resp_reject_pulse",
+          "resp_stale_pulse",
+          "timeout_fault",
+          "protocol_fault",
+          "sticky_fault_bits",
+          "actuator_cmd",
+          "actuator_cmd_valid",
+          "safe_mode",
+          "fallback_active",
+          "clamp_event",
+          "last_rsp_sequence",
+          "last_rsp_age",
+          "last_error_code"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_enable",
+          "cfg_timeout_thresh",
+          "cfg_freshness_thresh",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_fallback_cmd",
+          "cfg_safe_cmd",
+          "cfg_velocity_ref",
+          "request_sequence",
+          "request_launch_cycle",
+          "request_outstanding",
+          "model_rsp_valid",
+          "model_rsp_data",
+          "cycle_count"
+        ],
+        "must_not_drive": [
+          "clk",
+          "reset_n",
+          "cfg_enable",
+          "cfg_timeout_thresh",
+          "cfg_freshness_thresh",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_fallback_cmd",
+          "cfg_safe_cmd",
+          "cfg_velocity_ref",
+          "request_sequence",
+          "request_launch_cycle",
+          "request_outstanding",
+          "model_rsp_valid",
+          "model_rsp_data",
+          "cycle_count"
+        ],
+        "reset_behavior": "Drive model_rsp_ready low or benign during reset, clear accept/reject outputs, assert safe_mode, select fallback or safe command path, clear non-sticky validation state, and return to deterministic fallback on reset release.",
+        "behavior_rules": [
+          "A response is accepted only if valid is asserted, an outstanding request exists, and the response metadata matches the outstanding request.",
+          "Responses outside freshness threshold or after timeout are rejected and counted.",
+          "Invalid flags, mismatched sequence, stale age, or numeric/policy violations force fallback when policy requires it.",
+          "Actuator outputs must be clamped to cfg_actuator_min and cfg_actuator_max.",
+          "If no accepted response is present, or if controller is disabled, output cfg_fallback_cmd or cfg_safe_cmd according to safe-state policy.",
+          "safe_mode dominates all non-safe outputs under faults.",
+          "The module shall not implement the surrogate model, physics solver, or mesh processing."
+        ],
+        "rtl_output_file": "adaptive_aero_response_guard.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_regs.clk",
+        "adaptive_aero_request_fsm.clk",
+        "adaptive_aero_response_guard.clk"
+      ],
+      "description": "Top-level port clk connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reset_n",
+      "connected_to": [
+        "adaptive_aero_control_regs.reset_n",
+        "adaptive_aero_request_fsm.reset_n",
+        "adaptive_aero_response_guard.reset_n"
+      ],
+      "description": "Top-level port reset_n connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_addr",
+      "connected_to": [
+        "adaptive_aero_control_regs.reg_addr"
+      ],
+      "description": "Top-level port reg_addr connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_wr_en",
+      "connected_to": [
+        "adaptive_aero_control_regs.reg_wr_en"
+      ],
+      "description": "Top-level port reg_wr_en connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_rd_en",
+      "connected_to": [
+        "adaptive_aero_control_regs.reg_rd_en"
+      ],
+      "description": "Top-level port reg_rd_en connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_wdata",
+      "connected_to": [
+        "adaptive_aero_control_regs.reg_wdata"
+      ],
+      "description": "Top-level port reg_wdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_rdata",
+      "connected_to": [
+        "adaptive_aero_control_regs.reg_rdata"
+      ],
+      "description": "Top-level port reg_rdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reg_rvalid",
+      "connected_to": [
+        "adaptive_aero_control_regs.reg_rvalid"
+      ],
+      "description": "Top-level port reg_rvalid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "model_req_valid",
+      "connected_to": [
+        "adaptive_aero_request_fsm.model_req_valid"
+      ],
+      "description": "Top-level port model_req_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "model_req_ready",
+      "connected_to": [
+        "adaptive_aero_request_fsm.model_req_ready"
+      ],
+      "description": "Top-level port model_req_ready connected to matching child module port(s)."
+    },
+    {
+      "top_port": "model_req_data",
+      "connected_to": [
+        "adaptive_aero_request_fsm.model_req_data"
+      ],
+      "description": "Top-level port model_req_data connected to matching child module port(s)."
+    },
+    {
+      "top_port": "model_rsp_valid",
+      "connected_to": [
+        "adaptive_aero_response_guard.model_rsp_valid"
+      ],
+      "description": "Top-level port model_rsp_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "model_rsp_ready",
+      "connected_to": [
+        "adaptive_aero_response_guard.model_rsp_ready"
+      ],
+      "description": "Top-level port model_rsp_ready connected to matching child module port(s)."
+    },
+    {
+      "top_port": "model_rsp_data",
+      "connected_to": [
+        "adaptive_aero_response_guard.model_rsp_data"
+      ],
+      "description": "Top-level port model_rsp_data connected to matching child module port(s)."
+    },
+    {
+      "top_port": "actuator_cmd",
+      "connected_to": [
+        "adaptive_aero_response_guard.actuator_cmd"
+      ],
+      "description": "Top-level port actuator_cmd connected to matching child module port(s)."
+    },
+    {
+      "top_port": "actuator_cmd_valid",
+      "connected_to": [
+        "adaptive_aero_response_guard.actuator_cmd_valid"
+      ],
+      "description": "Top-level port actuator_cmd_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "safe_mode",
+      "connected_to": [
+        "adaptive_aero_response_guard.safe_mode"
+      ],
+      "description": "Top-level port safe_mode connected to matching child module port(s)."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "adaptive_aero_control_regs_cfg_actuator_max",
+      "width": 16,
+      "source": "adaptive_aero_control_regs.cfg_actuator_max",
+      "destinations": [
+        "adaptive_aero_response_guard.cfg_actuator_max"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_actuator_max."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_actuator_min",
+      "width": 16,
+      "source": "adaptive_aero_control_regs.cfg_actuator_min",
+      "destinations": [
+        "adaptive_aero_response_guard.cfg_actuator_min"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_actuator_min."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_enable",
+      "width": 1,
+      "source": "adaptive_aero_control_regs.cfg_enable",
+      "destinations": [
+        "adaptive_aero_request_fsm.cfg_enable",
+        "adaptive_aero_response_guard.cfg_enable"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_enable."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_fallback_cmd",
+      "width": 16,
+      "source": "adaptive_aero_control_regs.cfg_fallback_cmd",
+      "destinations": [
+        "adaptive_aero_response_guard.cfg_fallback_cmd"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_fallback_cmd."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_freshness_thresh",
+      "width": 8,
+      "source": "adaptive_aero_control_regs.cfg_freshness_thresh",
+      "destinations": [
+        "adaptive_aero_response_guard.cfg_freshness_thresh"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_freshness_thresh."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_geometry_id",
+      "width": 16,
+      "source": "adaptive_aero_control_regs.cfg_geometry_id",
+      "destinations": [
+        "adaptive_aero_request_fsm.cfg_geometry_id"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_geometry_id."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_mode",
+      "width": 3,
+      "source": "adaptive_aero_control_regs.cfg_mode",
+      "destinations": [
+        "adaptive_aero_request_fsm.cfg_mode"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_mode."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_queue_enable",
+      "width": 1,
+      "source": "adaptive_aero_control_regs.cfg_queue_enable",
+      "destinations": [
+        "adaptive_aero_request_fsm.cfg_queue_enable"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_queue_enable."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_safe_cmd",
+      "width": 16,
+      "source": "adaptive_aero_control_regs.cfg_safe_cmd",
+      "destinations": [
+        "adaptive_aero_response_guard.cfg_safe_cmd"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_safe_cmd."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_seq_seed",
+      "width": 16,
+      "source": "adaptive_aero_control_regs.cfg_seq_seed",
+      "destinations": [
+        "adaptive_aero_request_fsm.cfg_seq_seed"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_seq_seed."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_timeout_thresh",
+      "width": 16,
+      "source": "adaptive_aero_control_regs.cfg_timeout_thresh",
+      "destinations": [
+        "adaptive_aero_response_guard.cfg_timeout_thresh"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_timeout_thresh."
+    },
+    {
+      "name": "adaptive_aero_control_regs_cfg_velocity_ref",
+      "width": 16,
+      "source": "adaptive_aero_control_regs.cfg_velocity_ref",
+      "destinations": [
+        "adaptive_aero_request_fsm.cfg_velocity_ref",
+        "adaptive_aero_response_guard.cfg_velocity_ref"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_regs.cfg_velocity_ref."
+    },
+    {
+      "name": "adaptive_aero_request_fsm_request_launch_cycle",
+      "width": 16,
+      "source": "adaptive_aero_request_fsm.request_launch_cycle",
+      "destinations": [
+        "adaptive_aero_response_guard.request_launch_cycle"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_request_fsm.request_launch_cycle."
+    },
+    {
+      "name": "adaptive_aero_request_fsm_request_outstanding",
+      "width": 1,
+      "source": "adaptive_aero_request_fsm.request_outstanding",
+      "destinations": [
+        "adaptive_aero_response_guard.request_outstanding"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_request_fsm.request_outstanding."
+    },
+    {
+      "name": "adaptive_aero_request_fsm_request_sequence",
+      "width": 16,
+      "source": "adaptive_aero_request_fsm.request_sequence",
+      "destinations": [
+        "adaptive_aero_response_guard.request_sequence"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_request_fsm.request_sequence."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "adaptive_aero_control_regs_cfg_actuator_max",
+      "owner": "adaptive_aero_control_regs.cfg_actuator_max"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_actuator_min",
+      "owner": "adaptive_aero_control_regs.cfg_actuator_min"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_enable",
+      "owner": "adaptive_aero_control_regs.cfg_enable"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_fallback_cmd",
+      "owner": "adaptive_aero_control_regs.cfg_fallback_cmd"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_freshness_thresh",
+      "owner": "adaptive_aero_control_regs.cfg_freshness_thresh"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_geometry_id",
+      "owner": "adaptive_aero_control_regs.cfg_geometry_id"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_mode",
+      "owner": "adaptive_aero_control_regs.cfg_mode"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_queue_enable",
+      "owner": "adaptive_aero_control_regs.cfg_queue_enable"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_safe_cmd",
+      "owner": "adaptive_aero_control_regs.cfg_safe_cmd"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_seq_seed",
+      "owner": "adaptive_aero_control_regs.cfg_seq_seed"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_timeout_thresh",
+      "owner": "adaptive_aero_control_regs.cfg_timeout_thresh"
+    },
+    {
+      "signal": "adaptive_aero_control_regs_cfg_velocity_ref",
+      "owner": "adaptive_aero_control_regs.cfg_velocity_ref"
+    },
+    {
+      "signal": "adaptive_aero_request_fsm_request_launch_cycle",
+      "owner": "adaptive_aero_request_fsm.request_launch_cycle"
+    },
+    {
+      "signal": "adaptive_aero_request_fsm_request_outstanding",
+      "owner": "adaptive_aero_request_fsm.request_outstanding"
+    },
+    {
+      "signal": "adaptive_aero_request_fsm_request_sequence",
+      "owner": "adaptive_aero_request_fsm.request_sequence"
+    },
+    {
+      "signal": "reg_rdata",
+      "owner": "adaptive_aero_control_regs.reg_rdata"
+    },
+    {
+      "signal": "reg_rvalid",
+      "owner": "adaptive_aero_control_regs.reg_rvalid"
+    },
+    {
+      "signal": "model_req_valid",
+      "owner": "adaptive_aero_request_fsm.model_req_valid"
+    },
+    {
+      "signal": "model_req_data",
+      "owner": "adaptive_aero_request_fsm.model_req_data"
+    },
+    {
+      "signal": "model_rsp_ready",
+      "owner": "adaptive_aero_response_guard.model_rsp_ready"
+    },
+    {
+      "signal": "actuator_cmd",
+      "owner": "adaptive_aero_response_guard.actuator_cmd"
+    },
+    {
+      "signal": "actuator_cmd_valid",
+      "owner": "adaptive_aero_response_guard.actuator_cmd_valid"
+    },
+    {
+      "signal": "safe_mode",
+      "owner": "adaptive_aero_response_guard.safe_mode"
+    }
+  ],
+  "register_contract": {}
+}

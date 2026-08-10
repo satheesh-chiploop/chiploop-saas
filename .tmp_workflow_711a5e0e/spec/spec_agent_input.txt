@@ -1,0 +1,78 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, external model request/response transport, validation, safety, timeout, fallback, and bounded actuator-command behavior.
+
+EXTERNAL MODEL TRANSPORT DIRECTION CONTRACT (mandatory; this takes precedence over ambiguous ingress/egress wording in upstream prose): the RTL emits model-request valid/data as outputs and receives model-request ready as an input. The RTL receives model-response valid/data as inputs and emits model-response ready as an output. Apply this rule by data flow even when application-specific ports use cmd_*, req_*, rsp_*, or response_* names. A top-level output must have a real RTL driver; never connect a required top-level output only to a child input.
+Top-level module name: adaptive_aero_control_top.
+
+Implementation target: FPGA prototype. The design shall be synthesizable RTL that manages compact request/response transport and safety arbitration for an external NVIDIA DoMINO automotive aerodynamics surrogate executed in software/GPU. The RTL shall not implement the surrogate model, physics solver, mesh processing, or tensor math.
+
+Interface requirements:
+1) Provide a clock and reset input.
+2) Provide a compact register-mapped interface using a 64-bit data path and a 16-bit address. The interface shall support writes to configuration registers and reads from status counters.
+3) Provide a request channel to the external model transport layer using valid/ready semantics. The request payload width shall not exceed 64 bits.
+4) Provide a response channel from the external model transport layer using valid/ready semantics. The response payload width shall not exceed 64 bits.
+5) Provide a bounded actuator command output and a valid strobe.
+6) Provide a safe_mode output for fail-safe indication.
+
+Functional blocks:
+A) Configuration register bank:
+- Implement registers for enable, mode, sequence seed, request timeout threshold, freshness threshold, actuator min, actuator max, fallback command, and status clear.
+- Registers shall be synchronous and readable through the register window.
+- Writes shall be ignored while reset is asserted.
+
+B) Request formatter:
+- On a start-request command, capture the current sequence counter, the programmed reference velocity, and a compact geometry descriptor pointer/ID.
+- Encode the request into a 64-bit request word.
+- Assert model_req_valid until model_req_ready is observed.
+- Increment the sequence counter only on accepted request issuance.
+
+C) Outstanding-request tracking:
+- Maintain one outstanding request at a time or a small bounded queue of request descriptors, implemented with flip-flops only for control metadata.
+- Store request sequence, launch timestamp/cycle count, and request state.
+- The design shall reject new launches when resources are busy unless the configuration explicitly allows queueing.
+
+D) Timeout watchdog:
+- Count cycles from request launch.
+- If the response is not accepted within the configured timeout, set a timeout fault, drop the outstanding request, and force fallback.
+- The watchdog shall also support a stale-response rejection window based on the sequence and age metadata.
+
+E) Response validator:
+- Accept model_rsp_data only when model_rsp_valid is asserted and the response sequence matches the outstanding request.
+- Reject responses with invalid flags, mismatched sequence, or stale age.
+- Reject responses that violate encoded numeric limits or control policy constraints.
+- On rejection, increment error counters and enter fallback when the policy requires it.
+
+F) Actuator policy and clamping:
+- Map the accepted response into a single bounded actuator command or a small vector compressed into the 16-bit actuator_cmd output.
+- Clamp the command to programmable min/max limits before driving outputs.
+- If the accepted response is absent, invalid, or stale, drive the fallback command instead.
+- actuator_cmd_valid shall be asserted only for valid, accepted, or safe fallback updates.
+
+G) Safe fallback manager:
+- Define a deterministic safe state that corresponds to a conservative active-aero configuration.
+- Assert safe_mode whenever fallback is active due to timeout, invalid response, disabled controller, or reset recovery.
+- The safe state shall be programmable and shall dominate all non-safe outputs under fault conditions.
+
+H) Telemetry and counters:
+- Maintain counters for requests issued, responses accepted, stale rejects, timeout events, clamp events, fallback activations, and protocol errors.
+- Make counters readable through the register interface.
+- Include a sticky fault summary register with write-one-to-clear behavior.
+
+Implementation constraints:
+- Use only synthesizable RTL constructs.
+- Do not infer payload memories, geometry arrays, or surrogate tensors in RTL.
+- Do not use wide top-level buses beyond the compact 64-bit register/request/response path.
+- For the FPGA path, use FPGA BRAM only if a small control queue requires memory; bulk geometry storage shall be outside the RTL scope.
+- The design shall preserve deterministic behavior across reset and fault recovery.
+- The architecture-definition step does not provide model predictions; therefore no expected drag/lift values shall be hardcoded.
+
+Timing and control assumptions:
+- The external GPU/software service is responsible for DoMINO execution, including use of the DrivAerML reference geometry and the specified stream velocity reference conditions.
+- The RTL shall support an operating velocity range of 20 to 55 m/s via configuration and validation, with the current reference setpoint of 38.89 m/s.
+- The controller shall reject stale model commands, clamp actuator commands, and provide a safe fallback as mandatory safety behaviors.
+
+Reset behavior:
+- On reset, clear outstanding request state, deassert model_req_valid and actuator_cmd_valid, assert safe_mode, load fallback command, and clear non-sticky control state.
+- Sticky fault counters may be preserved or cleared only through explicit register write-one-to-clear semantics as specified.
+
+All interfaces, state machines, and datapaths shall be described in synthesizable Verilog/SystemVerilog suitable for an Arch2RTL workflow.
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.

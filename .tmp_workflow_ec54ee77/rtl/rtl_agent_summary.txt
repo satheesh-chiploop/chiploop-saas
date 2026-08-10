@@ -1,0 +1,11 @@
+RTL Agent Summary
+=================
+Mode: flat
+Top module: pwm_controller
+Expected files: ['pwm_controller.v']
+Materialized files: ['pwm_controller.v']
+Clock ports: ['clk']
+Reset ports: ['reset_n']
+Icarus compile: pass
+Verilator lint: pass
+Issue count: 0

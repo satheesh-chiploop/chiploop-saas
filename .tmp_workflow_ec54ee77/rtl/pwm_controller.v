@@ -1,0 +1,85 @@
+module pwm_controller (
+    clk,
+    reset_n,
+    wr_en,
+    wr_addr,
+    wr_data,
+    rd_en,
+    rd_addr,
+    rd_data,
+    pwm_out,
+    counter_value
+);
+
+input clk;
+input reset_n;
+input wr_en;
+input [7:0] wr_addr;
+input [7:0] wr_data;
+input rd_en;
+input [7:0] rd_addr;
+output [7:0] rd_data;
+output pwm_out;
+output [7:0] counter_value;
+reg [7:0] control_reg;
+reg [7:0] duty_cycle_reg;
+reg [7:0] period_reg;
+reg [7:0] counter_reg;
+reg [7:0] rd_data_r;
+reg pwm_out_r;
+
+assign rd_data = rd_data_r;
+assign pwm_out = pwm_out_r;
+assign counter_value = counter_reg;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        control_reg <= 8'h00;
+        duty_cycle_reg <= 8'h00;
+        period_reg <= 8'h00;
+        counter_reg <= 8'h00;
+        rd_data_r <= 8'h00;
+        pwm_out_r <= 1'b0;
+    end else begin
+        if (wr_en) begin
+            case (wr_addr)
+                8'h00: control_reg <= {7'b0000000, wr_data[0]};
+                8'h04: duty_cycle_reg <= wr_data;
+                8'h08: period_reg <= wr_data;
+                default: begin
+                    control_reg <= control_reg;
+                    duty_cycle_reg <= duty_cycle_reg;
+                    period_reg <= period_reg;
+                end
+            endcase
+        end
+
+        if (!control_reg[0] || (period_reg == 8'h00)) begin
+            counter_reg <= 8'h00;
+        end else if (counter_reg == period_reg) begin
+            counter_reg <= 8'h00;
+        end else begin
+            counter_reg <= counter_reg + 8'h01;
+        end
+
+        if (rd_en) begin
+            case (rd_addr)
+                8'h00: rd_data_r <= {7'b0000000, control_reg[0]};
+                8'h04: rd_data_r <= duty_cycle_reg;
+                8'h08: rd_data_r <= period_reg;
+                8'h0C: rd_data_r <= counter_reg;
+                default: rd_data_r <= 8'h00;
+            endcase
+        end else begin
+            rd_data_r <= 8'h00;
+        end
+
+        if (control_reg[0] && (period_reg != 8'h00) && (counter_reg < duty_cycle_reg)) begin
+            pwm_out_r <= 1'b1;
+        end else begin
+            pwm_out_r <= 1'b0;
+        end
+    end
+end
+
+endmodule

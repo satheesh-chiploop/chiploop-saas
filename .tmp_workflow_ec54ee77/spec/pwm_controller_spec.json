@@ -1,0 +1,133 @@
+{
+  "name": "pwm_controller",
+  "description": "Parameterized memory-mapped PWM controller with a single synchronous clock domain, active-low reset, firmware-accessible control/duty/period registers, live counter status readback, and PWM output generation.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "reset_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "All register accesses are synchronous to clk.",
+      "Read data is valid for the addressed register value in the cycle of read enable as implemented by the RTL.",
+      "No byte enables are provided; all writes are 8-bit full-register writes.",
+      "The COUNTER_VALUE register is read-only and reflects the live counter state.",
+      "When PERIOD is zero, the counter holds at zero and pwm_out remains low.",
+      "When DUTY_CYCLE is zero, pwm_out remains low while enabled.",
+      "When DUTY_CYCLE is greater than PERIOD, pwm_out follows the compare against the counter value within the programmed period range."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "reset_n",
+      "direction": "input",
+      "width": 1,
+      "active_low": true
+    },
+    {
+      "name": "wr_en",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "wr_addr",
+      "direction": "input",
+      "width": 8
+    },
+    {
+      "name": "wr_data",
+      "direction": "input",
+      "width": 8
+    },
+    {
+      "name": "rd_en",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "rd_addr",
+      "direction": "input",
+      "width": 8
+    },
+    {
+      "name": "rd_data",
+      "direction": "output",
+      "width": 8
+    },
+    {
+      "name": "pwm_out",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "counter_value",
+      "direction": "output",
+      "width": 8
+    }
+  ],
+  "functionality": "Implements a firmware-controlled PWM peripheral with a minimal memory-mapped register interface. The CONTROL register at 0x00 provides ENABLE control in bit 0. The DUTY_CYCLE register at 0x04 stores the compare threshold used to generate pwm_out. The PERIOD register at 0x08 sets the terminal count value; the internal counter increments while ENABLE is asserted and PERIOD is nonzero, then wraps to zero when it reaches PERIOD. The COUNTER_VALUE register at 0x0C returns the live counter state and is read-only. All registers, the counter, rd_data, pwm_out, and counter_value reset to zero when reset_n is low. Reads return the addressed register value. Writes update only the implemented writable registers and only at their defined addresses.",
+  "responsibilities": [
+    "Decode memory-mapped read and write transactions.",
+    "Store CONTROL.ENABLE, DUTY_CYCLE, and PERIOD register contents.",
+    "Maintain an 8-bit counter that increments and wraps according to ENABLE and PERIOD.",
+    "Generate pwm_out based on ENABLE and the duty-cycle comparison against the live counter.",
+    "Provide live counter status through the COUNTER_VALUE register and counter_value output.",
+    "Drive zero/default outputs during reset."
+  ],
+  "must_drive": [
+    "rd_data",
+    "pwm_out",
+    "counter_value"
+  ],
+  "must_receive": [
+    "clk",
+    "reset_n",
+    "wr_en",
+    "wr_addr",
+    "wr_data",
+    "rd_en",
+    "rd_addr"
+  ],
+  "must_not_drive": [
+    "clk",
+    "reset_n",
+    "wr_en",
+    "wr_addr",
+    "wr_data",
+    "rd_en",
+    "rd_addr"
+  ],
+  "reset_behavior": "On reset_n low, CONTROL.ENABLE is cleared to 0, DUTY_CYCLE is cleared to 0, PERIOD is cleared to 0, the internal counter is cleared to 0, rd_data is cleared to 0, pwm_out is cleared to 0, and counter_value is cleared to 0. After reset deassertion, all state remains zero until firmware performs writes.",
+  "behavior_rules": [
+    "Address 0x00 maps to CONTROL; bit 0 is ENABLE and all other bits read as zero and ignore writes or remain reserved as zero.",
+    "Address 0x04 maps to DUTY_CYCLE[7:0] and is fully writable.",
+    "Address 0x08 maps to PERIOD[7:0] and is fully writable.",
+    "Address 0x0C maps to COUNTER_VALUE[7:0] and is read-only; writes to this address must have no effect.",
+    "When CONTROL.ENABLE is high and PERIOD is nonzero, the counter increments on each rising clock edge.",
+    "When the counter reaches PERIOD, the next count value wraps to zero.",
+    "When CONTROL.ENABLE is low or PERIOD is zero, the counter holds at zero.",
+    "pwm_out is high only when CONTROL.ENABLE is high and counter_value is less than DUTY_CYCLE; otherwise pwm_out is low.",
+    "Read transactions return the current value of the addressed register; unimplemented addresses return zero.",
+    "counter_value output mirrors the internal counter state continuously.",
+    "All comparisons and arithmetic are on 8-bit unsigned values.",
+    "No combinational feedback from rd_data into control state is permitted."
+  ],
+  "rtl_output_file": "pwm_controller.v"
+}

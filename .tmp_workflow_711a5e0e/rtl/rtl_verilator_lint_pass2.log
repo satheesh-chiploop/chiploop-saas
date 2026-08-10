@@ -1,0 +1,9 @@
+=== STDERR ===
+%Error: pass2/adaptive_aero_response_guard.v:135:62: syntax error, unexpected '['
+  135 |             age_calc8 <= (cycle_count - request_launch_cycle)[7:0];
+      |                                                              ^
+        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1

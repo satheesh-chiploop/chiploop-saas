@@ -1,0 +1,704 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "pwm_controller",
+  "rtl_file_count": 1,
+  "module_count": 1,
+  "modules": [
+    {
+      "name": "pwm_controller",
+      "file": "backend/workflows/ec54ee77-b77e-42fa-ab44-ffafa8bc6a43/rtl/pwm_controller.v",
+      "input_count": 28,
+      "output_count": 17,
+      "inout_count": 0,
+      "input_port_count": 7,
+      "output_port_count": 3,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "wr_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "wr_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "wr_data",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "rd_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rd_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "rd_data",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "pwm_out",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "counter_value",
+          "direction": "output",
+          "width": "[7:0]"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 28,
+    "output_count": 17,
+    "inout_count": 0,
+    "input_port_count": 7,
+    "output_port_count": 3,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "wr_en",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "wr_addr",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "wr_data",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "rd_en",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "rd_addr",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "rd_data",
+        "direction": "output",
+        "width": "[7:0]"
+      },
+      {
+        "name": "pwm_out",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "counter_value",
+        "direction": "output",
+        "width": "[7:0]"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 41,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 6,
+    "latch_target_count": 0,
+    "sequential_blocks": 2,
+    "posedge_blocks": 1,
+    "negedge_blocks": 1,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "control_reg",
+      "counter_reg",
+      "duty_cycle_reg",
+      "period_reg",
+      "pwm_out_r",
+      "rd_data_r"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 1,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "clean",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 0,
+    "warning_count": 0,
+    "error_count": 0,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "pwm_controller",
+      "backend/workflows/ec54ee77-b77e-42fa-ab44-ffafa8bc6a43/rtl/pwm_controller.v"
+    ],
+    "stdout_tail": [
+      "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b",
+      "- Verilator: Built from 0.031 MB sources in 2 modules, into 0.017 MB in 3 C++ files needing 0.000 MB",
+      "- Verilator: Walltime 0.008 s (elab=0.001, cvt=0.003, bld=0.000); cpu 0.008 s on 1 threads; allocated 31.355 MB"
+    ],
+    "stderr_tail": [],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "pwm_controller",
+        "backend/workflows/ec54ee77-b77e-42fa-ab44-ffafa8bc6a43/rtl/pwm_controller.v"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stdout": "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b\n- Verilator: Built from 0.031 MB sources in 2 modules, into 0.017 MB in 3 C++ files needing 0.000 MB\n- Verilator: Walltime 0.008 s (elab=0.001, cvt=0.003, bld=0.000); cpu 0.008 s on 1 threads; allocated 31.355 MB\n",
+      "stderr": "",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-09T21:38:14.798054+00:00",
+      "ended_at": "2026-08-09T21:38:14.893451+00:00",
+      "elapsed_ms": 95
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 1,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "pwm_controller",
+          "file": "backend/workflows/ec54ee77-b77e-42fa-ab44-ffafa8bc6a43/rtl/pwm_controller.v",
+          "input_count": 28,
+          "output_count": 17,
+          "inout_count": 0,
+          "input_port_count": 7,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "pwm_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "counter_value",
+              "direction": "output",
+              "width": "[7:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 28,
+        "output_count": 17,
+        "inout_count": 0,
+        "input_port_count": 7,
+        "output_port_count": 3,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "wr_data",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "rd_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "rd_data",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "pwm_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "counter_value",
+            "direction": "output",
+            "width": "[7:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 41,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 6,
+        "latch_target_count": 0,
+        "sequential_blocks": 2,
+        "posedge_blocks": 1,
+        "negedge_blocks": 1,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "control_reg",
+          "counter_reg",
+          "duty_cycle_reg",
+          "period_reg",
+          "pwm_out_r",
+          "rd_data_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 1,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 1,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "pwm_controller",
+          "file": "backend/workflows/ec54ee77-b77e-42fa-ab44-ffafa8bc6a43/handoff/pwm_controller_ip_package/rtl/pwm_controller.v",
+          "input_count": 28,
+          "output_count": 17,
+          "inout_count": 0,
+          "input_port_count": 7,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "pwm_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "counter_value",
+              "direction": "output",
+              "width": "[7:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 28,
+        "output_count": 17,
+        "inout_count": 0,
+        "input_port_count": 7,
+        "output_port_count": 3,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "wr_data",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "rd_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "rd_data",
+            "direction": "output",
+            "width": "[7:0]"
+          },
+          {
+            "name": "pwm_out",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "counter_value",
+            "direction": "output",
+            "width": "[7:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 41,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 6,
+        "latch_target_count": 0,
+        "sequential_blocks": 2,
+        "posedge_blocks": 1,
+        "negedge_blocks": 1,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "control_reg",
+          "counter_reg",
+          "duty_cycle_reg",
+          "period_reg",
+          "pwm_out_r",
+          "rd_data_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 1,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 4,
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control register. Bit 0 enables PWM operation; all other bits are reserved and read as zero.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When 1, the PWM counter is allowed to run if PERIOD is nonzero. When 0, the counter holds at zero and pwm_out is low."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 1,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved bits. Always read as 0 and ignore writes."
+          }
+        ]
+      },
+      {
+        "name": "DUTY_CYCLE",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "PWM duty-cycle compare threshold. The output is high while enabled and counter_value is less than this value.",
+        "fields": [
+          {
+            "name": "DUTY_CYCLE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "8-bit duty threshold. pwm_out is high when ENABLE=1 and counter_value < DUTY_CYCLE."
+          }
+        ]
+      },
+      {
+        "name": "PERIOD",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "PWM period terminal count. The counter increments while enabled and wraps to zero when it reaches this value.",
+        "fields": [
+          {
+            "name": "PERIOD",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "8-bit terminal count. When ENABLE=1 and PERIOD!=0, the counter increments each clock and wraps to zero upon reaching PERIOD. When PERIOD=0, the counter holds at zero and pwm_out remains low."
+          }
+        ]
+      },
+      {
+        "name": "COUNTER_VALUE",
+        "offset": "0x0C",
+        "access": "RO",
+        "description": "Live counter status register. Reflects the current internal counter value and is read-only.",
+        "fields": [
+          {
+            "name": "COUNTER_VALUE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Live 8-bit counter state. Reads return the current counter value. Writes have no effect."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

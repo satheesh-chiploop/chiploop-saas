@@ -1,0 +1,89 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "pwm_controller",
+  "generated_at": "2026-08-09T21:38:14.043959",
+  "file_count": 16,
+  "files": [
+    {
+      "path": "docs/arch/digital_architecture.json",
+      "sha256": "701fea9ecf8e8e2a6953d76e074d8479f20f7dd60164723678ded137d23727e8",
+      "bytes": 6067
+    },
+    {
+      "path": "docs/microarch/digital_microarchitecture.json",
+      "sha256": "0d856973606f5564fd375a44a0215918487f49ccff51e7c703db91cabe4b86b2",
+      "bytes": 3669
+    },
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "3410a51f4527bf76be6d641593cdb8e59b8022d63bad69327d19edfc2b15036d",
+      "bytes": 3627
+    },
+    {
+      "path": "docs/regmap/digital_regmap_raw_output.txt",
+      "sha256": "d38bcce3cbfe1a67f8e3e3262c34e5ca4eb76e5ea9113d58ed7f0d768af30da1",
+      "bytes": 2623
+    },
+    {
+      "path": "docs/spec/pwm_controller_spec.json",
+      "sha256": "012d96f5294a943bc62b0b80695aabf02d656653bbd76084767311c42f20f8a9",
+      "bytes": 5234
+    },
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "a1af6e8538c87aafd88ac588da463d080a49b29eebd32d27501e15c98bd258f3",
+      "bytes": 2923
+    },
+    {
+      "path": "docs/spec/spec_agent_normalized_pass2.json",
+      "sha256": "012d96f5294a943bc62b0b80695aabf02d656653bbd76084767311c42f20f8a9",
+      "bytes": 5234
+    },
+    {
+      "path": "misc/power_intent_findings.json",
+      "sha256": "3af4a720ec8540fc7ac521486f8e7bf2e06984e3dfb9ad485356ddbf35b7c6e6",
+      "bytes": 275
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "63f368aa2268613bb327146a4211d0f804fee4e03c6a2c8409fc0f011c3b0865",
+      "bytes": 413
+    },
+    {
+      "path": "misc/rtl_agent_preflight.json",
+      "sha256": "e342532af1097307d343b83aefd14c056d05c56096221ecd88c550ff501a2101",
+      "bytes": 208
+    },
+    {
+      "path": "misc/tool_execution_summary.json",
+      "sha256": "a385710c39b440d998067bb44c2518ad5c294f999b17b6ca89fad70438db7736",
+      "bytes": 3031
+    },
+    {
+      "path": "misc/tool_profile_used.json",
+      "sha256": "11c75a5525cc3d922151609681da6a98cb0ec7e5813c53bc742f9d3356b6d4d8",
+      "bytes": 1101
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "ec2eb452681afc85fd8c75d51b07f093529a9fa598141f43c1f2ca5a70382242",
+      "bytes": 2221
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "a071cfab6d7a1903b9ad747635fe188e80baa926001226697bf41ab55a5fa21f",
+      "bytes": 776
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "5a0c3f58cdf6196d63c8a95f6b411083e269487b48c667421cfafac41584692c",
+      "bytes": 318
+    },
+    {
+      "path": "rtl/pwm_controller.v",
+      "sha256": "f3d011178104008039638cabc44f5b9f7bb8b6b3c4247e8fd29eaed48d338bf6",
+      "bytes": 2150
+    }
+  ]
+}
