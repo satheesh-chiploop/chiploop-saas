@@ -238,12 +238,12 @@ const selfRegulatedFeatures = [
 ];
 
 const physicalAiReferenceFlow = [
-  { step: "1", name: "Understand the application", detail: "Goals, operating range, safety, cost, and performance" },
-  { step: "2", name: "Map a model when useful", detail: "Evaluate governed equations and pretrained surrogate candidates" },
-  { step: "3", name: "Partition the complete system", detail: "Choose software, firmware, CPU/GPU, FPGA, or ASIC for each job" },
-  { step: "4", name: "Define the architecture", detail: "Create the product and Digital IP specification" },
-  { step: "5", name: "Build and verify", detail: "Generate RTL and prove it before implementation" },
-  { step: "6", name: "Deploy the product", detail: "FPGA bitstream or ASIC, plus firmware, software, and validation" },
+  { step: "1", name: "Understand", detail: "Goals and limits" },
+  { step: "2", name: "Match", detail: "Best model, if needed" },
+  { step: "3", name: "Partition", detail: "Hardware and software" },
+  { step: "4", name: "Architect", detail: "Define the system" },
+  { step: "5", name: "Build & verify", detail: "Create working IP" },
+  { step: "6", name: "Deploy", detail: "FPGA, ASIC, or product" },
 ];
 
 const eyebrowClass = "text-xs font-semibold uppercase text-cyan-300";
@@ -383,18 +383,25 @@ function LandingPageContent() {
         <div className={landingShellClass}>
           <div className="rounded-xl border border-fuchsia-400/30 bg-slate-900/70 p-5 sm:p-8">
             <div className="mx-auto max-w-4xl text-center">
-              <p className="text-xs font-semibold uppercase text-fuchsia-300">One Connected Journey</p>
-              <h2 className={`${sectionTitleClass} mx-auto`}>Start with an application, a physics-based surrogate model, or a chip specification.</h2>
-              <p className={`${sectionBodyClass} mx-auto`}>Application Intelligence understands the goal, maps a surrogate when useful, partitions the system, and connects architecture to software, firmware, FPGA, Digital IP, ASIC, validation, and product delivery.</p>
+              <div className="flex flex-wrap items-center justify-center gap-2"><p className="text-xs font-semibold uppercase text-fuchsia-300">One Connected Journey</p><span className="rounded-full border border-fuchsia-400/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Application Intelligence · Coming soon</span></div>
+              <h2 className={`${sectionTitleClass} mx-auto`}>Start anywhere. Build the complete system.</h2>
+              <p className={`${sectionBodyClass} mx-auto`}>ChipLoop turns your starting point into a clear path to deployment.</p>
             </div>
-            <div className="mx-auto mt-8 grid max-w-4xl gap-4 md:grid-cols-2">
+            <div className="mx-auto mt-8 grid max-w-5xl gap-3 md:grid-cols-3">
+              <button type="button" onClick={() => goTo("/apps/application-intelligence")} className="rounded-xl border-2 border-violet-400/50 bg-violet-500/10 p-5 text-left transition hover:-translate-y-0.5 hover:border-violet-300">
+                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-violet-300">Start with</div>
+                <div className="mt-1 text-lg font-bold text-white">Application Idea</div>
+                <p className="mt-2 text-sm text-slate-300">Tell us what you want to build.</p>
+              </button>
               <button type="button" onClick={() => goTo("/apps/application-intelligence")} className="rounded-xl border-2 border-fuchsia-400/50 bg-fuchsia-500/10 p-5 text-left transition hover:-translate-y-0.5 hover:border-fuchsia-300">
-                <div className="flex flex-wrap items-center justify-between gap-2"><span className="text-lg font-bold text-white">Application or Physics-Based Surrogate Model</span><span className="rounded-full border border-fuchsia-400/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span></div>
-                <p className="mt-3 text-sm leading-6 text-slate-300">Bring requirements or a physics-based surrogate model. ChipLoop maps the model, partitions the complete system, and prepares FPGA or ASIC implementation.</p>
+                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-fuchsia-300">Start with</div>
+                <div className="mt-1 text-lg font-bold text-white">Physics-Based Surrogate</div>
+                <p className="mt-2 text-sm text-slate-300">Turn your model into a product.</p>
               </button>
               <button type="button" onClick={() => goTo("/apps/arch2rtl?guided=1")} className="rounded-xl border-2 border-cyan-400/50 bg-cyan-500/10 p-5 text-left transition hover:-translate-y-0.5 hover:border-cyan-300">
-                <div className="text-lg font-bold text-white">Traditional Chip Specification</div>
-                <p className="mt-3 text-sm leading-6 text-slate-300">Bring a chip idea or hardware specification and use the same architecture, implementation, and product-delivery platform.</p>
+                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">Start with</div>
+                <div className="mt-1 text-lg font-bold text-white">Chip Specification</div>
+                <p className="mt-2 text-sm text-slate-300">Move directly into silicon development.</p>
               </button>
             </div>
             <div className="mt-4 text-center text-2xl font-bold text-fuchsia-300/70" aria-hidden="true">↓</div>
@@ -402,9 +409,9 @@ function LandingPageContent() {
               <div className="mx-auto flex w-max min-w-full flex-nowrap items-stretch justify-center gap-2 px-1">
                 {physicalAiReferenceFlow.map((stage, index) => (
                   <div key={stage.name} className="flex shrink-0 items-stretch">
-                    <div className="flex w-44 shrink-0 flex-col justify-center rounded-xl border border-fuchsia-400/30 bg-slate-950/80 p-4 text-center">
+                    <div className="flex h-36 w-44 shrink-0 flex-col items-center rounded-xl border border-fuchsia-400/30 bg-slate-950/80 p-4 text-center">
                       <span className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-fuchsia-500/15 text-xs font-bold text-fuchsia-200">{stage.step}</span>
-                      <span className="mt-3 text-sm font-semibold leading-5 text-slate-100">{stage.name}</span>
+                      <span className="mt-4 text-sm font-semibold leading-5 text-slate-100">{stage.name}</span>
                       <span className="mt-2 text-xs leading-5 text-slate-400">{stage.detail}</span>
                     </div>
                     {index < physicalAiReferenceFlow.length - 1 && <div className="flex w-7 shrink-0 items-center justify-center text-lg font-bold text-fuchsia-300/60" aria-hidden="true">→</div>}
