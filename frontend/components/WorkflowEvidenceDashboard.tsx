@@ -954,7 +954,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "physical_ai_workflow_summary.json",
         "physical_ai/physical_ai_workflow_summary.json",
         "requirements_contract.json",
+        "application_contract.json",
         "selected_physics_model.json",
+        "surrogate_mapping.json",
+        "partition_plan.json",
+        "cpu_reference_results.json",
+        "control_policy.json",
         "model_generated_architecture.json",
         "digital_ip_spec.json",
         "physical_ai/surrogate_architecture/digital_ip_spec.json",
@@ -1238,7 +1243,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     if (stage === "physical_ai") {
       const summary = record(evidence["physical_ai_workflow_summary.json"]);
       const requirements = record(summary.requirements || evidence["requirements_contract.json"]);
+      const application = record(summary.application_intelligence || evidence["application_contract.json"]);
       const physicsModel = record(summary.physics_model || evidence["selected_physics_model.json"]);
+      const qualification = record(summary.model_qualification || evidence["surrogate_mapping.json"]);
+      const partition = record(summary.partition || evidence["partition_plan.json"]);
       const execution = record(summary.physics_execution);
       const architecture = record(execution.architecture || evidence["model_generated_architecture.json"]);
       const digitalIpSpec = record(evidence["digital_ip_spec.json"] || evidence["physical_ai/surrogate_architecture/digital_ip_spec.json"]);
@@ -1255,6 +1263,18 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Implementation" value={implementationPath} />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-lg border border-fuchsia-400/25 bg-fuchsia-950/10 p-4">
+              <div className="text-sm font-semibold text-white">Application Intelligence</div>
+              <div className="mt-2 text-sm text-slate-300">{firstString(application.objective, requirements.objective, "Application contract generated.")}</div>
+              <div className="mt-3 text-xs text-slate-500">Model mapping: {firstString(qualification.qualification_status, "pending").replaceAll("_", " ")} · {array(application.acceptance_gates).length} acceptance gates · {firstString(application.generation_status, "deterministic").replaceAll("_", " ")}</div>
+              {application.generation_warning ? <div className="mt-2 text-xs text-amber-300">Model planning fallback used; the run remains valid and auditable.</div> : null}
+            </div>
+            <div className="rounded-lg border border-violet-400/25 bg-violet-950/10 p-4">
+              <div className="text-sm font-semibold text-white">System partition</div>
+              <div className="mt-2 text-sm text-slate-300">Software, firmware, GPU-service, and FPGA/ASIC jobs are explicit and independently traceable.</div>
+              <div className="mt-3 text-xs text-slate-500">{array(partition.jobs).length} jobs · Decision: {firstString(partition.decision, "pending")} · {firstString(partition.generation_status, "deterministic").replaceAll("_", " ")}</div>
+              {partition.generation_warning ? <div className="mt-2 text-xs text-amber-300">Model partitioning fallback used; inspect the partition artifact before implementation.</div> : null}
+            </div>
             <div className="rounded-lg border border-slate-800 bg-black/20 p-4">
               <div className="text-sm font-semibold text-white">Generated product architecture</div>
               <div className="mt-2 text-sm text-slate-300">{firstString(architecture.product_summary, architecture.purpose, requirements.objective, "Architecture evidence generated.")}</div>

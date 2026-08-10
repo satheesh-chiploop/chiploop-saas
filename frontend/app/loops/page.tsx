@@ -19,9 +19,9 @@ const loops: Array<{
 }> = [
   {
     name: "Physical AI",
-    short: "Move from physics requirements and equation or surrogate models to FPGA, firmware, validation, and a product demonstration.",
-    core: "Requirements, model selection, physics execution, fixed-point and RTL handoff",
-    advanced: "HEM orchestration, FPGA implementation, firmware, co-simulation, validation, product demo",
+    short: "Move from an application or physics model to system partitioning, architecture, FPGA or ASIC implementation, and product delivery.",
+    core: "Application understanding, model discovery and qualification, CPU reference, architecture, partitioning",
+    advanced: "HEM orchestration, RTL and verification, FPGA or ASIC implementation, firmware, software, validation",
     href: "/loops/physical-ai",
     metricKey: "physical-ai",
     border: "border-fuchsia-400/55",
@@ -107,6 +107,11 @@ const unlockExamples = [
 ];
 
 const referenceJourneys = [
+  {
+    title: "Application Intelligence: Active Aero — Coming soon",
+    body: "Start with the application, map NVIDIA DoMINO without claiming inference, execute a CPU reference, partition the system, and continue to FPGA or ASIC.",
+    href: "/apps/application-intelligence",
+  },
   {
     title: "PMSM Motor Control — Coming soon",
     body: "A Physical AI journey from equation-model validation through fixed-point RTL, FPGA, firmware, co-simulation, and product demo.",

@@ -1,4 +1,0 @@
-# ChipLoop starter PCF for pwm_fpga_demo
-# target_frequency_mhz 12.0
-set_io -nowarn clk 35
-set_io -nowarn led 37

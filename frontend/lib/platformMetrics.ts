@@ -11,7 +11,7 @@ export type LoopCatalogMetric = {
 // Authoritative UI snapshot of the current backend registry and published app/journey catalog.
 // Landing and loop surfaces must import this table instead of maintaining independent counts.
 export const loopCatalogMetrics: Record<string, LoopCatalogMetric> = {
-  "physical-ai": { agents: 4, workflows: 1, apps: 1, productJourneys: 1, referenceJourneys: 1 },
+  "physical-ai": { agents: 8, workflows: 1, apps: 2, productJourneys: 1, referenceJourneys: 2 },
   digital: { agents: 47, workflows: 6, apps: 9, productJourneys: 2, referenceJourneys: 5 },
   "digital-implementation": { agents: 41, workflows: 6, apps: 8, productJourneys: 2, referenceJourneys: 3 },
   fpga: { agents: 22, workflows: 4, apps: 10, productJourneys: 1, referenceJourneys: 2 },

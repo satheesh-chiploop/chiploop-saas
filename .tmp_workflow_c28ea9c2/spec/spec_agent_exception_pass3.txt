@@ -1,0 +1,1 @@
+ValueError('Spec JSON must be either flat single-module form or hierarchical form.')

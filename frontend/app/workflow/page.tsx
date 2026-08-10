@@ -264,9 +264,12 @@ const SYSTEM_ARCHITECTURE_EXPLORER_AGENTS = [
 const APP_PREBUILT_WORKFLOW_DEFINITIONS: Record<string, WorkflowGraphDefinition> = {
   Physical_AI_Loop: linearWorkflowDefinition([
     "Physical AI Requirements Agent",
+    "Application Intelligence Agent",
     "Physical AI Model Selection Agent",
+    "Surrogate Discovery and Mapping Agent",
     "Physical AI Physics Execution Agent",
     "Physical AI Architecture Agent",
+    "Hardware Software Partitioning Agent",
     "Physical AI Orchestrator Agent",
   ]),
   Digital_Arch2RTL: linearWorkflowDefinition([
@@ -900,9 +903,12 @@ type UserAppsResponse = {
 const LOOP_AGENTS: Record<LoopKey, CatalogItem[]> = {
   physical_ai: [
     { uiLabel: "Physical AI Requirements Agent", backendLabel: "Physical AI Requirements Agent", desc: "Normalizes application, operating-envelope, accuracy, safety, and implementation requirements." },
+    { uiLabel: "Application Intelligence Agent", backendLabel: "Application Intelligence Agent", desc: "Converts application intent into constraints, capabilities, and measurable acceptance gates." },
     { uiLabel: "Physical AI Model Selection Agent", backendLabel: "Physical AI Model Selection Agent", desc: "Selects a compatible governed equation or surrogate model from Supabase." },
+    { uiLabel: "Surrogate Discovery and Mapping Agent", backendLabel: "Surrogate Discovery and Mapping Agent", desc: "Ranks governed model candidates and records qualification limits without fabricating inference." },
     { uiLabel: "Physical AI Physics Execution Agent", backendLabel: "Physical AI Physics Execution Agent", desc: "Executes physics validation and generates operating-envelope, fixed-point, RTL, and register-map evidence." },
     { uiLabel: "Physical AI Architecture Agent", backendLabel: "Physical AI Architecture Agent", desc: "Uses the selected agent model and physics evidence to generate a product architecture and RTL-ready specification." },
+    { uiLabel: "Hardware Software Partitioning Agent", backendLabel: "Hardware Software Partitioning Agent", desc: "Partitions jobs across software, firmware, GPU services, FPGA, and ASIC targets." },
     { uiLabel: "Physical AI Orchestrator Agent", backendLabel: "Physical AI Orchestrator Agent", desc: "Judges readiness and delegates to FPGA, firmware, validation, and product workflows." },
   ],
   digital: [

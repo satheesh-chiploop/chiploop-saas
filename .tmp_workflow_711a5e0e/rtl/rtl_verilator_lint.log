@@ -1,9 +1,0 @@
-=== STDERR ===
-%Error: adaptive_aero_response_guard.v:134:67: syntax error, unexpected '['
-  134 |             last_rsp_age_r <= (cycle_count - request_launch_cycle)[7:0];
-      |                                                                   ^
-        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.
-%Error: Exiting due to 1 error(s)
-
-=== RETURN CODE ===
-1

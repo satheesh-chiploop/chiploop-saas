@@ -89,10 +89,10 @@ const paths = [
 ];
 
 const platformStats = [
-  ["231", "Published Agents", "text-cyan-300"],
-  ["60", "Published Apps", "text-emerald-300"],
+  ["235", "Published Agents", "text-cyan-300"],
+  ["61", "Published Apps", "text-emerald-300"],
   ["37", "Prebuilt Workflows", "text-violet-300"],
-  ["11", "Reference Journeys", "text-amber-300"],
+  ["12", "Reference Journeys", "text-amber-300"],
   ["5", "Product Journeys", "text-pink-300"],
   ["SDK + CLI + Studio", "Developer Access", "text-slate-100"],
 ];
@@ -107,8 +107,8 @@ const subscriptionLoops: Array<{
 }> = [
   {
     name: "Physical AI",
-    href: "/apps/physical-ai",
-    body: "Define physical requirements, select equation or surrogate models, validate operating envelopes, and orchestrate downstream silicon and product loops.",
+    href: "/loops/physical-ai",
+    body: "Understand an application, discover and qualify equation or physics-based surrogate models, partition software, firmware, and hardware, then orchestrate FPGA or ASIC delivery.",
     border: "border-fuchsia-400/55",
     hover: "hover:border-fuchsia-300 hover:shadow-fuchsia-950/35",
     comingSoon: true,
@@ -170,9 +170,9 @@ const agentSegments = [
 
 const workflowAgentChart = [
   {
-    label: "Physical AI Motor Product",
-    example: "PMSM model to product demo",
-    agents: { physical_ai: 5, system: 4, analog: 0, digital: 0, fpga: 22, firmware: 10, software: 12, product: 6 },
+    label: "Application Intelligence Product",
+    example: "Application to FPGA or ASIC",
+    agents: { physical_ai: 8, system: 4, analog: 0, digital: 0, fpga: 22, firmware: 10, software: 12, product: 6 },
   },
   {
     label: "Digital IP Product",
@@ -238,12 +238,12 @@ const selfRegulatedFeatures = [
 ];
 
 const physicalAiReferenceFlow = [
-  { step: "1", name: "Define architecture", detail: "Shape and optimize the design" },
-  { step: "2", name: "Create RTL", detail: "Generate the digital implementation" },
-  { step: "3", name: "Verify", detail: "Check function, safety, and coverage" },
-  { step: "4", name: "Choose implementation", detail: "FPGA prototype or Digital IP / ASIC" },
-  { step: "5", name: "Optional tapeout", detail: "Continue to GDS and signoff when needed" },
-  { step: "6", name: "Deliver the product", detail: "Add firmware, software, validation, and demos" },
+  { step: "1", name: "Understand the application", detail: "Goals, operating range, safety, cost, and performance" },
+  { step: "2", name: "Map a model when useful", detail: "Evaluate governed equations and pretrained surrogate candidates" },
+  { step: "3", name: "Partition the complete system", detail: "Choose software, firmware, CPU/GPU, FPGA, or ASIC for each job" },
+  { step: "4", name: "Define the architecture", detail: "Create the product and Digital IP specification" },
+  { step: "5", name: "Build and verify", detail: "Generate RTL and prove it before implementation" },
+  { step: "6", name: "Deploy the product", detail: "FPGA bitstream or ASIC, plus firmware, software, and validation" },
 ];
 
 const eyebrowClass = "text-xs font-semibold uppercase text-cyan-300";
@@ -310,7 +310,7 @@ function LandingPageContent() {
             All-in-one Agentic AI platform for Physical AI and Silicon Development
           </h1>
           <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-xl sm:leading-9">
-            Start from a physics surrogate model, application requirements, or a traditional chip specification—then move through architecture, RTL, verification, FPGA prototyping, firmware, software, ASIC tapeout, validation, and product delivery in one connected platform.
+            Start from a physics-based surrogate model, application requirements, or a traditional chip specification—then move through architecture, RTL, verification, FPGA prototyping, firmware, software, ASIC tapeout, validation, and product delivery in one connected platform.
           </p>
           <div className="mt-7 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
             <button onClick={() => router.push("/book-demo")} className="w-full rounded-xl bg-cyan-400 px-7 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-950/30 transition hover:bg-cyan-300 sm:w-auto">
@@ -384,30 +384,30 @@ function LandingPageContent() {
           <div className="rounded-xl border border-fuchsia-400/30 bg-slate-900/70 p-5 sm:p-8">
             <div className="mx-auto max-w-4xl text-center">
               <p className="text-xs font-semibold uppercase text-fuchsia-300">One Connected Journey</p>
-              <h2 className={`${sectionTitleClass} mx-auto`}>Start with physics or a chip specification. Build the product your way.</h2>
-              <p className={`${sectionBodyClass} mx-auto`}>Both starting points use the same connected architecture, RTL, verification, FPGA, Digital IP, software, validation, and product-delivery platform.</p>
+              <h2 className={`${sectionTitleClass} mx-auto`}>Start with an application, a physics-based surrogate model, or a chip specification.</h2>
+              <p className={`${sectionBodyClass} mx-auto`}>Application Intelligence understands the goal, maps a surrogate when useful, partitions the system, and connects architecture to software, firmware, FPGA, Digital IP, ASIC, validation, and product delivery.</p>
             </div>
             <div className="mx-auto mt-8 grid max-w-4xl gap-4 md:grid-cols-2">
-              <button type="button" onClick={() => goTo("/apps/physical-ai?reference=pretrained-aero")} className="rounded-xl border-2 border-fuchsia-400/50 bg-fuchsia-500/10 p-5 text-left transition hover:-translate-y-0.5 hover:border-fuchsia-300">
-                <div className="flex flex-wrap items-center justify-between gap-2"><span className="text-lg font-bold text-white">Physical AI</span><span className="rounded-full border border-fuchsia-400/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span></div>
-                <p className="mt-3 text-sm leading-6 text-slate-300">Bring an application, physics requirements, and an equation or pretrained surrogate model.</p>
+              <button type="button" onClick={() => goTo("/apps/application-intelligence")} className="rounded-xl border-2 border-fuchsia-400/50 bg-fuchsia-500/10 p-5 text-left transition hover:-translate-y-0.5 hover:border-fuchsia-300">
+                <div className="flex flex-wrap items-center justify-between gap-2"><span className="text-lg font-bold text-white">Application or Physics-Based Surrogate Model</span><span className="rounded-full border border-fuchsia-400/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-fuchsia-200">Coming soon</span></div>
+                <p className="mt-3 text-sm leading-6 text-slate-300">Bring requirements or a physics-based surrogate model. ChipLoop maps the model, partitions the complete system, and prepares FPGA or ASIC implementation.</p>
               </button>
               <button type="button" onClick={() => goTo("/apps/arch2rtl?guided=1")} className="rounded-xl border-2 border-cyan-400/50 bg-cyan-500/10 p-5 text-left transition hover:-translate-y-0.5 hover:border-cyan-300">
-                <div className="text-lg font-bold text-white">Silicon Development</div>
-                <p className="mt-3 text-sm leading-6 text-slate-300">Bring application requirements, a chip idea, or a traditional hardware specification.</p>
+                <div className="text-lg font-bold text-white">Traditional Chip Specification</div>
+                <p className="mt-3 text-sm leading-6 text-slate-300">Bring a chip idea or hardware specification and use the same architecture, implementation, and product-delivery platform.</p>
               </button>
             </div>
             <div className="mt-4 text-center text-2xl font-bold text-fuchsia-300/70" aria-hidden="true">↓</div>
-            <div className="mt-8 overflow-x-auto pb-2">
-              <div className="mx-auto grid min-w-[1050px] grid-cols-[repeat(11,minmax(0,auto))] items-stretch justify-center gap-2">
+            <div className="mt-8 overflow-x-auto pb-3">
+              <div className="mx-auto flex w-max min-w-full flex-nowrap items-stretch justify-center gap-2 px-1">
                 {physicalAiReferenceFlow.map((stage, index) => (
-                  <div key={stage.name} className="contents">
-                    <div className="flex w-40 flex-col justify-center rounded-xl border border-fuchsia-400/30 bg-slate-950/80 p-4 text-center">
+                  <div key={stage.name} className="flex shrink-0 items-stretch">
+                    <div className="flex w-44 shrink-0 flex-col justify-center rounded-xl border border-fuchsia-400/30 bg-slate-950/80 p-4 text-center">
                       <span className="mx-auto flex h-7 w-7 items-center justify-center rounded-full bg-fuchsia-500/15 text-xs font-bold text-fuchsia-200">{stage.step}</span>
                       <span className="mt-3 text-sm font-semibold leading-5 text-slate-100">{stage.name}</span>
                       <span className="mt-2 text-xs leading-5 text-slate-400">{stage.detail}</span>
                     </div>
-                    {index < physicalAiReferenceFlow.length - 1 && <div className="flex items-center justify-center text-lg font-bold text-fuchsia-300/60" aria-hidden="true">→</div>}
+                    {index < physicalAiReferenceFlow.length - 1 && <div className="flex w-7 shrink-0 items-center justify-center text-lg font-bold text-fuchsia-300/60" aria-hidden="true">→</div>}
                   </div>
                 ))}
               </div>

@@ -1141,14 +1141,14 @@ export default function AppsHomePage() {
 
   const referenceJourneys: ReferenceJourney[] = [
     {
-      key: "physical-ai-pretrained-aero",
-      exploreTitle: "Explore a Pretrained Surrogate",
-      segment: "Physical AI / Automotive Aerodynamics",
-      title: "Pretrained NVIDIA DoMINO: surrogate interface to product architecture and digital IP",
-      copy: "Select a real pretrained NVIDIA automotive-aerodynamics surrogate and create traceable model-interface, product-architecture, validation, and digital-IP contracts without claiming that GPU inference ran.",
-      button: "Open Pretrained Surrogate Journey",
-      onClick: () => router.push("/apps/physical-ai?reference=pretrained-aero"),
-      stages: ["Requirements", "Pretrained Model Selection", "Interface Contract", "Architecture", "Digital IP", "Digital Design"],
+      key: "physical-ai-application-intelligence-aero",
+      exploreTitle: "Explore Application Intelligence",
+      segment: "Physical AI / Intelligent Active Aerodynamics",
+      title: "Application to Intelligent System: DoMINO mapping, CPU reference, partitioning, FPGA or ASIC",
+      copy: "Start from an active-aerodynamics application, provisionally map NVIDIA DoMINO, run a transparent CPU reference without claiming surrogate inference, partition software, firmware, and hardware jobs, and continue through existing implementation loops.",
+      button: "Open Application Intelligence Journey",
+      onClick: () => router.push("/apps/application-intelligence"),
+      stages: ["Application", "Surrogate Mapping", "CPU Reference", "Partition", "Architecture", "RTL", "FPGA / ASIC"],
       comingSoon: true,
     },
     {
@@ -1784,6 +1784,4 @@ export default function AppsHomePage() {
     </main>
   );
 }
-
-
 
