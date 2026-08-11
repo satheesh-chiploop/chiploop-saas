@@ -1,0 +1,1654 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level adaptive aero-control controller and transport wrapper. It exposes a compact register file and bounded request/response transport for an external surrogate service, validates returned data, tracks freshness and timeout, clamps commanded actuator output, and forces deterministic safe fallback on reset, disable, fault, invalid response, or stale transaction.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "host_cfg_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_cfg_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "host_cfg_enable",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_cfg_clear_fault",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_cfg_mode",
+          "direction": "input",
+          "width": 2
+        },
+        {
+          "name": "host_cfg_velocity",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "host_cfg_timeout_threshold",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "host_cfg_min_cmd",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "host_cfg_max_cmd",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "host_cfg_slew_limit",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "host_cfg_req_seq",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "host_cfg_geometry_handle",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "host_cfg_flow_summary",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "req_seq_num",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "req_geometry_handle",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "req_velocity",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "req_flow_summary",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "resp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "resp_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "resp_validated",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "resp_seq_num",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "resp_drag_summary",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "resp_lift_summary",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "resp_age",
+          "direction": "input",
+          "width": 16
+        },
+        {
+          "name": "resp_timeout",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "act_cmd",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "act_mode",
+          "direction": "output",
+          "width": 2
+        },
+        {
+          "name": "act_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "sticky_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status",
+          "direction": "output",
+          "width": 4
+        },
+        {
+          "name": "last_accepted_seq",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "last_valid_resp_age",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "current_mode",
+          "direction": "output",
+          "width": 2
+        }
+      ],
+      "functionality": "Implements the complete external-model transport, validation, and safety contract. The top accepts compact host configuration and control inputs, issues a single bounded request descriptor when enabled and configuration is valid, receives a bounded response descriptor, verifies response validity and sequence number, supervises elapsed age against a timeout threshold, updates sticky fault state, and emits a saturated slew-limited actuator command with deterministic conservative fallback when disabled, faulted, stale, or unverified.",
+      "responsibilities": [
+        "Provide the only legal top-level integration point for the design.",
+        "Drive model-request valid/data outputs and receive model-request ready as input.",
+        "Receive model-response valid/data inputs and drive model-response ready as output.",
+        "Capture host configuration and request metadata into a bounded request descriptor.",
+        "Validate response sequence number, validity, and freshness before allowing control use.",
+        "Track outstanding request sequence and response age.",
+        "Assert sticky fault on stale, mismatched, malformed, or invalid responses.",
+        "Support host-clearable sticky fault only when no active fault persists.",
+        "Clamp actuator command to configured minimum/maximum and enforce slew limit.",
+        "Force safe conservative fallback mode whenever disabled, reset, or faulted.",
+        "Provide synchronous act_cmd, act_mode, and act_valid outputs only.",
+        "Expose status, sticky fault, last accepted sequence, last valid response age, and current mode."
+      ],
+      "must_drive": [
+        "req_valid",
+        "req_seq_num",
+        "req_geometry_handle",
+        "req_velocity",
+        "req_flow_summary",
+        "resp_ready",
+        "act_cmd",
+        "act_mode",
+        "act_valid",
+        "sticky_fault",
+        "status",
+        "last_accepted_seq",
+        "last_valid_resp_age",
+        "current_mode",
+        "host_cfg_ready"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "host_cfg_valid",
+        "host_cfg_enable",
+        "host_cfg_clear_fault",
+        "host_cfg_mode",
+        "host_cfg_velocity",
+        "host_cfg_timeout_threshold",
+        "host_cfg_min_cmd",
+        "host_cfg_max_cmd",
+        "host_cfg_slew_limit",
+        "host_cfg_req_seq",
+        "host_cfg_geometry_handle",
+        "host_cfg_flow_summary",
+        "req_ready",
+        "resp_valid",
+        "resp_validated",
+        "resp_seq_num",
+        "resp_drag_summary",
+        "resp_lift_summary",
+        "resp_age",
+        "resp_timeout"
+      ],
+      "must_not_drive": [
+        "host_cfg_enable",
+        "host_cfg_clear_fault",
+        "host_cfg_mode",
+        "host_cfg_velocity",
+        "host_cfg_timeout_threshold",
+        "host_cfg_min_cmd",
+        "host_cfg_max_cmd",
+        "host_cfg_slew_limit",
+        "host_cfg_req_seq",
+        "host_cfg_geometry_handle",
+        "host_cfg_flow_summary",
+        "req_ready",
+        "resp_valid",
+        "resp_validated",
+        "resp_seq_num",
+        "resp_drag_summary",
+        "resp_lift_summary",
+        "resp_age",
+        "resp_timeout"
+      ],
+      "reset_behavior": "On active-low reset, all control and status registers reset to safe fallback state, req_valid deasserts, resp_ready is asserted only per deterministic idle policy, act_valid deasserts, act_mode selects the conservative fallback mode, sticky_fault clears, outstanding request tracking clears, and command history is reset to a safe conservative value.",
+      "behavior_rules": [
+        "Accept host configuration only when host_cfg_valid is asserted and the controller is ready for a new configuration transaction.",
+        "Emit a single bounded request descriptor using the current host configuration and request sequence metadata; hold request fields stable while req_valid is asserted.",
+        "Only treat a response as usable when resp_valid, resp_validated, and sequence-match conditions are satisfied and no timeout is indicated.",
+        "Reject any response with mismatched sequence, invalid flag, malformed summary, or timeout indication by asserting sticky_fault and forcing fallback.",
+        "Set fault and reject the transaction if the elapsed age reaches or exceeds timeout_threshold before a valid response is accepted.",
+        "Saturate act_cmd to the configured min/max range and then apply slew limiting against the previous commanded value before driving output.",
+        "When disabled, faulted, or cleared by host without an active valid condition, drive the deterministic safe fallback mode and deassert act_valid.",
+        "Keep faults sticky until clear_fault is asserted and no active fault condition persists; clear_fault must not erase an active fault source.",
+        "All externally visible outputs are synchronous registered outputs; no combinational feed-through to actuator pins is permitted.",
+        "No surrogate computation, CFD, meshing, or payload history storage is implemented in this module."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "request_packer",
+        "description": "Captures host configuration and composes a bounded request descriptor for the external surrogate service. It emits only compact scalar metadata required for transport and sequencing.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "host_cfg_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_cfg_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "host_cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_cfg_mode",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "host_cfg_velocity",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "host_cfg_req_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "host_cfg_geometry_handle",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "host_cfg_flow_summary",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "req_seq_num",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "req_geometry_handle",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "req_velocity",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "req_flow_summary",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "req_mode",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "cfg_accepted",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements a small FSM that captures control inputs, checks enable and readiness, and emits one bounded request descriptor consisting only of scalar metadata. It does not widen, store, or process high-dimensional payloads.",
+        "responsibilities": [
+          "Sample host configuration fields for a new request.",
+          "Assert host_cfg_ready when it can accept and forward a configuration transaction.",
+          "Drive req_valid and keep descriptor fields stable until accepted.",
+          "Pass only bounded scalar metadata to the external transport boundary.",
+          "Emit cfg_accepted when a configuration is successfully packed and launched."
+        ],
+        "must_drive": [
+          "host_cfg_ready",
+          "req_valid",
+          "req_seq_num",
+          "req_geometry_handle",
+          "req_velocity",
+          "req_flow_summary",
+          "req_mode",
+          "cfg_accepted"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "host_cfg_valid",
+          "host_cfg_enable",
+          "host_cfg_mode",
+          "host_cfg_velocity",
+          "host_cfg_req_seq",
+          "host_cfg_geometry_handle",
+          "host_cfg_flow_summary",
+          "req_ready"
+        ],
+        "must_not_drive": [
+          "host_cfg_valid",
+          "host_cfg_enable",
+          "host_cfg_mode",
+          "host_cfg_velocity",
+          "host_cfg_req_seq",
+          "host_cfg_geometry_handle",
+          "host_cfg_flow_summary",
+          "req_ready"
+        ],
+        "reset_behavior": "Reset clears the packer FSM to idle, deasserts req_valid and cfg_accepted, and drives host_cfg_ready low until the controller is in a valid accepting state.",
+        "behavior_rules": [
+          "Issue a single request descriptor per accepted host configuration event.",
+          "Hold request outputs stable while req_valid is asserted and req_ready is low.",
+          "Do not alter request metadata after launch except by reset or a new accepted configuration event.",
+          "Only scalar fields listed in the port contract may be transferred.",
+          "Reject configuration when disabled or not ready without emitting a request."
+        ],
+        "rtl_output_file": "request_packer.v"
+      },
+      {
+        "name": "response_parser",
+        "description": "Accepts a compact returned descriptor from the external surrogate service and exposes only scalar control-relevant response fields after validation staging.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "resp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "resp_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "resp_validated",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "resp_seq_num",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "resp_drag_summary",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "resp_lift_summary",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "resp_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "resp_timeout",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "parsed_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "parsed_seq_num",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "parsed_drag_summary",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "parsed_lift_summary",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "parsed_age",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "parsed_timeout",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements response-side transport acceptance and scalar extraction. It does not perform model inference or payload interpretation beyond bounded control-relevant metadata staging.",
+        "responsibilities": [
+          "Accept returned response descriptors from the external service boundary.",
+          "Expose scalar response fields for downstream validation and control.",
+          "Indicate whether the parsed response is structurally valid enough for supervisory checking.",
+          "Provide a ready/valid handshake boundary for bounded-latency response transfer."
+        ],
+        "must_drive": [
+          "resp_ready",
+          "parsed_valid",
+          "parsed_seq_num",
+          "parsed_drag_summary",
+          "parsed_lift_summary",
+          "parsed_age",
+          "parsed_timeout"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "resp_valid",
+          "resp_validated",
+          "resp_seq_num",
+          "resp_drag_summary",
+          "resp_lift_summary",
+          "resp_age",
+          "resp_timeout"
+        ],
+        "must_not_drive": [
+          "resp_valid",
+          "resp_validated",
+          "resp_seq_num",
+          "resp_drag_summary",
+          "resp_lift_summary",
+          "resp_age",
+          "resp_timeout"
+        ],
+        "reset_behavior": "Reset deasserts parsed_valid, asserts or deasserts resp_ready according to the deterministic idle policy, and clears all parsed scalar outputs to safe zero values.",
+        "behavior_rules": [
+          "Only scalar response metadata may be propagated.",
+          "A malformed or unvalidated response must not be promoted to parsed_valid.",
+          "Parsed outputs must remain stable while a response handshake is in progress.",
+          "No bulk response storage or history buffering is implemented."
+        ],
+        "rtl_output_file": "response_parser.v"
+      },
+      {
+        "name": "freshness_monitor",
+        "description": "Tracks the outstanding request sequence number and elapsed cycles since request issuance, detects stale transactions, and supplies age/freshness status for safety supervision.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "req_launch",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_seq_num",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "timeout_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "resp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "resp_seq_num",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "resp_validated",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "outstanding_seq_num",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "age_cycles",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "timed_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "response_match",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "response_fresh",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Maintains small registers for the outstanding request sequence and cycle age. It detects timeout and sequence-match status to support stale-command rejection and fault generation.",
+        "responsibilities": [
+          "Record the last launched request sequence number.",
+          "Increment and expose age in cycles while a request is outstanding.",
+          "Assert timed_out when age meets or exceeds the configured timeout threshold.",
+          "Assert response_match only when the incoming response sequence equals the outstanding sequence.",
+          "Provide response_fresh only when a valid, matched, and non-timed-out response is observed."
+        ],
+        "must_drive": [
+          "outstanding_seq_num",
+          "age_cycles",
+          "timed_out",
+          "response_match",
+          "response_fresh"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "req_launch",
+          "req_seq_num",
+          "timeout_threshold",
+          "resp_valid",
+          "resp_seq_num",
+          "resp_validated"
+        ],
+        "must_not_drive": [
+          "req_launch",
+          "req_seq_num",
+          "timeout_threshold",
+          "resp_valid",
+          "resp_seq_num",
+          "resp_validated"
+        ],
+        "reset_behavior": "Reset clears the outstanding sequence, age counter, timed_out, response_match, and response_fresh indicators.",
+        "behavior_rules": [
+          "Age counter must advance synchronously and saturate rather than wrap.",
+          "A response is fresh only when valid, validated, matched, and not timed out.",
+          "Timeout handling must be deterministic and bounded by the configured threshold.",
+          "No deep buffering or payload history is permitted."
+        ],
+        "rtl_output_file": "freshness_monitor.v"
+      },
+      {
+        "name": "command_clamper",
+        "description": "Computes the actuator command from validated scalar response summaries, clamps it to configured bounds, and applies slew limiting before output staging.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "resp_validated",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "resp_drag_summary",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "resp_lift_summary",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "min_cmd",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "max_cmd",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "slew_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "prev_cmd",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cmd_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_value",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cmd_clamped",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_slew_limited",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Generates a bounded command candidate from validated scalar response summaries and enforces saturation and slew-rate limiting. It is intentionally simple and deterministic, with no surrogate-model computation beyond compact control-relevant arithmetic.",
+        "responsibilities": [
+          "Use validated scalar response summaries as the only input for command formation.",
+          "Clamp the command to the configured min/max range.",
+          "Apply slew limiting against the previous command value.",
+          "Report whether clamping and slew limiting were applied.",
+          "Assert cmd_valid only for a verified and bounded command candidate."
+        ],
+        "must_drive": [
+          "cmd_valid",
+          "cmd_value",
+          "cmd_clamped",
+          "cmd_slew_limited"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "resp_validated",
+          "resp_drag_summary",
+          "resp_lift_summary",
+          "min_cmd",
+          "max_cmd",
+          "slew_limit",
+          "prev_cmd"
+        ],
+        "must_not_drive": [
+          "resp_validated",
+          "resp_drag_summary",
+          "resp_lift_summary",
+          "min_cmd",
+          "max_cmd",
+          "slew_limit",
+          "prev_cmd"
+        ],
+        "reset_behavior": "Reset clears the command generator to a safe conservative command seed and deasserts cmd_valid.",
+        "behavior_rules": [
+          "All arithmetic must be fixed-width and deterministic.",
+          "Clamp before or as part of the bounded output computation, then apply slew limiting using the prior command state.",
+          "Never pass an unclamped or overslewed command forward.",
+          "No unverified response may influence cmd_valid high."
+        ],
+        "rtl_output_file": "command_clamper.v"
+      },
+      {
+        "name": "safe_fallback_manager",
+        "description": "Selects a deterministic conservative aero mode and command policy whenever the controller is disabled, faulted, or forced into fallback by unsafe conditions.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "sticky_fault_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timed_out",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_fresh",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "clear_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fallback_mode",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "fallback_cmd",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "fallback_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "active_fault",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Provides deterministic conservative fallback mode and command outputs. It decides when the system must remain or move into safe fallback based on enable, sticky fault, timeout, and response freshness indicators.",
+        "responsibilities": [
+          "Drive conservative aero mode whenever the controller is disabled or unsafe.",
+          "Generate a deterministic conservative fallback command.",
+          "Indicate whether an active fault condition is present.",
+          "Support host clear-fault sequencing without clearing an active unsafe condition."
+        ],
+        "must_drive": [
+          "fallback_mode",
+          "fallback_cmd",
+          "active_fault"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "enable",
+          "sticky_fault_in",
+          "timed_out",
+          "response_fresh",
+          "clear_fault",
+          "fallback_valid"
+        ],
+        "must_not_drive": [
+          "enable",
+          "sticky_fault_in",
+          "timed_out",
+          "response_fresh",
+          "clear_fault"
+        ],
+        "reset_behavior": "Reset forces fallback_mode to conservative, fallback_cmd to a safe conservative value, fallback_valid low, and active_fault low.",
+        "behavior_rules": [
+          "Fallback output must be deterministic and synchronous.",
+          "If disabled or faulted, fallback outputs override normal command generation.",
+          "clear_fault may only remove sticky fault state when no active fault condition persists.",
+          "The manager must never enable an unsafe actuator state."
+        ],
+        "rtl_output_file": "safe_fallback_manager.v"
+      },
+      {
+        "name": "telemetry_status",
+        "description": "Collects and exposes host-visible status information including sticky fault, last accepted sequence number, last valid response age, and current operating mode.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "sticky_fault_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "last_accepted_seq_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "last_valid_resp_age_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "current_mode_in",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "status",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "sticky_fault_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "last_accepted_seq_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "last_valid_resp_age_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "current_mode_out",
+            "direction": "output",
+            "width": 2
+          }
+        ],
+        "functionality": "Registers and reports compact telemetry and status fields for host observation. It does not contain bulk logs or deep history.",
+        "responsibilities": [
+          "Expose sticky fault status to the host.",
+          "Expose the last accepted request sequence number.",
+          "Expose the age of the last valid response.",
+          "Expose the current operating mode.",
+          "Encode compact status bits for host-visible supervision."
+        ],
+        "must_drive": [
+          "sticky_fault_out",
+          "last_accepted_seq_out",
+          "last_valid_resp_age_out",
+          "current_mode_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "sticky_fault_in",
+          "last_accepted_seq_in",
+          "last_valid_resp_age_in",
+          "current_mode_in",
+          "status"
+        ],
+        "must_not_drive": [
+          "sticky_fault_in",
+          "last_accepted_seq_in",
+          "last_valid_resp_age_in",
+          "current_mode_in"
+        ],
+        "reset_behavior": "Reset clears telemetry registers to safe zero or conservative mode values and deasserts fault indication.",
+        "behavior_rules": [
+          "Telemetry must reflect synchronous registered state only.",
+          "Sticky fault visibility must match the supervisory fault state.",
+          "No payload or geometry data is exposed through telemetry.",
+          "Status encoding must remain compact and bounded."
+        ],
+        "rtl_output_file": "telemetry_status.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "request_packer.clk",
+        "response_parser.clk",
+        "freshness_monitor.clk",
+        "command_clamper.clk",
+        "safe_fallback_manager.clk",
+        "telemetry_status.clk"
+      ],
+      "description": "Fan out the single synchronous clock to all synchronous submodules."
+    },
+    {
+      "top_port": "reset_n",
+      "connected_to": [
+        "request_packer.reset_n",
+        "response_parser.reset_n",
+        "freshness_monitor.reset_n",
+        "command_clamper.reset_n",
+        "safe_fallback_manager.reset_n",
+        "telemetry_status.reset_n"
+      ],
+      "description": "Fan out the active-low synchronous reset to all submodules."
+    },
+    {
+      "top_port": "host_cfg_valid",
+      "connected_to": [
+        "request_packer.host_cfg_valid"
+      ],
+      "description": "Host configuration valid strobe enters the request packer."
+    },
+    {
+      "top_port": "host_cfg_enable",
+      "connected_to": [
+        "request_packer.host_cfg_enable",
+        "safe_fallback_manager.enable"
+      ],
+      "description": "Host enable controls request acceptance and fallback supervision."
+    },
+    {
+      "top_port": "host_cfg_clear_fault",
+      "connected_to": [
+        "safe_fallback_manager.clear_fault"
+      ],
+      "description": "Host clear-fault request enters the fallback manager."
+    },
+    {
+      "top_port": "host_cfg_mode",
+      "connected_to": [
+        "request_packer.host_cfg_mode"
+      ],
+      "description": "Host mode selection enters the request packer for bounded request descriptor formation."
+    },
+    {
+      "top_port": "host_cfg_velocity",
+      "connected_to": [
+        "request_packer.host_cfg_velocity"
+      ],
+      "description": "Host velocity input enters the request packer as bounded operating-condition metadata."
+    },
+    {
+      "top_port": "host_cfg_timeout_threshold",
+      "connected_to": [
+        "freshness_monitor.timeout_threshold"
+      ],
+      "description": "Host-configured timeout threshold enters freshness supervision."
+    },
+    {
+      "top_port": "host_cfg_min_cmd",
+      "connected_to": [
+        "command_clamper.min_cmd"
+      ],
+      "description": "Host-configured minimum actuator command enters the command clamper."
+    },
+    {
+      "top_port": "host_cfg_max_cmd",
+      "connected_to": [
+        "command_clamper.max_cmd"
+      ],
+      "description": "Host-configured maximum actuator command enters the command clamper."
+    },
+    {
+      "top_port": "host_cfg_slew_limit",
+      "connected_to": [
+        "command_clamper.slew_limit"
+      ],
+      "description": "Host-configured slew limit enters the command clamper."
+    },
+    {
+      "top_port": "host_cfg_req_seq",
+      "connected_to": [
+        "request_packer.host_cfg_req_seq",
+        "freshness_monitor.req_seq_num"
+      ],
+      "description": "Host request sequence is packed for transport and supervised for freshness tracking."
+    },
+    {
+      "top_port": "host_cfg_geometry_handle",
+      "connected_to": [
+        "request_packer.host_cfg_geometry_handle"
+      ],
+      "description": "Geometry handle is included in the bounded request descriptor."
+    },
+    {
+      "top_port": "host_cfg_flow_summary",
+      "connected_to": [
+        "request_packer.host_cfg_flow_summary"
+      ],
+      "description": "Compact flow-condition summary is included in the bounded request descriptor."
+    },
+    {
+      "top_port": "req_ready",
+      "connected_to": [
+        "request_packer.req_ready"
+      ],
+      "description": "External request-ready handshake enters the request packer."
+    },
+    {
+      "top_port": "req_valid",
+      "connected_to": [
+        "request_packer.req_valid"
+      ],
+      "description": "Request valid is driven by the request packer to the external service boundary."
+    },
+    {
+      "top_port": "req_seq_num",
+      "connected_to": [
+        "request_packer.req_seq_num"
+      ],
+      "description": "Request sequence number is driven by the request packer."
+    },
+    {
+      "top_port": "req_geometry_handle",
+      "connected_to": [
+        "request_packer.req_geometry_handle"
+      ],
+      "description": "Request geometry handle is driven by the request packer."
+    },
+    {
+      "top_port": "req_velocity",
+      "connected_to": [
+        "request_packer.req_velocity"
+      ],
+      "description": "Request velocity metadata is driven by the request packer."
+    },
+    {
+      "top_port": "req_flow_summary",
+      "connected_to": [
+        "request_packer.req_flow_summary"
+      ],
+      "description": "Request flow summary metadata is driven by the request packer."
+    },
+    {
+      "top_port": "resp_valid",
+      "connected_to": [
+        "response_parser.resp_valid",
+        "freshness_monitor.resp_valid"
+      ],
+      "description": "Response valid from the external service is consumed by parser and freshness supervision."
+    },
+    {
+      "top_port": "resp_validated",
+      "connected_to": [
+        "response_parser.resp_validated",
+        "freshness_monitor.resp_validated",
+        "command_clamper.resp_validated"
+      ],
+      "description": "Validation qualifier from the external service boundary fans into parser, freshness supervision, and command generation."
+    },
+    {
+      "top_port": "resp_seq_num",
+      "connected_to": [
+        "response_parser.resp_seq_num",
+        "freshness_monitor.resp_seq_num"
+      ],
+      "description": "Response sequence number is parsed and supervised for match checking."
+    },
+    {
+      "top_port": "resp_drag_summary",
+      "connected_to": [
+        "response_parser.resp_drag_summary",
+        "command_clamper.resp_drag_summary"
+      ],
+      "description": "Validated scalar drag summary is parsed and optionally used for bounded command formation."
+    },
+    {
+      "top_port": "resp_lift_summary",
+      "connected_to": [
+        "response_parser.resp_lift_summary",
+        "command_clamper.resp_lift_summary"
+      ],
+      "description": "Validated scalar lift summary is parsed and optionally used for bounded command formation."
+    },
+    {
+      "top_port": "resp_age",
+      "connected_to": [
+        "response_parser.resp_age"
+      ],
+      "description": "Response age metadata is parsed for telemetry and supervision."
+    },
+    {
+      "top_port": "resp_timeout",
+      "connected_to": [
+        "response_parser.resp_timeout"
+      ],
+      "description": "Response timeout indicator is parsed for supervisory handling."
+    },
+    {
+      "top_port": "act_cmd",
+      "connected_to": [
+        "command_clamper.cmd_value"
+      ],
+      "description": "Final bounded actuator command is driven by the command clamper and selected by top-level safety logic."
+    },
+    {
+      "top_port": "act_mode",
+      "connected_to": [
+        "safe_fallback_manager.fallback_mode",
+        "telemetry_status.current_mode_out"
+      ],
+      "description": "Actuator operating mode is sourced from the fallback manager and reflected in telemetry."
+    },
+    {
+      "top_port": "act_valid",
+      "connected_to": [
+        "command_clamper.cmd_valid"
+      ],
+      "description": "Actuator valid is driven synchronously by command generation and overridden by fallback safety when required."
+    },
+    {
+      "top_port": "sticky_fault",
+      "connected_to": [
+        "safe_fallback_manager.active_fault",
+        "telemetry_status.sticky_fault_out"
+      ],
+      "description": "Sticky fault is managed by the fallback/supervision path and reported through telemetry."
+    },
+    {
+      "top_port": "last_accepted_seq",
+      "connected_to": [
+        "telemetry_status.last_accepted_seq_out"
+      ],
+      "description": "Last accepted sequence number is reported by telemetry status."
+    },
+    {
+      "top_port": "last_valid_resp_age",
+      "connected_to": [
+        "telemetry_status.last_valid_resp_age_out"
+      ],
+      "description": "Last valid response age is reported by telemetry status."
+    },
+    {
+      "top_port": "current_mode",
+      "connected_to": [
+        "telemetry_status.current_mode_out"
+      ],
+      "description": "Current operating mode is reported by telemetry status."
+    },
+    {
+      "top_port": "host_cfg_ready",
+      "connected_to": [
+        "request_packer.host_cfg_ready"
+      ],
+      "description": "Host configuration ready is sourced by the request packer."
+    },
+    {
+      "top_port": "resp_ready",
+      "connected_to": [
+        "response_parser.resp_ready"
+      ],
+      "description": "Response ready is sourced by the response parser toward the external service boundary."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "packed_req_launch",
+      "width": 1,
+      "source": "request_packer.cfg_accepted",
+      "destinations": [
+        "freshness_monitor.req_launch"
+      ],
+      "description": "Launch pulse that records a newly accepted request in the freshness monitor."
+    },
+    {
+      "name": "parsed_resp_valid",
+      "width": 1,
+      "source": "response_parser.parsed_valid",
+      "destinations": [
+        "freshness_monitor.resp_valid"
+      ],
+      "description": "Parsed response-valid indication used by freshness supervision."
+    },
+    {
+      "name": "parsed_resp_seq_num",
+      "width": 16,
+      "source": "response_parser.parsed_seq_num",
+      "destinations": [
+        "freshness_monitor.resp_seq_num"
+      ],
+      "description": "Parsed response sequence number used for freshness match checking."
+    },
+    {
+      "name": "parsed_resp_drag_summary",
+      "width": 16,
+      "source": "response_parser.parsed_drag_summary",
+      "destinations": [
+        "command_clamper.resp_drag_summary"
+      ],
+      "description": "Parsed scalar drag summary routed to the command clamper."
+    },
+    {
+      "name": "parsed_resp_lift_summary",
+      "width": 16,
+      "source": "response_parser.parsed_lift_summary",
+      "destinations": [
+        "command_clamper.resp_lift_summary"
+      ],
+      "description": "Parsed scalar lift summary routed to the command clamper."
+    },
+    {
+      "name": "parsed_resp_age",
+      "width": 16,
+      "source": "response_parser.parsed_age",
+      "destinations": [
+        "telemetry_status.last_valid_resp_age_in"
+      ],
+      "description": "Parsed response age routed to telemetry status."
+    },
+    {
+      "name": "parsed_resp_timeout",
+      "width": 1,
+      "source": "response_parser.parsed_timeout",
+      "destinations": [
+        "freshness_monitor.resp_validated"
+      ],
+      "description": "Parsed timeout indicator routed to freshness supervision for stale-response rejection."
+    },
+    {
+      "name": "fresh_outstanding_seq",
+      "width": 16,
+      "source": "freshness_monitor.outstanding_seq_num",
+      "destinations": [
+        "telemetry_status.last_accepted_seq_in"
+      ],
+      "description": "Outstanding or last accepted sequence value routed to telemetry status."
+    },
+    {
+      "name": "fresh_timed_out",
+      "width": 1,
+      "source": "freshness_monitor.timed_out",
+      "destinations": [
+        "safe_fallback_manager.timed_out"
+      ],
+      "description": "Timeout indication routed to safe fallback manager."
+    },
+    {
+      "name": "fresh_response_fresh",
+      "width": 1,
+      "source": "freshness_monitor.response_fresh",
+      "destinations": [
+        "safe_fallback_manager.response_fresh"
+      ],
+      "description": "Fresh response qualifier enables command generation and informs safety supervision."
+    },
+    {
+      "name": "cmd_candidate_valid",
+      "width": 1,
+      "source": "command_clamper.cmd_valid",
+      "destinations": [
+        "safe_fallback_manager.fallback_valid"
+      ],
+      "description": "Valid bounded command candidate is considered by the fallback manager for safe selection."
+    },
+    {
+      "name": "fallback_active_fault",
+      "width": 1,
+      "source": "safe_fallback_manager.active_fault",
+      "destinations": [
+        "telemetry_status.sticky_fault_in"
+      ],
+      "description": "Active fault state from fallback manager feeds telemetry sticky fault reporting."
+    },
+    {
+      "name": "fallback_mode_select",
+      "width": 2,
+      "source": "safe_fallback_manager.fallback_mode",
+      "destinations": [
+        "telemetry_status.current_mode_in"
+      ],
+      "description": "Fallback mode selection feeds telemetry current mode reporting."
+    },
+    {
+      "name": "fallback_command",
+      "width": 16,
+      "source": "safe_fallback_manager.fallback_cmd",
+      "destinations": [
+        "command_clamper.prev_cmd"
+      ],
+      "description": "Deterministic fallback command serves as the previous-command reference for bounded slew behavior."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "packed_req_launch",
+      "owner": "request_packer.cfg_accepted"
+    },
+    {
+      "signal": "packed_req_mode",
+      "owner": "request_packer.req_mode"
+    },
+    {
+      "signal": "parsed_resp_valid",
+      "owner": "response_parser.parsed_valid"
+    },
+    {
+      "signal": "parsed_resp_seq_num",
+      "owner": "response_parser.parsed_seq_num"
+    },
+    {
+      "signal": "parsed_resp_drag_summary",
+      "owner": "response_parser.parsed_drag_summary"
+    },
+    {
+      "signal": "parsed_resp_lift_summary",
+      "owner": "response_parser.parsed_lift_summary"
+    },
+    {
+      "signal": "parsed_resp_age",
+      "owner": "response_parser.parsed_age"
+    },
+    {
+      "signal": "parsed_resp_timeout",
+      "owner": "response_parser.parsed_timeout"
+    },
+    {
+      "signal": "fresh_outstanding_seq",
+      "owner": "freshness_monitor.outstanding_seq_num"
+    },
+    {
+      "signal": "fresh_age_cycles",
+      "owner": "freshness_monitor.age_cycles"
+    },
+    {
+      "signal": "fresh_timed_out",
+      "owner": "freshness_monitor.timed_out"
+    },
+    {
+      "signal": "fresh_response_match",
+      "owner": "freshness_monitor.response_match"
+    },
+    {
+      "signal": "fresh_response_fresh",
+      "owner": "freshness_monitor.response_fresh"
+    },
+    {
+      "signal": "cmd_candidate_valid",
+      "owner": "command_clamper.cmd_valid"
+    },
+    {
+      "signal": "cmd_candidate_value",
+      "owner": "command_clamper.cmd_value"
+    },
+    {
+      "signal": "cmd_candidate_clamped",
+      "owner": "command_clamper.cmd_clamped"
+    },
+    {
+      "signal": "cmd_candidate_slew_limited",
+      "owner": "command_clamper.cmd_slew_limited"
+    },
+    {
+      "signal": "fallback_active_fault",
+      "owner": "safe_fallback_manager.active_fault"
+    },
+    {
+      "signal": "fallback_mode_select",
+      "owner": "safe_fallback_manager.fallback_mode"
+    },
+    {
+      "signal": "fallback_command",
+      "owner": "safe_fallback_manager.fallback_cmd"
+    },
+    {
+      "signal": "req_valid",
+      "owner": "request_packer.req_valid"
+    },
+    {
+      "signal": "req_seq_num",
+      "owner": "request_packer.req_seq_num"
+    },
+    {
+      "signal": "req_geometry_handle",
+      "owner": "request_packer.req_geometry_handle"
+    },
+    {
+      "signal": "req_velocity",
+      "owner": "request_packer.req_velocity"
+    },
+    {
+      "signal": "req_flow_summary",
+      "owner": "request_packer.req_flow_summary"
+    },
+    {
+      "signal": "act_cmd",
+      "owner": "command_clamper.cmd_value"
+    },
+    {
+      "signal": "act_mode",
+      "owner": "safe_fallback_manager.fallback_mode"
+    },
+    {
+      "signal": "act_valid",
+      "owner": "command_clamper.cmd_valid"
+    },
+    {
+      "signal": "sticky_fault",
+      "owner": "safe_fallback_manager.active_fault"
+    },
+    {
+      "signal": "last_accepted_seq",
+      "owner": "telemetry_status.last_accepted_seq_out"
+    },
+    {
+      "signal": "last_valid_resp_age",
+      "owner": "telemetry_status.last_valid_resp_age_out"
+    },
+    {
+      "signal": "current_mode",
+      "owner": "telemetry_status.current_mode_out"
+    },
+    {
+      "signal": "host_cfg_ready",
+      "owner": "request_packer.host_cfg_ready"
+    },
+    {
+      "signal": "resp_ready",
+      "owner": "response_parser.resp_ready"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "minimal",
+    "registers": [
+      {
+        "name": "enable",
+        "width": 1,
+        "access": "rw",
+        "reset": 0,
+        "description": "Controller enable control, mapped to host_cfg_enable."
+      },
+      {
+        "name": "clear_fault",
+        "width": 1,
+        "access": "rw",
+        "reset": 0,
+        "description": "Host clear-fault request; clears sticky fault only when safe."
+      },
+      {
+        "name": "mode",
+        "width": 2,
+        "access": "rw",
+        "reset": 0,
+        "description": "Operating mode select."
+      },
+      {
+        "name": "velocity",
+        "width": 16,
+        "access": "rw",
+        "reset": 0,
+        "description": "Operating velocity input."
+      },
+      {
+        "name": "timeout_threshold",
+        "width": 16,
+        "access": "rw",
+        "reset": 0,
+        "description": "Freshness timeout threshold in cycles."
+      },
+      {
+        "name": "min_cmd",
+        "width": 16,
+        "access": "rw",
+        "reset": 0,
+        "description": "Minimum actuator command clamp."
+      },
+      {
+        "name": "max_cmd",
+        "width": 16,
+        "access": "rw",
+        "reset": 65535,
+        "description": "Maximum actuator command clamp."
+      },
+      {
+        "name": "slew_limit",
+        "width": 16,
+        "access": "rw",
+        "reset": 0,
+        "description": "Maximum per-update actuator slew limit."
+      },
+      {
+        "name": "req_seq_num",
+        "width": 16,
+        "access": "rw",
+        "reset": 0,
+        "description": "Request sequence number."
+      },
+      {
+        "name": "status",
+        "width": 4,
+        "access": "ro",
+        "reset": 0,
+        "description": "Compact status summary including fault and state indicators."
+      },
+      {
+        "name": "sticky_fault",
+        "width": 1,
+        "access": "ro",
+        "reset": 0,
+        "description": "Sticky fault indicator."
+      },
+      {
+        "name": "geometry_handle",
+        "width": 16,
+        "access": "rw",
+        "reset": 0,
+        "description": "Compact geometry handle for the external surrogate service."
+      },
+      {
+        "name": "flow_summary",
+        "width": 16,
+        "access": "rw",
+        "reset": 0,
+        "description": "Compact flow-condition summary for the external surrogate service."
+      },
+      {
+        "name": "last_accepted_seq",
+        "width": 16,
+        "access": "ro",
+        "reset": 0,
+        "description": "Last accepted request sequence number."
+      },
+      {
+        "name": "last_valid_resp_age",
+        "width": 16,
+        "access": "ro",
+        "reset": 0,
+        "description": "Age of the last valid response."
+      },
+      {
+        "name": "current_mode",
+        "width": 2,
+        "access": "ro",
+        "reset": 0,
+        "description": "Current operating mode."
+      }
+    ]
+  }
+}

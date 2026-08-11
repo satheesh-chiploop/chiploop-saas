@@ -1,0 +1,114 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "adaptive_aero_control_top",
+  "generated_at": "2026-08-11T17:28:41.632978",
+  "file_count": 21,
+  "files": [
+    {
+      "path": "docs/arch/digital_architecture.json",
+      "sha256": "b12fb90d83976ef43a5a40b1bcccbe0513d00ecab1893bea0ffabdcffb9458f0",
+      "bytes": 17598
+    },
+    {
+      "path": "docs/microarch/digital_microarchitecture.json",
+      "sha256": "0a053d88ef84f5f74360cd3f24ecb0dd4abfa1b956c00f7a579c47ecc8f1ba87",
+      "bytes": 15389
+    },
+    {
+      "path": "docs/regmap/digital_regmap.json",
+      "sha256": "c533e7fbbcd566aabebf141a005b0ddb8b88bd1f9be2cfdd1a9b16402046e7cf",
+      "bytes": 24174
+    },
+    {
+      "path": "docs/regmap/digital_regmap_raw_output.txt",
+      "sha256": "8eb5faeaea419a38ed0a71f7a4ac11090f935926802d39bed967fd006af6457f",
+      "bytes": 14773
+    },
+    {
+      "path": "docs/spec/adaptive_aero_control_top_spec.json",
+      "sha256": "d6d0ed13bdd8fd66a200fa3c6bb920599de300ac962b747d69fa44b7d49dc5c1",
+      "bytes": 51763
+    },
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "a5ec23f74fd697a3f7660aa30626e87cb91b3b2bbd711223f32b5d03385908aa",
+      "bytes": 13623
+    },
+    {
+      "path": "docs/spec/spec_agent_normalized.json",
+      "sha256": "d6d0ed13bdd8fd66a200fa3c6bb920599de300ac962b747d69fa44b7d49dc5c1",
+      "bytes": 51763
+    },
+    {
+      "path": "misc/power_intent_findings.json",
+      "sha256": "0ef50eac0d98366cfa3b1b305ea03c3d9d1d2c62c2b6c7a91b8772435e027a38",
+      "bytes": 305
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "46e265fada973538149d1225d27127e365a27bd678bc3a13aeaa6ebb964a224a",
+      "bytes": 435
+    },
+    {
+      "path": "misc/rtl_agent_preflight.json",
+      "sha256": "2cac2884d8242dcd162368852ff5cf21d63e5269e9b774ab47ba0b556f1d20ee",
+      "bytes": 397
+    },
+    {
+      "path": "misc/rtl_quality_gate.json",
+      "sha256": "9c30b9e0d26d0d2420dd3e382db02fe22903dc01c7f3eee9aa57494f92dec1da",
+      "bytes": 159
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "92e545716f94eacaecde214fa7d1950b06899c09498a5bcf255188699569772f",
+      "bytes": 2221
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "a071cfab6d7a1903b9ad747635fe188e80baa926001226697bf41ab55a5fa21f",
+      "bytes": 776
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "b4999d3e59d3d5a84e35ba3d1ef4ea2a2cfafa5aa922769abbaf7abda67a0d2a",
+      "bytes": 340
+    },
+    {
+      "path": "rtl/adaptive_aero_control_top.v",
+      "sha256": "af7133dcb0e200ac89ed3b7c1cd01894e6ede088b35bcdb1ef5a33bb78f66c4d",
+      "bytes": 6795
+    },
+    {
+      "path": "rtl/command_clamper.v",
+      "sha256": "af10930c95aa16807e5d03e3b15ed5622d79ac3a56a810ca7cf3d7208f3d7107",
+      "bytes": 2430
+    },
+    {
+      "path": "rtl/freshness_monitor.v",
+      "sha256": "1e66b06a4b61f30f8c69ed6110d92b9261b540dfee21a11af0af09b9be4c57a0",
+      "bytes": 1864
+    },
+    {
+      "path": "rtl/request_packer.v",
+      "sha256": "dc8a3a66278c355574959ceac56adb1adbb70e02ad01f91fea031880f1a0d97d",
+      "bytes": 2610
+    },
+    {
+      "path": "rtl/response_parser.v",
+      "sha256": "97752ed192716c9503ef88fd503e521d010c94d2e002ee36993581ae01e5d6da",
+      "bytes": 2055
+    },
+    {
+      "path": "rtl/safe_fallback_manager.v",
+      "sha256": "9c20555f7eaee0c7b7660c856b34d5d4a4a711ee94989dac71c5930570a4adb9",
+      "bytes": 1239
+    },
+    {
+      "path": "rtl/telemetry_status.v",
+      "sha256": "3c935b6c2bdb1169341191d3a4ae5907b8130d60597e21bec8622da34eeae321",
+      "bytes": 1387
+    }
+  ]
+}

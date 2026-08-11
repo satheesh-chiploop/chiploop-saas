@@ -1,0 +1,14 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: adaptive_aero_control_top
+Expected files: ['adaptive_aero_control_top.v', 'request_packer.v', 'response_parser.v', 'freshness_monitor.v', 'command_clamper.v', 'safe_fallback_manager.v', 'telemetry_status.v']
+Materialized files: ['adaptive_aero_control_top.v', 'request_packer.v', 'response_parser.v', 'freshness_monitor.v', 'command_clamper.v', 'safe_fallback_manager.v', 'telemetry_status.v']
+Clock ports: ['clk']
+Reset ports: ['reset_n']
+Icarus compile: pass
+Verilator lint: fatal
+Issue count: 1
+
+Issues:
+- ❌ Verilator lint failed.

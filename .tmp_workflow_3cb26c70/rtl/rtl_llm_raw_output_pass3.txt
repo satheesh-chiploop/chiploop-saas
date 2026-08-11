@@ -1,0 +1,682 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    clk,
+    reset_n,
+    host_cfg_valid,
+    host_cfg_ready,
+    host_cfg_enable,
+    host_cfg_clear_fault,
+    host_cfg_mode,
+    host_cfg_velocity,
+    host_cfg_timeout_threshold,
+    host_cfg_min_cmd,
+    host_cfg_max_cmd,
+    host_cfg_slew_limit,
+    host_cfg_req_seq,
+    host_cfg_geometry_handle,
+    host_cfg_flow_summary,
+    req_valid,
+    req_ready,
+    req_seq_num,
+    req_geometry_handle,
+    req_velocity,
+    req_flow_summary,
+    resp_valid,
+    resp_ready,
+    resp_validated,
+    resp_seq_num,
+    resp_drag_summary,
+    resp_lift_summary,
+    resp_age,
+    resp_timeout,
+    act_cmd,
+    act_mode,
+    act_valid,
+    sticky_fault,
+    status,
+    last_accepted_seq,
+    last_valid_resp_age,
+    current_mode
+);
+input clk;
+input reset_n;
+input host_cfg_valid;
+output host_cfg_ready;
+input host_cfg_enable;
+input host_cfg_clear_fault;
+input [1:0] host_cfg_mode;
+input [15:0] host_cfg_velocity;
+input [15:0] host_cfg_timeout_threshold;
+input [15:0] host_cfg_min_cmd;
+input [15:0] host_cfg_max_cmd;
+input [15:0] host_cfg_slew_limit;
+input [15:0] host_cfg_req_seq;
+input [15:0] host_cfg_geometry_handle;
+input [15:0] host_cfg_flow_summary;
+output req_valid;
+input req_ready;
+output [15:0] req_seq_num;
+output [15:0] req_geometry_handle;
+output [15:0] req_velocity;
+output [15:0] req_flow_summary;
+input resp_valid;
+output resp_ready;
+input resp_validated;
+input [15:0] resp_seq_num;
+input [15:0] resp_drag_summary;
+input [15:0] resp_lift_summary;
+input [15:0] resp_age;
+input resp_timeout;
+output [15:0] act_cmd;
+output [1:0] act_mode;
+output act_valid;
+output sticky_fault;
+output [3:0] status;
+output [15:0] last_accepted_seq;
+output [15:0] last_valid_resp_age;
+output [1:0] current_mode;
+
+wire host_cfg_ready_w;
+wire req_valid_w;
+wire [15:0] req_seq_num_w;
+wire [15:0] req_geometry_handle_w;
+wire [15:0] req_velocity_w;
+wire [15:0] req_flow_summary_w;
+wire req_mode_w;
+wire cfg_accepted_w;
+
+wire resp_ready_w;
+wire parsed_valid_w;
+wire [15:0] parsed_seq_num_w;
+wire [15:0] parsed_drag_summary_w;
+wire [15:0] parsed_lift_summary_w;
+wire [15:0] parsed_age_w;
+wire parsed_timeout_w;
+
+wire [15:0] outstanding_seq_num_w;
+wire [15:0] age_cycles_w;
+wire timed_out_w;
+wire response_match_w;
+wire response_fresh_w;
+
+wire cmd_valid_w;
+wire [15:0] cmd_value_w;
+wire cmd_clamped_w;
+wire cmd_slew_limited_w;
+
+wire [1:0] fallback_mode_w;
+wire [15:0] fallback_cmd_w;
+wire active_fault_w;
+
+wire sticky_fault_out_w;
+wire [15:0] last_accepted_seq_out_w;
+wire [15:0] last_valid_resp_age_out_w;
+wire [1:0] current_mode_out_w;
+
+assign host_cfg_ready = host_cfg_ready_w;
+assign req_valid = req_valid_w;
+assign req_seq_num = req_seq_num_w;
+assign req_geometry_handle = req_geometry_handle_w;
+assign req_velocity = req_velocity_w;
+assign req_flow_summary = req_flow_summary_w;
+assign resp_ready = resp_ready_w;
+assign act_cmd = cmd_value_w;
+assign act_mode = fallback_mode_w;
+assign act_valid = cmd_valid_w;
+assign sticky_fault = active_fault_w;
+assign status = {active_fault_w, active_fault_w, fallback_mode_w};
+assign last_accepted_seq = last_accepted_seq_out_w;
+assign last_valid_resp_age = last_valid_resp_age_out_w;
+assign current_mode = current_mode_out_w;
+
+request_packer u_request_packer (
+    .clk(clk),
+    .reset_n(reset_n),
+    .host_cfg_valid(host_cfg_valid),
+    .host_cfg_ready(host_cfg_ready_w),
+    .host_cfg_enable(host_cfg_enable),
+    .host_cfg_mode(host_cfg_mode),
+    .host_cfg_velocity(host_cfg_velocity),
+    .host_cfg_req_seq(host_cfg_req_seq),
+    .host_cfg_geometry_handle(host_cfg_geometry_handle),
+    .host_cfg_flow_summary(host_cfg_flow_summary),
+    .req_ready(req_ready),
+    .req_valid(req_valid_w),
+    .req_seq_num(req_seq_num_w),
+    .req_geometry_handle(req_geometry_handle_w),
+    .req_velocity(req_velocity_w),
+    .req_flow_summary(req_flow_summary_w),
+    .req_mode(req_mode_w),
+    .cfg_accepted(cfg_accepted_w)
+);
+
+response_parser u_response_parser (
+    .clk(clk),
+    .reset_n(reset_n),
+    .resp_valid(resp_valid),
+    .resp_ready(resp_ready_w),
+    .resp_validated(resp_validated),
+    .resp_seq_num(resp_seq_num),
+    .resp_drag_summary(resp_drag_summary),
+    .resp_lift_summary(resp_lift_summary),
+    .resp_age(resp_age),
+    .resp_timeout(resp_timeout),
+    .parsed_valid(parsed_valid_w),
+    .parsed_seq_num(parsed_seq_num_w),
+    .parsed_drag_summary(parsed_drag_summary_w),
+    .parsed_lift_summary(parsed_lift_summary_w),
+    .parsed_age(parsed_age_w),
+    .parsed_timeout(parsed_timeout_w)
+);
+
+freshness_monitor u_freshness_monitor (
+    .clk(clk),
+    .reset_n(reset_n),
+    .req_launch(cfg_accepted_w),
+    .req_seq_num(host_cfg_req_seq),
+    .timeout_threshold(host_cfg_timeout_threshold),
+    .resp_valid(parsed_valid_w),
+    .resp_seq_num(parsed_seq_num_w),
+    .resp_validated(parsed_timeout_w),
+    .outstanding_seq_num(outstanding_seq_num_w),
+    .age_cycles(age_cycles_w),
+    .timed_out(timed_out_w),
+    .response_match(response_match_w),
+    .response_fresh(response_fresh_w)
+);
+
+command_clamper u_command_clamper (
+    .clk(clk),
+    .reset_n(reset_n),
+    .resp_validated(parsed_valid_w),
+    .resp_drag_summary(parsed_drag_summary_w),
+    .resp_lift_summary(parsed_lift_summary_w),
+    .min_cmd(host_cfg_min_cmd),
+    .max_cmd(host_cfg_max_cmd),
+    .slew_limit(host_cfg_slew_limit),
+    .prev_cmd(fallback_cmd_w),
+    .cmd_valid(cmd_valid_w),
+    .cmd_value(cmd_value_w),
+    .cmd_clamped(cmd_clamped_w),
+    .cmd_slew_limited(cmd_slew_limited_w)
+);
+
+safe_fallback_manager u_safe_fallback_manager (
+    .clk(clk),
+    .reset_n(reset_n),
+    .enable(host_cfg_enable),
+    .sticky_fault_in(active_fault_w),
+    .timed_out(timed_out_w),
+    .response_fresh(response_fresh_w),
+    .clear_fault(host_cfg_clear_fault),
+    .fallback_mode(fallback_mode_w),
+    .fallback_cmd(fallback_cmd_w),
+    .fallback_valid(cmd_valid_w),
+    .active_fault(active_fault_w)
+);
+
+telemetry_status u_telemetry_status (
+    .clk(clk),
+    .reset_n(reset_n),
+    .sticky_fault_in(active_fault_w),
+    .last_accepted_seq_in(outstanding_seq_num_w),
+    .last_valid_resp_age_in(age_cycles_w),
+    .current_mode_in(fallback_mode_w),
+    .status(status),
+    .sticky_fault_out(sticky_fault_out_w),
+    .last_accepted_seq_out(last_accepted_seq_out_w),
+    .last_valid_resp_age_out(last_valid_resp_age_out_w),
+    .current_mode_out(current_mode_out_w)
+);
+
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN request_packer.v---
+module request_packer (
+    clk,
+    reset_n,
+    host_cfg_valid,
+    host_cfg_ready,
+    host_cfg_enable,
+    host_cfg_mode,
+    host_cfg_velocity,
+    host_cfg_req_seq,
+    host_cfg_geometry_handle,
+    host_cfg_flow_summary,
+    req_ready,
+    req_valid,
+    req_seq_num,
+    req_geometry_handle,
+    req_velocity,
+    req_flow_summary,
+    req_mode,
+    cfg_accepted
+);
+input clk;
+input reset_n;
+input host_cfg_valid;
+output host_cfg_ready;
+input host_cfg_enable;
+input [1:0] host_cfg_mode;
+input [15:0] host_cfg_velocity;
+input [15:0] host_cfg_req_seq;
+input [15:0] host_cfg_geometry_handle;
+input [15:0] host_cfg_flow_summary;
+input req_ready;
+output req_valid;
+output [15:0] req_seq_num;
+output [15:0] req_geometry_handle;
+output [15:0] req_velocity;
+output [15:0] req_flow_summary;
+output [1:0] req_mode;
+output cfg_accepted;
+
+reg host_cfg_ready_r;
+reg req_valid_r;
+reg [15:0] req_seq_num_r;
+reg [15:0] req_geometry_handle_r;
+reg [15:0] req_velocity_r;
+reg [15:0] req_flow_summary_r;
+reg [1:0] req_mode_r;
+reg cfg_accepted_r;
+reg busy_r;
+
+assign host_cfg_ready = host_cfg_ready_r;
+assign req_valid = req_valid_r;
+assign req_seq_num = req_seq_num_r;
+assign req_geometry_handle = req_geometry_handle_r;
+assign req_velocity = req_velocity_r;
+assign req_flow_summary = req_flow_summary_r;
+assign req_mode = req_mode_r;
+assign cfg_accepted = cfg_accepted_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        host_cfg_ready_r <= 1'b0;
+        req_valid_r <= 1'b0;
+        req_seq_num_r <= 16'h0000;
+        req_geometry_handle_r <= 16'h0000;
+        req_velocity_r <= 16'h0000;
+        req_flow_summary_r <= 16'h0000;
+        req_mode_r <= 2'b00;
+        cfg_accepted_r <= 1'b0;
+        busy_r <= 1'b0;
+    end else begin
+        cfg_accepted_r <= 1'b0;
+        if (req_valid_r && req_ready) begin
+            req_valid_r <= 1'b0;
+            busy_r <= 1'b0;
+        end
+        if (host_cfg_valid && host_cfg_enable && host_cfg_ready_r && !busy_r) begin
+            req_seq_num_r <= host_cfg_req_seq;
+            req_geometry_handle_r <= host_cfg_geometry_handle;
+            req_velocity_r <= host_cfg_velocity;
+            req_flow_summary_r <= host_cfg_flow_summary;
+            req_mode_r <= host_cfg_mode;
+            req_valid_r <= 1'b1;
+            cfg_accepted_r <= 1'b1;
+            busy_r <= 1'b1;
+        end
+        host_cfg_ready_r <= host_cfg_enable && !busy_r && (!req_valid_r || req_ready);
+        if (!host_cfg_enable) begin
+            host_cfg_ready_r <= 1'b0;
+            req_valid_r <= 1'b0;
+            busy_r <= 1'b0;
+        end
+    end
+end
+
+endmodule
+---END request_packer.v---
+---BEGIN response_parser.v---
+module response_parser (
+    clk,
+    reset_n,
+    resp_valid,
+    resp_ready,
+    resp_validated,
+    resp_seq_num,
+    resp_drag_summary,
+    resp_lift_summary,
+    resp_age,
+    resp_timeout,
+    parsed_valid,
+    parsed_seq_num,
+    parsed_drag_summary,
+    parsed_lift_summary,
+    parsed_age,
+    parsed_timeout
+);
+input clk;
+input reset_n;
+input resp_valid;
+output resp_ready;
+input resp_validated;
+input [15:0] resp_seq_num;
+input [15:0] resp_drag_summary;
+input [15:0] resp_lift_summary;
+input [15:0] resp_age;
+input resp_timeout;
+output parsed_valid;
+output [15:0] parsed_seq_num;
+output [15:0] parsed_drag_summary;
+output [15:0] parsed_lift_summary;
+output [15:0] parsed_age;
+output parsed_timeout;
+
+reg resp_ready_r;
+reg parsed_valid_r;
+reg [15:0] parsed_seq_num_r;
+reg [15:0] parsed_drag_summary_r;
+reg [15:0] parsed_lift_summary_r;
+reg [15:0] parsed_age_r;
+reg parsed_timeout_r;
+
+assign resp_ready = resp_ready_r;
+assign parsed_valid = parsed_valid_r;
+assign parsed_seq_num = parsed_seq_num_r;
+assign parsed_drag_summary = parsed_drag_summary_r;
+assign parsed_lift_summary = parsed_lift_summary_r;
+assign parsed_age = parsed_age_r;
+assign parsed_timeout = parsed_timeout_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        resp_ready_r <= 1'b1;
+        parsed_valid_r <= 1'b0;
+        parsed_seq_num_r <= 16'h0000;
+        parsed_drag_summary_r <= 16'h0000;
+        parsed_lift_summary_r <= 16'h0000;
+        parsed_age_r <= 16'h0000;
+        parsed_timeout_r <= 1'b0;
+    end else begin
+        parsed_valid_r <= 1'b0;
+        if (resp_valid && resp_validated && !resp_timeout) begin
+            parsed_valid_r <= 1'b1;
+            parsed_seq_num_r <= resp_seq_num;
+            parsed_drag_summary_r <= resp_drag_summary;
+            parsed_lift_summary_r <= resp_lift_summary;
+            parsed_age_r <= resp_age;
+            parsed_timeout_r <= resp_timeout;
+        end
+        if (resp_timeout) begin
+            parsed_timeout_r <= 1'b1;
+        end
+        resp_ready_r <= 1'b1;
+    end
+end
+
+endmodule
+---END response_parser.v---
+---BEGIN freshness_monitor.v---
+module freshness_monitor (
+    clk,
+    reset_n,
+    req_launch,
+    req_seq_num,
+    timeout_threshold,
+    resp_valid,
+    resp_seq_num,
+    resp_validated,
+    outstanding_seq_num,
+    age_cycles,
+    timed_out,
+    response_match,
+    response_fresh
+);
+input clk;
+input reset_n;
+input req_launch;
+input [15:0] req_seq_num;
+input [15:0] timeout_threshold;
+input resp_valid;
+input [15:0] resp_seq_num;
+input resp_validated;
+output [15:0] outstanding_seq_num;
+output [15:0] age_cycles;
+output timed_out;
+output response_match;
+output response_fresh;
+
+reg [15:0] outstanding_seq_num_r;
+reg [15:0] age_cycles_r;
+reg timed_out_r;
+reg response_match_r;
+reg response_fresh_r;
+
+assign outstanding_seq_num = outstanding_seq_num_r;
+assign age_cycles = age_cycles_r;
+assign timed_out = timed_out_r;
+assign response_match = response_match_r;
+assign response_fresh = response_fresh_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        outstanding_seq_num_r <= 16'h0000;
+        age_cycles_r <= 16'h0000;
+        timed_out_r <= 1'b0;
+        response_match_r <= 1'b0;
+        response_fresh_r <= 1'b0;
+    end else begin
+        response_match_r <= 1'b0;
+        response_fresh_r <= 1'b0;
+        timed_out_r <= 1'b0;
+        if (req_launch) begin
+            outstanding_seq_num_r <= req_seq_num;
+            age_cycles_r <= 16'h0000;
+        end else if (age_cycles_r != 16'hffff) begin
+            age_cycles_r <= age_cycles_r + 16'h0001;
+        end
+        if (timeout_threshold != 16'h0000 && age_cycles_r >= timeout_threshold) begin
+            timed_out_r <= 1'b1;
+        end
+        if (resp_valid && resp_validated && (resp_seq_num == outstanding_seq_num_r) && !timed_out_r) begin
+            response_match_r <= 1'b1;
+            response_fresh_r <= 1'b1;
+            age_cycles_r <= age_cycles_r;
+        end
+    end
+end
+
+endmodule
+---END freshness_monitor.v---
+---BEGIN command_clamper.v---
+module command_clamper (
+    clk,
+    reset_n,
+    resp_validated,
+    resp_drag_summary,
+    resp_lift_summary,
+    min_cmd,
+    max_cmd,
+    slew_limit,
+    prev_cmd,
+    cmd_valid,
+    cmd_value,
+    cmd_clamped,
+    cmd_slew_limited
+);
+input clk;
+input reset_n;
+input resp_validated;
+input [15:0] resp_drag_summary;
+input [15:0] resp_lift_summary;
+input [15:0] min_cmd;
+input [15:0] max_cmd;
+input [15:0] slew_limit;
+input [15:0] prev_cmd;
+output cmd_valid;
+output [15:0] cmd_value;
+output cmd_clamped;
+output cmd_slew_limited;
+
+reg cmd_valid_r;
+reg [15:0] cmd_value_r;
+reg cmd_clamped_r;
+reg cmd_slew_limited_r;
+reg [15:0] candidate_r;
+reg [15:0] bounded_r;
+reg [15:0] delta_r;
+reg [15:0] diff_r;
+
+assign cmd_valid = cmd_valid_r;
+assign cmd_value = cmd_value_r;
+assign cmd_clamped = cmd_clamped_r;
+assign cmd_slew_limited = cmd_slew_limited_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        cmd_valid_r <= 1'b0;
+        cmd_value_r <= 16'h0000;
+        cmd_clamped_r <= 1'b0;
+        cmd_slew_limited_r <= 1'b0;
+        candidate_r <= 16'h0000;
+        bounded_r <= 16'h0000;
+        delta_r <= 16'h0000;
+        diff_r <= 16'h0000;
+    end else begin
+        cmd_valid_r <= 1'b0;
+        cmd_clamped_r <= 1'b0;
+        cmd_slew_limited_r <= 1'b0;
+        if (resp_validated) begin
+            candidate_r <= resp_drag_summary + resp_lift_summary;
+            bounded_r <= candidate_r;
+            if (candidate_r < min_cmd) begin
+                bounded_r <= min_cmd;
+                cmd_clamped_r <= 1'b1;
+            end else if (candidate_r > max_cmd) begin
+                bounded_r <= max_cmd;
+                cmd_clamped_r <= 1'b1;
+            end
+            if (bounded_r > prev_cmd) begin
+                delta_r <= bounded_r - prev_cmd;
+                diff_r <= bounded_r - prev_cmd;
+            end else begin
+                delta_r <= prev_cmd - bounded_r;
+                diff_r <= prev_cmd - bounded_r;
+            end
+            if (delta_r > slew_limit) begin
+                cmd_slew_limited_r <= 1'b1;
+                if (bounded_r > prev_cmd) begin
+                    cmd_value_r <= prev_cmd + slew_limit;
+                end else begin
+                    cmd_value_r <= prev_cmd - slew_limit;
+                end
+            end else begin
+                cmd_value_r <= bounded_r;
+            end
+            cmd_valid_r <= 1'b1;
+        end
+    end
+end
+
+endmodule
+---END command_clamper.v---
+---BEGIN safe_fallback_manager.v---
+module safe_fallback_manager (
+    clk,
+    reset_n,
+    enable,
+    sticky_fault_in,
+    timed_out,
+    response_fresh,
+    clear_fault,
+    fallback_mode,
+    fallback_cmd,
+    fallback_valid,
+    active_fault
+);
+input clk;
+input reset_n;
+input enable;
+input sticky_fault_in;
+input timed_out;
+input response_fresh;
+input clear_fault;
+output [1:0] fallback_mode;
+output [15:0] fallback_cmd;
+input fallback_valid;
+output active_fault;
+
+reg [1:0] fallback_mode_r;
+reg [15:0] fallback_cmd_r;
+reg active_fault_r;
+
+assign fallback_mode = fallback_mode_r;
+assign fallback_cmd = fallback_cmd_r;
+assign active_fault = active_fault_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        fallback_mode_r <= 2'b00;
+        fallback_cmd_r <= 16'h0000;
+        active_fault_r <= 1'b0;
+    end else begin
+        fallback_mode_r <= 2'b00;
+        fallback_cmd_r <= 16'h0000;
+        if (!enable || sticky_fault_in || timed_out || !response_fresh) begin
+            active_fault_r <= 1'b1;
+        end else if (clear_fault) begin
+            active_fault_r <= 1'b0;
+        end
+        if (fallback_valid) begin
+            fallback_mode_r <= 2'b00;
+            fallback_cmd_r <= 16'h0000;
+        end
+    end
+end
+
+endmodule
+---END safe_fallback_manager.v---
+---BEGIN telemetry_status.v---
+module telemetry_status (
+    clk,
+    reset_n,
+    sticky_fault_in,
+    last_accepted_seq_in,
+    last_valid_resp_age_in,
+    current_mode_in,
+    status,
+    sticky_fault_out,
+    last_accepted_seq_out,
+    last_valid_resp_age_out,
+    current_mode_out
+);
+input clk;
+input reset_n;
+input sticky_fault_in;
+input [15:0] last_accepted_seq_in;
+input [15:0] last_valid_resp_age_in;
+input [1:0] current_mode_in;
+input [3:0] status;
+output sticky_fault_out;
+output [15:0] last_accepted_seq_out;
+output [15:0] last_valid_resp_age_out;
+output [1:0] current_mode_out;
+
+reg sticky_fault_out_r;
+reg [15:0] last_accepted_seq_out_r;
+reg [15:0] last_valid_resp_age_out_r;
+reg [1:0] current_mode_out_r;
+
+assign sticky_fault_out = sticky_fault_out_r;
+assign last_accepted_seq_out = last_accepted_seq_out_r;
+assign last_valid_resp_age_out = last_valid_resp_age_out_r;
+assign current_mode_out = current_mode_out_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        sticky_fault_out_r <= 1'b0;
+        last_accepted_seq_out_r <= 16'h0000;
+        last_valid_resp_age_out_r <= 16'h0000;
+        current_mode_out_r <= 2'b00;
+    end else begin
+        sticky_fault_out_r <= sticky_fault_in;
+        last_accepted_seq_out_r <= last_accepted_seq_in;
+        last_valid_resp_age_out_r <= last_valid_resp_age_in;
+        current_mode_out_r <= current_mode_in;
+    end
+end
+
+endmodule
+---END telemetry_status.v---
