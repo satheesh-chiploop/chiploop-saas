@@ -152,9 +152,10 @@ export default function PhysicalAiStudioPage() {
   const stages = useMemo(() => {
     const base = ["Application", "Model mapping", "Partition", "Architecture", "RTL generation", "Verification"];
     if (implementationPath === "architecture_only") return base.slice(0, 4);
-    if (implementationPath === "fpga_prototype") return [...base, "Board explorer", "Bitstream"];
-    if (implementationPath === "digital_ip_asic") return [...base, "ASIC implementation"];
-    return [...base, "Board explorer", "Bitstream", "ASIC implementation"];
+    const product = ["Device layer", "Software", "Validation", "Product"];
+    if (implementationPath === "fpga_prototype") return [...base, "Board explorer", "Bitstream", ...product];
+    if (implementationPath === "digital_ip_asic") return [...base, "ASIC implementation", ...product];
+    return [...base, "Board explorer", "Bitstream", "ASIC implementation", ...product];
   }, [implementationPath]);
   const deploymentOptions = useMemo(() => {
     if (implementationPath.includes("fpga")) return [

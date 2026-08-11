@@ -1,0 +1,36 @@
+Digital Testbench Generator Agent Log
+[2026-08-11T05:22:34.162845] [INFO] Starting Digital Testbench Generator Agent...
+[2026-08-11T05:22:34.163073] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/spec/fpga_verification_source_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 10,
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "soc_mode": false
+}
+[2026-08-11T05:22:34.164903] [INFO] resolved_mode=digital
+[2026-08-11T05:22:34.165008] [INFO] spec_path=/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/spec/fpga_verification_source_spec.json
+[2026-08-11T05:22:34.165092] [INFO] top_module=adaptive_aero_control_top_spi_fpga_top
+[2026-08-11T05:22:34.165161] [INFO] rtl_file_count=10
+[2026-08-11T05:22:34.165232] [INFO] port_source=rtl_fallback
+[2026-08-11T05:22:34.165320] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-08-11T05:22:34.165401] [INFO] reset_candidates=[
+  {
+    "name": "reset_n",
+    "active_low": true,
+    "async": false
+  }
+]
+[2026-08-11T05:22:34.285063] [INFO] verification_files=[]
+[2026-08-11T05:22:34.286181] [INFO] Generated testbench: vv/tb/test_adaptive_aero_control_top_spi_fpga_top.py
+[2026-08-11T05:22:34.286260] [INFO] Generated Makefile
+[2026-08-11T05:22:34.286402] [INFO] Generated rtl_sources.mk
+[2026-08-11T05:22:34.286496] [INFO] Generated testcases.json
+[2026-08-11T05:22:34.286557] [INFO] Generated tb_contract.json
+[2026-08-11T05:22:34.286665] [INFO] generated_testcases=[
+  "smoke_test",
+  "constrained_random_sanity"
+]

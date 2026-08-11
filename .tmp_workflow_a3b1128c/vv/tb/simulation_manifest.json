@@ -1,0 +1,33 @@
+{
+  "type": "vv_simulation_manifest",
+  "version": "1.1",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "spec_path": "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/spec/fpga_verification_source_spec.json",
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/actuator_clamper.v",
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/actuator_tx.v",
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/adaptive_aero_control_top.v",
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv",
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/command_validator.v",
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/control_register_bank.v",
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/fallback_fsm.v",
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/status_telemetry.v",
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/stream_rx.v",
+    "/root/chiploop-backend/backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/handoff/rtl/timeout_monitor.v"
+  ],
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity"
+  ],
+  "runner": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/run_regression.py",
+  "makefile": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/Makefile",
+  "testcases_json": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/testcases.json",
+  "tb_contract_json": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/tb_contract.json",
+  "reports_dir": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/reports",
+  "simulator": "verilator",
+  "sva_assertions_path": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+  "sva_bind_path": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+  "coverage_model_py": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/coverage_model.py",
+  "functional_coverage_summary_json": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/reports/functional_coverage_summary.json",
+  "functional_coverage_md": "backend/workflows/a3b1128c-fe93-4b9d-99aa-2cae3d164049/vv/tb/reports/COVERAGE.md"
+}

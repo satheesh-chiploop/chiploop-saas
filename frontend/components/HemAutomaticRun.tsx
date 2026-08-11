@@ -110,7 +110,12 @@ function stageFromLabel(label: string): string {
   const normalized = label.trim().toLowerCase();
   if (normalized === "dqa" || normalized === "system dqa") return "dqa";
   if (normalized === "verification" || normalized === "verify" || normalized === "system sim") return "verification";
-  if (normalized === "firmware" || normalized === "system firmware") return "firmware";
+  if (
+    normalized === "firmware" ||
+    normalized === "system firmware" ||
+    normalized === "device software through product demo" ||
+    normalized === "host driver through product demo"
+  ) return "firmware";
   if (normalized === "software" || normalized === "system software") return "software";
   if (normalized === "validation" || normalized === "co-simulation / validation" || normalized === "co-simulation" || normalized === "system validation") return "validation";
   if (normalized === "product demo" || normalized === "product app") return "product";
