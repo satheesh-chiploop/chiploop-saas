@@ -1,0 +1,14 @@
+RTL Agent Summary
+=================
+Mode: flat
+Top module: adaptive_aero_control_top
+Expected files: ['adaptive_aero_control_top.v']
+Materialized files: ['adaptive_aero_control_top.v']
+Clock ports: []
+Reset ports: []
+Icarus compile: pass
+Verilator lint: pass
+Issue count: 1
+
+Issues:
+- ❌ Module 'adaptive_aero_control_top' has extra ports vs spec: ['clk', 'rst_n', 'req_valid', 'req_ready', 'req_data', 'rsp_valid', 'rsp_ready', 'rsp_data', 'csr_we', 'csr_re', 'csr_addr', 'csr_wdata', 'csr_rdata', 'actuator_cmd', 'actuator_valid', 'safe_fallback']

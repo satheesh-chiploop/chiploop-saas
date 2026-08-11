@@ -1,0 +1,71 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.039 MB sources in 2 modules, into 0.063 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.027 s (elab=0.001, cvt=0.013, bld=0.000); cpu 0.021 s on 1 threads; allocated 31.359 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:6:19: Bits of signal are not used: 'req_data'[63:32,15:10]
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+    6 |     input  [63:0] req_data,
+      |                   ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:11:19: Signal is not used: 'csr_re'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   11 |     input         csr_re,
+      |                   ^~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:13:19: Bits of signal are not used: 'csr_wdata'[31:8]
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   13 |     input  [31:0] csr_wdata,
+      |                   ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:43:16: Signal is not used: 'req_seq_latched'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   43 |     reg [15:0] req_seq_latched;
+      |                ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:44:16: Signal is not used: 'rsp_seq_latched'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   44 |     reg [15:0] rsp_seq_latched;
+      |                ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:45:16: Signal is not used: 'req_velocity'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   45 |     reg [15:0] req_velocity;
+      |                ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:46:16: Signal is not driven, nor used: 'response_summary'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   46 |     reg [15:0] response_summary;
+      |                ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:50:16: Signal is not driven, nor used: 'timeout_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   50 |     reg [15:0] timeout_next;
+      |                ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:51:16: Signal is not driven, nor used: 'age_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   51 |     reg [15:0] age_next;
+      |                ^~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:54:17: Signal is not used: 'mode'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   54 |     wire [1:0]  mode;
+      |                 ^~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:59:17: Signal is not used: 'req_has_velocity'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   59 |     wire        req_has_velocity;
+      |                 ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:72:17: Signal is not driven, nor used: 'rsp_transaction_ok'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   72 |     wire        rsp_transaction_ok;
+      |                 ^~~~~~~~~~~~~~~~~~
+%Warning-UNOPTFLAT: adaptive_aero_control_top.v:9:19: Signal unoptimizable: Circular combinational logic: 'rsp_data'
+    9 |     output [63:0] rsp_data,
+      |                   ^~~~~~~~
+                    ... For warning description see https://verilator.org/warn/UNOPTFLAT?v=5.047
+                    ... Use "/* verilator lint_off UNOPTFLAT */" and lint_on around source to disable this message.
+                    adaptive_aero_control_top.v:9:19:      Example path: rsp_data
+                    adaptive_aero_control_top.v:9:19:      Example path: ASSIGNW
+                    adaptive_aero_control_top.v:9:19:      Example path: adaptive_aero_control_top.__VdfgRegularize_h1f348f7e_0_12
+                    adaptive_aero_control_top.v:22:16:      Example path: ASSIGNW
+                    adaptive_aero_control_top.v:22:16:      Example path: adaptive_aero_control_top.rsp_data_r
+                    adaptive_aero_control_top.v:9:19:      Example path: ASSIGNW
+                    adaptive_aero_control_top.v:9:19:      Example path: rsp_data
+
+=== RETURN CODE ===
+0

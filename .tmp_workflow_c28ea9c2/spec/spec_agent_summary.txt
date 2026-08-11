@@ -1,3 +1,0 @@
-❌ Digital Spec Agent failed.
-
-Pass1 JSON parse/normalize failed: Spec JSON must be either flat single-module form or hierarchical form.

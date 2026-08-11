@@ -1,0 +1,55 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.038 MB sources in 2 modules, into 0.069 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.017 s (elab=0.001, cvt=0.008, bld=0.000); cpu 0.016 s on 1 threads; allocated 31.359 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:6:19: Bits of signal are not used: 'req_data'[63:32,15:10]
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+    6 |     input  [63:0] req_data,
+      |                   ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:11:19: Signal is not used: 'csr_re'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   11 |     input         csr_re,
+      |                   ^~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:13:19: Bits of signal are not used: 'csr_wdata'[31:8]
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   13 |     input  [31:0] csr_wdata,
+      |                   ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:35:16: Signal is not used: 'req_seq_latched'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   35 |     reg [15:0] req_seq_latched;
+      |                ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:36:16: Signal is not used: 'rsp_seq_latched'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   36 |     reg [15:0] rsp_seq_latched;
+      |                ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:37:16: Signal is not used: 'req_velocity'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   37 |     reg [15:0] req_velocity;
+      |                ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:38:16: Signal is not used: 'response_summary'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   38 |     reg [15:0] response_summary;
+      |                ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:42:16: Signal is not used: 'timeout_next'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   42 |     reg [15:0] timeout_next;
+      |                ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:43:16: Signal is not used: 'age_next'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   43 |     reg [15:0] age_next;
+      |                ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:46:17: Signal is not used: 'mode'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   46 |     wire [1:0]  mode;
+      |                 ^~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:51:17: Signal is not used: 'req_has_velocity'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   51 |     wire        req_has_velocity;
+      |                 ^~~~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

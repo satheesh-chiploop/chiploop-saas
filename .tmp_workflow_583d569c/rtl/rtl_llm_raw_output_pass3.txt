@@ -1,0 +1,231 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    input         clk,
+    input         rst_n,
+    input         req_valid,
+    output reg    req_ready,
+    input  [63:0] req_data,
+    output reg    rsp_valid,
+    input         rsp_ready,
+    output reg [63:0] rsp_data,
+    input         csr_we,
+    input         csr_re,
+    input  [7:0]  csr_addr,
+    input  [31:0] csr_wdata,
+    output reg [31:0] csr_rdata,
+    output reg [15:0] actuator_cmd,
+    output reg    actuator_valid,
+    output reg    safe_fallback
+);
+
+    reg [7:0]  ctrl0_reg;
+    reg [15:0] timeout_th_reg;
+    reg [15:0] clamp_min_reg;
+    reg [15:0] clamp_max_reg;
+
+    reg        sticky_timeout;
+    reg        sticky_stale;
+    reg        sticky_envelope;
+    reg        req_accepted_pulse;
+    reg        rsp_valid_seen;
+    reg [3:0]  last_req_seq;
+    reg [3:0]  last_rsp_seq;
+    reg [15:0] age_counter;
+    reg [15:0] req_seq_track;
+    reg [15:0] rsp_seq_track;
+    reg [15:0] req_seq_latched;
+    reg [15:0] rsp_seq_latched;
+    reg [15:0] req_velocity;
+    reg [15:0] response_summary;
+    reg [15:0] bounded_cmd;
+    reg [15:0] safe_cmd;
+    reg [15:0] cmd_unclamped;
+    reg [15:0] timeout_next;
+    reg [15:0] age_next;
+
+    wire        enable;
+    wire [1:0]  mode;
+    wire [1:0]  safe_state_sel;
+    wire        clr_sticky;
+    wire [1:0]  req_opcode;
+    wire        req_cmd_en;
+    wire        req_has_velocity;
+    wire [15:0] req_velocity_raw;
+    wire [3:0]  req_seq_raw;
+    wire [1:0]  req_flags;
+    wire [15:0] rsp_seq_raw;
+    wire        rsp_valid_bit;
+    wire        rsp_stale_bit;
+    wire        rsp_timeout_bit;
+    wire        rsp_fallback_bit;
+    wire [15:0] rsp_summary_raw;
+    wire        req_seq_monotonic;
+    wire        req_velocity_in_range;
+    wire        req_format_ok;
+    wire        timeout_expired;
+    wire        any_fault;
+    wire [15:0] clamp_min_eff;
+    wire [15:0] clamp_max_eff;
+    wire [63:0] rsp_pack;
+
+    assign enable             = ctrl0_reg[0];
+    assign mode               = ctrl0_reg[2:1];
+    assign safe_state_sel     = ctrl0_reg[4:3];
+    assign clr_sticky         = csr_we & (csr_addr == 8'h00) & csr_wdata[5];
+    assign req_opcode         = req_data[1:0];
+    assign req_cmd_en         = req_data[2];
+    assign req_has_velocity   = req_data[3];
+    assign req_seq_raw        = req_data[7:4];
+    assign req_flags          = req_data[9:8];
+    assign req_velocity_raw   = req_data[31:16];
+    assign rsp_seq_raw        = rsp_data[15:0];
+    assign rsp_valid_bit      = rsp_data[16];
+    assign rsp_stale_bit      = rsp_data[17];
+    assign rsp_timeout_bit    = rsp_data[18];
+    assign rsp_fallback_bit   = rsp_data[19];
+    assign rsp_summary_raw    = rsp_data[63:48];
+    assign req_seq_monotonic  = (req_seq_raw >= last_req_seq);
+    assign req_velocity_in_range = (req_velocity_raw >= 16'd20) && (req_velocity_raw <= 16'd55);
+    assign req_format_ok      = (req_opcode == 2'b00) && req_cmd_en && (req_flags != 2'b11);
+    assign timeout_expired    = (age_counter >= timeout_th_reg);
+    assign any_fault         = sticky_timeout | sticky_stale | sticky_envelope | timeout_expired | rsp_stale_bit | rsp_timeout_bit | rsp_fallback_bit;
+    assign clamp_min_eff      = clamp_min_reg;
+    assign clamp_max_eff      = clamp_max_reg;
+    assign rsp_pack           = {rsp_summary_raw, 16'h0000, 4'b0000, safe_fallback, actuator_valid, sticky_timeout, sticky_stale, sticky_envelope, rsp_valid_seen, 20'h00000};
+
+    always @(*) begin
+        csr_rdata = 32'h00000000;
+        case (csr_addr)
+            8'h00: csr_rdata = {24'h000000, ctrl0_reg};
+            8'h01: csr_rdata = {24'h000000, timeout_th_reg[7:0]};
+            8'h02: csr_rdata = {24'h000000, timeout_th_reg[15:8]};
+            8'h03: csr_rdata = {24'h000000, clamp_min_reg[7:0]};
+            8'h04: csr_rdata = {24'h000000, clamp_min_reg[15:8]};
+            8'h05: csr_rdata = {24'h000000, clamp_max_reg[7:0]};
+            8'h06: csr_rdata = {24'h000000, clamp_max_reg[15:8]};
+            8'h10: csr_rdata = {24'h000000, safe_fallback, actuator_valid, sticky_timeout, sticky_stale, sticky_envelope, req_accepted_pulse, rsp_valid_seen, 1'b0};
+            8'h11: csr_rdata = {24'h000000, last_rsp_seq, last_req_seq};
+            8'h12: csr_rdata = {24'h000000, age_counter[7:0]};
+            8'h13: csr_rdata = {24'h000000, age_counter[15:8]};
+            8'h14: csr_rdata = {24'h000000, actuator_cmd[7:0]};
+            8'h15: csr_rdata = {24'h000000, actuator_cmd[15:8]};
+            8'h20: csr_rdata = {24'h000000, req_seq_track[7:0]};
+            8'h21: csr_rdata = {24'h000000, req_seq_track[15:8]};
+            8'h22: csr_rdata = {24'h000000, rsp_seq_track[7:0]};
+            8'h23: csr_rdata = {24'h000000, rsp_seq_track[15:8]};
+            default: csr_rdata = 32'h00000000;
+        endcase
+    end
+
+    always @(*) begin
+        req_ready = enable && !any_fault;
+        rsp_valid = rsp_valid_seen && rsp_ready;
+        rsp_data = rsp_pack;
+        safe_cmd = {14'b0, safe_state_sel};
+        cmd_unclamped = {8'h00, rsp_summary_raw[7:0]};
+        bounded_cmd = cmd_unclamped;
+        if (cmd_unclamped < clamp_min_eff)
+            bounded_cmd = clamp_min_eff;
+        else if (cmd_unclamped > clamp_max_eff)
+            bounded_cmd = clamp_max_eff;
+        else
+            bounded_cmd = cmd_unclamped;
+        actuator_cmd = safe_cmd;
+        actuator_valid = 1'b0;
+        safe_fallback = 1'b1;
+        if (enable && !any_fault && rsp_valid_seen) begin
+            safe_fallback = 1'b0;
+            actuator_cmd = bounded_cmd;
+            actuator_valid = 1'b1;
+        end
+        if (any_fault || !enable) begin
+            safe_fallback = 1'b1;
+            actuator_cmd = safe_cmd;
+            actuator_valid = 1'b0;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            ctrl0_reg <= 8'h00;
+            timeout_th_reg <= 16'd20;
+            clamp_min_reg <= 16'd0;
+            clamp_max_reg <= 16'd255;
+            sticky_timeout <= 1'b0;
+            sticky_stale <= 1'b0;
+            sticky_envelope <= 1'b0;
+            req_accepted_pulse <= 1'b0;
+            rsp_valid_seen <= 1'b0;
+            last_req_seq <= 4'h0;
+            last_rsp_seq <= 4'h0;
+            age_counter <= 16'h0000;
+            req_seq_track <= 16'h0000;
+            rsp_seq_track <= 16'h0000;
+            req_seq_latched <= 16'h0000;
+            rsp_seq_latched <= 16'h0000;
+            req_velocity <= 16'h0000;
+            response_summary <= 16'h0000;
+            timeout_next <= 16'h0000;
+            age_next <= 16'h0000;
+        end else begin
+            req_accepted_pulse <= 1'b0;
+            if (csr_we) begin
+                case (csr_addr)
+                    8'h00: begin
+                        ctrl0_reg[0] <= csr_wdata[0];
+                        ctrl0_reg[2:1] <= csr_wdata[2:1];
+                        ctrl0_reg[4:3] <= csr_wdata[4:3];
+                    end
+                    8'h01: timeout_th_reg[7:0] <= csr_wdata[7:0];
+                    8'h02: timeout_th_reg[15:8] <= csr_wdata[7:0];
+                    8'h03: clamp_min_reg[7:0] <= csr_wdata[7:0];
+                    8'h04: clamp_min_reg[15:8] <= csr_wdata[7:0];
+                    8'h05: clamp_max_reg[7:0] <= csr_wdata[7:0];
+                    8'h06: clamp_max_reg[15:8] <= csr_wdata[7:0];
+                    default: begin
+                    end
+                endcase
+                if (clr_sticky) begin
+                    sticky_timeout <= 1'b0;
+                    sticky_stale <= 1'b0;
+                    sticky_envelope <= 1'b0;
+                end
+            end
+
+            if (req_valid && req_ready) begin
+                req_accepted_pulse <= 1'b1;
+                req_seq_latched <= {12'h000, req_seq_raw};
+                req_velocity <= req_velocity_raw;
+                req_seq_track <= {12'h000, req_seq_raw};
+                last_req_seq <= req_seq_raw;
+                age_counter <= 16'h0000;
+                sticky_envelope <= sticky_envelope | ~req_format_ok | ~req_velocity_in_range;
+                sticky_stale <= sticky_stale | ~req_seq_monotonic;
+            end else if (enable && !timeout_expired) begin
+                age_counter <= age_counter + 16'd1;
+            end
+
+            if (rsp_ready && rsp_valid_seen) begin
+                rsp_valid_seen <= 1'b0;
+            end
+            if (rsp_valid_bit && !rsp_stale_bit && !rsp_timeout_bit) begin
+                rsp_valid_seen <= 1'b1;
+                rsp_seq_latched <= {12'h000, rsp_seq_raw};
+                rsp_seq_track <= {12'h000, rsp_seq_raw};
+                last_rsp_seq <= rsp_seq_raw[3:0];
+                response_summary <= rsp_summary_raw;
+            end
+
+            if (timeout_expired) begin
+                sticky_timeout <= 1'b1;
+                sticky_stale <= 1'b1;
+            end
+
+            if (req_valid && req_ready && (!req_format_ok || !req_velocity_in_range)) begin
+                sticky_envelope <= 1'b1;
+            end
+        end
+    end
+
+endmodule
+---END adaptive_aero_control_top.v---

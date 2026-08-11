@@ -1,0 +1,20 @@
+{
+  "name": "adaptive_aero_control_top",
+  "description": "Top-level synthesis target. Implements request ingress, packet capture, validation, stale/timeout tracking, response handling, clamp generation, safe fallback override, CSR control/status access, and registered actuator outputs. This module is the required design top and shall not be substituted.",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "ports": [],
+  "functionality": "Implements the complete control-plane contract for an adaptive aero controller. The module accepts 64-bit request packets on req_valid/req_ready, captures packet metadata on accepted handshakes, validates request format and operating envelope, tracks request sequence monotonicity and age against a programmable timeout, emits model-request traffic according to the external transport contract with model-request valid/data driven as outputs and model-request ready received as an input, receives model-response valid/data as inputs and emits model-response ready as an output, latches compact response metadata, synthesizes a bounded actuator recommendation summary, clamps the command to CSR-programmed limits, and forces a deterministic safe actuator state when response data is invalid, stale, timed out, malformed, or otherwise rejected. CSR accesses configure timeout threshold, clamp limits, operating mode, safe-state selection, fault clearing, and status readback. The module keeps sticky fault flags until cleared by CSR and registers every externally visible output.",
+  "responsibilities": [],
+  "must_drive": [],
+  "must_receive": [],
+  "must_not_drive": [],
+  "reset_behavior": "",
+  "behavior_rules": [
+    "The hierarchy top_module entry is the only legal top-level implementation target."
+  ],
+  "rtl_output_file": "adaptive_aero_control_top.v",
+  "register_contract": {}
+}
