@@ -1,0 +1,4095 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "adaptive_aero_control_top",
+  "rtl_file_count": 8,
+  "module_count": 8,
+  "modules": [
+    {
+      "name": "adaptive_aero_actuator_output_stage",
+      "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_actuator_output_stage.v",
+      "input_count": 37,
+      "output_count": 36,
+      "inout_count": 0,
+      "input_port_count": 6,
+      "output_port_count": 4,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "safe_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "fault_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_accept",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "actuator_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "actuator_mode",
+          "direction": "output",
+          "width": "[1:0]"
+        },
+        {
+          "name": "actuator_update_pulse",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_regfile",
+      "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v",
+      "input_count": 250,
+      "output_count": 313,
+      "inout_count": 0,
+      "input_port_count": 19,
+      "output_port_count": 28,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_addr",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "mmio_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "mmio_wstrb",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "mmio_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_write",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "mmio_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "mmio_rvalid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "mmio_error",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_soft_reset",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_launch",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_fault_clear",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_sticky_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_pipelined_mode",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_outstanding_limit",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "cfg_timeout_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_threshold",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_min_cmd",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_max_cmd",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_fallback_cmd",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_step_limit",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_irq_on_accept",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_irq_on_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_irq_on_timeout",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_request_type",
+          "direction": "output",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_sequence_seed",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_operating_velocity",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_velocity_fraction",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_reference_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geometry_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_session_rollover",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_status_clear",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_state",
+          "direction": "input",
+          "width": "[3:0]"
+        },
+        {
+          "name": "telemetry_busy",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_outstanding_count",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "telemetry_last_seq",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "telemetry_timeout_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_stale_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_protocol_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_clamp_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_fallback_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_response_count",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "telemetry_irq_latched",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "addr",
+          "direction": "input",
+          "width": "[63:0]"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_top",
+      "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v",
+      "input_count": 206,
+      "output_count": 169,
+      "inout_count": 0,
+      "input_port_count": 10,
+      "output_port_count": 11,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_addr",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "mmio_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "mmio_wstrb",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "mmio_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_write",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "mmio_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "mmio_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "mmio_rvalid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "mmio_error",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "surrogate_req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "surrogate_req_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "surrogate_req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "surrogate_rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "surrogate_rsp_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "surrogate_rsp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "actuator_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "actuator_mode",
+          "direction": "output",
+          "width": "[1:0]"
+        },
+        {
+          "name": "status_irq",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_fallback_controller",
+      "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_fallback_controller.v",
+      "input_count": 154,
+      "output_count": 38,
+      "inout_count": 0,
+      "input_port_count": 15,
+      "output_port_count": 7,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_fault_clear",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_sticky_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_min_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_max_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_fallback_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_step_limit",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "rsp_accepted_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_accept",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_timeout_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_stale_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_protocol_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "timeout_fault_latched",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "safe_cmd",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "clamp_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_timeout",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_stale",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "fault_protocol",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_request_packager",
+      "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_request_packager.v",
+      "input_count": 103,
+      "output_count": 83,
+      "inout_count": 0,
+      "input_port_count": 17,
+      "output_port_count": 5,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_launch",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_pipelined_mode",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_outstanding_limit",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "cfg_request_type",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_sequence_seed",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_operating_velocity",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_velocity_fraction",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_reference_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geometry_id",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_session_rollover",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_issue_ack",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_issue_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_outstanding_count",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "surrogate_req_valid",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "surrogate_req_data",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "surrogate_req_ready",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_launch_accepted",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "req_seq_active",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "req_outstanding_inc",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_response_validator",
+      "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_response_validator.v",
+      "input_count": 247,
+      "output_count": 55,
+      "inout_count": 0,
+      "input_port_count": 16,
+      "output_port_count": 9,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_timeout_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_min_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_max_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_step_limit",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_fallback_cmd",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "cfg_session_rollover",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "active_req_seq",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_age",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "timeout_expired",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "stale_session_event",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "surrogate_rsp_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "surrogate_rsp_data",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "surrogate_rsp_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "rsp_accept",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "rsp_seq_match",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "rsp_timeout_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "rsp_stale_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "rsp_protocol_fault",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "rsp_clamp_active",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "rsp_accepted_cmd",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rsp_response_count",
+          "direction": "output",
+          "width": "[15:0]"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_telemetry_status",
+      "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v",
+      "input_count": 52,
+      "output_count": 1,
+      "inout_count": 0,
+      "input_port_count": 17,
+      "output_port_count": 1,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_state",
+          "direction": "input",
+          "width": "[3:0]"
+        },
+        {
+          "name": "telemetry_busy",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_outstanding_count",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "telemetry_last_seq",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "telemetry_timeout_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_stale_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_protocol_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_clamp_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_fallback_active",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "telemetry_response_count",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "telemetry_irq_latched",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_irq_on_accept",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_irq_on_fault",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_irq_on_timeout",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_status_clear",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_irq",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "name": "adaptive_aero_timeout_monitor",
+      "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_timeout_monitor.v",
+      "input_count": 57,
+      "output_count": 23,
+      "inout_count": 0,
+      "input_port_count": 10,
+      "output_port_count": 6,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_timeout_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_freshness_threshold",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_outstanding_limit",
+          "direction": "input",
+          "width": "[2:0]"
+        },
+        {
+          "name": "cfg_session_rollover",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "req_launch_accepted",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rsp_accept",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "active_req_seq",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "request_age",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "outstanding_count",
+          "direction": "output",
+          "width": "[2:0]"
+        },
+        {
+          "name": "busy",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "timeout_expired",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "stale_session_event",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "timeout_fault_latched",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 206,
+    "output_count": 169,
+    "inout_count": 0,
+    "input_port_count": 10,
+    "output_port_count": 11,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "rst_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "mmio_addr",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "mmio_wdata",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "mmio_wstrb",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "mmio_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "mmio_write",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "mmio_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "mmio_rdata",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "mmio_rvalid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "mmio_error",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "surrogate_req_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "surrogate_req_data",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "surrogate_req_ready",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "surrogate_rsp_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "surrogate_rsp_data",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "surrogate_rsp_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "actuator_cmd",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "actuator_valid",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "actuator_mode",
+        "direction": "output",
+        "width": "[1:0]"
+      },
+      {
+        "name": "status_irq",
+        "direction": "output",
+        "width": "1"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "rst_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "rst_n"
+  },
+  "storage": {
+    "flipflop_count": 512,
+    "latch_count": 33,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 66,
+    "latch_target_count": 2,
+    "sequential_blocks": 14,
+    "posedge_blocks": 7,
+    "negedge_blocks": 7,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "actuator_cmd",
+      "actuator_mode",
+      "actuator_update_pulse",
+      "actuator_valid",
+      "age_cnt",
+      "busy",
+      "current_seq",
+      "fallback_active",
+      "fault_active",
+      "holding_req",
+      "irq_latched",
+      "last_cmd",
+      "last_fallback",
+      "last_fault",
+      "last_seq",
+      "mmio_error",
+      "outstanding_count",
+      "prev_cmd",
+      "prev_safe",
+      "reg_ctrl",
+      "reg_freshness_0",
+      "reg_freshness_1",
+      "reg_limits_0",
+      "reg_limits_1",
+      "reg_limits_10",
+      "reg_limits_11",
+      "reg_limits_12",
+      "reg_limits_13",
+      "reg_limits_2",
+      "reg_limits_3",
+      "reg_limits_4",
+      "reg_limits_5",
+      "reg_limits_6",
+      "reg_limits_7",
+      "reg_limits_8",
+      "reg_limits_9",
+      "reg_pipeline_0",
+      "reg_request_0",
+      "reg_request_1",
+      "reg_request_10",
+      "reg_request_11",
+      "reg_request_2",
+      "reg_request_3",
+      "reg_request_4",
+      "reg_request_5",
+      "reg_request_6",
+      "reg_request_7",
+      "reg_request_8",
+      "reg_request_9",
+      "reg_status_policy_0"
+    ],
+    "sampled_latch_targets": [
+      "request_age",
+      "rsp_cmd"
+    ],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 7,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "warnings",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 0,
+    "warning_count": 65,
+    "error_count": 0,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "adaptive_aero_control_top",
+      "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_actuator_output_stage.v",
+      "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v",
+      "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v",
+      "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_fallback_controller.v",
+      "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_request_packager.v",
+      "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_response_validator.v",
+      "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v",
+      "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_timeout_monitor.v"
+    ],
+    "stdout_tail": [
+      "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b",
+      "- Verilator: Built from 0.357 MB sources in 9 modules, into 0.199 MB in 3 C++ files needing 0.000 MB",
+      "- Verilator: Walltime 0.069 s (elab=0.008, cvt=0.037, bld=0.000); cpu 0.069 s on 1 threads; allocated 34.355 MB"
+    ],
+    "stderr_tail": [
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:116:13: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_accepted_cmd'",
+      "                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'",
+      "  116 | wire [31:0] adaptive_aero_response_validator_rsp_accepted_cmd;",
+      "      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:117:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_protocol_fault'",
+      "                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'",
+      "  117 | wire adaptive_aero_response_validator_rsp_protocol_fault;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:118:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_stale_fault'",
+      "                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'",
+      "  118 | wire adaptive_aero_response_validator_rsp_stale_fault;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:119:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_timeout_fault'",
+      "                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'",
+      "  119 | wire adaptive_aero_response_validator_rsp_timeout_fault;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:120:13: Signal is not driven, nor used: 'adaptive_aero_fallback_controller_safe_cmd'",
+      "                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'",
+      "  120 | wire [31:0] adaptive_aero_fallback_controller_safe_cmd;",
+      "      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:121:6: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_stale_session_event'",
+      "                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'",
+      "  121 | wire adaptive_aero_timeout_monitor_stale_session_event;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:122:6: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_timeout_expired'",
+      "                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'",
+      "  122 | wire adaptive_aero_timeout_monitor_timeout_expired;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:123:6: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_timeout_fault_latched'",
+      "                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'",
+      "  123 | wire adaptive_aero_timeout_monitor_timeout_fault_latched;",
+      "      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_actuator_output_stage.v:13:16: Signal is not used: 'last_cmd'",
+      "                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_actuator'",
+      "   13 |     reg [31:0] last_cmd;",
+      "      |                ^~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v:5:18: Bits of signal are not used: 'mmio_wdata'[63:8]",
+      "                                                                                                                      : ... note: In instance 'adaptive_aero_control_top.u_regfile'",
+      "    5 |     input [63:0] mmio_wdata,",
+      "      |                  ^~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v:6:17: Bits of signal are not used: 'mmio_wstrb'[7:1]",
+      "                                                                                                                      : ... note: In instance 'adaptive_aero_control_top.u_regfile'",
+      "    6 |     input [7:0] mmio_wstrb,",
+      "      |                 ^~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v:100:22: Bits of function variable are not used: 'addr'[63:8]",
+      "                                                                                                                        : ... note: In instance 'adaptive_aero_control_top.u_regfile'",
+      "  100 |         input [63:0] addr;",
+      "      |                      ^~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_response_validator.v:17:18: Bits of signal are not used: 'surrogate_rsp_data'[47:32]",
+      "                                                                                                                          : ... note: In instance 'adaptive_aero_control_top.u_validator'",
+      "   17 |     input [63:0] surrogate_rsp_data,",
+      "      |                  ^~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:4:17: Signal is not used: 'telemetry_state'",
+      "                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_telemetry'",
+      "    4 |     input [3:0] telemetry_state,",
+      "      |                 ^~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:5:11: Signal is not used: 'telemetry_busy'",
+      "                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_telemetry'",
+      "    5 |     input telemetry_busy,",
+      "      |           ^~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:6:17: Signal is not used: 'telemetry_outstanding_count'",
+      "                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_telemetry'",
+      "    6 |     input [2:0] telemetry_outstanding_count,",
+      "      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:7:18: Signal is not used: 'telemetry_last_seq'",
+      "                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_telemetry'",
+      "    7 |     input [15:0] telemetry_last_seq,",
+      "      |                  ^~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:11:11: Signal is not used: 'telemetry_clamp_active'",
+      "                                                                                                                        : ... note: In instance 'adaptive_aero_control_top.u_telemetry'",
+      "   11 |     input telemetry_clamp_active,",
+      "      |           ^~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:12:11: Signal is not used: 'telemetry_fallback_active'",
+      "                                                                                                                        : ... note: In instance 'adaptive_aero_control_top.u_telemetry'",
+      "   12 |     input telemetry_fallback_active,",
+      "      |           ^~~~~~~~~~~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_timeout_monitor.v:20:16: Signal is not used: 'last_seq'",
+      "                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_timeout'",
+      "   20 |     reg [15:0] last_seq;",
+      "      |                ^~~~~~~~"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "adaptive_aero_control_top",
+        "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_actuator_output_stage.v",
+        "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v",
+        "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v",
+        "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_fallback_controller.v",
+        "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_request_packager.v",
+        "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_response_validator.v",
+        "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v",
+        "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_timeout_monitor.v"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stdout": "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b\n- Verilator: Built from 0.357 MB sources in 9 modules, into 0.199 MB in 3 C++ files needing 0.000 MB\n- Verilator: Walltime 0.069 s (elab=0.008, cvt=0.037, bld=0.000); cpu 0.069 s on 1 threads; allocated 34.355 MB\n",
+      "stderr": "%Warning-PINCONNECTEMPTY: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:280:10: Instance pin connected by name with empty reference: 'actuator_update_pulse'\n  280 |         .actuator_update_pulse()\n      |          ^~~~~~~~~~~~~~~~~~~~~\n                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047\n                          ... Use \"/* verilator lint_off PINCONNECTEMPTY */\" and lint_on around source to disable this message.\n%Warning-WIDTHTRUNC: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_request_packager.v:58:40: Operator ASSIGNDLY expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 88 bits.\n                                                                                                                      : ... note: In instance 'adaptive_aero_control_top.u_packager'\n   58 |                     surrogate_req_data <= {cfg_request_type, next_seq, cfg_operating_velocity, cfg_velocity_fraction, cfg_reference_id, cfg_geometry_id};\n      |                                        ^~\n                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047\n                     ... Use \"/* verilator lint_off WIDTHTRUNC */\" and lint_on around source to disable this message.\n%Warning-WIDTHEXPAND: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v:145:33: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 1 bits.\n                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_regfile'\n  145 |                 8'h3F: read_mux = {mmio_error};\n      |                                 ^\n                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047\n                      ... Use \"/* verilator lint_off WIDTHEXPAND */\" and lint_on around source to disable this message.\n%Warning-BLKSEQ: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_request_packager.v:55:30: Blocking assignment '=' in sequential logic process\n                                                                                                                  : ... note: In instance 'adaptive_aero_control_top.u_packager'\n                                                                                                                  : ... Suggest using delayed assignment '<='\n   55 |                     next_seq = current_seq + 16'h0001;\n      |                              ^\n                 ... For warning description see https://verilator.org/warn/BLKSEQ?v=5.047\n                 ... Use \"/* verilator lint_off BLKSEQ */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:25:10: Signal is not used: 'cfg_soft_reset'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n   25 |     wire cfg_soft_reset;\n      |          ^~~~~~~~~~~~~~\n                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047\n                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:49:16: Signal is not driven: 'telemetry_state'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   49 |     wire [3:0] telemetry_state;\n      |                ^~~~~~~~~~~~~~~\n                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047\n                   ... Use \"/* verilator lint_off UNDRIVEN */\" and lint_on around source to disable this message.\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:51:16: Signal is not driven: 'telemetry_outstanding_count'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   51 |     wire [2:0] telemetry_outstanding_count;\n      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:52:17: Signal is not driven: 'telemetry_last_seq'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   52 |     wire [15:0] telemetry_last_seq;\n      |                 ^~~~~~~~~~~~~~~~~~\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:53:10: Signal is not driven: 'telemetry_timeout_fault'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   53 |     wire telemetry_timeout_fault;\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:54:10: Signal is not driven: 'telemetry_stale_fault'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   54 |     wire telemetry_stale_fault;\n      |          ^~~~~~~~~~~~~~~~~~~~~\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:55:10: Signal is not driven: 'telemetry_protocol_fault'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   55 |     wire telemetry_protocol_fault;\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:56:10: Signal is not driven: 'telemetry_clamp_active'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   56 |     wire telemetry_clamp_active;\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:57:10: Signal is not driven: 'telemetry_fallback_active'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   57 |     wire telemetry_fallback_active;\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:58:17: Signal is not driven: 'telemetry_response_count'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   58 |     wire [15:0] telemetry_response_count;\n      |                 ^~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNDRIVEN: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:59:10: Signal is not driven: 'telemetry_irq_latched'\n                                                                                                               : ... note: In instance 'adaptive_aero_control_top'\n   59 |     wire telemetry_irq_latched;\n      |          ^~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:63:10: Signal is not used: 'req_outstanding_inc'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n   63 |     wire req_outstanding_inc;\n      |          ^~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:72:10: Signal is not used: 'rsp_seq_match'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n   72 |     wire rsp_seq_match;\n      |          ^~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:88:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_enable'\n                                                                                                                  : ... note: In instance 'adaptive_aero_control_top'\n   88 | wire adaptive_aero_control_regfile_cfg_enable;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:89:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_fallback_cmd'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n   89 | wire [31:0] adaptive_aero_control_regfile_cfg_fallback_cmd;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:90:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_fault_clear'\n                                                                                                                  : ... note: In instance 'adaptive_aero_control_top'\n   90 | wire adaptive_aero_control_regfile_cfg_fault_clear;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:91:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_freshness_threshold'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n   91 | wire [15:0] adaptive_aero_control_regfile_cfg_freshness_threshold;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:92:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_geometry_id'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n   92 | wire [15:0] adaptive_aero_control_regfile_cfg_geometry_id;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:93:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_irq_on_accept'\n                                                                                                                  : ... note: In instance 'adaptive_aero_control_top'\n   93 | wire adaptive_aero_control_regfile_cfg_irq_on_accept;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:94:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_irq_on_fault'\n                                                                                                                  : ... note: In instance 'adaptive_aero_control_top'\n   94 | wire adaptive_aero_control_regfile_cfg_irq_on_fault;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:95:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_irq_on_timeout'\n                                                                                                                  : ... note: In instance 'adaptive_aero_control_top'\n   95 | wire adaptive_aero_control_regfile_cfg_irq_on_timeout;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:96:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_launch'\n                                                                                                                  : ... note: In instance 'adaptive_aero_control_top'\n   96 | wire adaptive_aero_control_regfile_cfg_launch;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:97:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_max_cmd'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n   97 | wire [31:0] adaptive_aero_control_regfile_cfg_max_cmd;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:98:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_min_cmd'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n   98 | wire [31:0] adaptive_aero_control_regfile_cfg_min_cmd;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:99:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_operating_velocity'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n   99 | wire [15:0] adaptive_aero_control_regfile_cfg_operating_velocity;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:100:12: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_outstanding_limit'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  100 | wire [2:0] adaptive_aero_control_regfile_cfg_outstanding_limit;\n      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:101:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_pipelined_mode'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  101 | wire adaptive_aero_control_regfile_cfg_pipelined_mode;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:102:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_reference_id'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  102 | wire [15:0] adaptive_aero_control_regfile_cfg_reference_id;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:103:12: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_request_type'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  103 | wire [7:0] adaptive_aero_control_regfile_cfg_request_type;\n      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:104:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_sequence_seed'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  104 | wire [15:0] adaptive_aero_control_regfile_cfg_sequence_seed;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:105:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_session_rollover'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  105 | wire adaptive_aero_control_regfile_cfg_session_rollover;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:106:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_status_clear'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  106 | wire adaptive_aero_control_regfile_cfg_status_clear;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:107:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_step_limit'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  107 | wire [15:0] adaptive_aero_control_regfile_cfg_step_limit;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:108:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_sticky_fault'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  108 | wire adaptive_aero_control_regfile_cfg_sticky_fault;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:109:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_timeout_threshold'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  109 | wire [15:0] adaptive_aero_control_regfile_cfg_timeout_threshold;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:110:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_velocity_fraction'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  110 | wire [15:0] adaptive_aero_control_regfile_cfg_velocity_fraction;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:111:6: Signal is not driven, nor used: 'adaptive_aero_fallback_controller_fallback_active'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  111 | wire adaptive_aero_fallback_controller_fallback_active;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:112:6: Signal is not driven, nor used: 'adaptive_aero_fallback_controller_fault_active'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  112 | wire adaptive_aero_fallback_controller_fault_active;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:113:6: Signal is not driven, nor used: 'adaptive_aero_request_packager_req_launch_accepted'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  113 | wire adaptive_aero_request_packager_req_launch_accepted;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:114:13: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_request_age'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  114 | wire [15:0] adaptive_aero_timeout_monitor_request_age;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:115:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_accept'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  115 | wire adaptive_aero_response_validator_rsp_accept;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:116:13: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_accepted_cmd'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  116 | wire [31:0] adaptive_aero_response_validator_rsp_accepted_cmd;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:117:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_protocol_fault'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  117 | wire adaptive_aero_response_validator_rsp_protocol_fault;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:118:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_stale_fault'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  118 | wire adaptive_aero_response_validator_rsp_stale_fault;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:119:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_timeout_fault'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  119 | wire adaptive_aero_response_validator_rsp_timeout_fault;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:120:13: Signal is not driven, nor used: 'adaptive_aero_fallback_controller_safe_cmd'\n                                                                                                                    : ... note: In instance 'adaptive_aero_control_top'\n  120 | wire [31:0] adaptive_aero_fallback_controller_safe_cmd;\n      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:121:6: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_stale_session_event'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  121 | wire adaptive_aero_timeout_monitor_stale_session_event;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:122:6: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_timeout_expired'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  122 | wire adaptive_aero_timeout_monitor_timeout_expired;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v:123:6: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_timeout_fault_latched'\n                                                                                                                   : ... note: In instance 'adaptive_aero_control_top'\n  123 | wire adaptive_aero_timeout_monitor_timeout_fault_latched;\n      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_actuator_output_stage.v:13:16: Signal is not used: 'last_cmd'\n                                                                                                                             : ... note: In instance 'adaptive_aero_control_top.u_actuator'\n   13 |     reg [31:0] last_cmd;\n      |                ^~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v:5:18: Bits of signal are not used: 'mmio_wdata'[63:8]\n                                                                                                                      : ... note: In instance 'adaptive_aero_control_top.u_regfile'\n    5 |     input [63:0] mmio_wdata,\n      |                  ^~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v:6:17: Bits of signal are not used: 'mmio_wstrb'[7:1]\n                                                                                                                      : ... note: In instance 'adaptive_aero_control_top.u_regfile'\n    6 |     input [7:0] mmio_wstrb,\n      |                 ^~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v:100:22: Bits of function variable are not used: 'addr'[63:8]\n                                                                                                                        : ... note: In instance 'adaptive_aero_control_top.u_regfile'\n  100 |         input [63:0] addr;\n      |                      ^~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_response_validator.v:17:18: Bits of signal are not used: 'surrogate_rsp_data'[47:32]\n                                                                                                                          : ... note: In instance 'adaptive_aero_control_top.u_validator'\n   17 |     input [63:0] surrogate_rsp_data,\n      |                  ^~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:4:17: Signal is not used: 'telemetry_state'\n                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_telemetry'\n    4 |     input [3:0] telemetry_state,\n      |                 ^~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:5:11: Signal is not used: 'telemetry_busy'\n                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_telemetry'\n    5 |     input telemetry_busy,\n      |           ^~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:6:17: Signal is not used: 'telemetry_outstanding_count'\n                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_telemetry'\n    6 |     input [2:0] telemetry_outstanding_count,\n      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:7:18: Signal is not used: 'telemetry_last_seq'\n                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_telemetry'\n    7 |     input [15:0] telemetry_last_seq,\n      |                  ^~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:11:11: Signal is not used: 'telemetry_clamp_active'\n                                                                                                                        : ... note: In instance 'adaptive_aero_control_top.u_telemetry'\n   11 |     input telemetry_clamp_active,\n      |           ^~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v:12:11: Signal is not used: 'telemetry_fallback_active'\n                                                                                                                        : ... note: In instance 'adaptive_aero_control_top.u_telemetry'\n   12 |     input telemetry_fallback_active,\n      |           ^~~~~~~~~~~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_timeout_monitor.v:20:16: Signal is not used: 'last_seq'\n                                                                                                                       : ... note: In instance 'adaptive_aero_control_top.u_timeout'\n   20 |     reg [15:0] last_seq;\n      |                ^~~~~~~~\n",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-11T16:46:01.321866+00:00",
+      "ended_at": "2026-08-11T16:46:01.527143+00:00",
+      "elapsed_ms": 205
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 8,
+      "module_count": 8,
+      "modules": [
+        {
+          "name": "adaptive_aero_actuator_output_stage",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_actuator_output_stage.v",
+          "input_count": 37,
+          "output_count": 36,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 4,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fault_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_mode",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "actuator_update_pulse",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_regfile",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_regfile.v",
+          "input_count": 250,
+          "output_count": 313,
+          "inout_count": 0,
+          "input_port_count": 19,
+          "output_port_count": 28,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_addr",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_wstrb",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "mmio_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_soft_reset",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_launch",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fault_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_sticky_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_pipelined_mode",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_outstanding_limit",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_min_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_step_limit",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_irq_on_accept",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_request_type",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_sequence_seed",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_operating_velocity",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_velocity_fraction",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_reference_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_session_rollover",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_status_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_state",
+              "direction": "input",
+              "width": "[3:0]"
+            },
+            {
+              "name": "telemetry_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_outstanding_count",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "telemetry_last_seq",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_timeout_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_stale_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_protocol_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_clamp_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_response_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_irq_latched",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr",
+              "direction": "input",
+              "width": "[63:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_top",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_control_top.v",
+          "input_count": 206,
+          "output_count": 169,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 11,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_addr",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_wstrb",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "mmio_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "surrogate_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "surrogate_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_mode",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "status_irq",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_fallback_controller",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_fallback_controller.v",
+          "input_count": 154,
+          "output_count": 38,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fault_clear",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_sticky_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_min_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_step_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rsp_accepted_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_timeout_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_stale_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_protocol_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fault_latched",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_stale",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_protocol",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_request_packager",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_request_packager.v",
+          "input_count": 103,
+          "output_count": 83,
+          "inout_count": 0,
+          "input_port_count": 17,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_launch",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_pipelined_mode",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_outstanding_limit",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_request_type",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_sequence_seed",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_operating_velocity",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_velocity_fraction",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_reference_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_session_rollover",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_issue_ack",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_issue_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_outstanding_count",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "surrogate_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "surrogate_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_launch_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_seq_active",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_outstanding_inc",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_response_validator",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_response_validator.v",
+          "input_count": 247,
+          "output_count": 55,
+          "inout_count": 0,
+          "input_port_count": 16,
+          "output_port_count": 9,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_min_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_step_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_session_rollover",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "active_req_seq",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_age",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_session_event",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "surrogate_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_accept",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_seq_match",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_timeout_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_stale_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_protocol_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_accepted_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_response_count",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_telemetry_status",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_telemetry_status.v",
+          "input_count": 52,
+          "output_count": 1,
+          "inout_count": 0,
+          "input_port_count": 17,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_state",
+              "direction": "input",
+              "width": "[3:0]"
+            },
+            {
+              "name": "telemetry_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_outstanding_count",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "telemetry_last_seq",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_timeout_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_stale_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_protocol_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_clamp_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_response_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_irq_latched",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_timeout",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_status_clear",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_irq",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_timeout_monitor",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/rtl/adaptive_aero_timeout_monitor.v",
+          "input_count": 57,
+          "output_count": 23,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_outstanding_limit",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_session_rollover",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_launch_accepted",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "active_req_seq",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "outstanding_count",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_session_event",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fault_latched",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 206,
+        "output_count": 169,
+        "inout_count": 0,
+        "input_port_count": 10,
+        "output_port_count": 11,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_addr",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "mmio_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "mmio_wstrb",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "mmio_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_write",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "mmio_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "mmio_rvalid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "mmio_error",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "surrogate_req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "surrogate_req_data",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "surrogate_req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "surrogate_rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "surrogate_rsp_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "surrogate_rsp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "actuator_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_mode",
+            "direction": "output",
+            "width": "[1:0]"
+          },
+          {
+            "name": "status_irq",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 512,
+        "latch_count": 33,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 66,
+        "latch_target_count": 2,
+        "sequential_blocks": 14,
+        "posedge_blocks": 7,
+        "negedge_blocks": 7,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_cmd",
+          "actuator_mode",
+          "actuator_update_pulse",
+          "actuator_valid",
+          "age_cnt",
+          "busy",
+          "current_seq",
+          "fallback_active",
+          "fault_active",
+          "holding_req",
+          "irq_latched",
+          "last_cmd",
+          "last_fallback",
+          "last_fault",
+          "last_seq",
+          "mmio_error",
+          "outstanding_count",
+          "prev_cmd",
+          "prev_safe",
+          "reg_ctrl",
+          "reg_freshness_0",
+          "reg_freshness_1",
+          "reg_limits_0",
+          "reg_limits_1",
+          "reg_limits_10",
+          "reg_limits_11",
+          "reg_limits_12",
+          "reg_limits_13",
+          "reg_limits_2",
+          "reg_limits_3",
+          "reg_limits_4",
+          "reg_limits_5",
+          "reg_limits_6",
+          "reg_limits_7",
+          "reg_limits_8",
+          "reg_limits_9",
+          "reg_pipeline_0",
+          "reg_request_0",
+          "reg_request_1",
+          "reg_request_10",
+          "reg_request_11",
+          "reg_request_2",
+          "reg_request_3",
+          "reg_request_4",
+          "reg_request_5",
+          "reg_request_6",
+          "reg_request_7",
+          "reg_request_8",
+          "reg_request_9",
+          "reg_status_policy_0"
+        ],
+        "sampled_latch_targets": [
+          "request_age",
+          "rsp_cmd"
+        ],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 7,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 8,
+      "module_count": 8,
+      "modules": [
+        {
+          "name": "adaptive_aero_actuator_output_stage",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_actuator_output_stage.v",
+          "input_count": 37,
+          "output_count": 36,
+          "inout_count": 0,
+          "input_port_count": 6,
+          "output_port_count": 4,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "fault_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_mode",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "actuator_update_pulse",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_regfile",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_regfile.v",
+          "input_count": 250,
+          "output_count": 313,
+          "inout_count": 0,
+          "input_port_count": 19,
+          "output_port_count": 28,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_addr",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_wstrb",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "mmio_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_soft_reset",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_launch",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fault_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_sticky_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_pipelined_mode",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_outstanding_limit",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_min_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_step_limit",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_irq_on_accept",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_request_type",
+              "direction": "output",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_sequence_seed",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_operating_velocity",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_velocity_fraction",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_reference_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_session_rollover",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_status_clear",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_state",
+              "direction": "input",
+              "width": "[3:0]"
+            },
+            {
+              "name": "telemetry_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_outstanding_count",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "telemetry_last_seq",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_timeout_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_stale_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_protocol_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_clamp_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_response_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_irq_latched",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr",
+              "direction": "input",
+              "width": "[63:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_top",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_top.v",
+          "input_count": 206,
+          "output_count": 169,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 11,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_addr",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_wstrb",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "mmio_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mmio_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "mmio_rvalid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mmio_error",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "surrogate_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "surrogate_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "actuator_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_mode",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "status_irq",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_fallback_controller",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_fallback_controller.v",
+          "input_count": 154,
+          "output_count": 38,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fault_clear",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_sticky_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_min_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_step_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rsp_accepted_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_timeout_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_stale_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_protocol_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fault_latched",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "safe_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_timeout",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_stale",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fault_protocol",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_request_packager",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_request_packager.v",
+          "input_count": 103,
+          "output_count": 83,
+          "inout_count": 0,
+          "input_port_count": 17,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_launch",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_pipelined_mode",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_outstanding_limit",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_request_type",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_sequence_seed",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_operating_velocity",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_velocity_fraction",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_reference_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_session_rollover",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_issue_ack",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_issue_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_outstanding_count",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "surrogate_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_req_data",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "surrogate_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_launch_accepted",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "req_seq_active",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "req_outstanding_inc",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_response_validator",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_response_validator.v",
+          "input_count": 247,
+          "output_count": 55,
+          "inout_count": 0,
+          "input_port_count": 16,
+          "output_port_count": 9,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_min_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_max_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_step_limit",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fallback_cmd",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "cfg_session_rollover",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "active_req_seq",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_age",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "stale_session_event",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "surrogate_rsp_data",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "surrogate_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_accept",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_seq_match",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_timeout_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_stale_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_protocol_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "rsp_accepted_cmd",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rsp_response_count",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_telemetry_status",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_telemetry_status.v",
+          "input_count": 52,
+          "output_count": 1,
+          "inout_count": 0,
+          "input_port_count": 17,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_state",
+              "direction": "input",
+              "width": "[3:0]"
+            },
+            {
+              "name": "telemetry_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_outstanding_count",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "telemetry_last_seq",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_timeout_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_stale_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_protocol_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_clamp_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "telemetry_response_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "telemetry_irq_latched",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_irq_on_timeout",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_status_clear",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_irq",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_timeout_monitor",
+          "file": "backend/workflows/d497c803-87ac-4178-8e0e-79c4748819b6/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_timeout_monitor.v",
+          "input_count": 57,
+          "output_count": 23,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_freshness_threshold",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_outstanding_limit",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "cfg_session_rollover",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "req_launch_accepted",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rsp_accept",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "active_req_seq",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_age",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "outstanding_count",
+              "direction": "output",
+              "width": "[2:0]"
+            },
+            {
+              "name": "busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_expired",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "stale_session_event",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "timeout_fault_latched",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 206,
+        "output_count": 169,
+        "inout_count": 0,
+        "input_port_count": 10,
+        "output_port_count": 11,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_addr",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "mmio_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "mmio_wstrb",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "mmio_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_write",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "mmio_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "mmio_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "mmio_rvalid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "mmio_error",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "surrogate_req_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "surrogate_req_data",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "surrogate_req_ready",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "surrogate_rsp_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "surrogate_rsp_data",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "surrogate_rsp_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_cmd",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "actuator_valid",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "actuator_mode",
+            "direction": "output",
+            "width": "[1:0]"
+          },
+          {
+            "name": "status_irq",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 459,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 59,
+        "latch_target_count": 0,
+        "sequential_blocks": 12,
+        "posedge_blocks": 6,
+        "negedge_blocks": 6,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_cmd",
+          "actuator_mode",
+          "actuator_update_pulse",
+          "actuator_valid",
+          "age_count",
+          "current_seq",
+          "fallback_active",
+          "fault_active",
+          "holding_req",
+          "irq_latched",
+          "last_cmd",
+          "last_fallback",
+          "last_fault",
+          "last_seq",
+          "mmio_error",
+          "prev_safe",
+          "reg_ctrl",
+          "reg_freshness_0",
+          "reg_freshness_1",
+          "reg_limits_0",
+          "reg_limits_1",
+          "reg_limits_10",
+          "reg_limits_11",
+          "reg_limits_12",
+          "reg_limits_13",
+          "reg_limits_2",
+          "reg_limits_3",
+          "reg_limits_4",
+          "reg_limits_5",
+          "reg_limits_6",
+          "reg_limits_7",
+          "reg_limits_8",
+          "reg_limits_9",
+          "reg_pipeline_0",
+          "reg_request_0",
+          "reg_request_1",
+          "reg_request_10",
+          "reg_request_11",
+          "reg_request_2",
+          "reg_request_3",
+          "reg_request_4",
+          "reg_request_5",
+          "reg_request_6",
+          "reg_request_7",
+          "reg_request_8",
+          "reg_request_9",
+          "reg_status_policy_0",
+          "reg_timeout_0",
+          "reg_timeout_1",
+          "req_launch_accepted"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 6,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 42,
+    "registers": [
+      {
+        "name": "CONTROL_0",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Primary control byte. Writing the enable/launch/clear bits affects request issuance and fault handling. Soft reset is level-sensitive within the synchronous control plane and should be pulsed by firmware.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Master enable for request issuance and closed-loop operation."
+          },
+          {
+            "name": "SOFT_RESET",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Requests a synchronous soft-reset action in the control plane."
+          },
+          {
+            "name": "LAUNCH",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Launches one outbound surrogate request when ENABLE is set and outstanding limit allows it. Self-clearing after acceptance behavior is implementation-defined but the request must be issued once per asserted launch event."
+          },
+          {
+            "name": "FAULT_CLEAR",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Clears transient fault latches according to sticky-fault policy."
+          },
+          {
+            "name": "STICKY_FAULT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW",
+            "reset": 0,
+            "description": "Retains fault latches until firmware explicitly clears them."
+          },
+          {
+            "name": "PIPELINED_MODE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RW",
+            "reset": 0,
+            "description": "Allows limited multiple outstanding requests when supported by the outstanding limit."
+          },
+          {
+            "name": "SESSION_ROLLOVER",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RW",
+            "reset": 0,
+            "description": "Indicates host-managed session rollover; stale detection uses this to invalidate older request context."
+          },
+          {
+            "name": "STATUS_CLEAR",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Clears latched IRQ/status indications without changing unrelated control state."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_0",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Request metadata byte 0. Encodes request type and sequence seed low bits.",
+        "fields": [
+          {
+            "name": "REQUEST_TYPE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "8-bit request type tag placed into the outbound surrogate request word."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_1",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Request metadata byte 1. Sequence seed high byte.",
+        "fields": [
+          {
+            "name": "SEQUENCE_SEED_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the 16-bit sequence seed used as the initial request sequence basis."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_2",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Request metadata byte 2. Sequence seed high byte and compact model identifiers low bits.",
+        "fields": [
+          {
+            "name": "SEQUENCE_SEED_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the 16-bit sequence seed."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_3",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Request metadata byte 3. Operating velocity low byte.",
+        "fields": [
+          {
+            "name": "OPERATING_VELOCITY_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the 16-bit representative operating velocity in the supported envelope, e.g. 38.89 m/s encoded by firmware convention."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_4",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Request metadata byte 4. Operating velocity high byte.",
+        "fields": [
+          {
+            "name": "OPERATING_VELOCITY_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the 16-bit operating velocity field."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_5",
+        "offset": "0x06",
+        "access": "RW",
+        "description": "Request metadata byte 5. Velocity fraction low byte.",
+        "fields": [
+          {
+            "name": "VELOCITY_FRACTION_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the 16-bit velocity fraction field used as compact operating-point metadata."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_6",
+        "offset": "0x07",
+        "access": "RW",
+        "description": "Request metadata byte 6. Velocity fraction high byte.",
+        "fields": [
+          {
+            "name": "VELOCITY_FRACTION_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the 16-bit velocity fraction field."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_7",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Request metadata byte 7. Reference ID low byte.",
+        "fields": [
+          {
+            "name": "REFERENCE_ID_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the 16-bit compact reference identifier for DrivAerML or equivalent host-side reference naming."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_8",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Request metadata byte 8. Reference ID high byte.",
+        "fields": [
+          {
+            "name": "REFERENCE_ID_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the 16-bit compact reference identifier."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_9",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "Request metadata byte 9. Geometry ID low byte.",
+        "fields": [
+          {
+            "name": "GEOMETRY_ID_LSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Low byte of the compact geometry identifier. No raw geometry payload is stored in RTL."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_10",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "Request metadata byte 10. Geometry ID high byte.",
+        "fields": [
+          {
+            "name": "GEOMETRY_ID_MSB",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "High byte of the compact geometry identifier."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

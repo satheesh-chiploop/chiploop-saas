@@ -1,0 +1,281 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.343 MB sources in 9 modules, into 0.199 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.043 s (elab=0.005, cvt=0.024, bld=0.000); cpu 0.043 s on 1 threads; allocated 34.355 MB
+
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: adaptive_aero_control_top.v:280:10: Instance pin connected by name with empty reference: 'actuator_update_pulse'
+  280 |         .actuator_update_pulse()
+      |          ^~~~~~~~~~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: adaptive_aero_request_packager.v:58:40: Operator ASSIGNDLY expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 88 bits.
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_packager'
+   58 |                     surrogate_req_data <= {cfg_request_type, next_seq, cfg_operating_velocity, cfg_velocity_fraction, cfg_reference_id, cfg_geometry_id};
+      |                                        ^~
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: adaptive_aero_control_regfile.v:145:33: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 1 bits.
+                                                            : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+  145 |                 8'h3F: read_mux = {mmio_error};
+      |                                 ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-BLKSEQ: adaptive_aero_request_packager.v:55:30: Blocking assignment '=' in sequential logic process
+                                                       : ... note: In instance 'adaptive_aero_control_top.u_packager'
+                                                       : ... Suggest using delayed assignment '<='
+   55 |                     next_seq = current_seq + 16'h0001;
+      |                              ^
+                 ... For warning description see https://verilator.org/warn/BLKSEQ?v=5.047
+                 ... Use "/* verilator lint_off BLKSEQ */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:25:10: Signal is not used: 'cfg_soft_reset'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   25 |     wire cfg_soft_reset;
+      |          ^~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:49:16: Signal is not driven: 'telemetry_state'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   49 |     wire [3:0] telemetry_state;
+      |                ^~~~~~~~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047
+                   ... Use "/* verilator lint_off UNDRIVEN */" and lint_on around source to disable this message.
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:51:16: Signal is not driven: 'telemetry_outstanding_count'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   51 |     wire [2:0] telemetry_outstanding_count;
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:52:17: Signal is not driven: 'telemetry_last_seq'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   52 |     wire [15:0] telemetry_last_seq;
+      |                 ^~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:53:10: Signal is not driven: 'telemetry_timeout_fault'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   53 |     wire telemetry_timeout_fault;
+      |          ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:54:10: Signal is not driven: 'telemetry_stale_fault'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   54 |     wire telemetry_stale_fault;
+      |          ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:55:10: Signal is not driven: 'telemetry_protocol_fault'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   55 |     wire telemetry_protocol_fault;
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:56:10: Signal is not driven: 'telemetry_clamp_active'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   56 |     wire telemetry_clamp_active;
+      |          ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:57:10: Signal is not driven: 'telemetry_fallback_active'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   57 |     wire telemetry_fallback_active;
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:58:17: Signal is not driven: 'telemetry_response_count'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   58 |     wire [15:0] telemetry_response_count;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: adaptive_aero_control_top.v:59:10: Signal is not driven: 'telemetry_irq_latched'
+                                                    : ... note: In instance 'adaptive_aero_control_top'
+   59 |     wire telemetry_irq_latched;
+      |          ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:63:10: Signal is not used: 'req_outstanding_inc'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   63 |     wire req_outstanding_inc;
+      |          ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:72:10: Signal is not used: 'rsp_seq_match'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   72 |     wire rsp_seq_match;
+      |          ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:88:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_enable'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   88 | wire adaptive_aero_control_regfile_cfg_enable;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:89:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_fallback_cmd'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   89 | wire [31:0] adaptive_aero_control_regfile_cfg_fallback_cmd;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:90:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_fault_clear'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   90 | wire adaptive_aero_control_regfile_cfg_fault_clear;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:91:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_freshness_threshold'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   91 | wire [15:0] adaptive_aero_control_regfile_cfg_freshness_threshold;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:92:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_geometry_id'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   92 | wire [15:0] adaptive_aero_control_regfile_cfg_geometry_id;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:93:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_irq_on_accept'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   93 | wire adaptive_aero_control_regfile_cfg_irq_on_accept;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:94:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_irq_on_fault'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   94 | wire adaptive_aero_control_regfile_cfg_irq_on_fault;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:95:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_irq_on_timeout'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   95 | wire adaptive_aero_control_regfile_cfg_irq_on_timeout;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:96:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_launch'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   96 | wire adaptive_aero_control_regfile_cfg_launch;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:97:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_max_cmd'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   97 | wire [31:0] adaptive_aero_control_regfile_cfg_max_cmd;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:98:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_min_cmd'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   98 | wire [31:0] adaptive_aero_control_regfile_cfg_min_cmd;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:99:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_operating_velocity'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   99 | wire [15:0] adaptive_aero_control_regfile_cfg_operating_velocity;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:100:12: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_outstanding_limit'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  100 | wire [2:0] adaptive_aero_control_regfile_cfg_outstanding_limit;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:101:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_pipelined_mode'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  101 | wire adaptive_aero_control_regfile_cfg_pipelined_mode;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:102:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_reference_id'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  102 | wire [15:0] adaptive_aero_control_regfile_cfg_reference_id;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:103:12: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_request_type'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  103 | wire [7:0] adaptive_aero_control_regfile_cfg_request_type;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:104:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_sequence_seed'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  104 | wire [15:0] adaptive_aero_control_regfile_cfg_sequence_seed;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:105:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_session_rollover'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  105 | wire adaptive_aero_control_regfile_cfg_session_rollover;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:106:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_status_clear'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  106 | wire adaptive_aero_control_regfile_cfg_status_clear;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:107:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_step_limit'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  107 | wire [15:0] adaptive_aero_control_regfile_cfg_step_limit;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:108:6: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_sticky_fault'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  108 | wire adaptive_aero_control_regfile_cfg_sticky_fault;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:109:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_timeout_threshold'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  109 | wire [15:0] adaptive_aero_control_regfile_cfg_timeout_threshold;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:110:13: Signal is not driven, nor used: 'adaptive_aero_control_regfile_cfg_velocity_fraction'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  110 | wire [15:0] adaptive_aero_control_regfile_cfg_velocity_fraction;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:111:6: Signal is not driven, nor used: 'adaptive_aero_fallback_controller_fallback_active'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  111 | wire adaptive_aero_fallback_controller_fallback_active;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:112:6: Signal is not driven, nor used: 'adaptive_aero_fallback_controller_fault_active'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  112 | wire adaptive_aero_fallback_controller_fault_active;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:113:6: Signal is not driven, nor used: 'adaptive_aero_request_packager_req_launch_accepted'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  113 | wire adaptive_aero_request_packager_req_launch_accepted;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:114:13: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_request_age'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  114 | wire [15:0] adaptive_aero_timeout_monitor_request_age;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:115:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_accept'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  115 | wire adaptive_aero_response_validator_rsp_accept;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:116:13: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_accepted_cmd'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  116 | wire [31:0] adaptive_aero_response_validator_rsp_accepted_cmd;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:117:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_protocol_fault'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  117 | wire adaptive_aero_response_validator_rsp_protocol_fault;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:118:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_stale_fault'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  118 | wire adaptive_aero_response_validator_rsp_stale_fault;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:119:6: Signal is not driven, nor used: 'adaptive_aero_response_validator_rsp_timeout_fault'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  119 | wire adaptive_aero_response_validator_rsp_timeout_fault;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:120:13: Signal is not driven, nor used: 'adaptive_aero_fallback_controller_safe_cmd'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  120 | wire [31:0] adaptive_aero_fallback_controller_safe_cmd;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:121:6: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_stale_session_event'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  121 | wire adaptive_aero_timeout_monitor_stale_session_event;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:122:6: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_timeout_expired'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  122 | wire adaptive_aero_timeout_monitor_timeout_expired;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:123:6: Signal is not driven, nor used: 'adaptive_aero_timeout_monitor_timeout_fault_latched'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  123 | wire adaptive_aero_timeout_monitor_timeout_fault_latched;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_actuator_output_stage.v:13:16: Signal is not used: 'last_cmd'
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_actuator'
+   13 |     reg [31:0] last_cmd;
+      |                ^~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_regfile.v:5:18: Bits of signal are not used: 'mmio_wdata'[63:8]
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+    5 |     input [63:0] mmio_wdata,
+      |                  ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_regfile.v:6:17: Bits of signal are not used: 'mmio_wstrb'[7:1]
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+    6 |     input [7:0] mmio_wstrb,
+      |                 ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_regfile.v:100:22: Bits of function variable are not used: 'addr'[63:8]
+                                                             : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+  100 |         input [63:0] addr;
+      |                      ^~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_response_validator.v:17:18: Bits of signal are not used: 'surrogate_rsp_data'[47:32]
+                                                               : ... note: In instance 'adaptive_aero_control_top.u_validator'
+   17 |     input [63:0] surrogate_rsp_data,
+      |                  ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_telemetry_status.v:4:17: Signal is not used: 'telemetry_state'
+                                                            : ... note: In instance 'adaptive_aero_control_top.u_telemetry'
+    4 |     input [3:0] telemetry_state,
+      |                 ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_telemetry_status.v:5:11: Signal is not used: 'telemetry_busy'
+                                                            : ... note: In instance 'adaptive_aero_control_top.u_telemetry'
+    5 |     input telemetry_busy,
+      |           ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_telemetry_status.v:6:17: Signal is not used: 'telemetry_outstanding_count'
+                                                            : ... note: In instance 'adaptive_aero_control_top.u_telemetry'
+    6 |     input [2:0] telemetry_outstanding_count,
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_telemetry_status.v:7:18: Signal is not used: 'telemetry_last_seq'
+                                                            : ... note: In instance 'adaptive_aero_control_top.u_telemetry'
+    7 |     input [15:0] telemetry_last_seq,
+      |                  ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_telemetry_status.v:11:11: Signal is not used: 'telemetry_clamp_active'
+                                                             : ... note: In instance 'adaptive_aero_control_top.u_telemetry'
+   11 |     input telemetry_clamp_active,
+      |           ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_telemetry_status.v:12:11: Signal is not used: 'telemetry_fallback_active'
+                                                             : ... note: In instance 'adaptive_aero_control_top.u_telemetry'
+   12 |     input telemetry_fallback_active,
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_timeout_monitor.v:20:16: Signal is not used: 'last_seq'
+                                                            : ... note: In instance 'adaptive_aero_control_top.u_timeout'
+   20 |     reg [15:0] last_seq;
+      |                ^~~~~~~~
+
+=== RETURN CODE ===
+0

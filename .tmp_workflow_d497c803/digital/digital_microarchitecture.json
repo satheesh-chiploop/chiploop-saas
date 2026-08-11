@@ -1,0 +1,112 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_regfile",
+      "implementation_style": "Small synchronous MMIO decode and control/status register bank with byte-write masking, legal address decode, and fixed readback datapath. Use flip-flops only for the compact control plane and telemetry mirrors; no payload flattening or large storage.",
+      "control_strategy": "Accept mmio_valid/mmio_write accesses, decode a compact 64-bit register window, update semantic config fields on legal writes, and return mmio_error on unsupported or malformed addresses. Preserve configuration until rewritten and present deterministic reset defaults for enable, launch, timeout, limits, fallback, sequencing, and IRQ policy.",
+      "state_strategy": "Maintain a minimal set of synchronous registers for enable, launch, reset/fault clear, sticky-fault policy, pipelined mode, outstanding limit, timeout/freshness thresholds, command bounds, fallback command, step limit, request type, sequence seed, operating-point metadata, session rollover, and status-clear control. Telemetry fields are read-only mirrors of downstream controller state.",
+      "output_strategy": "Drive only semantic configuration outputs and MMIO response outputs. The module does not drive transport or actuator pins directly; its outputs feed the request packager, validator, timeout monitor, fallback controller, and telemetry block.",
+      "ownership_notes": [
+        "Owns the MMIO-facing configuration and status plane.",
+        "Does not own request/response transport, actuator outputs, or interrupt generation directly.",
+        "rtl_output_file: adaptive_aero_control_regfile.v"
+      ]
+    },
+    {
+      "name": "adaptive_aero_request_packager",
+      "implementation_style": "Small synchronous request constructor with one-hot-like issue control and a held-valid handshake. Compose a single 64-bit request word from sequence, request type, operating-point metadata, and compact identifiers.",
+      "control_strategy": "Launch only when enabled and cfg_launch is asserted, while respecting outstanding-limit gating and optional pipelined mode. Once a request is issued, keep surrogate_req_valid asserted until surrogate_req_ready is sampled high; do not issue another request until policy allows it.",
+      "state_strategy": "Retain the active sequence counter, request-hold state, and a minimal outstanding-issue indicator. Sequence numbering increments monotonically, with reset/seed behavior determined by the configured seed and session rollover policy.",
+      "output_strategy": "Drive surrogate_req_valid and surrogate_req_data as RTL outputs, with req_launch_accepted and req_seq_active exported to downstream monitors. The request word is bounded and compact, never a bulk geometry payload.",
+      "ownership_notes": [
+        "Owns outbound request packing and launch acceptance.",
+        "Does not own response acceptance, fallback, telemetry, or actuator outputs.",
+        "rtl_output_file: adaptive_aero_request_packager.v"
+      ]
+    },
+    {
+      "name": "adaptive_aero_response_validator",
+      "implementation_style": "Synchronous response-checking datapath with simple extract/compare/clamp logic. Parse the 64-bit response into a sequence/token field and actuator suggestion field, then validate freshness and range before acceptance.",
+      "control_strategy": "Accept only when surrogate_rsp_valid is high, sequence/token matches the active request, timeout has not expired, and stale-session/freshness conditions are clear. Reject malformed, stale, late, or out-of-range responses without updating the accepted command.",
+      "state_strategy": "Track the last accepted sequence context, a small response counter, and acceptance/fault strobes. Use only compact arithmetic and comparators for sequence match, timeout relevance, and command bounding.",
+      "output_strategy": "Drive surrogate_rsp_ready, rsp_accept, rsp_seq_match, fault classification bits, clamp activity, accepted bounded command suggestion, and response count. The accepted command remains a semantic suggestion and is not the final actuator output.",
+      "ownership_notes": [
+        "Owns inbound response validation and bounded accepted-command suggestion.",
+        "Does not own the final actuator stage or fallback policy.",
+        "rtl_output_file: adaptive_aero_response_validator.v"
+      ]
+    },
+    {
+      "name": "adaptive_aero_timeout_monitor",
+      "implementation_style": "Small counter-based age and outstanding monitor with synchronous increment/decrement behavior. Keep the logic intentionally simple: request-age counter(s), outstanding count, busy flag, timeout compare, and stale-session indication.",
+      "control_strategy": "Start age tracking when a request is accepted, clear or decrement on response acceptance, and assert timeout_expired when the programmed threshold is exceeded. Detect stale-data conditions from request age, freshness threshold, and session rollover policy.",
+      "state_strategy": "Maintain the active request age, outstanding_count, busy status, timeout fault latch, and stale-session event. All counters reset deterministically and remain bounded to the configured small outstanding limit.",
+      "output_strategy": "Drive request_age, outstanding_count, busy, timeout_expired, stale_session_event, and timeout_fault_latched for use by the validator, fallback controller, and telemetry.",
+      "ownership_notes": [
+        "Owns timeout and freshness tracking plus the latched timeout fault indication.",
+        "Does not own MMIO configuration or transport handshakes.",
+        "rtl_output_file: adaptive_aero_timeout_monitor.v"
+      ]
+    },
+    {
+      "name": "adaptive_aero_fallback_controller",
+      "implementation_style": "Deterministic safe-command selector with minimal fault retention logic. Use bounded compare/clamp/optional step-limit arithmetic only; avoid complex FSMs unless needed for sticky-fault retention and fault-clear handling.",
+      "control_strategy": "Select safe fallback whenever disabled, in reset, on timeout/stale/protocol fault, or when the timeout latch is asserted. Allow fault_clear to release transient faults only when sticky-fault policy permits it. When a response is accepted, pass the validated bounded command forward if safe to do so.",
+      "state_strategy": "Hold the current safe command, fallback_active, fault_active, and fault-classification bits. Preserve a stable fallback command across fault entry until explicitly cleared or superseded by a valid accepted command under policy.",
+      "output_strategy": "Drive safe_cmd, fallback_active, fault_active, clamp_active, and fault_timeout/fault_stale/fault_protocol. The safe command is always bounded by the configured limits and never exceeds the controller envelope.",
+      "ownership_notes": [
+        "Owns fallback selection and fault consolidation before actuator staging.",
+        "Does not own the actuator output pins directly.",
+        "rtl_output_file: adaptive_aero_fallback_controller.v"
+      ]
+    },
+    {
+      "name": "adaptive_aero_actuator_output_stage",
+      "implementation_style": "Registered output pipeline with a stable final command register and a small mode encoder. Keep this stage purely sequential so the top-level actuator outputs are always driven by real RTL registers.",
+      "control_strategy": "Capture the controller-selected safe_cmd and qualify actuator_valid/mode based on fallback_active, fault_active, and response-accept events. The stage never forwards an unclamped value and does not create combinational feedback into upstream logic.",
+      "state_strategy": "Maintain the registered actuator command, validity flag, mode encoding, and update pulse. On reset, initialize to the fallback default or conservative safe value and keep the output stable until a valid update occurs.",
+      "output_strategy": "Drive actuator_cmd, actuator_valid, and actuator_mode as the final top-level actuator outputs. actuator_mode distinguishes normal closed-loop update, fallback hold, and fault-safe state.",
+      "ownership_notes": [
+        "Owns the final registered actuator output path.",
+        "Does not own command selection or fault classification.",
+        "rtl_output_file: adaptive_aero_actuator_output_stage.v"
+      ]
+    },
+    {
+      "name": "adaptive_aero_telemetry_status",
+      "implementation_style": "Lightweight telemetry aggregation and IRQ generation block with synchronous latch/level behavior. The design should stay simple: collect status fields, synthesize IRQ according to configuration, and expose stable readback values.",
+      "control_strategy": "Assert status_irq on response acceptance, timeout, or fault entry according to register bits. Support synchronous clear through cfg_status_clear and reset, and do not alter control state while generating telemetry.",
+      "state_strategy": "Mirror telemetry_state, busy, outstanding_count, last_seq, fault flags, clamp/fallback indicators, response count, and IRQ latch state. Maintain deterministic clear behavior and stable values for MMIO readout.",
+      "output_strategy": "Drive status_irq only. Telemetry itself is supplied to the regfile as read-only inputs for status readback and does not feed back into control decisions.",
+      "ownership_notes": [
+        "Owns IRQ generation and telemetry aggregation.",
+        "Does not own transport, control registers, or actuator outputs.",
+        "rtl_output_file: adaptive_aero_telemetry_status.v"
+      ]
+    }
+  ],
+  "fsm_intent": [],
+  "datapath_intent": [],
+  "sequencing_notes": [
+    "Request launch is a single synchronous issue event gated by enable and cfg_launch, then held valid until surrogate_req_ready is observed.",
+    "The request packager monotonically increments the sequence field and exports the active sequence for validation and timeout tracking.",
+    "The timeout monitor begins age tracking on request acceptance and clears/decrements on response acceptance; timeout and stale conditions are derived from compact counters and threshold compares.",
+    "The response validator only accepts valid, sequence-matched, fresh responses; accepted command suggestions may still be clamped and step-limited before use.",
+    "The fallback controller deterministically selects safe behavior on disable, reset, timeout, stale, protocol failure, or latched timeout fault.",
+    "The actuator output stage registers the final command and mode so the top-level actuator outputs always have real RTL drivers."
+  ],
+  "timing_notes": [
+    "All logic is synchronous to clk with active-low rst_n and should be implemented using standard FPGA-flavored registers and comparators.",
+    "No combinational loop should exist between request and response handshakes; surrogate_req_valid and surrogate_rsp_ready must be generated independently of any direct combinational dependence on the opposing channel.",
+    "The request valid signal must remain asserted until ready is seen, which implies a held-valid register or equivalent synchronous hold behavior.",
+    "The output stage should register command, valid, and mode in the same clock domain to guarantee bounded and stable actuator outputs.",
+    "Any step limiting, if implemented, should be a small subtract/compare path with synchronous update only."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}
