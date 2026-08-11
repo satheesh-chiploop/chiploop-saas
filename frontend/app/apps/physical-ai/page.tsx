@@ -98,7 +98,7 @@ export default function PhysicalAiStudioPage() {
       setModelId("nvidia.domino.automotive_aero");
       setExecutionMode("cpu_reference");
       setImplementationPath("fpga_prototype");
-      setObjective("Build an intelligent active-aerodynamics controller: map NVIDIA DoMINO, run a transparent CPU reference, partition the product, and create an FPGA prototype");
+      setObjective("Build an intelligent active-aerodynamics controller for 20–55 m/s operation. Evaluate NVIDIA DoMINO as the physics-based surrogate, establish a transparent reference, partition the system, define and optimize the architecture, and deliver the hardware, firmware, and software with bounded control, stale-data detection, timeout handling, and safe fallback.");
     } else if (new URLSearchParams(window.location.search).get("reference") === "motor") {
       setModelId("chiploop.pmsm.dq.v1");
       setExecutionMode("validated");
