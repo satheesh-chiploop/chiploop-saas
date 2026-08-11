@@ -1,0 +1,16 @@
+❌ RTL generation aborted due to invalid spec connectivity contract.
+
+âŒ top-level input owner 'adaptive_aero_control_top.cfg_wdata' may own only its external input signal 'cfg_wdata', not 'cfg_enable'.
+âŒ top-level input owner 'adaptive_aero_control_top.cfg_wdata' may own only its external input signal 'cfg_wdata', not 'cfg_watchdog_limit'.
+âŒ top-level input owner 'adaptive_aero_control_top.cfg_wdata' may own only its external input signal 'cfg_wdata', not 'cfg_freshness_limit'.
+âŒ top-level input owner 'adaptive_aero_control_top.cfg_wdata' may own only its external input signal 'cfg_wdata', not 'cfg_cmd_min_bound'.
+âŒ top-level input owner 'adaptive_aero_control_top.cfg_wdata' may own only its external input signal 'cfg_wdata', not 'cfg_cmd_max_bound'.
+âŒ top-level input owner 'adaptive_aero_control_top.cfg_wdata' may own only its external input signal 'cfg_wdata', not 'cfg_geometry_descriptor_id'.
+âŒ top-level input owner 'adaptive_aero_control_top.cfg_wdata' may own only its external input signal 'cfg_wdata', not 'cfg_profile_selector'.
+âŒ top-level input owner 'adaptive_aero_control_top.cfg_wdata' may own only its external input signal 'cfg_wdata', not 'cfg_hold_last_good_enable'.
+âŒ top-level input owner 'adaptive_aero_control_top.req_ready' may own only its external input signal 'req_ready', not 'request_ready'.
+âŒ top-level input owner 'adaptive_aero_control_top.rsp_valid' may own only its external input signal 'rsp_valid', not 'response_stream_valid'.
+âŒ top-level input owner 'adaptive_aero_control_top.rsp_data' may own only its external input signal 'rsp_data', not 'response_stream_data'.
+âŒ top-level input owner 'adaptive_aero_control_top.act_cmd_ready' may own only its external input signal 'act_cmd_ready', not 'actuator_ready'.
+âŒ top-level input owner 'adaptive_aero_control_top.stream_velocity_mps' may own only its external input signal 'stream_velocity_mps', not 'stream_velocity_mps_meta'.
+âŒ top-level input owner 'adaptive_aero_control_top.health_status_bits' may own only its external input signal 'health_status_bits', not 'health_status_meta'.

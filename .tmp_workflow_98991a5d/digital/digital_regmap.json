@@ -1,0 +1,437 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "abstract",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 64,
+    "registers": [
+      {
+        "name": "CFG_WINDOW",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "64-bit compact configuration window. Firmware writes capture mode enable, watchdog limit, freshness limit, command clamp bounds, geometry descriptor ID, control profile selection, and hold-last-good policy. Firmware reads return the same window fields and any readable mirrored status/debug bits defined by the RTL implementation.",
+        "fields": [
+          {
+            "name": "MODE_ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables request issuance and response supervision when set."
+          },
+          {
+            "name": "HOLD_LAST_GOOD_ENABLE",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "When set, permits the controller to retain the last known good command on fault instead of forcing deterministic fallback."
+          },
+          {
+            "name": "WATCHDOG_LIMIT",
+            "lsb": 15,
+            "msb": 2,
+            "access": "RW",
+            "reset": 1000,
+            "description": "Maximum request-to-acceptance age in controller clock cycles before timeout handling is forced."
+          },
+          {
+            "name": "FRESHNESS_LIMIT",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RW",
+            "reset": 256,
+            "description": "Maximum allowable response age for freshness acceptance."
+          },
+          {
+            "name": "CMD_MIN_BOUND",
+            "lsb": 47,
+            "msb": 32,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower 16-bit packed command bound used by firmware-visible configuration. The RTL maps this field into the internal 32-bit clamp register convention as implementation-defined sign/zero extension consistent with the chosen command encoding."
+          },
+          {
+            "name": "CMD_MAX_BOUND",
+            "lsb": 63,
+            "msb": 48,
+            "access": "RW",
+            "reset": 65535,
+            "description": "Upper 16-bit packed command bound used by firmware-visible configuration. The RTL maps this field into the internal 32-bit clamp register convention as implementation-defined sign/zero extension consistent with the chosen command encoding."
+          }
+        ]
+      },
+      {
+        "name": "CFG_EXT0",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Extended configuration window for compact metadata not fully represented in CFG_WINDOW.",
+        "fields": [
+          {
+            "name": "GEOMETRY_DESCRIPTOR_ID",
+            "lsb": 11,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact geometry descriptor identifier inserted into outbound request packets."
+          },
+          {
+            "name": "PROFILE_SELECTOR",
+            "lsb": 15,
+            "msb": 12,
+            "access": "RW",
+            "reset": 0,
+            "description": "Control profile selector used in request packaging and fallback profile selection."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 16,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved for future compact configuration expansion; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_WINDOW",
+        "offset": "0x02",
+        "access": "RO",
+        "description": "64-bit status/readback window containing busy, request_pending, response_valid, stale_detected, timeout_detected, clamp_applied, fallback_active, fault_latched, and auxiliary debug bits.",
+        "fields": [
+          {
+            "name": "STATUS_BUSY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Controller is actively supervising an outstanding transaction or executing fallback/timeout handling."
+          },
+          {
+            "name": "STATUS_REQUEST_PENDING",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "A request has been issued or is pending handshake/response completion."
+          },
+          {
+            "name": "STATUS_RESPONSE_VALID",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response has been validated and accepted for command processing."
+          },
+          {
+            "name": "STATUS_STALE_DETECTED",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "A stale, duplicated, or out-of-order response was detected."
+          },
+          {
+            "name": "STATUS_TIMEOUT_DETECTED",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "The watchdog timeout condition was detected."
+          },
+          {
+            "name": "STATUS_CLAMP_APPLIED",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Final command required clamping to fit within configured bounds."
+          },
+          {
+            "name": "STATUS_FALLBACK_ACTIVE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 1,
+            "description": "Deterministic fallback command behavior is currently active."
+          },
+          {
+            "name": "STATUS_FAULT_LATCHED",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Fault has been latched due to invalid, stale, malformed, or late response conditions."
+          },
+          {
+            "name": "REQUEST_TAG",
+            "lsb": 23,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current outstanding request tag for transaction matching and stale detection."
+          },
+          {
+            "name": "OUTSTANDING_AGE",
+            "lsb": 39,
+            "msb": 24,
+            "access": "RO",
+            "reset": 0,
+            "description": "Aging counter for the current outstanding request in clock cycles."
+          },
+          {
+            "name": "LAST_GOOD_CMD_LO",
+            "lsb": 55,
+            "msb": 40,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 16 bits of the last known good command, exposed for software observability."
+          },
+          {
+            "name": "LAST_GOOD_CMD_HI",
+            "lsb": 63,
+            "msb": 56,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 8 bits of the last known good command, exposed for software observability."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_STATUS",
+        "offset": "0x03",
+        "access": "RO",
+        "description": "Request-side observability for host coordination with the external surrogate service.",
+        "fields": [
+          {
+            "name": "REQ_VALID_OUT",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Outbound request valid currently asserted by the RTL."
+          },
+          {
+            "name": "REQ_READY_IN",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "External request-ready handshake as sampled by the RTL."
+          },
+          {
+            "name": "RSP_VALID_IN",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "External response valid currently observed by the RTL."
+          },
+          {
+            "name": "RSP_READY_OUT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Response ready driven by the RTL back to the external service."
+          },
+          {
+            "name": "REQUEST_ISSUED",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Internal request issuance pulse observed for software status correlation."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CLEAR",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Write-one-to-clear fault and status latches. Safety-critical state remains synchronous and may reassert if the fault condition persists.",
+        "fields": [
+          {
+            "name": "CLEAR_FAULT_LATCH",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Writing 1 clears the latched fault state when the underlying condition is no longer present."
+          },
+          {
+            "name": "CLEAR_STALE_FLAG",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Writing 1 clears the stale-detected status latch."
+          },
+          {
+            "name": "CLEAR_TIMEOUT_FLAG",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Writing 1 clears the timeout-detected status latch."
+          },
+          {
+            "name": "CLEAR_CLAMP_FLAG",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Writing 1 clears the clamp-applied sticky indication if implemented as latched status."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "COMMAND_OBSERVE",
+        "offset": "0x05",
+        "access": "RO",
+        "description": "Readback of the final actuator command and selected auxiliary command state.",
+        "fields": [
+          {
+            "name": "ACT_CMD_VALID",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Final actuator command valid indicator."
+          },
+          {
+            "name": "ACT_CMD_READY",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Observed actuator ready handshake input."
+          },
+          {
+            "name": "ACT_CMD_DATA_LO",
+            "lsb": 17,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower 16 bits of the final actuator command."
+          },
+          {
+            "name": "ACT_CMD_DATA_HI",
+            "lsb": 33,
+            "msb": 18,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper 16 bits of the final actuator command."
+          },
+          {
+            "name": "FALLBACK_PROFILE_SEL",
+            "lsb": 37,
+            "msb": 34,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current fallback profile selection observed by the controller."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 63,
+            "msb": 38,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "REQ_PACKET_LO",
+        "offset": "0x06",
+        "access": "RO",
+        "description": "Lower 64 bits of the most recently launched 128-bit request packet for firmware observability.",
+        "fields": [
+          {
+            "name": "REQ_PACKET_LO",
+            "lsb": 63,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Lower half of the request packet. The exact field packing is RTL-defined but remains bounded and compact."
+          }
+        ]
+      },
+      {
+        "name": "REQ_PACKET_HI",
+        "offset": "0x07",
+        "access": "RO",
+        "description": "Upper 64 bits of the most recently launched 128-bit request packet for firmware observability.",
+        "fields": [
+          {
+            "name": "REQ_PACKET_HI",
+            "lsb": 63,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Upper half of the request packet. The exact field packing is RTL-defined but remains bounded and compact."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "FAULT_LATCHED_IRQ",
+        "description": "Asserted when a fault is latched due to invalid, stale, malformed, duplicated, out-of-order, or late response handling."
+      },
+      {
+        "name": "TIMEOUT_IRQ",
+        "description": "Asserted when the watchdog limit is exceeded and timeout handling is entered."
+      },
+      {
+        "name": "REQUEST_ISSUED_IRQ",
+        "description": "Optional pulse-style notification that a compact request packet has been launched for the external surrogate service."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Hold reset asserted, then deassert reset_n synchronously.",
+      "Program CFG_WINDOW with MODE_ENABLE=0 while loading WATCHDOG_LIMIT and FRESHNESS_LIMIT.",
+      "Program command bounds, geometry descriptor ID, profile selector, and HOLD_LAST_GOOD_ENABLE through CFG_WINDOW and CFG_EXT0.",
+      "Clear any stale status by writing 1s to FAULT_CLEAR fields as needed.",
+      "Set MODE_ENABLE=1 after configuration is stable."
+    ],
+    "polling_sequence": [
+      "Poll STATUS_WINDOW for STATUS_REQUEST_PENDING, STATUS_RESPONSE_VALID, STATUS_STALE_DETECTED, STATUS_TIMEOUT_DETECTED, STATUS_FALLBACK_ACTIVE, STATUS_FAULT_LATCHED, and STATUS_CLAMP_APPLIED.",
+      "Optionally read REQ_PACKET_LO/HI and REQUEST_STATUS to debug outbound request content and handshake state.",
+      "If fault or timeout is reported, write FAULT_CLEAR to clear sticky indicators after the external condition is resolved."
+    ],
+    "irq_sequence": [
+      "On FAULT_LATCHED_IRQ or TIMEOUT_IRQ, stop issuing new requests until software has observed the fault context and, if appropriate, adjusted configuration or cleared the fault.",
+      "On REQUEST_ISSUED_IRQ, correlate the launch event with external service handling of the same request semantics.",
+      "After handling the event, resume polling STATUS_WINDOW until the controller returns to a ready state."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "No new hierarchy or ports were invented.",
+    "The register map uses the abstract firmware-visible register window implied by the spec and preserves the required 64-bit configuration/status access contract.",
+    "Wider values are exposed only via split registers or bounded readbacks, not as wide external pins."
+  ]
+}
