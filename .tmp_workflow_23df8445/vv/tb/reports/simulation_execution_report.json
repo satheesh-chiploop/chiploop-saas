@@ -1,0 +1,191 @@
+{
+  "type": "simulation_execution_report",
+  "manifest_path": "backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/simulation_manifest.json",
+  "tests": [
+    "smoke_test",
+    "constrained_random_sanity"
+  ],
+  "seeds": [
+    1
+  ],
+  "pass": 2,
+  "fail": 0,
+  "coverage_json_present": true,
+  "coverage_md_present": true,
+  "code_coverage_json_present": true,
+  "code_coverage": {
+    "type": "code_coverage_summary",
+    "tool": "verilator_coverage",
+    "status": "ok",
+    "coverage_dat_files": [
+      "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/coverage.dat"
+    ],
+    "line_coverage_pct": 44.99,
+    "branch_coverage_pct": 0.75,
+    "condition_coverage_pct": 0.75,
+    "toggle_coverage_pct": 3.47,
+    "condition_source": "verilator_lcov_branch_proxy",
+    "toggle_source": "verilator_coverage_annotate_points",
+    "returncode": 0,
+    "stdout_tail": [],
+    "stderr_tail": [],
+    "tool_execution": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "code_coverage_lcov",
+      "tool": "/usr/local/bin/verilator_coverage",
+      "executable": "/usr/local/bin/verilator_coverage",
+      "command": [
+        "/usr/local/bin/verilator_coverage",
+        "--write-info",
+        "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/code_coverage.info",
+        "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/coverage.dat"
+      ],
+      "cwd": "backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-11T16:17:17.440289+00:00",
+      "ended_at": "2026-08-11T16:17:17.566159+00:00",
+      "elapsed_ms": 125
+    },
+    "lcov_info_path": "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/code_coverage.info",
+    "line_found": 529,
+    "line_hit": 238,
+    "branch_found": 7829,
+    "branch_hit": 59,
+    "condition_found": 7829,
+    "condition_hit": 59,
+    "toggle_found": 7686,
+    "toggle_hit": 267,
+    "annotate_returncode": 0,
+    "annotate_stdout_tail": [
+      "Total coverage (159/529) 30.00%",
+      "See lines with '%00' in /root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/verilator_coverage_annotated"
+    ],
+    "annotate_stderr_tail": [],
+    "annotate_tool_execution": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "code_coverage_annotate",
+      "tool": "/usr/local/bin/verilator_coverage",
+      "executable": "/usr/local/bin/verilator_coverage",
+      "command": [
+        "/usr/local/bin/verilator_coverage",
+        "--annotate",
+        "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/verilator_coverage_annotated",
+        "--annotate-points",
+        "--annotate-all",
+        "--annotate-min",
+        "1",
+        "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/coverage.dat"
+      ],
+      "cwd": "backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb",
+      "returncode": 0,
+      "stdout": "Total coverage (159/529) 30.00%\nSee lines with '%00' in /root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/verilator_coverage_annotated\n",
+      "stderr": "",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-11T16:17:17.578799+00:00",
+      "ended_at": "2026-08-11T16:17:17.705305+00:00",
+      "elapsed_ms": 126
+    },
+    "toggle_annotation_dir": "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/verilator_coverage_annotated",
+    "missed_toggle_points": [
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=rst_n:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=enable:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=enable:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=mode_select[0]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=mode_select[0]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=mode_select[1]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=mode_select[1]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=mode_select[2]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=mode_select[2]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[0]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[0]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[10]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[10]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[11]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[11]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[12]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[12]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[13]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[13]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      },
+      {
+        "file": "adaptive_aero_control_validator.v",
+        "point": "comment=max_cmd[14]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_validator"
+      }
+    ]
+  },
+  "toolchain": {
+    "simulator": "verilator",
+    "code_coverage": "verilator_coverage"
+  },
+  "artifacts": {
+    "functional_coverage_summary": "backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/functional_coverage_summary.json",
+    "functional_coverage_md": "backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/COVERAGE.md",
+    "code_coverage_summary": "backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/code_coverage_summary.json",
+    "code_coverage_info": "backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/code_coverage.info",
+    "simulation_execution_summary": "backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/simulation_execution_summary.json",
+    "sim_execution_md": "backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/vv/tb/reports/SIM_EXECUTION.md"
+  }
+}

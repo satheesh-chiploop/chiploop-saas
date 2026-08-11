@@ -18,6 +18,7 @@ type TopNavProps = {
   showAdmin?: boolean;
   maxWidthClass?: string;
   className?: string;
+  compact?: boolean;
 };
 
 const handwrittenNavFont = "font-['Segoe_Print','Bradley_Hand','Comic_Sans_MS',cursive]";
@@ -98,6 +99,7 @@ export default function TopNav({
   showAdmin = false,
   maxWidthClass = "max-w-none",
   className = "sticky top-0 z-50",
+  compact = false,
 }: TopNavProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -155,17 +157,17 @@ export default function TopNav({
 
   return (
     <nav className={`${className} border-b border-slate-800 bg-slate-950/90 backdrop-blur`}>
-      <div className={`mx-auto flex min-w-0 ${maxWidthClass} items-center justify-between gap-5 px-4 py-3.5 sm:px-8 sm:py-4 xl:px-10`}>
+      <div className={`mx-auto flex min-w-0 ${maxWidthClass} items-center justify-between ${compact ? "gap-3 px-4 py-2.5 sm:px-6 sm:py-3 xl:px-8" : "gap-5 px-4 py-3.5 sm:px-8 sm:py-4 xl:px-10"}`}>
         <button
           onClick={() => router.push("/")}
-          className="group flex shrink-0 items-center gap-2 text-[1.75rem] font-black text-cyan-300 sm:gap-3 sm:text-[2.15rem]"
+          className={`group flex shrink-0 items-center font-black text-cyan-300 ${compact ? "gap-1.5 text-[1.55rem] sm:gap-2 sm:text-[1.85rem]" : "gap-2 text-[1.75rem] sm:gap-3 sm:text-[2.15rem]"}`}
           aria-label="ChipLoop home"
         >
           <AnimatedTesseractLogo />
           <span className={`hidden ${handwrittenNavFont} leading-none min-[380px]:inline`}>ChipLoop</span>
         </button>
 
-        <div className="flex min-w-0 flex-1 items-center justify-start gap-5 overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-6 sm:pb-0 xl:gap-7 2xl:gap-8">
+        <div className={`flex min-w-0 flex-1 items-center justify-start overflow-x-auto pb-1 sm:w-auto sm:flex-nowrap sm:justify-end sm:pb-0 ${compact ? "gap-3 sm:gap-4 xl:gap-5" : "gap-5 sm:gap-6 xl:gap-7 2xl:gap-8"}`}>
           {showPlanBadge ? <PlanCreditBadge /> : null}
           {links.filter((link) => link.show).map((link) => (
             <button
@@ -173,10 +175,10 @@ export default function TopNav({
               onClick={() => router.push(link.href)}
               className={
                 link.key === "demo"
-                  ? `whitespace-nowrap rounded-lg bg-cyan-400 px-5 py-2.5 ${handwrittenNavFont} text-[1.34rem] font-black text-slate-950 transition hover:bg-cyan-300 sm:px-6`
+                  ? `whitespace-nowrap rounded-lg bg-cyan-400 ${compact ? "px-3.5 py-2 text-[1.05rem] sm:px-4" : "px-5 py-2.5 text-[1.34rem] sm:px-6"} ${handwrittenNavFont} font-black text-slate-950 transition hover:bg-cyan-300`
                   : current === link.key
-                  ? activeNavButtonClass
-                  : navButtonClass
+                  ? compact ? `${activeNavButtonClass} !text-[1.05rem]` : activeNavButtonClass
+                  : compact ? `${navButtonClass} !text-[1.05rem]` : navButtonClass
               }
             >
               {link.label}
@@ -189,14 +191,14 @@ export default function TopNav({
                 setDisplayName(null);
                 router.push("/login");
               }}
-              className={`whitespace-nowrap rounded-lg border border-cyan-400/30 px-5 py-2.5 ${handwrittenNavFont} text-[1.34rem] font-black text-cyan-300 transition hover:bg-slate-900 hover:text-cyan-100 sm:px-6`}
+              className={`whitespace-nowrap rounded-lg border border-cyan-400/30 ${compact ? "px-3.5 py-2 text-[1.05rem] sm:px-4" : "px-5 py-2.5 text-[1.34rem] sm:px-6"} ${handwrittenNavFont} font-black text-cyan-300 transition hover:bg-slate-900 hover:text-cyan-100`}
             >
               <span className="mr-2 text-cyan-200">Hi, {displayName}</span>Logout
             </button>
           ) : (
             <button
               onClick={() => router.push(`/login?next=${encodeURIComponent(next)}`)}
-              className={`whitespace-nowrap ${handwrittenNavFont} text-[1.34rem] font-black text-cyan-300 transition hover:text-cyan-100`}
+              className={`whitespace-nowrap ${handwrittenNavFont} ${compact ? "text-[1.05rem]" : "text-[1.34rem]"} font-black text-cyan-300 transition hover:text-cyan-100`}
             >
               Login
             </button>

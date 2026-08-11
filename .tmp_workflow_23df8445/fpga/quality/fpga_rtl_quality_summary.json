@@ -1,0 +1,102 @@
+{
+  "agent": "FPGA RTL Quality Gate Agent",
+  "pass1": {
+    "rtl_file_count": 6,
+    "status": "pass",
+    "suffix": "pass1",
+    "tools": {
+      "iverilog": {
+        "available": true,
+        "cmd": [
+          "iverilog",
+          "-g2012",
+          "-tnull",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_csr.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_fsm.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_transport.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_validator.v"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/quality/iverilog_pass1.log",
+        "ok": true,
+        "returncode": 0
+      },
+      "verilator": {
+        "available": true,
+        "cmd": [
+          "verilator",
+          "--lint-only",
+          "-Wall",
+          "-Wno-fatal",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_csr.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_fsm.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_transport.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_validator.v"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/quality/verilator_pass1.log",
+        "ok": true,
+        "returncode": 0
+      }
+    }
+  },
+  "pass2": {
+    "rtl_file_count": 6,
+    "status": "pass",
+    "suffix": "pass2",
+    "tools": {
+      "iverilog": {
+        "available": true,
+        "cmd": [
+          "iverilog",
+          "-g2012",
+          "-tnull",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_csr.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_fsm.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_transport.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_validator.v"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/quality/iverilog_pass2.log",
+        "ok": true,
+        "returncode": 0
+      },
+      "verilator": {
+        "available": true,
+        "cmd": [
+          "verilator",
+          "--lint-only",
+          "-Wall",
+          "-Wno-fatal",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_csr.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_fsm.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_transport.v",
+          "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_validator.v"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/quality/verilator_pass2.log",
+        "ok": true,
+        "returncode": 0
+      }
+    }
+  },
+  "repair": {
+    "applied": false,
+    "enabled": true
+  },
+  "repair_enabled": true,
+  "rtl_file_count": 6,
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_csr.v",
+    "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_fsm.v",
+    "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top.v",
+    "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv",
+    "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_transport.v",
+    "/root/chiploop-backend/backend/workflows/23df8445-70ed-4bc4-9bb2-ca69e91f0d75/fpga/src/upstream/adaptive_aero_control_validator.v"
+  ],
+  "status": "pass"
+}

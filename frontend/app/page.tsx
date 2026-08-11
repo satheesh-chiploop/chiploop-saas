@@ -302,7 +302,7 @@ function LandingPageContent() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-slate-950 text-white">
-      <TopNav current="home" showMarketplace showSettings={false} className="fixed left-0 top-0 z-50 w-full" />
+      <TopNav current="home" showMarketplace showSettings={false} compact className="fixed left-0 top-0 z-50 w-full" />
 
       <section className="w-full border-b border-slate-800 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.16),transparent_34%),linear-gradient(180deg,#020617_0%,#0f172a_62%,#020617_100%)]">
         <div className={`${landingShellClass} flex flex-col items-center px-4 pb-8 pt-24 text-center sm:px-6 sm:pb-10 sm:pt-28 lg:pt-28`}>
