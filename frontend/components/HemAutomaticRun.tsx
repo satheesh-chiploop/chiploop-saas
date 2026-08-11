@@ -92,9 +92,22 @@ export function systemHemStageOptions(goal: SystemHemGoal, toggles: SystemHemSta
   }));
 }
 
-const HEM_STAGE_ORDER = ["dqa", "verification", "firmware", "software", "validation", "product", "synthesis", "tapeout"];
+const HEM_STAGE_ORDER = [
+  "rtl",
+  "dqa",
+  "verification",
+  "fpga-explorer",
+  "fpga-bitstream",
+  "firmware",
+  "software",
+  "validation",
+  "product",
+  "synthesis",
+  "tapeout",
+];
 
 function labelFromStage(stage: string): string {
+  if (stage === "rtl" || stage === "arch2rtl") return "RTL Generation";
   if (stage === "dqa") return "DQA";
   if (stage === "verification" || stage === "verify") return "Verification";
   if (stage === "firmware") return "Firmware";
@@ -108,17 +121,21 @@ function labelFromStage(stage: string): string {
 
 function stageFromLabel(label: string): string {
   const normalized = label.trim().toLowerCase();
+  if (normalized === "rtl" || normalized === "rtl generation" || normalized === "arch2rtl") return "rtl";
   if (normalized === "dqa" || normalized === "system dqa") return "dqa";
   if (normalized === "verification" || normalized === "verify" || normalized === "system sim") return "verification";
   if (
     normalized === "firmware" ||
     normalized === "system firmware" ||
+    normalized === "device layer / firmware" ||
     normalized === "device software through product demo" ||
     normalized === "host driver through product demo"
   ) return "firmware";
   if (normalized === "software" || normalized === "system software") return "software";
   if (normalized === "validation" || normalized === "co-simulation / validation" || normalized === "co-simulation" || normalized === "system validation") return "validation";
   if (normalized === "product demo" || normalized === "product app") return "product";
+  if (normalized === "fpga target explorer" || normalized === "fpga explorer" || normalized === "fpga_target_explorer") return "fpga-explorer";
+  if (normalized === "fpga rtl to bitstream" || normalized === "fpga bitstream" || normalized === "fpga_bitstream") return "fpga-bitstream";
   if (normalized === "synthesis" || normalized === "arch2synthesis" || normalized === "system synthesis") return "synthesis";
   if (normalized === "tapeout" || normalized === "arch2tapeout" || normalized === "system pd") return "tapeout";
   return normalized.replace(/\s+/g, "-");
@@ -264,7 +281,7 @@ export function HemAutomaticRunControls({
                 onChange={(event) => onGoalChange(event.target.value)}
                 className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-semibold text-slate-100"
               >
-                {goalOptions.map((option) => (
+                {(goalOptions || []).map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -278,7 +295,7 @@ export function HemAutomaticRunControls({
             <div className="rounded-lg border border-slate-800 bg-black/20 p-3">
               <div className="text-xs font-semibold uppercase text-slate-400">Allowed automatic stages</div>
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                {stageOptions.map((stage) => (
+                {(stageOptions || []).map((stage) => (
                   <label key={stage.key} className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2 text-xs text-slate-300">
                     <input
                       type="checkbox"
