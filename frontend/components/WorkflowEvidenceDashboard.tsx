@@ -1089,6 +1089,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         "fpga/target_explorer/fpga_explorer_io_mapping.json",
         "fpga_handoff_ingest.json",
         "fpga/handoff/fpga_handoff_ingest.json",
+        "fpga_serial_transport.json",
+        "fpga/target_explorer/fpga_serial_transport.json",
+        "fpga_spi_transport_contract.json",
+        "fpga/target_explorer/interface_adapter/fpga_spi_transport_contract.json",
       ],
       fpga: [
         "fpga_dashboard.json",
@@ -1247,6 +1251,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const physicsModel = record(summary.physics_model || evidence["selected_physics_model.json"]);
       const qualification = record(summary.model_qualification || evidence["surrogate_mapping.json"]);
       const partition = record(summary.partition || evidence["partition_plan.json"]);
+      const partitionPhases = record(partition.partition_phases);
+      const targetRefinement = record(partitionPhases.target_refinement);
+      const firmwareGate = record(targetRefinement.firmware_gate);
       const execution = record(summary.physics_execution);
       const architecture = record(execution.architecture || evidence["model_generated_architecture.json"]);
       const digitalIpSpec = record(evidence["digital_ip_spec.json"] || evidence["physical_ai/surrogate_architecture/digital_ip_spec.json"]);
@@ -1272,6 +1279,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <div className="rounded-lg border border-violet-400/25 bg-violet-950/10 p-4">
               <div className="text-sm font-semibold text-white">System partition</div>
               <div className="mt-2 text-sm text-slate-300">Software, firmware, GPU-service, and FPGA/ASIC jobs are explicit and independently traceable.</div>
+              <div className="mt-2 text-xs text-slate-500">Functional partition: {firstString(record(partitionPhases.functional).status, "completed").replaceAll("_", " ")} | Target refinement: {firstString(targetRefinement.status, "pending").replaceAll("_", " ")}</div>
+              <div className="mt-2 text-xs text-slate-500">Host mode: {firstString(targetRefinement.selected_mode, targetRefinement.requested_mode, "automatic").replaceAll("_", " ")} | Firmware: {Boolean(firmwareGate.ready) ? "ready" : "waiting for platform contract"}</div>
               <div className="mt-3 text-xs text-slate-500">{array(partition.jobs).length} jobs · Decision: {firstString(partition.decision, "pending")} · {firstString(partition.generation_status, "deterministic").replaceAll("_", " ")}</div>
               {partition.generation_warning ? <div className="mt-2 text-xs text-amber-300">Model partitioning fallback used; inspect the partition artifact before implementation.</div> : null}
             </div>
@@ -1685,6 +1694,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       const recommendationDetails = record(explorer.recommendation_details);
       const continuation = record(explorer.continuation);
       const ioMapping = record(ev("fpga_explorer_io_mapping.json", "fpga/target_explorer/fpga_explorer_io_mapping.json"));
+      const serialTransport = record(ev("fpga_serial_transport.json", "fpga/target_explorer/fpga_serial_transport.json"));
+      const transportContract = record(ev("fpga_spi_transport_contract.json", "fpga/target_explorer/interface_adapter/fpga_spi_transport_contract.json"));
       const ioMappings = array(ioMapping.mappings).map(record);
       const targetMhz = firstNumber(explorer.target_frequency_mhz);
       const maxFmax = Math.max(...results.map((item) => firstNumber(item.best_frequency_mhz) || 0), targetMhz || 1);
@@ -1751,6 +1762,9 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             <Stat title="Candidates" value={firstNumber(explorer.candidate_count)} />
             <Stat title="Unique Implementations" value={firstNumber(explorer.unique_implementation_count)} />
             <Stat title="Primary Recommendation" value={firstString(explorer.selected_recommendation, "not available")} />
+            <Stat title="Host Transport" value={firstString(continuation.host_transport, serialTransport.transport, "not selected").replaceAll("_", " ")} />
+            <Stat title="Protocol Contract" value={Boolean(continuation.transport_contract_ready || transportContract.schema) ? "ready" : "not generated"} />
+            <Stat title="Host Driver" value={continuation.host_driver_ready === true ? "ready" : "not generated"} />
           </div>
 
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">

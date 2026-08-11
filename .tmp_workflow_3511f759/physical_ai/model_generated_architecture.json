@@ -1,0 +1,178 @@
+{
+  "architecture_decisions": [
+    "Use an FPGA-first control architecture with a compact memory-mapped register interface rather than exposing geometry arrays or flow fields as top-level ports.",
+    "Keep the surrogate model outside RTL; RTL only handles transport, buffering, request tracking, validation, timeout management, and actuator command generation.",
+    "Adopt a CPU reference execution path for architecture-definition mode, with forward compatibility to future GPU/NIM execution through the same register protocol.",
+    "Limit top-level I/O to scalar control/status signals and a 64-bit-wide register window to remain implementation-friendly and below the 256 scalar-equivalent I/O target.",
+    "Represent vehicle geometry as a pointer/descriptor into host-managed memory or external software, not as RTL-managed bulk payload storage.",
+    "Implement stale-data rejection by sequence numbering, age limits, and response-validity checks before any actuator update is committed.",
+    "Implement command clamping in hardware against configured min/max actuator limits and a safe fallback state for any invalid, missing, or late model response.",
+    "Use a small FSM for request issuance, waiting, response capture, validation, and fallback arbitration.",
+    "Preserve a clean software/hardware split: software packages the DrivAerML STL geometry and flow conditions, while RTL manages deterministic control safety and timing.",
+    "For FPGA prototype, no Sky130 hard macro is used; payload buffering should rely on FPGA BRAM or host-side memory, with only small control registers in RTL."
+  ],
+  "blocks": [
+    {
+      "function": "Holds configuration, operating limits, enable bits, timeout thresholds, sequence counters, and status flags.",
+      "name": "control_register_file"
+    },
+    {
+      "function": "Captures flow-condition inputs and geometry descriptor fields, assembles a compact inference request, and issues a transaction toward the software/GPU transport layer.",
+      "name": "request_formatter"
+    },
+    {
+      "function": "Accepts a compact model-response packet, extracts drag/lift or downstream control-relevant outputs, and checks validity markers and sequence numbers.",
+      "name": "response_receiver"
+    },
+    {
+      "function": "Tracks outstanding requests, compares response age against a programmable timeout, and triggers rejection or fallback on late data.",
+      "name": "stale_timeout_monitor"
+    },
+    {
+      "function": "Constrains actuator commands to configured bounds and enforces safe default outputs when data is invalid, stale, or missing.",
+      "name": "safety_clamp_unit"
+    },
+    {
+      "function": "Implements safe fallback selection, hold-last-good behavior where permitted, and fault annunciation when model service is unavailable.",
+      "name": "fallback_fsm"
+    },
+    {
+      "function": "Converts validated control decisions into a compact actuator command packet for the active-aero mechanism driver.",
+      "name": "actuator_command_pack"
+    },
+    {
+      "function": "Aggregates error conditions such as stale response, timeout, malformed packet, out-of-range command, and communication fault.",
+      "name": "status_fault_manager"
+    },
+    {
+      "function": "Provides the external register-memory window for software to write requests and read responses/status without exposing bulk tensors at the top level.",
+      "name": "host_interface_bridge"
+    }
+  ],
+  "interfaces": [
+    {
+      "direction": "input",
+      "name": "clk",
+      "type": "clock",
+      "width": 1
+    },
+    {
+      "direction": "input",
+      "name": "rst_n",
+      "type": "reset",
+      "width": 1
+    },
+    {
+      "direction": "input",
+      "name": "reg_addr",
+      "type": "register_window_address",
+      "width": 8
+    },
+    {
+      "direction": "input",
+      "name": "reg_wdata",
+      "type": "register_window_write_data",
+      "width": 64
+    },
+    {
+      "direction": "output",
+      "name": "reg_rdata",
+      "type": "register_window_read_data",
+      "width": 64
+    },
+    {
+      "direction": "input",
+      "name": "reg_we",
+      "type": "register_write_strobe",
+      "width": 1
+    },
+    {
+      "direction": "input",
+      "name": "reg_re",
+      "type": "register_read_strobe",
+      "width": 1
+    },
+    {
+      "direction": "output",
+      "name": "req_valid",
+      "type": "model_request_valid",
+      "width": 1
+    },
+    {
+      "direction": "input",
+      "name": "req_ready",
+      "type": "model_request_ready",
+      "width": 1
+    },
+    {
+      "direction": "output",
+      "name": "req_payload",
+      "type": "compact_model_request_payload",
+      "width": 128
+    },
+    {
+      "direction": "input",
+      "name": "rsp_valid",
+      "type": "model_response_valid",
+      "width": 1
+    },
+    {
+      "direction": "output",
+      "name": "rsp_ready",
+      "type": "model_response_ready",
+      "width": 1
+    },
+    {
+      "direction": "input",
+      "name": "rsp_payload",
+      "type": "compact_model_response_payload",
+      "width": 128
+    },
+    {
+      "direction": "output",
+      "name": "actuator_cmd",
+      "type": "actuator_command_bus",
+      "width": 32
+    },
+    {
+      "direction": "output",
+      "name": "actuator_cmd_valid",
+      "type": "actuator_command_valid",
+      "width": 1
+    },
+    {
+      "direction": "output",
+      "name": "fault",
+      "type": "fault_indicator",
+      "width": 1
+    }
+  ],
+  "product_name": "Intelligent Active Aerodynamics Controller",
+  "product_summary": "FPGA prototype for an intelligent active-aerodynamics controller operating from 20 to 55 m/s using a CPU reference path for DoMINO-based aerodynamics evaluation. The hardware does not implement the surrogate model itself; it provides a bounded request/response interface to software or GPU inference, validates inputs, detects stale or timed-out model responses, clamps actuator commands, and falls back to a safe aerodynamic mode when model data is invalid or unavailable.",
+  "rtl_spec_text": "Module adaptive_aero_control_top shall be a synthesizable FPGA-oriented RTL top level for active aerodynamic control supervision. The module shall not implement NVIDIA DoMINO inference, CFD, mesh processing, or tensor arithmetic. Instead, it shall provide a deterministic transport-and-safety wrapper around an external software or GPU service that performs the surrogate evaluation.\n\n1. Clocking and reset:\n- Inputs clk and rst_n shall clock and reset all internal state.\n- Reset shall initialize the controller into safe fallback state, clear outstanding request state, clear fault latches, and set actuator command output to a configured safe default.\n\n2. External register window:\n- The module shall expose an implementation-friendly register window using reg_addr[7:0], reg_wdata[63:0], reg_rdata[63:0], reg_we, and reg_re.\n- The register window shall be used to configure operating parameters including request enable, timeout limit, command clamp limits, fallback mode select, and sequence counters.\n- The register window shall also expose status bits for busy, request_pending, response_valid, timeout_fault, stale_fault, malformed_response_fault, clamp_active, and fallback_active.\n- The register file shall be small and synthesizable; it shall not contain bulk geometry storage or flow-field storage.\n\n3. Model transport interface:\n- The top level shall provide a bounded streaming request/response interface with no port wider than 128 bits.\n- req_payload[127:0] shall carry a compact descriptor containing at minimum: request sequence ID, flow-condition encoding, geometry descriptor or host pointer token, operating-point identifier, and control flags.\n- rsp_payload[127:0] shall carry a compact result packet containing at minimum: response sequence ID, validity flags, compact predicted aerodynamic metrics, and any service status code required by the host software.\n- req_valid shall assert when a new request is available; req_ready shall qualify acceptance by the downstream transport.\n- rsp_valid shall be sampled only when rsp_ready is asserted by the module.\n\n4. Request handling:\n- When enabled and not stalled, the module shall assemble a request packet from programmed configuration and issue it once per control cycle or on host command.\n- The module shall track the outstanding request sequence ID and timestamp counter.\n- The module shall prevent issuance of a new request that would overwrite an outstanding unacknowledged request unless a programmable overwrite mode explicitly allows it.\n\n5. Response validation:\n- The module shall verify that rsp_payload sequence ID matches the outstanding request.\n- The module shall reject responses that are stale according to the configured timeout threshold, malformed according to protocol validity bits, or received when no request is pending.\n- The module shall assert a fault when any response validation rule fails.\n- The module shall only forward validated aerodynamic outputs into the command-selection path.\n\n6. Safety and fallback:\n- If no valid response arrives before timeout, the module shall enter fallback mode.\n- Fallback mode shall drive a safe actuator command, which may be hold-last-good if explicitly configured and only if safety limits permit; otherwise it shall drive a neutral or minimum-drag safe default.\n- The module shall clamp all actuator commands to programmable minimum and maximum bounds.\n- The module shall provide fault signaling and status latch behavior until software clears the fault.\n\n7. Actuator command generation:\n- The module shall convert validated aerodynamic decisions into a compact actuator command bus of 32 bits or fewer.\n- The command generator shall support a safe-default command, a validated model-driven command, and a fallback command.\n- The command path shall include saturation logic and validity gating before asserting actuator_cmd_valid.\n\n8. Storage and implementation constraints:\n- For the FPGA prototype, payload storage shall use FPGA BRAM or host-managed memory access; no Sky130 hard macro shall be instantiated.\n- The design shall not infer bulk payload memory using register arrays or generic SRAM modules in the FPGA top level.\n- Only small control/status registers, counters, FSM state, and shadow copies of compact packet fields may be implemented in flip-flops.\n\n9. Protocol and integration assumptions:\n- The software side is responsible for packaging vehicle geometry from DrivAerML STL inputs and flow conditions into the compact request payload.\n- The hardware side is responsible for transport, buffering of compact packets, validation, timeout enforcement, and actuator command safety.\n- The architecture shall remain forward-compatible with future NVIDIA-hosted NIM or ChipLoop GPU worker execution using the same request/response contract.\n\n10. Determinism and observability:\n- The module shall provide sufficient status visibility for host software to reconstruct request issuance, response arrival, timeout events, stale-data rejection, and clamp activity.\n- Any fault shall be observable through dedicated status bits and the fault output.\n- The design shall be deterministic under identical request timing and register programming.",
+  "safety_requirements": [
+    "Reject any response that is stale, out of sequence, malformed, or inconsistent with the outstanding request ID.",
+    "Reject any command when the response age exceeds the programmable timeout threshold.",
+    "Clamp actuator outputs to programmable minimum and maximum limits before driving the actuator command bus.",
+    "Enter a safe fallback mode when the model path is unavailable, the request is not acknowledged, or the response is invalid.",
+    "Do not update actuator outputs from a response unless all validity checks pass.",
+    "Maintain a clear fault status until software explicitly acknowledges and clears the condition.",
+    "On reset, drive the actuator to a safe default and clear outstanding request tracking.",
+    "Do not rely on unbounded buffers, inferred payload FIFOs, or large register arrays for payload storage in the FPGA prototype."
+  ],
+  "top_module": "adaptive_aero_control_top",
+  "verification_goals": [
+    "Verify reset enters safe fallback state and clears all outstanding request tracking.",
+    "Verify register reads and writes correctly program timeout, clamp limits, enable bits, and fallback mode.",
+    "Verify request issuance uses the compact 128-bit payload and never exposes bulk geometry or flow fields on top-level pins.",
+    "Verify a valid response with matching sequence ID is accepted and propagates to actuator command generation.",
+    "Verify stale responses are rejected and raise the appropriate fault status.",
+    "Verify timeout expiration triggers fallback mode and safe actuator output.",
+    "Verify malformed or unexpected responses are rejected without updating actuator commands.",
+    "Verify actuator command clamping is enforced for both model-driven and fallback commands.",
+    "Verify no new request overwrites an outstanding request unless overwrite mode is explicitly enabled.",
+    "Verify fault latches remain asserted until software clears them.",
+    "Verify the design stays within the compact interface constraint and does not exceed the top-level I/O budget.",
+    "Verify FPGA implementation does not instantiate Sky130 macros and does not infer bulk payload storage in flip-flop arrays."
+  ]
+}

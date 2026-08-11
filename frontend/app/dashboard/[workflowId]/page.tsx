@@ -5,20 +5,45 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import TopNav from "@/components/TopNav";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 
-type DashboardStage = "arch2rtl" | "dqa" | "smoke" | "synthesis" | "tapeout" | "verification" | "embedded" | "software" | "validation" | "product";
+type DashboardStage = "physical_ai" | "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "fpga" | "fpga_target_explorer" | "verification" | "embedded" | "software" | "validation" | "product";
 
 const VALID_STAGES = new Set<DashboardStage>([
+  "physical_ai",
   "arch2rtl",
   "dqa",
+  "rtl_review",
+  "constraint_review",
+  "timing_debug",
   "smoke",
   "synthesis",
   "tapeout",
+  "fpga",
+  "fpga_target_explorer",
   "verification",
   "embedded",
   "software",
   "validation",
   "product",
 ]);
+
+const STAGE_LABELS: Record<DashboardStage, string> = {
+  physical_ai: "Physical AI / Application Intelligence",
+  arch2rtl: "RTL Generation",
+  dqa: "Design Quality",
+  rtl_review: "RTL Review",
+  constraint_review: "Constraint Review",
+  timing_debug: "Timing Debug",
+  smoke: "Smoke Verification",
+  synthesis: "Synthesis",
+  tapeout: "ASIC Implementation",
+  fpga: "FPGA Implementation",
+  fpga_target_explorer: "FPGA Target Explorer",
+  verification: "RTL Verification",
+  embedded: "Firmware",
+  software: "Software",
+  validation: "Validation",
+  product: "Product",
+};
 
 function parseStage(value: string | null): DashboardStage {
   return value && VALID_STAGES.has(value as DashboardStage) ? value as DashboardStage : "arch2rtl";
@@ -50,7 +75,7 @@ export default function WorkflowDashboardPage() {
             <div className="text-xs font-semibold uppercase text-cyan-300">Workflow Dashboard</div>
             <h1 className="mt-2 text-3xl font-bold tracking-normal text-white">Dashboard Results</h1>
             <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-slate-300">
-              Workflow {workflowId}{app ? ` | ${app}` : ""} | {stage}
+              Workflow {workflowId}{app ? ` | ${app}` : ""} | {STAGE_LABELS[stage]}
             </p>
           </div>
           <a

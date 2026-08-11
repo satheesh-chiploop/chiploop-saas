@@ -1,0 +1,280 @@
+{
+  "application": "intelligent_active_aerodynamics_controller",
+  "decision": "Partitioned for fpga_prototype as an FPGA-oriented transport-and-safety wrapper around an external CPU/GPU software surrogate service. The DoMINO surrogate remains in GPU/CPU software because the qualification run did not prove hardware-deployable inference. Hardware handles deterministic control supervision, validation, timeout handling, command clamping, and safe fallback; software handles STL geometry packaging, reference evaluation, surrogate execution, and optimization/validation analysis.",
+  "decision_factors": [
+    "Selected model nvidia.domino.automotive_aero is provisionally compatible but not accuracy-qualified and explicitly requires a GPU worker/remote NIM runtime.",
+    "No evidence was provided that the surrogate is hardware-deployable, so it remains in GPU/CPU software.",
+    "The architecture specifies an FPGA-first control wrapper that does not implement the surrogate, only transport, validation, clamping, and fallback.",
+    "Acceptance gates require deterministic command bounding, stale-data rejection, timeout handling, and safe fallback, which are best enforced in FPGA logic.",
+    "Transparent reference computation is required for 100% of validation cases and is explicitly suited to CPU software for traceability.",
+    "STL geometry ingestion and DrivAerML-compatible packaging are software tasks due to parsing and host-memory handling needs.",
+    "Interface constraints favor compact register/packet protocols rather than large geometry tensors on hardware pins.",
+    "The implementation path is fpga_prototype, but the contract does not bind to a board or specific fabric.",
+    "Safety requirements mandate fault latching, safe default behavior, and independent fallback availability, which favors hardware enforcement of the last-mile control path.",
+    "Architecture optimization and validation traceability are design-time software activities rather than real-time hardware datapath functions."
+  ],
+  "generation_status": "model_generated",
+  "implementation_path": "fpga_prototype",
+  "interfaces": [
+    {
+      "name": "geometry_input",
+      "rationale": "STL handling requires parsing and host-side file/memory access.",
+      "responsibility": "Accept STL geometry input and provide validated geometry for reference and surrogate evaluation.",
+      "status": "software-facing",
+      "type": "data"
+    },
+    {
+      "name": "operating_condition_input",
+      "rationale": "Input acquisition and range normalization are host orchestration tasks.",
+      "responsibility": "Provide normalized stream-velocity values within 20-55 m/s to the control pipeline.",
+      "status": "software-facing",
+      "type": "data"
+    },
+    {
+      "name": "reference_output",
+      "rationale": "The reference path is required to be transparent and traceable.",
+      "responsibility": "Deliver transparent baseline outputs for validation and comparison.",
+      "status": "cpu_software-facing",
+      "type": "data"
+    },
+    {
+      "name": "control_command_output",
+      "rationale": "Actuator command generation and clamping are deterministic safety functions assigned to hardware.",
+      "responsibility": "Emit bounded actuator commands only after validity, freshness, and timeout checks pass.",
+      "status": "fpga-driven",
+      "type": "data"
+    },
+    {
+      "name": "safety_status_output",
+      "rationale": "Host integration requires explicit observability from the hardware supervisor.",
+      "responsibility": "Report fault, freshness, timeout, clamp, and fallback states to the host control stack.",
+      "status": "fpga-driven",
+      "type": "data"
+    },
+    {
+      "name": "fallback_control_interface",
+      "rationale": "Safe fallback must be available independently of model output validity.",
+      "responsibility": "Assert safe hold or predefined safe actuator state when validity cannot be guaranteed.",
+      "status": "fpga-driven",
+      "type": "data"
+    },
+    {
+      "name": "validation_telemetry",
+      "rationale": "Logging, audit, and test evidence collection are software-centric and should not burden the real-time path.",
+      "responsibility": "Collect logs and evidence for traceability, acceptance gating, and performance validation across the operating envelope.",
+      "status": "software-facing",
+      "type": "data"
+    },
+    {
+      "name": "compact_model_request_payload",
+      "rationale": "The architecture intentionally avoids exposing bulk geometry on top-level FPGA ports.",
+      "responsibility": "Carry compact request metadata such as sequence ID, flow-condition encoding, geometry token, operating-point ID, and control flags.",
+      "status": "fpga-software boundary",
+      "type": "data"
+    },
+    {
+      "name": "compact_model_response_payload",
+      "rationale": "Response validation relies on a compact, bounded protocol between FPGA supervision and the external service.",
+      "responsibility": "Return compact response metadata including sequence ID, validity, predicted metrics, and service status.",
+      "status": "fpga-software boundary",
+      "type": "data"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job_geometry_ingestion",
+      "inputs": [
+        "geometry_input",
+        "DrivAerML-compatible STL file"
+      ],
+      "latency_budget": "offline or pre-cycle; must complete before control-cycle request issuance",
+      "outputs": [
+        "validated_geometry_descriptor",
+        "geometry_metadata",
+        "geometry_validation_status"
+      ],
+      "rationale": "Geometry parsing and STL handling are not hardware-deployable in the provided architecture and are better kept in software with direct access to host-managed memory and file I/O.",
+      "responsibility": "Parse and validate STL geometry derived from DrivAerML reference geometry, perform structural readiness checks, and package a compact geometry descriptor or host pointer token for downstream use.",
+      "status": "planned",
+      "target": "software"
+    },
+    {
+      "id": "job_operating_condition_acquisition",
+      "inputs": [
+        "operating_condition_input"
+      ],
+      "latency_budget": "per evaluation/control cycle; sub-cycle on host side",
+      "outputs": [
+        "normalized_flow_condition",
+        "operating_point_id",
+        "range_check_status"
+      ],
+      "rationale": "Condition ingestion is a host/software concern because it is closely tied to orchestration, envelope validation, and request packaging.",
+      "responsibility": "Receive, normalize, and range-check stream velocity inputs across 20-55 m/s and convert them into compact operating-point encodings for the control path.",
+      "status": "planned",
+      "target": "software"
+    },
+    {
+      "id": "job_transparent_reference_evaluation",
+      "inputs": [
+        "validated_geometry_descriptor",
+        "normalized_flow_condition"
+      ],
+      "latency_budget": "validation-time / offline or nearline; must cover 100% of validation cases",
+      "outputs": [
+        "reference_output",
+        "reference_metrics",
+        "reference_trace"
+      ],
+      "rationale": "The architecture explicitly assigns the transparent reference path to CPU software for traceability and validation. This path must remain observable and easy to audit.",
+      "responsibility": "Compute the transparent baseline aerodynamic response/control estimate for every validation case and serve as the traceable reference path.",
+      "status": "planned",
+      "target": "cpu_software"
+    },
+    {
+      "id": "job_surrogate_evaluation",
+      "inputs": [
+        "compact_model_request_payload",
+        "validated_geometry_descriptor",
+        "normalized_flow_condition"
+      ],
+      "latency_budget": "bounded by control timeout threshold configured in hardware; service must respond within the programmable timeout",
+      "outputs": [
+        "compact_model_response_payload",
+        "surrogate_metrics",
+        "service_status"
+      ],
+      "rationale": "The selected model requires a GPU worker and remote NIM-style runtime; no evidence supports hardware deployment, so it stays in GPU/CPU software.",
+      "responsibility": "Execute the physics-based DoMINO surrogate in a remote GPU/CPU service using the compact request/response contract, without assuming RTL implementation.",
+      "status": "planned",
+      "target": "gpu_service"
+    },
+    {
+      "id": "job_control_partitioning",
+      "inputs": [
+        "reference_output",
+        "compact_model_response_payload",
+        "validation rules",
+        "safety rules"
+      ],
+      "latency_budget": "per control cycle; must produce inputs before hardware commit deadline",
+      "outputs": [
+        "control_policy_config",
+        "decision_intent",
+        "command_constraints"
+      ],
+      "rationale": "High-level partitioning and policy assembly are best handled in software, while hardware enforces deterministic safety constraints.",
+      "responsibility": "Separate estimation, decision logic, command shaping, validity checking, and safety supervision into explicit software responsibilities and generate compact control intent for hardware enforcement.",
+      "status": "planned",
+      "target": "software"
+    },
+    {
+      "id": "job_bounded_command_generation",
+      "inputs": [
+        "compact_model_response_payload",
+        "control_policy_config",
+        "register_programmed_limits",
+        "freshness status"
+      ],
+      "latency_budget": "single control-cycle latency; deterministic and bounded",
+      "outputs": [
+        "actuator_cmd",
+        "actuator_cmd_valid",
+        "clamp_status"
+      ],
+      "rationale": "This is the core real-time safety function explicitly mapped to FPGA in the architecture, with small FSM, clamp logic, and command packing.",
+      "responsibility": "Clamp actuator commands to configured min/max limits, gate updates on validity checks, and emit a compact actuator command bus only when all conditions pass.",
+      "status": "planned",
+      "target": "fpga"
+    },
+    {
+      "id": "job_freshness_and_timeout_monitoring",
+      "inputs": [
+        "req_valid",
+        "rsp_valid",
+        "rsp_payload",
+        "register_programmed_timeout",
+        "sequence counters"
+      ],
+      "latency_budget": "hard real-time; must resolve within the configured timeout window and before command commit",
+      "outputs": [
+        "stale_fault",
+        "timeout_fault",
+        "response_valid",
+        "fault",
+        "status_flags"
+      ],
+      "rationale": "The architecture and safety requirements assign freshness, stale-data, and timeout enforcement to deterministic hardware supervision.",
+      "responsibility": "Track request sequence numbers, response age, elapsed timeout, and stale-data conditions; reject invalid or late model responses and assert faults as needed.",
+      "status": "planned",
+      "target": "fpga"
+    },
+    {
+      "id": "job_safe_fallback_execution",
+      "inputs": [
+        "fault flags",
+        "fallback mode select",
+        "safe default configuration",
+        "last-good command state"
+      ],
+      "latency_budget": "immediate on fault detection; no additional cycle beyond detection",
+      "outputs": [
+        "fallback_control_interface",
+        "safe actuator command",
+        "fallback_active",
+        "latched fault state"
+      ],
+      "rationale": "Safe fallback must remain available independent of model validity, and the architecture explicitly places this in FPGA control supervision.",
+      "responsibility": "Drive safe hold or predefined safe actuator state when model data is invalid, stale, missing, or timed out; maintain fault latching until cleared by software.",
+      "status": "planned",
+      "target": "fpga"
+    },
+    {
+      "id": "job_validation_and_traceability_logging",
+      "inputs": [
+        "validation_telemetry",
+        "reference_output",
+        "actuator_cmd",
+        "fault/status flags"
+      ],
+      "latency_budget": "offline or nearline; must not delay control loop",
+      "outputs": [
+        "validation_records",
+        "traceability_report",
+        "acceptance_gate_evidence"
+      ],
+      "rationale": "Traceability and audit logging are richer software tasks and must support the documented acceptance gates and validation evidence.",
+      "responsibility": "Record inputs, intermediate states, reference outputs, control outputs, faults, clamp events, stale rejections, and fallback transitions for acceptance-gate evidence.",
+      "status": "planned",
+      "target": "software"
+    },
+    {
+      "id": "job_architecture_optimization",
+      "inputs": [
+        "architecture_decisions",
+        "validation_records",
+        "resource constraints",
+        "performance measurements"
+      ],
+      "latency_budget": "design-time / iterative; no real-time requirement",
+      "outputs": [
+        "optimized_architecture_config",
+        "interface_spec_updates",
+        "design_tradeoff_notes"
+      ],
+      "rationale": "Architecture definition and optimization are explicitly required and are best performed in software before or alongside hardware implementation.",
+      "responsibility": "Explore and optimize system structure, interface sizing, timeout settings, fallback policies, and execution partitioning without binding to a specific board or fabric.",
+      "status": "planned",
+      "target": "software"
+    }
+  ],
+  "schema": "chiploop.application_intelligence.partition.v1",
+  "tradeoffs": [
+    "Keeping the surrogate in GPU/CPU software preserves model flexibility and aligns with qualification status, but adds transport latency and service dependency.",
+    "Implementing command clamping, freshness checks, and fallback in FPGA improves determinism and safety, but constrains protocol complexity and limits on-device model logic.",
+    "Using a compact request/response interface simplifies hardware and I/O budget, but requires disciplined software packaging of geometry descriptors and control context.",
+    "CPU reference evaluation maximizes transparency and traceability, but may be slower than a specialized accelerator for large validation sweeps.",
+    "A hold-last-good fallback can improve drivability, but must be tightly bounded by safety rules to avoid propagating stale behavior.",
+    "Forward compatibility with future GPU/NIM execution is preserved, but the current design cannot claim hardware-surrogate acceleration benefits until the model is qualified for deployment."
+  ]
+}

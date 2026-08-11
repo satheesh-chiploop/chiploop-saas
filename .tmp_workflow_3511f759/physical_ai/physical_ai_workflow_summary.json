@@ -1,0 +1,1023 @@
+{
+  "application_intelligence": {
+    "acceptance_gates": [
+      "Command bounding: 100% of issued actuator commands shall remain within configured min/max limits during validation runs.",
+      "Stale-data rejection: 100% of intentionally stale commands injected during test shall be rejected.",
+      "Timeout handling: 100% of simulated timeout events shall cause the controller to enter the defined fallback state.",
+      "Safe fallback: 100% of fallback transitions shall produce a documented safe actuator command or hold state.",
+      "Reference availability: A transparent reference path shall produce outputs for 100% of validation cases within the operating envelope.",
+      "Operating-envelope coverage: Validation shall include test cases spanning the full 20-55 m/s range.",
+      "Freshness enforcement: All accepted commands shall pass freshness checks with measured age below the configured freshness threshold.",
+      "Geometry handling: STL input shall be parsed successfully for all conformance test geometries in the approved dataset.",
+      "Interface integrity: All declared interfaces shall exchange data without schema or protocol errors in integration testing.",
+      "Traceability: Every control decision in validation shall be traceable to inputs, reference outputs, and safety-state outcomes."
+    ],
+    "constraints": [
+      "Operating scope limited to the stated stream-velocity envelope.",
+      "Geometry input shall be accepted in STL format.",
+      "Reference geometry source shall be compatible with DrivAerML reference geometry.",
+      "Control outputs shall be bounded to prevent actuator overdrive.",
+      "Stale model commands shall be rejected.",
+      "Command timeout conditions shall trigger defined fallback behavior.",
+      "Safe fallback shall remain available independent of model output validity.",
+      "Any surrogate or controller evaluation shall be benchmarked against a transparent reference path.",
+      "No board, processor, or implementation fabric is implied by this contract.",
+      "No pretrained inference result is assumed.",
+      "No model accuracy is fabricated beyond measurable acceptance criteria.",
+      "All performance claims must be validated on the declared operating envelope."
+    ],
+    "generation_status": "model_generated",
+    "interfaces": [
+      {
+        "description": "STL-form geometry input stream or file interface for vehicle/aerodynamic surfaces.",
+        "name": "geometry_input",
+        "type": "data"
+      },
+      {
+        "description": "Stream-velocity input interface for values within 20-55 m/s.",
+        "name": "operating_condition_input",
+        "type": "data"
+      },
+      {
+        "description": "Transparent baseline outputs used for comparison, validation, and traceability.",
+        "name": "reference_output",
+        "type": "data"
+      },
+      {
+        "description": "Bounded actuator command interface delivered to the active-aerodynamics subsystem.",
+        "name": "control_command_output",
+        "type": "data"
+      },
+      {
+        "description": "Fault, freshness, timeout, and fallback status reporting interface.",
+        "name": "safety_status_output",
+        "type": "data"
+      },
+      {
+        "description": "Interface that asserts safe hold or predefined safe actuator state during invalid or timed-out control conditions.",
+        "name": "fallback_control_interface",
+        "type": "data"
+      },
+      {
+        "description": "Logging interface for test evidence, traceability records, and acceptance-gate measurements.",
+        "name": "validation_telemetry",
+        "type": "data"
+      }
+    ],
+    "name": "intelligent_active_aerodynamics_controller",
+    "objective": "Develop an intelligent active-aerodynamics control product for automotive use over 20-55 m/s flow conditions. The product shall support evaluation of a physics-based surrogate, a transparent reference implementation, system partitioning, architecture definition and optimization, and delivery of hardware, firmware, and software capabilities that enforce bounded control, stale-data detection, timeout handling, and safe fallback behavior.",
+    "operating_envelope": {
+      "stream_velocity_mps": [
+        20,
+        55
+      ]
+    },
+    "physics_domain": "automotive_aerodynamics",
+    "required_capabilities": [
+      "Accept vehicle/aerodynamic geometry inputs in STL form.",
+      "Ingest stream-velocity conditions within the declared operating envelope.",
+      "Provide a transparent reference computation path for comparison and validation.",
+      "Evaluate a physics-based surrogate against the reference path.",
+      "Partition the application into sensing, estimation, decision, actuation, and safety functions.",
+      "Generate bounded actuator commands.",
+      "Detect stale command or stale-state conditions using explicit freshness checks.",
+      "Detect timeout conditions on model, control, or communication paths.",
+      "Reject commands that violate freshness, validity, or bounds constraints.",
+      "Transition to a safe fallback mode when command validity cannot be guaranteed.",
+      "Expose status and fault information suitable for integration into a higher-level vehicle control stack.",
+      "Support architecture definition and optimization activities without binding to a specific compute target.",
+      "Support delivery of hardware, firmware, and software implementations as separate deliverables if needed."
+    ],
+    "schema": "chiploop.application_intelligence.contract.v1",
+    "source_of_truth": "supabase",
+    "workloads": [
+      {
+        "description": "Load and validate STL geometry derived from the DrivAerML reference geometry, including basic structural checks and readiness for downstream aerodynamic evaluation.",
+        "name": "geometry_ingestion"
+      },
+      {
+        "description": "Receive and normalize stream-velocity conditions across the 20-55 m/s envelope for each control cycle or evaluation job.",
+        "name": "operating_condition_acquisition"
+      },
+      {
+        "description": "Compute a transparent baseline aerodynamic control or response estimate for comparison against the physics-based surrogate and for validation traceability.",
+        "name": "transparent_reference_evaluation"
+      },
+      {
+        "description": "Execute a physics-based surrogate workload to estimate aerodynamic response from geometry and operating conditions without assuming a specific implementation technology.",
+        "name": "surrogate_evaluation"
+      },
+      {
+        "description": "Separate control responsibilities into estimation, decision logic, command shaping, validity checking, and safety supervision tasks.",
+        "name": "control_partitioning"
+      },
+      {
+        "description": "Produce actuator commands constrained by configured limits and application safety rules.",
+        "name": "bounded_command_generation"
+      },
+      {
+        "description": "Track command age, input staleness, and elapsed time for control-cycle completion in order to detect invalid or expired data.",
+        "name": "freshness_and_timeout_monitoring"
+      },
+      {
+        "description": "Replace invalid control outputs with a predefined safe state or hold behavior when freshness, timeout, or validity checks fail.",
+        "name": "safe_fallback_execution"
+      },
+      {
+        "description": "Explore and optimize the system structure, interfaces, and execution partitioning while preserving the declared control and safety requirements.",
+        "name": "architecture_optimization"
+      },
+      {
+        "description": "Record inputs, intermediate states, reference outputs, control outputs, faults, and fallback events for audit and performance verification.",
+        "name": "validation_and_traceability_logging"
+      }
+    ]
+  },
+  "architecture_generation": {
+    "agent_model_policy": {
+      "mode": "standard",
+      "selected_model": "chiploop_default"
+    },
+    "inference_status": "not_executed",
+    "status": "generated"
+  },
+  "files": {
+    "application_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/application_contract.json",
+    "child_handoff": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/child_handoff.json",
+    "control_policy": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/active_aero_reference/control_policy.json",
+    "cpu_reference_results": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/active_aero_reference/cpu_reference_results.json",
+    "digital_ip_spec": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/surrogate_architecture/digital_ip_spec.json",
+    "loop_state": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/physical_ai_loop_state.json",
+    "model_generated_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/model_generated_architecture.json",
+    "model_generated_architecture_raw": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/model_generated_architecture_raw.txt",
+    "partition_plan": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/partition_plan.json",
+    "product_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/surrogate_architecture/product_architecture.json",
+    "product_map": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/surrogate_architecture/product_map.json",
+    "requirements_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/requirements_contract.json",
+    "selected_physics_model": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/selected_physics_model.json",
+    "surrogate_interface_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/surrogate_architecture/surrogate_interface_contract.json",
+    "surrogate_mapping": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/surrogate_mapping.json",
+    "validation_plan": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/surrogate_architecture/validation_plan.json"
+  },
+  "hem": {
+    "enabled": true,
+    "goal": "product_demo",
+    "mode": "fixed",
+    "stage_toggles": {
+      "firmware_product": true,
+      "fpga_bitstream": true,
+      "fpga_exploration": true
+    },
+    "start_condition": "architecture_passed"
+  },
+  "loop": {
+    "architecture_passed": true,
+    "child_handoff": {
+      "cpu_reference_status": "completed",
+      "digital_ip_spec": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/surrogate_architecture/digital_ip_spec.json",
+      "implementation_path": "fpga_prototype",
+      "inference_status": "not_executed",
+      "model_generated_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/model_generated_architecture.json",
+      "next_loop": "digital_design",
+      "parent_workflow_id": "3511f759-42df-4f1b-8f37-b1837b5ed00e",
+      "product_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/surrogate_architecture/product_architecture.json",
+      "return_to_parent": true,
+      "rtl_spec_text": "Module adaptive_aero_control_top shall be a synthesizable FPGA-oriented RTL top level for active aerodynamic control supervision. The module shall not implement NVIDIA DoMINO inference, CFD, mesh processing, or tensor arithmetic. Instead, it shall provide a deterministic transport-and-safety wrapper around an external software or GPU service that performs the surrogate evaluation.\n\n1. Clocking and reset:\n- Inputs clk and rst_n shall clock and reset all internal state.\n- Reset shall initialize the controller into safe fallback state, clear outstanding request state, clear fault latches, and set actuator command output to a configured safe default.\n\n2. External register window:\n- The module shall expose an implementation-friendly register window using reg_addr[7:0], reg_wdata[63:0], reg_rdata[63:0], reg_we, and reg_re.\n- The register window shall be used to configure operating parameters including request enable, timeout limit, command clamp limits, fallback mode select, and sequence counters.\n- The register window shall also expose status bits for busy, request_pending, response_valid, timeout_fault, stale_fault, malformed_response_fault, clamp_active, and fallback_active.\n- The register file shall be small and synthesizable; it shall not contain bulk geometry storage or flow-field storage.\n\n3. Model transport interface:\n- The top level shall provide a bounded streaming request/response interface with no port wider than 128 bits.\n- req_payload[127:0] shall carry a compact descriptor containing at minimum: request sequence ID, flow-condition encoding, geometry descriptor or host pointer token, operating-point identifier, and control flags.\n- rsp_payload[127:0] shall carry a compact result packet containing at minimum: response sequence ID, validity flags, compact predicted aerodynamic metrics, and any service status code required by the host software.\n- req_valid shall assert when a new request is available; req_ready shall qualify acceptance by the downstream transport.\n- rsp_valid shall be sampled only when rsp_ready is asserted by the module.\n\n4. Request handling:\n- When enabled and not stalled, the module shall assemble a request packet from programmed configuration and issue it once per control cycle or on host command.\n- The module shall track the outstanding request sequence ID and timestamp counter.\n- The module shall prevent issuance of a new request that would overwrite an outstanding unacknowledged request unless a programmable overwrite mode explicitly allows it.\n\n5. Response validation:\n- The module shall verify that rsp_payload sequence ID matches the outstanding request.\n- The module shall reject responses that are stale according to the configured timeout threshold, malformed according to protocol validity bits, or received when no request is pending.\n- The module shall assert a fault when any response validation rule fails.\n- The module shall only forward validated aerodynamic outputs into the command-selection path.\n\n6. Safety and fallback:\n- If no valid response arrives before timeout, the module shall enter fallback mode.\n- Fallback mode shall drive a safe actuator command, which may be hold-last-good if explicitly configured and only if safety limits permit; otherwise it shall drive a neutral or minimum-drag safe default.\n- The module shall clamp all actuator commands to programmable minimum and maximum bounds.\n- The module shall provide fault signaling and status latch behavior until software clears the fault.\n\n7. Actuator command generation:\n- The module shall convert validated aerodynamic decisions into a compact actuator command bus of 32 bits or fewer.\n- The command generator shall support a safe-default command, a validated model-driven command, and a fallback command.\n- The command path shall include saturation logic and validity gating before asserting actuator_cmd_valid.\n\n8. Storage and implementation constraints:\n- For the FPGA prototype, payload storage shall use FPGA BRAM or host-managed memory access; no Sky130 hard macro shall be instantiated.\n- The design shall not infer bulk payload memory using register arrays or generic SRAM modules in the FPGA top level.\n- Only small control/status registers, counters, FSM state, and shadow copies of compact packet fields may be implemented in flip-flops.\n\n9. Protocol and integration assumptions:\n- The software side is responsible for packaging vehicle geometry from DrivAerML STL inputs and flow conditions into the compact request payload.\n- The hardware side is responsible for transport, buffering of compact packets, validation, timeout enforcement, and actuator command safety.\n- The architecture shall remain forward-compatible with future NVIDIA-hosted NIM or ChipLoop GPU worker execution using the same request/response contract.\n\n10. Determinism and observability:\n- The module shall provide sufficient status visibility for host software to reconstruct request issuance, response arrival, timeout events, stale-data rejection, and clamp activity.\n- Any fault shall be observable through dedicated status bits and the fault output.\n- The design shall be deterministic under identical request timing and register programming.",
+      "schema": "chiploop.physical_ai.architecture_handoff.v1",
+      "source_model_id": "nvidia.domino.automotive_aero",
+      "surrogate_interface_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/3511f759-42df-4f1b-8f37-b1837b5ed00e/f7684a60-2a15-4ea4-a138-fa740c09e003/physical_ai/physical_ai/surrogate_architecture/surrogate_interface_contract.json"
+    },
+    "fixed_point_passed": false,
+    "implementation_path": "fpga_prototype",
+    "inference_status": "not_executed",
+    "physics_passed": false,
+    "rtl_smoke_passed": false,
+    "stages": [
+      {
+        "id": "requirements",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "model_selection",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "surrogate_interface",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "architecture_definition",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "cpu_reference",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "surrogate_inference",
+        "owner": "physical_ai",
+        "status": "not_executed"
+      },
+      {
+        "app_path": "/apps/arch2rtl",
+        "id": "digital_design",
+        "owner": "existing_loop",
+        "status": "ready"
+      },
+      {
+        "app_path": "/apps/verify",
+        "id": "rtl_verification",
+        "owner": "existing_loop",
+        "status": "planned"
+      },
+      {
+        "app_path": "/apps/fpga-implementation",
+        "id": "digital_implementation",
+        "owner": "existing_loop",
+        "status": "not_requested"
+      },
+      {
+        "app_path": "/apps/fpga-target-explorer",
+        "id": "fpga_exploration",
+        "owner": "existing_loop",
+        "status": "planned"
+      }
+    ]
+  },
+  "model_qualification": {
+    "accuracy_qualified": false,
+    "candidate_count": 2,
+    "candidates": [
+      {
+        "availability": "requires_gpu_worker",
+        "domain_match": true,
+        "gpu_required": true,
+        "model_id": "nvidia.domino.automotive_aero",
+        "name": "NVIDIA DoMINO Automotive Aero",
+        "provider": "NVIDIA",
+        "runtime": "remote_nim",
+        "score": 100
+      },
+      {
+        "availability": "ready",
+        "domain_match": false,
+        "gpu_required": false,
+        "model_id": "chiploop.pmsm.dq.v1",
+        "name": "PMSM dq Equation Model",
+        "provider": "ChipLoop",
+        "runtime": "cpu_equation",
+        "score": 0
+      }
+    ],
+    "checkpoint_identified": true,
+    "inference_executed": false,
+    "limitations": [
+      "Surrogate inference and application-specific accuracy are not qualified in this run."
+    ],
+    "qualification_status": "provisionally_compatible",
+    "schema": "chiploop.application_intelligence.model_qualification.v1",
+    "selected_model_id": "nvidia.domino.automotive_aero",
+    "selection_basis": "domain, interface, runtime, availability, and implementation-path compatibility"
+  },
+  "partition": {
+    "application": "intelligent_active_aerodynamics_controller",
+    "decision": "Partitioned for fpga_prototype as an FPGA-oriented transport-and-safety wrapper around an external CPU/GPU software surrogate service. The DoMINO surrogate remains in GPU/CPU software because the qualification run did not prove hardware-deployable inference. Hardware handles deterministic control supervision, validation, timeout handling, command clamping, and safe fallback; software handles STL geometry packaging, reference evaluation, surrogate execution, and optimization/validation analysis.",
+    "decision_factors": [
+      "Selected model nvidia.domino.automotive_aero is provisionally compatible but not accuracy-qualified and explicitly requires a GPU worker/remote NIM runtime.",
+      "No evidence was provided that the surrogate is hardware-deployable, so it remains in GPU/CPU software.",
+      "The architecture specifies an FPGA-first control wrapper that does not implement the surrogate, only transport, validation, clamping, and fallback.",
+      "Acceptance gates require deterministic command bounding, stale-data rejection, timeout handling, and safe fallback, which are best enforced in FPGA logic.",
+      "Transparent reference computation is required for 100% of validation cases and is explicitly suited to CPU software for traceability.",
+      "STL geometry ingestion and DrivAerML-compatible packaging are software tasks due to parsing and host-memory handling needs.",
+      "Interface constraints favor compact register/packet protocols rather than large geometry tensors on hardware pins.",
+      "The implementation path is fpga_prototype, but the contract does not bind to a board or specific fabric.",
+      "Safety requirements mandate fault latching, safe default behavior, and independent fallback availability, which favors hardware enforcement of the last-mile control path.",
+      "Architecture optimization and validation traceability are design-time software activities rather than real-time hardware datapath functions."
+    ],
+    "generation_status": "model_generated",
+    "implementation_path": "fpga_prototype",
+    "interfaces": [
+      {
+        "name": "geometry_input",
+        "rationale": "STL handling requires parsing and host-side file/memory access.",
+        "responsibility": "Accept STL geometry input and provide validated geometry for reference and surrogate evaluation.",
+        "status": "software-facing",
+        "type": "data"
+      },
+      {
+        "name": "operating_condition_input",
+        "rationale": "Input acquisition and range normalization are host orchestration tasks.",
+        "responsibility": "Provide normalized stream-velocity values within 20-55 m/s to the control pipeline.",
+        "status": "software-facing",
+        "type": "data"
+      },
+      {
+        "name": "reference_output",
+        "rationale": "The reference path is required to be transparent and traceable.",
+        "responsibility": "Deliver transparent baseline outputs for validation and comparison.",
+        "status": "cpu_software-facing",
+        "type": "data"
+      },
+      {
+        "name": "control_command_output",
+        "rationale": "Actuator command generation and clamping are deterministic safety functions assigned to hardware.",
+        "responsibility": "Emit bounded actuator commands only after validity, freshness, and timeout checks pass.",
+        "status": "fpga-driven",
+        "type": "data"
+      },
+      {
+        "name": "safety_status_output",
+        "rationale": "Host integration requires explicit observability from the hardware supervisor.",
+        "responsibility": "Report fault, freshness, timeout, clamp, and fallback states to the host control stack.",
+        "status": "fpga-driven",
+        "type": "data"
+      },
+      {
+        "name": "fallback_control_interface",
+        "rationale": "Safe fallback must be available independently of model output validity.",
+        "responsibility": "Assert safe hold or predefined safe actuator state when validity cannot be guaranteed.",
+        "status": "fpga-driven",
+        "type": "data"
+      },
+      {
+        "name": "validation_telemetry",
+        "rationale": "Logging, audit, and test evidence collection are software-centric and should not burden the real-time path.",
+        "responsibility": "Collect logs and evidence for traceability, acceptance gating, and performance validation across the operating envelope.",
+        "status": "software-facing",
+        "type": "data"
+      },
+      {
+        "name": "compact_model_request_payload",
+        "rationale": "The architecture intentionally avoids exposing bulk geometry on top-level FPGA ports.",
+        "responsibility": "Carry compact request metadata such as sequence ID, flow-condition encoding, geometry token, operating-point ID, and control flags.",
+        "status": "fpga-software boundary",
+        "type": "data"
+      },
+      {
+        "name": "compact_model_response_payload",
+        "rationale": "Response validation relies on a compact, bounded protocol between FPGA supervision and the external service.",
+        "responsibility": "Return compact response metadata including sequence ID, validity, predicted metrics, and service status.",
+        "status": "fpga-software boundary",
+        "type": "data"
+      }
+    ],
+    "jobs": [
+      {
+        "id": "job_geometry_ingestion",
+        "inputs": [
+          "geometry_input",
+          "DrivAerML-compatible STL file"
+        ],
+        "latency_budget": "offline or pre-cycle; must complete before control-cycle request issuance",
+        "outputs": [
+          "validated_geometry_descriptor",
+          "geometry_metadata",
+          "geometry_validation_status"
+        ],
+        "rationale": "Geometry parsing and STL handling are not hardware-deployable in the provided architecture and are better kept in software with direct access to host-managed memory and file I/O.",
+        "responsibility": "Parse and validate STL geometry derived from DrivAerML reference geometry, perform structural readiness checks, and package a compact geometry descriptor or host pointer token for downstream use.",
+        "status": "planned",
+        "target": "software"
+      },
+      {
+        "id": "job_operating_condition_acquisition",
+        "inputs": [
+          "operating_condition_input"
+        ],
+        "latency_budget": "per evaluation/control cycle; sub-cycle on host side",
+        "outputs": [
+          "normalized_flow_condition",
+          "operating_point_id",
+          "range_check_status"
+        ],
+        "rationale": "Condition ingestion is a host/software concern because it is closely tied to orchestration, envelope validation, and request packaging.",
+        "responsibility": "Receive, normalize, and range-check stream velocity inputs across 20-55 m/s and convert them into compact operating-point encodings for the control path.",
+        "status": "planned",
+        "target": "software"
+      },
+      {
+        "id": "job_transparent_reference_evaluation",
+        "inputs": [
+          "validated_geometry_descriptor",
+          "normalized_flow_condition"
+        ],
+        "latency_budget": "validation-time / offline or nearline; must cover 100% of validation cases",
+        "outputs": [
+          "reference_output",
+          "reference_metrics",
+          "reference_trace"
+        ],
+        "rationale": "The architecture explicitly assigns the transparent reference path to CPU software for traceability and validation. This path must remain observable and easy to audit.",
+        "responsibility": "Compute the transparent baseline aerodynamic response/control estimate for every validation case and serve as the traceable reference path.",
+        "status": "planned",
+        "target": "cpu_software"
+      },
+      {
+        "id": "job_surrogate_evaluation",
+        "inputs": [
+          "compact_model_request_payload",
+          "validated_geometry_descriptor",
+          "normalized_flow_condition"
+        ],
+        "latency_budget": "bounded by control timeout threshold configured in hardware; service must respond within the programmable timeout",
+        "outputs": [
+          "compact_model_response_payload",
+          "surrogate_metrics",
+          "service_status"
+        ],
+        "rationale": "The selected model requires a GPU worker and remote NIM-style runtime; no evidence supports hardware deployment, so it stays in GPU/CPU software.",
+        "responsibility": "Execute the physics-based DoMINO surrogate in a remote GPU/CPU service using the compact request/response contract, without assuming RTL implementation.",
+        "status": "planned",
+        "target": "gpu_service"
+      },
+      {
+        "id": "job_control_partitioning",
+        "inputs": [
+          "reference_output",
+          "compact_model_response_payload",
+          "validation rules",
+          "safety rules"
+        ],
+        "latency_budget": "per control cycle; must produce inputs before hardware commit deadline",
+        "outputs": [
+          "control_policy_config",
+          "decision_intent",
+          "command_constraints"
+        ],
+        "rationale": "High-level partitioning and policy assembly are best handled in software, while hardware enforces deterministic safety constraints.",
+        "responsibility": "Separate estimation, decision logic, command shaping, validity checking, and safety supervision into explicit software responsibilities and generate compact control intent for hardware enforcement.",
+        "status": "planned",
+        "target": "software"
+      },
+      {
+        "id": "job_bounded_command_generation",
+        "inputs": [
+          "compact_model_response_payload",
+          "control_policy_config",
+          "register_programmed_limits",
+          "freshness status"
+        ],
+        "latency_budget": "single control-cycle latency; deterministic and bounded",
+        "outputs": [
+          "actuator_cmd",
+          "actuator_cmd_valid",
+          "clamp_status"
+        ],
+        "rationale": "This is the core real-time safety function explicitly mapped to FPGA in the architecture, with small FSM, clamp logic, and command packing.",
+        "responsibility": "Clamp actuator commands to configured min/max limits, gate updates on validity checks, and emit a compact actuator command bus only when all conditions pass.",
+        "status": "planned",
+        "target": "fpga"
+      },
+      {
+        "id": "job_freshness_and_timeout_monitoring",
+        "inputs": [
+          "req_valid",
+          "rsp_valid",
+          "rsp_payload",
+          "register_programmed_timeout",
+          "sequence counters"
+        ],
+        "latency_budget": "hard real-time; must resolve within the configured timeout window and before command commit",
+        "outputs": [
+          "stale_fault",
+          "timeout_fault",
+          "response_valid",
+          "fault",
+          "status_flags"
+        ],
+        "rationale": "The architecture and safety requirements assign freshness, stale-data, and timeout enforcement to deterministic hardware supervision.",
+        "responsibility": "Track request sequence numbers, response age, elapsed timeout, and stale-data conditions; reject invalid or late model responses and assert faults as needed.",
+        "status": "planned",
+        "target": "fpga"
+      },
+      {
+        "id": "job_safe_fallback_execution",
+        "inputs": [
+          "fault flags",
+          "fallback mode select",
+          "safe default configuration",
+          "last-good command state"
+        ],
+        "latency_budget": "immediate on fault detection; no additional cycle beyond detection",
+        "outputs": [
+          "fallback_control_interface",
+          "safe actuator command",
+          "fallback_active",
+          "latched fault state"
+        ],
+        "rationale": "Safe fallback must remain available independent of model validity, and the architecture explicitly places this in FPGA control supervision.",
+        "responsibility": "Drive safe hold or predefined safe actuator state when model data is invalid, stale, missing, or timed out; maintain fault latching until cleared by software.",
+        "status": "planned",
+        "target": "fpga"
+      },
+      {
+        "id": "job_validation_and_traceability_logging",
+        "inputs": [
+          "validation_telemetry",
+          "reference_output",
+          "actuator_cmd",
+          "fault/status flags"
+        ],
+        "latency_budget": "offline or nearline; must not delay control loop",
+        "outputs": [
+          "validation_records",
+          "traceability_report",
+          "acceptance_gate_evidence"
+        ],
+        "rationale": "Traceability and audit logging are richer software tasks and must support the documented acceptance gates and validation evidence.",
+        "responsibility": "Record inputs, intermediate states, reference outputs, control outputs, faults, clamp events, stale rejections, and fallback transitions for acceptance-gate evidence.",
+        "status": "planned",
+        "target": "software"
+      },
+      {
+        "id": "job_architecture_optimization",
+        "inputs": [
+          "architecture_decisions",
+          "validation_records",
+          "resource constraints",
+          "performance measurements"
+        ],
+        "latency_budget": "design-time / iterative; no real-time requirement",
+        "outputs": [
+          "optimized_architecture_config",
+          "interface_spec_updates",
+          "design_tradeoff_notes"
+        ],
+        "rationale": "Architecture definition and optimization are explicitly required and are best performed in software before or alongside hardware implementation.",
+        "responsibility": "Explore and optimize system structure, interface sizing, timeout settings, fallback policies, and execution partitioning without binding to a specific board or fabric.",
+        "status": "planned",
+        "target": "software"
+      }
+    ],
+    "schema": "chiploop.application_intelligence.partition.v1",
+    "tradeoffs": [
+      "Keeping the surrogate in GPU/CPU software preserves model flexibility and aligns with qualification status, but adds transport latency and service dependency.",
+      "Implementing command clamping, freshness checks, and fallback in FPGA improves determinism and safety, but constrains protocol complexity and limits on-device model logic.",
+      "Using a compact request/response interface simplifies hardware and I/O budget, but requires disciplined software packaging of geometry descriptors and control context.",
+      "CPU reference evaluation maximizes transparency and traceability, but may be slower than a specialized accelerator for large validation sweeps.",
+      "A hold-last-good fallback can improve drivability, but must be tightly bounded by safety rules to avoid propagating stale behavior.",
+      "Forward compatibility with future GPU/NIM execution is preserved, but the current design cannot claim hardware-surrogate acceleration benefits until the model is qualified for deployment."
+    ]
+  },
+  "physics_execution": {
+    "architecture": {
+      "architecture_decisions": [
+        "Use an FPGA-first control architecture with a compact memory-mapped register interface rather than exposing geometry arrays or flow fields as top-level ports.",
+        "Keep the surrogate model outside RTL; RTL only handles transport, buffering, request tracking, validation, timeout management, and actuator command generation.",
+        "Adopt a CPU reference execution path for architecture-definition mode, with forward compatibility to future GPU/NIM execution through the same register protocol.",
+        "Limit top-level I/O to scalar control/status signals and a 64-bit-wide register window to remain implementation-friendly and below the 256 scalar-equivalent I/O target.",
+        "Represent vehicle geometry as a pointer/descriptor into host-managed memory or external software, not as RTL-managed bulk payload storage.",
+        "Implement stale-data rejection by sequence numbering, age limits, and response-validity checks before any actuator update is committed.",
+        "Implement command clamping in hardware against configured min/max actuator limits and a safe fallback state for any invalid, missing, or late model response.",
+        "Use a small FSM for request issuance, waiting, response capture, validation, and fallback arbitration.",
+        "Preserve a clean software/hardware split: software packages the DrivAerML STL geometry and flow conditions, while RTL manages deterministic control safety and timing.",
+        "For FPGA prototype, no Sky130 hard macro is used; payload buffering should rely on FPGA BRAM or host-side memory, with only small control registers in RTL."
+      ],
+      "blocks": [
+        {
+          "function": "Holds configuration, operating limits, enable bits, timeout thresholds, sequence counters, and status flags.",
+          "name": "control_register_file"
+        },
+        {
+          "function": "Captures flow-condition inputs and geometry descriptor fields, assembles a compact inference request, and issues a transaction toward the software/GPU transport layer.",
+          "name": "request_formatter"
+        },
+        {
+          "function": "Accepts a compact model-response packet, extracts drag/lift or downstream control-relevant outputs, and checks validity markers and sequence numbers.",
+          "name": "response_receiver"
+        },
+        {
+          "function": "Tracks outstanding requests, compares response age against a programmable timeout, and triggers rejection or fallback on late data.",
+          "name": "stale_timeout_monitor"
+        },
+        {
+          "function": "Constrains actuator commands to configured bounds and enforces safe default outputs when data is invalid, stale, or missing.",
+          "name": "safety_clamp_unit"
+        },
+        {
+          "function": "Implements safe fallback selection, hold-last-good behavior where permitted, and fault annunciation when model service is unavailable.",
+          "name": "fallback_fsm"
+        },
+        {
+          "function": "Converts validated control decisions into a compact actuator command packet for the active-aero mechanism driver.",
+          "name": "actuator_command_pack"
+        },
+        {
+          "function": "Aggregates error conditions such as stale response, timeout, malformed packet, out-of-range command, and communication fault.",
+          "name": "status_fault_manager"
+        },
+        {
+          "function": "Provides the external register-memory window for software to write requests and read responses/status without exposing bulk tensors at the top level.",
+          "name": "host_interface_bridge"
+        }
+      ],
+      "interfaces": [
+        {
+          "direction": "input",
+          "name": "clk",
+          "type": "clock",
+          "width": 1
+        },
+        {
+          "direction": "input",
+          "name": "rst_n",
+          "type": "reset",
+          "width": 1
+        },
+        {
+          "direction": "input",
+          "name": "reg_addr",
+          "type": "register_window_address",
+          "width": 8
+        },
+        {
+          "direction": "input",
+          "name": "reg_wdata",
+          "type": "register_window_write_data",
+          "width": 64
+        },
+        {
+          "direction": "output",
+          "name": "reg_rdata",
+          "type": "register_window_read_data",
+          "width": 64
+        },
+        {
+          "direction": "input",
+          "name": "reg_we",
+          "type": "register_write_strobe",
+          "width": 1
+        },
+        {
+          "direction": "input",
+          "name": "reg_re",
+          "type": "register_read_strobe",
+          "width": 1
+        },
+        {
+          "direction": "output",
+          "name": "req_valid",
+          "type": "model_request_valid",
+          "width": 1
+        },
+        {
+          "direction": "input",
+          "name": "req_ready",
+          "type": "model_request_ready",
+          "width": 1
+        },
+        {
+          "direction": "output",
+          "name": "req_payload",
+          "type": "compact_model_request_payload",
+          "width": 128
+        },
+        {
+          "direction": "input",
+          "name": "rsp_valid",
+          "type": "model_response_valid",
+          "width": 1
+        },
+        {
+          "direction": "output",
+          "name": "rsp_ready",
+          "type": "model_response_ready",
+          "width": 1
+        },
+        {
+          "direction": "input",
+          "name": "rsp_payload",
+          "type": "compact_model_response_payload",
+          "width": 128
+        },
+        {
+          "direction": "output",
+          "name": "actuator_cmd",
+          "type": "actuator_command_bus",
+          "width": 32
+        },
+        {
+          "direction": "output",
+          "name": "actuator_cmd_valid",
+          "type": "actuator_command_valid",
+          "width": 1
+        },
+        {
+          "direction": "output",
+          "name": "fault",
+          "type": "fault_indicator",
+          "width": 1
+        }
+      ],
+      "product_name": "Intelligent Active Aerodynamics Controller",
+      "product_summary": "FPGA prototype for an intelligent active-aerodynamics controller operating from 20 to 55 m/s using a CPU reference path for DoMINO-based aerodynamics evaluation. The hardware does not implement the surrogate model itself; it provides a bounded request/response interface to software or GPU inference, validates inputs, detects stale or timed-out model responses, clamps actuator commands, and falls back to a safe aerodynamic mode when model data is invalid or unavailable.",
+      "rtl_spec_text": "Module adaptive_aero_control_top shall be a synthesizable FPGA-oriented RTL top level for active aerodynamic control supervision. The module shall not implement NVIDIA DoMINO inference, CFD, mesh processing, or tensor arithmetic. Instead, it shall provide a deterministic transport-and-safety wrapper around an external software or GPU service that performs the surrogate evaluation.\n\n1. Clocking and reset:\n- Inputs clk and rst_n shall clock and reset all internal state.\n- Reset shall initialize the controller into safe fallback state, clear outstanding request state, clear fault latches, and set actuator command output to a configured safe default.\n\n2. External register window:\n- The module shall expose an implementation-friendly register window using reg_addr[7:0], reg_wdata[63:0], reg_rdata[63:0], reg_we, and reg_re.\n- The register window shall be used to configure operating parameters including request enable, timeout limit, command clamp limits, fallback mode select, and sequence counters.\n- The register window shall also expose status bits for busy, request_pending, response_valid, timeout_fault, stale_fault, malformed_response_fault, clamp_active, and fallback_active.\n- The register file shall be small and synthesizable; it shall not contain bulk geometry storage or flow-field storage.\n\n3. Model transport interface:\n- The top level shall provide a bounded streaming request/response interface with no port wider than 128 bits.\n- req_payload[127:0] shall carry a compact descriptor containing at minimum: request sequence ID, flow-condition encoding, geometry descriptor or host pointer token, operating-point identifier, and control flags.\n- rsp_payload[127:0] shall carry a compact result packet containing at minimum: response sequence ID, validity flags, compact predicted aerodynamic metrics, and any service status code required by the host software.\n- req_valid shall assert when a new request is available; req_ready shall qualify acceptance by the downstream transport.\n- rsp_valid shall be sampled only when rsp_ready is asserted by the module.\n\n4. Request handling:\n- When enabled and not stalled, the module shall assemble a request packet from programmed configuration and issue it once per control cycle or on host command.\n- The module shall track the outstanding request sequence ID and timestamp counter.\n- The module shall prevent issuance of a new request that would overwrite an outstanding unacknowledged request unless a programmable overwrite mode explicitly allows it.\n\n5. Response validation:\n- The module shall verify that rsp_payload sequence ID matches the outstanding request.\n- The module shall reject responses that are stale according to the configured timeout threshold, malformed according to protocol validity bits, or received when no request is pending.\n- The module shall assert a fault when any response validation rule fails.\n- The module shall only forward validated aerodynamic outputs into the command-selection path.\n\n6. Safety and fallback:\n- If no valid response arrives before timeout, the module shall enter fallback mode.\n- Fallback mode shall drive a safe actuator command, which may be hold-last-good if explicitly configured and only if safety limits permit; otherwise it shall drive a neutral or minimum-drag safe default.\n- The module shall clamp all actuator commands to programmable minimum and maximum bounds.\n- The module shall provide fault signaling and status latch behavior until software clears the fault.\n\n7. Actuator command generation:\n- The module shall convert validated aerodynamic decisions into a compact actuator command bus of 32 bits or fewer.\n- The command generator shall support a safe-default command, a validated model-driven command, and a fallback command.\n- The command path shall include saturation logic and validity gating before asserting actuator_cmd_valid.\n\n8. Storage and implementation constraints:\n- For the FPGA prototype, payload storage shall use FPGA BRAM or host-managed memory access; no Sky130 hard macro shall be instantiated.\n- The design shall not infer bulk payload memory using register arrays or generic SRAM modules in the FPGA top level.\n- Only small control/status registers, counters, FSM state, and shadow copies of compact packet fields may be implemented in flip-flops.\n\n9. Protocol and integration assumptions:\n- The software side is responsible for packaging vehicle geometry from DrivAerML STL inputs and flow conditions into the compact request payload.\n- The hardware side is responsible for transport, buffering of compact packets, validation, timeout enforcement, and actuator command safety.\n- The architecture shall remain forward-compatible with future NVIDIA-hosted NIM or ChipLoop GPU worker execution using the same request/response contract.\n\n10. Determinism and observability:\n- The module shall provide sufficient status visibility for host software to reconstruct request issuance, response arrival, timeout events, stale-data rejection, and clamp activity.\n- Any fault shall be observable through dedicated status bits and the fault output.\n- The design shall be deterministic under identical request timing and register programming.",
+      "safety_requirements": [
+        "Reject any response that is stale, out of sequence, malformed, or inconsistent with the outstanding request ID.",
+        "Reject any command when the response age exceeds the programmable timeout threshold.",
+        "Clamp actuator outputs to programmable minimum and maximum limits before driving the actuator command bus.",
+        "Enter a safe fallback mode when the model path is unavailable, the request is not acknowledged, or the response is invalid.",
+        "Do not update actuator outputs from a response unless all validity checks pass.",
+        "Maintain a clear fault status until software explicitly acknowledges and clears the condition.",
+        "On reset, drive the actuator to a safe default and clear outstanding request tracking.",
+        "Do not rely on unbounded buffers, inferred payload FIFOs, or large register arrays for payload storage in the FPGA prototype."
+      ],
+      "top_module": "adaptive_aero_control_top",
+      "verification_goals": [
+        "Verify reset enters safe fallback state and clears all outstanding request tracking.",
+        "Verify register reads and writes correctly program timeout, clamp limits, enable bits, and fallback mode.",
+        "Verify request issuance uses the compact 128-bit payload and never exposes bulk geometry or flow fields on top-level pins.",
+        "Verify a valid response with matching sequence ID is accepted and propagates to actuator command generation.",
+        "Verify stale responses are rejected and raise the appropriate fault status.",
+        "Verify timeout expiration triggers fallback mode and safe actuator output.",
+        "Verify malformed or unexpected responses are rejected without updating actuator commands.",
+        "Verify actuator command clamping is enforced for both model-driven and fallback commands.",
+        "Verify no new request overwrites an outstanding request unless overwrite mode is explicitly enabled.",
+        "Verify fault latches remain asserted until software clears them.",
+        "Verify the design stays within the compact interface constraint and does not exceed the top-level I/O budget.",
+        "Verify FPGA implementation does not instantiate Sky130 macros and does not infer bulk payload storage in flip-flop arrays."
+      ]
+    },
+    "control_policy": {
+      "entries": [
+        {
+          "x": 20.0,
+          "y": 0.0
+        },
+        {
+          "x": 28.75,
+          "y": 17.5
+        },
+        {
+          "x": 37.5,
+          "y": 35.0
+        },
+        {
+          "x": 46.25,
+          "y": 52.5
+        },
+        {
+          "x": 55.0,
+          "y": 70.0
+        }
+      ],
+      "format": "piecewise_linear_lut",
+      "input": "vehicle_speed_mps",
+      "output": "actuator_command_percent",
+      "qualification": "cpu_reference_only",
+      "schema": "chiploop.physical_ai.control_policy.v1"
+    },
+    "cpu_reference": {
+      "equation": "drag_force = 0.5 * air_density * velocity^2 * drag_coefficient * frontal_area",
+      "model_type": "analytical_drag_reference",
+      "operating_points": [
+        {
+          "actuator_command_percent": 0.0,
+          "effective_drag_coefficient": 0.3,
+          "estimated_drag_force_n": 161.7,
+          "speed_mps": 20.0
+        },
+        {
+          "actuator_command_percent": 17.5,
+          "effective_drag_coefficient": 0.2958,
+          "estimated_drag_force_n": 329.46,
+          "speed_mps": 28.75
+        },
+        {
+          "actuator_command_percent": 35.0,
+          "effective_drag_coefficient": 0.2916,
+          "estimated_drag_force_n": 552.5592,
+          "speed_mps": 37.5
+        },
+        {
+          "actuator_command_percent": 52.5,
+          "effective_drag_coefficient": 0.2874,
+          "estimated_drag_force_n": 828.3979,
+          "speed_mps": 46.25
+        },
+        {
+          "actuator_command_percent": 70.0,
+          "effective_drag_coefficient": 0.2832,
+          "estimated_drag_force_n": 1154.3763,
+          "speed_mps": 55.0
+        }
+      ],
+      "parameters": {
+        "air_density_kg_m3": 1.225,
+        "baseline_drag_coefficient": 0.3,
+        "frontal_area_m2": 2.2
+      },
+      "purpose": "Exercise application partitioning and controller implementation without claiming pretrained-surrogate predictions.",
+      "schema": "chiploop.physical_ai.cpu_reference.v1",
+      "surrogate_inference_status": "not_executed",
+      "surrogate_model_id": "nvidia.domino.automotive_aero"
+    },
+    "digital_ip_spec": {
+      "blocks": [
+        "register bank",
+        "sensor filter",
+        "feature aggregator",
+        "command limiter",
+        "safety state machine",
+        "watchdog",
+        "telemetry FIFO"
+      ],
+      "clock": {
+        "name": "clk",
+        "target_frequency_mhz": 100
+      },
+      "downstream_loop": "Digital Design Loop",
+      "interfaces": [
+        "AXI4-Lite control/status",
+        "streaming pressure-sensor input",
+        "speed and yaw inputs",
+        "actuator command output",
+        "interrupt"
+      ],
+      "name": "adaptive_aero_control_ip",
+      "project_name": "adaptive_aero_control",
+      "purpose": "Low-latency sensor aggregation, safety monitoring, and active-aero actuator control around an external GPU surrogate.",
+      "requirements": [
+        "Fail safe when surrogate command is stale or invalid",
+        "Clamp every actuator command to software-programmable limits",
+        "Expose timestamp, validity, fault, and model-version registers",
+        "Permit deterministic fallback control without the GPU service"
+      ],
+      "reset": {
+        "active_low": true,
+        "name": "reset_n"
+      },
+      "schema": "chiploop.digital_ip.spec.v1",
+      "surrogate_is_not_rtl": true,
+      "top_module": "adaptive_aero_control_top"
+    },
+    "execution_mode": "cpu_reference",
+    "implementation_path": "fpga_prototype",
+    "inference_status": "not_executed",
+    "interface": {
+      "checkpoint": "nvidia/domino_drivaerml",
+      "inference": {
+        "future_runtimes": [
+          "NVIDIA-hosted NIM",
+          "ChipLoop GPU worker"
+        ],
+        "reason": "Architecture-definition mode does not require a GPU worker or hosted NIM.",
+        "status": "not_executed"
+      },
+      "inputs": [
+        "vehicle_geometry",
+        "flow_conditions"
+      ],
+      "model_id": "nvidia.domino.automotive_aero",
+      "model_name": "NVIDIA DoMINO Automotive Aero",
+      "outputs": [
+        "drag_force",
+        "lift_force",
+        "surface_pressure",
+        "flow_field"
+      ],
+      "provider": "NVIDIA",
+      "reference_conditions": {
+        "geometry_format": "STL",
+        "geometry_source": "DrivAerML reference geometry",
+        "stream_velocity_mps": 38.89
+      },
+      "reference_url": "https://huggingface.co/nvidia/domino_drivaerml",
+      "schema": "chiploop.physical_ai.surrogate_interface.v1"
+    },
+    "product_map": {
+      "implementation_path": "fpga_prototype",
+      "milestones": [
+        {
+          "id": "m1",
+          "name": "Architecture and digital-IP contract",
+          "status": "completed"
+        },
+        {
+          "id": "m2",
+          "name": "RTL and verification",
+          "status": "ready"
+        },
+        {
+          "id": "m3",
+          "name": "Digital IP / ASIC implementation",
+          "status": "not_requested"
+        },
+        {
+          "id": "m3_fpga",
+          "name": "FPGA prototype",
+          "status": "planned"
+        },
+        {
+          "id": "m4",
+          "name": "Surrogate-backed validation",
+          "status": "blocked_on_inference_runtime"
+        },
+        {
+          "id": "m5",
+          "name": "Optional FPGA prototype",
+          "status": "optional"
+        }
+      ],
+      "product": "AI-assisted active aerodynamics controller",
+      "schema": "chiploop.physical_ai.product_map.v1"
+    },
+    "status": "cpu_reference_ready",
+    "validation": {
+      "architecture_gate": "passed",
+      "cpu_reference_gate": "passed",
+      "digital_ip_tests": [
+        "register access",
+        "stale-command timeout",
+        "limit clamping",
+        "fallback transition",
+        "fault interrupt",
+        "telemetry ordering"
+      ],
+      "required_before_validated_mode": [
+        "Connect NVIDIA NIM or GPU worker",
+        "Run reference geometry",
+        "Persist real predictions",
+        "Compare against CFD reference evidence"
+      ],
+      "schema": "chiploop.physical_ai.validation_plan.v1",
+      "surrogate_inference_gate": "not_executed"
+    }
+  },
+  "physics_model": {
+    "architecture_definition_supported": true,
+    "availability": "requires_gpu_worker",
+    "configuration": {
+      "architecture_definition_supported": true,
+      "checkpoint": "nvidia/domino_drivaerml",
+      "cpu_reference_supported": true,
+      "cpu_reference_type": "analytical_drag_reference",
+      "digital_ip_project_name": "adaptive_aero_control",
+      "digital_ip_top_module": "adaptive_aero_control_top",
+      "reference_application": "intelligent_active_aerodynamics_controller",
+      "reference_url": "https://huggingface.co/nvidia/domino_drivaerml",
+      "surrogate_inference_claimed": false,
+      "version": 2
+    },
+    "digital_ip_project_name": "adaptive_aero_control",
+    "digital_ip_top_module": "adaptive_aero_control_top",
+    "domain": "automotive_aerodynamics",
+    "executor": null,
+    "gpu_required": true,
+    "implementation_targets": [
+      "gpu_service"
+    ],
+    "inputs": [
+      "vehicle_geometry",
+      "flow_conditions"
+    ],
+    "model_id": "nvidia.domino.automotive_aero",
+    "name": "NVIDIA DoMINO Automotive Aero",
+    "outputs": [
+      "drag_force",
+      "lift_force",
+      "surface_pressure",
+      "flow_field"
+    ],
+    "provider": "NVIDIA",
+    "runtime": "remote_nim",
+    "training_required": false,
+    "updated_at": "2026-08-11T01:11:33.28176+00:00"
+  },
+  "requirements": {
+    "accuracy": {
+      "maximum_error_percent": 3.0
+    },
+    "application": "intelligent_active_aerodynamics_controller",
+    "approved": true,
+    "execution_mode": "cpu_reference",
+    "implementation_path": "fpga_prototype",
+    "implementation_target": "fpga",
+    "objective": "Build an intelligent active-aerodynamics controller for 20\u201355 m/s operation. Evaluate NVIDIA DoMINO as the physics-based surrogate, establish a transparent reference, partition the system, define and optimize the architecture, and deliver the hardware, firmware, and software with bounded control, stale-data detection, timeout handling, and safe fallback.",
+    "operating_envelope": {
+      "stream_velocity_mps": [
+        20,
+        55
+      ]
+    },
+    "parameters": {
+      "geometry_format": "STL",
+      "geometry_source": "DrivAerML reference geometry",
+      "stream_velocity_mps": 38.89
+    },
+    "physics_domain": "automotive_aerodynamics",
+    "safety_constraints": [
+      "Reject stale model commands",
+      "Clamp actuator commands",
+      "Provide a safe fallback"
+    ],
+    "schema": "chiploop.physical_ai.requirements.v1"
+  },
+  "schema": "chiploop.physical_ai.workflow_result.v1",
+  "status": "ready_for_digital_design"
+}

@@ -12,6 +12,7 @@ const supabase = createClientComponentClient();
 type PhysicsModel = { model_id: string; name: string; provider: string; domain: string; runtime: string; availability: string; gpu_required: boolean };
 type ExecutionMode = "architecture" | "cpu_reference" | "validated";
 type ImplementationPath = "architecture_only" | "digital_ip_asic" | "fpga_prototype" | "fpga_then_asic";
+type DeploymentArchitecture = "automatic" | "fpga_onboard_cpu" | "fpga_soft_cpu" | "fpga_external_host" | "asic_digital_ip" | "asic_soc" | "asic_companion";
 
 const paths: Array<{ key: ImplementationPath; title: string; body: string }> = [
   { key: "architecture_only", title: "Architecture only", body: "Stop after the architecture and digital-IP plan." },
@@ -68,6 +69,7 @@ export default function PhysicalAiStudioPage() {
   const [objective, setObjective] = useState("Build and verify a safe motor-control digital IP");
   const [executionMode, setExecutionMode] = useState<ExecutionMode>("validated");
   const [implementationPath, setImplementationPath] = useState<ImplementationPath>("fpga_prototype");
+  const [deploymentArchitecture, setDeploymentArchitecture] = useState<DeploymentArchitecture>("automatic");
   const [agentMode, setAgentMode] = useState<"standard" | "smart">("standard");
   const [standardModel, setStandardModel] = useState("chiploop_default");
   const [hemEnabled, setHemEnabled] = useState(true);
@@ -154,6 +156,24 @@ export default function PhysicalAiStudioPage() {
     if (implementationPath === "digital_ip_asic") return [...base, "ASIC implementation"];
     return [...base, "Board explorer", "Bitstream", "ASIC implementation"];
   }, [implementationPath]);
+  const deploymentOptions = useMemo(() => {
+    if (implementationPath.includes("fpga")) return [
+      { key: "automatic", title: "Choose automatically", body: "Refine after FPGA Explorer selects a viable board." },
+      { key: "fpga_onboard_cpu", title: "Onboard CPU", body: "Use a hard CPU connected to FPGA fabric." },
+      { key: "fpga_soft_cpu", title: "Soft CPU", body: "Implement a CPU in FPGA logic and reserve its resources." },
+      { key: "fpga_external_host", title: "External host", body: "Use a PC, Mac, MCU, or embedded host over a board transport." },
+    ] as const;
+    return [
+      { key: "automatic", title: "Choose automatically", body: "Select the ASIC integration model from the requirements." },
+      { key: "asic_digital_ip", title: "Digital IP", body: "Deliver reusable IP; the customer supplies the CPU." },
+      { key: "asic_soc", title: "ASIC SoC", body: "Include an embedded CPU, interconnect, firmware, and software." },
+      { key: "asic_companion", title: "Companion ASIC", body: "Use an external processor through a defined transport." },
+    ] as const;
+  }, [implementationPath]);
+
+  useEffect(() => {
+    if (!deploymentOptions.some((option) => option.key === deploymentArchitecture)) setDeploymentArchitecture("automatic");
+  }, [deploymentArchitecture, deploymentOptions]);
 
   async function start() {
     if (!token || !selected || running) return;
@@ -176,6 +196,7 @@ export default function PhysicalAiStudioPage() {
           physics_model_id: selected.model_id,
           execution_mode: executionMode,
           implementation_path: implementationPath,
+          deployment_architecture: deploymentArchitecture,
           implementation_target: implementationPath.includes("fpga") ? "fpga" : "asic",
           generate_architecture_with_model: true,
           parameters: motor
@@ -223,6 +244,8 @@ export default function PhysicalAiStudioPage() {
       <section className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><div className="text-xs font-bold uppercase text-violet-300">3 · Agent model</div><div className="mt-4 flex gap-3">{(["standard", "smart"] as const).map((item) => <button type="button" key={item} onClick={() => setAgentMode(item)} className={`rounded-lg border px-4 py-2 capitalize ${agentMode === item ? "border-violet-400 bg-violet-500/10" : "border-slate-700"}`}>{item}</button>)}</div>{agentMode === "standard" && <select value={standardModel} onChange={(event) => setStandardModel(event.target.value)} className="mt-4 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="chiploop_default">ChipLoop default model</option><option value="nvidia_nemotron">NVIDIA Nemotron for every agent</option></select>}<p className="mt-4 text-xs text-slate-400">Smart mode selects the model for each agent. The chosen policy is saved with the run.</p></section></div>
 
     <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><div className="text-xs font-bold uppercase text-lime-300">4 · Choose where the design goes</div><div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">{paths.map((path) => <button type="button" key={path.key} onClick={() => setImplementationPath(path.key)} className={`rounded-xl border p-4 text-left ${implementationPath === path.key ? "border-lime-400 bg-lime-500/10" : "border-slate-700 bg-slate-950"}`}><div className="font-semibold">{path.title}</div><div className="mt-2 text-xs leading-5 text-slate-400">{path.body}</div></button>)}</div><div className="mt-6 overflow-x-auto"><div className="flex min-w-max items-center gap-2">{stages.map((stage, index) => <div key={stage} className="contents"><div className="w-36 rounded-xl border border-slate-700 bg-slate-950 p-3 text-center text-sm"><span className="mr-2 text-fuchsia-300">{index + 1}</span>{stage}</div>{index < stages.length - 1 && <span className="text-slate-500">→</span>}</div>)}</div></div></section>
+
+    {implementationPath !== "architecture_only" && <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><div className="text-xs font-bold uppercase text-amber-300">5 · CPU and host architecture</div><p className="mt-2 text-sm text-slate-400">Functional partitioning happens first. This choice controls target refinement and the firmware gate.</p><div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">{deploymentOptions.map((option) => <button type="button" key={option.key} onClick={() => setDeploymentArchitecture(option.key)} className={`rounded-xl border p-4 text-left ${deploymentArchitecture === option.key ? "border-amber-400 bg-amber-500/10" : "border-slate-700 bg-slate-950"}`}><div className="font-semibold">{option.title}</div><div className="mt-2 text-xs leading-5 text-slate-400">{option.body}</div></button>)}</div></section>}
 
     {implementationPath !== "architecture_only" && <section className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-6"><HemAutomaticRunControls enabled={hemEnabled} adaptive={hemAdaptive} onEnabledChange={setHemEnabled} onAdaptiveChange={setHemAdaptive} currentStageLabel="Physical AI architecture" nextStageLabel="RTL generation" /><p className="mt-4 text-sm text-slate-400">When enabled, ChipLoop continues automatically through the selected path. When disabled, the completed dashboard shows the next workflow button.</p></section>}
     {error && <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200">{error}</div>}
