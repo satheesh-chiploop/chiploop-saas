@@ -1,0 +1,29 @@
+{
+  "entries": [
+    {
+      "x": 20.0,
+      "y": 0.0
+    },
+    {
+      "x": 28.75,
+      "y": 17.5
+    },
+    {
+      "x": 37.5,
+      "y": 35.0
+    },
+    {
+      "x": 46.25,
+      "y": 52.5
+    },
+    {
+      "x": 55.0,
+      "y": 70.0
+    }
+  ],
+  "format": "piecewise_linear_lut",
+  "input": "vehicle_speed_mps",
+  "output": "actuator_command_percent",
+  "qualification": "cpu_reference_only",
+  "schema": "chiploop.physical_ai.control_policy.v1"
+}

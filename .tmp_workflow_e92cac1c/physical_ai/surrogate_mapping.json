@@ -1,0 +1,35 @@
+{
+  "accuracy_qualified": false,
+  "candidate_count": 2,
+  "candidates": [
+    {
+      "availability": "requires_gpu_worker",
+      "domain_match": true,
+      "gpu_required": true,
+      "model_id": "nvidia.domino.automotive_aero",
+      "name": "NVIDIA DoMINO Automotive Aero",
+      "provider": "NVIDIA",
+      "runtime": "remote_nim",
+      "score": 100
+    },
+    {
+      "availability": "ready",
+      "domain_match": false,
+      "gpu_required": false,
+      "model_id": "chiploop.pmsm.dq.v1",
+      "name": "PMSM dq Equation Model",
+      "provider": "ChipLoop",
+      "runtime": "cpu_equation",
+      "score": 0
+    }
+  ],
+  "checkpoint_identified": true,
+  "inference_executed": false,
+  "limitations": [
+    "Surrogate inference and application-specific accuracy are not qualified in this run."
+  ],
+  "qualification_status": "provisionally_compatible",
+  "schema": "chiploop.application_intelligence.model_qualification.v1",
+  "selected_model_id": "nvidia.domino.automotive_aero",
+  "selection_basis": "domain, interface, runtime, availability, and implementation-path compatibility"
+}

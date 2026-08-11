@@ -1,0 +1,168 @@
+{
+  "acceptance_gates": [
+    {
+      "gate": "operating_envelope_coverage",
+      "metric": "Validated operation across the full 20\u201355 m/s range",
+      "threshold": "100% of specified velocity range exercised in verification tests"
+    },
+    {
+      "gate": "control_error_bound",
+      "metric": "Absolute control/output error versus reference",
+      "threshold": "Maximum error <= 3.0% on the approved validation set"
+    },
+    {
+      "gate": "stale_command_rejection",
+      "metric": "Stale command detection and rejection rate",
+      "threshold": "100% of injected stale commands rejected"
+    },
+    {
+      "gate": "timeout_fallback",
+      "metric": "Fallback activation on timeout or missing output",
+      "threshold": "100% of timeout cases transition to safe fallback within the defined timeout budget"
+    },
+    {
+      "gate": "actuator_clamping",
+      "metric": "Outputs within configured safe actuator limits",
+      "threshold": "0 violations in validation testing"
+    },
+    {
+      "gate": "reference_consistency",
+      "metric": "Agreement between transparent reference path and validated implementation",
+      "threshold": "All tested cases produce traceable, reproducible outputs with documented deviations"
+    }
+  ],
+  "constraints": [
+    "Operating velocity shall remain within 20\u201355 m/s.",
+    "The system shall reject stale model commands.",
+    "The system shall clamp actuator commands to configured safe bounds.",
+    "The system shall provide a safe fallback behavior on timeout, invalid input, or model/data unavailability.",
+    "The implementation shall preserve a transparent reference path for verification and comparison.",
+    "Geometry input shall be accepted in STL format.",
+    "Reference geometry shall be compatible with DrivAerML-derived inputs.",
+    "No assumption is made about pretrained inference availability or model accuracy beyond measurable validation results.",
+    "No board, device, or compute architecture is implied by this contract."
+  ],
+  "generation_status": "model_generated",
+  "interfaces": [
+    {
+      "format": "STL",
+      "name": "geometry_input",
+      "purpose": "Provide vehicle geometry for processing",
+      "type": "file_or_stream"
+    },
+    {
+      "fields": [
+        "stream_velocity_mps",
+        "operating_state",
+        "model_timestamp",
+        "sequence_id"
+      ],
+      "name": "scenario_input",
+      "purpose": "Provide operating conditions and freshness metadata",
+      "type": "structured_input"
+    },
+    {
+      "fields": [
+        "control_recommendation",
+        "confidence_or_quality_indicator",
+        "timestamp",
+        "sequence_id"
+      ],
+      "name": "model_output",
+      "purpose": "Return aerodynamic control decisions and validity metadata",
+      "type": "structured_output"
+    },
+    {
+      "fields": [
+        "command_value",
+        "clamp_status",
+        "validity_status"
+      ],
+      "name": "actuator_command",
+      "purpose": "Deliver bounded commands to the downstream actuator interface",
+      "type": "structured_output"
+    },
+    {
+      "fields": [
+        "stale_data_status",
+        "timeout_status",
+        "fallback_active"
+      ],
+      "name": "safety_state",
+      "purpose": "Expose safety and fallback state",
+      "type": "structured_output"
+    },
+    {
+      "fields": [
+        "input_summary",
+        "reference_result",
+        "implementation_result",
+        "deviation_summary"
+      ],
+      "name": "reference_trace",
+      "purpose": "Support transparency, comparison, and verification",
+      "type": "log_or_report"
+    }
+  ],
+  "name": "intelligent_active_aerodynamics_controller",
+  "objective": "Develop an intelligent active-aerodynamics control system for automotive operation over 20\u201355 m/s using a physics-based surrogate and a transparent reference implementation. The system must support model evaluation, architecture partitioning, implementation, optimization, and delivery of hardware, firmware, and software elements with bounded control behavior, stale-data detection, timeout handling, and safe fallback.",
+  "operating_envelope": {
+    "stream_velocity_mps": [
+      20,
+      55
+    ]
+  },
+  "physics_domain": "automotive_aerodynamics",
+  "required_capabilities": [
+    "Ingest vehicle geometry and operating-condition inputs.",
+    "Evaluate a physics-based surrogate for active-aerodynamics control decisions.",
+    "Provide a transparent reference computation path for cross-checking results.",
+    "Partition the application into data ingestion, model evaluation, control synthesis, command validation, and safety management functions.",
+    "Detect stale data based on age or sequence validity.",
+    "Enforce timeout handling for delayed or missing outputs.",
+    "Clamp outputs to actuator-safe limits.",
+    "Transition to a safe fallback state when validation fails.",
+    "Support architecture definition and optimization for the final implementation path.",
+    "Expose interfaces suitable for hardware, firmware, and software integration."
+  ],
+  "schema": "chiploop.application_intelligence.contract.v1",
+  "source_of_truth": "supabase",
+  "workloads": [
+    {
+      "description": "Load and validate STL geometry derived from the reference vehicle model.",
+      "name": "geometry_ingestion"
+    },
+    {
+      "description": "Prepare stream-velocity and scenario inputs across the 20\u201355 m/s envelope.",
+      "name": "operating_condition_preparation"
+    },
+    {
+      "description": "Compute aerodynamic control-relevant outputs using a physics-based surrogate model.",
+      "name": "physics_surrogate_evaluation"
+    },
+    {
+      "description": "Run a verifiable reference implementation to support comparison, traceability, and validation.",
+      "name": "transparent_reference_execution"
+    },
+    {
+      "description": "Generate active-aerodynamics control commands from model outputs and operating conditions.",
+      "name": "control_decision_generation"
+    },
+    {
+      "description": "Check freshness, bounds, and validity of commands before release to actuators.",
+      "name": "command_safety_validation"
+    },
+    {
+      "description": "Detect late, missing, or invalid results and switch to a safe fallback mode.",
+      "name": "timeout_and_fallback_management"
+    },
+    {
+      "description": "Define functional partitions, allocate responsibilities, and optimize the implementation architecture.",
+      "name": "architecture_partitioning_and_optimization"
+    },
+    {
+      "description": "Run repeatable tests against the approved reference set and record measurable compliance results.",
+      "name": "verification_and_regression_testing"
+    }
+  ]
+}
