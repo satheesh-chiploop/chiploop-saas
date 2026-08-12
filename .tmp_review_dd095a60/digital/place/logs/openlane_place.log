@@ -1,0 +1,2203 @@
+== ChipLoop: Digital Placement Agent ==
+PDK_VARIANT=sky130A
+OPENLANE_IMAGE=ghcr.io/efabless/openlane2:2.4.0.dev1
+WORKDIR=/work
+[20:22:11] INFO     Loading the design configuration file has      config.py:716
+                    generated the following warnings:                           
+[20:22:11] WARNING  The configuration variable 'PL_TARGET_DENSITY' config.py:720
+                    is deprecated. Please check the docs for the                
+                    usage on the replacement variable                           
+                    'PL_TARGET_DENSITY_PCT'.                                    
+[20:22:11] WARNING  An unknown key 'CHIPLOOP_DIE_SIDE_UM' was      config.py:720
+                    provided.                                                   
+[20:22:11] WARNING  An unknown key 'CHIPLOOP_FILELIST' was         config.py:720
+                    provided.                                                   
+[20:22:11] WARNING  An unknown key 'CHIPLOOP_SOURCE_SPEC_JSON' was config.py:720
+                    provided.                                                   
+[20:22:11] WARNING  An unknown key 'CHIPLOOP_TOP_LEVEL_IO_BITS'    config.py:720
+                    was provided.                                               
+[20:22:11] WARNING  An unknown key 'CHIPLOOP_UPSTREAM_SDC_SOURCE'  config.py:720
+                    was provided.                                               
+[20:22:11] INFO     Starting a new run of the 'Classic' flow with    flow.py:628
+                    the tag                                                     
+                    'Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-94            
+                    3e030b19e3'.                                                
+[20:22:11] INFO     Starting…                                  sequential.py:294
+[20:22:11] INFO     Gating variable for step 'Verilator.Lint'  sequential.py:317
+                    set to 'False'- the step will be skipped.                   
+[20:22:11] INFO     Skipping step 'Verilator Lint'…            sequential.py:325
+[20:22:11] INFO     Gating variable for step                   sequential.py:317
+                    'Checker.LintTimingConstructs' set to                       
+                    'False'- the step will be skipped.                          
+[20:22:11] INFO     Skipping step 'Lint Timing Error Checker'… sequential.py:325
+[20:22:11] INFO     Gating variable for step                   sequential.py:317
+                    'Checker.LintErrors' set to 'False'- the                    
+                    step will be skipped.                                       
+[20:22:11] INFO     Skipping step 'Lint Errors Checker'…       sequential.py:325
+[20:22:11] INFO     Gating variable for step                   sequential.py:317
+                    'Checker.LintWarnings' set to 'False'- the                  
+                    step will be skipped.                                       
+[20:22:11] INFO     Skipping step 'Lint Warnings Checker'…     sequential.py:325
+───────────────────────────── Generate JSON Header ─────────────────────────────
+[20:22:11] VERBOSE  Running 'Yosys.JsonHeader' at                   step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/01-yosys-jsonheader'…                
+[20:22:12] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/01-yosys-jsonheader/yosy             
+                    s-jsonheader.log'…                                          
+                                                                                
+/----------------------------------------------------------------------------\  
+|  yosys -- Yosys Open SYnthesis Suite                                       |  
+|  Copyright (C) 2012 - 2024  Claire Xenia Wolf <claire@yosyshq.com>         |  
+|  Distributed under an ISC-like license, type "license" to see terms        |  
+\----------------------------------------------------------------------------/  
+Yosys 0.46 (git sha1 e97731b9dda91fa5fa53ed87df7c34163ba59a41, clang++ 17.0.6   
+-fPIC -O3)                                                                      
+Loaded SDC plugin                                                               
+                                                                                
+1. Executing Verilog-2005 frontend:                                             
+/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/tmp/6
+9fe72ec6bf048b5962692487830b973.bb.v                                            
+Parsing SystemVerilog input from                                                
+`/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/tmp/
+69fe72ec6bf048b5962692487830b973.bb.v' to AST representation.                   
+Generating RTLIL representation for module `\sky130_ef_sc_hd__decap_12'.        
+Generating RTLIL representation for module `\sky130_ef_sc_hd__fill_12'.         
+Generating RTLIL representation for module `\sky130_ef_sc_hd__fill_4'.          
+Generating RTLIL representation for module `\sky130_ef_sc_hd__fill_8'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111o_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111o_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111o_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111oi_0'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111oi_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111oi_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2111oi_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211o_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211o_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211o_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211oi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211oi_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a211oi_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21bo_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21bo_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21bo_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21boi_0'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21boi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21boi_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21boi_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a21oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221o_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221o_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221o_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221oi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221oi_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a221oi_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a222oi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a22oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2o_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2o_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2o_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2oi_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2oi_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a2bb2oi_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311o_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311o_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311o_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311oi_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311oi_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a311oi_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a31oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a32oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41o_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41o_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41o_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41oi_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41oi_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__a41oi_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2_0'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and2b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and3b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4bb_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4bb_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__and4bb_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_12'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_16'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_6'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__buf_8'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__bufbuf_16'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__bufbuf_8'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__bufinv_16'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__bufinv_8'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_16'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkbuf_8'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s15_1'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s15_2'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s18_1'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s18_2'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s25_1'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s25_2'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s50_1'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkdlybuf4s50_2'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_16'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinv_8'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinvlp_2'.      
+Generating RTLIL representation for module `\sky130_fd_sc_hd__clkinvlp_4'.      
+Generating RTLIL representation for module `\sky130_fd_sc_hd__conb_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_12'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_3'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_6'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__decap_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfbbn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfbbn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfbbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrbp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfrtp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfsbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfsbp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfstp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfstp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfstp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxbp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxtp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxtp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dfxtp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__diode_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlclkp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlclkp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlclkp_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrbn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrbn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrbp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtn_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlrtp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxbn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxbn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxbp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxtn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxtn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxtn_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlxtp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlygate4sd1_1'.   
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlygate4sd2_1'.   
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlygate4sd3_1'.   
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlymetal6s2s_1'.  
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlymetal6s4s_1'.  
+Generating RTLIL representation for module `\sky130_fd_sc_hd__dlymetal6s6s_1'.  
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ebufn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ebufn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ebufn_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ebufn_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__edfxbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__edfxtp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_0'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvn_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvp_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvp_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvp_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__einvp_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fa_1'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fa_2'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fa_4'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fah_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fahcin_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fahcon_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__fill_8'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ha_1'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ha_2'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__ha_4'.            
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_12'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_16'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_6'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__inv_8'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__lpflow_bleeder_1'.
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_1'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_16'.                                      
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_2'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_4'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkbufkapwr_8'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_1'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_16'.                                      
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_2'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_4'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_clkinvkapwr_8'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_12'.                                       
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_3'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_4'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_6'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_decapkapwr_8'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputiso0n_1'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputiso0p_1'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputiso1n_1'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputiso1p_1'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_inputisolatch_1'.                                     
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_1'.                                         
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_16'.                                        
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_2'.                                         
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_4'.                                         
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrc_8'.                                         
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_isobufsrckapwr_16'.                                   
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_1'.                           
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_2'.                           
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_4'.                           
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_4'.                                  
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_1'.                              
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_2'.                              
+Generating RTLIL representation for module                                      
+`\sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_4'.                              
+Generating RTLIL representation for module `\sky130_fd_sc_hd__macro_sparecell'. 
+Generating RTLIL representation for module `\sky130_fd_sc_hd__maj3_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__maj3_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__maj3_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2_8'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2i_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2i_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux2i_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux4_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux4_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__mux4_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2_8'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2b_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2b_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand2b_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3b_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3b_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand3b_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4b_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4b_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4b_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4bb_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4bb_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nand4bb_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2_8'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor2b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor3b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4b_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4b_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4b_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4bb_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4bb_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__nor4bb_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111a_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111a_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111a_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111ai_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111ai_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2111ai_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211a_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211a_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211a_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211ai_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211ai_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o211ai_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ai_0'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ba_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ba_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21ba_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21bai_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21bai_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o21bai_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221a_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221a_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221a_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221ai_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221ai_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o221ai_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o22ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2a_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2a_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2a_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2ai_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2ai_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o2bb2ai_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311a_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311a_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311a_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311ai_0'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311ai_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311ai_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o311ai_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o31ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o32ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41a_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41a_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41a_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41ai_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41ai_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__o41ai_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_0'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2b_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2b_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or2b_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3b_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3b_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or3b_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4_4'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4b_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4b_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4b_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4bb_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4bb_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__or4bb_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__probe_p_8'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__probec_p_8'.      
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfbbn_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfbbn_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfbbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrbp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrtn_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrtp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrtp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfrtp_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfsbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfsbp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfstp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfstp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfstp_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxbp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxbp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxtp_1'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxtp_2'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdfxtp_4'.        
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdlclkp_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdlclkp_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sdlclkp_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxbp_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxbp_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxtp_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxtp_2'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__sedfxtp_4'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tap_1'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tap_2'.           
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tapvgnd2_1'.      
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tapvgnd_1'.       
+Generating RTLIL representation for module `\sky130_fd_sc_hd__tapvpwrvgnd_1'.   
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor2_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor2_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor2_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor3_1'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor3_2'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xnor3_4'.         
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor2_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor2_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor2_4'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor3_1'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor3_2'.          
+Generating RTLIL representation for module `\sky130_fd_sc_hd__xor3_4'.          
+Successfully finished Verilog frontend.                                         
+                                                                                
+2. Executing Verilog-2005 frontend: inputs/netlist/safety_fault_watchdog_synth.v
+Parsing SystemVerilog input from `inputs/netlist/safety_fault_watchdog_synth.v' 
+to AST representation.                                                          
+Storing AST representation for module `$abstract\safety_fault_watchdog'.        
+Successfully finished Verilog frontend.                                         
+                                                                                
+3. Executing HIERARCHY pass (managing design hierarchy).                        
+                                                                                
+4. Executing AST frontend in derive mode using pre-parsed AST for module        
+`\safety_fault_watchdog'.                                                       
+Generating RTLIL representation for module `\safety_fault_watchdog'.            
+                                                                                
+4.1. Analyzing design hierarchy..                                               
+Top module:  \safety_fault_watchdog                                             
+                                                                                
+4.2. Analyzing design hierarchy..                                               
+Top module:  \safety_fault_watchdog                                             
+Removing unused module `$abstract\safety_fault_watchdog'.                       
+Removed 1 unused modules.                                                       
+Renaming module safety_fault_watchdog to safety_fault_watchdog.                 
+                                                                                
+5. Executing PROC pass (convert processes to netlists).                         
+                                                                                
+5.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).     
+Cleaned up 0 empty switches.                                                    
+                                                                                
+5.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).     
+Removed a total of 0 dead cases.                                                
+                                                                                
+5.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).     
+Removed 0 redundant assignments.                                                
+Promoted 0 assignments to connections.                                          
+                                                                                
+5.4. Executing PROC_INIT pass (extract init attributes).                        
+                                                                                
+5.5. Executing PROC_ARST pass (detect async resets in processes).               
+                                                                                
+5.6. Executing PROC_ROM pass (convert switches to ROMs).                        
+Converted 0 switches.                                                           
+                                                                                
+5.7. Executing PROC_MUX pass (convert decision trees to multiplexers).          
+                                                                                
+5.8. Executing PROC_DLATCH pass (convert process syncs to latches).             
+                                                                                
+5.9. Executing PROC_DFF pass (convert process syncs to FFs).                    
+                                                                                
+5.10. Executing PROC_MEMWR pass (convert process memory writes to cells).       
+                                                                                
+5.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).    
+Cleaned up 0 empty switches.                                                    
+                                                                                
+5.12. Executing OPT_EXPR pass (perform const folding).                          
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+6. Executing FLATTEN pass (flatten design).                                     
+                                                                                
+7. Executing OPT_CLEAN pass (remove unused cells and wires).                    
+Finding unused cells or wires in module \safety_fault_watchdog..                
+────────────────────────────────── Synthesis ───────────────────────────────────
+[20:22:13] VERBOSE  Running 'Yosys.Synthesis' at                    step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/02-yosys-synthesis'…                 
+[20:22:13] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/02-yosys-synthesis/yosys             
+                    -synthesis.log'…                                            
+                                                                                
+/----------------------------------------------------------------------------\  
+|  yosys -- Yosys Open SYnthesis Suite                                       |  
+|  Copyright (C) 2012 - 2024  Claire Xenia Wolf <claire@yosyshq.com>         |  
+|  Distributed under an ISC-like license, type "license" to see terms        |  
+\----------------------------------------------------------------------------/  
+Yosys 0.46 (git sha1 e97731b9dda91fa5fa53ed87df7c34163ba59a41, clang++ 17.0.6   
+-fPIC -O3)                                                                      
+Loaded SDC plugin                                                               
+                                                                                
+1. Executing Liberty frontend:                                                  
+/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/lib
+s.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib                     
+Imported 428 cell types from liberty file.                                      
+[INFO] Using SDC file                                                           
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/02-y
+osys-synthesis/synthesis.abc.sdc' for ABC…                                      
+                                                                                
+2. Executing Verilog-2005 frontend: inputs/netlist/safety_fault_watchdog_synth.v
+Parsing SystemVerilog input from `inputs/netlist/safety_fault_watchdog_synth.v' 
+to AST representation.                                                          
+Storing AST representation for module `$abstract\safety_fault_watchdog'.        
+Successfully finished Verilog frontend.                                         
+                                                                                
+3. Executing HIERARCHY pass (managing design hierarchy).                        
+                                                                                
+4. Executing AST frontend in derive mode using pre-parsed AST for module        
+`\safety_fault_watchdog'.                                                       
+Generating RTLIL representation for module `\safety_fault_watchdog'.            
+                                                                                
+4.1. Analyzing design hierarchy..                                               
+Top module:  \safety_fault_watchdog                                             
+                                                                                
+4.2. Analyzing design hierarchy..                                               
+Top module:  \safety_fault_watchdog                                             
+Removing unused module `$abstract\safety_fault_watchdog'.                       
+Removed 1 unused modules.                                                       
+Renaming module safety_fault_watchdog to safety_fault_watchdog.                 
+                                                                                
+5. Generating Graphviz representation of design.                                
+Writing dot description to                                                      
+`/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/02-y
+osys-synthesis/hierarchy.dot'.                                                  
+Dumping module safety_fault_watchdog to page 1.                                 
+                                                                                
+6. Executing TRIBUF pass.                                                       
+                                                                                
+7. Executing HIERARCHY pass (managing design hierarchy).                        
+                                                                                
+7.1. Analyzing design hierarchy..                                               
+Top module:  \safety_fault_watchdog                                             
+                                                                                
+7.2. Analyzing design hierarchy..                                               
+Top module:  \safety_fault_watchdog                                             
+Removed 0 unused modules.                                                       
+                                                                                
+8. Executing PROC_CLEAN pass (remove empty switches from decision trees).       
+Cleaned up 0 empty switches.                                                    
+                                                                                
+9. Executing PROC_RMDEAD pass (remove dead branches from decision trees).       
+Removed a total of 0 dead cases.                                                
+                                                                                
+10. Executing PROC_PRUNE pass (remove redundant assignments in processes).      
+Removed 0 redundant assignments.                                                
+Promoted 0 assignments to connections.                                          
+                                                                                
+11. Executing PROC_INIT pass (extract init attributes).                         
+                                                                                
+12. Executing PROC_ARST pass (detect async resets in processes).                
+                                                                                
+13. Executing PROC_ROM pass (convert switches to ROMs).                         
+Converted 0 switches.                                                           
+                                                                                
+14. Executing PROC_MUX pass (convert decision trees to multiplexers).           
+                                                                                
+15. Executing PROC_DLATCH pass (convert process syncs to latches).              
+                                                                                
+16. Executing PROC_DFF pass (convert process syncs to FFs).                     
+                                                                                
+17. Executing PROC_MEMWR pass (convert process memory writes to cells).         
+                                                                                
+18. Executing PROC_CLEAN pass (remove empty switches from decision trees).      
+Cleaned up 0 empty switches.                                                    
+                                                                                
+19. Executing CHECK pass (checking for obvious problems).                       
+Checking module safety_fault_watchdog...                                        
+Found and reported 0 problems.                                                  
+                                                                                
+20. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+21. Executing FLATTEN pass (flatten design).                                    
+                                                                                
+22. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+23. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+24. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+25. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+26. Executing OPT_MUXTREE pass (detect dead branches in mux trees).             
+Running muxtree optimizer on module \safety_fault_watchdog..                    
+Creating internal representation of mux trees.                                  
+No muxes found in this module.                                                  
+Removed 0 multiplexer ports.                                                    
+                                                                                
+27. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).         
+Optimizing cells in module \safety_fault_watchdog.                              
+Performed a total of 0 changes.                                                 
+                                                                                
+28. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+29. Executing OPT_DFF pass (perform DFF optimizations).                         
+                                                                                
+30. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+31. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+32. Executing FSM pass (extract and optimize FSM).                              
+                                                                                
+32.1. Executing FSM_DETECT pass (finding FSMs in design).                       
+                                                                                
+32.2. Executing FSM_EXTRACT pass (extracting FSM from design).                  
+                                                                                
+32.3. Executing FSM_OPT pass (simple optimizations of FSMs).                    
+                                                                                
+32.4. Executing OPT_CLEAN pass (remove unused cells and wires).                 
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+32.5. Executing FSM_OPT pass (simple optimizations of FSMs).                    
+                                                                                
+32.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).              
+                                                                                
+32.7. Executing FSM_INFO pass (dumping all available information on FSM cells). 
+                                                                                
+32.8. Executing FSM_MAP pass (mapping FSMs to basic logic).                     
+                                                                                
+33. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+34. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+35. Executing OPT_MUXTREE pass (detect dead branches in mux trees).             
+Running muxtree optimizer on module \safety_fault_watchdog..                    
+Creating internal representation of mux trees.                                  
+No muxes found in this module.                                                  
+Removed 0 multiplexer ports.                                                    
+                                                                                
+36. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).         
+Optimizing cells in module \safety_fault_watchdog.                              
+Performed a total of 0 changes.                                                 
+                                                                                
+37. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+38. Executing OPT_DFF pass (perform DFF optimizations).                         
+                                                                                
+39. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+40. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+41. Executing WREDUCE pass (reducing word size of cells).                       
+                                                                                
+42. Executing PEEPOPT pass (run peephole optimizers).                           
+                                                                                
+43. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+44. Executing ALUMACC pass (create $alu and $macc cells).                       
+Extracting $alu and $macc cells in module safety_fault_watchdog:                
+created 0 $alu and 0 $macc cells.                                               
+                                                                                
+45. Executing SHARE pass (SAT-based resource sharing).                          
+                                                                                
+46. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+47. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+48. Executing OPT_MUXTREE pass (detect dead branches in mux trees).             
+Running muxtree optimizer on module \safety_fault_watchdog..                    
+Creating internal representation of mux trees.                                  
+No muxes found in this module.                                                  
+Removed 0 multiplexer ports.                                                    
+                                                                                
+49. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).         
+Optimizing cells in module \safety_fault_watchdog.                              
+Performed a total of 0 changes.                                                 
+                                                                                
+50. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+51. Executing OPT_DFF pass (perform DFF optimizations).                         
+                                                                                
+52. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+53. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+54. Executing MEMORY pass.                                                      
+                                                                                
+54.1. Executing OPT_MEM pass (optimize memories).                               
+Performed a total of 0 transformations.                                         
+                                                                                
+54.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write        
+priority relations).                                                            
+Performed a total of 0 transformations.                                         
+                                                                                
+54.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback    
+paths).                                                                         
+                                                                                
+54.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).                
+                                                                                
+54.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).                 
+                                                                                
+54.6. Executing OPT_CLEAN pass (remove unused cells and wires).                 
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+54.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).          
+                                                                                
+54.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.                                         
+                                                                                
+54.9. Executing OPT_CLEAN pass (remove unused cells and wires).                 
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+54.10. Executing MEMORY_COLLECT pass (generating $mem cells).                   
+                                                                                
+55. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+56. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+57. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+58. Executing OPT_DFF pass (perform DFF optimizations).                         
+                                                                                
+59. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+60. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).    
+                                                                                
+61. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+62. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+63. Executing OPT_MUXTREE pass (detect dead branches in mux trees).             
+Running muxtree optimizer on module \safety_fault_watchdog..                    
+Creating internal representation of mux trees.                                  
+No muxes found in this module.                                                  
+Removed 0 multiplexer ports.                                                    
+                                                                                
+64. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).         
+Optimizing cells in module \safety_fault_watchdog.                              
+Performed a total of 0 changes.                                                 
+                                                                                
+65. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+66. Executing OPT_SHARE pass.                                                   
+                                                                                
+67. Executing OPT_DFF pass (perform DFF optimizations).                         
+                                                                                
+68. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+69. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+70. Executing TECHMAP pass (map to technology primitives).                      
+                                                                                
+70.1. Executing Verilog-2005 frontend:                                          
+/nix/store/9r0bh7sp051dpm8km8bqlb028anpd3v3-yosys/bin/../share/yosys/techmap.v  
+Parsing Verilog input from                                                      
+`/nix/store/9r0bh7sp051dpm8km8bqlb028anpd3v3-yosys/bin/../share/yosys/techmap.v'
+to AST representation.                                                          
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.           
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.         
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.          
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.        
+Generating RTLIL representation for module `\_90_simplemap_various'.            
+Generating RTLIL representation for module `\_90_simplemap_registers'.          
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.  
+Generating RTLIL representation for module `\_90_shift_shiftx'.                 
+Generating RTLIL representation for module `\_90_fa'.                           
+Generating RTLIL representation for module `\_90_lcu_brent_kung'.               
+Generating RTLIL representation for module `\_90_alu'.                          
+Generating RTLIL representation for module `\_90_macc'.                         
+Generating RTLIL representation for module `\_90_alumacc'.                      
+Generating RTLIL representation for module `\$__div_mod_u'.                     
+Generating RTLIL representation for module `\$__div_mod_trunc'.                 
+Generating RTLIL representation for module `\_90_div'.                          
+Generating RTLIL representation for module `\_90_mod'.                          
+Generating RTLIL representation for module `\$__div_mod_floor'.                 
+Generating RTLIL representation for module `\_90_divfloor'.                     
+Generating RTLIL representation for module `\_90_modfloor'.                     
+Generating RTLIL representation for module `\_90_pow'.                          
+Generating RTLIL representation for module `\_90_pmux'.                         
+Generating RTLIL representation for module `\_90_demux'.                        
+Generating RTLIL representation for module `\_90_lut'.                          
+Successfully finished Verilog frontend.                                         
+                                                                                
+70.2. Continuing TECHMAP pass.                                                  
+No more expansions possible.                                                    
+<suppressed ~73 debug messages>                                                 
+                                                                                
+71. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+72. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+73. Executing OPT_DFF pass (perform DFF optimizations).                         
+                                                                                
+74. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+75. Executing OPT_EXPR pass (perform const folding).                            
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+76. Executing OPT_MERGE pass (detect identical cells).                          
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+77. Executing OPT_DFF pass (perform DFF optimizations).                         
+                                                                                
+78. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+79. Executing ABC pass (technology mapping using ABC).                          
+                                                                                
+79.1. Extracting gate netlist of module `\safety_fault_watchdog' to             
+`<abc-temp-dir>/input.blif'..                                                   
+Extracted 0 gates and 0 wires to a netlist network with 0 inputs and 0 outputs. 
+Don't call ABC as there is nothing to map.                                      
+Removing temp directory.                                                        
+                                                                                
+80. Executing OPT pass (performing simple optimizations).                       
+                                                                                
+80.1. Executing OPT_EXPR pass (perform const folding).                          
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+80.2. Executing OPT_MERGE pass (detect identical cells).                        
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+80.3. Executing OPT_DFF pass (perform DFF optimizations).                       
+                                                                                
+80.4. Executing OPT_CLEAN pass (remove unused cells and wires).                 
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+80.5. Finished fast OPT passes.                                                 
+                                                                                
+81. Executing HIERARCHY pass (managing design hierarchy).                       
+                                                                                
+81.1. Analyzing design hierarchy..                                              
+Top module:  \safety_fault_watchdog                                             
+                                                                                
+81.2. Analyzing design hierarchy..                                              
+Top module:  \safety_fault_watchdog                                             
+Removed 0 unused modules.                                                       
+                                                                                
+82. Executing CHECK pass (checking for obvious problems).                       
+Checking module safety_fault_watchdog...                                        
+Found and reported 0 problems.                                                  
+                                                                                
+83. Printing statistics.                                                        
+                                                                                
+=== safety_fault_watchdog ===                                                   
+                                                                                
+Number of wires:               1073                                             
+Number of wire bits:           1172                                             
+Number of public wires:        1073                                             
+Number of public wire bits:    1172                                             
+Number of ports:                 16                                             
+Number of port bits:            115                                             
+Number of memories:               0                                             
+Number of memory bits:            0                                             
+Number of processes:              0                                             
+Number of cells:               1102                                             
+sky130_fd_sc_hd__a2111o_2       1                                               
+sky130_fd_sc_hd__a21o_2        15                                               
+sky130_fd_sc_hd__a21oi_2       25                                               
+sky130_fd_sc_hd__a221o_2       33                                               
+sky130_fd_sc_hd__a22o_2       111                                               
+sky130_fd_sc_hd__a22oi_2        1                                               
+sky130_fd_sc_hd__a2bb2o_2       2                                               
+sky130_fd_sc_hd__a31o_2        20                                               
+sky130_fd_sc_hd__a31oi_2        2                                               
+sky130_fd_sc_hd__a32o_2         1                                               
+sky130_fd_sc_hd__a41o_2         1                                               
+sky130_fd_sc_hd__and2_2        28                                               
+sky130_fd_sc_hd__and2b_2       21                                               
+sky130_fd_sc_hd__and3_2        27                                               
+sky130_fd_sc_hd__and4_2        31                                               
+sky130_fd_sc_hd__and4b_2        1                                               
+sky130_fd_sc_hd__dfrtp_2      301                                               
+sky130_fd_sc_hd__dfstp_2        1                                               
+sky130_fd_sc_hd__dfxtp_2        8                                               
+sky130_fd_sc_hd__inv_2         15                                               
+sky130_fd_sc_hd__mux2_1       134                                               
+sky130_fd_sc_hd__nand2_2       43                                               
+sky130_fd_sc_hd__nand2b_2       4                                               
+sky130_fd_sc_hd__nand3_2        1                                               
+sky130_fd_sc_hd__nand3b_2       1                                               
+sky130_fd_sc_hd__nor2_2        50                                               
+sky130_fd_sc_hd__nor3_2         1                                               
+sky130_fd_sc_hd__nor4_2         3                                               
+sky130_fd_sc_hd__o211a_2        1                                               
+sky130_fd_sc_hd__o21a_2        25                                               
+sky130_fd_sc_hd__o21ai_2        8                                               
+sky130_fd_sc_hd__o21ba_2       23                                               
+sky130_fd_sc_hd__o21bai_2       2                                               
+sky130_fd_sc_hd__o221a_2        2                                               
+sky130_fd_sc_hd__o22a_2         6                                               
+sky130_fd_sc_hd__o2bb2a_2       3                                               
+sky130_fd_sc_hd__o311a_2        1                                               
+sky130_fd_sc_hd__o31a_2        14                                               
+sky130_fd_sc_hd__o31ai_2        1                                               
+sky130_fd_sc_hd__o41a_2         2                                               
+sky130_fd_sc_hd__or2_2         30                                               
+sky130_fd_sc_hd__or3_2         13                                               
+sky130_fd_sc_hd__or3b_2         5                                               
+sky130_fd_sc_hd__or4_2         35                                               
+sky130_fd_sc_hd__or4b_2         4                                               
+sky130_fd_sc_hd__xnor2_2       25                                               
+sky130_fd_sc_hd__xor2_2        20                                               
+                                                                                
+84. Generating Graphviz representation of design.                               
+Writing dot description to                                                      
+`/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/02-y
+osys-synthesis/primitive_techmap.dot'.                                          
+Dumping module safety_fault_watchdog to page 1.                                 
+                                                                                
+85. Executing OPT pass (performing simple optimizations).                       
+                                                                                
+85.1. Executing OPT_EXPR pass (perform const folding).                          
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+85.2. Executing OPT_MERGE pass (detect identical cells).                        
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+85.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).           
+Running muxtree optimizer on module \safety_fault_watchdog..                    
+Creating internal representation of mux trees.                                  
+No muxes found in this module.                                                  
+Removed 0 multiplexer ports.                                                    
+                                                                                
+85.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).       
+Optimizing cells in module \safety_fault_watchdog.                              
+Performed a total of 0 changes.                                                 
+                                                                                
+85.5. Executing OPT_MERGE pass (detect identical cells).                        
+Finding identical cells in module `\safety_fault_watchdog'.                     
+Removed a total of 0 cells.                                                     
+                                                                                
+85.6. Executing OPT_DFF pass (perform DFF optimizations).                       
+                                                                                
+85.7. Executing OPT_CLEAN pass (remove unused cells and wires).                 
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+85.8. Executing OPT_EXPR pass (perform const folding).                          
+Optimizing module safety_fault_watchdog.                                        
+                                                                                
+85.9. Finished OPT passes. (There is nothing left to do.)                       
+                                                                                
+86. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+{                                                                               
+"creator": "Yosys 0.46 (git sha1 e97731b9dda91fa5fa53ed87df7c34163ba59a41,      
+clang++ 17.0.6 -fPIC -O3)",                                                     
+"invocation": "stat -json -liberty                                              
+/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/tmp/9
+2222cdb60794b04a0a889f23c501e7c.lib ",                                          
+"modules": {                                                                    
+"\\safety_fault_watchdog": {                                                    
+"num_wires":         1073,                                                      
+"num_wire_bits":     1172,                                                      
+"num_pub_wires":     1073,                                                      
+"num_pub_wire_bits": 1172,                                                      
+"num_ports":         16,                                                        
+"num_port_bits":     115,                                                       
+"num_memories":      0,                                                         
+"num_memory_bits":   0,                                                         
+"num_processes":     0,                                                         
+"num_cells":         1102,                                                      
+"area":              15642.502400,                                              
+"num_cells_by_type": {                                                          
+"sky130_fd_sc_hd__a2111o_2": 1,                                                 
+"sky130_fd_sc_hd__a21o_2": 15,                                                  
+"sky130_fd_sc_hd__a21oi_2": 25,                                                 
+"sky130_fd_sc_hd__a221o_2": 33,                                                 
+"sky130_fd_sc_hd__a22o_2": 111,                                                 
+"sky130_fd_sc_hd__a22oi_2": 1,                                                  
+"sky130_fd_sc_hd__a2bb2o_2": 2,                                                 
+"sky130_fd_sc_hd__a31o_2": 20,                                                  
+"sky130_fd_sc_hd__a31oi_2": 2,                                                  
+"sky130_fd_sc_hd__a32o_2": 1,                                                   
+"sky130_fd_sc_hd__a41o_2": 1,                                                   
+"sky130_fd_sc_hd__and2_2": 28,                                                  
+"sky130_fd_sc_hd__and2b_2": 21,                                                 
+"sky130_fd_sc_hd__and3_2": 27,                                                  
+"sky130_fd_sc_hd__and4_2": 31,                                                  
+"sky130_fd_sc_hd__and4b_2": 1,                                                  
+"sky130_fd_sc_hd__dfrtp_2": 301,                                                
+"sky130_fd_sc_hd__dfstp_2": 1,                                                  
+"sky130_fd_sc_hd__dfxtp_2": 8,                                                  
+"sky130_fd_sc_hd__inv_2": 15,                                                   
+"sky130_fd_sc_hd__mux2_1": 134,                                                 
+"sky130_fd_sc_hd__nand2_2": 43,                                                 
+"sky130_fd_sc_hd__nand2b_2": 4,                                                 
+"sky130_fd_sc_hd__nand3_2": 1,                                                  
+"sky130_fd_sc_hd__nand3b_2": 1,                                                 
+"sky130_fd_sc_hd__nor2_2": 50,                                                  
+"sky130_fd_sc_hd__nor3_2": 1,                                                   
+"sky130_fd_sc_hd__nor4_2": 3,                                                   
+"sky130_fd_sc_hd__o211a_2": 1,                                                  
+"sky130_fd_sc_hd__o21a_2": 25,                                                  
+"sky130_fd_sc_hd__o21ai_2": 8,                                                  
+"sky130_fd_sc_hd__o21ba_2": 23,                                                 
+"sky130_fd_sc_hd__o21bai_2": 2,                                                 
+"sky130_fd_sc_hd__o221a_2": 2,                                                  
+"sky130_fd_sc_hd__o22a_2": 6,                                                   
+"sky130_fd_sc_hd__o2bb2a_2": 3,                                                 
+"sky130_fd_sc_hd__o311a_2": 1,                                                  
+"sky130_fd_sc_hd__o31a_2": 14,                                                  
+"sky130_fd_sc_hd__o31ai_2": 1,                                                  
+"sky130_fd_sc_hd__o41a_2": 2,                                                   
+"sky130_fd_sc_hd__or2_2": 30,                                                   
+"sky130_fd_sc_hd__or3_2": 13,                                                   
+"sky130_fd_sc_hd__or3b_2": 5,                                                   
+"sky130_fd_sc_hd__or4_2": 35,                                                   
+"sky130_fd_sc_hd__or4b_2": 4,                                                   
+"sky130_fd_sc_hd__xnor2_2": 25,                                                 
+"sky130_fd_sc_hd__xor2_2": 20                                                   
+}                                                                               
+}                                                                               
+},                                                                              
+"design": {                                                                     
+"num_wires":         1073,                                                      
+"num_wire_bits":     1172,                                                      
+"num_pub_wires":     1073,                                                      
+"num_pub_wire_bits": 1172,                                                      
+"num_ports":         16,                                                        
+"num_port_bits":     115,                                                       
+"num_memories":      0,                                                         
+"num_memory_bits":   0,                                                         
+"num_processes":     0,                                                         
+"num_cells":         1102,                                                      
+"area":              15642.502400,                                              
+"num_cells_by_type": {                                                          
+"sky130_fd_sc_hd__a2111o_2": 1,                                                 
+"sky130_fd_sc_hd__a21o_2": 15,                                                  
+"sky130_fd_sc_hd__a21oi_2": 25,                                                 
+"sky130_fd_sc_hd__a221o_2": 33,                                                 
+"sky130_fd_sc_hd__a22o_2": 111,                                                 
+"sky130_fd_sc_hd__a22oi_2": 1,                                                  
+"sky130_fd_sc_hd__a2bb2o_2": 2,                                                 
+"sky130_fd_sc_hd__a31o_2": 20,                                                  
+"sky130_fd_sc_hd__a31oi_2": 2,                                                  
+"sky130_fd_sc_hd__a32o_2": 1,                                                   
+"sky130_fd_sc_hd__a41o_2": 1,                                                   
+"sky130_fd_sc_hd__and2_2": 28,                                                  
+"sky130_fd_sc_hd__and2b_2": 21,                                                 
+"sky130_fd_sc_hd__and3_2": 27,                                                  
+"sky130_fd_sc_hd__and4_2": 31,                                                  
+"sky130_fd_sc_hd__and4b_2": 1,                                                  
+"sky130_fd_sc_hd__dfrtp_2": 301,                                                
+"sky130_fd_sc_hd__dfstp_2": 1,                                                  
+"sky130_fd_sc_hd__dfxtp_2": 8,                                                  
+"sky130_fd_sc_hd__inv_2": 15,                                                   
+"sky130_fd_sc_hd__mux2_1": 134,                                                 
+"sky130_fd_sc_hd__nand2_2": 43,                                                 
+"sky130_fd_sc_hd__nand2b_2": 4,                                                 
+"sky130_fd_sc_hd__nand3_2": 1,                                                  
+"sky130_fd_sc_hd__nand3b_2": 1,                                                 
+"sky130_fd_sc_hd__nor2_2": 50,                                                  
+"sky130_fd_sc_hd__nor3_2": 1,                                                   
+"sky130_fd_sc_hd__nor4_2": 3,                                                   
+"sky130_fd_sc_hd__o211a_2": 1,                                                  
+"sky130_fd_sc_hd__o21a_2": 25,                                                  
+"sky130_fd_sc_hd__o21ai_2": 8,                                                  
+"sky130_fd_sc_hd__o21ba_2": 23,                                                 
+"sky130_fd_sc_hd__o21bai_2": 2,                                                 
+"sky130_fd_sc_hd__o221a_2": 2,                                                  
+"sky130_fd_sc_hd__o22a_2": 6,                                                   
+"sky130_fd_sc_hd__o2bb2a_2": 3,                                                 
+"sky130_fd_sc_hd__o311a_2": 1,                                                  
+"sky130_fd_sc_hd__o31a_2": 14,                                                  
+"sky130_fd_sc_hd__o31ai_2": 1,                                                  
+"sky130_fd_sc_hd__o41a_2": 2,                                                   
+"sky130_fd_sc_hd__or2_2": 30,                                                   
+"sky130_fd_sc_hd__or3_2": 13,                                                   
+"sky130_fd_sc_hd__or3b_2": 5,                                                   
+"sky130_fd_sc_hd__or4_2": 35,                                                   
+"sky130_fd_sc_hd__or4b_2": 4,                                                   
+"sky130_fd_sc_hd__xnor2_2": 25,                                                 
+"sky130_fd_sc_hd__xor2_2": 20                                                   
+}                                                                               
+}                                                                               
+}                                                                               
+                                                                                
+87. Printing statistics.                                                        
+                                                                                
+=== safety_fault_watchdog ===                                                   
+                                                                                
+Number of wires:               1073                                             
+Number of wire bits:           1172                                             
+Number of public wires:        1073                                             
+Number of public wire bits:    1172                                             
+Number of ports:                 16                                             
+Number of port bits:            115                                             
+Number of memories:               0                                             
+Number of memory bits:            0                                             
+Number of processes:              0                                             
+Number of cells:               1102                                             
+sky130_fd_sc_hd__a2111o_2       1                                               
+sky130_fd_sc_hd__a21o_2        15                                               
+sky130_fd_sc_hd__a21oi_2       25                                               
+sky130_fd_sc_hd__a221o_2       33                                               
+sky130_fd_sc_hd__a22o_2       111                                               
+sky130_fd_sc_hd__a22oi_2        1                                               
+sky130_fd_sc_hd__a2bb2o_2       2                                               
+sky130_fd_sc_hd__a31o_2        20                                               
+sky130_fd_sc_hd__a31oi_2        2                                               
+sky130_fd_sc_hd__a32o_2         1                                               
+sky130_fd_sc_hd__a41o_2         1                                               
+sky130_fd_sc_hd__and2_2        28                                               
+sky130_fd_sc_hd__and2b_2       21                                               
+sky130_fd_sc_hd__and3_2        27                                               
+sky130_fd_sc_hd__and4_2        31                                               
+sky130_fd_sc_hd__and4b_2        1                                               
+sky130_fd_sc_hd__dfrtp_2      301                                               
+sky130_fd_sc_hd__dfstp_2        1                                               
+sky130_fd_sc_hd__dfxtp_2        8                                               
+sky130_fd_sc_hd__inv_2         15                                               
+sky130_fd_sc_hd__mux2_1       134                                               
+sky130_fd_sc_hd__nand2_2       43                                               
+sky130_fd_sc_hd__nand2b_2       4                                               
+sky130_fd_sc_hd__nand3_2        1                                               
+sky130_fd_sc_hd__nand3b_2       1                                               
+sky130_fd_sc_hd__nor2_2        50                                               
+sky130_fd_sc_hd__nor3_2         1                                               
+sky130_fd_sc_hd__nor4_2         3                                               
+sky130_fd_sc_hd__o211a_2        1                                               
+sky130_fd_sc_hd__o21a_2        25                                               
+sky130_fd_sc_hd__o21ai_2        8                                               
+sky130_fd_sc_hd__o21ba_2       23                                               
+sky130_fd_sc_hd__o21bai_2       2                                               
+sky130_fd_sc_hd__o221a_2        2                                               
+sky130_fd_sc_hd__o22a_2         6                                               
+sky130_fd_sc_hd__o2bb2a_2       3                                               
+sky130_fd_sc_hd__o311a_2        1                                               
+sky130_fd_sc_hd__o31a_2        14                                               
+sky130_fd_sc_hd__o31ai_2        1                                               
+sky130_fd_sc_hd__o41a_2         2                                               
+sky130_fd_sc_hd__or2_2         30                                               
+sky130_fd_sc_hd__or3_2         13                                               
+sky130_fd_sc_hd__or3b_2         5                                               
+sky130_fd_sc_hd__or4_2         35                                               
+sky130_fd_sc_hd__or4b_2         4                                               
+sky130_fd_sc_hd__xnor2_2       25                                               
+sky130_fd_sc_hd__xor2_2        20                                               
+                                                                                
+Chip area for module '\safety_fault_watchdog': 15642.502400                     
+of which used for sequential elements: 8105.273600 (51.82%)                     
+                                                                                
+[INFO] Applying tri-state buffer mapping from                                   
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.tech/openlane/sky130_fd_sc_hd/tribuff_map.v'…                                
+                                                                                
+88. Executing TECHMAP pass (map to technology primitives).                      
+                                                                                
+88.1. Executing Verilog-2005 frontend:                                          
+/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/lib
+s.tech/openlane/sky130_fd_sc_hd/tribuff_map.v                                   
+Parsing Verilog input from                                                      
+`/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.tech/openlane/sky130_fd_sc_hd/tribuff_map.v' to AST representation.          
+Generating RTLIL representation for module `\$_TBUF_'.                          
+Successfully finished Verilog frontend.                                         
+                                                                                
+88.2. Continuing TECHMAP pass.                                                  
+No more expansions possible.                                                    
+<suppressed ~3 debug messages>                                                  
+                                                                                
+89. Executing SIMPLEMAP pass (map simple cells to gate primitives).             
+[INFO] Applying latch mapping from                                              
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.tech/openlane/sky130_fd_sc_hd/latch_map.v'…                                  
+                                                                                
+90. Executing TECHMAP pass (map to technology primitives).                      
+                                                                                
+90.1. Executing Verilog-2005 frontend:                                          
+/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/lib
+s.tech/openlane/sky130_fd_sc_hd/latch_map.v                                     
+Parsing Verilog input from                                                      
+`/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.tech/openlane/sky130_fd_sc_hd/latch_map.v' to AST representation.            
+Generating RTLIL representation for module `\$_DLATCH_P_'.                      
+Generating RTLIL representation for module `\$_DLATCH_N_'.                      
+Successfully finished Verilog frontend.                                         
+                                                                                
+90.2. Continuing TECHMAP pass.                                                  
+No more expansions possible.                                                    
+<suppressed ~4 debug messages>                                                  
+                                                                                
+91. Executing SIMPLEMAP pass (map simple cells to gate primitives).             
+                                                                                
+92. Executing DFFLIBMAP pass (mapping DFF cells to sequential cells from liberty
+file).                                                                          
+cell sky130_fd_sc_hd__dfxtp_2 (noninv, pins=3, area=21.27) is a direct match for
+cell type $_DFF_P_.                                                             
+cell sky130_fd_sc_hd__dfrtp_2 (noninv, pins=4, area=26.28) is a direct match for
+cell type $_DFF_PN0_.                                                           
+cell sky130_fd_sc_hd__dfstp_2 (noninv, pins=4, area=26.28) is a direct match for
+cell type $_DFF_PN1_.                                                           
+cell sky130_fd_sc_hd__dfbbn_2 (noninv, pins=6, area=35.03) is a direct match for
+cell type $_DFFSR_NNN_.                                                         
+final dff cell mappings:                                                        
+unmapped dff cell: $_DFF_N_                                                     
+\sky130_fd_sc_hd__dfxtp_2 _DFF_P_ (.CLK( C), .D( D), .Q( Q));                   
+unmapped dff cell: $_DFF_NN0_                                                   
+unmapped dff cell: $_DFF_NN1_                                                   
+unmapped dff cell: $_DFF_NP0_                                                   
+unmapped dff cell: $_DFF_NP1_                                                   
+\sky130_fd_sc_hd__dfrtp_2 _DFF_PN0_ (.CLK( C), .D( D), .Q( Q), .RESET_B( R));   
+\sky130_fd_sc_hd__dfstp_2 _DFF_PN1_ (.CLK( C), .D( D), .Q( Q), .SET_B( R));     
+unmapped dff cell: $_DFF_PP0_                                                   
+unmapped dff cell: $_DFF_PP1_                                                   
+\sky130_fd_sc_hd__dfbbn_2 _DFFSR_NNN_ (.CLK_N( C), .D( D), .Q( Q), .Q_N(~Q),    
+.RESET_B( R), .SET_B( S));                                                      
+unmapped dff cell: $_DFFSR_NNP_                                                 
+unmapped dff cell: $_DFFSR_NPN_                                                 
+unmapped dff cell: $_DFFSR_NPP_                                                 
+unmapped dff cell: $_DFFSR_PNN_                                                 
+unmapped dff cell: $_DFFSR_PNP_                                                 
+unmapped dff cell: $_DFFSR_PPN_                                                 
+unmapped dff cell: $_DFFSR_PPP_                                                 
+                                                                                
+92.1. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+Mapping DFF cells in module `\safety_fault_watchdog':                           
+{                                                                               
+"creator": "Yosys 0.46 (git sha1 e97731b9dda91fa5fa53ed87df7c34163ba59a41,      
+clang++ 17.0.6 -fPIC -O3)",                                                     
+"invocation": "stat -json -liberty                                              
+/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/tmp/9
+2222cdb60794b04a0a889f23c501e7c.lib ",                                          
+"modules": {                                                                    
+"\\safety_fault_watchdog": {                                                    
+"num_wires":         1073,                                                      
+"num_wire_bits":     1172,                                                      
+"num_pub_wires":     1073,                                                      
+"num_pub_wire_bits": 1172,                                                      
+"num_ports":         16,                                                        
+"num_port_bits":     115,                                                       
+"num_memories":      0,                                                         
+"num_memory_bits":   0,                                                         
+"num_processes":     0,                                                         
+"num_cells":         1102,                                                      
+"area":              15642.502400,                                              
+"num_cells_by_type": {                                                          
+"sky130_fd_sc_hd__a2111o_2": 1,                                                 
+"sky130_fd_sc_hd__a21o_2": 15,                                                  
+"sky130_fd_sc_hd__a21oi_2": 25,                                                 
+"sky130_fd_sc_hd__a221o_2": 33,                                                 
+"sky130_fd_sc_hd__a22o_2": 111,                                                 
+"sky130_fd_sc_hd__a22oi_2": 1,                                                  
+"sky130_fd_sc_hd__a2bb2o_2": 2,                                                 
+"sky130_fd_sc_hd__a31o_2": 20,                                                  
+"sky130_fd_sc_hd__a31oi_2": 2,                                                  
+"sky130_fd_sc_hd__a32o_2": 1,                                                   
+"sky130_fd_sc_hd__a41o_2": 1,                                                   
+"sky130_fd_sc_hd__and2_2": 28,                                                  
+"sky130_fd_sc_hd__and2b_2": 21,                                                 
+"sky130_fd_sc_hd__and3_2": 27,                                                  
+"sky130_fd_sc_hd__and4_2": 31,                                                  
+"sky130_fd_sc_hd__and4b_2": 1,                                                  
+"sky130_fd_sc_hd__dfrtp_2": 301,                                                
+"sky130_fd_sc_hd__dfstp_2": 1,                                                  
+"sky130_fd_sc_hd__dfxtp_2": 8,                                                  
+"sky130_fd_sc_hd__inv_2": 15,                                                   
+"sky130_fd_sc_hd__mux2_1": 134,                                                 
+"sky130_fd_sc_hd__nand2_2": 43,                                                 
+"sky130_fd_sc_hd__nand2b_2": 4,                                                 
+"sky130_fd_sc_hd__nand3_2": 1,                                                  
+"sky130_fd_sc_hd__nand3b_2": 1,                                                 
+"sky130_fd_sc_hd__nor2_2": 50,                                                  
+"sky130_fd_sc_hd__nor3_2": 1,                                                   
+"sky130_fd_sc_hd__nor4_2": 3,                                                   
+"sky130_fd_sc_hd__o211a_2": 1,                                                  
+"sky130_fd_sc_hd__o21a_2": 25,                                                  
+"sky130_fd_sc_hd__o21ai_2": 8,                                                  
+"sky130_fd_sc_hd__o21ba_2": 23,                                                 
+"sky130_fd_sc_hd__o21bai_2": 2,                                                 
+"sky130_fd_sc_hd__o221a_2": 2,                                                  
+"sky130_fd_sc_hd__o22a_2": 6,                                                   
+"sky130_fd_sc_hd__o2bb2a_2": 3,                                                 
+"sky130_fd_sc_hd__o311a_2": 1,                                                  
+"sky130_fd_sc_hd__o31a_2": 14,                                                  
+"sky130_fd_sc_hd__o31ai_2": 1,                                                  
+"sky130_fd_sc_hd__o41a_2": 2,                                                   
+"sky130_fd_sc_hd__or2_2": 30,                                                   
+"sky130_fd_sc_hd__or3_2": 13,                                                   
+"sky130_fd_sc_hd__or3b_2": 5,                                                   
+"sky130_fd_sc_hd__or4_2": 35,                                                   
+"sky130_fd_sc_hd__or4b_2": 4,                                                   
+"sky130_fd_sc_hd__xnor2_2": 25,                                                 
+"sky130_fd_sc_hd__xor2_2": 20                                                   
+}                                                                               
+}                                                                               
+},                                                                              
+"design": {                                                                     
+"num_wires":         1073,                                                      
+"num_wire_bits":     1172,                                                      
+"num_pub_wires":     1073,                                                      
+"num_pub_wire_bits": 1172,                                                      
+"num_ports":         16,                                                        
+"num_port_bits":     115,                                                       
+"num_memories":      0,                                                         
+"num_memory_bits":   0,                                                         
+"num_processes":     0,                                                         
+"num_cells":         1102,                                                      
+"area":              15642.502400,                                              
+"num_cells_by_type": {                                                          
+"sky130_fd_sc_hd__a2111o_2": 1,                                                 
+"sky130_fd_sc_hd__a21o_2": 15,                                                  
+"sky130_fd_sc_hd__a21oi_2": 25,                                                 
+"sky130_fd_sc_hd__a221o_2": 33,                                                 
+"sky130_fd_sc_hd__a22o_2": 111,                                                 
+"sky130_fd_sc_hd__a22oi_2": 1,                                                  
+"sky130_fd_sc_hd__a2bb2o_2": 2,                                                 
+"sky130_fd_sc_hd__a31o_2": 20,                                                  
+"sky130_fd_sc_hd__a31oi_2": 2,                                                  
+"sky130_fd_sc_hd__a32o_2": 1,                                                   
+"sky130_fd_sc_hd__a41o_2": 1,                                                   
+"sky130_fd_sc_hd__and2_2": 28,                                                  
+"sky130_fd_sc_hd__and2b_2": 21,                                                 
+"sky130_fd_sc_hd__and3_2": 27,                                                  
+"sky130_fd_sc_hd__and4_2": 31,                                                  
+"sky130_fd_sc_hd__and4b_2": 1,                                                  
+"sky130_fd_sc_hd__dfrtp_2": 301,                                                
+"sky130_fd_sc_hd__dfstp_2": 1,                                                  
+"sky130_fd_sc_hd__dfxtp_2": 8,                                                  
+"sky130_fd_sc_hd__inv_2": 15,                                                   
+"sky130_fd_sc_hd__mux2_1": 134,                                                 
+"sky130_fd_sc_hd__nand2_2": 43,                                                 
+"sky130_fd_sc_hd__nand2b_2": 4,                                                 
+"sky130_fd_sc_hd__nand3_2": 1,                                                  
+"sky130_fd_sc_hd__nand3b_2": 1,                                                 
+"sky130_fd_sc_hd__nor2_2": 50,                                                  
+"sky130_fd_sc_hd__nor3_2": 1,                                                   
+"sky130_fd_sc_hd__nor4_2": 3,                                                   
+"sky130_fd_sc_hd__o211a_2": 1,                                                  
+"sky130_fd_sc_hd__o21a_2": 25,                                                  
+"sky130_fd_sc_hd__o21ai_2": 8,                                                  
+"sky130_fd_sc_hd__o21ba_2": 23,                                                 
+"sky130_fd_sc_hd__o21bai_2": 2,                                                 
+"sky130_fd_sc_hd__o221a_2": 2,                                                  
+"sky130_fd_sc_hd__o22a_2": 6,                                                   
+"sky130_fd_sc_hd__o2bb2a_2": 3,                                                 
+"sky130_fd_sc_hd__o311a_2": 1,                                                  
+"sky130_fd_sc_hd__o31a_2": 14,                                                  
+"sky130_fd_sc_hd__o31ai_2": 1,                                                  
+"sky130_fd_sc_hd__o41a_2": 2,                                                   
+"sky130_fd_sc_hd__or2_2": 30,                                                   
+"sky130_fd_sc_hd__or3_2": 13,                                                   
+"sky130_fd_sc_hd__or3b_2": 5,                                                   
+"sky130_fd_sc_hd__or4_2": 35,                                                   
+"sky130_fd_sc_hd__or4b_2": 4,                                                   
+"sky130_fd_sc_hd__xnor2_2": 25,                                                 
+"sky130_fd_sc_hd__xor2_2": 20                                                   
+}                                                                               
+}                                                                               
+}                                                                               
+                                                                                
+93. Printing statistics.                                                        
+                                                                                
+=== safety_fault_watchdog ===                                                   
+                                                                                
+Number of wires:               1073                                             
+Number of wire bits:           1172                                             
+Number of public wires:        1073                                             
+Number of public wire bits:    1172                                             
+Number of ports:                 16                                             
+Number of port bits:            115                                             
+Number of memories:               0                                             
+Number of memory bits:            0                                             
+Number of processes:              0                                             
+Number of cells:               1102                                             
+sky130_fd_sc_hd__a2111o_2       1                                               
+sky130_fd_sc_hd__a21o_2        15                                               
+sky130_fd_sc_hd__a21oi_2       25                                               
+sky130_fd_sc_hd__a221o_2       33                                               
+sky130_fd_sc_hd__a22o_2       111                                               
+sky130_fd_sc_hd__a22oi_2        1                                               
+sky130_fd_sc_hd__a2bb2o_2       2                                               
+sky130_fd_sc_hd__a31o_2        20                                               
+sky130_fd_sc_hd__a31oi_2        2                                               
+sky130_fd_sc_hd__a32o_2         1                                               
+sky130_fd_sc_hd__a41o_2         1                                               
+sky130_fd_sc_hd__and2_2        28                                               
+sky130_fd_sc_hd__and2b_2       21                                               
+sky130_fd_sc_hd__and3_2        27                                               
+sky130_fd_sc_hd__and4_2        31                                               
+sky130_fd_sc_hd__and4b_2        1                                               
+sky130_fd_sc_hd__dfrtp_2      301                                               
+sky130_fd_sc_hd__dfstp_2        1                                               
+sky130_fd_sc_hd__dfxtp_2        8                                               
+sky130_fd_sc_hd__inv_2         15                                               
+sky130_fd_sc_hd__mux2_1       134                                               
+sky130_fd_sc_hd__nand2_2       43                                               
+sky130_fd_sc_hd__nand2b_2       4                                               
+sky130_fd_sc_hd__nand3_2        1                                               
+sky130_fd_sc_hd__nand3b_2       1                                               
+sky130_fd_sc_hd__nor2_2        50                                               
+sky130_fd_sc_hd__nor3_2         1                                               
+sky130_fd_sc_hd__nor4_2         3                                               
+sky130_fd_sc_hd__o211a_2        1                                               
+sky130_fd_sc_hd__o21a_2        25                                               
+sky130_fd_sc_hd__o21ai_2        8                                               
+sky130_fd_sc_hd__o21ba_2       23                                               
+sky130_fd_sc_hd__o21bai_2       2                                               
+sky130_fd_sc_hd__o221a_2        2                                               
+sky130_fd_sc_hd__o22a_2         6                                               
+sky130_fd_sc_hd__o2bb2a_2       3                                               
+sky130_fd_sc_hd__o311a_2        1                                               
+sky130_fd_sc_hd__o31a_2        14                                               
+sky130_fd_sc_hd__o31ai_2        1                                               
+sky130_fd_sc_hd__o41a_2         2                                               
+sky130_fd_sc_hd__or2_2         30                                               
+sky130_fd_sc_hd__or3_2         13                                               
+sky130_fd_sc_hd__or3b_2         5                                               
+sky130_fd_sc_hd__or4_2         35                                               
+sky130_fd_sc_hd__or4b_2         4                                               
+sky130_fd_sc_hd__xnor2_2       25                                               
+sky130_fd_sc_hd__xor2_2        20                                               
+                                                                                
+Chip area for module '\safety_fault_watchdog': 15642.502400                     
+of which used for sequential elements: 8105.273600 (51.82%)                     
+                                                                                
+[INFO] Using generated ABC script                                               
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/02-y
+osys-synthesis/AREA_0.abc'…                                                     
+                                                                                
+94. Executing ABC pass (technology mapping using ABC).                          
+                                                                                
+94.1. Extracting gate netlist of module `\safety_fault_watchdog' to             
+`/tmp/yosys-abc-wibXch/input.blif'..                                            
+Extracted 0 gates and 0 wires to a netlist network with 0 inputs and 0 outputs. 
+Don't call ABC as there is nothing to map.                                      
+Removing temp directory.                                                        
+                                                                                
+95. Executing SETUNDEF pass (replace undef values with defined constants).      
+                                                                                
+96. Executing HILOMAP pass (mapping to constant drivers).                       
+                                                                                
+97. Executing SPLITNETS pass (splitting up multi-bit signals).                  
+                                                                                
+98. Executing OPT_CLEAN pass (remove unused cells and wires).                   
+Finding unused cells or wires in module \safety_fault_watchdog..                
+                                                                                
+99. Executing INSBUF pass (insert buffer cells for connected wires).            
+                                                                                
+100. Executing CHECK pass (checking for obvious problems).                      
+Checking module safety_fault_watchdog...                                        
+Found and reported 0 problems.                                                  
+{                                                                               
+"creator": "Yosys 0.46 (git sha1 e97731b9dda91fa5fa53ed87df7c34163ba59a41,      
+clang++ 17.0.6 -fPIC -O3)",                                                     
+"invocation": "stat -json -liberty                                              
+/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/tmp/9
+2222cdb60794b04a0a889f23c501e7c.lib ",                                          
+"modules": {                                                                    
+"\\safety_fault_watchdog": {                                                    
+"num_wires":         1073,                                                      
+"num_wire_bits":     1172,                                                      
+"num_pub_wires":     1073,                                                      
+"num_pub_wire_bits": 1172,                                                      
+"num_ports":         16,                                                        
+"num_port_bits":     115,                                                       
+"num_memories":      0,                                                         
+"num_memory_bits":   0,                                                         
+"num_processes":     0,                                                         
+"num_cells":         1102,                                                      
+"area":              15642.502400,                                              
+"num_cells_by_type": {                                                          
+"sky130_fd_sc_hd__a2111o_2": 1,                                                 
+"sky130_fd_sc_hd__a21o_2": 15,                                                  
+"sky130_fd_sc_hd__a21oi_2": 25,                                                 
+"sky130_fd_sc_hd__a221o_2": 33,                                                 
+"sky130_fd_sc_hd__a22o_2": 111,                                                 
+"sky130_fd_sc_hd__a22oi_2": 1,                                                  
+"sky130_fd_sc_hd__a2bb2o_2": 2,                                                 
+"sky130_fd_sc_hd__a31o_2": 20,                                                  
+"sky130_fd_sc_hd__a31oi_2": 2,                                                  
+"sky130_fd_sc_hd__a32o_2": 1,                                                   
+"sky130_fd_sc_hd__a41o_2": 1,                                                   
+"sky130_fd_sc_hd__and2_2": 28,                                                  
+"sky130_fd_sc_hd__and2b_2": 21,                                                 
+"sky130_fd_sc_hd__and3_2": 27,                                                  
+"sky130_fd_sc_hd__and4_2": 31,                                                  
+"sky130_fd_sc_hd__and4b_2": 1,                                                  
+"sky130_fd_sc_hd__dfrtp_2": 301,                                                
+"sky130_fd_sc_hd__dfstp_2": 1,                                                  
+"sky130_fd_sc_hd__dfxtp_2": 8,                                                  
+"sky130_fd_sc_hd__inv_2": 15,                                                   
+"sky130_fd_sc_hd__mux2_1": 134,                                                 
+"sky130_fd_sc_hd__nand2_2": 43,                                                 
+"sky130_fd_sc_hd__nand2b_2": 4,                                                 
+"sky130_fd_sc_hd__nand3_2": 1,                                                  
+"sky130_fd_sc_hd__nand3b_2": 1,                                                 
+"sky130_fd_sc_hd__nor2_2": 50,                                                  
+"sky130_fd_sc_hd__nor3_2": 1,                                                   
+"sky130_fd_sc_hd__nor4_2": 3,                                                   
+"sky130_fd_sc_hd__o211a_2": 1,                                                  
+"sky130_fd_sc_hd__o21a_2": 25,                                                  
+"sky130_fd_sc_hd__o21ai_2": 8,                                                  
+"sky130_fd_sc_hd__o21ba_2": 23,                                                 
+"sky130_fd_sc_hd__o21bai_2": 2,                                                 
+"sky130_fd_sc_hd__o221a_2": 2,                                                  
+"sky130_fd_sc_hd__o22a_2": 6,                                                   
+"sky130_fd_sc_hd__o2bb2a_2": 3,                                                 
+"sky130_fd_sc_hd__o311a_2": 1,                                                  
+"sky130_fd_sc_hd__o31a_2": 14,                                                  
+"sky130_fd_sc_hd__o31ai_2": 1,                                                  
+"sky130_fd_sc_hd__o41a_2": 2,                                                   
+"sky130_fd_sc_hd__or2_2": 30,                                                   
+"sky130_fd_sc_hd__or3_2": 13,                                                   
+"sky130_fd_sc_hd__or3b_2": 5,                                                   
+"sky130_fd_sc_hd__or4_2": 35,                                                   
+"sky130_fd_sc_hd__or4b_2": 4,                                                   
+"sky130_fd_sc_hd__xnor2_2": 25,                                                 
+"sky130_fd_sc_hd__xor2_2": 20                                                   
+}                                                                               
+}                                                                               
+},                                                                              
+"design": {                                                                     
+"num_wires":         1073,                                                      
+"num_wire_bits":     1172,                                                      
+"num_pub_wires":     1073,                                                      
+"num_pub_wire_bits": 1172,                                                      
+"num_ports":         16,                                                        
+"num_port_bits":     115,                                                       
+"num_memories":      0,                                                         
+"num_memory_bits":   0,                                                         
+"num_processes":     0,                                                         
+"num_cells":         1102,                                                      
+"area":              15642.502400,                                              
+"num_cells_by_type": {                                                          
+"sky130_fd_sc_hd__a2111o_2": 1,                                                 
+"sky130_fd_sc_hd__a21o_2": 15,                                                  
+"sky130_fd_sc_hd__a21oi_2": 25,                                                 
+"sky130_fd_sc_hd__a221o_2": 33,                                                 
+"sky130_fd_sc_hd__a22o_2": 111,                                                 
+"sky130_fd_sc_hd__a22oi_2": 1,                                                  
+"sky130_fd_sc_hd__a2bb2o_2": 2,                                                 
+"sky130_fd_sc_hd__a31o_2": 20,                                                  
+"sky130_fd_sc_hd__a31oi_2": 2,                                                  
+"sky130_fd_sc_hd__a32o_2": 1,                                                   
+"sky130_fd_sc_hd__a41o_2": 1,                                                   
+"sky130_fd_sc_hd__and2_2": 28,                                                  
+"sky130_fd_sc_hd__and2b_2": 21,                                                 
+"sky130_fd_sc_hd__and3_2": 27,                                                  
+"sky130_fd_sc_hd__and4_2": 31,                                                  
+"sky130_fd_sc_hd__and4b_2": 1,                                                  
+"sky130_fd_sc_hd__dfrtp_2": 301,                                                
+"sky130_fd_sc_hd__dfstp_2": 1,                                                  
+"sky130_fd_sc_hd__dfxtp_2": 8,                                                  
+"sky130_fd_sc_hd__inv_2": 15,                                                   
+"sky130_fd_sc_hd__mux2_1": 134,                                                 
+"sky130_fd_sc_hd__nand2_2": 43,                                                 
+"sky130_fd_sc_hd__nand2b_2": 4,                                                 
+"sky130_fd_sc_hd__nand3_2": 1,                                                  
+"sky130_fd_sc_hd__nand3b_2": 1,                                                 
+"sky130_fd_sc_hd__nor2_2": 50,                                                  
+"sky130_fd_sc_hd__nor3_2": 1,                                                   
+"sky130_fd_sc_hd__nor4_2": 3,                                                   
+"sky130_fd_sc_hd__o211a_2": 1,                                                  
+"sky130_fd_sc_hd__o21a_2": 25,                                                  
+"sky130_fd_sc_hd__o21ai_2": 8,                                                  
+"sky130_fd_sc_hd__o21ba_2": 23,                                                 
+"sky130_fd_sc_hd__o21bai_2": 2,                                                 
+"sky130_fd_sc_hd__o221a_2": 2,                                                  
+"sky130_fd_sc_hd__o22a_2": 6,                                                   
+"sky130_fd_sc_hd__o2bb2a_2": 3,                                                 
+"sky130_fd_sc_hd__o311a_2": 1,                                                  
+"sky130_fd_sc_hd__o31a_2": 14,                                                  
+"sky130_fd_sc_hd__o31ai_2": 1,                                                  
+"sky130_fd_sc_hd__o41a_2": 2,                                                   
+"sky130_fd_sc_hd__or2_2": 30,                                                   
+"sky130_fd_sc_hd__or3_2": 13,                                                   
+"sky130_fd_sc_hd__or3b_2": 5,                                                   
+"sky130_fd_sc_hd__or4_2": 35,                                                   
+"sky130_fd_sc_hd__or4b_2": 4,                                                   
+"sky130_fd_sc_hd__xnor2_2": 25,                                                 
+"sky130_fd_sc_hd__xor2_2": 20                                                   
+}                                                                               
+}                                                                               
+}                                                                               
+                                                                                
+101. Printing statistics.                                                       
+                                                                                
+=== safety_fault_watchdog ===                                                   
+                                                                                
+Number of wires:               1073                                             
+Number of wire bits:           1172                                             
+Number of public wires:        1073                                             
+Number of public wire bits:    1172                                             
+Number of ports:                 16                                             
+Number of port bits:            115                                             
+Number of memories:               0                                             
+Number of memory bits:            0                                             
+Number of processes:              0                                             
+Number of cells:               1102                                             
+sky130_fd_sc_hd__a2111o_2       1                                               
+sky130_fd_sc_hd__a21o_2        15                                               
+sky130_fd_sc_hd__a21oi_2       25                                               
+sky130_fd_sc_hd__a221o_2       33                                               
+sky130_fd_sc_hd__a22o_2       111                                               
+sky130_fd_sc_hd__a22oi_2        1                                               
+sky130_fd_sc_hd__a2bb2o_2       2                                               
+sky130_fd_sc_hd__a31o_2        20                                               
+sky130_fd_sc_hd__a31oi_2        2                                               
+sky130_fd_sc_hd__a32o_2         1                                               
+sky130_fd_sc_hd__a41o_2         1                                               
+sky130_fd_sc_hd__and2_2        28                                               
+sky130_fd_sc_hd__and2b_2       21                                               
+sky130_fd_sc_hd__and3_2        27                                               
+sky130_fd_sc_hd__and4_2        31                                               
+sky130_fd_sc_hd__and4b_2        1                                               
+sky130_fd_sc_hd__dfrtp_2      301                                               
+sky130_fd_sc_hd__dfstp_2        1                                               
+sky130_fd_sc_hd__dfxtp_2        8                                               
+sky130_fd_sc_hd__inv_2         15                                               
+sky130_fd_sc_hd__mux2_1       134                                               
+sky130_fd_sc_hd__nand2_2       43                                               
+sky130_fd_sc_hd__nand2b_2       4                                               
+sky130_fd_sc_hd__nand3_2        1                                               
+sky130_fd_sc_hd__nand3b_2       1                                               
+sky130_fd_sc_hd__nor2_2        50                                               
+sky130_fd_sc_hd__nor3_2         1                                               
+sky130_fd_sc_hd__nor4_2         3                                               
+sky130_fd_sc_hd__o211a_2        1                                               
+sky130_fd_sc_hd__o21a_2        25                                               
+sky130_fd_sc_hd__o21ai_2        8                                               
+sky130_fd_sc_hd__o21ba_2       23                                               
+sky130_fd_sc_hd__o21bai_2       2                                               
+sky130_fd_sc_hd__o221a_2        2                                               
+sky130_fd_sc_hd__o22a_2         6                                               
+sky130_fd_sc_hd__o2bb2a_2       3                                               
+sky130_fd_sc_hd__o311a_2        1                                               
+sky130_fd_sc_hd__o31a_2        14                                               
+sky130_fd_sc_hd__o31ai_2        1                                               
+sky130_fd_sc_hd__o41a_2         2                                               
+sky130_fd_sc_hd__or2_2         30                                               
+sky130_fd_sc_hd__or3_2         13                                               
+sky130_fd_sc_hd__or3b_2         5                                               
+sky130_fd_sc_hd__or4_2         35                                               
+sky130_fd_sc_hd__or4b_2         4                                               
+sky130_fd_sc_hd__xnor2_2       25                                               
+sky130_fd_sc_hd__xor2_2        20                                               
+                                                                                
+Chip area for module '\safety_fault_watchdog': 15642.502400                     
+of which used for sequential elements: 8105.273600 (51.82%)                     
+                                                                                
+102. Executing Verilog backend.                                                 
+Dumping module `\safety_fault_watchdog'.                                        
+                                                                                
+103. Executing JSON backend.                                                    
+[20:22:15] VERBOSE  Parsing synthesis checks…                       pyosys.py:54
+──────────────────────────── Unmapped Cells Checker ────────────────────────────
+[20:22:15] VERBOSE  Running 'Checker.YosysUnmappedCells' at         step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/03-checker-yosysunmapped             
+                    cells'…                                                     
+[20:22:15] INFO     Check for Unmapped Yosys instances clear.     checker.py:132
+────────────────────────────── Yosys Synth Checks ──────────────────────────────
+[20:22:15] VERBOSE  Running 'Checker.YosysSynthChecks' at           step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/04-checker-yosyssynthche             
+                    cks'…                                                       
+[20:22:15] INFO     Check for Yosys check errors clear.           checker.py:132
+─────────────────────── Netlist Assign Statement Checker ───────────────────────
+[20:22:15] VERBOSE  Running 'Checker.NetlistAssignStatements' at    step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/05-checker-netlistassign             
+                    statements'…                                                
+─────────────────────────────── Check SDC Files ────────────────────────────────
+[20:22:15] VERBOSE  Running 'OpenROAD.CheckSDCFiles' at             step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/06-openroad-checksdcfile             
+                    s'…                                                         
+[20:22:15] WARNING  'SIGNOFF_SDC_FILE' is not defined. Using     openroad.py:170
+                    generic fallback SDC for OpenROAD PnR steps.                
+──────────────────────────── Check Macro Instances ─────────────────────────────
+[20:22:15] VERBOSE  Running 'OpenROAD.CheckMacroInstances' at       step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/07-openroad-checkmacroin             
+                    stances'…                                                   
+[20:22:15] INFO     No macros found, skipping instance check…    openroad.py:511
+─────────────────────── Static Timing Analysis (Pre-PnR) ───────────────────────
+[20:22:15] VERBOSE  Running 'OpenROAD.STAPrePNR' at                 step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/08-openroad-staprepnr'…              
+[20:22:15] INFO     Starting STA for the nom_tt_025C_1v80 timing openroad.py:566
+                    corner…                                                     
+[20:22:15] INFO     Starting STA for the nom_ss_100C_1v60 timing openroad.py:566
+                    corner…                                                     
+[20:22:15] INFO     Skipping corner min_tt_025C_1v80 for STA     openroad.py:604
+                    (identical to nom_tt_025C_1v80 at this                      
+                    stage)…                                                     
+[20:22:15] INFO     Skipping corner min_ss_100C_1v60 for STA     openroad.py:604
+                    (identical to nom_ss_100C_1v60 at this                      
+                    stage)…                                                     
+[20:22:15] INFO     Skipping corner min_ff_n40C_1v95 for STA     openroad.py:604
+                    (identical to nom_ff_n40C_1v95 at this                      
+                    stage)…                                                     
+[20:22:15] INFO     Skipping corner max_tt_025C_1v80 for STA     openroad.py:604
+                    (identical to nom_tt_025C_1v80 at this                      
+                    stage)…                                                     
+[20:22:15] INFO     Skipping corner max_ss_100C_1v60 for STA     openroad.py:604
+                    (identical to nom_ss_100C_1v60 at this                      
+                    stage)…                                                     
+[20:22:15] INFO     Skipping corner max_ff_n40C_1v95 for STA     openroad.py:604
+                    (identical to nom_ff_n40C_1v95 at this                      
+                    stage)…                                                     
+[20:22:15] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/08-openroad-staprepnr/no             
+                    m_ss_100C_1v60/sta.log'…                                    
+[20:22:15] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/08-openroad-staprepnr/no             
+                    m_tt_025C_1v80/sta.log'…                                    
+[20:22:16] INFO     Finished STA for the nom_tt_025C_1v80 timing openroad.py:581
+                    corner.                                                     
+[20:22:16] INFO     Starting STA for the nom_ff_n40C_1v95 timing openroad.py:566
+                    corner…                                                     
+[20:22:16] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/08-openroad-staprepnr/no             
+                    m_ff_n40C_1v95/sta.log'…                                    
+[20:22:16] INFO     Finished STA for the nom_ss_100C_1v60 timing openroad.py:581
+                    corner.                                                     
+[20:22:17] INFO     Finished STA for the nom_ff_n40C_1v95 timing openroad.py:581
+                    corner.                                                     
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━━┳━━━┳━━━━┳━━━┳━━━━┳━━━┳━━━━┳━━━┓
+┃                      ┃    ┃    ┃    ┃    ┃ of ┃   ┃    ┃   ┃    ┃ … ┃    ┃   ┃
+┃                      ┃    ┃ R… ┃    ┃    ┃ w… ┃   ┃ R… ┃   ┃    ┃ … ┃    ┃   ┃
+┃                      ┃ H… ┃ to ┃    ┃ H… ┃ r… ┃ … ┃ to ┃   ┃ S… ┃ … ┃ M… ┃ … ┃
+┃                      ┃ W… ┃ R… ┃ H… ┃ V… ┃ to ┃ … ┃ R… ┃ … ┃ V… ┃ … ┃ C… ┃ … ┃
+┃ Corner/Group         ┃ S… ┃ P… ┃ T… ┃ C… ┃ r… ┃ … ┃ P… ┃ … ┃ C… ┃ … ┃ V… ┃ … ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━╇━━━━╇━━━━╇━━━━╇━━━━╇━━━╇━━━━╇━━━╇━━━━╇━━━╇━━━━╇━━━┩
+│ Overall              │ 0… │ 0… │ 0… │ 0  │ 0  │ … │ -… │ … │ 5  │ 5 │ 0  │ 0 │
+│ nom_tt_025C_1v80     │ 0… │ 0… │ 0… │ 0  │ 0  │ … │ 5… │ … │ 0  │ 0 │ 0  │ 0 │
+│ nom_ss_100C_1v60     │ 0… │ 0… │ 0… │ 0  │ 0  │ … │ -… │ … │ 5  │ 5 │ 0  │ 0 │
+│ nom_ff_n40C_1v95     │ 0… │ 0… │ 0… │ 0  │ 0  │ … │ 7… │ … │ 0  │ 0 │ 0  │ 0 │
+└──────────────────────┴────┴────┴────┴────┴────┴───┴────┴───┴────┴───┴────┴───┘
+─────────────────────────── Floorplan Initialization ───────────────────────────
+[20:22:17] VERBOSE  Running 'OpenROAD.Floorplan' at                 step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/09-openroad-floorplan'…              
+[20:22:17] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/09-openroad-floorplan/op             
+                    enroad-floorplan.log'…                                      
+Reading library file at                                                         
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib'…                  
+Reading technology LEF file at                                                  
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.ref/sky130_fd_sc_hd/techlef/sky130_fd_sc_hd__nom.tlef'…                      
+[INFO ODB-0227] LEF file:                                                       
+/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/lib
+s.ref/sky130_fd_sc_hd/techlef/sky130_fd_sc_hd__nom.tlef, created 14 layers, 25  
+vias                                                                            
+Reading cell LEF file at                                                        
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.ref/sky130_fd_sc_hd/lef/sky130_fd_sc_hd.lef'…                                
+The NOWIREEXTENSIONATPIN statement will be ignored. See file                    
+/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/lib
+s.ref/sky130_fd_sc_hd/lef/sky130_fd_sc_hd.lef at line 2.                        
+                                                                                
+[INFO ODB-0227] LEF file:                                                       
+/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/lib
+s.ref/sky130_fd_sc_hd/lef/sky130_fd_sc_hd.lef, created 437 library cells        
+Reading cell LEF file at                                                        
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.ref/sky130_fd_sc_hd/lef/sky130_ef_sc_hd.lef'…                                
+The NOWIREEXTENSIONATPIN statement will be ignored. See file                    
+/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/lib
+s.ref/sky130_fd_sc_hd/lef/sky130_ef_sc_hd.lef at line 2.                        
+                                                                                
+[INFO ODB-0227] LEF file:                                                       
+/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/lib
+s.ref/sky130_fd_sc_hd/lef/sky130_ef_sc_hd.lef, created 4 library cells          
+Reading top-level netlist at                                                    
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/02-y
+osys-synthesis/safety_fault_watchdog.nl.v'…                                     
+Linking design 'safety_fault_watchdog' from netlist…                            
+Reading design constraints file at                                              
+'inputs/constraints/safety_fault_watchdog.sdc'…                                 
+[INFO] No information on clock propagation in input SDC file-- propagating all  
+clocks.                                                                         
+Using site height: 2.72 and site width: 0.46…                                   
+[INFO] Using absolute sizing for the floorplan.                                 
+[INFO IFP-0001] Added 65 rows of 410 site unithd.                               
+[INFO IFP-0030] Inserted 0 tiecells using sky130_fd_sc_hd__conb_1/LO.           
+[INFO IFP-0030] Inserted 0 tiecells using sky130_fd_sc_hd__conb_1/HI.           
+[INFO] Extracting DIE_AREA and CORE_AREA from the floorplan                     
+[INFO] Floorplanned on a die area of 0.0 0.0 200.0 200.0 (µm).                  
+[INFO] Floorplanned on a core area of 5.52 10.88 194.12 187.68 (µm).            
+Writing metric design__die__bbox: 0.0 0.0 200.0 200.0                           
+Writing metric design__core__bbox: 5.52 10.88 194.12 187.68                     
+Setting global connections for newly added cells…                               
+[INFO] Setting global connections...                                            
+Updating metrics…                                                               
+Cell type report:                       Count       Area                        
+Inverter                                 15      56.30                          
+Sequential cell                         310    8105.27                          
+Multi-Input combinational cell          777    7480.92                          
+Total                                  1102   15642.50                          
+Writing OpenROAD database to                                                    
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/09-o
+penroad-floorplan/safety_fault_watchdog.odb'…                                   
+Writing netlist to                                                              
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/09-o
+penroad-floorplan/safety_fault_watchdog.nl.v'…                                  
+Writing powered netlist to                                                      
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/09-o
+penroad-floorplan/safety_fault_watchdog.pnl.v'…                                 
+Writing layout to                                                               
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/09-o
+penroad-floorplan/safety_fault_watchdog.def'…                                   
+Writing timing constraints to                                                   
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/09-o
+penroad-floorplan/safety_fault_watchdog.sdc'…                                   
+────────── Check Antenna Properties of Macros Pins in Their LEF Views ──────────
+[20:22:18] VERBOSE  Running 'Odb.CheckMacroAntennaProperties' at    step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/10-odb-checkmacroantenna             
+                    properties'…                                                
+[20:22:18] INFO     No cells provided, skipping…                      odb.py:210
+──────────────────────────── Set Power Connections ─────────────────────────────
+[20:22:18] VERBOSE  Running 'Odb.SetPowerConnections' at            step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/11-odb-setpowerconnectio             
+                    ns'…                                                        
+[20:22:18] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/11-odb-setpowerconnectio             
+                    ns/odb-setpowerconnections.log'…                            
+──────────────────────────── Manual Macro Placement ────────────────────────────
+[20:22:19] VERBOSE  Running 'Odb.ManualMacroPlacement' at           step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/12-odb-manualmacroplacem             
+                    ent'…                                                       
+[20:22:19] INFO     No instances found, skipping                      odb.py:442
+                    'Odb.ManualMacroPlacement'…                                 
+─────────────────────────────────── Cut Rows ───────────────────────────────────
+[20:22:19] VERBOSE  Running 'OpenROAD.CutRows' at                   step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/13-openroad-cutrows'…                
+[20:22:19] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/13-openroad-cutrows/open             
+                    road-cutrows.log'…                                          
+Reading OpenROAD database at                                                    
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/11-o
+db-setpowerconnections/safety_fault_watchdog.odb'…                              
+Reading library file at                                                         
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib'…                  
+Reading design constraints file at                                              
+'inputs/constraints/safety_fault_watchdog.sdc'…                                 
+[INFO] No information on clock propagation in input SDC file-- propagating all  
+clocks.                                                                         
+Setting global connections for newly added cells…                               
+[INFO] Setting global connections...                                            
+Updating metrics…                                                               
+Cell type report:                       Count       Area                        
+Inverter                                 15      56.30                          
+Sequential cell                         310    8105.27                          
+Multi-Input combinational cell          777    7480.92                          
+Total                                  1102   15642.50                          
+Writing OpenROAD database to                                                    
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/13-o
+penroad-cutrows/safety_fault_watchdog.odb'…                                     
+Writing layout to                                                               
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/13-o
+penroad-cutrows/safety_fault_watchdog.def'…                                     
+───────────────────────────── Tap/Decap Insertion ──────────────────────────────
+[20:22:20] VERBOSE  Running 'OpenROAD.TapEndcapInsertion' at        step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/14-openroad-tapendcapins             
+                    ertion'…                                                    
+[20:22:20] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/14-openroad-tapendcapins             
+                    ertion/openroad-tapendcapinsertion.log'…                    
+Reading OpenROAD database at                                                    
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/13-o
+penroad-cutrows/safety_fault_watchdog.odb'…                                     
+Reading library file at                                                         
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib'…                  
+Reading design constraints file at                                              
+'inputs/constraints/safety_fault_watchdog.sdc'…                                 
+[INFO] No information on clock propagation in input SDC file-- propagating all  
+clocks.                                                                         
+[INFO TAP-0004] Inserted 130 endcaps.                                           
+[INFO TAP-0005] Inserted 469 tapcells.                                          
+Setting global connections for newly added cells…                               
+[INFO] Setting global connections...                                            
+Updating metrics…                                                               
+Cell type report:                       Count       Area                        
+Fill cell                               130     487.97                          
+Tap cell                                469     586.81                          
+Inverter                                 15      56.30                          
+Sequential cell                         310    8105.27                          
+Multi-Input combinational cell          777    7480.92                          
+Total                                  1701   16717.28                          
+Writing OpenROAD database to                                                    
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/14-o
+penroad-tapendcapinsertion/safety_fault_watchdog.odb'…                          
+Writing netlist to                                                              
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/14-o
+penroad-tapendcapinsertion/safety_fault_watchdog.nl.v'…                         
+Writing powered netlist to                                                      
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/14-o
+penroad-tapendcapinsertion/safety_fault_watchdog.pnl.v'…                        
+Writing layout to                                                               
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/14-o
+penroad-tapendcapinsertion/safety_fault_watchdog.def'…                          
+Writing timing constraints to                                                   
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/14-o
+penroad-tapendcapinsertion/safety_fault_watchdog.sdc'…                          
+───────────────────────────── Add PDN obstructions ─────────────────────────────
+[20:22:21] VERBOSE  Running 'Odb.AddPDNObstructions' at             step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/15-odb-addpdnobstruction             
+                    s'…                                                         
+[20:22:21] INFO     'PDN_OBSTRUCTIONS' is not defined. Skipping       odb.py:558
+                    'Odb.AddPDNObstructions'…                                   
+──────────────────── Power Distribution Network Generation ─────────────────────
+[20:22:21] VERBOSE  Running 'OpenROAD.GeneratePDN' at               step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/16-openroad-generatepdn'             
+                    …                                                           
+[20:22:21] INFO     'FP_PDN_CFG' not explicitly set, setting it openroad.py:1179
+                    to                                                          
+                    /nix/store/7l0f3byalx17dsl5m0bpzrsl6lkcyv3g                 
+                    -python3-3.11.9-env/lib/python3.11/site-pac                 
+                    kages/openlane/scripts/openroad/common/pdn_                 
+                    cfg.tcl…                                                    
+[20:22:21] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/16-openroad-generatepdn/             
+                    openroad-generatepdn.log'…                                  
+Reading OpenROAD database at                                                    
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/14-o
+penroad-tapendcapinsertion/safety_fault_watchdog.odb'…                          
+Reading library file at                                                         
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib'…                  
+Reading design constraints file at                                              
+'inputs/constraints/safety_fault_watchdog.sdc'…                                 
+[INFO] No information on clock propagation in input SDC file-- propagating all  
+clocks.                                                                         
+[INFO] Setting global connections...                                            
+[INFO PDN-0001] Inserting grid: stdcell_grid                                    
+Setting global connections for newly added cells…                               
+[INFO] Setting global connections...                                            
+Updating metrics…                                                               
+Cell type report:                       Count       Area                        
+Fill cell                               130     487.97                          
+Tap cell                                469     586.81                          
+Inverter                                 15      56.30                          
+Sequential cell                         310    8105.27                          
+Multi-Input combinational cell          777    7480.92                          
+Total                                  1701   16717.28                          
+Writing OpenROAD database to                                                    
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/16-o
+penroad-generatepdn/safety_fault_watchdog.odb'…                                 
+Writing netlist to                                                              
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/16-o
+penroad-generatepdn/safety_fault_watchdog.nl.v'…                                
+Writing powered netlist to                                                      
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/16-o
+penroad-generatepdn/safety_fault_watchdog.pnl.v'…                               
+Writing layout to                                                               
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/16-o
+penroad-generatepdn/safety_fault_watchdog.def'…                                 
+Writing timing constraints to                                                   
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/16-o
+penroad-generatepdn/safety_fault_watchdog.sdc'…                                 
+[INFO PSM-0040] All shapes on net VPWR are connected.                           
+[INFO PSM-0040] All shapes on net VGND are connected.                           
+─────────────────────────── Remove PDN obstructions ────────────────────────────
+[20:22:22] VERBOSE  Running 'Odb.RemovePDNObstructions' at          step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/17-odb-removepdnobstruct             
+                    ions'…                                                      
+[20:22:22] INFO     'PDN_OBSTRUCTIONS' is not defined. Skipping       odb.py:558
+                    'Odb.RemovePDNObstructions'…                                
+─────────────────────────────── Add Obstructions ───────────────────────────────
+[20:22:22] VERBOSE  Running 'Odb.AddRoutingObstructions' at         step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/18-odb-addroutingobstruc             
+                    tions'…                                                     
+[20:22:22] INFO     'ROUTING_OBSTRUCTIONS' is not defined. Skipping   odb.py:558
+                    'Odb.AddRoutingObstructions'…                               
+─────────────────────────── Global Placement Skip IO ───────────────────────────
+[20:22:22] VERBOSE  Running 'OpenROAD.GlobalPlacementSkipIO' at     step.py:1122
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/19-openroad-globalplacem             
+                    entskipio'…                                                 
+[20:22:22] VERBOSE  Logging subprocess to                           step.py:1318
+                    'place/runs/Digital_Arch2Tapeout_dd095a60-e45f-             
+                    44c3-beb0-943e030b19e3/19-openroad-globalplacem             
+                    entskipio/openroad-globalplacementskipio.log'…              
+Reading OpenROAD database at                                                    
+'/work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/16-o
+penroad-generatepdn/safety_fault_watchdog.odb'…                                 
+Reading library file at                                                         
+'/pdk/volare/sky130/versions/0fe599b2afb6708d281543108caf8310912f54af/sky130A/li
+bs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib'…                  
+Reading design constraints file at                                              
+'inputs/constraints/safety_fault_watchdog.sdc'…                                 
+[INFO] No information on clock propagation in input SDC file-- propagating all  
+clocks.                                                                         
++ global_placement -density 0.25 -skip_io -pad_right 0 -pad_left 0              
+-init_wirelength_coef 0.25                                                      
+[INFO GPL-0002] DBU: 1000                                                       
+[INFO GPL-0003] SiteSize: (  0.460  2.720 ) um                                  
+[INFO GPL-0004] CoreBBox: (  5.520 10.880 ) ( 194.120 187.680 ) um              
+[INFO GPL-0006] NumInstances:              1701                                 
+[INFO GPL-0007] NumPlaceInstances:         1102                                 
+[INFO GPL-0008] NumFixedInstances:          599                                 
+[INFO GPL-0009] NumDummyInstances:            0                                 
+[INFO GPL-0010] NumNets:                   1172                                 
+[INFO GPL-0011] NumPins:                   4466                                 
+[INFO GPL-0012] DieBBox:  (  0.000  0.000 ) ( 200.000 200.000 ) um              
+[INFO GPL-0013] CoreBBox: (  5.520 10.880 ) ( 194.120 187.680 ) um              
+[INFO GPL-0016] CoreArea:             33344.480 um^2                            
+[INFO GPL-0017] NonPlaceInstsArea:     1074.781 um^2                            
+[INFO GPL-0018] PlaceInstsArea:       15642.502 um^2                            
+[INFO GPL-0019] Util:                    48.474 %                               
+[INFO GPL-0020] StdInstsArea:         15642.502 um^2                            
+[INFO GPL-0021] MacroInstsArea:           0.000 um^2                            
+[20:22:22] ERROR    [GPL-0302] Use a higher -density or          openroad.py:235
+                    re-floorplan with a larger core area.                       
+Given target density: 0.25                                                      
+Suggested target density: 0.49                                                  
+Error: gpl.tcl, 79 GPL-0302                                                     
+Classic - Stage 23 - Global Placement Skip IO ━━━━━╸               22/78 0:00:11
+[20:22:23] WARNING  The following warnings were generated by the     flow.py:673
+                    flow:                                                       
+[20:22:23] WARNING  [OpenROAD.CheckSDCFiles] 'SIGNOFF_SDC_FILE' is   flow.py:675
+                    not defined. Using generic fallback SDC for                 
+                    OpenROAD PnR steps.                                         
+[20:22:23] ERROR    The following error was encountered while    __main__.py:187
+                    running the flow:                                           
+                    OpenROAD.GlobalPlacementSkipIO failed with                  
+                    the following errors:                                       
+                    [GPL-0302] Use a higher -density or                         
+                    re-floorplan with a larger core area.                       
+[20:22:23] ERROR    OpenLane will now quit.                      __main__.py:188

@@ -1,0 +1,9 @@
+{
+  "top_module": "safety_fault_watchdog",
+  "scan_chains": 4,
+  "max_chain_length_estimate": 78,
+  "scan_enable": "scan_en",
+  "scan_in_prefix": "scan_in",
+  "scan_out_prefix": "scan_out",
+  "clock_mixing": "no_mix"
+}

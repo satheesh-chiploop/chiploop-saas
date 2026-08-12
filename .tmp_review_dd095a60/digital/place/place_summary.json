@@ -1,0 +1,15 @@
+{
+  "workflow_id": "dd095a60-e45f-44c3-beb0-943e030b19e3",
+  "agent": "Digital Placement Agent",
+  "status": "failed",
+  "return_code": 2,
+  "reason": "openlane_failed",
+  "outputs": {
+    "sdc": "digital/place/constraints/safety_fault_watchdog.sdc",
+    "metrics_json": null,
+    "primary_def": null,
+    "macro_placement_cfg": null,
+    "log": "digital/place/logs/openlane_place.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/run_work/place/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3"
+  }
+}

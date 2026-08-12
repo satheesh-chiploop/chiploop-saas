@@ -1,0 +1,52 @@
+{
+  "workflow_id": "dd095a60-e45f-44c3-beb0-943e030b19e3",
+  "agent": "Digital Synthesis Agent",
+  "status": "ok",
+  "return_code": 0,
+  "inputs": {
+    "rtl_files": [
+      "safety_fault_watchdog.v",
+      "safety_fault_watchdog_mmio.v",
+      "safety_fault_watchdog_controller.v"
+    ],
+    "pre_synthesis_rtl_repairs": {},
+    "macro_libs": [],
+    "macro_lefs": [],
+    "macro_gds": [],
+    "macro_spice": [],
+    "macro_verilog": [],
+    "pdk_sram_collateral": [],
+    "top_module": "safety_fault_watchdog",
+    "clock_port": "clk",
+    "clock_period_ns": 10.0,
+    "synthesis_closure_iteration": 0,
+    "synthesis_closure_timing_repair_enabled": true,
+    "synthesis_closure_optimization_profile": {
+      "enabled": false,
+      "iteration": 0,
+      "clock_margin": 1.0,
+      "strategy": "AREA 0",
+      "allow_retiming": false,
+      "allow_flattening": false,
+      "techniques": []
+    },
+    "synthesis_closure_openlane_overrides": {},
+    "pdk_variant": "sky130A",
+    "openlane_image": "ghcr.io/efabless/openlane2:2.4.0.dev1",
+    "openlane_to_step": "OpenROAD.STAPrePNR",
+    "pdk_root_host": "/root/chiploop-backend/backend/pdk"
+  },
+  "outputs": {
+    "stage_dir": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/synth",
+    "config_json": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/synth/config.json",
+    "sdc": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/synth/constraints/safety_fault_watchdog.sdc",
+    "run_sh": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/synth/run.sh",
+    "exec_log": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/synth/logs/openlane_synth.log",
+    "metrics_json": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/synth/metrics.json",
+    "netlist": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/synth/netlist/safety_fault_watchdog_synth.v",
+    "netlist_candidates": [
+      "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/synth/runs/Digital_Arch2Tapeout_dd095a60-e45f-44c3-beb0-943e030b19e3/02-yosys-synthesis/safety_fault_watchdog.nl.v"
+    ],
+    "enriched_metrics": true
+  }
+}

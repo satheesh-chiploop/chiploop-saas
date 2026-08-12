@@ -1,0 +1,227 @@
+Info: Logic utilisation before packing:
+Info:     Total LUT4s:       125/24288     0%
+Info:         logic LUTs:    101/24288     0%
+Info:         carry LUTs:     24/24288     0%
+Info:           RAM LUTs:      0/ 3036     0%
+Info:          RAMW LUTs:      0/ 6072     0%
+
+Info:      Total DFFs:        13/24288     0%
+
+Info: Packing IOs..
+Info: Packing constants..
+Info: Packing carries...
+Info: Packing LUTs...
+Info: Packing LUT5-7s...
+Info: Packing FFs...
+Info:     1 FFs paired with LUTs.
+Info: Generating derived timing constraints...
+Info: Promoting globals...
+Info:     promoting clock net clk$TRELLIS_IO_IN to global network
+Info: Checksum: 0x0fc92313
+
+Info: Device utilisation:
+Info: 	          TRELLIS_IO:    53/  197    26%
+Info: 	                DCCA:     1/   56     1%
+Info: 	              DP16KD:     0/   56     0%
+Info: 	          MULT18X18D:     0/   28     0%
+Info: 	              ALU54B:     0/   14     0%
+Info: 	             EHXPLLL:     0/    2     0%
+Info: 	             EXTREFB:     0/    1     0%
+Info: 	                DCUA:     0/    1     0%
+Info: 	           PCSCLKDIV:     0/    2     0%
+Info: 	             IOLOGIC:     0/  128     0%
+Info: 	            SIOLOGIC:     0/   69     0%
+Info: 	                 GSR:     0/    1     0%
+Info: 	               JTAGG:     0/    1     0%
+Info: 	                OSCG:     0/    1     0%
+Info: 	               SEDGA:     0/    1     0%
+Info: 	                 DTR:     0/    1     0%
+Info: 	             USRMCLK:     0/    1     0%
+Info: 	             CLKDIVF:     0/    4     0%
+Info: 	           ECLKSYNCB:     0/   10     0%
+Info: 	             DLLDELD:     0/    8     0%
+Info: 	              DDRDLL:     0/    4     0%
+Info: 	             DQSBUFM:     0/    8     0%
+Info: 	     TRELLIS_ECLKBUF:     0/    8     0%
+Info: 	        ECLKBRIDGECS:     0/    2     0%
+Info: 	                DCSC:     0/    2     0%
+Info: 	          TRELLIS_FF:    13/24288     0%
+Info: 	        TRELLIS_COMB:   135/24288     0%
+Info: 	        TRELLIS_RAMW:     0/ 3036     0%
+
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 74 cells, random placement wirelen = 6924.
+Info:     at initial placer iter 0, wirelen = 2793
+Info:     at initial placer iter 1, wirelen = 2480
+Info:     at initial placer iter 2, wirelen = 2412
+Info:     at initial placer iter 3, wirelen = 2386
+Info: Running main analytical placer, max placement attempts per cell = 10000.
+Info:     at iteration #1, type ALL: wirelen solved = 2366, spread = 2465, legal = 2489; time = 0.01s
+Info: HeAP Placer Time: 0.04s
+Info:   of which solving equations: 0.01s
+Info:   of which spreading cells: 0.00s
+Info:   of which strict legalisation: 0.00s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 2489
+Info:   at iteration #5: temp = 0.000000, timing cost = 0, wirelen = 1908
+Info:   at iteration #10: temp = 0.000000, timing cost = 0, wirelen = 1898
+Info:   at iteration #12: temp = 0.000000, timing cost = 0, wirelen = 1897 
+Info: SA placement time 0.09s
+
+Info: No Fmax available; no interior timing paths found in design.
+Info: Checksum: 0xc4eddb02
+Info: Routing globals...
+Info:     routing clock net $glbnet$clk$TRELLIS_IO_IN using global 0
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 396 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:        440 |       37        356 |   37   356 |         0|       0.13       0.13|
+Info: Routing complete.
+Info: Router1 time 0.13s
+Info: Checksum: 0x5d86513c
+
+Info: Critical path report for cross-domain path '<async>' -> 'posedge $glbnet$clk$TRELLIS_IO_IN':
+Info: curr total
+Info:  0.0  0.0  Source requested_cmd[8]$tr_io.O
+Info:  4.1  4.1    Net requested_cmd[8]$TRELLIS_IO_IN (72,14) -> (13,8)
+Info:                Sink fallback_sel_LUT4_C_Z_LUT4_Z_2.A
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2  4.4  Source fallback_sel_LUT4_C_Z_LUT4_Z_2.F
+Info:  1.2  5.5    Net fallback_sel_LUT4_C_Z[2] (13,8) -> (12,10)
+Info:                Sink selected_cmd_LUT4_Z_B_LUT4_Z.B
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2  5.8  Source selected_cmd_LUT4_Z_B_LUT4_Z.F
+Info:  0.4  6.2    Net selected_cmd_LUT4_Z_B[0] (12,10) -> (12,10)
+Info:                Sink selected_cmd_LUT4_Z_2.B
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2  6.5  Source selected_cmd_LUT4_Z_2.F
+Info:  1.6  8.1    Net selected_cmd[5] (12,10) -> (9,8)
+Info:                Sink selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_2$CCU2_COMB1.B
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:12.12-12.24
+Info:  0.4  8.5  Source selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_2$CCU2_COMB1.FCO
+Info:  0.0  8.5    Net selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_COUT[6] (9,8) -> (10,8)
+Info:                Sink selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_1$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:34.9-34.36
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1  8.6  Source selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_1$CCU2_COMB0.FCO
+Info:  0.0  8.6    Net selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_1$CCU2_FCI_INT (10,8) -> (10,8)
+Info:                Sink selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_1$CCU2_COMB1.FCI
+Info:  0.0  8.6  Source selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_1$CCU2_COMB1.FCO
+Info:  0.0  8.6    Net selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_COUT[8] (10,8) -> (10,8)
+Info:                Sink selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:34.9-34.36
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1  8.7  Source selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0$CCU2_COMB0.FCO
+Info:  0.0  8.7    Net selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0$CCU2_FCI_INT (10,8) -> (10,8)
+Info:                Sink selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0$CCU2_COMB1.FCI
+Info:  0.0  8.7  Source selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0$CCU2_COMB1.FCO
+Info:  0.0  8.7    Net selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT_S0_CCU2C_S0_COUT[10] (10,8) -> (10,8)
+Info:                Sink selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:34.9-34.36
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1  8.7  Source selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT$CCU2_COMB0.FCO
+Info:  0.0  8.7    Net selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT$CCU2_FCI_INT (10,8) -> (10,8)
+Info:                Sink selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT$CCU2_COMB1.FCI
+Info:  0.0  8.7  Source selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_CCU2C_COUT$CCU2_COMB1.FCO
+Info:  0.0  8.7    Net $nextpnr_CCU2C_1$CIN (10,8) -> (10,8)
+Info:                Sink $nextpnr_CCU2C_1$CCU2_COMB0.FCI
+Info:  0.4  9.2  Source $nextpnr_CCU2C_1$CCU2_COMB0.F
+Info:  0.9 10.1    Net selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z[6] (10,8) -> (12,9)
+Info:                Sink selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_PFUMX_C0_1_ALUT_LUT4_Z.M
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.3 10.3  Source selected_cmd_LUT4_Z_C_LUT4_D_Z_PFUMX_BLUT_Z_L6MUX21_D1_Z_PFUMX_C0_1_ALUT_LUT4_Z.OFX
+Info:  1.4 11.8    Net cmd_max_limit_CCU2C_A0_4_COUT[3] (12,9) -> (9,10)
+Info:                Sink selected_cmd_LUT4_B_Z_LUT4_Z_7.D
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.2 12.0  Source selected_cmd_LUT4_B_Z_LUT4_Z_7.F
+Info:  0.8 12.8    Net selected_cmd_LUT4_B_Z[1] (9,10) -> (10,10)
+Info:                Sink cmd_max_limit_CCU2C_A0_5$CCU2_COMB1.B
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:39.9-39.36
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:32.22-32.23
+Info:  0.4 13.3  Source cmd_max_limit_CCU2C_A0_5$CCU2_COMB1.FCO
+Info:  0.0 13.3    Net cmd_max_limit_CCU2C_A0_COUT[2] (10,10) -> (10,10)
+Info:                Sink cmd_max_limit_CCU2C_A0_3$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:39.9-39.36
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 13.3  Source cmd_max_limit_CCU2C_A0_3$CCU2_COMB0.FCO
+Info:  0.0 13.3    Net cmd_max_limit_CCU2C_A0_3$CCU2_FCI_INT (10,10) -> (10,10)
+Info:                Sink cmd_max_limit_CCU2C_A0_3$CCU2_COMB1.FCI
+Info:  0.0 13.3  Source cmd_max_limit_CCU2C_A0_3$CCU2_COMB1.FCO
+Info:  0.0 13.3    Net cmd_max_limit_CCU2C_A0_COUT[4] (10,10) -> (10,10)
+Info:                Sink cmd_max_limit_CCU2C_A0_2$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:39.9-39.36
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 13.4  Source cmd_max_limit_CCU2C_A0_2$CCU2_COMB0.FCO
+Info:  0.0 13.4    Net cmd_max_limit_CCU2C_A0_2$CCU2_FCI_INT (10,10) -> (10,10)
+Info:                Sink cmd_max_limit_CCU2C_A0_2$CCU2_COMB1.FCI
+Info:  0.0 13.4  Source cmd_max_limit_CCU2C_A0_2$CCU2_COMB1.FCO
+Info:  0.0 13.4    Net cmd_max_limit_CCU2C_A0_COUT[6] (10,10) -> (11,10)
+Info:                Sink cmd_max_limit_CCU2C_A0_1$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:39.9-39.36
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 13.5  Source cmd_max_limit_CCU2C_A0_1$CCU2_COMB0.FCO
+Info:  0.0 13.5    Net cmd_max_limit_CCU2C_A0_1$CCU2_FCI_INT (11,10) -> (11,10)
+Info:                Sink cmd_max_limit_CCU2C_A0_1$CCU2_COMB1.FCI
+Info:  0.0 13.5  Source cmd_max_limit_CCU2C_A0_1$CCU2_COMB1.FCO
+Info:  0.0 13.5    Net cmd_max_limit_CCU2C_A0_COUT[8] (11,10) -> (11,10)
+Info:                Sink cmd_max_limit_CCU2C_A0$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:39.9-39.36
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 13.5  Source cmd_max_limit_CCU2C_A0$CCU2_COMB0.FCO
+Info:  0.0 13.5    Net cmd_max_limit_CCU2C_A0$CCU2_FCI_INT (11,10) -> (11,10)
+Info:                Sink cmd_max_limit_CCU2C_A0$CCU2_COMB1.FCI
+Info:  0.0 13.5  Source cmd_max_limit_CCU2C_A0$CCU2_COMB1.FCO
+Info:  0.0 13.5    Net cmd_max_limit_CCU2C_A0_COUT[10] (11,10) -> (11,10)
+Info:                Sink cmd_max_limit_CCU2C_A0_4$CCU2_COMB0.FCI
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:39.9-39.36
+Info:                  /usr/bin/../share/yosys/ecp5/arith_map.v:63.22-63.23
+Info:  0.1 13.6  Source cmd_max_limit_CCU2C_A0_4$CCU2_COMB0.FCO
+Info:  0.0 13.6    Net cmd_max_limit_CCU2C_A0_4$CCU2_FCI_INT (11,10) -> (11,10)
+Info:                Sink cmd_max_limit_CCU2C_A0_4$CCU2_COMB1.FCI
+Info:  0.0 13.6  Source cmd_max_limit_CCU2C_A0_4$CCU2_COMB1.FCO
+Info:  0.0 13.6    Net $nextpnr_CCU2C_3$CIN (11,10) -> (11,10)
+Info:                Sink $nextpnr_CCU2C_3$CCU2_COMB0.FCI
+Info:  0.4 14.1  Source $nextpnr_CCU2C_3$CCU2_COMB0.F
+Info:  1.1 15.2    Net cmd_max_limit_CCU2C_A0_4_COUT[4] (11,10) -> (12,14)
+Info:                Sink clamped_cmd_PFUMX_Z_4_BLUT_LUT4_Z.M
+Info:                Defined in:
+Info:                  /usr/bin/../share/yosys/ecp5/cells_map.v:108.23-108.24
+Info:  0.3 15.4  Source clamped_cmd_PFUMX_Z_4_BLUT_LUT4_Z.OFX
+Info:  2.7 18.1    Net clamped_cmd[7] (12,14) -> (45,19)
+Info:                Sink safe_cmd_TRELLIS_FF_Q_4.M
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:14.12-14.23
+Info:  0.0 18.1  Setup safe_cmd_TRELLIS_FF_Q_4.M
+Info: 3.8 ns logic, 14.3 ns routing
+
+Info: Critical path report for cross-domain path 'posedge $glbnet$clk$TRELLIS_IO_IN' -> '<async>':
+Info: curr total
+Info:  0.5  0.5  Source safe_cmd_TRELLIS_FF_Q_8.Q
+Info:  3.0  3.6    Net safe_cmd[3]$TRELLIS_IO_OUT (30,6) -> (72,5)
+Info:                Sink safe_cmd[3]$tr_io.I
+Info:                Defined in:
+Info:                  /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v:8.23-8.31
+Info: 0.5 ns logic, 3.0 ns routing
+
+Info: No Fmax available; no interior timing paths found in design.
+
+Info: Program finished normally.

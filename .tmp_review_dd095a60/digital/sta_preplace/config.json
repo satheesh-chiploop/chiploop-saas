@@ -1,0 +1,20 @@
+{
+  "DESIGN_NAME": "safety_fault_watchdog",
+  "PDK": "sky130A",
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 10.0,
+  "VERILOG_FILES": [
+    "inputs/netlist/safety_fault_watchdog_synth.v"
+  ],
+  "PNR_SDC_FILE": "inputs/constraints/safety_fault_watchdog.sdc",
+  "CHIPLOOP_SOURCE_SPEC_JSON": null,
+  "CHIPLOOP_FILELIST": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/dd095a60-e45f-44c3-beb0-943e030b19e3/ff5167b1-75d5-4b82-8bf2-b2321c18cdb9/digital/arch2tapeout/digital/impl_setup/filelist.f",
+  "CHIPLOOP_UPSTREAM_SDC_SOURCE": "inferred_clock_intent",
+  "FP_CORE_UTIL": 20,
+  "PL_TARGET_DENSITY": 0.25,
+  "FP_SIZING": "absolute",
+  "DIE_AREA": "0 0 200 200",
+  "CHIPLOOP_TOP_LEVEL_IO_BITS": 115,
+  "CHIPLOOP_DIE_SIDE_UM": 200.0,
+  "RUN_LINTER": false
+}
