@@ -1134,6 +1134,10 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
       ],
       verification: ["simulation_summary_coverage.json", "formal_report.json", "system_sim_dashboard.json"],
       embedded: [
+        "register_map.json",
+        "firmware/register_map.json",
+        "register_map_summary.json",
+        "firmware/register_map_summary.json",
         "system_firmware_dashboard.json",
         "system_firmware_execution.json",
         "system/firmware/cosim/system_firmware_dashboard.json",
@@ -2567,6 +2571,12 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
     if (stage === "embedded") {
       const dashboard = evidence["system_firmware_dashboard.json"] || evidence["system_firmware_coverage_dashboard.json"] || {};
       const execution = evidence["system_firmware_execution.json"] || evidence["system_firmware_coverage_summary.json"] || {};
+      const firmwareRegmap = record(evidence["register_map.json"] || evidence["firmware/register_map.json"]);
+      const firmwareRegisters = array(firmwareRegmap.registers).map(record);
+      const programmableRegisters = firmwareRegisters.filter((register) => {
+        const registerAccess = firstString(register.access, "RW").toUpperCase();
+        return registerAccess !== "RO" || array(register.fields).some((field) => firstString(record(field).access, registerAccess).toUpperCase() !== "RO");
+      });
       const readiness = record(execution.readiness);
       const inputs = record(execution.inputs);
       const results = record(execution.results);
@@ -2628,6 +2638,56 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
               <Stat title="Missing Inputs" value={missingInputs.length} />
             </div>
           </div>
+          {firmwareRegisters.length ? (
+            <div className="rounded-xl border border-cyan-900/60 bg-cyan-950/10 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="text-sm font-semibold text-slate-100">Firmware-visible registers</div>
+                  <div className="mt-1 text-xs text-slate-400">Registers and fields used by the generated HAL and driver. RW/WO fields are programmable; RO fields are status.</div>
+                </div>
+                <div className="flex gap-2 text-xs">
+                  <span className="rounded-full border border-cyan-800 px-2.5 py-1 text-cyan-200">{programmableRegisters.length} programmable</span>
+                  <span className="rounded-full border border-slate-700 px-2.5 py-1 text-slate-300">{firmwareRegisters.length} total</span>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {firmwareRegisters.slice(0, 12).map((register, index) => {
+                  const registerAccess = firstString(register.access, "RW").toUpperCase();
+                  const fields = array(register.fields).map(record);
+                  const writableFields = fields.filter((field) => firstString(field.access, registerAccess).toUpperCase() !== "RO");
+                  return (
+                    <div key={`${firstString(register.name, "register")}-${index}`} className="min-w-0 rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="break-words font-semibold text-slate-100">{firstString(register.name, "REGISTER")}</div>
+                          <div className="mt-1 text-xs text-cyan-300">Offset {firstString(register.offset, "not reported")}</div>
+                        </div>
+                        <span className={`rounded px-2 py-1 text-[11px] font-semibold ${writableFields.length || registerAccess !== "RO" ? "bg-cyan-500/15 text-cyan-200" : "bg-slate-800 text-slate-400"}`}>
+                          {registerAccess}
+                        </span>
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {fields.slice(0, 8).map((field, fieldIndex) => {
+                          const access = firstString(field.access, registerAccess).toUpperCase();
+                          const offset = firstNumber(field.bit_offset, field.lsb);
+                          const width = firstNumber(field.bit_width, typeof field.msb === "number" ? Number(field.msb) - offset + 1 : 1);
+                          return (
+                            <span key={`${firstString(field.name, "field")}-${fieldIndex}`} title={`${access} · bits ${width > 1 ? `${offset + width - 1}:${offset}` : offset}`} className={`rounded border px-2 py-1 text-[11px] ${access === "RO" ? "border-slate-700 text-slate-400" : "border-cyan-900 text-cyan-200"}`}>
+                              {firstString(field.name, "FIELD")}
+                            </span>
+                          );
+                        })}
+                        {fields.length > 8 ? <span className="px-1 py-1 text-[11px] text-slate-500">+{fields.length - 8} more</span> : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {firmwareRegisters.length > 12 ? <div className="mt-3 text-xs text-slate-500">Showing 12 of {firmwareRegisters.length} registers. Download ZIP for the complete register map.</div> : null}
+            </div>
+          ) : (
+            <div className="rounded-lg border border-amber-800/50 bg-amber-950/15 p-4 text-sm text-amber-100">Firmware register-map evidence was not produced for this run.</div>
+          )}
         </div>
       );
     }
