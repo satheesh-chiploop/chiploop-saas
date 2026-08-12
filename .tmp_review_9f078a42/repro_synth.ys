@@ -1,0 +1,5 @@
+read_verilog -sv fpga/handoff/rtl/adaptive_aero_control_top.v
+read_verilog -sv fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv
+hierarchy -check -top adaptive_aero_control_top_spi_fpga_top
+proc; opt; memory; opt_clean
+write_verilog -noattr repro_generic.v

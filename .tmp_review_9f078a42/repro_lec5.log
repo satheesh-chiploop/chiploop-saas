@@ -1,0 +1,1669 @@
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2025  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.56 (git sha1 9c447ad9d4b1ea589369364eea38b4d70da2c599, x86_64-w64-mingw32-g++ 15.2.0 -march=nocona -msahf -mtune=generic -O2 -fstack-protector-strong -O3)
+
+-- Executing script file `repro_lec.ys' --
+
+1. Executing Verilog-2005 frontend: fpga/handoff/rtl/adaptive_aero_control_top.v
+Parsing SystemVerilog input from `fpga/handoff/rtl/adaptive_aero_control_top.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv
+Parsing SystemVerilog input from `fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_spi_fpga_top'.
+Successfully finished Verilog frontend.
+
+3. Executing PREP pass.
+
+3.1. Executing HIERARCHY pass (managing design hierarchy).
+
+3.1.1. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+
+3.1.2. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+Removed 0 unused modules.
+
+3.2. Executing PROC pass (convert processes to netlists).
+
+3.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 10 empty switches in `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+Cleaned up 10 empty switches.
+
+3.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:50$70 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:46$69 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 7 switch rules as full_case in process $proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27 in module adaptive_aero_control_top.
+Marked 14 switch rules as full_case in process $proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1 in module adaptive_aero_control_top.
+Removed a total of 0 dead cases.
+
+3.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 12 redundant assignments.
+Promoted 32 assignments to connections.
+
+3.2.4. Executing PROC_INIT pass (extract init attributes).
+
+3.2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73'.
+Found async reset \spi_cs_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:46$69'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+
+3.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~36 debug messages>
+
+3.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:0$77'.
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73'.
+     1/5: $0\tx_snapshot[166:0]
+     2/5: $0\spi_cs_prev[0:0]
+     3/5: $0\spi_cs_sync[0:0]
+     4/5: $0\spi_cs_meta[0:0]
+     5/5: $0\rx_active[135:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:50$70'.
+     1/2: $0\tx_shift[166:0]
+     2/2: $0\rx_shift[135:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:46$69'.
+     1/1: $0\spi_active[0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+     1/41: $0\req_hist_web[0:0]
+     2/41: $0\req_hist_csb[0:0]
+     3/41: $0\status_rsp_received_reg[0:0]
+     4/41: $0\status_req_accepted_reg[0:0]
+     5/41: $0\irq_r[0:0]
+     6/41: $0\hold_safe_sel_reg[0:0]
+     7/41: $0\ctrl_reg[7:0] [4]
+     8/41: $0\ctrl_reg[7:0] [0]
+     9/41: $0\state_reg[1:0]
+    10/41: $0\fault_latched_reg[0:0]
+    11/41: $0\req_hist_read_pending_reg[0:0]
+    12/41: $0\req_hist_write_pending_reg[0:0]
+    13/41: $0\pending_rearm_reg[0:0]
+    14/41: $0\pending_clear_fault_reg[0:0]
+    15/41: $0\pending_launch_reg[0:0]
+    16/41: $0\req_hist_din[63:0]
+    17/41: $0\req_hist_addr[3:0]
+    18/41: $0\busy_reg[0:0]
+    19/41: $0\status_fault_active_reg[0:0]
+    20/41: $0\status_fallback_active_reg[0:0]
+    21/41: $0\status_timeout_reg[0:0]
+    22/41: $0\status_stale_reject_reg[0:0]
+    23/41: $0\status_clamp_applied_reg[0:0]
+    24/41: $0\status_rsp_validated_reg[0:0]
+    25/41: $0\outstanding_valid_reg[0:0]
+    26/41: $0\outstanding_age_reg[15:0]
+    27/41: $0\outstanding_seq_reg[15:0]
+    28/41: $0\rejected_count_reg[15:0]
+    29/41: $0\accepted_count_reg[15:0]
+    30/41: $0\req_meta_reg[63:0]
+    31/41: $0\irq_en_reg[63:0]
+    32/41: $0\bounds_reg[63:0]
+    33/41: $0\limits_reg[63:0]
+    34/41: $0\mode_seq_reg[63:0]
+    35/41: { $0\ctrl_reg[7:0] [7:5] $0\ctrl_reg[7:0] [3:1] }
+    36/41: $0\act_cmd_data_r[31:0]
+    37/41: $0\act_cmd_fault_r[0:0]
+    38/41: $0\act_cmd_valid_r[0:0]
+    39/41: $0\rsp_ready_r[0:0]
+    40/41: $0\req_data_r[63:0]
+    41/41: $0\req_valid_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+     1/28: $5\state_next[1:0]
+     2/28: $4\clamp_needed_next[0:0]
+     3/28: $4\clamp_value_next[31:0]
+     4/28: $3\clamp_needed_next[0:0]
+     5/28: $3\clamp_value_next[31:0]
+     6/28: $4\state_next[1:0]
+     7/28: $2\clamp_needed_next[0:0]
+     8/28: $2\clamp_value_next[31:0]
+     9/28: $1\clamp_needed_next[0:0]
+    10/28: $1\clamp_value_next[31:0]
+    11/28: $3\state_next[1:0]
+    12/28: $2\state_next[1:0]
+    13/28: $1\state_next[1:0]
+    14/28: $1\mmio_rdata_r[63:0]
+    15/28: $3\launch_accept_pulse[0:0]
+    16/28: $3\rearm_pulse[0:0]
+    17/28: $3\clear_fault_pulse[0:0]
+    18/28: $2\launch_accept_pulse[0:0]
+    19/28: $2\rearm_pulse[0:0]
+    20/28: $2\clear_fault_pulse[0:0]
+    21/28: $2\req_hist_read_pulse[0:0]
+    22/28: $2\req_hist_write_pulse[0:0]
+    23/28: $1\req_hist_read_pulse[0:0]
+    24/28: $1\req_hist_write_pulse[0:0]
+    25/28: $1\rearm_pulse[0:0]
+    26/28: $1\clear_fault_pulse[0:0]
+    27/28: $1\launch_accept_pulse[0:0]
+    28/28: $1\read_data_next[63:0]
+
+3.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_miso' from process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:0$77'.
+No latch inferred for signal `\adaptive_aero_control_top.\mmio_rdata_r' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\mmio_ready_r' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\mmio_error_r' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\state_next' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\status_reg_r' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\read_data_next' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\launch_accept_pulse' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\clear_fault_pulse' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\rearm_pulse' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\req_hist_write_pulse' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\req_hist_read_pulse' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\rsp_valid_sync' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\rsp_seq_in' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\rsp_cmd_in' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\rsp_schema_ok' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\clamp_value_next' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\clamp_needed_next' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\fallback_value_sel' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\transport_error_reg' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+No latch inferred for signal `\adaptive_aero_control_top.\malformed_rsp_reg' from process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+
+3.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73'.
+  created $adff cell `$procdff$351' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_snapshot' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73'.
+  created $adff cell `$procdff$356' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_meta' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73'.
+  created $adff cell `$procdff$361' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_sync' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73'.
+  created $adff cell `$procdff$366' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_prev' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73'.
+  created $adff cell `$procdff$371' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:50$70'.
+  created $dff cell `$procdff$372' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:50$70'.
+  created $dff cell `$procdff$373' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:46$69'.
+  created $adff cell `$procdff$376' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_valid_r' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$381' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_data_r' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$386' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\rsp_ready_r' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$391' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\act_cmd_valid_r' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$396' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\act_cmd_fault_r' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$401' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\act_cmd_data_r' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$406' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\irq_r' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$411' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\ctrl_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$416' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\mode_seq_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$421' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\limits_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$426' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\bounds_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$431' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\irq_en_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$436' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_meta_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$441' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\accepted_count_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$446' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\rejected_count_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$451' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\outstanding_seq_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$456' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\outstanding_age_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$461' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\outstanding_valid_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$466' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_req_accepted_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$471' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_rsp_received_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$476' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_rsp_validated_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$481' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_clamp_applied_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$486' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_stale_reject_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$491' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_timeout_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$496' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_fallback_active_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$501' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_fault_active_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$506' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\busy_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$511' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_hist_csb' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$516' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_hist_web' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$521' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_hist_addr' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$526' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_hist_din' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$531' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\state_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$536' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\pending_launch_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$541' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\pending_clear_fault_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$546' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\pending_rearm_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$551' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\hold_safe_sel_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$556' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_hist_write_pending_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$561' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_hist_read_pending_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$566' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\fault_latched_reg' using process `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+  created $adff cell `$procdff$571' with positive edge clock and positive level reset.
+
+3.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+3.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:0$77'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:59$73'.
+Found and cleaned up 2 empty switches in `\adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:50$70'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:50$70'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:46$69'.
+Found and cleaned up 19 empty switches in `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+Removing empty process `adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:254$27'.
+Found and cleaned up 14 empty switches in `\adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+Removing empty process `adaptive_aero_control_top.$proc$fpga/handoff/rtl/adaptive_aero_control_top.v:130$1'.
+Cleaned up 36 empty switches.
+
+3.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+<suppressed ~14 debug messages>
+Optimizing module adaptive_aero_control_top.
+<suppressed ~89 debug messages>
+
+3.3. Executing FLATTEN pass (flatten design).
+Deleting now unused module adaptive_aero_control_top.
+<suppressed ~1 debug messages>
+
+3.4. Executing FUTURE pass.
+
+3.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+3.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 99 unused cells and 336 unused wires.
+<suppressed ~111 debug messages>
+
+3.7. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+3.8. Executing OPT pass (performing simple optimizations).
+
+3.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+3.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+<suppressed ~60 debug messages>
+Removed a total of 20 cells.
+
+3.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+      Replacing known input bits on port A of cell $flatten\u_core.$procmux$121: \u_core.req_hist_write_pending_reg -> 1'0
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$227.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$265.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$267.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$275.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$277.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$285.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$287.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$294.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$301.
+    dead port 2/2 on $mux $flatten\u_core.$procmux$308.
+Removed 10 multiplexer ports.
+<suppressed ~33 debug messages>
+
+3.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+3.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+3.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 0 unused cells and 30 unused wires.
+<suppressed ~1 debug messages>
+
+3.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+3.8.8. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.8.9. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~33 debug messages>
+
+3.8.10. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+3.8.11. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+3.8.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+3.8.13. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+3.8.14. Finished OPT passes. (There is nothing left to do.)
+
+3.9. Executing WREDUCE pass (reducing word size of cells).
+Removed top 1 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procmux$342_CMP0 ($eq).
+Removed top 15 bits (of 16) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$add$fpga/handoff/rtl/adaptive_aero_control_top.v:323$49 ($add).
+Removed top 1 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$fpga/handoff/rtl/adaptive_aero_control_top.v:309$41 ($eq).
+Removed top 1 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$fpga/handoff/rtl/adaptive_aero_control_top.v:308$39 ($eq).
+Removed top 1 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$fpga/handoff/rtl/adaptive_aero_control_top.v:307$37 ($eq).
+Removed top 2 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$fpga/handoff/rtl/adaptive_aero_control_top.v:306$35 ($eq).
+Removed top 2 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$fpga/handoff/rtl/adaptive_aero_control_top.v:305$33 ($eq).
+Removed top 3 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$fpga/handoff/rtl/adaptive_aero_control_top.v:304$31 ($eq).
+
+3.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+3.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+3.12. Executing OPT pass (performing simple optimizations).
+
+3.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+3.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+3.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+3.12.4. Finished fast OPT passes.
+
+3.13. Printing statistics.
+
+=== adaptive_aero_control_top_spi_fpga_top ===
+
+   Number of wires:                194
+   Number of wire bits:           3365
+   Number of public wires:         101
+   Number of public wire bits:    2204
+   Number of ports:                  7
+   Number of port bits:              7
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                143
+     $add                            1
+     $adff                          38
+     $and                            7
+     $dff                            2
+     $eq                             8
+     $ge                             1
+     $logic_and                     18
+     $logic_not                      6
+     $mux                           50
+     $ne                             1
+     $not                            1
+     $or                             7
+     $pmux                           1
+     $reduce_bool                    1
+     $scopeinfo                      1
+
+3.14. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+4. Executing ASYNC2SYNC pass.
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$381 ($adff): ARST=\reset_n, D=\u_core.req_valid_r, Q=\u_core.req_valid_r
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$386 ($adff): ARST=\reset_n, D=\u_core.req_data_r, Q=\u_core.req_data_r
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$391 ($adff): ARST=\reset_n, D=\u_core.rsp_ready_r, Q=\u_core.rsp_ready_r
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$396 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\act_cmd_valid_r[0:0], Q=\u_core.act_cmd_valid_r
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$401 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\act_cmd_fault_r[0:0], Q=\u_core.act_cmd_fault_r
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$406 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\act_cmd_data_r[31:0], Q=\u_core.act_cmd_data_r
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$411 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\irq_r[0:0], Q=\u_core.irq_r
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$416 ($adff): ARST=\reset_n, D={ \u_core.ctrl_reg [7:5] $flatten\u_core.$0\ctrl_reg[7:0] [4] \u_core.ctrl_reg [3:1] $flatten\u_core.$0\ctrl_reg[7:0] [0] }, Q=\u_core.ctrl_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$421 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\mode_seq_reg[63:0], Q=\u_core.mode_seq_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$426 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\limits_reg[63:0], Q=\u_core.limits_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$431 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\bounds_reg[63:0], Q=\u_core.bounds_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$436 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\irq_en_reg[63:0], Q=\u_core.irq_en_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$441 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\req_meta_reg[63:0], Q=\u_core.req_meta_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$446 ($adff): ARST=\reset_n, D=\u_core.accepted_count_reg, Q=\u_core.accepted_count_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$451 ($adff): ARST=\reset_n, D=\u_core.rejected_count_reg, Q=\u_core.rejected_count_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$456 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\outstanding_seq_reg[15:0], Q=\u_core.outstanding_seq_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$461 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\outstanding_age_reg[15:0], Q=\u_core.outstanding_age_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$466 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\outstanding_valid_reg[0:0], Q=\u_core.outstanding_valid_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$471 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\status_req_accepted_reg[0:0], Q=\u_core.status_req_accepted_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$476 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\status_rsp_received_reg[0:0], Q=\u_core.status_rsp_received_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$481 ($adff): ARST=\reset_n, D=\u_core.status_rsp_validated_reg, Q=\u_core.status_rsp_validated_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$486 ($adff): ARST=\reset_n, D=\u_core.status_clamp_applied_reg, Q=\u_core.status_clamp_applied_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$491 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\status_stale_reject_reg[0:0], Q=\u_core.status_stale_reject_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$496 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\status_timeout_reg[0:0], Q=\u_core.status_timeout_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$501 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\status_fallback_active_reg[0:0], Q=\u_core.status_fallback_active_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$506 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\status_fault_active_reg[0:0], Q=\u_core.status_fault_active_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$511 ($adff): ARST=\reset_n, D=\u_core.busy_reg, Q=\u_core.busy_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$526 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\req_hist_addr[3:0], Q=\u_core.req_hist_addr
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$536 ($adff): ARST=\reset_n, D=\u_core.state_next, Q=\u_core.state_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$556 ($adff): ARST=\reset_n, D=\u_core.ctrl_reg [4], Q=\u_core.hold_safe_sel_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$561 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\req_hist_write_pending_reg[0:0], Q=\u_core.req_hist_write_pending_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$566 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\req_hist_read_pending_reg[0:0], Q=\u_core.req_hist_read_pending_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$351 ($adff): ARST=\reset_n, D=$0\rx_active[135:0], Q=\rx_active
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$356 ($adff): ARST=\reset_n, D={ \core_mmio_rdata 2'10 \u_core.req_valid_r \u_core.req_data_r \u_core.rsp_ready_r \u_core.act_cmd_valid_r \u_core.act_cmd_fault_r \u_core.act_cmd_data_r \u_core.irq_r }, Q=\tx_snapshot
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$361 ($adff): ARST=\reset_n, D=\spi_cs_n, Q=\spi_cs_meta
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$366 ($adff): ARST=\reset_n, D=\spi_cs_meta, Q=\spi_cs_sync
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$371 ($adff): ARST=\reset_n, D=\spi_cs_sync, Q=\spi_cs_prev
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$376 ($adff): ARST=\spi_cs_n, D=1'1, Q=\spi_active
+
+5. Executing MEMORY pass.
+
+5.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+5.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+5.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+5.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+5.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+5.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+5.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+5.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+5.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+5.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+5.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Renaming module \adaptive_aero_control_top_spi_fpga_top to \gold.
+
+7. Executing Verilog-2005 frontend: repro_generic.v
+Parsing SystemVerilog input from `repro_generic.v' to AST representation.
+Warning: Encountered `parallel_case' comment! Such legacy hot comments are supported by Yosys, but are not part of any formal language specification. Using the Verilog `parallel_case' attribute or the SystemVerilog `unique' or `priority' keywords is recommended!
+Generating RTLIL representation for module `\adaptive_aero_control_top'.
+Generating RTLIL representation for module `\adaptive_aero_control_top_spi_fpga_top'.
+Successfully finished Verilog frontend.
+
+8. Executing PREP pass.
+
+8.1. Executing HIERARCHY pass (managing design hierarchy).
+
+8.1.1. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+
+8.1.2. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+Removed 0 unused modules.
+
+8.2. Executing PROC pass (convert processes to netlists).
+
+8.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+8.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:390$859 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:387$857 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:384$855 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:381$853 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:378$851 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:369$843 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:0$837 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:226$804 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:223$802 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:220$800 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:217$798 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:214$796 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:211$794 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:184$768 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:181$766 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:178$764 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:175$762 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:172$760 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:169$758 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:166$756 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:163$754 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:159$752 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:154$750 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:150$748 in module adaptive_aero_control_top.
+Marked 1 switch rules as full_case in process $proc$repro_generic.v:147$746 in module adaptive_aero_control_top.
+Removed a total of 0 dead cases.
+
+8.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 11 redundant assignments.
+Promoted 4 assignments to connections.
+
+8.2.4. Executing PROC_INIT pass (extract init attributes).
+
+8.2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \spi_cs_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:390$859'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:387$857'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:384$855'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:381$853'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:378$851'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:369$843'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:226$804'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:223$802'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:220$800'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:217$798'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:214$796'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:211$794'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:184$768'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:181$766'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:178$764'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:175$762'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:172$760'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:169$758'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:166$756'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:163$754'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:159$752'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:154$750'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:150$748'.
+Found async reset \reset_n in `\adaptive_aero_control_top.$proc$repro_generic.v:147$746'.
+
+8.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~16 debug messages>
+
+8.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:390$859'.
+     1/1: $0\spi_active[0:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:387$857'.
+     1/1: $0\spi_cs_prev[0:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:384$855'.
+     1/1: $0\spi_cs_sync[0:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:381$853'.
+     1/1: $0\spi_cs_meta[0:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:378$851'.
+     1/1: $0\tx_snapshot[166:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:374$847'.
+     1/1: $0\tx_shift[166:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:372$845'.
+     1/1: $0\rx_shift[135:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:369$843'.
+     1/1: $0\rx_active[135:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:0$837'.
+     1/1: $1\_121_$func$repro_generic.v:277$742.$result[63:0]$842
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:226$804'.
+     1/1: $0\req_hist_read_pending_reg[0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:223$802'.
+     1/1: $0\req_hist_write_pending_reg[0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:220$800'.
+     1/1: $0\status_rsp_received_reg[0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:217$798'.
+     1/1: $0\status_req_accepted_reg[0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:214$796'.
+     1/1: $0\outstanding_age_reg[15:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:211$794'.
+     1/1: $0\irq_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:184$768'.
+     1/1: $0\irq_en_reg[63:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:181$766'.
+     1/1: $0\req_hist_addr[3:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:178$764'.
+     1/1: $0\bounds_reg[63:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:175$762'.
+     1/1: $0\act_cmd_valid_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:172$760'.
+     1/1: $0\req_meta_reg[63:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:169$758'.
+     1/1: $0\limits_reg[63:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:166$756'.
+     1/1: $0\mode_seq_reg[63:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:163$754'.
+     1/1: $0\outstanding_valid_reg[0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:159$752'.
+     1/1: $0\ctrl_reg_reg[0][0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:154$750'.
+     1/1: $0\ctrl_reg_reg[4][0:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:150$748'.
+     1/1: $0\state_reg[1:0]
+Creating decoders for process `\adaptive_aero_control_top.$proc$repro_generic.v:147$746'.
+     1/1: $0\outstanding_seq_reg[15:0]
+
+8.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\adaptive_aero_control_top.\_121_$func$repro_generic.v:277$742.s' from process `\adaptive_aero_control_top.$proc$repro_generic.v:0$837'.
+No latch inferred for signal `\adaptive_aero_control_top.\_121_$func$repro_generic.v:277$742.b' from process `\adaptive_aero_control_top.$proc$repro_generic.v:0$837'.
+No latch inferred for signal `\adaptive_aero_control_top.\_121_$func$repro_generic.v:277$742.$result' from process `\adaptive_aero_control_top.$proc$repro_generic.v:0$837'.
+No latch inferred for signal `\adaptive_aero_control_top.\_121_$func$repro_generic.v:277$741.$result' from process `\adaptive_aero_control_top.$proc$repro_generic.v:0$837'.
+
+8.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:390$859'.
+  created $adff cell `$procdff$904' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_prev' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:387$857'.
+  created $adff cell `$procdff$909' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_sync' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:384$855'.
+  created $adff cell `$procdff$914' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_meta' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:381$853'.
+  created $adff cell `$procdff$919' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_snapshot' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:378$851'.
+  created $adff cell `$procdff$924' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:374$847'.
+  created $dff cell `$procdff$925' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:372$845'.
+  created $dff cell `$procdff$926' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:369$843'.
+  created $adff cell `$procdff$931' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_hist_read_pending_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:226$804'.
+  created $adff cell `$procdff$936' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_hist_write_pending_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:223$802'.
+  created $adff cell `$procdff$941' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_rsp_received_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:220$800'.
+  created $adff cell `$procdff$946' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\status_req_accepted_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:217$798'.
+  created $adff cell `$procdff$951' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\outstanding_age_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:214$796'.
+  created $adff cell `$procdff$956' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\irq_r' using process `\adaptive_aero_control_top.$proc$repro_generic.v:211$794'.
+  created $adff cell `$procdff$961' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\irq_en_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:184$768'.
+  created $adff cell `$procdff$966' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_hist_addr' using process `\adaptive_aero_control_top.$proc$repro_generic.v:181$766'.
+  created $adff cell `$procdff$971' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\bounds_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:178$764'.
+  created $adff cell `$procdff$976' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\act_cmd_valid_r' using process `\adaptive_aero_control_top.$proc$repro_generic.v:175$762'.
+  created $adff cell `$procdff$981' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\req_meta_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:172$760'.
+  created $adff cell `$procdff$986' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\limits_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:169$758'.
+  created $adff cell `$procdff$991' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\mode_seq_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:166$756'.
+  created $adff cell `$procdff$996' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\outstanding_valid_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:163$754'.
+  created $adff cell `$procdff$1001' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\ctrl_reg_reg[0]' using process `\adaptive_aero_control_top.$proc$repro_generic.v:159$752'.
+  created $adff cell `$procdff$1006' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\ctrl_reg_reg[4]' using process `\adaptive_aero_control_top.$proc$repro_generic.v:154$750'.
+  created $adff cell `$procdff$1011' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\state_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:150$748'.
+  created $adff cell `$procdff$1016' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top.\outstanding_seq_reg' using process `\adaptive_aero_control_top.$proc$repro_generic.v:147$746'.
+  created $adff cell `$procdff$1021' with positive edge clock and positive level reset.
+
+8.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+8.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:390$859'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:387$857'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:384$855'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:381$853'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:378$851'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:374$847'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:374$847'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:372$845'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:372$845'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:369$843'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$repro_generic.v:369$843'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:0$837'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:0$837'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:226$804'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:223$802'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:220$800'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:217$798'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:214$796'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:211$794'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:184$768'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:184$768'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:181$766'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:181$766'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:178$764'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:178$764'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:175$762'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:175$762'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:172$760'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:172$760'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:169$758'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:169$758'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:166$756'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:166$756'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:163$754'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:163$754'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:159$752'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:159$752'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:154$750'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:154$750'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:150$748'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:150$748'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top.$proc$repro_generic.v:147$746'.
+Removing empty process `adaptive_aero_control_top.$proc$repro_generic.v:147$746'.
+Cleaned up 16 empty switches.
+
+8.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+<suppressed ~13 debug messages>
+Optimizing module adaptive_aero_control_top.
+<suppressed ~36 debug messages>
+
+8.3. Executing FLATTEN pass (flatten design).
+Deleting now unused module adaptive_aero_control_top.
+<suppressed ~1 debug messages>
+
+8.4. Executing FUTURE pass.
+
+8.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 48 unused cells and 191 unused wires.
+<suppressed ~49 debug messages>
+
+8.7. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+8.8. Executing OPT pass (performing simple optimizations).
+
+8.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+8.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+8.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $flatten\u_core.$ternary$repro_generic.v:239$816.
+Removed 1 multiplexer ports.
+<suppressed ~26 debug messages>
+
+8.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+8.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+8.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+8.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+8.8.8. Rerunning OPT passes. (Maybe there is more to do..)
+
+8.8.9. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~26 debug messages>
+
+8.8.10. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+8.8.11. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+8.8.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+8.8.13. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+8.8.14. Finished OPT passes. (There is nothing left to do.)
+
+8.9. Executing WREDUCE pass (reducing word size of cells).
+Removed top 1 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$repro_generic.v:278$829 ($eq).
+Removed top 1 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$repro_generic.v:279$830 ($eq).
+Removed top 1 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$repro_generic.v:280$831 ($eq).
+Removed top 1 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$repro_generic.v:281$832 ($eq).
+Removed top 2 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$repro_generic.v:282$833 ($eq).
+Removed top 2 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$repro_generic.v:283$834 ($eq).
+Removed top 3 bits (of 4) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$eq$repro_generic.v:284$835 ($eq).
+Removed top 15 bits (of 16) from port B of cell adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$add$repro_generic.v:144$743 ($add).
+
+8.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+8.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+8.12. Executing OPT pass (performing simple optimizations).
+
+8.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+8.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+8.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+8.12.4. Finished fast OPT passes.
+
+8.13. Printing statistics.
+
+=== adaptive_aero_control_top_spi_fpga_top ===
+
+   Number of wires:                176
+   Number of wire bits:           3797
+   Number of public wires:         161
+   Number of public wire bits:    3012
+   Number of ports:                  7
+   Number of port bits:              7
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                104
+     $add                            1
+     $adff                          24
+     $and                            2
+     $dff                            2
+     $eq                             8
+     $ge                             1
+     $logic_and                     15
+     $logic_not                      4
+     $mux                           39
+     $ne                             1
+     $not                            1
+     $or                             2
+     $pmux                           1
+     $reduce_or                      2
+     $scopeinfo                      1
+
+8.14. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+9. Executing ASYNC2SYNC pass.
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$1001 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\outstanding_valid_reg[0:0], Q=\u_core.outstanding_valid_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$1006 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\ctrl_reg_reg[0][0:0], Q=\u_core.ctrl_reg_reg[0]
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$1011 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\ctrl_reg_reg[4][0:0], Q=\u_core.ctrl_reg_reg[4]
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$1016 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\state_reg[1:0], Q=\u_core.state_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$1021 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\outstanding_seq_reg[15:0], Q=\u_core.outstanding_seq_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$936 ($adff): ARST=\reset_n, D=\u_core._003_, Q=\u_core.req_hist_read_pending_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$941 ($adff): ARST=\reset_n, D=\u_core._004_, Q=\u_core.req_hist_write_pending_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$946 ($adff): ARST=\reset_n, D=\u_core._006_, Q=\u_core.status_rsp_received_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$951 ($adff): ARST=\reset_n, D=\u_core._005_, Q=\u_core.status_req_accepted_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$956 ($adff): ARST=\reset_n, D=\u_core._002_, Q=\u_core.outstanding_age_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$961 ($adff): ARST=\reset_n, D=\u_core._001_, Q=\u_core.irq_r
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$966 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\irq_en_reg[63:0], Q=\u_core.irq_en_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$971 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\req_hist_addr[3:0], Q=\u_core.req_hist_addr
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$976 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\bounds_reg[63:0], Q=\u_core.bounds_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$981 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\act_cmd_valid_r[0:0], Q=\u_core.act_cmd_valid_r
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$986 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\req_meta_reg[63:0], Q=\u_core.req_meta_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$991 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\limits_reg[63:0], Q=\u_core.limits_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$flatten\u_core.$procdff$996 ($adff): ARST=\reset_n, D=$flatten\u_core.$0\mode_seq_reg[63:0], Q=\u_core.mode_seq_reg
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$904 ($adff): ARST=\spi_cs_n, D=1'1, Q=\spi_active
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$909 ($adff): ARST=\reset_n, D=\spi_cs_sync, Q=\spi_cs_prev
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$914 ($adff): ARST=\reset_n, D=\spi_cs_meta, Q=\spi_cs_sync
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$919 ($adff): ARST=\reset_n, D=\spi_cs_n, Q=\spi_cs_meta
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$924 ($adff): ARST=\reset_n, D={ \core_mmio_rdata 68'10000000000000000000000000000000000000000000000000000000000000000001 \u_core.act_cmd_valid_r \u_core.act_cmd_valid_r 32'00000000000000000000000000000000 \u_core.irq_r }, Q=\tx_snapshot
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$931 ($adff): ARST=\reset_n, D=$0\rx_active[135:0], Q=\rx_active
+
+10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Renaming module \adaptive_aero_control_top_spi_fpga_top to \gate.
+
+11. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: fault_indicator_gold (1'0), fault_indicator_gate (1'0) -> fault_indicator
+Presumably equivalent wires: reset_n_gold (\reset_n_gold), reset_n_gate (\reset_n_gate) -> reset_n
+Presumably equivalent wires: rx_shift_gold (\rx_shift_gold), rx_shift_gate (\rx_shift_gate) -> rx_shift
+Presumably equivalent wires: spi_cs_n_gold (\spi_cs_n_gold), spi_cs_n_gate (\spi_cs_n_gate) -> spi_cs_n
+Presumably equivalent wires: spi_miso_gold (\spi_miso_gold), spi_miso_gate (\spi_miso_gate) -> spi_miso
+Presumably equivalent wires: spi_mosi_gold (\spi_mosi_gold), spi_mosi_gate (\spi_mosi_gate) -> spi_mosi
+Presumably equivalent wires: spi_sclk_gold (\spi_sclk_gold), spi_sclk_gate (\spi_sclk_gate) -> spi_sclk
+Presumably equivalent wires: tx_shift_gold (\tx_shift_gold), tx_shift_gate (\tx_shift_gate) -> tx_shift
+Changing input B of cell $procmux$862_gate ($mux): \tx_shift_gate -> \tx_shift
+Changing input A of cell $procmux$864_gate ($mux): { \rx_shift_gate [134:0] \spi_mosi_gate } -> { \rx_shift [134:0] \spi_mosi_gate }
+Changing input B of cell $procmux$864_gate ($mux): \rx_shift_gate -> \rx_shift
+Changing input B of cell $procmux$866_gate ($mux): \rx_shift_gate -> \rx_shift
+Changing input B of cell $ternary$repro_generic.v:393$860_gate ($mux): { \tx_shift_gate [165:0] 1'0 } -> { \tx_shift [165:0] 1'0 }
+Changing input B of cell $ternary$repro_generic.v:394$861_gate ($mux): \tx_shift_gate [166] -> \tx_shift [166]
+Changing input B of cell $procmux$79_gold ($mux): \rx_shift_gold -> \rx_shift
+Changing input B of cell $procmux$82_gold ($mux): { \tx_shift_gold [165:0] 1'0 } -> { \tx_shift [165:0] 1'0 }
+Changing input B of cell $procmux$84_gold ($mux): \tx_shift_gold -> \tx_shift
+Changing input A of cell $procmux$86_gold ($mux): { \rx_shift_gold [134:0] \spi_mosi_gold } -> { \rx_shift [134:0] \spi_mosi_gold }
+Changing input B of cell $procmux$86_gold ($mux): \rx_shift_gold -> \rx_shift
+Changing input B of cell $ternary$fpga/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:69$78_gold ($mux): \tx_shift_gold [166] -> \tx_shift [166]
+Presumably equivalent cells: u_core_gold u_core_gate ($scopeinfo) -> u_core
+
+12. Executing HIERARCHY pass (managing design hierarchy).
+
+12.1. Analyzing design hierarchy..
+Top module:  \equiv
+
+12.2. Analyzing design hierarchy..
+Top module:  \equiv
+Removing unused module `\gate'.
+Removing unused module `\gold'.
+Removed 2 unused modules.
+
+13. Executing EQUIV_STRUCT pass.
+Running equiv_struct on module equiv:
+  Starting iteration 1.
+    Nothing to merge.
+
+14. Executing EQUIV_SIMPLE pass.
+Found 305 unproven $equiv cells (4 groups) in equiv:
+  Trying to prove $equiv for \spi_miso: failed.
+  Trying to prove $equiv for \fault_indicator: success!
+ Grouping SAT models for \rx_shift:
+  Trying to prove $equiv for \rx_shift [0]: success!
+  Trying to prove $equiv for \rx_shift [1]: success!
+  Trying to prove $equiv for \rx_shift [2]: success!
+  Trying to prove $equiv for \rx_shift [3]: success!
+  Trying to prove $equiv for \rx_shift [4]: success!
+  Trying to prove $equiv for \rx_shift [5]: success!
+  Trying to prove $equiv for \rx_shift [6]: success!
+  Trying to prove $equiv for \rx_shift [7]: success!
+  Trying to prove $equiv for \rx_shift [8]: success!
+  Trying to prove $equiv for \rx_shift [9]: success!
+  Trying to prove $equiv for \rx_shift [10]: success!
+  Trying to prove $equiv for \rx_shift [11]: success!
+  Trying to prove $equiv for \rx_shift [12]: success!
+  Trying to prove $equiv for \rx_shift [13]: success!
+  Trying to prove $equiv for \rx_shift [14]: success!
+  Trying to prove $equiv for \rx_shift [15]: success!
+  Trying to prove $equiv for \rx_shift [16]: success!
+  Trying to prove $equiv for \rx_shift [17]: success!
+  Trying to prove $equiv for \rx_shift [18]: success!
+  Trying to prove $equiv for \rx_shift [19]: success!
+  Trying to prove $equiv for \rx_shift [20]: success!
+  Trying to prove $equiv for \rx_shift [21]: success!
+  Trying to prove $equiv for \rx_shift [22]: success!
+  Trying to prove $equiv for \rx_shift [23]: success!
+  Trying to prove $equiv for \rx_shift [24]: success!
+  Trying to prove $equiv for \rx_shift [25]: success!
+  Trying to prove $equiv for \rx_shift [26]: success!
+  Trying to prove $equiv for \rx_shift [27]: success!
+  Trying to prove $equiv for \rx_shift [28]: success!
+  Trying to prove $equiv for \rx_shift [29]: success!
+  Trying to prove $equiv for \rx_shift [30]: success!
+  Trying to prove $equiv for \rx_shift [31]: success!
+  Trying to prove $equiv for \rx_shift [32]: success!
+  Trying to prove $equiv for \rx_shift [33]: success!
+  Trying to prove $equiv for \rx_shift [34]: success!
+  Trying to prove $equiv for \rx_shift [35]: success!
+  Trying to prove $equiv for \rx_shift [36]: success!
+  Trying to prove $equiv for \rx_shift [37]: success!
+  Trying to prove $equiv for \rx_shift [38]: success!
+  Trying to prove $equiv for \rx_shift [39]: success!
+  Trying to prove $equiv for \rx_shift [40]: success!
+  Trying to prove $equiv for \rx_shift [41]: success!
+  Trying to prove $equiv for \rx_shift [42]: success!
+  Trying to prove $equiv for \rx_shift [43]: success!
+  Trying to prove $equiv for \rx_shift [44]: success!
+  Trying to prove $equiv for \rx_shift [45]: success!
+  Trying to prove $equiv for \rx_shift [46]: success!
+  Trying to prove $equiv for \rx_shift [47]: success!
+  Trying to prove $equiv for \rx_shift [48]: success!
+  Trying to prove $equiv for \rx_shift [49]: success!
+  Trying to prove $equiv for \rx_shift [50]: success!
+  Trying to prove $equiv for \rx_shift [51]: success!
+  Trying to prove $equiv for \rx_shift [52]: success!
+  Trying to prove $equiv for \rx_shift [53]: success!
+  Trying to prove $equiv for \rx_shift [54]: success!
+  Trying to prove $equiv for \rx_shift [55]: success!
+  Trying to prove $equiv for \rx_shift [56]: success!
+  Trying to prove $equiv for \rx_shift [57]: success!
+  Trying to prove $equiv for \rx_shift [58]: success!
+  Trying to prove $equiv for \rx_shift [59]: success!
+  Trying to prove $equiv for \rx_shift [60]: success!
+  Trying to prove $equiv for \rx_shift [61]: success!
+  Trying to prove $equiv for \rx_shift [62]: success!
+  Trying to prove $equiv for \rx_shift [63]: success!
+  Trying to prove $equiv for \rx_shift [64]: success!
+  Trying to prove $equiv for \rx_shift [65]: success!
+  Trying to prove $equiv for \rx_shift [66]: success!
+  Trying to prove $equiv for \rx_shift [67]: success!
+  Trying to prove $equiv for \rx_shift [68]: success!
+  Trying to prove $equiv for \rx_shift [69]: success!
+  Trying to prove $equiv for \rx_shift [70]: success!
+  Trying to prove $equiv for \rx_shift [71]: success!
+  Trying to prove $equiv for \rx_shift [72]: success!
+  Trying to prove $equiv for \rx_shift [73]: success!
+  Trying to prove $equiv for \rx_shift [74]: success!
+  Trying to prove $equiv for \rx_shift [75]: success!
+  Trying to prove $equiv for \rx_shift [76]: success!
+  Trying to prove $equiv for \rx_shift [77]: success!
+  Trying to prove $equiv for \rx_shift [78]: success!
+  Trying to prove $equiv for \rx_shift [79]: success!
+  Trying to prove $equiv for \rx_shift [80]: success!
+  Trying to prove $equiv for \rx_shift [81]: success!
+  Trying to prove $equiv for \rx_shift [82]: success!
+  Trying to prove $equiv for \rx_shift [83]: success!
+  Trying to prove $equiv for \rx_shift [84]: success!
+  Trying to prove $equiv for \rx_shift [85]: success!
+  Trying to prove $equiv for \rx_shift [86]: success!
+  Trying to prove $equiv for \rx_shift [87]: success!
+  Trying to prove $equiv for \rx_shift [88]: success!
+  Trying to prove $equiv for \rx_shift [89]: success!
+  Trying to prove $equiv for \rx_shift [90]: success!
+  Trying to prove $equiv for \rx_shift [91]: success!
+  Trying to prove $equiv for \rx_shift [92]: success!
+  Trying to prove $equiv for \rx_shift [93]: success!
+  Trying to prove $equiv for \rx_shift [94]: success!
+  Trying to prove $equiv for \rx_shift [95]: success!
+  Trying to prove $equiv for \rx_shift [96]: success!
+  Trying to prove $equiv for \rx_shift [97]: success!
+  Trying to prove $equiv for \rx_shift [98]: success!
+  Trying to prove $equiv for \rx_shift [99]: success!
+  Trying to prove $equiv for \rx_shift [100]: success!
+  Trying to prove $equiv for \rx_shift [101]: success!
+  Trying to prove $equiv for \rx_shift [102]: success!
+  Trying to prove $equiv for \rx_shift [103]: success!
+  Trying to prove $equiv for \rx_shift [104]: success!
+  Trying to prove $equiv for \rx_shift [105]: success!
+  Trying to prove $equiv for \rx_shift [106]: success!
+  Trying to prove $equiv for \rx_shift [107]: success!
+  Trying to prove $equiv for \rx_shift [108]: success!
+  Trying to prove $equiv for \rx_shift [109]: success!
+  Trying to prove $equiv for \rx_shift [110]: success!
+  Trying to prove $equiv for \rx_shift [111]: success!
+  Trying to prove $equiv for \rx_shift [112]: success!
+  Trying to prove $equiv for \rx_shift [113]: success!
+  Trying to prove $equiv for \rx_shift [114]: success!
+  Trying to prove $equiv for \rx_shift [115]: success!
+  Trying to prove $equiv for \rx_shift [116]: success!
+  Trying to prove $equiv for \rx_shift [117]: success!
+  Trying to prove $equiv for \rx_shift [118]: success!
+  Trying to prove $equiv for \rx_shift [119]: success!
+  Trying to prove $equiv for \rx_shift [120]: success!
+  Trying to prove $equiv for \rx_shift [121]: success!
+  Trying to prove $equiv for \rx_shift [122]: success!
+  Trying to prove $equiv for \rx_shift [123]: success!
+  Trying to prove $equiv for \rx_shift [124]: success!
+  Trying to prove $equiv for \rx_shift [125]: success!
+  Trying to prove $equiv for \rx_shift [126]: success!
+  Trying to prove $equiv for \rx_shift [127]: success!
+  Trying to prove $equiv for \rx_shift [128]: success!
+  Trying to prove $equiv for \rx_shift [129]: success!
+  Trying to prove $equiv for \rx_shift [130]: success!
+  Trying to prove $equiv for \rx_shift [131]: success!
+  Trying to prove $equiv for \rx_shift [132]: success!
+  Trying to prove $equiv for \rx_shift [133]: success!
+  Trying to prove $equiv for \rx_shift [134]: success!
+  Trying to prove $equiv for \rx_shift [135]: success!
+ Grouping SAT models for \tx_shift:
+  Trying to prove $equiv for \tx_shift [0]: success!
+  Trying to prove $equiv for \tx_shift [1]: failed.
+  Trying to prove $equiv for \tx_shift [2]: failed.
+  Trying to prove $equiv for \tx_shift [3]: failed.
+  Trying to prove $equiv for \tx_shift [4]: failed.
+  Trying to prove $equiv for \tx_shift [5]: failed.
+  Trying to prove $equiv for \tx_shift [6]: failed.
+  Trying to prove $equiv for \tx_shift [7]: failed.
+  Trying to prove $equiv for \tx_shift [8]: failed.
+  Trying to prove $equiv for \tx_shift [9]: failed.
+  Trying to prove $equiv for \tx_shift [10]: failed.
+  Trying to prove $equiv for \tx_shift [11]: failed.
+  Trying to prove $equiv for \tx_shift [12]: failed.
+  Trying to prove $equiv for \tx_shift [13]: failed.
+  Trying to prove $equiv for \tx_shift [14]: failed.
+  Trying to prove $equiv for \tx_shift [15]: failed.
+  Trying to prove $equiv for \tx_shift [16]: failed.
+  Trying to prove $equiv for \tx_shift [17]: failed.
+  Trying to prove $equiv for \tx_shift [18]: failed.
+  Trying to prove $equiv for \tx_shift [19]: failed.
+  Trying to prove $equiv for \tx_shift [20]: failed.
+  Trying to prove $equiv for \tx_shift [21]: failed.
+  Trying to prove $equiv for \tx_shift [22]: failed.
+  Trying to prove $equiv for \tx_shift [23]: failed.
+  Trying to prove $equiv for \tx_shift [24]: failed.
+  Trying to prove $equiv for \tx_shift [25]: failed.
+  Trying to prove $equiv for \tx_shift [26]: failed.
+  Trying to prove $equiv for \tx_shift [27]: failed.
+  Trying to prove $equiv for \tx_shift [28]: failed.
+  Trying to prove $equiv for \tx_shift [29]: failed.
+  Trying to prove $equiv for \tx_shift [30]: failed.
+  Trying to prove $equiv for \tx_shift [31]: failed.
+  Trying to prove $equiv for \tx_shift [32]: failed.
+  Trying to prove $equiv for \tx_shift [33]: failed.
+  Trying to prove $equiv for \tx_shift [34]: failed.
+  Trying to prove $equiv for \tx_shift [35]: failed.
+  Trying to prove $equiv for \tx_shift [36]: failed.
+  Trying to prove $equiv for \tx_shift [37]: failed.
+  Trying to prove $equiv for \tx_shift [38]: failed.
+  Trying to prove $equiv for \tx_shift [39]: failed.
+  Trying to prove $equiv for \tx_shift [40]: failed.
+  Trying to prove $equiv for \tx_shift [41]: failed.
+  Trying to prove $equiv for \tx_shift [42]: failed.
+  Trying to prove $equiv for \tx_shift [43]: failed.
+  Trying to prove $equiv for \tx_shift [44]: failed.
+  Trying to prove $equiv for \tx_shift [45]: failed.
+  Trying to prove $equiv for \tx_shift [46]: failed.
+  Trying to prove $equiv for \tx_shift [47]: failed.
+  Trying to prove $equiv for \tx_shift [48]: failed.
+  Trying to prove $equiv for \tx_shift [49]: failed.
+  Trying to prove $equiv for \tx_shift [50]: failed.
+  Trying to prove $equiv for \tx_shift [51]: failed.
+  Trying to prove $equiv for \tx_shift [52]: failed.
+  Trying to prove $equiv for \tx_shift [53]: failed.
+  Trying to prove $equiv for \tx_shift [54]: failed.
+  Trying to prove $equiv for \tx_shift [55]: failed.
+  Trying to prove $equiv for \tx_shift [56]: failed.
+  Trying to prove $equiv for \tx_shift [57]: failed.
+  Trying to prove $equiv for \tx_shift [58]: failed.
+  Trying to prove $equiv for \tx_shift [59]: failed.
+  Trying to prove $equiv for \tx_shift [60]: failed.
+  Trying to prove $equiv for \tx_shift [61]: failed.
+  Trying to prove $equiv for \tx_shift [62]: failed.
+  Trying to prove $equiv for \tx_shift [63]: failed.
+  Trying to prove $equiv for \tx_shift [64]: failed.
+  Trying to prove $equiv for \tx_shift [65]: failed.
+  Trying to prove $equiv for \tx_shift [66]: failed.
+  Trying to prove $equiv for \tx_shift [67]: failed.
+  Trying to prove $equiv for \tx_shift [68]: failed.
+  Trying to prove $equiv for \tx_shift [69]: failed.
+  Trying to prove $equiv for \tx_shift [70]: failed.
+  Trying to prove $equiv for \tx_shift [71]: failed.
+  Trying to prove $equiv for \tx_shift [72]: failed.
+  Trying to prove $equiv for \tx_shift [73]: failed.
+  Trying to prove $equiv for \tx_shift [74]: failed.
+  Trying to prove $equiv for \tx_shift [75]: failed.
+  Trying to prove $equiv for \tx_shift [76]: failed.
+  Trying to prove $equiv for \tx_shift [77]: failed.
+  Trying to prove $equiv for \tx_shift [78]: failed.
+  Trying to prove $equiv for \tx_shift [79]: failed.
+  Trying to prove $equiv for \tx_shift [80]: failed.
+  Trying to prove $equiv for \tx_shift [81]: failed.
+  Trying to prove $equiv for \tx_shift [82]: failed.
+  Trying to prove $equiv for \tx_shift [83]: failed.
+  Trying to prove $equiv for \tx_shift [84]: failed.
+  Trying to prove $equiv for \tx_shift [85]: failed.
+  Trying to prove $equiv for \tx_shift [86]: failed.
+  Trying to prove $equiv for \tx_shift [87]: failed.
+  Trying to prove $equiv for \tx_shift [88]: failed.
+  Trying to prove $equiv for \tx_shift [89]: failed.
+  Trying to prove $equiv for \tx_shift [90]: failed.
+  Trying to prove $equiv for \tx_shift [91]: failed.
+  Trying to prove $equiv for \tx_shift [92]: failed.
+  Trying to prove $equiv for \tx_shift [93]: failed.
+  Trying to prove $equiv for \tx_shift [94]: failed.
+  Trying to prove $equiv for \tx_shift [95]: failed.
+  Trying to prove $equiv for \tx_shift [96]: failed.
+  Trying to prove $equiv for \tx_shift [97]: failed.
+  Trying to prove $equiv for \tx_shift [98]: failed.
+  Trying to prove $equiv for \tx_shift [99]: failed.
+  Trying to prove $equiv for \tx_shift [100]: failed.
+  Trying to prove $equiv for \tx_shift [101]: failed.
+  Trying to prove $equiv for \tx_shift [102]: failed.
+  Trying to prove $equiv for \tx_shift [103]: failed.
+  Trying to prove $equiv for \tx_shift [104]: failed.
+  Trying to prove $equiv for \tx_shift [105]: failed.
+  Trying to prove $equiv for \tx_shift [106]: failed.
+  Trying to prove $equiv for \tx_shift [107]: failed.
+  Trying to prove $equiv for \tx_shift [108]: failed.
+  Trying to prove $equiv for \tx_shift [109]: failed.
+  Trying to prove $equiv for \tx_shift [110]: failed.
+  Trying to prove $equiv for \tx_shift [111]: failed.
+  Trying to prove $equiv for \tx_shift [112]: failed.
+  Trying to prove $equiv for \tx_shift [113]: failed.
+  Trying to prove $equiv for \tx_shift [114]: failed.
+  Trying to prove $equiv for \tx_shift [115]: failed.
+  Trying to prove $equiv for \tx_shift [116]: failed.
+  Trying to prove $equiv for \tx_shift [117]: failed.
+  Trying to prove $equiv for \tx_shift [118]: failed.
+  Trying to prove $equiv for \tx_shift [119]: failed.
+  Trying to prove $equiv for \tx_shift [120]: failed.
+  Trying to prove $equiv for \tx_shift [121]: failed.
+  Trying to prove $equiv for \tx_shift [122]: failed.
+  Trying to prove $equiv for \tx_shift [123]: failed.
+  Trying to prove $equiv for \tx_shift [124]: failed.
+  Trying to prove $equiv for \tx_shift [125]: failed.
+  Trying to prove $equiv for \tx_shift [126]: failed.
+  Trying to prove $equiv for \tx_shift [127]: failed.
+  Trying to prove $equiv for \tx_shift [128]: failed.
+  Trying to prove $equiv for \tx_shift [129]: failed.
+  Trying to prove $equiv for \tx_shift [130]: failed.
+  Trying to prove $equiv for \tx_shift [131]: failed.
+  Trying to prove $equiv for \tx_shift [132]: failed.
+  Trying to prove $equiv for \tx_shift [133]: failed.
+  Trying to prove $equiv for \tx_shift [134]: failed.
+  Trying to prove $equiv for \tx_shift [135]: failed.
+  Trying to prove $equiv for \tx_shift [136]: failed.
+  Trying to prove $equiv for \tx_shift [137]: failed.
+  Trying to prove $equiv for \tx_shift [138]: failed.
+  Trying to prove $equiv for \tx_shift [139]: failed.
+  Trying to prove $equiv for \tx_shift [140]: failed.
+  Trying to prove $equiv for \tx_shift [141]: failed.
+  Trying to prove $equiv for \tx_shift [142]: failed.
+  Trying to prove $equiv for \tx_shift [143]: failed.
+  Trying to prove $equiv for \tx_shift [144]: failed.
+  Trying to prove $equiv for \tx_shift [145]: failed.
+  Trying to prove $equiv for \tx_shift [146]: failed.
+  Trying to prove $equiv for \tx_shift [147]: failed.
+  Trying to prove $equiv for \tx_shift [148]: failed.
+  Trying to prove $equiv for \tx_shift [149]: failed.
+  Trying to prove $equiv for \tx_shift [150]: failed.
+  Trying to prove $equiv for \tx_shift [151]: failed.
+  Trying to prove $equiv for \tx_shift [152]: failed.
+  Trying to prove $equiv for \tx_shift [153]: failed.
+  Trying to prove $equiv for \tx_shift [154]: failed.
+  Trying to prove $equiv for \tx_shift [155]: failed.
+  Trying to prove $equiv for \tx_shift [156]: failed.
+  Trying to prove $equiv for \tx_shift [157]: failed.
+  Trying to prove $equiv for \tx_shift [158]: failed.
+  Trying to prove $equiv for \tx_shift [159]: failed.
+  Trying to prove $equiv for \tx_shift [160]: failed.
+  Trying to prove $equiv for \tx_shift [161]: failed.
+  Trying to prove $equiv for \tx_shift [162]: failed.
+  Trying to prove $equiv for \tx_shift [163]: failed.
+  Trying to prove $equiv for \tx_shift [164]: failed.
+  Trying to prove $equiv for \tx_shift [165]: failed.
+  Trying to prove $equiv for \tx_shift [166]: failed.
+Proved 138 previously unproven $equiv cells.
+
+15. Executing EQUIV_INDUCT pass.
+Found 167 unproven $equiv cells in module equiv:
+  Undef modelling: force def on 2099 initial reg values and 5 inputs.
+  Proving existence of base case for step 1. (293960 clauses over 109746 variables)
+  Proving induction step 1. (694660 clauses over 255908 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 2. (694661 clauses over 255908 variables)
+  Proving induction step 2. (1095361 clauses over 402070 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 3. (1095362 clauses over 402070 variables)
+  Proving induction step 3. (1496062 clauses over 548232 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 4. (1496063 clauses over 548232 variables)
+  Proving induction step 4. (1896763 clauses over 694394 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 5. (1896764 clauses over 694394 variables)
+  Proving induction step 5. (2297464 clauses over 840556 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 6. (2297465 clauses over 840556 variables)
+  Proving induction step 6. (2698165 clauses over 986718 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 7. (2698166 clauses over 986718 variables)
+  Proving induction step 7. (3098866 clauses over 1132880 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 8. (3098867 clauses over 1132880 variables)
+  Proving induction step 8. (3499567 clauses over 1279042 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 9. (3499568 clauses over 1279042 variables)
+  Proving induction step 9. (3900268 clauses over 1425204 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 10. (3900269 clauses over 1425204 variables)
+  Proving induction step 10. (4300969 clauses over 1571366 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 11. (4300970 clauses over 1571366 variables)
+  Proving induction step 11. (4701670 clauses over 1717528 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 12. (4701671 clauses over 1717528 variables)
+  Proving induction step 12. (5102371 clauses over 1863690 variables)
+  Proof for induction step failed. Trying to prove individual $equiv from workset.
+  Trying to prove $equiv for \tx_shift [78]: failed.
+  Trying to prove $equiv for \tx_shift [54]: failed.
+  Trying to prove $equiv for \tx_shift [55]: failed.
+  Trying to prove $equiv for \tx_shift [30]: failed.
+  Trying to prove $equiv for \tx_shift [58]: failed.
+  Trying to prove $equiv for \tx_shift [44]: failed.
+  Trying to prove $equiv for \tx_shift [41]: failed.
+  Trying to prove $equiv for \tx_shift [56]: failed.
+  Trying to prove $equiv for \tx_shift [32]: failed.
+  Trying to prove $equiv for \tx_shift [37]: failed.
+  Trying to prove $equiv for \tx_shift [53]: failed.
+  Trying to prove $equiv for \tx_shift [39]: failed.
+  Trying to prove $equiv for \tx_shift [38]: failed.
+  Trying to prove $equiv for \tx_shift [59]: failed.
+  Trying to prove $equiv for \tx_shift [60]: failed.
+  Trying to prove $equiv for \tx_shift [43]: failed.
+  Trying to prove $equiv for \tx_shift [61]: failed.
+  Trying to prove $equiv for \tx_shift [50]: failed.
+  Trying to prove $equiv for \tx_shift [25]: failed.
+  Trying to prove $equiv for \tx_shift [26]: failed.
+  Trying to prove $equiv for \tx_shift [34]: failed.
+  Trying to prove $equiv for \tx_shift [23]: failed.
+  Trying to prove $equiv for \tx_shift [35]: failed.
+  Trying to prove $equiv for \tx_shift [40]: failed.
+  Trying to prove $equiv for \tx_shift [31]: failed.
+  Trying to prove $equiv for \tx_shift [27]: failed.
+  Trying to prove $equiv for \tx_shift [42]: failed.
+  Trying to prove $equiv for \tx_shift [57]: failed.
+  Trying to prove $equiv for \tx_shift [28]: failed.
+  Trying to prove $equiv for \tx_shift [49]: failed.
+  Trying to prove $equiv for \tx_shift [62]: failed.
+  Trying to prove $equiv for \tx_shift [63]: failed.
+  Trying to prove $equiv for \tx_shift [45]: failed.
+  Trying to prove $equiv for \tx_shift [46]: failed.
+  Trying to prove $equiv for \tx_shift [29]: failed.
+  Trying to prove $equiv for \tx_shift [47]: failed.
+  Trying to prove $equiv for \tx_shift [36]: failed.
+  Trying to prove $equiv for \tx_shift [48]: failed.
+  Trying to prove $equiv for \tx_shift [51]: failed.
+  Trying to prove $equiv for \tx_shift [24]: failed.
+  Trying to prove $equiv for \tx_shift [33]: failed.
+  Trying to prove $equiv for \tx_shift [52]: failed.
+  Trying to prove $equiv for \tx_shift [76]: failed.
+  Trying to prove $equiv for \tx_shift [77]: failed.
+  Trying to prove $equiv for \tx_shift [65]: failed.
+  Trying to prove $equiv for \tx_shift [66]: failed.
+  Trying to prove $equiv for \tx_shift [67]: failed.
+  Trying to prove $equiv for \tx_shift [69]: failed.
+  Trying to prove $equiv for \tx_shift [64]: failed.
+  Trying to prove $equiv for \tx_shift [68]: failed.
+  Trying to prove $equiv for \tx_shift [70]: failed.
+  Trying to prove $equiv for \tx_shift [71]: failed.
+  Trying to prove $equiv for \tx_shift [72]: failed.
+  Trying to prove $equiv for \tx_shift [73]: failed.
+  Trying to prove $equiv for \tx_shift [74]: failed.
+  Trying to prove $equiv for \tx_shift [75]: failed.
+  Trying to prove $equiv for \tx_shift [8]: failed.
+  Trying to prove $equiv for \tx_shift [12]: failed.
+  Trying to prove $equiv for \tx_shift [13]: failed.
+  Trying to prove $equiv for \tx_shift [3]: failed.
+  Trying to prove $equiv for \tx_shift [4]: failed.
+  Trying to prove $equiv for \spi_miso: failed.
+  Trying to prove $equiv for \tx_shift [2]: failed.
+  Trying to prove $equiv for \tx_shift [15]: failed.
+  Trying to prove $equiv for \tx_shift [17]: failed.
+  Trying to prove $equiv for \tx_shift [18]: failed.
+  Trying to prove $equiv for \tx_shift [20]: failed.
+  Trying to prove $equiv for \tx_shift [21]: failed.
+  Trying to prove $equiv for \tx_shift [22]: failed.
+  Trying to prove $equiv for \tx_shift [14]: failed.
+  Trying to prove $equiv for \tx_shift [7]: failed.
+  Trying to prove $equiv for \tx_shift [10]: failed.
+  Trying to prove $equiv for \tx_shift [11]: failed.
+  Trying to prove $equiv for \tx_shift [16]: failed.
+  Trying to prove $equiv for \tx_shift [9]: failed.
+  Trying to prove $equiv for \tx_shift [19]: failed.
+  Trying to prove $equiv for \tx_shift [1]: failed.
+  Trying to prove $equiv for \tx_shift [5]: failed.
+  Trying to prove $equiv for \tx_shift [6]: failed.
+  Trying to prove $equiv for \tx_shift [117]: failed.
+  Trying to prove $equiv for \tx_shift [118]: failed.
+  Trying to prove $equiv for \tx_shift [105]: failed.
+  Trying to prove $equiv for \tx_shift [122]: failed.
+  Trying to prove $equiv for \tx_shift [123]: failed.
+  Trying to prove $equiv for \tx_shift [131]: failed.
+  Trying to prove $equiv for \tx_shift [96]: failed.
+  Trying to prove $equiv for \tx_shift [81]: failed.
+  Trying to prove $equiv for \tx_shift [126]: failed.
+  Trying to prove $equiv for \tx_shift [110]: failed.
+  Trying to prove $equiv for \tx_shift [112]: failed.
+  Trying to prove $equiv for \tx_shift [128]: failed.
+  Trying to prove $equiv for \tx_shift [133]: failed.
+  Trying to prove $equiv for \tx_shift [82]: failed.
+  Trying to prove $equiv for \tx_shift [97]: failed.
+  Trying to prove $equiv for \tx_shift [109]: failed.
+  Trying to prove $equiv for \tx_shift [80]: failed.
+  Trying to prove $equiv for \tx_shift [91]: failed.
+  Trying to prove $equiv for \tx_shift [119]: failed.
+  Trying to prove $equiv for \tx_shift [134]: failed.
+  Trying to prove $equiv for \tx_shift [135]: failed.
+  Trying to prove $equiv for \tx_shift [136]: failed.
+  Trying to prove $equiv for \tx_shift [132]: failed.
+  Trying to prove $equiv for \tx_shift [137]: failed.
+  Trying to prove $equiv for \tx_shift [138]: failed.
+  Trying to prove $equiv for \tx_shift [101]: failed.
+  Trying to prove $equiv for \tx_shift [139]: failed.
+  Trying to prove $equiv for \tx_shift [140]: failed.
+  Trying to prove $equiv for \tx_shift [98]: failed.
+  Trying to prove $equiv for \tx_shift [142]: failed.
+  Trying to prove $equiv for \tx_shift [141]: failed.
+  Trying to prove $equiv for \tx_shift [85]: failed.
+  Trying to prove $equiv for \tx_shift [88]: failed.
+  Trying to prove $equiv for \tx_shift [89]: failed.
+  Trying to prove $equiv for \tx_shift [106]: failed.
+  Trying to prove $equiv for \tx_shift [102]: success!
+  Trying to prove $equiv for \tx_shift [111]: failed.
+  Trying to prove $equiv for \tx_shift [113]: failed.
+  Trying to prove $equiv for \tx_shift [103]: success!
+  Trying to prove $equiv for \tx_shift [114]: failed.
+  Trying to prove $equiv for \tx_shift [116]: failed.
+  Trying to prove $equiv for \tx_shift [92]: failed.
+  Trying to prove $equiv for \tx_shift [124]: failed.
+  Trying to prove $equiv for \tx_shift [125]: failed.
+  Trying to prove $equiv for \tx_shift [121]: failed.
+  Trying to prove $equiv for \tx_shift [115]: failed.
+  Trying to prove $equiv for \tx_shift [90]: failed.
+  Trying to prove $equiv for \tx_shift [87]: failed.
+  Trying to prove $equiv for \tx_shift [99]: failed.
+  Trying to prove $equiv for \tx_shift [86]: failed.
+  Trying to prove $equiv for \tx_shift [84]: failed.
+  Trying to prove $equiv for \tx_shift [100]: failed.
+  Trying to prove $equiv for \tx_shift [95]: failed.
+  Trying to prove $equiv for \tx_shift [104]: failed.
+  Trying to prove $equiv for \tx_shift [120]: failed.
+  Trying to prove $equiv for \tx_shift [127]: failed.
+  Trying to prove $equiv for \tx_shift [83]: failed.
+  Trying to prove $equiv for \tx_shift [129]: failed.
+  Trying to prove $equiv for \tx_shift [130]: failed.
+  Trying to prove $equiv for \tx_shift [79]: failed.
+  Trying to prove $equiv for \tx_shift [93]: failed.
+  Trying to prove $equiv for \tx_shift [94]: failed.
+  Trying to prove $equiv for \tx_shift [107]: failed.
+  Trying to prove $equiv for \tx_shift [108]: failed.
+  Trying to prove $equiv for \tx_shift [151]: failed.
+  Trying to prove $equiv for \tx_shift [153]: failed.
+  Trying to prove $equiv for \tx_shift [146]: failed.
+  Trying to prove $equiv for \tx_shift [158]: failed.
+  Trying to prove $equiv for \tx_shift [161]: failed.
+  Trying to prove $equiv for \tx_shift [160]: failed.
+  Trying to prove $equiv for \tx_shift [145]: failed.
+  Trying to prove $equiv for \tx_shift [152]: failed.
+  Trying to prove $equiv for \tx_shift [147]: failed.
+  Trying to prove $equiv for \tx_shift [144]: failed.
+  Trying to prove $equiv for \tx_shift [157]: failed.
+  Trying to prove $equiv for \tx_shift [149]: failed.
+  Trying to prove $equiv for \tx_shift [156]: failed.
+  Trying to prove $equiv for \tx_shift [150]: failed.
+  Trying to prove $equiv for \tx_shift [155]: failed.
+  Trying to prove $equiv for \tx_shift [162]: failed.
+  Trying to prove $equiv for \tx_shift [166]: failed.
+  Trying to prove $equiv for \tx_shift [163]: failed.
+  Trying to prove $equiv for \tx_shift [164]: failed.
+  Trying to prove $equiv for \tx_shift [165]: failed.
+  Trying to prove $equiv for \tx_shift [143]: failed.
+  Trying to prove $equiv for \tx_shift [154]: failed.
+  Trying to prove $equiv for \tx_shift [159]: failed.
+  Trying to prove $equiv for \tx_shift [148]: failed.
+Proved 2 previously unproven $equiv cells.
+
+16. Executing EQUIV_STATUS pass.
+Found 305 $equiv cells in equiv:
+  Of those cells 140 are proven and 165 are unproven.
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1525: \tx_shift_gold [164] \tx_shift_gate [164]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1524: \tx_shift_gold [163] \tx_shift_gate [163]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1523: \tx_shift_gold [162] \tx_shift_gate [162]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1522: \tx_shift_gold [161] \tx_shift_gate [161]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1521: \tx_shift_gold [160] \tx_shift_gate [160]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1520: \tx_shift_gold [159] \tx_shift_gate [159]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1519: \tx_shift_gold [158] \tx_shift_gate [158]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1518: \tx_shift_gold [157] \tx_shift_gate [157]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1517: \tx_shift_gold [156] \tx_shift_gate [156]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1516: \tx_shift_gold [155] \tx_shift_gate [155]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1515: \tx_shift_gold [154] \tx_shift_gate [154]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1514: \tx_shift_gold [153] \tx_shift_gate [153]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1513: \tx_shift_gold [152] \tx_shift_gate [152]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1512: \tx_shift_gold [151] \tx_shift_gate [151]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1511: \tx_shift_gold [150] \tx_shift_gate [150]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1510: \tx_shift_gold [149] \tx_shift_gate [149]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1509: \tx_shift_gold [148] \tx_shift_gate [148]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1508: \tx_shift_gold [147] \tx_shift_gate [147]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1507: \tx_shift_gold [146] \tx_shift_gate [146]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1506: \tx_shift_gold [145] \tx_shift_gate [145]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1505: \tx_shift_gold [144] \tx_shift_gate [144]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1504: \tx_shift_gold [143] \tx_shift_gate [143]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1503: \tx_shift_gold [142] \tx_shift_gate [142]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1502: \tx_shift_gold [141] \tx_shift_gate [141]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1501: \tx_shift_gold [140] \tx_shift_gate [140]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1500: \tx_shift_gold [139] \tx_shift_gate [139]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1499: \tx_shift_gold [138] \tx_shift_gate [138]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1498: \tx_shift_gold [137] \tx_shift_gate [137]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1497: \tx_shift_gold [136] \tx_shift_gate [136]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1496: \tx_shift_gold [135] \tx_shift_gate [135]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1495: \tx_shift_gold [134] \tx_shift_gate [134]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1494: \tx_shift_gold [133] \tx_shift_gate [133]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1493: \tx_shift_gold [132] \tx_shift_gate [132]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1492: \tx_shift_gold [131] \tx_shift_gate [131]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1491: \tx_shift_gold [130] \tx_shift_gate [130]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1490: \tx_shift_gold [129] \tx_shift_gate [129]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1489: \tx_shift_gold [128] \tx_shift_gate [128]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1488: \tx_shift_gold [127] \tx_shift_gate [127]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1487: \tx_shift_gold [126] \tx_shift_gate [126]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1486: \tx_shift_gold [125] \tx_shift_gate [125]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1485: \tx_shift_gold [124] \tx_shift_gate [124]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1484: \tx_shift_gold [123] \tx_shift_gate [123]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1483: \tx_shift_gold [122] \tx_shift_gate [122]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1482: \tx_shift_gold [121] \tx_shift_gate [121]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1481: \tx_shift_gold [120] \tx_shift_gate [120]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1480: \tx_shift_gold [119] \tx_shift_gate [119]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1479: \tx_shift_gold [118] \tx_shift_gate [118]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1478: \tx_shift_gold [117] \tx_shift_gate [117]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1477: \tx_shift_gold [116] \tx_shift_gate [116]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1476: \tx_shift_gold [115] \tx_shift_gate [115]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1475: \tx_shift_gold [114] \tx_shift_gate [114]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1474: \tx_shift_gold [113] \tx_shift_gate [113]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1473: \tx_shift_gold [112] \tx_shift_gate [112]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1472: \tx_shift_gold [111] \tx_shift_gate [111]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1471: \tx_shift_gold [110] \tx_shift_gate [110]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1470: \tx_shift_gold [109] \tx_shift_gate [109]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1469: \tx_shift_gold [108] \tx_shift_gate [108]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1468: \tx_shift_gold [107] \tx_shift_gate [107]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1467: \tx_shift_gold [106] \tx_shift_gate [106]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1466: \tx_shift_gold [105] \tx_shift_gate [105]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1465: \tx_shift_gold [104] \tx_shift_gate [104]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1462: \tx_shift_gold [101] \tx_shift_gate [101]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1461: \tx_shift_gold [100] \tx_shift_gate [100]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1460: \tx_shift_gold [99] \tx_shift_gate [99]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1459: \tx_shift_gold [98] \tx_shift_gate [98]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1458: \tx_shift_gold [97] \tx_shift_gate [97]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1457: \tx_shift_gold [96] \tx_shift_gate [96]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1456: \tx_shift_gold [95] \tx_shift_gate [95]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1455: \tx_shift_gold [94] \tx_shift_gate [94]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1454: \tx_shift_gold [93] \tx_shift_gate [93]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1453: \tx_shift_gold [92] \tx_shift_gate [92]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1452: \tx_shift_gold [91] \tx_shift_gate [91]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1451: \tx_shift_gold [90] \tx_shift_gate [90]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1450: \tx_shift_gold [89] \tx_shift_gate [89]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1449: \tx_shift_gold [88] \tx_shift_gate [88]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1448: \tx_shift_gold [87] \tx_shift_gate [87]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1447: \tx_shift_gold [86] \tx_shift_gate [86]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1446: \tx_shift_gold [85] \tx_shift_gate [85]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1445: \tx_shift_gold [84] \tx_shift_gate [84]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1444: \tx_shift_gold [83] \tx_shift_gate [83]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1443: \tx_shift_gold [82] \tx_shift_gate [82]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1442: \tx_shift_gold [81] \tx_shift_gate [81]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1441: \tx_shift_gold [80] \tx_shift_gate [80]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1440: \tx_shift_gold [79] \tx_shift_gate [79]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1439: \tx_shift_gold [78] \tx_shift_gate [78]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1438: \tx_shift_gold [77] \tx_shift_gate [77]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1437: \tx_shift_gold [76] \tx_shift_gate [76]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1436: \tx_shift_gold [75] \tx_shift_gate [75]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1435: \tx_shift_gold [74] \tx_shift_gate [74]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1434: \tx_shift_gold [73] \tx_shift_gate [73]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1433: \tx_shift_gold [72] \tx_shift_gate [72]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1432: \tx_shift_gold [71] \tx_shift_gate [71]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1431: \tx_shift_gold [70] \tx_shift_gate [70]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1430: \tx_shift_gold [69] \tx_shift_gate [69]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1429: \tx_shift_gold [68] \tx_shift_gate [68]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1428: \tx_shift_gold [67] \tx_shift_gate [67]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1427: \tx_shift_gold [66] \tx_shift_gate [66]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1426: \tx_shift_gold [65] \tx_shift_gate [65]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1425: \tx_shift_gold [64] \tx_shift_gate [64]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1424: \tx_shift_gold [63] \tx_shift_gate [63]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1423: \tx_shift_gold [62] \tx_shift_gate [62]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1422: \tx_shift_gold [61] \tx_shift_gate [61]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1421: \tx_shift_gold [60] \tx_shift_gate [60]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1420: \tx_shift_gold [59] \tx_shift_gate [59]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1419: \tx_shift_gold [58] \tx_shift_gate [58]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1418: \tx_shift_gold [57] \tx_shift_gate [57]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1417: \tx_shift_gold [56] \tx_shift_gate [56]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1416: \tx_shift_gold [55] \tx_shift_gate [55]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1415: \tx_shift_gold [54] \tx_shift_gate [54]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1414: \tx_shift_gold [53] \tx_shift_gate [53]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1413: \tx_shift_gold [52] \tx_shift_gate [52]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1412: \tx_shift_gold [51] \tx_shift_gate [51]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1411: \tx_shift_gold [50] \tx_shift_gate [50]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1410: \tx_shift_gold [49] \tx_shift_gate [49]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1409: \tx_shift_gold [48] \tx_shift_gate [48]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1408: \tx_shift_gold [47] \tx_shift_gate [47]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1407: \tx_shift_gold [46] \tx_shift_gate [46]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1406: \tx_shift_gold [45] \tx_shift_gate [45]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1405: \tx_shift_gold [44] \tx_shift_gate [44]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1404: \tx_shift_gold [43] \tx_shift_gate [43]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1403: \tx_shift_gold [42] \tx_shift_gate [42]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1402: \tx_shift_gold [41] \tx_shift_gate [41]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1401: \tx_shift_gold [40] \tx_shift_gate [40]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1400: \tx_shift_gold [39] \tx_shift_gate [39]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1399: \tx_shift_gold [38] \tx_shift_gate [38]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1398: \tx_shift_gold [37] \tx_shift_gate [37]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1397: \tx_shift_gold [36] \tx_shift_gate [36]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1396: \tx_shift_gold [35] \tx_shift_gate [35]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1395: \tx_shift_gold [34] \tx_shift_gate [34]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1394: \tx_shift_gold [33] \tx_shift_gate [33]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1393: \tx_shift_gold [32] \tx_shift_gate [32]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1392: \tx_shift_gold [31] \tx_shift_gate [31]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1391: \tx_shift_gold [30] \tx_shift_gate [30]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1390: \tx_shift_gold [29] \tx_shift_gate [29]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1389: \tx_shift_gold [28] \tx_shift_gate [28]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1388: \tx_shift_gold [27] \tx_shift_gate [27]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1387: \tx_shift_gold [26] \tx_shift_gate [26]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1386: \tx_shift_gold [25] \tx_shift_gate [25]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1385: \tx_shift_gold [24] \tx_shift_gate [24]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1384: \tx_shift_gold [23] \tx_shift_gate [23]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1383: \tx_shift_gold [22] \tx_shift_gate [22]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1382: \tx_shift_gold [21] \tx_shift_gate [21]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1381: \tx_shift_gold [20] \tx_shift_gate [20]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1380: \tx_shift_gold [19] \tx_shift_gate [19]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1379: \tx_shift_gold [18] \tx_shift_gate [18]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1378: \tx_shift_gold [17] \tx_shift_gate [17]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1377: \tx_shift_gold [16] \tx_shift_gate [16]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1376: \tx_shift_gold [15] \tx_shift_gate [15]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1375: \tx_shift_gold [14] \tx_shift_gate [14]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1374: \tx_shift_gold [13] \tx_shift_gate [13]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1373: \tx_shift_gold [12] \tx_shift_gate [12]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1372: \tx_shift_gold [11] \tx_shift_gate [11]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1371: \tx_shift_gold [10] \tx_shift_gate [10]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1370: \tx_shift_gold [9] \tx_shift_gate [9]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1369: \tx_shift_gold [8] \tx_shift_gate [8]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1368: \tx_shift_gold [7] \tx_shift_gate [7]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1367: \tx_shift_gold [6] \tx_shift_gate [6]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1366: \tx_shift_gold [5] \tx_shift_gate [5]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1365: \tx_shift_gold [4] \tx_shift_gate [4]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1364: \tx_shift_gold [3] \tx_shift_gate [3]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1363: \tx_shift_gold [2] \tx_shift_gate [2]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1362: \tx_shift_gold [1] \tx_shift_gate [1]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1360: \spi_miso_gold \spi_miso_gate
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1527: \tx_shift_gold [166] \tx_shift_gate [166]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1526: \tx_shift_gold [165] \tx_shift_gate [165]
+Found a total of 165 unproven $equiv cells.
+ERROR: Found 165 unproven $equiv cells in 'equiv_status -assert'.

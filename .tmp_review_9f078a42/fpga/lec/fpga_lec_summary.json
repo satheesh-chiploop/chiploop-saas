@@ -1,0 +1,67 @@
+{
+  "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+  "comparison": "two_stage_rtl_generic_and_generic_mapped_equivalence",
+  "enabled": true,
+  "failure_kind": "proof_incomplete",
+  "family": "ecp5",
+  "gate_status": "fail",
+  "generic_lec": {
+    "command": {
+      "cmd": [
+        "/usr/bin/yosys",
+        "-s",
+        "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/lec/fpga_rtl_to_generic_lec.ys"
+      ],
+      "error": null,
+      "executable": "/usr/bin/yosys",
+      "log": "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/lec/fpga_rtl_to_generic_lec.log",
+      "ok": false,
+      "profile_id": "chiploop_saas_default",
+      "returncode": 1,
+      "status": "failed",
+      "stderr_tail": "ERROR: Found 2 unproven $equiv cells in 'equiv_status -assert'.\n",
+      "stdout_tail": " prove $equiv for \\u_core.req_meta_reg [60]: success!\n  Trying to prove $equiv for \\u_core.req_meta_reg [61]: success!\n  Trying to prove $equiv for \\u_core.req_meta_reg [62]: success!\n  Trying to prove $equiv for \\u_core.req_meta_reg [63]: success!\n  Trying to prove $equiv for \\u_core.req_ready: success!\n  Trying to prove $equiv for \\u_core.req_valid_r: success!\n  Trying to prove $equiv for \\u_core.rsp_data [32]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [34]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [36]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [38]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [40]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [42]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [44]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [46]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [48]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [50]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [52]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [54]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [56]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [58]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [60]: success!\n  Trying to prove $equiv for \\u_core.rsp_data [62]: success!\n  Trying to prove $equiv for \\u_core.state_next [0]: failed.\n  Trying to prove $equiv for \\u_core.state_next [1]: failed.\n  Trying to prove $equiv for \\u_core.state_reg [0]: success!\n  Trying to prove $equiv for \\u_core.state_reg [1]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [0]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [4]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [7]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [8]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [16]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [17]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [18]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [19]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [20]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [21]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [22]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [23]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [24]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [25]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [26]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [27]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [28]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [29]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [30]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [31]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [32]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [33]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [34]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [35]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [36]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [37]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [38]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [39]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [40]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [41]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [42]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [43]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [44]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [45]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [46]: success!\n  Trying to prove $equiv for \\u_core.status_reg_r [47]: success!\nProved 859 previously unproven $equiv cells.\n\n15. Executing EQUIV_STATUS pass.\n"
+    },
+    "failure_kind": "proof_incomplete",
+    "gate": "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/src/upstream/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+    ],
+    "log": "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/lec/fpga_rtl_to_generic_lec.log",
+    "proven": false,
+    "reason": "Yosys could not prove 2 equivalence points after induction depths 12.",
+    "script": "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/lec/fpga_rtl_to_generic_lec.ys",
+    "status": "inconclusive",
+    "timeout_seconds": 413,
+    "unproven_points": 2
+  },
+  "generic_netlist": "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+  "generic_proven": false,
+  "induction_depth": 12,
+  "induction_depths_attempted": [
+    12
+  ],
+  "mapped_lec": {
+    "failure_kind": "upstream_proof_failed",
+    "gate": "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v"
+    ],
+    "proven": false,
+    "reason": "Mapped-netlist LEC was not started because RTL-to-generic LEC did not pass.",
+    "status": "blocked",
+    "unproven_points": null
+  },
+  "mapped_netlist": "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "mapped_proven": false,
+  "netlist": "/root/chiploop-backend/backend/workflows/9f078a42-8a1a-4f9d-aabd-dd90018fd9c0/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "proven": false,
+  "reason": "Yosys could not prove 2 equivalence points after induction depths 12.",
+  "required": true,
+  "rtl_file_count": 2,
+  "status": "inconclusive",
+  "tool": "Yosys",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "unproven_points": 2
+}
