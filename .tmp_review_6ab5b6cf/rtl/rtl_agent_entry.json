@@ -1,8 +1,0 @@
-{
-  "workflow_id": "6ab5b6cf-4432-4492-ae49-c8a93aa81706",
-  "workflow_dir": "backend/workflows/6ab5b6cf-4432-4492-ae49-c8a93aa81706",
-  "digital_spec_json": "backend/workflows/6ab5b6cf-4432-4492-ae49-c8a93aa81706/spec/uart_packet_engine_spec.json",
-  "spec_json": "backend/workflows/6ab5b6cf-4432-4492-ae49-c8a93aa81706/spec/uart_packet_engine_spec.json",
-  "digital_spec_json_exists": true,
-  "spec_json_exists": true
-}

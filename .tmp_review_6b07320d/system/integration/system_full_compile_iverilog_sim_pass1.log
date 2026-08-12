@@ -1,0 +1,7 @@
+$ iverilog -g2012 -s temp_monitor_soc_sim -o /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_sim.out /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_regfile.v /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_sim.sv
+
+STDOUT:
+
+
+STDERR:
+

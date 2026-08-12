@@ -1,0 +1,27 @@
+{
+  "agent": "System RTL Handoff Package Agent",
+  "generated_at": "2026-08-12T22:20:54.436158+00:00",
+  "workflow_id": "6b07320d-1662-471b-88b1-df3d065727b6",
+  "resolution_mode": "supabase_first",
+  "artifacts": {
+    "system_integration_intent_json": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_integration_intent.json",
+    "system_full_compile_summary_json": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_full_compile_summary.json",
+    "soc_top_sim_sv": "",
+    "soc_top_phys_sv": "",
+    "system_rtl_filelist_sim_txt": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_rtl_filelist_sim.txt",
+    "system_rtl_filelist_phys_txt": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_rtl_filelist_phys.txt",
+    "system_lib_filelist_phys_txt": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_lib_filelist_phys.txt",
+    "digital_regmap_json": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/digital/digital_regmap.json",
+    "iverilog_sim_log": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_full_compile_iverilog_sim_pass1.log",
+    "verilator_sim_log": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_full_compile_verilator_sim_pass1.log",
+    "iverilog_phys_log": "",
+    "verilator_phys_log": ""
+  },
+  "warnings": [],
+  "workflow_row_found": true,
+  "storage_prefixes": [
+    "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/",
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/",
+    "3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/"
+  ]
+}

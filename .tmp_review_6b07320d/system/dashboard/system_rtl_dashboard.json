@@ -1,0 +1,1744 @@
+{
+  "type": "system_rtl_dashboard",
+  "version": "1.0",
+  "filelists": {
+    "sim_count": 5,
+    "phys_count": 4
+  },
+  "compile": {
+    "sim": "pass",
+    "phys": "skipped",
+    "phys_reason": "Phys compile skipped because no non-top analog RTL/stub/wrapper was found after excluding analog behavioral model. Liberty files were emitted in system_lib_filelist_phys.txt for downstream handoff/STA flow and must not be passed to iverilog/verilator."
+  },
+  "lint_summary": {
+    "digital": "fail",
+    "analog": "pass",
+    "soc": "pass",
+    "system": "fail"
+  },
+  "scopes": {
+    "system": {
+      "scope": "system",
+      "top_module": "temp_monitor_soc_sim",
+      "rtl_file_count": 6,
+      "module_count": 6,
+      "modules": [
+        {
+          "name": "temp_sensor_adc_model",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v",
+          "input_count": 19,
+          "output_count": 13,
+          "inout_count": 0,
+          "input_port_count": 4,
+          "output_port_count": 2,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "sample_req",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sensor_temp_celsius",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "avdd",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "avss",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "adc_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "adc_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "temp_monitor_digital",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v",
+          "input_count": 49,
+          "output_count": 43,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "adc_code",
+              "direction": "input",
+              "width": "[11:0]"
+            },
+            {
+              "name": "adc_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "sample_req",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "alert_irq",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "temp_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "threshold_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "alert_status",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "temp_monitor_digital_regfile",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_regfile.v",
+          "input_count": 70,
+          "output_count": 34,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 8,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "control_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "control_sample_start_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "control_irq_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "control_alert_clear_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_clear_alert_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_clear_sample_done_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "threshold_code_reg",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "status_sample_done",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_alert_pending",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_adc_valid_seen",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "irq_status_alert",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "irq_status_sample_done",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "latest_temp",
+              "direction": "input",
+              "width": "[11:0]"
+            },
+            {
+              "name": "sample_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "temp_monitor_digital_sample_ctrl",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v",
+          "input_count": 33,
+          "output_count": 52,
+          "inout_count": 0,
+          "input_port_count": 11,
+          "output_port_count": 15,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "control_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "control_sample_start_pulse",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "control_irq_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "control_alert_clear_pulse",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "irq_clear_alert_pulse",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "irq_clear_sample_done_pulse",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "threshold_code_reg",
+              "direction": "input",
+              "width": "[11:0]"
+            },
+            {
+              "name": "adc_code",
+              "direction": "input",
+              "width": "[11:0]"
+            },
+            {
+              "name": "adc_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sample_req",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "alert_irq",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "temp_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "alert_status",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_sample_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_alert_pending",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_adc_valid_seen",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_status_alert",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_status_sample_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "latest_temp",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "sample_count",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "compare_alert",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sample_done_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sample_req_pulse",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "temp_monitor_soc_phys",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_phys.sv",
+          "input_count": 54,
+          "output_count": 42,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "alert_irq",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "alert_status",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "avdd",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "avss",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sensor_temp_celsius",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "temp_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "threshold_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "temp_monitor_soc_sim",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_sim.sv",
+          "input_count": 54,
+          "output_count": 42,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "alert_irq",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "alert_status",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "avdd",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "avss",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sensor_temp_celsius",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "temp_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "threshold_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 54,
+        "output_count": 42,
+        "inout_count": 0,
+        "input_port_count": 10,
+        "output_port_count": 5,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "alert_irq",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "alert_status",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "avdd",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "avss",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "rd_data",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "rd_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "sensor_temp_celsius",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "temp_code",
+            "direction": "output",
+            "width": "[11:0]"
+          },
+          {
+            "name": "threshold_code",
+            "direction": "output",
+            "width": "[11:0]"
+          },
+          {
+            "name": "wr_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "wr_data",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "wr_en",
+            "direction": "input",
+            "width": "1"
+          }
+        ]
+      },
+      "clock_reset": {
+        "clock_names": [
+          "clk"
+        ],
+        "reset_names": [
+          "reset_n"
+        ],
+        "primary_clock": "clk",
+        "primary_reset": "reset_n"
+      },
+      "storage": {
+        "flipflop_count": 201,
+        "latch_count": 1,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 36,
+        "latch_target_count": 1,
+        "sequential_blocks": 6,
+        "posedge_blocks": 4,
+        "negedge_blocks": 2,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "NOMINAL_SAMPLE_LATENCY",
+          "adc_code",
+          "adc_valid",
+          "alert_irq",
+          "alert_status",
+          "avg_sum",
+          "avg_sum_next",
+          "avg_value",
+          "compare_alert",
+          "control_alert_clear_pulse",
+          "control_enable",
+          "control_irq_enable",
+          "control_sample_start_pulse",
+          "conversion_timer",
+          "irq_clear_alert_pulse",
+          "irq_clear_sample_done_pulse",
+          "irq_status_alert",
+          "irq_status_sample_done",
+          "latest_temp",
+          "pending_sample",
+          "periodic_cnt",
+          "rd_data",
+          "request_active",
+          "sample_count",
+          "sample_done_pulse",
+          "sample_hist0",
+          "sample_hist1",
+          "sample_req",
+          "sample_req_int",
+          "sample_req_pulse",
+          "status_adc_valid_seen",
+          "status_alert_pending",
+          "status_busy",
+          "status_sample_done",
+          "temp_code",
+          "threshold_code_reg"
+        ],
+        "sampled_latch_targets": [
+          "NOMINAL_SAMPLE_LATENCY"
+        ],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 2,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      },
+      "lint": {
+        "status": "fail",
+        "basis": "Lint means Icarus compile plus Verilator lint for the relevant scope; System Lint is the Digital + Analog + SoC roll-up."
+      }
+    },
+    "soc": {
+      "scope": "soc",
+      "top_module": "temp_monitor_soc_sim",
+      "rtl_file_count": 2,
+      "module_count": 2,
+      "modules": [
+        {
+          "name": "temp_monitor_soc_phys",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_phys.sv",
+          "input_count": 54,
+          "output_count": 42,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "alert_irq",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "alert_status",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "avdd",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "avss",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sensor_temp_celsius",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "temp_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "threshold_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "temp_monitor_soc_sim",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_sim.sv",
+          "input_count": 54,
+          "output_count": 42,
+          "inout_count": 0,
+          "input_port_count": 10,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "alert_irq",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "alert_status",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "avdd",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "avss",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sensor_temp_celsius",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "temp_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "threshold_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 54,
+        "output_count": 42,
+        "inout_count": 0,
+        "input_port_count": 10,
+        "output_port_count": 5,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "alert_irq",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "alert_status",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "avdd",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "avss",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "rd_data",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "rd_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "sensor_temp_celsius",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "temp_code",
+            "direction": "output",
+            "width": "[11:0]"
+          },
+          {
+            "name": "threshold_code",
+            "direction": "output",
+            "width": "[11:0]"
+          },
+          {
+            "name": "wr_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "wr_data",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "wr_en",
+            "direction": "input",
+            "width": "1"
+          }
+        ]
+      },
+      "clock_reset": {
+        "clock_names": [
+          "clk"
+        ],
+        "reset_names": [
+          "reset_n"
+        ],
+        "primary_clock": "clk",
+        "primary_reset": "reset_n"
+      },
+      "storage": {
+        "flipflop_count": 0,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 0,
+        "latch_target_count": 0,
+        "sequential_blocks": 0,
+        "posedge_blocks": 0,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 2,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      },
+      "lint": {
+        "status": "pass",
+        "basis": "Lint means Icarus compile plus Verilator lint for the relevant scope; System Lint is the Digital + Analog + SoC roll-up."
+      }
+    },
+    "digital": {
+      "scope": "digital",
+      "top_module": "temp_monitor_digital",
+      "rtl_file_count": 3,
+      "module_count": 3,
+      "modules": [
+        {
+          "name": "temp_monitor_digital",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v",
+          "input_count": 49,
+          "output_count": 43,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "adc_code",
+              "direction": "input",
+              "width": "[11:0]"
+            },
+            {
+              "name": "adc_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "sample_req",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "alert_irq",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "temp_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "threshold_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "alert_status",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "temp_monitor_digital_regfile",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_regfile.v",
+          "input_count": 70,
+          "output_count": 34,
+          "inout_count": 0,
+          "input_port_count": 15,
+          "output_port_count": 8,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "control_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "control_sample_start_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "control_irq_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "control_alert_clear_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_clear_alert_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_clear_sample_done_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "threshold_code_reg",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "status_sample_done",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_alert_pending",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_adc_valid_seen",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_busy",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "irq_status_alert",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "irq_status_sample_done",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "latest_temp",
+              "direction": "input",
+              "width": "[11:0]"
+            },
+            {
+              "name": "sample_count",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "temp_monitor_digital_sample_ctrl",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v",
+          "input_count": 33,
+          "output_count": 52,
+          "inout_count": 0,
+          "input_port_count": 11,
+          "output_port_count": 15,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "control_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "control_sample_start_pulse",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "control_irq_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "control_alert_clear_pulse",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "irq_clear_alert_pulse",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "irq_clear_sample_done_pulse",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "threshold_code_reg",
+              "direction": "input",
+              "width": "[11:0]"
+            },
+            {
+              "name": "adc_code",
+              "direction": "input",
+              "width": "[11:0]"
+            },
+            {
+              "name": "adc_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sample_req",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "alert_irq",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "temp_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "alert_status",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_sample_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_alert_pending",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_adc_valid_seen",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_status_alert",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq_status_sample_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "latest_temp",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "sample_count",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "compare_alert",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sample_done_pulse",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sample_req_pulse",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 49,
+        "output_count": 43,
+        "inout_count": 0,
+        "input_port_count": 9,
+        "output_port_count": 6,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "wr_data",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "rd_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "adc_code",
+            "direction": "input",
+            "width": "[11:0]"
+          },
+          {
+            "name": "adc_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_data",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "sample_req",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "alert_irq",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "temp_code",
+            "direction": "output",
+            "width": "[11:0]"
+          },
+          {
+            "name": "threshold_code",
+            "direction": "output",
+            "width": "[11:0]"
+          },
+          {
+            "name": "alert_status",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "clock_reset": {
+        "clock_names": [
+          "clk"
+        ],
+        "reset_names": [
+          "reset_n"
+        ],
+        "primary_clock": "clk",
+        "primary_reset": "reset_n"
+      },
+      "storage": {
+        "flipflop_count": 154,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 31,
+        "latch_target_count": 0,
+        "sequential_blocks": 4,
+        "posedge_blocks": 2,
+        "negedge_blocks": 2,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "alert_irq",
+          "alert_status",
+          "avg_sum",
+          "avg_sum_next",
+          "avg_value",
+          "compare_alert",
+          "control_alert_clear_pulse",
+          "control_enable",
+          "control_irq_enable",
+          "control_sample_start_pulse",
+          "irq_clear_alert_pulse",
+          "irq_clear_sample_done_pulse",
+          "irq_status_alert",
+          "irq_status_sample_done",
+          "latest_temp",
+          "pending_sample",
+          "periodic_cnt",
+          "rd_data",
+          "sample_count",
+          "sample_done_pulse",
+          "sample_hist0",
+          "sample_hist1",
+          "sample_req",
+          "sample_req_int",
+          "sample_req_pulse",
+          "status_adc_valid_seen",
+          "status_alert_pending",
+          "status_busy",
+          "status_sample_done",
+          "temp_code",
+          "threshold_code_reg"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 2,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      },
+      "lint": {
+        "status": "fail",
+        "basis": "Lint means Icarus compile plus Verilator lint for the relevant scope; System Lint is the Digital + Analog + SoC roll-up."
+      }
+    },
+    "analog": {
+      "scope": "analog",
+      "top_module": "temp_sensor_adc_model",
+      "rtl_file_count": 1,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "temp_sensor_adc_model",
+          "file": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v",
+          "input_count": 19,
+          "output_count": 13,
+          "inout_count": 0,
+          "input_port_count": 4,
+          "output_port_count": 2,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "sample_req",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "sensor_temp_celsius",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "avdd",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "avss",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "adc_code",
+              "direction": "output",
+              "width": "[11:0]"
+            },
+            {
+              "name": "adc_valid",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 19,
+        "output_count": 13,
+        "inout_count": 0,
+        "input_port_count": 4,
+        "output_port_count": 2,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "sample_req",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "sensor_temp_celsius",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "avdd",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "avss",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "adc_code",
+            "direction": "output",
+            "width": "[11:0]"
+          },
+          {
+            "name": "adc_valid",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "clock_reset": {
+        "clock_names": [
+          "clk"
+        ],
+        "reset_names": [
+          "reset_n"
+        ],
+        "primary_clock": "clk",
+        "primary_reset": "reset_n"
+      },
+      "storage": {
+        "flipflop_count": 47,
+        "latch_count": 1,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 5,
+        "latch_target_count": 1,
+        "sequential_blocks": 2,
+        "posedge_blocks": 2,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "NOMINAL_SAMPLE_LATENCY",
+          "adc_code",
+          "adc_valid",
+          "conversion_timer",
+          "request_active"
+        ],
+        "sampled_latch_targets": [
+          "NOMINAL_SAMPLE_LATENCY"
+        ],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      },
+      "lint": {
+        "status": "pass",
+        "basis": "Lint means Icarus compile plus Verilator lint for the relevant scope; System Lint is the Digital + Analog + SoC roll-up."
+      }
+    }
+  },
+  "classification": {
+    "basis": "filelist path/module-name classification; SoC tops separated from analog macro and digital RTL files",
+    "analog_patterns": [
+      "analog",
+      "macro",
+      "ams",
+      "behavioral",
+      "sensor",
+      "temp",
+      "adc",
+      "dac",
+      "pll",
+      "ldo",
+      "bandgap",
+      "opamp"
+    ]
+  }
+}

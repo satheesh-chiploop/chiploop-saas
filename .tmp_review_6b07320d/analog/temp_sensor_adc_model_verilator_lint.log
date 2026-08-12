@@ -1,0 +1,25 @@
+%Warning-WIDTHEXPAND: artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:28:21: Operator ASSIGN expects 32 bits on the Assign RHS, but Assign RHS's SIGNED generates 17 bits.
+                                                                                                                                                                                          : ... note: In instance 'temp_sensor_adc_model'
+   28 |         temp_signed = $signed({1'b0, sensor_temp_celsius});
+      |                     ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-INITIALDLY: artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:72:18: Non-blocking assignment '<=' in initial/final block
+                                                                                                                                                                                         : ... This will be executed as a blocking assignment '='!
+   72 |         adc_code <= 12'd0;
+      |                  ^~
+                     ... For warning description see https://verilator.org/warn/INITIALDLY?v=5.047
+                     ... Use "/* verilator lint_off INITIALDLY */" and lint_on around source to disable this message.
+%Warning-INITIALDLY: artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:73:19: Non-blocking assignment '<=' in initial/final block
+                                                                                                                                                                                         : ... This will be executed as a blocking assignment '='!
+   73 |         adc_valid <= 1'b0;
+      |                   ^~
+%Warning-INITIALDLY: artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:76:26: Non-blocking assignment '<=' in initial/final block
+                                                                                                                                                                                         : ... This will be executed as a blocking assignment '='!
+   76 |         conversion_timer <= 32'd0;
+      |                          ^~
+%Warning-INITIALDLY: artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:77:24: Non-blocking assignment '<=' in initial/final block
+                                                                                                                                                                                         : ... This will be executed as a blocking assignment '='!
+   77 |         request_active <= 1'b0;
+      |                        ^~
+%Error: Exiting due to 5 warning(s)

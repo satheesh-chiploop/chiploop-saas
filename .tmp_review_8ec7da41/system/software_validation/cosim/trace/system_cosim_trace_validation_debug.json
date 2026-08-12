@@ -1,8 +1,0 @@
-{
-  "agent": "System Software CoSim Trace Validation Agent",
-  "generated_at": "2026-08-12T19:01:30.575857+00:00",
-  "scenario_count": 9,
-  "mismatch_categories": [
-    "execution_not_passed"
-  ]
-}

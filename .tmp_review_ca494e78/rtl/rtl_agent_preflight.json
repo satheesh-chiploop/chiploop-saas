@@ -1,0 +1,14 @@
+{
+  "mode": "hierarchical",
+  "top_module": "smart_sensor_hub_mcu",
+  "expected_files": [
+    "smart_sensor_hub_mcu.v",
+    "sensor_hub_regfile.v",
+    "sensor_hub_sample_ctrl.v",
+    "sensor_hub_fifo_alert.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 122033
+}

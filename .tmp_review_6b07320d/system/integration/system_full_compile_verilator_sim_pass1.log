@@ -1,0 +1,93 @@
+$ verilator --lint-only --timing -Wall -Wno-fatal --top-module temp_monitor_soc_sim /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_regfile.v /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_sim.sv
+
+STDOUT:
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.156 MB sources in 6 modules, into 0.037 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.018 s (elab=0.002, cvt=0.007, bld=0.000); cpu 0.018 s on 1 threads; allocated 32.355 MB
+
+
+STDERR:
+%Warning-EOFNEWLINE: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_sim.sv:51:10: Missing newline at end of file (POSIX 3.206).
+                                                                                                                                                                                                                            : ... Suggest add newline.
+   51 | endmodule
+      |          ^
+                     ... For warning description see https://verilator.org/warn/EOFNEWLINE?v=5.047
+                     ... Use "/* verilator lint_off EOFNEWLINE */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:28:21: Operator ASSIGN expects 32 bits on the Assign RHS, but Assign RHS's SIGNED generates 17 bits.
+                                                                                                                                                                                                                 : ... note: In instance 'temp_monitor_soc_sim.u_analog'
+   28 |         temp_signed = $signed({1'b0, sensor_temp_celsius});
+      |                     ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-BLKSEQ: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v:128:26: Blocking assignment '=' in sequential logic process
+                                                                                                                                                                                                                     : ... note: In instance 'temp_monitor_soc_sim.u_digital.u_temp_monitor_digital_sample_ctrl'
+                                                                                                                                                                                                                     : ... Suggest using delayed assignment '<='
+  128 |             avg_sum_next = {1'b0, adc_code} + {1'b0, sample_hist0};
+      |                          ^
+                 ... For warning description see https://verilator.org/warn/BLKSEQ?v=5.047
+                 ... Use "/* verilator lint_off BLKSEQ */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v:49:6: Signal is not used: 'compare_alert'
+                                                                                                                                                                                                             : ... note: In instance 'temp_monitor_soc_sim.u_digital'
+   49 | wire compare_alert;
+      |      ^~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v:50:6: Signal is not used: 'sample_done_pulse'
+                                                                                                                                                                                                             : ... note: In instance 'temp_monitor_soc_sim.u_digital'
+   50 | wire sample_done_pulse;
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v:51:6: Signal is not used: 'sample_req_pulse'
+                                                                                                                                                                                                             : ... note: In instance 'temp_monitor_soc_sim.u_digital'
+   51 | wire sample_req_pulse;
+      |      ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:14:16: Signal is not used: 'latched_adc_code'
+                                                                                                                                                                                                                  : ... note: In instance 'temp_monitor_soc_sim.u_analog'
+   14 |     reg [11:0] latched_adc_code;
+      |                ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:15:16: Signal is not used: 'latched_adc_valid'
+                                                                                                                                                                                                                  : ... note: In instance 'temp_monitor_soc_sim.u_analog'
+   15 |     reg        latched_adc_valid;
+      |                ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:16:16: Signal is not used: 'conversion_timer'
+                                                                                                                                                                                                                  : ... note: In instance 'temp_monitor_soc_sim.u_analog'
+   16 |     reg [31:0] conversion_timer;
+      |                ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:19:16: Signal is not used: 'scaled_temp'
+                                                                                                                                                                                                                  : ... note: In instance 'temp_monitor_soc_sim.u_analog'
+   19 |     reg [31:0] scaled_temp;
+      |                ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_regfile.v:31:14: Bits of signal are not used: 'wr_data'[15:12]
+                                                                                                                                                                                                                      : ... note: In instance 'temp_monitor_soc_sim.u_digital.u_temp_monitor_digital_regfile'
+   31 | input [15:0] wr_data;
+      |              ^~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v:58:12: Signal is not used: 'sample_hist1'
+                                                                                                                                                                                                                          : ... note: In instance 'temp_monitor_soc_sim.u_digital.u_temp_monitor_digital_sample_ctrl'
+   58 | reg [11:0] sample_hist1;
+      |            ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v:59:12: Signal is not used: 'avg_sum'
+                                                                                                                                                                                                                          : ... note: In instance 'temp_monitor_soc_sim.u_digital.u_temp_monitor_digital_sample_ctrl'
+   59 | reg [12:0] avg_sum;
+      |            ^~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v:60:12: Signal is not used: 'avg_value'
+                                                                                                                                                                                                                          : ... note: In instance 'temp_monitor_soc_sim.u_digital.u_temp_monitor_digital_sample_ctrl'
+   60 | reg [11:0] avg_value;
+      |            ^~~~~~~~~
+%Warning-INITIALDLY: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:72:18: Non-blocking assignment '<=' in initial/final block
+                                                                                                                                                                                                                : ... This will be executed as a blocking assignment '='!
+   72 |         adc_code <= 12'd0;
+      |                  ^~
+                     ... For warning description see https://verilator.org/warn/INITIALDLY?v=5.047
+                     ... Use "/* verilator lint_off INITIALDLY */" and lint_on around source to disable this message.
+%Warning-INITIALDLY: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:73:19: Non-blocking assignment '<=' in initial/final block
+                                                                                                                                                                                                                : ... This will be executed as a blocking assignment '='!
+   73 |         adc_valid <= 1'b0;
+      |                   ^~
+%Warning-INITIALDLY: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:76:26: Non-blocking assignment '<=' in initial/final block
+                                                                                                                                                                                                                : ... This will be executed as a blocking assignment '='!
+   76 |         conversion_timer <= 32'd0;
+      |                          ^~
+%Warning-INITIALDLY: /root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v:77:24: Non-blocking assignment '<=' in initial/final block
+                                                                                                                                                                                                                : ... This will be executed as a blocking assignment '='!
+   77 |         request_active <= 1'b0;
+      |                        ^~
+

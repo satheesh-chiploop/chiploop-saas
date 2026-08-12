@@ -1,0 +1,417 @@
+---BEGIN temp_monitor_digital.v---
+module temp_monitor_digital (
+    clk,
+    reset_n,
+    wr_en,
+    wr_addr,
+    wr_data,
+    rd_en,
+    rd_addr,
+    adc_code,
+    adc_valid,
+    rd_data,
+    sample_req,
+    alert_irq,
+    temp_code,
+    threshold_code,
+    alert_status
+);
+
+input clk;
+input reset_n;
+input wr_en;
+input [7:0] wr_addr;
+input [15:0] wr_data;
+input rd_en;
+input [7:0] rd_addr;
+input [11:0] adc_code;
+input adc_valid;
+output [15:0] rd_data;
+output sample_req;
+output alert_irq;
+output [11:0] temp_code;
+output [11:0] threshold_code;
+output alert_status;
+
+wire control_enable;
+wire control_sample_start_pulse;
+wire control_irq_enable;
+wire control_alert_clear_pulse;
+wire irq_clear_alert_pulse;
+wire irq_clear_sample_done_pulse;
+wire [11:0] threshold_code_reg;
+wire status_sample_done;
+wire status_alert_pending;
+wire status_adc_valid_seen;
+wire status_busy;
+wire irq_status_alert;
+wire irq_status_sample_done;
+wire [11:0] latest_temp;
+wire [15:0] sample_count;
+wire compare_alert;
+wire sample_done_pulse;
+wire sample_req_pulse;
+
+assign threshold_code = threshold_code_reg;
+assign temp_code = latest_temp;
+
+temp_monitor_digital_regfile u_temp_monitor_digital_regfile (
+    .clk(clk),
+    .reset_n(reset_n),
+    .wr_en(wr_en),
+    .wr_addr(wr_addr),
+    .wr_data(wr_data),
+    .rd_en(rd_en),
+    .rd_addr(rd_addr),
+    .control_enable(control_enable),
+    .control_sample_start_pulse(control_sample_start_pulse),
+    .control_irq_enable(control_irq_enable),
+    .control_alert_clear_pulse(control_alert_clear_pulse),
+    .irq_clear_alert_pulse(irq_clear_alert_pulse),
+    .irq_clear_sample_done_pulse(irq_clear_sample_done_pulse),
+    .threshold_code_reg(threshold_code_reg),
+    .status_sample_done(status_sample_done),
+    .status_alert_pending(status_alert_pending),
+    .status_adc_valid_seen(status_adc_valid_seen),
+    .status_busy(status_busy),
+    .irq_status_alert(irq_status_alert),
+    .irq_status_sample_done(irq_status_sample_done),
+    .latest_temp(latest_temp),
+    .sample_count(sample_count),
+    .rd_data(rd_data)
+);
+
+temp_monitor_digital_sample_ctrl u_temp_monitor_digital_sample_ctrl (
+    .clk(clk),
+    .reset_n(reset_n),
+    .control_enable(control_enable),
+    .control_sample_start_pulse(control_sample_start_pulse),
+    .control_irq_enable(control_irq_enable),
+    .control_alert_clear_pulse(control_alert_clear_pulse),
+    .irq_clear_alert_pulse(irq_clear_alert_pulse),
+    .irq_clear_sample_done_pulse(irq_clear_sample_done_pulse),
+    .threshold_code_reg(threshold_code_reg),
+    .adc_code(adc_code),
+    .adc_valid(adc_valid),
+    .sample_req(sample_req),
+    .alert_irq(alert_irq),
+    .temp_code(temp_code),
+    .alert_status(alert_status),
+    .status_sample_done(status_sample_done),
+    .status_alert_pending(status_alert_pending),
+    .status_adc_valid_seen(status_adc_valid_seen),
+    .status_busy(status_busy),
+    .irq_status_alert(irq_status_alert),
+    .irq_status_sample_done(irq_status_sample_done),
+    .latest_temp(latest_temp),
+    .sample_count(sample_count),
+    .compare_alert(compare_alert),
+    .sample_done_pulse(sample_done_pulse),
+    .sample_req_pulse(sample_req_pulse)
+);
+
+endmodule
+---END temp_monitor_digital.v---
+---BEGIN temp_monitor_digital_regfile.v---
+module temp_monitor_digital_regfile (
+    clk,
+    reset_n,
+    wr_en,
+    wr_addr,
+    wr_data,
+    rd_en,
+    rd_addr,
+    control_enable,
+    control_sample_start_pulse,
+    control_irq_enable,
+    control_alert_clear_pulse,
+    irq_clear_alert_pulse,
+    irq_clear_sample_done_pulse,
+    threshold_code_reg,
+    status_sample_done,
+    status_alert_pending,
+    status_adc_valid_seen,
+    status_busy,
+    irq_status_alert,
+    irq_status_sample_done,
+    latest_temp,
+    sample_count,
+    rd_data
+);
+
+input clk;
+input reset_n;
+input wr_en;
+input [7:0] wr_addr;
+input [15:0] wr_data;
+input rd_en;
+input [7:0] rd_addr;
+output reg control_enable;
+output reg control_sample_start_pulse;
+output reg control_irq_enable;
+output reg control_alert_clear_pulse;
+output reg irq_clear_alert_pulse;
+output reg irq_clear_sample_done_pulse;
+output reg [11:0] threshold_code_reg;
+input status_sample_done;
+input status_alert_pending;
+input status_adc_valid_seen;
+input status_busy;
+input irq_status_alert;
+input irq_status_sample_done;
+input [11:0] latest_temp;
+input [15:0] sample_count;
+output reg [15:0] rd_data;
+
+localparam [7:0] REG_CONTROL     = 8'h00;
+localparam [7:0] REG_STATUS      = 8'h04;
+localparam [7:0] REG_THRESHOLD   = 8'h08;
+localparam [7:0] REG_LATEST_TEMP = 8'h0C;
+localparam [7:0] REG_SAMPLE_CNT  = 8'h10;
+localparam [7:0] REG_IRQ_STATUS  = 8'h14;
+localparam [7:0] REG_IRQ_CLEAR   = 8'h18;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        control_enable <= 1'b0;
+        control_sample_start_pulse <= 1'b0;
+        control_irq_enable <= 1'b0;
+        control_alert_clear_pulse <= 1'b0;
+        irq_clear_alert_pulse <= 1'b0;
+        irq_clear_sample_done_pulse <= 1'b0;
+        threshold_code_reg <= 12'h000;
+        rd_data <= 16'h0000;
+    end else begin
+        control_sample_start_pulse <= 1'b0;
+        control_alert_clear_pulse <= 1'b0;
+        irq_clear_alert_pulse <= 1'b0;
+        irq_clear_sample_done_pulse <= 1'b0;
+        rd_data <= 16'h0000;
+
+        if (wr_en) begin
+            case (wr_addr)
+                REG_CONTROL: begin
+                    control_enable <= wr_data[0];
+                    if (wr_data[1]) begin
+                        control_sample_start_pulse <= 1'b1;
+                    end
+                    control_irq_enable <= wr_data[2];
+                    if (wr_data[3]) begin
+                        control_alert_clear_pulse <= 1'b1;
+                    end
+                end
+                REG_THRESHOLD: begin
+                    threshold_code_reg <= wr_data[11:0];
+                end
+                REG_IRQ_CLEAR: begin
+                    if (wr_data[0]) begin
+                        irq_clear_alert_pulse <= 1'b1;
+                    end
+                    if (wr_data[1]) begin
+                        irq_clear_sample_done_pulse <= 1'b1;
+                    end
+                end
+                default: begin
+                end
+            endcase
+        end
+
+        if (rd_en) begin
+            case (rd_addr)
+                REG_CONTROL: begin
+                    rd_data <= {12'h000, control_irq_enable, 1'b0, control_enable, 1'b0};
+                end
+                REG_STATUS: begin
+                    rd_data <= {12'h000, status_busy, status_adc_valid_seen, status_alert_pending, status_sample_done};
+                end
+                REG_THRESHOLD: begin
+                    rd_data <= {4'h0, threshold_code_reg};
+                end
+                REG_LATEST_TEMP: begin
+                    rd_data <= {4'h0, latest_temp};
+                end
+                REG_SAMPLE_CNT: begin
+                    rd_data <= sample_count;
+                end
+                REG_IRQ_STATUS: begin
+                    rd_data <= {14'h0000, irq_status_sample_done, irq_status_alert};
+                end
+                REG_IRQ_CLEAR: begin
+                    rd_data <= 16'h0000;
+                end
+                default: begin
+                    rd_data <= 16'h0000;
+                end
+            endcase
+        end
+    end
+end
+
+endmodule
+---END temp_monitor_digital_regfile.v---
+---BEGIN temp_monitor_digital_sample_ctrl.v---
+module temp_monitor_digital_sample_ctrl (
+    clk,
+    reset_n,
+    control_enable,
+    control_sample_start_pulse,
+    control_irq_enable,
+    control_alert_clear_pulse,
+    irq_clear_alert_pulse,
+    irq_clear_sample_done_pulse,
+    threshold_code_reg,
+    adc_code,
+    adc_valid,
+    sample_req,
+    alert_irq,
+    temp_code,
+    alert_status,
+    status_sample_done,
+    status_alert_pending,
+    status_adc_valid_seen,
+    status_busy,
+    irq_status_alert,
+    irq_status_sample_done,
+    latest_temp,
+    sample_count,
+    compare_alert,
+    sample_done_pulse,
+    sample_req_pulse
+);
+
+input clk;
+input reset_n;
+input control_enable;
+input control_sample_start_pulse;
+input control_irq_enable;
+input control_alert_clear_pulse;
+input irq_clear_alert_pulse;
+input irq_clear_sample_done_pulse;
+input [11:0] threshold_code_reg;
+input [11:0] adc_code;
+input adc_valid;
+output reg sample_req;
+output reg alert_irq;
+output reg [11:0] temp_code;
+output reg alert_status;
+output reg status_sample_done;
+output reg status_alert_pending;
+output reg status_adc_valid_seen;
+output reg status_busy;
+output reg irq_status_alert;
+output reg irq_status_sample_done;
+output reg [11:0] latest_temp;
+output reg [15:0] sample_count;
+output reg compare_alert;
+output reg sample_done_pulse;
+output reg sample_req_pulse;
+
+reg [11:0] sample_hist0;
+reg [11:0] sample_hist1;
+reg [12:0] avg_sum;
+reg [11:0] avg_value;
+reg [3:0] periodic_cnt;
+reg pending_sample;
+reg sample_req_int;
+reg [12:0] avg_sum_next;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        sample_hist0 <= 12'h000;
+        sample_hist1 <= 12'h000;
+        avg_sum <= 13'h0000;
+        avg_value <= 12'h000;
+        periodic_cnt <= 4'h0;
+        pending_sample <= 1'b0;
+        sample_req_int <= 1'b0;
+        sample_req <= 1'b0;
+        alert_irq <= 1'b0;
+        temp_code <= 12'h000;
+        alert_status <= 1'b0;
+        status_sample_done <= 1'b0;
+        status_alert_pending <= 1'b0;
+        status_adc_valid_seen <= 1'b0;
+        status_busy <= 1'b0;
+        irq_status_alert <= 1'b0;
+        irq_status_sample_done <= 1'b0;
+        latest_temp <= 12'h000;
+        sample_count <= 16'h0000;
+        compare_alert <= 1'b0;
+        sample_done_pulse <= 1'b0;
+        sample_req_pulse <= 1'b0;
+        avg_sum_next <= 13'h0000;
+    end else begin
+        sample_req <= 1'b0;
+        alert_irq <= control_irq_enable & (irq_status_alert | irq_status_sample_done);
+        sample_req_int <= 1'b0;
+        sample_req_pulse <= 1'b0;
+        sample_done_pulse <= 1'b0;
+        compare_alert <= 1'b0;
+
+        if (control_alert_clear_pulse || irq_clear_alert_pulse) begin
+            alert_status <= 1'b0;
+            status_alert_pending <= 1'b0;
+            irq_status_alert <= 1'b0;
+        end
+
+        if (irq_clear_sample_done_pulse) begin
+            status_sample_done <= 1'b0;
+            irq_status_sample_done <= 1'b0;
+        end
+
+        if (control_sample_start_pulse) begin
+            sample_req_int <= 1'b1;
+        end else if (control_enable && !pending_sample && !adc_valid) begin
+            if (periodic_cnt == 4'h0) begin
+                sample_req_int <= 1'b1;
+                periodic_cnt <= 4'hF;
+            end else begin
+                periodic_cnt <= periodic_cnt - 4'h1;
+            end
+        end
+
+        if (sample_req_int) begin
+            sample_req <= 1'b1;
+            sample_req_pulse <= 1'b1;
+            pending_sample <= 1'b1;
+        end
+
+        if (adc_valid) begin
+            avg_sum_next = {1'b0, adc_code} + {1'b0, sample_hist0};
+            sample_hist1 <= sample_hist0;
+            sample_hist0 <= adc_code;
+            avg_sum <= avg_sum_next;
+            avg_value <= avg_sum_next[12:1];
+            latest_temp <= avg_sum_next[12:1];
+            temp_code <= avg_sum_next[12:1];
+            sample_count <= sample_count + 16'h0001;
+            sample_done_pulse <= 1'b1;
+            status_sample_done <= 1'b1;
+            irq_status_sample_done <= 1'b1;
+            status_adc_valid_seen <= 1'b1;
+            pending_sample <= 1'b0;
+            periodic_cnt <= 4'hF;
+            compare_alert <= (avg_sum_next[12:1] > threshold_code_reg);
+            if (avg_sum_next[12:1] > threshold_code_reg) begin
+                alert_status <= 1'b1;
+                status_alert_pending <= 1'b1;
+                irq_status_alert <= 1'b1;
+            end
+        end
+
+        if (control_enable && !pending_sample && !adc_valid && !control_sample_start_pulse) begin
+            status_busy <= 1'b0;
+        end else if (pending_sample) begin
+            status_busy <= 1'b1;
+        end else if (control_sample_start_pulse) begin
+            status_busy <= 1'b1;
+        end else if (adc_valid) begin
+            status_busy <= 1'b0;
+        end
+
+        alert_irq <= control_irq_enable & (irq_status_alert | irq_status_sample_done);
+    end
+end
+
+endmodule
+---END temp_monitor_digital_sample_ctrl.v---

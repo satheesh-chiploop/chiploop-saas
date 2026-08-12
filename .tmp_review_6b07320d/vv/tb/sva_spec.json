@@ -1,0 +1,110 @@
+{
+  "top_module": "temp_monitor_soc_sim",
+  "clock_names": [
+    "clk"
+  ],
+  "reset_signals": [
+    {
+      "name": "reset_n",
+      "active_low": true,
+      "async": false
+    }
+  ],
+  "ports": [
+    {
+      "name": "alert_irq",
+      "direction": "output",
+      "width": "1"
+    },
+    {
+      "name": "alert_status",
+      "direction": "output",
+      "width": "1"
+    },
+    {
+      "name": "avdd",
+      "direction": "input",
+      "width": "1"
+    },
+    {
+      "name": "avss",
+      "direction": "input",
+      "width": "1"
+    },
+    {
+      "name": "clk",
+      "direction": "input",
+      "width": "1"
+    },
+    {
+      "name": "rd_addr",
+      "direction": "input",
+      "width": "1"
+    },
+    {
+      "name": "rd_data",
+      "direction": "output",
+      "width": "1"
+    },
+    {
+      "name": "rd_en",
+      "direction": "input",
+      "width": "1"
+    },
+    {
+      "name": "reset_n",
+      "direction": "input",
+      "width": "1"
+    },
+    {
+      "name": "sensor_temp_celsius",
+      "direction": "input",
+      "width": "1"
+    },
+    {
+      "name": "temp_code",
+      "direction": "output",
+      "width": "1"
+    },
+    {
+      "name": "threshold_code",
+      "direction": "output",
+      "width": "1"
+    },
+    {
+      "name": "wr_addr",
+      "direction": "input",
+      "width": "1"
+    },
+    {
+      "name": "wr_data",
+      "direction": "input",
+      "width": "1"
+    },
+    {
+      "name": "wr_en",
+      "direction": "input",
+      "width": "1"
+    }
+  ],
+  "integration_summary": {
+    "instance_names": [
+      "u_digital",
+      "u_analog"
+    ],
+    "connection_count": 18
+  },
+  "control_model": {
+    "has_regmap": true,
+    "reg_count": 7,
+    "register_names": [
+      "CONTROL",
+      "STATUS",
+      "THRESHOLD",
+      "LATEST_TEMP",
+      "SAMPLE_COUNT",
+      "IRQ_STATUS",
+      "IRQ_CLEAR"
+    ]
+  }
+}

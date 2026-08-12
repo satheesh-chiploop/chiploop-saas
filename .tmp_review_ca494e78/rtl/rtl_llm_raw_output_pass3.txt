@@ -1,0 +1,593 @@
+---BEGIN smart_sensor_hub_mcu.v---
+module smart_sensor_hub_mcu (
+    clk,
+    reset_n,
+    wr_en,
+    wr_addr,
+    wr_data,
+    rd_en,
+    rd_addr,
+    sensor_temp_raw,
+    sensor_humidity_raw,
+    sensor_air_raw,
+    sensor_valid,
+    rd_data,
+    sensor_sample_req,
+    alert_irq,
+    fifo_level,
+    low_power_active,
+    sample_count,
+    alert_status
+);
+    input clk;
+    input reset_n;
+    input wr_en;
+    input [11:0] wr_addr;
+    input [31:0] wr_data;
+    input rd_en;
+    input [11:0] rd_addr;
+    input [15:0] sensor_temp_raw;
+    input [15:0] sensor_humidity_raw;
+    input [15:0] sensor_air_raw;
+    input sensor_valid;
+    output [31:0] rd_data;
+    output sensor_sample_req;
+    output alert_irq;
+    output [5:0] fifo_level;
+    output low_power_active;
+    output [31:0] sample_count;
+    output [7:0] alert_status;
+
+    wire control_enable_o;
+    wire control_sample_start_o;
+    wire control_low_power_en_o;
+    wire control_irq_enable_o;
+    wire control_fifo_clear_o;
+    wire [31:0] sample_period_o;
+    wire [2:0] sensor_select_o;
+    wire [15:0] temp_threshold_o;
+    wire [15:0] humidity_threshold_o;
+    wire [15:0] air_threshold_o;
+    wire [7:0] alert_clear_o;
+    wire [31:0] rd_data_o;
+
+    wire [5:0] fifo_level_i;
+    wire low_power_active_i;
+    wire [31:0] sample_count_i;
+    wire [7:0] alert_status_i;
+    wire sample_done_i;
+    wire fifo_empty_i;
+    wire fifo_full_i;
+    wire busy_i;
+    wire [15:0] latest_temp_i;
+    wire [15:0] latest_humidity_i;
+    wire [15:0] latest_air_i;
+    wire [31:0] fifo_rdata_i;
+
+    wire sensor_sample_req_o;
+    wire busy_o;
+    wire sample_done_o;
+    wire low_power_active_o;
+    wire [31:0] sample_count_o;
+    wire fifo_push_o;
+    wire [31:0] fifo_push_data_o;
+
+    wire [31:0] fifo_rdata_o;
+    wire [5:0] fifo_level_o;
+    wire fifo_empty_o;
+    wire fifo_full_o;
+    wire [7:0] alert_status_o;
+    wire alert_pending_o;
+    wire alert_irq_o;
+    wire fifo_overflow_o;
+
+    assign rd_data = rd_data_o;
+    assign sensor_sample_req = sensor_sample_req_o;
+    assign alert_irq = alert_irq_o;
+    assign fifo_level = fifo_level_o;
+    assign low_power_active = low_power_active_o;
+    assign sample_count = sample_count_o;
+    assign alert_status = alert_status_o;
+
+    sensor_hub_regfile u_sensor_hub_regfile (
+        .clk(clk),
+        .reset_n(reset_n),
+        .wr_en(wr_en),
+        .wr_addr(wr_addr),
+        .wr_data(wr_data),
+        .rd_en(rd_en),
+        .rd_addr(rd_addr),
+        .fifo_level_i(fifo_level_i),
+        .low_power_active_i(low_power_active_i),
+        .sample_count_i(sample_count_i),
+        .alert_status_i(alert_status_i),
+        .sample_done_i(sample_done_i),
+        .fifo_empty_i(fifo_empty_i),
+        .fifo_full_i(fifo_full_i),
+        .busy_i(busy_i),
+        .latest_temp_i(latest_temp_i),
+        .latest_humidity_i(latest_humidity_i),
+        .latest_air_i(latest_air_i),
+        .fifo_rdata_i(fifo_rdata_i),
+        .control_enable_o(control_enable_o),
+        .control_sample_start_o(control_sample_start_o),
+        .control_low_power_en_o(control_low_power_en_o),
+        .control_irq_enable_o(control_irq_enable_o),
+        .control_fifo_clear_o(control_fifo_clear_o),
+        .sample_period_o(sample_period_o),
+        .sensor_select_o(sensor_select_o),
+        .temp_threshold_o(temp_threshold_o),
+        .humidity_threshold_o(humidity_threshold_o),
+        .air_threshold_o(air_threshold_o),
+        .alert_clear_o(alert_clear_o),
+        .rd_data_o(rd_data_o)
+    );
+
+    sensor_hub_sample_ctrl u_sensor_hub_sample_ctrl (
+        .clk(clk),
+        .reset_n(reset_n),
+        .control_enable_i(control_enable_o),
+        .control_sample_start_i(control_sample_start_o),
+        .control_low_power_en_i(control_low_power_en_o),
+        .sample_period_i(sample_period_o),
+        .sensor_select_i(sensor_select_o),
+        .sensor_valid_i(sensor_valid),
+        .fifo_full_i(fifo_full_o),
+        .sensor_sample_req_o(sensor_sample_req_o),
+        .busy_o(busy_o),
+        .sample_done_o(sample_done_o),
+        .low_power_active_o(low_power_active_o),
+        .sample_count_o(sample_count_o),
+        .fifo_push_o(fifo_push_o),
+        .fifo_push_data_o(fifo_push_data_o)
+    );
+
+    sensor_hub_fifo_alert u_sensor_hub_fifo_alert (
+        .clk(clk),
+        .reset_n(reset_n),
+        .fifo_push_i(fifo_push_o),
+        .fifo_push_data_i(fifo_push_data_o),
+        .fifo_pop_i(rd_en && (rd_addr == 12'h028)),
+        .fifo_clear_i(control_fifo_clear_o),
+        .latest_temp_i(latest_temp_i),
+        .latest_humidity_i(latest_humidity_i),
+        .latest_air_i(latest_air_i),
+        .temp_threshold_i(temp_threshold_o),
+        .humidity_threshold_i(humidity_threshold_o),
+        .air_threshold_i(air_threshold_o),
+        .alert_clear_i(alert_clear_o),
+        .irq_enable_i(control_irq_enable_o),
+        .fifo_rdata_o(fifo_rdata_i),
+        .fifo_level_o(fifo_level_i),
+        .fifo_empty_o(fifo_empty_i),
+        .fifo_full_o(fifo_full_i),
+        .alert_status_o(alert_status_i),
+        .alert_pending_o(alert_pending_o),
+        .alert_irq_o(alert_irq_o),
+        .fifo_overflow_o(fifo_overflow_o)
+    );
+endmodule
+---END smart_sensor_hub_mcu.v---
+---BEGIN sensor_hub_regfile.v---
+module sensor_hub_regfile (
+    clk,
+    reset_n,
+    wr_en,
+    wr_addr,
+    wr_data,
+    rd_en,
+    rd_addr,
+    fifo_level_i,
+    low_power_active_i,
+    sample_count_i,
+    alert_status_i,
+    sample_done_i,
+    fifo_empty_i,
+    fifo_full_i,
+    busy_i,
+    latest_temp_i,
+    latest_humidity_i,
+    latest_air_i,
+    fifo_rdata_i,
+    control_enable_o,
+    control_sample_start_o,
+    control_low_power_en_o,
+    control_irq_enable_o,
+    control_fifo_clear_o,
+    sample_period_o,
+    sensor_select_o,
+    temp_threshold_o,
+    humidity_threshold_o,
+    air_threshold_o,
+    alert_clear_o,
+    rd_data_o
+);
+    input clk;
+    input reset_n;
+    input wr_en;
+    input [11:0] wr_addr;
+    input [31:0] wr_data;
+    input rd_en;
+    input [11:0] rd_addr;
+    input [5:0] fifo_level_i;
+    input low_power_active_i;
+    input [31:0] sample_count_i;
+    input [7:0] alert_status_i;
+    input sample_done_i;
+    input fifo_empty_i;
+    input fifo_full_i;
+    input busy_i;
+    input [15:0] latest_temp_i;
+    input [15:0] latest_humidity_i;
+    input [15:0] latest_air_i;
+    input [31:0] fifo_rdata_i;
+    output control_enable_o;
+    output control_sample_start_o;
+    output control_low_power_en_o;
+    output control_irq_enable_o;
+    output control_fifo_clear_o;
+    output [31:0] sample_period_o;
+    output [2:0] sensor_select_o;
+    output [15:0] temp_threshold_o;
+    output [15:0] humidity_threshold_o;
+    output [15:0] air_threshold_o;
+    output [7:0] alert_clear_o;
+    output [31:0] rd_data_o;
+
+    reg control_enable_r;
+    reg control_sample_start_r;
+    reg control_low_power_en_r;
+    reg control_irq_enable_r;
+    reg control_fifo_clear_r;
+    reg [31:0] sample_period_r;
+    reg [2:0] sensor_select_r;
+    reg [15:0] temp_threshold_r;
+    reg [15:0] humidity_threshold_r;
+    reg [15:0] air_threshold_r;
+    reg [7:0] alert_clear_r;
+    reg [31:0] rd_data_r;
+
+    assign control_enable_o = control_enable_r;
+    assign control_sample_start_o = control_sample_start_r;
+    assign control_low_power_en_o = control_low_power_en_r;
+    assign control_irq_enable_o = control_irq_enable_r;
+    assign control_fifo_clear_o = control_fifo_clear_r;
+    assign sample_period_o = sample_period_r;
+    assign sensor_select_o = sensor_select_r;
+    assign temp_threshold_o = temp_threshold_r;
+    assign humidity_threshold_o = humidity_threshold_r;
+    assign air_threshold_o = air_threshold_r;
+    assign alert_clear_o = alert_clear_r;
+    assign rd_data_o = rd_data_r;
+
+    always @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            control_enable_r <= 1'b0;
+            control_sample_start_r <= 1'b0;
+            control_low_power_en_r <= 1'b0;
+            control_irq_enable_r <= 1'b0;
+            control_fifo_clear_r <= 1'b0;
+            sample_period_r <= 32'h00000000;
+            sensor_select_r <= 3'b000;
+            temp_threshold_r <= 16'h0000;
+            humidity_threshold_r <= 16'h0000;
+            air_threshold_r <= 16'h0000;
+            alert_clear_r <= 8'h00;
+            rd_data_r <= 32'h00000000;
+        end else begin
+            control_sample_start_r <= 1'b0;
+            control_fifo_clear_r <= 1'b0;
+            alert_clear_r <= 8'h00;
+            if (wr_en) begin
+                case (wr_addr)
+                    12'h000: begin
+                        control_enable_r <= wr_data[0];
+                        control_sample_start_r <= wr_data[1];
+                        control_low_power_en_r <= wr_data[2];
+                        control_irq_enable_r <= wr_data[3];
+                        control_fifo_clear_r <= wr_data[4];
+                    end
+                    12'h008: sample_period_r <= wr_data;
+                    12'h00C: sensor_select_r <= wr_data[2:0];
+                    12'h010: temp_threshold_r <= wr_data[15:0];
+                    12'h014: humidity_threshold_r <= wr_data[15:0];
+                    12'h018: air_threshold_r <= wr_data[15:0];
+                    12'h034: alert_clear_r <= wr_data[7:0];
+                    default: begin
+                    end
+                endcase
+            end
+            if (rd_en) begin
+                case (rd_addr)
+                    12'h000: rd_data_r <= {27'b000000000000000000000000000, control_fifo_clear_r, control_irq_enable_r, control_low_power_en_r, control_sample_start_r, control_enable_r};
+                    12'h004: rd_data_r <= {26'b00000000000000000000000000, low_power_active_i, alert_status_i[4], fifo_full_i, fifo_empty_i, sample_done_i, busy_i};
+                    12'h008: rd_data_r <= sample_period_r;
+                    12'h00C: rd_data_r <= {29'b00000000000000000000000000000, sensor_select_r};
+                    12'h010: rd_data_r <= {16'h0000, temp_threshold_r};
+                    12'h014: rd_data_r <= {16'h0000, humidity_threshold_r};
+                    12'h018: rd_data_r <= {16'h0000, air_threshold_r};
+                    12'h01C: rd_data_r <= {16'h0000, latest_temp_i};
+                    12'h020: rd_data_r <= {16'h0000, latest_humidity_i};
+                    12'h024: rd_data_r <= {16'h0000, latest_air_i};
+                    12'h028: rd_data_r <= fifo_rdata_i;
+                    12'h02C: rd_data_r <= {26'b00000000000000000000000000, fifo_level_i};
+                    12'h030: rd_data_r <= {24'h000000, alert_status_i};
+                    12'h034: rd_data_r <= 32'h00000000;
+                    12'h038: rd_data_r <= sample_count_i;
+                    default: rd_data_r <= 32'h00000000;
+                endcase
+            end else begin
+                rd_data_r <= 32'h00000000;
+            end
+        end
+    end
+endmodule
+---END sensor_hub_regfile.v---
+---BEGIN sensor_hub_sample_ctrl.v---
+module sensor_hub_sample_ctrl (
+    clk,
+    reset_n,
+    control_enable_i,
+    control_sample_start_i,
+    control_low_power_en_i,
+    sample_period_i,
+    sensor_select_i,
+    sensor_valid_i,
+    fifo_full_i,
+    sensor_sample_req_o,
+    busy_o,
+    sample_done_o,
+    low_power_active_o,
+    sample_count_o,
+    fifo_push_o,
+    fifo_push_data_o
+);
+    input clk;
+    input reset_n;
+    input control_enable_i;
+    input control_sample_start_i;
+    input control_low_power_en_i;
+    input [31:0] sample_period_i;
+    input [2:0] sensor_select_i;
+    input sensor_valid_i;
+    input fifo_full_i;
+    output sensor_sample_req_o;
+    output busy_o;
+    output sample_done_o;
+    output low_power_active_o;
+    output [31:0] sample_count_o;
+    output fifo_push_o;
+    output [31:0] fifo_push_data_o;
+
+    reg sensor_sample_req_r;
+    reg busy_r;
+    reg sample_done_r;
+    reg low_power_active_r;
+    reg [31:0] sample_count_r;
+    reg fifo_push_r;
+    reg [31:0] fifo_push_data_r;
+    reg [31:0] period_cnt_r;
+
+    assign sensor_sample_req_o = sensor_sample_req_r;
+    assign busy_o = busy_r;
+    assign sample_done_o = sample_done_r;
+    assign low_power_active_o = low_power_active_r;
+    assign sample_count_o = sample_count_r;
+    assign fifo_push_o = fifo_push_r;
+    assign fifo_push_data_o = fifo_push_data_r;
+
+    always @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            sensor_sample_req_r <= 1'b0;
+            busy_r <= 1'b0;
+            sample_done_r <= 1'b0;
+            low_power_active_r <= 1'b0;
+            sample_count_r <= 32'h00000000;
+            fifo_push_r <= 1'b0;
+            fifo_push_data_r <= 32'h00000000;
+            period_cnt_r <= 32'h00000000;
+        end else begin
+            sensor_sample_req_r <= 1'b0;
+            sample_done_r <= 1'b0;
+            fifo_push_r <= 1'b0;
+            if (!control_enable_i) begin
+                busy_r <= 1'b0;
+                period_cnt_r <= 32'h00000000;
+            end else begin
+                busy_r <= sensor_valid_i | sensor_sample_req_r;
+                if (control_sample_start_i) begin
+                    sensor_sample_req_r <= 1'b1;
+                    busy_r <= 1'b1;
+                    period_cnt_r <= 32'h00000000;
+                end else if (sample_period_i != 32'h00000000) begin
+                    if (period_cnt_r >= sample_period_i) begin
+                        sensor_sample_req_r <= 1'b1;
+                        busy_r <= 1'b1;
+                        period_cnt_r <= 32'h00000000;
+                    end else begin
+                        period_cnt_r <= period_cnt_r + 32'h00000001;
+                    end
+                end
+            end
+            low_power_active_r <= control_low_power_en_i && ((sample_period_i == 32'h00000000) || (sensor_select_i == 3'b000));
+            if (sensor_valid_i) begin
+                sample_done_r <= 1'b1;
+                sample_count_r <= sample_count_r + 32'h00000001;
+                fifo_push_r <= !fifo_full_i;
+                fifo_push_data_r <= {5'b00000, sensor_select_i, sample_count_r[24:0]};
+            end
+        end
+    end
+endmodule
+---END sensor_hub_sample_ctrl.v---
+---BEGIN sensor_hub_fifo_alert.v---
+module sensor_hub_fifo_alert (
+    clk,
+    reset_n,
+    fifo_push_i,
+    fifo_push_data_i,
+    fifo_pop_i,
+    fifo_clear_i,
+    latest_temp_i,
+    latest_humidity_i,
+    latest_air_i,
+    temp_threshold_i,
+    humidity_threshold_i,
+    air_threshold_i,
+    alert_clear_i,
+    irq_enable_i,
+    fifo_rdata_o,
+    fifo_level_o,
+    fifo_empty_o,
+    fifo_full_o,
+    alert_status_o,
+    alert_pending_o,
+    alert_irq_o,
+    fifo_overflow_o
+);
+    input clk;
+    input reset_n;
+    input fifo_push_i;
+    input [31:0] fifo_push_data_i;
+    input fifo_pop_i;
+    input fifo_clear_i;
+    input [15:0] latest_temp_i;
+    input [15:0] latest_humidity_i;
+    input [15:0] latest_air_i;
+    input [15:0] temp_threshold_i;
+    input [15:0] humidity_threshold_i;
+    input [15:0] air_threshold_i;
+    input [7:0] alert_clear_i;
+    input irq_enable_i;
+    output [31:0] fifo_rdata_o;
+    output [5:0] fifo_level_o;
+    output fifo_empty_o;
+    output fifo_full_o;
+    output [7:0] alert_status_o;
+    output alert_pending_o;
+    output alert_irq_o;
+    output fifo_overflow_o;
+
+    reg [31:0] fifo_mem0;
+    reg [31:0] fifo_mem1;
+    reg [31:0] fifo_mem2;
+    reg [31:0] fifo_mem3;
+    reg [31:0] fifo_mem4;
+    reg [31:0] fifo_mem5;
+    reg [31:0] fifo_mem6;
+    reg [31:0] fifo_mem7;
+    reg [31:0] fifo_mem8;
+    reg [31:0] fifo_mem9;
+    reg [31:0] fifo_mem10;
+    reg [31:0] fifo_mem11;
+    reg [31:0] fifo_mem12;
+    reg [31:0] fifo_mem13;
+    reg [31:0] fifo_mem14;
+    reg [31:0] fifo_mem15;
+    reg [3:0] rd_ptr_r;
+    reg [3:0] wr_ptr_r;
+    reg [4:0] level_r;
+    reg [7:0] alert_status_r;
+    reg overflow_r;
+
+    assign fifo_rdata_o = (level_r == 5'd0) ? 32'h00000000 :
+                          (rd_ptr_r == 4'd0) ? fifo_mem0 :
+                          (rd_ptr_r == 4'd1) ? fifo_mem1 :
+                          (rd_ptr_r == 4'd2) ? fifo_mem2 :
+                          (rd_ptr_r == 4'd3) ? fifo_mem3 :
+                          (rd_ptr_r == 4'd4) ? fifo_mem4 :
+                          (rd_ptr_r == 4'd5) ? fifo_mem5 :
+                          (rd_ptr_r == 4'd6) ? fifo_mem6 :
+                          (rd_ptr_r == 4'd7) ? fifo_mem7 :
+                          (rd_ptr_r == 4'd8) ? fifo_mem8 :
+                          (rd_ptr_r == 4'd9) ? fifo_mem9 :
+                          (rd_ptr_r == 4'd10) ? fifo_mem10 :
+                          (rd_ptr_r == 4'd11) ? fifo_mem11 :
+                          (rd_ptr_r == 4'd12) ? fifo_mem12 :
+                          (rd_ptr_r == 4'd13) ? fifo_mem13 :
+                          (rd_ptr_r == 4'd14) ? fifo_mem14 :
+                          fifo_mem15;
+    assign fifo_level_o = {1'b0, level_r};
+    assign fifo_empty_o = (level_r == 5'd0);
+    assign fifo_full_o = (level_r == 5'd16);
+    assign alert_status_o = alert_status_r;
+    assign alert_pending_o = |alert_status_r;
+    assign alert_irq_o = irq_enable_i & (|alert_status_r);
+    assign fifo_overflow_o = overflow_r;
+
+    always @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            fifo_mem0 <= 32'h00000000;
+            fifo_mem1 <= 32'h00000000;
+            fifo_mem2 <= 32'h00000000;
+            fifo_mem3 <= 32'h00000000;
+            fifo_mem4 <= 32'h00000000;
+            fifo_mem5 <= 32'h00000000;
+            fifo_mem6 <= 32'h00000000;
+            fifo_mem7 <= 32'h00000000;
+            fifo_mem8 <= 32'h00000000;
+            fifo_mem9 <= 32'h00000000;
+            fifo_mem10 <= 32'h00000000;
+            fifo_mem11 <= 32'h00000000;
+            fifo_mem12 <= 32'h00000000;
+            fifo_mem13 <= 32'h00000000;
+            fifo_mem14 <= 32'h00000000;
+            fifo_mem15 <= 32'h00000000;
+            rd_ptr_r <= 4'h0;
+            wr_ptr_r <= 4'h0;
+            level_r <= 5'h00;
+            alert_status_r <= 8'h00;
+            overflow_r <= 1'b0;
+        end else begin
+            if (fifo_clear_i) begin
+                rd_ptr_r <= 4'h0;
+                wr_ptr_r <= 4'h0;
+                level_r <= 5'h00;
+            end else begin
+                if (fifo_pop_i && (level_r != 5'd0)) begin
+                    if (rd_ptr_r == 4'd15) rd_ptr_r <= 4'h0; else rd_ptr_r <= rd_ptr_r + 4'h1;
+                    level_r <= level_r - 5'h01;
+                end
+                if (fifo_push_i) begin
+                    if (level_r != 5'd16) begin
+                        case (wr_ptr_r)
+                            4'd0: fifo_mem0 <= fifo_push_data_i;
+                            4'd1: fifo_mem1 <= fifo_push_data_i;
+                            4'd2: fifo_mem2 <= fifo_push_data_i;
+                            4'd3: fifo_mem3 <= fifo_push_data_i;
+                            4'd4: fifo_mem4 <= fifo_push_data_i;
+                            4'd5: fifo_mem5 <= fifo_push_data_i;
+                            4'd6: fifo_mem6 <= fifo_push_data_i;
+                            4'd7: fifo_mem7 <= fifo_push_data_i;
+                            4'd8: fifo_mem8 <= fifo_push_data_i;
+                            4'd9: fifo_mem9 <= fifo_push_data_i;
+                            4'd10: fifo_mem10 <= fifo_push_data_i;
+                            4'd11: fifo_mem11 <= fifo_push_data_i;
+                            4'd12: fifo_mem12 <= fifo_push_data_i;
+                            4'd13: fifo_mem13 <= fifo_push_data_i;
+                            4'd14: fifo_mem14 <= fifo_push_data_i;
+                            default: fifo_mem15 <= fifo_push_data_i;
+                        endcase
+                        if (wr_ptr_r == 4'd15) wr_ptr_r <= 4'h0; else wr_ptr_r <= wr_ptr_r + 4'h1;
+                        level_r <= level_r + 5'h01;
+                    end else begin
+                        overflow_r <= 1'b1;
+                        alert_status_r[3] <= 1'b1;
+                    end
+                end
+            end
+            if (latest_temp_i > temp_threshold_i) alert_status_r[0] <= 1'b1;
+            if (latest_humidity_i > humidity_threshold_i) alert_status_r[1] <= 1'b1;
+            if (latest_air_i > air_threshold_i) alert_status_r[2] <= 1'b1;
+            if (alert_clear_i[0]) alert_status_r[0] <= 1'b0;
+            if (alert_clear_i[1]) alert_status_r[1] <= 1'b0;
+            if (alert_clear_i[2]) alert_status_r[2] <= 1'b0;
+            if (alert_clear_i[3]) begin
+                alert_status_r[3] <= 1'b0;
+                overflow_r <= 1'b0;
+            end
+            if (alert_clear_i[4]) alert_status_r[4] <= 1'b0;
+        end
+    end
+endmodule
+---END sensor_hub_fifo_alert.v---

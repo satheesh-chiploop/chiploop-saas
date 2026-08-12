@@ -1,0 +1,130 @@
+{
+  "block_name": "temp_sensor_adc_model",
+  "module_name": "temp_sensor_adc_model",
+  "description": "Behavioral temperature sensor plus 12-bit ADC front-end model for system integration.",
+  "operating_constraints": {
+    "clock_domains": [],
+    "reset_signals": [],
+    "fixed_assumptions": [
+      "Model is idealized and intended for system integration.",
+      "Temperature input is provided as a 16-bit behavioral control stimulus in Celsius units.",
+      "ADC output is 12-bit unsigned and clamped to the range 0 to 4095.",
+      "A simple linear transfer function maps temperature to ADC code.",
+      "A request on sample_req initiates a conversion response after a small behavioral latency.",
+      "Parameters shall exist for gain error, offset error, and nominal sample latency.",
+      "Analog supply pins avdd and avss are included as interface context signals."
+    ]
+  },
+  "ports": [
+    {
+      "name": "sample_req",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "sensor_temp_celsius",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "avdd",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "avss",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "adc_code",
+      "direction": "output",
+      "width": 12
+    },
+    {
+      "name": "adc_valid",
+      "direction": "output",
+      "width": 1
+    }
+  ],
+  "functionality": "Accepts a temperature stimulus and a sample request, then produces a clamped 12-bit ADC code derived from a linear temperature transfer function. The block asserts adc_valid when the sampled result is available and holds the converted code until a subsequent conversion updates it. The model is deterministic and intended to approximate sensor plus ADC front-end behavior for SoC integration and correlation planning.",
+  "responsibilities": [
+    "Monitor sample_req for conversion initiation.",
+    "Convert sensor_temp_celsius into a 12-bit digital code using a linear mapping.",
+    "Apply gain error and offset error parameters to the ideal transfer function.",
+    "Clamp the computed code to the legal 12-bit range.",
+    "Assert adc_valid when the conversion result becomes available.",
+    "Hold adc_code constant between conversion updates.",
+    "Provide a simple latency abstraction using a nominal sample latency parameter.",
+    "Expose interface context through avdd and avss pins."
+  ],
+  "must_drive": [
+    "adc_code",
+    "adc_valid"
+  ],
+  "must_receive": [
+    "sample_req",
+    "sensor_temp_celsius",
+    "avdd",
+    "avss"
+  ],
+  "must_not_drive": [
+    "sample_req",
+    "sensor_temp_celsius",
+    "avdd",
+    "avss"
+  ],
+  "reset_behavior": "No dedicated reset signal is specified. On model initialization, adc_valid shall be deasserted and adc_code shall initialize to 0. If sample_req is not asserted, the outputs remain at their last driven state, with adc_valid deasserted until a conversion completes.",
+  "behavior_rules": [
+    "Use a deterministic linear transfer function from temperature to code.",
+    "Include parameter hooks for gain error, offset error, and nominal sample latency.",
+    "Saturate the final code to 12-bit unsigned range.",
+    "Assert adc_valid only when converted output data is available.",
+    "Retain the last converted adc_code until overwritten by a new conversion.",
+    "Do not modify outputs in response to avdd and avss in this simplified behavioral model.",
+    "Treat sample_req as the sole conversion request control."
+  ],
+  "behavioral_contract": {
+    "deterministic_behavior": true,
+    "state_elements": [
+      "latched_adc_code",
+      "latched_adc_valid",
+      "conversion_timer"
+    ],
+    "input_to_output_relations": [
+      "sample_req initiates a delayed update of adc_code and adc_valid.",
+      "sensor_temp_celsius maps linearly to adc_code with gain and offset error adjustments.",
+      "avdd and avss are observed as interface context signals."
+    ],
+    "event_triggers": [
+      "assertion of sample_req",
+      "completion of nominal sample latency"
+    ],
+    "output_update_rules": [
+      "Update adc_code only when the conversion response is due.",
+      "Assert adc_valid when the updated adc_code is presented.",
+      "Hold adc_code constant between conversions.",
+      "Deassert adc_valid when no conversion result is being presented."
+    ],
+    "error_conditions": [
+      "Computed code below 0 shall be saturated to 0.",
+      "Computed code above 4095 shall be saturated to 4095."
+    ],
+    "latency_rules": [
+      "Conversion output shall be delayed by the nominal sample latency parameter after sample_req assertion."
+    ],
+    "timing_rules": [
+      "Behavior is synchronous to the internal behavioral timing abstraction defined by the model.",
+      "No combinational change of adc_code is permitted directly on sample_req assertion.",
+      "adc_valid shall not assert before the modeled latency elapses."
+    ]
+  },
+  "deliverables": [
+    "behavioral_model",
+    "abstract_view_notes",
+    "params_json",
+    "testbench_intent",
+    "coverage_intent",
+    "analog_spec_json"
+  ]
+}

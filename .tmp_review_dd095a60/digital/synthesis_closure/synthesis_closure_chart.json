@@ -1,6 +1,0 @@
-{
-  "type": "digital_synthesis_closure_chart",
-  "series": [],
-  "status": "skipped",
-  "reason": "synthesis_closure_loop_not_enabled"
-}

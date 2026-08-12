@@ -1,0 +1,40 @@
+{
+  "workflow_id": "ca494e78-42e0-4839-881b-4679e10e23f1",
+  "workflow_dir": "backend/workflows/ca494e78-42e0-4839-881b-4679e10e23f1",
+  "spec_dir": "backend/workflows/ca494e78-42e0-4839-881b-4679e10e23f1/spec",
+  "state_keys": [
+    "_agent_runtime_active",
+    "_participating_agents",
+    "app_name",
+    "artifact_dir",
+    "artifact_prefix",
+    "current_agent",
+    "design_language",
+    "hem_enabled",
+    "hem_mode",
+    "hem_stage_toggles",
+    "loop_type",
+    "project_name",
+    "run_id",
+    "spec",
+    "spec_text",
+    "supabase_client",
+    "template_workflow",
+    "template_workflow_name",
+    "toggles",
+    "top_module",
+    "user_id",
+    "workflow_chain",
+    "workflow_id",
+    "workflow_name"
+  ],
+  "input_candidates": {
+    "spec": "Design a smart sensor hub microcontroller subsystem with a memory-mapped register interface.\n\nThis IoT edge-node demo should model a small microcontroller-style subsystem around sensor telemetry, local threshold policy, FIFO buffering, interrupt generation, and low-power sampling control. The CPU core may be represented as a firmware-facing control sequencer and register fabric for this reference journey; focus the generated RTL on the sensor hub peripherals and software-visible behavior.\n\nTop module:\n- smart_sensor_hub_mcu\n\nInputs:\n- clk\n- reset_n\n- wr_en\n- wr_addr[11:0]\n- wr_data[31:0]\n- rd_en\n- rd_addr[11:0]\n- sensor_temp_raw[15:0]\n- sensor_humidity_raw[15:0]\n- sensor_air_raw[15:0]\n- sensor_valid\n\nOutputs:\n- rd_data[31:0]\n- sensor_sample_req\n- alert_irq\n- fifo_level[5:0]\n- low_power_active\n- sample_count[31:0]\n- alert_status[7:0]\n\nRegister map:\n- 0x000 CONTROL: bit 0 ENABLE, bit 1 SAMPLE_START, bit 2 LOW_POWER_EN, bit 3 IRQ_ENABLE, bit 4 FIFO_CLEAR\n- 0x004 STATUS: busy, sample_done, fifo_empty, fifo_full, alert_pending, low_power_active\n- 0x008 SAMPLE_PERIOD: sample period in controller clock ticks[31:0]\n- 0x00C SENSOR_SELECT: enable bits for temperature, humidity, and air-quality channels\n- 0x010 TEMP_THRESHOLD: high temperature alert threshold[15:0]\n- 0x014 HUMIDITY_THRESHOLD: high humidity alert threshold[15:0]\n- 0x018 AIR_THRESHOLD: high air-quality alert threshold[15:0]\n- 0x01C LATEST_TEMP: latest sampled temperature[15:0]\n- 0x020 LATEST_HUMIDITY: latest sampled humidity[15:0]\n- 0x024 LATEST_AIR: latest sampled air-quality value[15:0]\n- 0x028 FIFO_DATA: packed sensor sample data, read pops FIFO\n- 0x02C FIFO_LEVEL: current FIFO occupancy[5:0]\n- 0x030 ALERT_STATUS: temp_alert, humidity_alert, air_alert, fifo_overflow, sample_timeout\n- 0x034 ALERT_CLEAR: write one to clear alert bits\n- 0x038 SAMPLE_COUNT: completed sample count[31:0]\n\nFunctional requirements:\n- Reset clears registers, FIFO, sample counters, alert state, IRQ, and low-power state.\n- SAMPLE_PERIOD controls periodic sensor_sample_req generation while CONTROL.ENABLE is set.\n- SENSOR_SELECT enables sampling of temperature, humidity, and air-quality channels.\n- On sensor_valid, capture enabled sensor channels into latest-value registers and push a packed sample record into a 16-entry FIFO.\n- Compare captured readings against threshold registers and latch ALERT_STATUS bits when limits are crossed.\n- alert_irq asserts when CONTROL.IRQ_ENABLE is set and any ALERT_STATUS bit is set.\n- Firmware can read FIFO_DATA to pop buffered sample records and read FIFO_LEVEL for telemetry.\n- FIFO overflow latches an alert bit without corrupting existing unread samples.\n- LOW_POWER_EN gates periodic sample requests when no channels are enabled or when sample period is zero, and low_power_active reflects this state.\n- SAMPLE_COUNT increments once per completed sample event.\n\nGenerate synthesizable SystemVerilog, a register map, assertions, a simulation testbench, UPF-lite collateral, and a packaging manifest.",
+    "spec_text": "Design a smart sensor hub microcontroller subsystem with a memory-mapped register interface.\n\nThis IoT edge-node demo should model a small microcontroller-style subsystem around sensor telemetry, local threshold policy, FIFO buffering, interrupt generation, and low-power sampling control. The CPU core may be represented as a firmware-facing control sequencer and register fabric for this reference journey; focus the generated RTL on the sensor hub peripherals and software-visible behavior.\n\nTop module:\n- smart_sensor_hub_mcu\n\nInputs:\n- clk\n- reset_n\n- wr_en\n- wr_addr[11:0]\n- wr_data[31:0]\n- rd_en\n- rd_addr[11:0]\n- sensor_temp_raw[15:0]\n- sensor_humidity_raw[15:0]\n- sensor_air_raw[15:0]\n- sensor_valid\n\nOutputs:\n- rd_data[31:0]\n- sensor_sample_req\n- alert_irq\n- fifo_level[5:0]\n- low_power_active\n- sample_count[31:0]\n- alert_status[7:0]\n\nRegister map:\n- 0x000 CONTROL: bit 0 ENABLE, bit 1 SAMPLE_START, bit 2 LOW_POWER_EN, bit 3 IRQ_ENABLE, bit 4 FIFO_CLEAR\n- 0x004 STATUS: busy, sample_done, fifo_empty, fifo_full, alert_pending, low_power_active\n- 0x008 SAMPLE_PERIOD: sample period in controller clock ticks[31:0]\n- 0x00C SENSOR_SELECT: enable bits for temperature, humidity, and air-quality channels\n- 0x010 TEMP_THRESHOLD: high temperature alert threshold[15:0]\n- 0x014 HUMIDITY_THRESHOLD: high humidity alert threshold[15:0]\n- 0x018 AIR_THRESHOLD: high air-quality alert threshold[15:0]\n- 0x01C LATEST_TEMP: latest sampled temperature[15:0]\n- 0x020 LATEST_HUMIDITY: latest sampled humidity[15:0]\n- 0x024 LATEST_AIR: latest sampled air-quality value[15:0]\n- 0x028 FIFO_DATA: packed sensor sample data, read pops FIFO\n- 0x02C FIFO_LEVEL: current FIFO occupancy[5:0]\n- 0x030 ALERT_STATUS: temp_alert, humidity_alert, air_alert, fifo_overflow, sample_timeout\n- 0x034 ALERT_CLEAR: write one to clear alert bits\n- 0x038 SAMPLE_COUNT: completed sample count[31:0]\n\nFunctional requirements:\n- Reset clears registers, FIFO, sample counters, alert state, IRQ, and low-power state.\n- SAMPLE_PERIOD controls periodic sensor_sample_req generation while CONTROL.ENABLE is set.\n- SENSOR_SELECT enables sampling of temperature, humidity, and air-quality channels.\n- On sensor_valid, capture enabled sensor channels into latest-value registers and push a packed sample record into a 16-entry FIFO.\n- Compare captured readings against threshold registers and latch ALERT_STATUS bits when limits are crossed.\n- alert_irq asserts when CONTROL.IRQ_ENABLE is set and any ALERT_STATUS bit is set.\n- Firmware can read FIFO_DATA to pop buffered sample records and read FIFO_LEVEL for telemetry.\n- FIFO overflow latches an alert bit without corrupting existing unread samples.\n- LOW_POWER_EN gates periodic sample requests when no channels are enabled or when sample period is zero, and low_power_active reflects this state.\n- SAMPLE_COUNT increments once per completed sample event.\n\nGenerate synthesizable SystemVerilog, a register map, assertions, a simulation testbench, UPF-lite collateral, and a packaging manifest.",
+    "digital_spec": null,
+    "digital_spec_text": null,
+    "soc_spec": null,
+    "system_spec": null,
+    "description": null
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "package_type": "system_rtl",
+  "generated_at": "2026-08-12T22:21:09.204942+00:00",
+  "top": {
+    "sim": "temp_monitor_soc_sim",
+    "phys": "temp_monitor_soc_phys"
+  },
+  "filelists": {
+    "sim": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_regfile.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_sim.sv"
+    ],
+    "phys": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_regfile.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_phys.sv"
+    ],
+    "libs": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/abstract/temp_sensor_adc_model.lib"
+    ]
+  },
+  "storage": {
+    "rtl_files": [
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/analog/temp_sensor_adc_model.v",
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/analog/temp_sensor_adc_model_pass1.v",
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/rtl/temp_monitor_digital.v",
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/rtl/temp_monitor_digital_regfile.v",
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/rtl/temp_monitor_digital_sample_ctrl.v",
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/temp_monitor_soc_phys.sv",
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/temp_monitor_soc_phys_pass1.sv",
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/temp_monitor_soc_sim.sv",
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/temp_monitor_soc_sim_pass1.sv"
+    ],
+    "filelists": {
+      "sim": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_rtl_filelist_sim.txt",
+      "phys": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_rtl_filelist_phys.txt",
+      "libs": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_lib_filelist_phys.txt"
+    },
+    "integration_intent": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/system/integration/system_integration_intent.json",
+    "soc_top_sim": "",
+    "soc_top_phys": "",
+    "digital_regmap": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/digital/digital_regmap.json",
+    "macro_lefs": [
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/analog/abstract/temp_sensor_adc_model.lef"
+    ],
+    "macro_libs": [
+      "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/analog/abstract/temp_sensor_adc_model.lib"
+    ],
+    "macro_gds": [],
+    "analog_macro_interface_contract": "backend/workflows/6b07320d-1662-471b-88b1-df3d065727b6/analog/interface/analog_macro_interface_contract.json"
+  },
+  "analog_macros": {
+    "lef_files": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/abstract/temp_sensor_adc_model.lef"
+    ],
+    "lib_files": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/abstract/temp_sensor_adc_model.lib"
+    ],
+    "gds_files": [],
+    "blackbox_for_drc_lvs": true,
+    "blackbox_reason": "analog_macro_gds_missing"
+  },
+  "compile": {
+    "sim": "pass",
+    "phys": "skipped",
+    "logs_present": {
+      "iverilog_sim": true,
+      "verilator_sim": true,
+      "iverilog_phys": false,
+      "verilator_phys": false
+    }
+  },
+  "artifacts": {
+    "soc_top_sim": false,
+    "soc_top_phys": false,
+    "sim_top_module": "temp_monitor_soc_sim",
+    "phys_top_module": "temp_monitor_soc_phys",
+    "integration_intent": true,
+    "digital_regmap": true
+  },
+  "ready_for_cosim": true
+}

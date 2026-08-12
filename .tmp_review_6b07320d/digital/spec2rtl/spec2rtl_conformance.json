@@ -1,0 +1,1661 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "partial",
+  "summary": {
+    "checked": 84,
+    "matched": 80,
+    "partial": 1,
+    "missing": 3,
+    "inconclusive": 0
+  },
+  "setup_issues": [],
+  "top_module": {
+    "expected": "temp_monitor_digital",
+    "modules_found": [
+      "temp_sensor_adc_model",
+      "temp_monitor_digital",
+      "temp_monitor_digital_regfile",
+      "temp_monitor_digital_sample_ctrl",
+      "temp_monitor_soc_phys",
+      "temp_monitor_soc_sim",
+      "temp_monitor_soc_sim_assertions"
+    ],
+    "status": "pass"
+  },
+  "interface": {
+    "status": "pass",
+    "expected_ports": [
+      "adc_code",
+      "adc_valid",
+      "alert_irq",
+      "alert_status",
+      "clk",
+      "rd_addr",
+      "rd_data",
+      "rd_en",
+      "reset_n",
+      "sample_req",
+      "temp_code",
+      "threshold_code",
+      "wr_addr",
+      "wr_data",
+      "wr_en"
+    ],
+    "matched_ports": [
+      "adc_code",
+      "adc_valid",
+      "alert_irq",
+      "alert_status",
+      "clk",
+      "rd_addr",
+      "rd_data",
+      "rd_en",
+      "reset_n",
+      "sample_req",
+      "temp_code",
+      "threshold_code",
+      "wr_addr",
+      "wr_data",
+      "wr_en"
+    ],
+    "missing_ports": [],
+    "rtl_ports": [
+      "adc_code",
+      "adc_valid",
+      "alert_irq",
+      "alert_status",
+      "avdd",
+      "avss",
+      "clk",
+      "compare_alert",
+      "control_alert_clear_pulse",
+      "control_enable",
+      "control_irq_enable",
+      "control_sample_start_pulse",
+      "irq_clear_alert_pulse",
+      "irq_clear_sample_done_pulse",
+      "irq_status_alert",
+      "irq_status_sample_done",
+      "latest_temp",
+      "rd_addr",
+      "rd_data",
+      "rd_en",
+      "reset_n",
+      "sample_count",
+      "sample_done_pulse",
+      "sample_req",
+      "sample_req_pulse",
+      "sensor_temp_celsius",
+      "status_adc_valid_seen",
+      "status_alert_pending",
+      "status_busy",
+      "status_sample_done",
+      "temp_code",
+      "threshold_code",
+      "threshold_code_reg",
+      "wr_addr",
+      "wr_data",
+      "wr_en"
+    ]
+  },
+  "register_map": {
+    "expected": [
+      "ALERT_CLEAR",
+      "ENABLE",
+      "IRQ_ENABLE",
+      "IRQ_STATUS",
+      "SAMPLE_START",
+      "adc_valid_seen",
+      "alert",
+      "alert_pending",
+      "alert_status",
+      "busy",
+      "clear_alert",
+      "clear_sample_done",
+      "latest_temp",
+      "sample_count",
+      "sample_done",
+      "temp_monitor_digital_sample_ctrl",
+      "threshold_code",
+      "threshold_code_reg"
+    ],
+    "matched": [
+      "ALERT_CLEAR",
+      "ENABLE",
+      "IRQ_ENABLE",
+      "IRQ_STATUS",
+      "SAMPLE_START",
+      "adc_valid_seen",
+      "alert",
+      "alert_pending",
+      "alert_status",
+      "busy",
+      "clear_alert",
+      "clear_sample_done",
+      "latest_temp",
+      "sample_count",
+      "sample_done",
+      "temp_monitor_digital_sample_ctrl",
+      "threshold_code",
+      "threshold_code_reg"
+    ],
+    "expected_registers": [
+      "CONTROL",
+      "IRQ_CLEAR",
+      "IRQ_STATUS",
+      "LATEST_TEMP",
+      "SAMPLE_COUNT",
+      "STATUS",
+      "THRESHOLD"
+    ],
+    "matched_registers": [
+      "CONTROL",
+      "IRQ_CLEAR",
+      "IRQ_STATUS",
+      "LATEST_TEMP",
+      "SAMPLE_COUNT",
+      "STATUS",
+      "THRESHOLD"
+    ],
+    "expected_addresses": [
+      "0x00",
+      "0x04",
+      "0x08",
+      "0x0C",
+      "0x10",
+      "0x14",
+      "0x18"
+    ],
+    "matched_addresses": [
+      "0x00",
+      "0x04",
+      "0x08",
+      "0x0C",
+      "0x10",
+      "0x14",
+      "0x18"
+    ],
+    "missing": [],
+    "missing_registers": [],
+    "missing_addresses": [],
+    "status": "pass"
+  },
+  "clock_reset": {
+    "clock_ports": [
+      "clk"
+    ],
+    "reset_ports": [
+      "reset_n"
+    ],
+    "status": "pass"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "requirement": "Decode CONTROL, THRESHOLD, STATUS, LATEST_TEMP, SAMPLE_COUNT, IRQ_STATUS, and IRQ_CLEAR register behavior.",
+      "status": "matched",
+      "evidence_tokens": [
+        "latest_temp",
+        "sample_count",
+        "register_address_decode"
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "requirement": "Generate one-cycle pulses for SAMPLE_START, ALERT_CLEAR, and IRQ_CLEAR bits.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-003",
+      "requirement": "Maintain stored ENABLE and IRQ_ENABLE control state.",
+      "status": "matched",
+      "evidence_tokens": [
+        "state",
+        "control_enable",
+        "CONTROL.IRQ_ENABLE stored"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "requirement": "Maintain sticky STATUS and IRQ status bits.",
+      "status": "matched",
+      "evidence_tokens": [
+        "sticky STATUS/IRQ_STATUS independent clears"
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "requirement": "Produce sample_req pulses for explicit sample requests and periodic enabled sampling.",
+      "status": "matched",
+      "evidence_tokens": [
+        "sample_req"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "requirement": "Capture ADC samples, filter them, update latest_temp, and increment sample_count.",
+      "status": "matched",
+      "evidence_tokens": [
+        "latest_temp",
+        "sample_count",
+        "increment_logic"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "requirement": "Compare latest_temp against threshold_code and latch alert state when above threshold.",
+      "status": "matched",
+      "evidence_tokens": [
+        "latest_temp",
+        "threshold_code",
+        "state",
+        "alert_status",
+        "compare_alert"
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "requirement": "Assert alert_irq only when IRQ_ENABLE is set and at least one IRQ status bit is latched.",
+      "status": "matched",
+      "evidence_tokens": [
+        "alert_irq"
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "requirement": "Provide zero-extended readback values for read-only registers and upper bits of partial-width fields.",
+      "status": "matched",
+      "evidence_tokens": [
+        "read_path",
+        "rd_data"
+      ]
+    },
+    {
+      "id": "REQ-010",
+      "requirement": "Preserve architectural ownership of explicit internal state signals.",
+      "status": "matched",
+      "evidence_tokens": [
+        "state",
+        "internal_state_contract"
+      ]
+    },
+    {
+      "id": "REQ-011",
+      "requirement": "CONTROL bit 0 stores ENABLE.",
+      "status": "matched",
+      "evidence_tokens": [
+        "control_enable"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "requirement": "CONTROL bit 1 is a write pulse; writing 1 generates a one-cycle sample request and does not store the bit.",
+      "status": "matched",
+      "evidence_tokens": [
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "requirement": "CONTROL bit 2 stores IRQ_ENABLE.",
+      "status": "matched",
+      "evidence_tokens": [
+        "CONTROL.IRQ_ENABLE stored"
+      ]
+    },
+    {
+      "id": "REQ-014",
+      "requirement": "CONTROL bit 3 is a write pulse; writing 1 generates an alert clear action and does not store the bit.",
+      "status": "matched",
+      "evidence_tokens": [
+        "alert_status",
+        "control_alert_clear_pulse",
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-015",
+      "requirement": "STATUS bit 0 is sticky sample_done until cleared by IRQ_CLEAR bit 1.",
+      "status": "matched",
+      "evidence_tokens": [
+        "sticky STATUS/IRQ_STATUS independent clears"
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "requirement": "STATUS bit 1 is sticky alert_pending until cleared by ALERT_CLEAR or IRQ_CLEAR bit 0.",
+      "status": "matched",
+      "evidence_tokens": [
+        "sticky STATUS/IRQ_STATUS independent clears"
+      ]
+    },
+    {
+      "id": "REQ-017",
+      "requirement": "STATUS bit 2 is sticky adc_valid_seen after the first adc_valid until reset.",
+      "status": "matched",
+      "evidence_tokens": [
+        "after",
+        "adc_valid",
+        "reset_zero",
+        "sticky_adc_valid_seen"
+      ]
+    },
+    {
+      "id": "REQ-018",
+      "requirement": "STATUS bit 3 busy is high while a requested sample is pending.",
+      "status": "matched",
+      "evidence_tokens": [
+        "pending_sample",
+        "status_busy"
+      ]
+    },
+    {
+      "id": "REQ-019",
+      "requirement": "THRESHOLD stores threshold_code_reg in bits [11:0] and reads upper bits as zero.",
+      "status": "matched",
+      "evidence_tokens": [
+        "threshold_code_reg",
+        "read_path",
+        "rd_data"
+      ]
+    },
+    {
+      "id": "REQ-020",
+      "requirement": "LATEST_TEMP readback is latest_temp in bits [11:0] with upper bits zero.",
+      "status": "matched",
+      "evidence_tokens": [
+        "latest_temp",
+        "read_path",
+        "rd_data"
+      ]
+    },
+    {
+      "id": "REQ-021",
+      "requirement": "SAMPLE_COUNT is read-only and increments on each completed adc_valid sample.",
+      "status": "matched",
+      "evidence_tokens": [
+        "sample_count",
+        "adc_valid",
+        "read_path",
+        "rd_data",
+        "increment_logic"
+      ]
+    },
+    {
+      "id": "REQ-022",
+      "requirement": "IRQ_STATUS bit 0 latches alert and bit 1 latches sample_done until cleared by IRQ_CLEAR.",
+      "status": "matched",
+      "evidence_tokens": [
+        "alert_status",
+        "IRQ_STATUS.sample_done scalar latch"
+      ]
+    },
+    {
+      "id": "REQ-023",
+      "requirement": "alert_irq = CONTROL.IRQ_ENABLE AND (IRQ_STATUS.alert OR IRQ_STATUS.sample_done).",
+      "status": "matched",
+      "evidence_tokens": [
+        "alert_irq",
+        "alert_status",
+        "CONTROL.IRQ_ENABLE stored"
+      ]
+    },
+    {
+      "id": "REQ-024",
+      "requirement": "A sample request pulse may be generated immediately from CONTROL.SAMPLE_START and periodically when CONTROL.ENABLE is asserted, using a synthesizable internal schedule.",
+      "status": "matched",
+      "evidence_tokens": [
+        "control_enable"
+      ]
+    },
+    {
+      "id": "REQ-025",
+      "requirement": "On adc_valid, the design captures adc_code, updates the two-sample moving average result to latest_temp/temp_code, increments sample_count, sets STATUS.sample_done and IRQ_STATUS.sample_done, sets STATUS.adc_valid_seen, and compares the fil",
+      "status": "matched",
+      "evidence_tokens": [
+        "adc_valid",
+        "adc_code",
+        "latest_temp",
+        "temp_code",
+        "sample_count",
+        "increment_logic",
+        "sticky_adc_valid_seen"
+      ]
+    },
+    {
+      "id": "REQ-026",
+      "requirement": "When filtered temp_code is above threshold_code_reg, alert_status, STATUS.alert_pending, and IRQ_STATUS.alert are latched.",
+      "status": "matched",
+      "evidence_tokens": [
+        "temp_code",
+        "threshold_code_reg",
+        "alert_status"
+      ]
+    },
+    {
+      "id": "REQ-027",
+      "requirement": "ALERT_CLEAR clears alert_status and STATUS.alert_pending, and may also clear IRQ_STATUS.alert only if implemented through the specified alert-clear behavior, but it must not affect sample_count, threshold_code_reg, or latest_temp.",
+      "status": "matched",
+      "evidence_tokens": [
+        "alert_status",
+        "sample_count",
+        "threshold_code_reg",
+        "latest_temp"
+      ]
+    },
+    {
+      "id": "REQ-028",
+      "requirement": "IRQ_CLEAR bit 0 clears IRQ_STATUS.alert and alert_status.",
+      "status": "matched",
+      "evidence_tokens": [
+        "alert_status"
+      ]
+    },
+    {
+      "id": "REQ-029",
+      "requirement": "IRQ_CLEAR bit 1 clears IRQ_STATUS.sample_done and STATUS.sample_done.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-030",
+      "requirement": "Writes to non-reserved read-only locations must not alter state beyond the specified side effects.",
+      "status": "matched",
+      "evidence_tokens": [
+        "state",
+        "read_path",
+        "rd_data",
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-031",
+      "requirement": "Unread or unmapped addresses return zero on rd_data unless mapped otherwise by the specified register map.",
+      "status": "matched",
+      "evidence_tokens": [
+        "rd_data"
+      ]
+    },
+    {
+      "id": "REQ-032",
+      "requirement": "sample_req",
+      "status": "matched",
+      "evidence_tokens": [
+        "sample_req"
+      ]
+    },
+    {
+      "id": "REQ-033",
+      "requirement": "alert_irq",
+      "status": "matched",
+      "evidence_tokens": [
+        "alert_irq"
+      ]
+    },
+    {
+      "id": "REQ-034",
+      "requirement": "temp_code",
+      "status": "matched",
+      "evidence_tokens": [
+        "temp_code"
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "requirement": "threshold_code",
+      "status": "matched",
+      "evidence_tokens": [
+        "threshold_code"
+      ]
+    },
+    {
+      "id": "REQ-036",
+      "requirement": "alert_status",
+      "status": "matched",
+      "evidence_tokens": [
+        "alert_status"
+      ]
+    },
+    {
+      "id": "REQ-037",
+      "requirement": "adc_code",
+      "status": "matched",
+      "evidence_tokens": [
+        "adc_code"
+      ]
+    },
+    {
+      "id": "REQ-038",
+      "requirement": "adc_valid",
+      "status": "matched",
+      "evidence_tokens": [
+        "adc_valid"
+      ]
+    },
+    {
+      "id": "REQ-039",
+      "requirement": "On reset_n deassertion, clear CONTROL.ENABLE, CONTROL.IRQ_ENABLE, all pulse outputs, STATUS.sample_done, STATUS.alert_pending, STATUS.adc_valid_seen, STATUS.busy, IRQ status bits, alert_status, latest_temp, sample_count, threshold_code_reg,",
+      "status": "matched",
+      "evidence_tokens": [
+        "reset_n",
+        "alert_status",
+        "latest_temp",
+        "sample_count",
+        "threshold_code_reg",
+        "control_enable",
+        "control_irq_enable",
+        "status_busy"
+      ]
+    },
+    {
+      "id": "REQ-040",
+      "requirement": "Decode wr_addr and rd_addr.",
+      "status": "matched",
+      "evidence_tokens": [
+        "wr_addr",
+        "rd_addr"
+      ]
+    },
+    {
+      "id": "REQ-041",
+      "requirement": "Store CONTROL.ENABLE and CONTROL.IRQ_ENABLE.",
+      "status": "matched",
+      "evidence_tokens": [
+        "control_enable",
+        "CONTROL.IRQ_ENABLE stored"
+      ]
+    },
+    {
+      "id": "REQ-042",
+      "requirement": "Emit sample-start, alert-clear, and IRQ-clear pulses from writes.",
+      "status": "matched",
+      "evidence_tokens": [
+        "alert_irq",
+        "alert_status",
+        "irq_status_alert",
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-043",
+      "requirement": "Store threshold_code_reg from THRESHOLD writes.",
+      "status": "matched",
+      "evidence_tokens": [
+        "threshold_code_reg",
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-044",
+      "requirement": "Assemble STATUS readback from sticky status inputs and internal decode.",
+      "status": "matched",
+      "evidence_tokens": [
+        "read_path",
+        "rd_data"
+      ]
+    },
+    {
+      "id": "REQ-045",
+      "requirement": "Assemble read-only status and counter readback values with zero extension.",
+      "status": "matched",
+      "evidence_tokens": [
+        "read_path",
+        "rd_data"
+      ]
+    },
+    {
+      "id": "REQ-046",
+      "requirement": "Present a write-one-to-clear compatible view of IRQ_CLEAR.",
+      "status": "matched",
+      "evidence_tokens": [
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-047",
+      "requirement": "Drive the architectural threshold_code_reg output used by the datapath/comparator.",
+      "status": "matched",
+      "evidence_tokens": [
+        "threshold_code_reg"
+      ]
+    },
+    {
+      "id": "REQ-048",
+      "requirement": "CONTROL bit 0 is a stored level bit.",
+      "status": "partial",
+      "evidence_tokens": [
+        "level"
+      ]
+    },
+    {
+      "id": "REQ-049",
+      "requirement": "CONTROL bit 1 is an un-stored write pulse that returns zero on readback.",
+      "status": "matched",
+      "evidence_tokens": [
+        "read_path",
+        "rd_data",
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-050",
+      "requirement": "CONTROL bit 2 is a stored IRQ enable bit.",
+      "status": "matched",
+      "evidence_tokens": [
+        "control_enable",
+        "control_irq_enable",
+        "CONTROL.IRQ_ENABLE stored"
+      ]
+    },
+    {
+      "id": "REQ-051",
+      "requirement": "CONTROL bit 3 is an un-stored write pulse that returns zero on readback.",
+      "status": "matched",
+      "evidence_tokens": [
+        "read_path",
+        "rd_data",
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-052",
+      "requirement": "STATUS is read-only and reflects its input sticky bits.",
+      "status": "matched",
+      "evidence_tokens": [
+        "read_path",
+        "rd_data"
+      ]
+    },
+    {
+      "id": "REQ-053",
+      "requirement": "THRESHOLD[11:0] reads/writes threshold_code_reg and upper bits read as zero.",
+      "status": "matched",
+      "evidence_tokens": [
+        "threshold_code_reg",
+        "read_path",
+        "rd_data",
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-054",
+      "requirement": "LATEST_TEMP[11:0] returns latest_temp and upper bits are zero.",
+      "status": "matched",
+      "evidence_tokens": [
+        "latest_temp"
+      ]
+    },
+    {
+      "id": "REQ-055",
+      "requirement": "SAMPLE_COUNT is read-only and reflects the input counter.",
+      "status": "matched",
+      "evidence_tokens": [
+        "sample_count",
+        "read_path",
+        "rd_data"
+      ]
+    },
+    {
+      "id": "REQ-056",
+      "requirement": "IRQ_STATUS readback reflects the input sticky IRQ bits.",
+      "status": "matched",
+      "evidence_tokens": [
+        "read_path",
+        "rd_data",
+        "sticky STATUS/IRQ_STATUS independent clears"
+      ]
+    },
+    {
+      "id": "REQ-057",
+      "requirement": "IRQ_CLEAR readback is zero; writes generate clear pulses for supported bits only.",
+      "status": "matched",
+      "evidence_tokens": [
+        "read_path",
+        "rd_data",
+        "write_path"
+      ]
+    },
+    {
+      "id": "REQ-058",
+      "requirement": "Any unmapped read returns zero.",
+      "status": "matched",
+      "evidence_tokens": [
+        "read_path",
+        "rd_data"
+      ]
+    },
+    {
+      "id": "REQ-059",
+      "requirement": "One-cycle pulses must not self-stretch.",
+      "status": "missing",
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-060",
+      "requirement": "control_enable",
+      "status": "matched",
+      "evidence_tokens": [
+        "control_enable"
+      ]
+    },
+    {
+      "id": "REQ-061",
+      "requirement": "control_sample_start_pulse",
+      "status": "matched",
+      "evidence_tokens": [
+        "control_sample_start_pulse"
+      ]
+    },
+    {
+      "id": "REQ-062",
+      "requirement": "control_irq_enable",
+      "status": "matched",
+      "evidence_tokens": [
+        "control_irq_enable",
+        "CONTROL.IRQ_ENABLE stored"
+      ]
+    },
+    {
+      "id": "REQ-063",
+      "requirement": "control_alert_clear_pulse",
+      "status": "matched",
+      "evidence_tokens": [
+        "control_alert_clear_pulse"
+      ]
+    },
+    {
+      "id": "REQ-064",
+      "requirement": "irq_clear_alert_pulse",
+      "status": "matched",
+      "evidence_tokens": [
+        "irq_clear_alert_pulse"
+      ]
+    },
+    {
+      "id": "REQ-065",
+      "requirement": "irq_clear_sample_done_pulse",
+      "status": "matched",
+      "evidence_tokens": [
+        "irq_clear_sample_done_pulse"
+      ]
+    },
+    {
+      "id": "REQ-066",
+      "requirement": "threshold_code_reg",
+      "status": "matched",
+      "evidence_tokens": [
+        "threshold_code_reg"
+      ]
+    },
+    {
+      "id": "REQ-067",
+      "requirement": "status_sample_done",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_sample_done"
+      ]
+    },
+    {
+      "id": "REQ-068",
+      "requirement": "status_alert_pending",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_alert_pending"
+      ]
+    },
+    {
+      "id": "REQ-069",
+      "requirement": "status_adc_valid_seen",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_adc_valid_seen",
+        "sticky_adc_valid_seen"
+      ]
+    },
+    {
+      "id": "REQ-070",
+      "requirement": "status_busy",
+      "status": "matched",
+      "evidence_tokens": [
+        "status_busy"
+      ]
+    },
+    {
+      "id": "REQ-071",
+      "requirement": "irq_status_alert",
+      "status": "matched",
+      "evidence_tokens": [
+        "irq_status_alert"
+      ]
+    },
+    {
+      "id": "REQ-072",
+      "requirement": "irq_status_sample_done",
+      "status": "matched",
+      "evidence_tokens": [
+        "irq_status_sample_done"
+      ]
+    },
+    {
+      "id": "REQ-073",
+      "requirement": "latest_temp",
+      "status": "matched",
+      "evidence_tokens": [
+        "latest_temp"
+      ]
+    },
+    {
+      "id": "REQ-074",
+      "requirement": "sample_count",
+      "status": "matched",
+      "evidence_tokens": [
+        "sample_count"
+      ]
+    },
+    {
+      "id": "REQ-075",
+      "requirement": "Reset clears stored CONTROL bits, threshold_code_reg, write-pulse outputs, and rd_data to zero.",
+      "status": "matched",
+      "evidence_tokens": [
+        "threshold_code_reg",
+        "rd_data",
+        "write_path",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-076",
+      "requirement": "Generate explicit one-cycle sample_req pulses.",
+      "status": "matched",
+      "evidence_tokens": [
+        "sample_req"
+      ]
+    },
+    {
+      "id": "REQ-077",
+      "requirement": "Generate deterministic periodic sample_req pulses while enabled.",
+      "status": "matched",
+      "evidence_tokens": [
+        "sample_req"
+      ]
+    },
+    {
+      "id": "REQ-078",
+      "requirement": "Track a pending-busy condition while a request awaits adc_valid.",
+      "status": "matched",
+      "evidence_tokens": [
+        "adc_valid",
+        "status_busy"
+      ]
+    },
+    {
+      "id": "REQ-079",
+      "requirement": "Capture adc_code on adc_valid.",
+      "status": "matched",
+      "evidence_tokens": [
+        "adc_code",
+        "adc_valid"
+      ]
+    },
+    {
+      "id": "REQ-080",
+      "requirement": "Filter using a two-sample moving average and present the resulting temp_code/latest_temp.",
+      "status": "matched",
+      "evidence_tokens": [
+        "temp_code",
+        "latest_temp"
+      ]
+    }
+  ],
+  "rtl_files": [
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v",
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model_pass1.v",
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v",
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_regfile.v",
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v",
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_phys.sv",
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_sim.sv",
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/vv/tb/temp_monitor_soc_sim_assertions.sv",
+    "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/vv/tb/temp_monitor_soc_sim_assertions_bind.sv"
+  ],
+  "modules": [
+    {
+      "name": "temp_sensor_adc_model",
+      "file": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/analog/temp_sensor_adc_model.v",
+      "ports": [
+        {
+          "name": "sample_req",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "sensor_temp_celsius",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "avdd",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "avss",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "adc_code",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "adc_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        }
+      ]
+    },
+    {
+      "name": "temp_monitor_digital",
+      "file": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "wr_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "wr_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "wr_data",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "rd_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rd_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "adc_code",
+          "direction": "input",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "adc_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rd_data",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "sample_req",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "alert_irq",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "temp_code",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "threshold_code",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "alert_status",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        }
+      ]
+    },
+    {
+      "name": "temp_monitor_digital_regfile",
+      "file": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_regfile.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "wr_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "wr_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "wr_data",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "rd_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rd_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "control_enable",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "control_sample_start_pulse",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "control_irq_enable",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "control_alert_clear_pulse",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "irq_clear_alert_pulse",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "irq_clear_sample_done_pulse",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "threshold_code_reg",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "status_sample_done",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_alert_pending",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_adc_valid_seen",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_busy",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "irq_status_alert",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "irq_status_sample_done",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "latest_temp",
+          "direction": "input",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "sample_count",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "rd_data",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        }
+      ]
+    },
+    {
+      "name": "temp_monitor_digital_sample_ctrl",
+      "file": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/rtl/temp_monitor_digital_sample_ctrl.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "control_enable",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "control_sample_start_pulse",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "control_irq_enable",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "control_alert_clear_pulse",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "irq_clear_alert_pulse",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "irq_clear_sample_done_pulse",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "threshold_code_reg",
+          "direction": "input",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "adc_code",
+          "direction": "input",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "adc_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "sample_req",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "alert_irq",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "temp_code",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "alert_status",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_sample_done",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_alert_pending",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_adc_valid_seen",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_busy",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "irq_status_alert",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "irq_status_sample_done",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "latest_temp",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "sample_count",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "compare_alert",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "sample_done_pulse",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "sample_req_pulse",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        }
+      ]
+    },
+    {
+      "name": "temp_monitor_soc_phys",
+      "file": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_phys.sv",
+      "ports": [
+        {
+          "name": "alert_irq",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "alert_status",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "avdd",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "avss",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rd_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "rd_data",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "rd_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "sensor_temp_celsius",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "temp_code",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "threshold_code",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "wr_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "wr_data",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "wr_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        }
+      ]
+    },
+    {
+      "name": "temp_monitor_soc_sim",
+      "file": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/system/integration/temp_monitor_soc_sim.sv",
+      "ports": [
+        {
+          "name": "alert_irq",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "alert_status",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "avdd",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "avss",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rd_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "rd_data",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "rd_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "sensor_temp_celsius",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "temp_code",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "threshold_code",
+          "direction": "output",
+          "width": "[11:0]",
+          "bits": 12
+        },
+        {
+          "name": "wr_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "wr_data",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "wr_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        }
+      ]
+    },
+    {
+      "name": "temp_monitor_soc_sim_assertions",
+      "file": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/6b07320d-1662-471b-88b1-df3d065727b6/a43a5ef1-8c16-4e8b-b80e-4205a474e5f7/system/vv/tb/temp_monitor_soc_sim_assertions.sv",
+      "ports": [
+        {
+          "name": "alert_irq",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "alert_status",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "avdd",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "avss",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rd_addr",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rd_data",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rd_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "sensor_temp_celsius",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "temp_code",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "threshold_code",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "wr_addr",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "wr_data",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "wr_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}

@@ -1,0 +1,324 @@
+VERSION 5.8 ;
+BUSBITCHARS "[]" ;
+DIVIDERCHAR "/" ;
+
+MACRO temp_sensor_adc_model
+  FOREIGN temp_sensor_adc_model ;
+  CLASS BLOCK ;
+  ORIGIN 0 0 ;
+  SIZE 100.00 BY 100.00 ;
+  SYMMETRY X Y R90 ;
+  SITE unithd ;
+
+  PIN VPWR
+    DIRECTION INOUT ;
+    USE POWER ;
+    SHAPE ABUTMENT ;
+    PORT
+      LAYER met4 ;
+      RECT 0.00 0.00 2.00 100.00 ;
+      RECT 98.00 0.00 100.00 100.00 ;
+    END
+  END VPWR
+
+  PIN VGND
+    DIRECTION INOUT ;
+    USE GROUND ;
+    SHAPE ABUTMENT ;
+    PORT
+      LAYER met4 ;
+      RECT 4.00 0.00 6.00 100.00 ;
+      RECT 94.00 0.00 96.00 100.00 ;
+    END
+  END VGND
+
+  PIN sample_req
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 10.00 2.00 11.50 ;
+    END
+  END sample_req
+
+  PIN sensor_temp_celsius[0]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 14.00 2.00 15.50 ;
+    END
+  END sensor_temp_celsius[0]
+
+  PIN sensor_temp_celsius[1]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 18.00 2.00 19.50 ;
+    END
+  END sensor_temp_celsius[1]
+
+  PIN sensor_temp_celsius[2]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 22.00 2.00 23.50 ;
+    END
+  END sensor_temp_celsius[2]
+
+  PIN sensor_temp_celsius[3]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 26.00 2.00 27.50 ;
+    END
+  END sensor_temp_celsius[3]
+
+  PIN sensor_temp_celsius[4]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 30.00 2.00 31.50 ;
+    END
+  END sensor_temp_celsius[4]
+
+  PIN sensor_temp_celsius[5]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 34.00 2.00 35.50 ;
+    END
+  END sensor_temp_celsius[5]
+
+  PIN sensor_temp_celsius[6]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 38.00 2.00 39.50 ;
+    END
+  END sensor_temp_celsius[6]
+
+  PIN sensor_temp_celsius[7]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 42.00 2.00 43.50 ;
+    END
+  END sensor_temp_celsius[7]
+
+  PIN sensor_temp_celsius[8]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 46.00 2.00 47.50 ;
+    END
+  END sensor_temp_celsius[8]
+
+  PIN sensor_temp_celsius[9]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 50.00 2.00 51.50 ;
+    END
+  END sensor_temp_celsius[9]
+
+  PIN sensor_temp_celsius[10]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 54.00 2.00 55.50 ;
+    END
+  END sensor_temp_celsius[10]
+
+  PIN sensor_temp_celsius[11]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 58.00 2.00 59.50 ;
+    END
+  END sensor_temp_celsius[11]
+
+  PIN sensor_temp_celsius[12]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 62.00 2.00 63.50 ;
+    END
+  END sensor_temp_celsius[12]
+
+  PIN sensor_temp_celsius[13]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 66.00 2.00 67.50 ;
+    END
+  END sensor_temp_celsius[13]
+
+  PIN sensor_temp_celsius[14]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 70.00 2.00 71.50 ;
+    END
+  END sensor_temp_celsius[14]
+
+  PIN sensor_temp_celsius[15]
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 74.00 2.00 75.50 ;
+    END
+  END sensor_temp_celsius[15]
+
+  PIN avdd
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 78.00 2.00 79.50 ;
+    END
+  END avdd
+
+  PIN avss
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 82.00 2.00 83.50 ;
+    END
+  END avss
+
+  PIN adc_code[0]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 86.00 2.00 87.50 ;
+    END
+  END adc_code[0]
+
+  PIN adc_code[1]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 90.00 2.00 91.50 ;
+    END
+  END adc_code[1]
+
+  PIN adc_code[2]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 94.00 2.00 95.50 ;
+    END
+  END adc_code[2]
+
+  PIN adc_code[3]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 98.00 2.00 99.50 ;
+    END
+  END adc_code[3]
+
+  PIN adc_code[4]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 102.00 2.00 103.50 ;
+    END
+  END adc_code[4]
+
+  PIN adc_code[5]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 106.00 2.00 107.50 ;
+    END
+  END adc_code[5]
+
+  PIN adc_code[6]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 110.00 2.00 111.50 ;
+    END
+  END adc_code[6]
+
+  PIN adc_code[7]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 114.00 2.00 115.50 ;
+    END
+  END adc_code[7]
+
+  PIN adc_code[8]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 118.00 2.00 119.50 ;
+    END
+  END adc_code[8]
+
+  PIN adc_code[9]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 122.00 2.00 123.50 ;
+    END
+  END adc_code[9]
+
+  PIN adc_code[10]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 126.00 2.00 127.50 ;
+    END
+  END adc_code[10]
+
+  PIN adc_code[11]
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 130.00 2.00 131.50 ;
+    END
+  END adc_code[11]
+
+  PIN adc_valid
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER met2 ;
+      RECT 0.00 134.00 2.00 135.50 ;
+    END
+  END adc_valid
+
+END temp_sensor_adc_model
+END LIBRARY

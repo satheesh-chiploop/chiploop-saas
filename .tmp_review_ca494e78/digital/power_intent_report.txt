@@ -1,0 +1,4 @@
+Digital Power Intent (UPF-Lite) Agent Report
+Spec mode: hierarchical
+Top module: smart_sensor_hub_mcu
+Domains: ['PD_TOP']

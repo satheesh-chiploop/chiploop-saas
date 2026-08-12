@@ -1,4 +1,0 @@
-Digital Power Intent (UPF-Lite) Agent Report
-Spec mode: hierarchical
-Top module: uart_packet_engine
-Domains: ['PD_TOP']

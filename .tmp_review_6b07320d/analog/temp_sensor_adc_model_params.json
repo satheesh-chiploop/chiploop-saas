@@ -1,0 +1,72 @@
+{
+  "block_name": "temp_sensor_adc_model",
+  "module_name": "temp_sensor_adc_model",
+  "model_filename": "temp_sensor_adc_model.v",
+  "ports": [
+    {
+      "name": "sample_req",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "sensor_temp_celsius",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "avdd",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "avss",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "adc_code",
+      "direction": "output",
+      "width": 12
+    },
+    {
+      "name": "adc_valid",
+      "direction": "output",
+      "width": 1
+    }
+  ],
+  "behavioral_contract": {
+    "deterministic_behavior": true,
+    "state_elements": [
+      "latched_adc_code",
+      "latched_adc_valid",
+      "conversion_timer"
+    ],
+    "input_to_output_relations": [
+      "sample_req initiates a delayed update of adc_code and adc_valid.",
+      "sensor_temp_celsius maps linearly to adc_code with gain and offset error adjustments.",
+      "avdd and avss are observed as interface context signals."
+    ],
+    "event_triggers": [
+      "assertion of sample_req",
+      "completion of nominal sample latency"
+    ],
+    "output_update_rules": [
+      "Update adc_code only when the conversion response is due.",
+      "Assert adc_valid when the updated adc_code is presented.",
+      "Hold adc_code constant between conversions.",
+      "Deassert adc_valid when no conversion result is being presented."
+    ],
+    "error_conditions": [
+      "Computed code below 0 shall be saturated to 0.",
+      "Computed code above 4095 shall be saturated to 4095."
+    ],
+    "latency_rules": [
+      "Conversion output shall be delayed by the nominal sample latency parameter after sample_req assertion."
+    ],
+    "timing_rules": [
+      "Behavior is synchronous to the internal behavioral timing abstraction defined by the model.",
+      "No combinational change of adc_code is permitted directly on sample_req assertion.",
+      "adc_valid shall not assert before the modeled latency elapses."
+    ]
+  }
+}

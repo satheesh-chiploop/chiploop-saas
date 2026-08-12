@@ -1,2 +1,0 @@
-read_verilog -sv /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/src/upstream/adaptive_aero_control_top.v
-synth_gowin -top adaptive_aero_control_top -noflatten -noiopads -json /root/chiploop-backend/backend/workflows/9c17c947-7429-4ac2-8c83-d7c3f630d808/fpga/target_explorer/gowin_tang_nano_20k/baseline/synth/adaptive_aero_control_top_gowin.json

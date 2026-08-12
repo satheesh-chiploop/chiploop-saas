@@ -1,0 +1,244 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "temp_monitor_digital",
+  "design_summary": {
+    "purpose": "Register-mapped mixed-signal temperature monitor RTL that controls sampling, captures ADC conversions, filters temperature codes, compares against a programmable threshold, and exposes sticky status/IRQ state through an MMIO register set.",
+    "operating_model": "The design is organized as a top-level controller plus a register file and a sample-control/datapath block. Firmware programs CONTROL and THRESHOLD, requests samples explicitly through SAMPLE_START or by enabling periodic sampling, and observes readback status, latest filtered temperature, sample count, and IRQ state. ADC conversions are captured on adc_valid, processed through a two-sample moving average, and used to update temperature and alert state.",
+    "external_interfaces": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": 1
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": 1
+      },
+      {
+        "name": "wr_en",
+        "direction": "input",
+        "width": 1
+      },
+      {
+        "name": "wr_addr",
+        "direction": "input",
+        "width": 8
+      },
+      {
+        "name": "wr_data",
+        "direction": "input",
+        "width": 16
+      },
+      {
+        "name": "rd_en",
+        "direction": "input",
+        "width": 1
+      },
+      {
+        "name": "rd_addr",
+        "direction": "input",
+        "width": 8
+      },
+      {
+        "name": "adc_code",
+        "direction": "input",
+        "width": 12
+      },
+      {
+        "name": "adc_valid",
+        "direction": "input",
+        "width": 1
+      },
+      {
+        "name": "rd_data",
+        "direction": "output",
+        "width": 16
+      },
+      {
+        "name": "sample_req",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "alert_irq",
+        "direction": "output",
+        "width": 1
+      },
+      {
+        "name": "temp_code",
+        "direction": "output",
+        "width": 12
+      },
+      {
+        "name": "threshold_code",
+        "direction": "output",
+        "width": 12
+      },
+      {
+        "name": "alert_status",
+        "direction": "output",
+        "width": 1
+      }
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "temp_monitor_digital_regfile",
+      "role": "Register decode, storage, pulse generation, and readback mux for the MMIO-visible control/status map.",
+      "responsibilities": [
+        "Decode wr_addr and rd_addr.",
+        "Store CONTROL.ENABLE and CONTROL.IRQ_ENABLE.",
+        "Emit one-cycle SAMPLE_START, ALERT_CLEAR, and IRQ_CLEAR pulses from writes.",
+        "Store threshold_code_reg from THRESHOLD writes.",
+        "Assemble STATUS readback from sticky status inputs and internal decode.",
+        "Assemble read-only status, temperature, counter, and IRQ readback values with zero extension for unspecified bits.",
+        "Present a write-one-to-clear compatible view of IRQ_CLEAR.",
+        "Drive the architectural threshold_code_reg output used by the datapath and comparator."
+      ],
+      "interface_notes": [
+        "Owns the top-level read data return path via rd_data.",
+        "Consumes sampled sticky state and counters from the sample controller for STATUS, LATEST_TEMP, SAMPLE_COUNT, and IRQ_STATUS readback.",
+        "Provides stored control bits and write pulses to the sample controller.",
+        "All unused or unmapped readback bits are zero.",
+        "Pulse outputs are intended to be single-cycle and non-self-stretching."
+      ],
+      "ownership_notes": [
+        "control_enable",
+        "control_sample_start_pulse",
+        "control_irq_enable",
+        "control_alert_clear_pulse",
+        "irq_clear_alert_pulse",
+        "irq_clear_sample_done_pulse",
+        "threshold_code_reg",
+        "rd_data"
+      ]
+    },
+    {
+      "name": "temp_monitor_digital_sample_ctrl",
+      "role": "Sampling control, ADC capture/processing, temperature filtering, threshold comparison, sticky status/IRQ latching, and interrupt output generation.",
+      "responsibilities": [
+        "Generate explicit one-cycle sample_req pulses.",
+        "Generate deterministic periodic sample_req pulses while enabled.",
+        "Track a pending-busy condition while a request awaits adc_valid.",
+        "Capture adc_code on adc_valid.",
+        "Filter using a two-sample moving average and present the resulting temp_code/latest_temp.",
+        "Compare filtered temperature against threshold_code_reg.",
+        "Latch alert and sample-done sticky state.",
+        "Clear only the specified sticky bits on ALERT_CLEAR and IRQ_CLEAR inputs.",
+        "Maintain sample_count as a completed-sample counter.",
+        "Drive alert_irq according to IRQ enable and latched IRQ status."
+      ],
+      "interface_notes": [
+        "Receives stored control state and clear pulses from the register file.",
+        "Receives ADC code and valid from the top-level mixed-signal boundary.",
+        "Drives sticky status back to the register file for STATUS and IRQ_STATUS readback.",
+        "Produces the top-level sample_req, alert_irq, temp_code, and alert_status outputs.",
+        "Implements the two-sample moving-average datapath without combinational loops.",
+        "Uses internal explicit state names for sticky and architectural signals where practical."
+      ],
+      "ownership_notes": [
+        "status_sample_done",
+        "status_alert_pending",
+        "status_adc_valid_seen",
+        "status_busy",
+        "irq_status_alert",
+        "irq_status_sample_done",
+        "latest_temp",
+        "sample_count",
+        "compare_alert",
+        "sample_done_pulse",
+        "sample_req_pulse",
+        "sample_req",
+        "alert_irq",
+        "temp_code",
+        "alert_status"
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "temp_monitor_digital_regfile",
+      "to": "temp_monitor_digital_sample_ctrl",
+      "signals": [
+        "control_enable",
+        "control_sample_start_pulse",
+        "control_irq_enable",
+        "control_alert_clear_pulse",
+        "irq_clear_alert_pulse",
+        "irq_clear_sample_done_pulse",
+        "threshold_code_reg"
+      ],
+      "intent": "Move programmed control state, clear pulses, and the threshold register into the sample controller/datapath."
+    },
+    {
+      "from": "temp_monitor_digital_sample_ctrl",
+      "to": "temp_monitor_digital_regfile",
+      "signals": [
+        "status_sample_done",
+        "status_alert_pending",
+        "status_adc_valid_seen",
+        "status_busy",
+        "irq_status_alert",
+        "irq_status_sample_done",
+        "latest_temp",
+        "sample_count"
+      ],
+      "intent": "Return sticky status, IRQ state, latest filtered temperature, and sample count for MMIO readback."
+    },
+    {
+      "from": "temp_monitor_digital_regfile",
+      "to": "top-level outputs",
+      "signals": [
+        "rd_data"
+      ],
+      "intent": "Expose the selected register readback value at the system MMIO interface."
+    },
+    {
+      "from": "temp_monitor_digital_sample_ctrl",
+      "to": "top-level outputs",
+      "signals": [
+        "sample_req",
+        "alert_irq",
+        "temp_code",
+        "alert_status"
+      ],
+      "intent": "Drive the externally visible sample request, interrupt, filtered temperature code, and alert state."
+    },
+    {
+      "from": "top-level ADC boundary",
+      "to": "temp_monitor_digital_sample_ctrl",
+      "signals": [
+        "adc_code",
+        "adc_valid"
+      ],
+      "intent": "Provide conversion results into the sample-control datapath for capture, filtering, and status updates."
+    }
+  ],
+  "data_flow_summary": [
+    "Writes to CONTROL and IRQ_CLEAR are decoded by the register file into stored enables and one-cycle clear/sample pulses.",
+    "Writes to THRESHOLD update threshold_code_reg; the same stored value is forwarded to the sample controller and read back through THRESHOLD and the threshold_code top-level output.",
+    "The sample controller generates sample_req from explicit SAMPLE_START requests and periodic enabled operation, then waits for adc_valid to complete a sample.",
+    "On adc_valid, adc_code is captured, a two-sample moving average is formed, latest_temp/temp_code are updated, and sample_count increments.",
+    "The filtered temperature is compared against threshold_code_reg; if above threshold, alert_status, status_alert_pending, and irq_status_alert are latched.",
+    "Each completed sample also latches status_sample_done and irq_status_sample_done, and sets status_adc_valid_seen on the first observed adc_valid until reset.",
+    "alert_irq is asserted only when CONTROL.IRQ_ENABLE is set and at least one latched IRQ status bit is asserted.",
+    "Register readback muxing returns CONTROL, STATUS, THRESHOLD, LATEST_TEMP, SAMPLE_COUNT, IRQ_STATUS, and IRQ_CLEAR semantics with zero-filled reserved bits and zero for unmapped addresses."
+  ],
+  "clock_reset_summary": {
+    "clocking": "Single synchronous clock domain on clk. All sequential behavior is clocked by clk, with registered state updates and one-cycle pulses derived in synchronous logic.",
+    "reset_behavior": "Active-low reset_n clears control bits, status, IRQ state, latest temperature, sample count, threshold storage, output registers, sample request state, alert state, and internal sticky state to zero. Reset also clears the register file readback state and all pulse outputs."
+  },
+  "integration_notes": [
+    "The register file is the sole owner of MMIO decoding and readback assembly; the sample controller is the sole owner of dynamic temperature processing and sticky status evolution.",
+    "ALERT_CLEAR and IRQ_CLEAR are intentionally narrow: they only clear their specified alert/IRQ/status bits and do not modify latest_temp, threshold_code_reg, or sample_count.",
+    "CONTROL.SAMPLE_START and CONTROL.ALERT_CLEAR are write pulses and do not store state.",
+    "STATUS.sample_done, STATUS.alert_pending, STATUS.adc_valid_seen, IRQ_STATUS.alert, and IRQ_STATUS.sample_done are sticky until cleared by the specified clear actions or reset as defined by the contract.",
+    "The design description preserves the explicit internal signal names requested for architectural clarity: irq_status_alert, irq_status_sample_done, status_sample_done, status_alert_pending, latest_temp, sample_count, and threshold_code."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

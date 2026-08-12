@@ -1,0 +1,270 @@
+{
+  "temp_monitor_digital": {
+    "ports": {
+      "clk": {
+        "dir": "input",
+        "width": "1"
+      },
+      "reset_n": {
+        "dir": "input",
+        "width": "1"
+      },
+      "wr_en": {
+        "dir": "input",
+        "width": "1"
+      },
+      "wr_addr": {
+        "dir": "input",
+        "width": "[7:0]"
+      },
+      "wr_data": {
+        "dir": "input",
+        "width": "[15:0]"
+      },
+      "rd_en": {
+        "dir": "input",
+        "width": "1"
+      },
+      "rd_addr": {
+        "dir": "input",
+        "width": "[7:0]"
+      },
+      "adc_code": {
+        "dir": "input",
+        "width": "[11:0]"
+      },
+      "adc_valid": {
+        "dir": "input",
+        "width": "1"
+      },
+      "rd_data": {
+        "dir": "output",
+        "width": "[15:0]"
+      },
+      "sample_req": {
+        "dir": "output",
+        "width": "1"
+      },
+      "alert_irq": {
+        "dir": "output",
+        "width": "1"
+      },
+      "temp_code": {
+        "dir": "output",
+        "width": "[11:0]"
+      },
+      "threshold_code": {
+        "dir": "output",
+        "width": "[11:0]"
+      },
+      "alert_status": {
+        "dir": "output",
+        "width": "1"
+      }
+    }
+  },
+  "temp_monitor_digital_regfile": {
+    "ports": {
+      "clk": {
+        "dir": "input",
+        "width": "1"
+      },
+      "reset_n": {
+        "dir": "input",
+        "width": "1"
+      },
+      "wr_en": {
+        "dir": "input",
+        "width": "1"
+      },
+      "wr_addr": {
+        "dir": "input",
+        "width": "[7:0]"
+      },
+      "wr_data": {
+        "dir": "input",
+        "width": "[15:0]"
+      },
+      "rd_en": {
+        "dir": "input",
+        "width": "1"
+      },
+      "rd_addr": {
+        "dir": "input",
+        "width": "[7:0]"
+      },
+      "control_enable": {
+        "dir": "output",
+        "width": "1"
+      },
+      "control_sample_start_pulse": {
+        "dir": "output",
+        "width": "1"
+      },
+      "control_irq_enable": {
+        "dir": "output",
+        "width": "1"
+      },
+      "control_alert_clear_pulse": {
+        "dir": "output",
+        "width": "1"
+      },
+      "irq_clear_alert_pulse": {
+        "dir": "output",
+        "width": "1"
+      },
+      "irq_clear_sample_done_pulse": {
+        "dir": "output",
+        "width": "1"
+      },
+      "threshold_code_reg": {
+        "dir": "output",
+        "width": "[11:0]"
+      },
+      "status_sample_done": {
+        "dir": "input",
+        "width": "1"
+      },
+      "status_alert_pending": {
+        "dir": "input",
+        "width": "1"
+      },
+      "status_adc_valid_seen": {
+        "dir": "input",
+        "width": "1"
+      },
+      "status_busy": {
+        "dir": "input",
+        "width": "1"
+      },
+      "irq_status_alert": {
+        "dir": "input",
+        "width": "1"
+      },
+      "irq_status_sample_done": {
+        "dir": "input",
+        "width": "1"
+      },
+      "latest_temp": {
+        "dir": "input",
+        "width": "[11:0]"
+      },
+      "sample_count": {
+        "dir": "input",
+        "width": "[15:0]"
+      },
+      "rd_data": {
+        "dir": "output",
+        "width": "[15:0]"
+      }
+    }
+  },
+  "temp_monitor_digital_sample_ctrl": {
+    "ports": {
+      "clk": {
+        "dir": "input",
+        "width": "1"
+      },
+      "reset_n": {
+        "dir": "input",
+        "width": "1"
+      },
+      "control_enable": {
+        "dir": "input",
+        "width": "1"
+      },
+      "control_sample_start_pulse": {
+        "dir": "input",
+        "width": "1"
+      },
+      "control_irq_enable": {
+        "dir": "input",
+        "width": "1"
+      },
+      "control_alert_clear_pulse": {
+        "dir": "input",
+        "width": "1"
+      },
+      "irq_clear_alert_pulse": {
+        "dir": "input",
+        "width": "1"
+      },
+      "irq_clear_sample_done_pulse": {
+        "dir": "input",
+        "width": "1"
+      },
+      "threshold_code_reg": {
+        "dir": "input",
+        "width": "[11:0]"
+      },
+      "adc_code": {
+        "dir": "input",
+        "width": "[11:0]"
+      },
+      "adc_valid": {
+        "dir": "input",
+        "width": "1"
+      },
+      "sample_req": {
+        "dir": "output",
+        "width": "1"
+      },
+      "alert_irq": {
+        "dir": "output",
+        "width": "1"
+      },
+      "temp_code": {
+        "dir": "output",
+        "width": "[11:0]"
+      },
+      "alert_status": {
+        "dir": "output",
+        "width": "1"
+      },
+      "status_sample_done": {
+        "dir": "output",
+        "width": "1"
+      },
+      "status_alert_pending": {
+        "dir": "output",
+        "width": "1"
+      },
+      "status_adc_valid_seen": {
+        "dir": "output",
+        "width": "1"
+      },
+      "status_busy": {
+        "dir": "output",
+        "width": "1"
+      },
+      "irq_status_alert": {
+        "dir": "output",
+        "width": "1"
+      },
+      "irq_status_sample_done": {
+        "dir": "output",
+        "width": "1"
+      },
+      "latest_temp": {
+        "dir": "output",
+        "width": "[11:0]"
+      },
+      "sample_count": {
+        "dir": "output",
+        "width": "[15:0]"
+      },
+      "compare_alert": {
+        "dir": "output",
+        "width": "1"
+      },
+      "sample_done_pulse": {
+        "dir": "output",
+        "width": "1"
+      },
+      "sample_req_pulse": {
+        "dir": "output",
+        "width": "1"
+      }
+    }
+  }
+}

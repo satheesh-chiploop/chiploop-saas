@@ -1,0 +1,11 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: temp_monitor_digital
+Expected files: ['temp_monitor_digital.v', 'temp_monitor_digital_regfile.v', 'temp_monitor_digital_sample_ctrl.v']
+Materialized files: ['temp_monitor_digital.v', 'temp_monitor_digital_regfile.v', 'temp_monitor_digital_sample_ctrl.v']
+Clock ports: ['clk']
+Reset ports: ['reset_n']
+Icarus compile: pass
+Verilator lint: pass
+Issue count: 0
