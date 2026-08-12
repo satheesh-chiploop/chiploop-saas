@@ -880,6 +880,9 @@ function TokenHeatmapLoader({
     if (!workflowId) return;
     let active = true;
     let timer: ReturnType<typeof setTimeout> | null = null;
+    const terminal = ["completed", "failed", "cancelled", "stopped", "error"].includes(
+      String(status || "").trim().toLowerCase(),
+    );
     const loadTokenUsage = (attempt = 0) => {
       setLoading(true);
       apiGet<TokenHeatmapResponse>(`/apps/dashboard/token_heatmap/${encodeURIComponent(workflowId)}`)
@@ -887,14 +890,16 @@ function TokenHeatmapLoader({
           if (!active) return;
           setUsage(data);
           setError(null);
-          if (!tokenResponseHasUsefulUsage(data) && attempt < 12) {
+          if (!terminal) {
+            timer = setTimeout(() => loadTokenUsage(attempt + 1), 3000);
+          } else if (!tokenResponseHasUsefulUsage(data) && attempt < 2) {
             timer = setTimeout(() => loadTokenUsage(attempt + 1), 2500);
           }
         })
         .catch((reason: unknown) => {
           if (!active) return;
           setError(reason instanceof Error ? reason.message : String(reason));
-          if (attempt < 4) {
+          if ((!terminal && attempt < 120) || (terminal && attempt < 2)) {
             timer = setTimeout(() => loadTokenUsage(attempt + 1), 2500);
           }
         })
@@ -1310,6 +1315,19 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           <div className="flex flex-wrap gap-3">
             <button type="button" onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || "/api"}/workflow/${workflowId}/download_zip?full=1`, "_blank")} className="rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-sm font-semibold text-emerald-100 hover:border-emerald-300">Download run ZIP</button>
           </div>
+        </div>
+      );
+    }
+    const hasAnyEvidence = Object.values(evidence).some((value) => Object.keys(record(value)).length > 0);
+    if (!hasAnyEvidence) {
+      const logTail = String(effectiveLogs || "").split(/\r?\n/).filter(Boolean).slice(-8).join("\n");
+      return (
+        <div className="mt-5 rounded-lg border border-amber-800/60 bg-amber-950/20 p-4">
+          <div className="text-sm font-semibold text-amber-200">Workflow {status || "status unavailable"}</div>
+          <div className="mt-2 text-sm text-slate-300">
+            No dashboard artifacts were indexed for this workflow. The Supabase workflow status and final execution log remain available below.
+          </div>
+          {logTail ? <pre className="mt-3 max-h-56 overflow-auto whitespace-pre-wrap rounded bg-black/30 p-3 text-xs text-slate-400">{logTail}</pre> : null}
         </div>
       );
     }
@@ -2821,14 +2839,14 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
         ) : null}
       </div>
     );
-  }, [agentCount, artifactsLoaded, evidence, error, logs, resultsReady, stage, status, workflowId]);
+  }, [agentCount, artifactsLoaded, effectiveLogs, evidence, error, logs, resultsReady, stage, status, workflowId]);
 
   return (
     <section className="w-full rounded-lg border border-slate-800 bg-slate-950/45 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-sm font-semibold text-white">Dashboard - Run Summary</div>
-          <div className="mt-1 text-xs text-slate-400">Rendered from generated workflow artifacts.</div>
+          <div className="mt-1 text-xs text-slate-400">Supabase workflow status with generated artifact evidence.</div>
         </div>
         <div className="flex max-w-full flex-wrap items-center justify-end gap-2">
           {flow.map((item, index) => (

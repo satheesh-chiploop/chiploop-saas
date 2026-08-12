@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import TopNav from "@/components/TopNav";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import { createClientComponentClient } from "@/lib/platformClient";
 
 type DashboardStage = "physical_ai" | "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "fpga" | "fpga_target_explorer" | "verification" | "embedded" | "software" | "validation" | "product";
 
@@ -55,8 +56,41 @@ export default function WorkflowDashboardPage() {
   const router = useRouter();
   const workflowId = params.workflowId;
   const stage = parseStage(searchParams.get("stage"));
-  const status = searchParams.get("status") || "completed";
+  const requestedStatus = searchParams.get("status") || "running";
   const app = searchParams.get("app") || "";
+  const supabase = useMemo(() => createClientComponentClient(), []);
+  const [workflowState, setWorkflowState] = useState<{ status: string; phase: string; logs: string; hasArtifacts: boolean | null }>({
+    status: requestedStatus,
+    phase: "",
+    logs: "",
+    hasArtifacts: null,
+  });
+
+  useEffect(() => {
+    let active = true;
+    let interval: number | null = null;
+    const load = async () => {
+      const { data, error } = await supabase
+        .from("workflows")
+        .select("status,phase,logs,artifacts")
+        .eq("id", workflowId)
+        .single();
+      if (!active || error || !data) return;
+      const row = data as { status?: string | null; phase?: string | null; logs?: string | null; artifacts?: unknown };
+      setWorkflowState({
+        status: row.status || requestedStatus,
+        phase: row.phase || "",
+        logs: row.logs || "",
+        hasArtifacts: artifactIndexHasEntries(row.artifacts),
+      });
+    };
+    void load();
+    interval = window.setInterval(() => void load(), 2500);
+    return () => {
+      active = false;
+      if (interval) window.clearInterval(interval);
+    };
+  }, [requestedStatus, supabase, workflowId]);
 
   const downloadHref = useMemo(
     () => `/api/workflow/${encodeURIComponent(workflowId)}/download_zip?full=1`,
@@ -78,16 +112,33 @@ export default function WorkflowDashboardPage() {
               Workflow {workflowId}{app ? ` | ${app}` : ""} | {STAGE_LABELS[stage]}
             </p>
           </div>
-          <a
-            href={downloadHref}
-            className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800"
-          >
-            Download ZIP
-          </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold uppercase text-slate-300">
+              {workflowState.status}{workflowState.phase ? ` · ${workflowState.phase}` : ""}
+            </span>
+            {workflowState.hasArtifacts === true ? (
+              <a href={downloadHref} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-800">
+                Download ZIP
+              </a>
+            ) : workflowState.hasArtifacts === false ? (
+              <span className="cursor-not-allowed rounded-lg border border-slate-800 px-4 py-2 text-sm font-semibold text-slate-500" title="No artifacts were indexed for this workflow. Review its status and logs below.">
+                No artifacts
+              </span>
+            ) : (
+              <span className="rounded-lg border border-slate-800 px-4 py-2 text-sm font-semibold text-slate-500">Checking artifacts...</span>
+            )}
+          </div>
         </div>
 
-        <WorkflowEvidenceDashboard workflowId={workflowId} status={status} stage={stage} />
+        <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowState.status} stage={stage} logs={workflowState.logs} />
       </div>
     </main>
   );
+}
+
+function artifactIndexHasEntries(value: unknown): boolean {
+  if (typeof value === "string") return value.trim().length > 0;
+  if (Array.isArray(value)) return value.some(artifactIndexHasEntries);
+  if (value && typeof value === "object") return Object.values(value as Record<string, unknown>).some(artifactIndexHasEntries);
+  return false;
 }

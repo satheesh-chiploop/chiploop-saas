@@ -334,7 +334,15 @@ type SupabaseHemChildRun = {
   label: string;
   status?: string | null;
   dashboard_path: string;
+  has_artifacts?: boolean;
 };
+
+function artifactIndexHasEntries(value: unknown): boolean {
+  if (typeof value === "string") return value.trim().length > 0;
+  if (Array.isArray(value)) return value.some(artifactIndexHasEntries);
+  if (value && typeof value === "object") return Object.values(value as Record<string, unknown>).some(artifactIndexHasEntries);
+  return false;
+}
 
 export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: string | null | undefined; runs?: SupabaseHemChildRun[]; rootWorkflowId?: string | null }) {
   const [linkedRuns, setLinkedRuns] = useState<SupabaseHemChildRun[]>([]);
@@ -350,10 +358,10 @@ export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: s
     const fetchLinkedRuns = async () => {
       const { data, error } = await supabase
         .from("workflows")
-        .select("id,name,status,definitions")
+        .select("id,name,status,definitions,artifacts")
         .contains("definitions", { hem_root_workflow_id: rootWorkflowId });
       if (!active || error || !data) return;
-      const next = (data as Array<{ id: string; name?: string | null; status?: string | null; definitions?: Record<string, unknown> | null }>)
+      const next = (data as Array<{ id: string; name?: string | null; status?: string | null; definitions?: Record<string, unknown> | null; artifacts?: unknown }>)
         .filter((row) => Boolean(row.id))
         .map((row) => {
           const definitions = row.definitions || {};
@@ -364,6 +372,7 @@ export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: s
             label: String(definitions.hem_stage_label || row.name || labelFromStage(stage)),
             status: row.status || "running",
             dashboard_path: `/dashboard/${row.id}?stage=${encodeURIComponent(dashboardStage)}&app=HEM`,
+            has_artifacts: artifactIndexHasEntries(row.artifacts),
           };
         });
       setLinkedRuns(next);
@@ -382,10 +391,21 @@ export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: s
       workflowId: run.workflow_id,
       dashboardPath: run.dashboard_path,
       status: run.status || "running",
+      hasArtifacts: run.has_artifacts,
     }));
-    const byId = new Map(authoritative.map((run) => [run.workflowId, run]));
+    const byId = new Map<string, (typeof authoritative)[number]>();
+    for (const run of authoritative) {
+      const previous = byId.get(run.workflowId);
+      byId.set(run.workflowId, {
+        ...previous,
+        ...run,
+        hasArtifacts: previous?.hasArtifacts === true || run.hasArtifacts === true
+          ? true
+          : run.hasArtifacts ?? previous?.hasArtifacts,
+      });
+    }
     for (const parsed of parseHemChildRuns(logs)) {
-      if (!byId.has(parsed.workflowId)) byId.set(parsed.workflowId, { ...parsed, status: parsed.status || "running" });
+      if (!byId.has(parsed.workflowId)) byId.set(parsed.workflowId, { ...parsed, status: parsed.status || "running", hasArtifacts: undefined });
     }
     return Array.from(byId.values()).sort((a, b) => {
       const aIndex = HEM_STAGE_ORDER.indexOf(stageFromLabel(a.label));
@@ -486,14 +506,20 @@ export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: s
                   >
                     Open Dashboard
                   </a>
-                  <a
-                    href={`${process.env.NEXT_PUBLIC_API_URL || "/api"}/workflow/${encodeURIComponent(child.workflowId)}/download_zip?full=1`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-100 hover:border-emerald-400"
-                  >
-                    Download ZIP
-                  </a>
+                  {child.hasArtifacts === false ? (
+                    <span className="cursor-not-allowed rounded-lg border border-slate-700 bg-slate-900/70 px-3 py-2 text-xs font-semibold text-slate-500" title="This workflow produced no indexed artifacts. Open Dashboard to review its status and failure reason.">
+                      No artifacts
+                    </span>
+                  ) : (
+                    <a
+                      href={`${process.env.NEXT_PUBLIC_API_URL || "/api"}/workflow/${encodeURIComponent(child.workflowId)}/download_zip?full=1`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-100 hover:border-emerald-400"
+                    >
+                      Download ZIP
+                    </a>
+                  )}
                   </div>
                 </td>
               </tr>

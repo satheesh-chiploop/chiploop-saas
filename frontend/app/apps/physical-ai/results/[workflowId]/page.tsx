@@ -3,10 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
-import { HemChildDashboardLinks } from "@/components/HemAutomaticRun";
+import { HemChildDashboardLinks as HemChildDashboardLinksBase } from "@/components/HemAutomaticRun";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 const supabase = createClientComponentClient();
+
+function HemChildDashboardLinks(props: React.ComponentProps<typeof HemChildDashboardLinksBase>) {
+  const params = useParams<{ workflowId: string }>();
+  return <HemChildDashboardLinksBase {...props} rootWorkflowId={props.rootWorkflowId || params.workflowId} />;
+}
 
 type SweepCase = {
   target_speed_rpm: number;
