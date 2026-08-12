@@ -1,0 +1,117 @@
+{
+  "agent": "System CoSim Ingest Agent",
+  "generated_at": "2026-08-12T19:00:59.899458+00:00",
+  "software_resolution": {
+    "state_keys_checked": [
+      "system_software_validation_package",
+      "system_software_package",
+      "software_package"
+    ],
+    "workflow_id_hint": "295f6d9a-5924-479f-80c0-1c426b5e6a53",
+    "candidate_paths": [
+      "system/software/package/system_software_package.json",
+      "system/software_validation/package/system_software_validation_package.json",
+      "software/package/system_software_package.json",
+      "validation/l1/system_software_validation_package.json"
+    ],
+    "resolution": "state:system_software_package",
+    "resolved_path": "state:system_software_package",
+    "storage_prefixes": [],
+    "workflow_row_found": false
+  },
+  "firmware_resolution": {
+    "state_keys_checked": [
+      "system_firmware_handoff",
+      "system_software_handoff",
+      "system_firmware_package",
+      "firmware_package"
+    ],
+    "workflow_id_hint": "d08e11f9-6e47-4d53-8030-78a842968cf5",
+    "candidate_paths": [
+      "system/software_handoff/system_software_handoff.json",
+      "firmware/package/system_firmware_package.json",
+      "firmware/package/firmware_package.json",
+      "firmware/firmware_manifest.json",
+      "system/firmware/package/system_firmware_package.json"
+    ],
+    "resolution": "supabase",
+    "resolved_path": "backend/workflows/d08e11f9-6e47-4d53-8030-78a842968cf5/system/software_handoff/system_software_handoff.json",
+    "storage_prefixes": [
+      "backend/workflows/d08e11f9-6e47-4d53-8030-78a842968cf5/",
+      "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d08e11f9-6e47-4d53-8030-78a842968cf5/",
+      "3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d08e11f9-6e47-4d53-8030-78a842968cf5/"
+    ],
+    "workflow_row_found": true
+  },
+  "rtl_resolution": {
+    "state_keys_checked": [
+      "system_rtl_package",
+      "rtl_package"
+    ],
+    "workflow_id_hint": "2b69fc1c-8119-4549-86cd-59a3fd7d7d8f",
+    "candidate_paths": [
+      "system/package/system_rtl_package.json",
+      "system/integration/system_rtl_package.json"
+    ],
+    "resolution": "state:system_rtl_package",
+    "resolved_path": "state:system_rtl_package",
+    "storage_prefixes": [],
+    "workflow_row_found": false
+  },
+  "verified_simulation_bundle": {
+    "status": "incomplete",
+    "source_workflow_id": "48808218-e19e-4861-9646-b7dc0a105149",
+    "restore_root": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8ec7da41-59b5-4ffa-8177-d3c4db4628f1/f3c51375-b803-460e-b45e-990e3112bfb4/system/system/restored_rtl_sim/48808218-e19e-4861-9646-b7dc0a105149",
+    "restored_file_count": 19,
+    "simulation_manifest_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8ec7da41-59b5-4ffa-8177-d3c4db4628f1/f3c51375-b803-460e-b45e-990e3112bfb4/system/system/restored_rtl_sim/48808218-e19e-4861-9646-b7dc0a105149/vv/tb/simulation_manifest.json",
+    "simulation_manifest": {
+      "type": "vv_system_simulation_manifest",
+      "version": "1.1",
+      "top_module": "temp_monitor_soc_sim",
+      "system_integration_intent_json": "system/integration/system_integration_intent.json",
+      "soc_top_sim_path": "system/imported_rtl/temp_monitor_soc_sim.sv",
+      "rtl_files": [
+        "system/imported_rtl/temp_sensor_adc_model.v",
+        "system/imported_rtl/temp_monitor_digital.v",
+        "system/imported_rtl/temp_monitor_soc_phys.sv",
+        "system/imported_rtl/temp_monitor_soc_sim.sv"
+      ],
+      "default_tests": [
+        "system_smoke_test",
+        "integrated_input_sanity",
+        "register_access_directed",
+        "output_activation_sweep"
+      ],
+      "runner": "vv/tb/run_regression.py",
+      "makefile": "vv/tb/Makefile",
+      "test_py": "vv/tb/test_temp_monitor_soc_sim.py",
+      "testcases_json": "vv/tb/testcases.json",
+      "tb_contract_json": "vv/tb/tb_contract.json",
+      "reports_dir": "vv/tb/reports",
+      "simulator": "verilator",
+      "regmap_json": "digital/digital_regmap.json",
+      "sva_assertions_path": null,
+      "sva_bind_path": null,
+      "coverage_model_py": "vv/tb/coverage_model.py",
+      "coverage_spec_json": "vv/tb/coverage_spec.json",
+      "functional_coverage_summary_json": "vv/tb/reports/functional_coverage_summary.json",
+      "functional_coverage_md": "vv/tb/reports/COVERAGE.md",
+      "verification_sources_mk": "vv/tb/verification_sources.mk"
+    },
+    "makefile_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8ec7da41-59b5-4ffa-8177-d3c4db4628f1/f3c51375-b803-460e-b45e-990e3112bfb4/system/system/restored_rtl_sim/48808218-e19e-4861-9646-b7dc0a105149/vv/tb/Makefile",
+    "make_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8ec7da41-59b5-4ffa-8177-d3c4db4628f1/f3c51375-b803-460e-b45e-990e3112bfb4/system/system/restored_rtl_sim/48808218-e19e-4861-9646-b7dc0a105149/vv/tb",
+    "rtl_files": [],
+    "top_module": "temp_monitor_soc_sim"
+  },
+  "manifest_checks": {
+    "software_entry_found": true,
+    "firmware_elf_found": true,
+    "register_map_found": true,
+    "interrupt_count": 0,
+    "dma_present_resolved": false,
+    "rtl_sim_file_count": 4,
+    "software_l1_status_found": false,
+    "digital_spec_found": true,
+    "integration_intent_found": true
+  }
+}

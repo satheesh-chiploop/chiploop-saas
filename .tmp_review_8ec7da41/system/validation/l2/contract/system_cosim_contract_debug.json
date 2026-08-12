@@ -1,0 +1,8 @@
+{
+  "agent": "System CoSim Contract Agent",
+  "generated_at": "2026-08-12T19:01:01.224736+00:00",
+  "manifest_present": true,
+  "pass_count": 8,
+  "issue_count": 2,
+  "blocking_error_count": 0
+}

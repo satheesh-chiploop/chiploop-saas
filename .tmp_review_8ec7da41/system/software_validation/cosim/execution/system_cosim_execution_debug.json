@@ -1,0 +1,7 @@
+{
+  "agent": "System Software CoSim Execution Agent",
+  "generated_at": "2026-08-12T19:01:29.717316+00:00",
+  "harness_status": "ready",
+  "scenario_count": 9,
+  "execution_status": "partial_pass"
+}

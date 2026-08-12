@@ -1,0 +1,24 @@
+❌ RTL generation aborted due to invalid spec connectivity contract.
+
+âŒ signal_ownership owner port 'uart_packet_engine.control_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.baud_div_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.packet_len_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.tx_fifo_push_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.tx_fifo_push_data_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.rx_fifo_pop_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.irq_status_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.irq_clear_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.debug_count_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_tx_busy_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_rx_busy_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_packet_active_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_error_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_rx_done_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_tx_done_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_framing_error_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_rx_byte_valid_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_rx_byte_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_tx_byte_done_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_tx_fifo_empty_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_tx_fifo_level_o' does not exist.
+âŒ signal_ownership owner port 'uart_packet_engine.uart_rx_fifo_level_o' does not exist.

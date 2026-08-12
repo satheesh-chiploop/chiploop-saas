@@ -1,0 +1,250 @@
+{
+  "agent": "System Software CoSim Harness Agent",
+  "generated_at": "2026-08-12T19:01:03.929874+00:00",
+  "software": {
+    "l1_ready": null,
+    "software_root": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8ec7da41-59b5-4ffa-8177-d3c4db4628f1/f3c51375-b803-460e-b45e-990e3112bfb4/system/restored_system_software",
+    "build_root": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8ec7da41-59b5-4ffa-8177-d3c4db4628f1/f3c51375-b803-460e-b45e-990e3112bfb4/system/restored_system_software/system/software",
+    "package_manifest_path": "backend/workflows/295f6d9a-5924-479f-80c0-1c426b5e6a53/system/software/package/system_software_package.json",
+    "api_contract_path": "backend/workflows/295f6d9a-5924-479f-80c0-1c426b5e6a53/system/software/sdk/system_software_api_contract.json",
+    "input_contract_path": "backend/workflows/295f6d9a-5924-479f-80c0-1c426b5e6a53/system/software/input/system_software_input_contract.json"
+  },
+  "software_entry": {
+    "app_name": "control_service",
+    "cargo_package": "ss_app_control_service",
+    "binary_name": "ss_app_control_service",
+    "command": [
+      "cargo",
+      "run",
+      "-p",
+      "ss_app_control_service"
+    ],
+    "working_dir": "system/software",
+    "command_source": "package_entry",
+    "entry_resolution_status": "resolved",
+    "native_binary_candidates": [
+      "target/debug/ss_app_control_service",
+      "target/release/ss_app_control_service"
+    ],
+    "workspace_members": [
+      "sdk/temp_monitor_mixed_signal_soc",
+      "services",
+      "adapter/temp_monitor_mixed_signal_soc_adapter",
+      "apps/control_service",
+      "apps/diagnostics",
+      "apps/demo_cli"
+    ]
+  },
+  "firmware": {
+    "register_map_path": "firmware/register_map.json",
+    "register_map_json": {
+      "block_name": "digital_subsystem",
+      "module_name": "digital_subsystem",
+      "base_address": "0x00000000",
+      "bus": "MINIMAL",
+      "registers": [
+        {
+          "name": "CONTROL",
+          "offset": "0x00000000",
+          "address": null,
+          "access": "RW",
+          "reset": "0x00000000",
+          "description": "Control register. Bit 0 stores ENABLE. Bit 1 is a write pulse for SAMPLE_START and always reads back as 0. Bit 2 stores IRQ_ENABLE. Bit 3 is a write pulse for ALERT_CLEAR and always reads back as 0. Other bits read as 0.",
+          "fields": [
+            {
+              "name": "ENABLE",
+              "bit_offset": 0,
+              "bit_width": 1,
+              "access": "RW",
+              "description": "Master enable for periodic sampling generation."
+            },
+            {
+              "name": "SAMPLE_START",
+              "bit_offset": 1,
+              "bit_width": 1,
+              "access": "RW",
+              "description": "Writing 1 generates a one-cycle sample_req pulse. Readback is always 0."
+            },
+            {
+              "name": "IRQ_ENABLE",
+              "bit_offset": 2,
+              "bit_width": 1,
+              "access": "RW",
+              "description": "Enables alert_irq when any IRQ_STATUS bit is set."
+            },
+            {
+              "name": "ALERT_CLEAR",
+              "bit_offset": 3,
+              "bit_width": 1,
+              "access": "RW",
+              "description": "Writing 1 clears alert_status and STATUS.alert_pending. Readback is always 0."
+            }
+          ]
+        },
+        {
+          "name": "STATUS",
+          "offset": "0x00000004",
+          "address": null,
+          "access": "RO",
+          "reset": "0x00000000",
+          "description": "Status register. Bit 0 sample_done is sticky until cleared by IRQ_CLEAR bit 1. Bit 1 alert_pending mirrors latched alert_status until cleared by ALERT_CLEAR or IRQ_CLEAR bit 0. Bit 2 adc_valid_seen is sticky until reset. Bit 3 busy is high while a requested sample is pending. Other bits read as 0.",
+          "fields": [
+            {
+              "name": "sample_done",
+              "bit_offset": 0,
+              "bit_width": 1,
+              "access": "RO",
+              "description": "Sticky indication that at least one adc_valid completion occurred since last clear."
+            },
+            {
+              "name": "alert_pending",
+              "bit_offset": 1,
+              "bit_width": 1,
+              "access": "RO",
+              "description": "Mirrors latched alert_status until cleared by ALERT_CLEAR or IRQ_CLEAR bit 0."
+            },
+            {
+              "name": "adc_valid_seen",
+              "bit_offset": 2,
+              "bit_width": 1,
+              "access": "RO",
+              "description": "Sticky after the first adc_valid sample until reset."
+            },
+            {
+              "name": "busy",
+              "bit_offset": 3,
+              "bit_width": 1,
+              "access": "RO",
+              "description": "High while a requested sample is pending."
+            }
+          ]
+        },
+        {
+          "name": "THRESHOLD",
+          "offset": "0x00000008",
+          "address": null,
+          "access": "RW",
+          "reset": "0x00000000",
+          "description": "Threshold compare register. threshold_code is stored in bits [11:0]. Upper bits read as 0.",
+          "fields": [
+            {
+              "name": "threshold_code",
+              "bit_offset": 0,
+              "bit_width": 12,
+              "access": "RW",
+              "description": "Filtered temperature threshold used for alert comparison."
+            }
+          ]
+        },
+        {
+          "name": "LATEST_TEMP",
+          "offset": "0x0000000C",
+          "address": null,
+          "access": "RO",
+          "reset": "0x00000000",
+          "description": "Latest filtered temperature register. latest_temp is reported in bits [11:0]. Upper bits read as 0.",
+          "fields": [
+            {
+              "name": "latest_temp",
+              "bit_offset": 0,
+              "bit_width": 12,
+              "access": "RO",
+              "description": "Latest filtered temperature code from the two-sample moving-average path."
+            }
+          ]
+        },
+        {
+          "name": "SAMPLE_COUNT",
+          "offset": "0x00000010",
+          "address": null,
+          "access": "RO",
+          "reset": "0x00000000",
+          "description": "Completed sample count. This register is preserved by ALERT_CLEAR and IRQ_CLEAR and is only cleared by reset. Width is 16 bits.",
+          "fields": [
+            {
+              "name": "sample_count",
+              "bit_offset": 0,
+              "bit_width": 16,
+              "access": "RO",
+              "description": "Number of completed adc_valid samples captured since reset."
+            }
+          ]
+        },
+        {
+          "name": "IRQ_STATUS",
+          "offset": "0x00000014",
+          "address": null,
+          "access": "RO",
+          "reset": "0x00000000",
+          "description": "Sticky interrupt status register. Bit 0 alert. Bit 1 sample_done. Other bits read as 0.",
+          "fields": [
+            {
+              "name": "alert",
+              "bit_offset": 0,
+              "bit_width": 1,
+              "access": "RO",
+              "description": "Sticky alert interrupt source, set when filtered temperature exceeds threshold."
+            },
+            {
+              "name": "sample_done",
+              "bit_offset": 1,
+              "bit_width": 1,
+              "access": "RO",
+              "description": "Sticky sample-complete interrupt source, set on each adc_valid completion."
+            }
+          ]
+        },
+        {
+          "name": "IRQ_CLEAR",
+          "offset": "0x00000018",
+          "address": null,
+          "access": "W1C",
+          "reset": "0x00000000",
+          "description": "Write-one-to-clear register. Writing bit 0 clears IRQ_STATUS.alert and alert_status. Writing bit 1 clears IRQ_STATUS.sample_done and STATUS.sample_done. Upper bits are ignored. Readback is not required and may read as 0.",
+          "fields": [
+            {
+              "name": "clear_alert",
+              "bit_offset": 0,
+              "bit_width": 1,
+              "access": "W1C",
+              "description": "Write 1 to clear irq_status_alert and alert_status."
+            },
+            {
+              "name": "clear_sample_done",
+              "bit_offset": 1,
+              "bit_width": 1,
+              "access": "W1C",
+              "description": "Write 1 to clear irq_status_sample_done and STATUS.sample_done."
+            }
+          ]
+        }
+      ],
+      "__source": {
+        "mode": "artifact_passthrough",
+        "path": "state.digital_regmap"
+      }
+    },
+    "hal_path": "",
+    "elf_path": "firmware/build/target/x86_64-unknown-linux-gnu/release/firmware_app.elf"
+  },
+  "rtl": {
+    "sim_top_path": "temp_monitor_soc_sim",
+    "sim_harness_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8ec7da41-59b5-4ffa-8177-d3c4db4628f1/f3c51375-b803-460e-b45e-990e3112bfb4/system/system/imported_rtl/temp_sensor_adc_model.v",
+    "verilator_makefile_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8ec7da41-59b5-4ffa-8177-d3c4db4628f1/f3c51375-b803-460e-b45e-990e3112bfb4/system/system/restored_rtl_sim/48808218-e19e-4861-9646-b7dc0a105149/vv/tb/Makefile",
+    "waveform_root": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8ec7da41-59b5-4ffa-8177-d3c4db4628f1/f3c51375-b803-460e-b45e-990e3112bfb4/system/system/restored_rtl_sim/48808218-e19e-4861-9646-b7dc0a105149/vv/tb"
+  },
+  "semantic_assets": {
+    "digital_spec_json_path": "derived:rtl_package_and_register_map",
+    "integration_intent_path": "system/integration/system_integration_intent.json",
+    "digital_spec_loaded": true,
+    "integration_intent_loaded": true
+  },
+  "tool_availability": {
+    "python": true,
+    "python3": true,
+    "make": true,
+    "verilator": true
+  },
+  "blocked_dependencies": [],
+  "resolved_command_count": 7
+}

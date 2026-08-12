@@ -1,0 +1,139 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "uart_packet_engine",
+  "module_microarchitecture": [
+    {
+      "name": "uart_packet_engine",
+      "implementation_style": "Single-module RTL implementing MMIO decode, control/status registers, two small 16x8 FIFOs, shared baud tick generation, UART TX/RX bit engines, packet counting, and sticky IRQ logic in one synchronous clk domain.",
+      "control_strategy": "Use simple address decode on wr_en/rd_en to update CONTROL, BAUD_DIV, PACKET_LEN, and IRQ_CLEAR; TX_DATA writes enqueue into the TX FIFO when not full; RX_DATA reads dequeue from the RX FIFO when not empty. A shared baud tick derived from BAUD_DIV advances both TX and RX timing. CONTROL.ENABLE gates overall operation, RX_ENABLE and TX_ENABLE gate the respective datapaths, LOOPBACK routes completed transmitted bytes into the RX acceptance path, and IRQ_ENABLE gates the final irq output from latched IRQ_STATUS bits.",
+      "state_strategy": "Maintain explicit state for TX and RX UART engines, FIFO write/read pointers, occupancy counters, shift registers, bit counters, baud divider counter, packet byte counters, live status flags, and latched IRQ bits. Use straightforward enumerated states for idle/start/data/stop sequencing in TX and idle/start/data/stop validation in RX. Preserve FIFO level state independently for TX and RX, and update packet_count on accepted valid receive bytes. Keep reset behavior synchronous and deterministic with all registers, counters, pointers, shifters, and status outputs cleared.",
+      "output_strategy": "Drive rd_data from the selected readable register or zero for unmapped addresses. Drive uart_tx from the TX state machine idle-high output, with no combinational dependence on uart_rx. Drive irq as a level signal from CONTROL.IRQ_ENABLE ANDed with any set IRQ_STATUS bit. Drive rx_fifo_level and tx_fifo_level directly from FIFO occupancy, and mirror packet_count to the debug count output. STATUS reflects live FIFO and busy/error conditions, while IRQ_STATUS holds latched completion and error events until cleared by IRQ_CLEAR.",
+      "ownership_notes": [
+        "Owns all top-level MMIO-visible control, status, and debug behavior exactly as defined by the register contract.",
+        "Owns the full UART protocol implementation for 1 start bit, 8 data bits LSB-first, no parity, and 1 stop bit.",
+        "Owns the only state elements needed for the requested scale: FIFO storage/pointers/counts, baud counter, shifters, byte/bit counters, packet counters, status flags, and interrupt latches.",
+        "Must preserve the exact top-level module name, port names, and register map without introducing extra interfaces or subordinate modules."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "name": "tx_uart_fsm",
+      "present": true,
+      "description": "Simple transmit sequencer that remains in idle until CONTROL.ENABLE and CONTROL.TX_ENABLE are asserted and TX FIFO is non-empty. It then emits a start bit, shifts out 8 data bits LSB-first using the shared baud tick, emits one stop bit, and marks byte completion before returning to idle or immediately starting the next byte if more FIFO data is present.",
+      "states": [
+        "IDLE",
+        "START_BIT",
+        "DATA_BITS",
+        "STOP_BIT"
+      ]
+    },
+    {
+      "name": "rx_uart_fsm",
+      "present": true,
+      "description": "Simple receive sequencer that waits for a start-bit qualification on uart_rx, samples the data bits using the shared baud tick, checks the stop bit, and either accepts the reconstructed byte or latches framing_error. Valid received bytes are pushed into the RX FIFO when space is available, or latch rx_overflow on full.",
+      "states": [
+        "IDLE",
+        "START_BIT",
+        "DATA_BITS",
+        "STOP_BIT"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "name": "register_and_status_datapath",
+      "inputs": [
+        "wr_en",
+        "wr_addr[7:0]",
+        "wr_data[7:0]",
+        "rd_en",
+        "rd_addr[7:0]"
+      ],
+      "internal_storage": [
+        "CONTROL[7:0]",
+        "BAUD_DIV[15:0]",
+        "PACKET_LEN[7:0]",
+        "IRQ_STATUS[7:0]",
+        "TX FIFO storage and write/read pointers",
+        "RX FIFO storage and write/read pointers",
+        "TX and RX occupancy counters",
+        "packet_count[15:0]",
+        "baud divider counter",
+        "rd_data staging register"
+      ],
+      "output_mapping": [
+        "rd_data returns the addressed readable register value or zero for unmapped addresses.",
+        "STATUS bit assignments follow the live FIFO empty/full, tx_busy, rx_busy, packet_active, and error conditions.",
+        "IRQ_STATUS bits hold rx_done, tx_done, rx_overflow, tx_underflow, framing_error, and packet_done until cleared.",
+        "rx_fifo_level and tx_fifo_level expose FIFO occupancy truncated or sized to 6 bits as required by the port width.",
+        "packet_count output mirrors the internal debug counter value."
+      ]
+    },
+    {
+      "name": "uart_tx_datapath",
+      "inputs": [
+        "TX FIFO pop data",
+        "baud tick",
+        "CONTROL bits",
+        "PACKET_LEN",
+        "shared reset"
+      ],
+      "internal_storage": [
+        "TX shift register",
+        "TX bit counter",
+        "TX byte completion counter",
+        "TX busy flag",
+        "TX done latch condition"
+      ],
+      "output_mapping": [
+        "uart_tx is held high in idle and stop state, low for the start bit, and driven by the current transmit shift bit during data bits.",
+        "A completed transmitted byte increments the packet accounting path when packet counting semantics are enabled by the top-level control flow.",
+        "tx_fifo_level and STATUS.tx_empty/tx_full reflect FIFO occupancy driven by TX push/pop activity."
+      ]
+    },
+    {
+      "name": "uart_rx_datapath",
+      "inputs": [
+        "uart_rx",
+        "baud tick",
+        "CONTROL bits",
+        "PACKET_LEN",
+        "shared reset",
+        "loopback-eligible transmitted bytes"
+      ],
+      "internal_storage": [
+        "RX synchronizer/qualification state",
+        "RX shift register",
+        "RX bit counter",
+        "RX busy flag",
+        "RX byte-valid pulse",
+        "RX packet byte counter"
+      ],
+      "output_mapping": [
+        "Valid framed bytes are pushed into the RX FIFO when enabled and space is available.",
+        "Invalid stop-bit sampling latches framing_error into IRQ_STATUS and sets STATUS.error.",
+        "Loopback routes completed transmitted bytes into the same RX acceptance path without creating combinational feedback on uart_tx."
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "RESET clears all configuration, FIFO storage/pointers, counters, shifters, state machines, status flags, interrupt latches, irq, rd_data, and packet_count-related outputs.",
+    "MMIO writes are handled synchronously on clk; TX_DATA writes only enqueue when TX FIFO is not full, and RX_DATA reads only dequeue when RX FIFO is not empty.",
+    "BAUD_DIV is used to generate a deterministic shared baud tick for both TX and RX timing; a zero divider is treated as minimum-division behavior in a simple synthesizable way.",
+    "Packet completion is based on valid byte counts, not framing bits; rx_done and tx_done assert when the relevant byte counter reaches PACKET_LEN.",
+    "IRQ_STATUS bits are sticky until cleared by IRQ_CLEAR write-one-to-clear semantics, and irq is a level signal gated by CONTROL.IRQ_ENABLE.",
+    "Loopback only redirects completed transmitted bytes into the receive acceptance path after transmit completion semantics, not combinationally from uart_tx."
+  ],
+  "timing_notes": [
+    "Single synchronous clock domain only; no additional clock or reset domains are introduced.",
+    "The shared baud tick is derived from clk and BAUD_DIV with no requirement for fractional timing.",
+    "UART TX and RX state machines advance only on baud-tick events and therefore remain straightforward and synthesizable.",
+    "The implementation intent favors small, explicit counters and state registers rather than deep control logic, while still reaching the requested roughly 150-200 flip-flop scale through the two FIFOs, counters, shifters, and status/IRQ state."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

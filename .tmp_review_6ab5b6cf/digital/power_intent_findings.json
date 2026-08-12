@@ -1,0 +1,16 @@
+{
+  "domains": [
+    {
+      "name": "PD_TOP",
+      "elements": [
+        "uart_packet_engine"
+      ],
+      "primary_power_net": "VDD",
+      "primary_ground_net": "VSS"
+    }
+  ],
+  "isolation": [],
+  "retention": [],
+  "spec_mode": "hierarchical",
+  "top_module": "uart_packet_engine"
+}

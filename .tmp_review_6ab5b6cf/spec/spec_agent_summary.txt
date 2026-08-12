@@ -1,0 +1,3 @@
+❌ Digital Spec Agent failed.
+
+Pass1 JSON parse/normalize failed: inter_module_signals must be present and non-empty for hierarchical mode.
