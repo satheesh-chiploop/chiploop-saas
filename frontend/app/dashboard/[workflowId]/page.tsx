@@ -50,20 +50,50 @@ function parseStage(value: string | null): DashboardStage {
   return value && VALID_STAGES.has(value as DashboardStage) ? value as DashboardStage : "arch2rtl";
 }
 
+function stageFromWorkflowDefinition(definitions: unknown, requestedStage: DashboardStage): DashboardStage {
+  if (!definitions || typeof definitions !== "object" || Array.isArray(definitions)) return requestedStage;
+  const definition = definitions as Record<string, unknown>;
+  const hemStage = String(definition.hem_stage || "").trim().toLowerCase();
+  // Supabase is authoritative for workflow identity. Derive presentation from
+  // the durable HEM stage so stale dashboard metadata cannot mislabel old runs.
+  const hemDashboardStages: Record<string, DashboardStage> = {
+    arch2rtl: "arch2rtl",
+    verify: "verification",
+    fpga_exploration: "fpga_target_explorer",
+    fpga_bitstream: "fpga",
+    asic_tapeout: "tapeout",
+    firmware_product: "embedded",
+    system_dqa: "dqa",
+    system_sim: "verification",
+    system_firmware: "embedded",
+    system_software: "software",
+    system_software_validation_l2: "validation",
+    system_product_app_builder: "product",
+    system_synthesis: "synthesis",
+    system_pd: "tapeout",
+  };
+  if (hemDashboardStages[hemStage]) return hemDashboardStages[hemStage];
+  const dashboardStage = String(definition.hem_dashboard_stage || "").trim();
+  return VALID_STAGES.has(dashboardStage as DashboardStage)
+    ? dashboardStage as DashboardStage
+    : requestedStage;
+}
+
 export default function WorkflowDashboardPage() {
   const params = useParams<{ workflowId: string }>();
   const searchParams = useSearchParams();
   const router = useRouter();
   const workflowId = params.workflowId;
-  const stage = parseStage(searchParams.get("stage"));
+  const requestedStage = parseStage(searchParams.get("stage"));
   const requestedStatus = searchParams.get("status") || "running";
   const app = searchParams.get("app") || "";
   const supabase = useMemo(() => createClientComponentClient(), []);
-  const [workflowState, setWorkflowState] = useState<{ status: string; phase: string; logs: string; hasArtifacts: boolean | null }>({
+  const [workflowState, setWorkflowState] = useState<{ status: string; phase: string; logs: string; hasArtifacts: boolean | null; stage: DashboardStage }>({
     status: requestedStatus,
     phase: "",
     logs: "",
     hasArtifacts: null,
+    stage: requestedStage,
   });
 
   useEffect(() => {
@@ -72,16 +102,17 @@ export default function WorkflowDashboardPage() {
     const load = async () => {
       const { data, error } = await supabase
         .from("workflows")
-        .select("status,phase,logs,artifacts")
+        .select("status,phase,logs,artifacts,definitions")
         .eq("id", workflowId)
         .single();
       if (!active || error || !data) return;
-      const row = data as { status?: string | null; phase?: string | null; logs?: string | null; artifacts?: unknown };
+      const row = data as { status?: string | null; phase?: string | null; logs?: string | null; artifacts?: unknown; definitions?: unknown };
       setWorkflowState({
         status: row.status || requestedStatus,
         phase: row.phase || "",
         logs: row.logs || "",
         hasArtifacts: artifactIndexHasEntries(row.artifacts),
+        stage: stageFromWorkflowDefinition(row.definitions, requestedStage),
       });
     };
     void load();
@@ -90,7 +121,9 @@ export default function WorkflowDashboardPage() {
       active = false;
       if (interval) window.clearInterval(interval);
     };
-  }, [requestedStatus, supabase, workflowId]);
+  }, [requestedStage, requestedStatus, supabase, workflowId]);
+
+  const stage = workflowState.stage;
 
   const downloadHref = useMemo(
     () => `/api/workflow/${encodeURIComponent(workflowId)}/download_zip?full=1`,

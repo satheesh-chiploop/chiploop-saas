@@ -418,7 +418,8 @@ function extractParticipatingAgentNames(logs: string | null | undefined): string
     const finished = line.match(/^(.+?\sAgent)\s+(?:done|failed)\b/i);
     const lifecycle = line.match(/(?:^|:)\s*(.+?\sAgent)\s+(?:started|completed|done|failed)\b/i);
     const physicalAiLifecycle = line.match(/Physical\s+AI\s+agent\s+(?:started|completed|done|failed):\s*(.+?\sAgent)\b/i);
-    const name = physicalAiLifecycle?.[1] || running?.[1] || finished?.[1] || lifecycle?.[1];
+    const platformLifecycle = line.match(/^(?:ACTIVE\s+AGENT|AGENT\s+(?:COMPLETED|FAILED)):\s*(.+?\sAgent)(?:\s*\||$)/i);
+    const name = platformLifecycle?.[1] || physicalAiLifecycle?.[1] || running?.[1] || finished?.[1] || lifecycle?.[1];
     if (name) {
       const normalized = canonicalAgentName(name);
       if (normalized) agents.add(normalized);

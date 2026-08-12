@@ -106,6 +106,31 @@ const HEM_STAGE_ORDER = [
   "tapeout",
 ];
 
+function dashboardStageFromHemStage(stage: string): string {
+  const normalized = stage.trim().toLowerCase().replaceAll("-", "_").replaceAll(" ", "_");
+  return {
+    rtl: "arch2rtl",
+    arch2rtl: "arch2rtl",
+    verify: "verification",
+    verification: "verification",
+    fpga_exploration: "fpga_target_explorer",
+    fpga_explorer: "fpga_target_explorer",
+    fpga_target_explorer: "fpga_target_explorer",
+    fpga_bitstream: "fpga",
+    asic_tapeout: "tapeout",
+    firmware: "embedded",
+    firmware_product: "embedded",
+    system_dqa: "dqa",
+    system_sim: "verification",
+    system_firmware: "embedded",
+    system_software: "software",
+    system_software_validation_l2: "validation",
+    system_product_app_builder: "product",
+    system_synthesis: "synthesis",
+    system_pd: "tapeout",
+  }[normalized] || normalized;
+}
+
 function labelFromStage(stage: string): string {
   if (stage === "rtl" || stage === "arch2rtl") return "RTL Generation";
   if (stage === "dqa") return "DQA";
@@ -152,7 +177,7 @@ export function parseHemChildRuns(logs: string | null | undefined): HemChildRun[
   for (const started of logs.matchAll(startedPattern)) {
     const label = started[1].trim();
     const workflowId = started[2];
-    const dashboardPath = started[3] || `/dashboard/${workflowId}?stage=${stageFromLabel(label)}&app=HEM`;
+    const dashboardPath = started[3] || `/dashboard/${workflowId}?stage=${dashboardStageFromHemStage(stageFromLabel(label))}&app=HEM`;
     if (byWorkflowId.has(workflowId)) continue;
     const item = {
       label,
@@ -366,7 +391,7 @@ export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: s
         .map((row) => {
           const definitions = row.definitions || {};
           const stage = String(definitions.hem_stage || "");
-          const dashboardStage = String(definitions.hem_dashboard_stage || stage || "run");
+          const dashboardStage = dashboardStageFromHemStage(stage || String(definitions.hem_dashboard_stage || "run"));
           return {
             workflow_id: row.id,
             label: String(definitions.hem_stage_label || row.name || labelFromStage(stage)),
