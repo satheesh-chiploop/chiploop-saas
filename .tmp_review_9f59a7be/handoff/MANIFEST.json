@@ -1,0 +1,34 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "image_dma_pipeline",
+  "generated_at": "2026-08-13T00:22:09.196845",
+  "file_count": 5,
+  "files": [
+    {
+      "path": "docs/spec/digital_spec.json",
+      "sha256": "f3ef5c524cd8488e54e23772c1653dc1b3c6079dc465abe80b629a57fce4ca45",
+      "bytes": 15630
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "71d8b9b70f209ed9042cead334ecbf4944b26ab0efbf44c5c93e13b56cc58a2a",
+      "bytes": 2291
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "5139584a01cd29a996cf67484712774771849b2f7d41cee62b3482f7877d4d7b",
+      "bytes": 826
+    },
+    {
+      "path": "power/power_intent.upf",
+      "sha256": "8de84f985a2436d37b89d35e44a7e6127aff14f07b9ebfb5b97fac592e772826",
+      "bytes": 326
+    },
+    {
+      "path": "rtl/image_dma_pipeline.v",
+      "sha256": "5efae2235efa0d1d967e05bee9c1661821b0c69f0dba1393c7b7d21c03985752",
+      "bytes": 15846
+    }
+  ]
+}

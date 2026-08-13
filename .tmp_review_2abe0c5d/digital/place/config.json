@@ -1,0 +1,20 @@
+{
+  "DESIGN_NAME": "smart_sensor_hub_mcu",
+  "PDK": "sky130A",
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 10.0,
+  "VERILOG_FILES": [
+    "inputs/netlist/smart_sensor_hub_mcu_synth.v"
+  ],
+  "PNR_SDC_FILE": "inputs/constraints/smart_sensor_hub_mcu.sdc",
+  "CHIPLOOP_SOURCE_SPEC_JSON": null,
+  "CHIPLOOP_FILELIST": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/2abe0c5d-7ac4-43fe-8031-ae931b35b29f/b4a2d3ee-d6f5-41d7-8ee3-2683e506f826/digital/arch2tapeout/digital/impl_setup/filelist.f",
+  "CHIPLOOP_UPSTREAM_SDC_SOURCE": "inferred_clock_intent",
+  "FP_CORE_UTIL": 20,
+  "PL_TARGET_DENSITY": 0.25,
+  "FP_SIZING": "absolute",
+  "DIE_AREA": "0 0 280 280",
+  "CHIPLOOP_TOP_LEVEL_IO_BITS": 190,
+  "CHIPLOOP_DIE_SIDE_UM": 280.0,
+  "RUN_LINTER": false
+}

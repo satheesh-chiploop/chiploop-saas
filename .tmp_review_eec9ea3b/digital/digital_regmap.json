@@ -1,0 +1,373 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "flat",
+  "regmap": {
+    "bus": "custom",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 32,
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Global control register for the demo SRAM controller.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Master enable for controller-visible operation. When 0, controller behavior is held inactive for software-visible access sequencing."
+          },
+          {
+            "name": "SOFT_RESET",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-requested reset of controller-visible state. Self-clearing or level-sensitive handling is implementation-defined, but it must clear control/status-visible state without changing the top-level port list."
+          },
+          {
+            "name": "IRQ_ENABLE",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables irq assertion when latched BIST done/fail status is present."
+          },
+          {
+            "name": "RSVD",
+            "lsb": 3,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "Controller status register.",
+        "fields": [
+          {
+            "name": "READY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates controller ready for a new software-visible memory or BIST request."
+          },
+          {
+            "name": "BIST_DONE",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched BIST completion indication."
+          },
+          {
+            "name": "BIST_FAIL",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched BIST failure indication."
+          },
+          {
+            "name": "BUSY",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates controller is busy with a memory access or BIST bookkeeping action."
+          },
+          {
+            "name": "RSVD",
+            "lsb": 4,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "MEM_ADDR",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Scratchpad memory address register.",
+        "fields": [
+          {
+            "name": "ADDR",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Memory address for subsequent read or write access. Matches the 256-word scratchpad depth."
+          },
+          {
+            "name": "RSVD",
+            "lsb": 8,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "MEM_WDATA",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Scratchpad memory write data register.",
+        "fields": [
+          {
+            "name": "WDATA",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "32-bit write data staged for a memory write transaction."
+          }
+        ]
+      },
+      {
+        "name": "MEM_RDATA",
+        "offset": "0x10",
+        "access": "RO",
+        "description": "Scratchpad memory read data register.",
+        "fields": [
+          {
+            "name": "RDATA",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "32-bit read data captured from the scratchpad memory."
+          }
+        ]
+      },
+      {
+        "name": "MEM_CONTROL",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Memory access control register.",
+        "fields": [
+          {
+            "name": "MEM_WRITE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Write strobe/command bit. When asserted, commits MEM_WDATA to MEM_ADDR through the SRAM wrapper."
+          },
+          {
+            "name": "MEM_READ",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Read strobe/command bit. When asserted, captures the addressed memory word into MEM_RDATA and drives rd_data."
+          },
+          {
+            "name": "RSVD",
+            "lsb": 2,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "BIST_CONTROL",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "BIST request and result-clear control register.",
+        "fields": [
+          {
+            "name": "START",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-requested BIST start pulse or level. Also accepts the external bist_start input as a request qualifier."
+          },
+          {
+            "name": "CLEAR_RESULT",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Clears latched BIST done/fail state and associated sticky interrupt indications."
+          },
+          {
+            "name": "RSVD",
+            "lsb": 2,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "BIST_STATUS",
+        "offset": "0x1C",
+        "access": "RO",
+        "description": "BIST status register.",
+        "fields": [
+          {
+            "name": "DONE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched indication that a BIST operation completed."
+          },
+          {
+            "name": "FAIL",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched indication that a BIST operation failed."
+          },
+          {
+            "name": "RUNNING",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a BIST operation is in progress."
+          },
+          {
+            "name": "LAST_FAIL_ADDR",
+            "lsb": 3,
+            "msb": 10,
+            "access": "RO",
+            "reset": 0,
+            "description": "Address of the last observed BIST failure, if any."
+          },
+          {
+            "name": "RSVD",
+            "lsb": 11,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_STATUS",
+        "offset": "0x20",
+        "access": "RW",
+        "description": "Interrupt status register with sticky latched sources.",
+        "fields": [
+          {
+            "name": "BIST_DONE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Sticky interrupt source indicating BIST completion."
+          },
+          {
+            "name": "BIST_FAIL",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Sticky interrupt source indicating BIST failure."
+          },
+          {
+            "name": "RSVD",
+            "lsb": 2,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_CLEAR",
+        "offset": "0x24",
+        "access": "WO",
+        "description": "Write-one-to-clear register for IRQ_STATUS sticky bits.",
+        "fields": [
+          {
+            "name": "BIST_DONE_CLR",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Writing 1 clears IRQ_STATUS.BIST_DONE."
+          },
+          {
+            "name": "BIST_FAIL_CLR",
+            "lsb": 1,
+            "msb": 1,
+            "access": "WO",
+            "reset": 0,
+            "description": "Writing 1 clears IRQ_STATUS.BIST_FAIL."
+          },
+          {
+            "name": "RSVD",
+            "lsb": 2,
+            "msb": 31,
+            "access": "WO",
+            "reset": 0,
+            "description": "Reserved; write 0."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "BIST_DONE_IRQ",
+        "description": "Asserted when BIST completes and the corresponding latched interrupt source is set while IRQ_ENABLE is enabled."
+      },
+      {
+        "name": "BIST_FAIL_IRQ",
+        "description": "Asserted when BIST fails and the corresponding latched interrupt source is set while IRQ_ENABLE is enabled."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Assert reset_n low then high; verify STATUS.READY=0, BIST status cleared, IRQ_STATUS cleared, and MEM_RDATA cleared after reset release.",
+      "Write CONTROL.ENABLE=1 and optionally CONTROL.IRQ_ENABLE=1.",
+      "Program MEM_ADDR and MEM_WDATA before issuing a memory write via MEM_CONTROL.MEM_WRITE=1; deassert or allow self-clear according to implementation after the access is accepted.",
+      "Program MEM_ADDR before issuing a memory read via MEM_CONTROL.MEM_READ=1; poll STATUS.READY or read back MEM_RDATA after the access completes.",
+      "If BIST is desired, write BIST_CONTROL.START=1 or pulse bist_start; then monitor BIST_STATUS until DONE or FAIL is observed."
+    ],
+    "polling_sequence": [
+      "Poll STATUS.BUSY until 0 before starting a new access.",
+      "Poll BIST_STATUS.RUNNING until 0, then inspect BIST_STATUS.DONE and BIST_STATUS.FAIL.",
+      "Read MEM_RDATA after a MEM_READ transaction to obtain the accessed scratchpad word.",
+      "Read IRQ_STATUS to determine which sticky interrupt source is pending."
+    ],
+    "irq_sequence": [
+      "Enable CONTROL.IRQ_ENABLE.",
+      "Start BIST using BIST_CONTROL.START or bist_start.",
+      "Wait for irq to assert.",
+      "Read BIST_STATUS and IRQ_STATUS to determine whether the event was a done or fail condition.",
+      "Clear sticky interrupt sources by writing 1s to IRQ_CLEAR bits and, if needed, clear result state with BIST_CONTROL.CLEAR_RESULT."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The top module remains a controller and is not replaced by a raw SRAM model.",
+    "No new hierarchy or external ports are introduced.",
+    "The register map is software-visible and compatible with the specified controller port list and memory wrapper intent.",
+    "The selected bus type is a minimal custom memory-mapped register interface, consistent with the specification and not forced to AXI/APB."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "workflow_id": "2abe0c5d-7ac4-43fe-8031-ae931b35b29f",
+  "agent": "Digital Placement Agent",
+  "status": "running",
+  "started_at": "2026-08-12T23:58:41.486636Z",
+  "timeout_seconds": 1500,
+  "run_tag": "Digital_Arch2Tapeout_2abe0c5d-7ac4-43fe-8031-ae931b35b29f",
+  "die_area": "0 0 280 280",
+  "fp_sizing": "absolute",
+  "capacity_calibration": {
+    "source": "digital/floorplan/metrics.json",
+    "measured_instance_utilization": 0.00442655,
+    "requested_density": 0.25,
+    "adjusted": false
+  }
+}

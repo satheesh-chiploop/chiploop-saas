@@ -1,4 +1,0 @@
-rtl/temp_monitor_digital.v
-rtl/temp_monitor_digital_regfile.v
-rtl/temp_monitor_digital_sample_ctrl.v
-analog/temp_sensor_adc_model.v

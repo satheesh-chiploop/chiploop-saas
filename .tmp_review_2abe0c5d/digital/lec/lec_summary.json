@@ -1,0 +1,56 @@
+{
+  "workflow_id": "2abe0c5d-7ac4-43fe-8031-ae931b35b29f",
+  "agent": "Digital Logic Equivalence Check Agent",
+  "status": "pass",
+  "tool": "yosys",
+  "tool_available": true,
+  "return_code": 0,
+  "top_module": "smart_sensor_hub_mcu",
+  "rtl_files": [
+    "smart_sensor_hub_mcu.v"
+  ],
+  "yosys_rtl_files": [
+    "smart_sensor_hub_mcu.v"
+  ],
+  "golden_macro_blackbox_stubs": [],
+  "synth_netlist": "smart_sensor_hub_mcu_synth.v",
+  "yosys_synth_netlist": "smart_sensor_hub_mcu_synth.v",
+  "macro_cutpoint_count": 0,
+  "macro_cutpoints": [],
+  "liberty_files": [
+    "sky130_fd_sc_hd__tt_025C_1v80.lib"
+  ],
+  "liberty_file_count": 1,
+  "liberty_usage": "discovered_not_required_for_verilog_model_lec",
+  "stdcell_verilog_files": [
+    "sky130_fd_sc_hd.v"
+  ],
+  "stdcell_verilog_file_count": 1,
+  "yosys_stdcell_verilog_files": [
+    "stdcell_functional_wrappers.v"
+  ],
+  "generated_stdcell_model": "stdcell_functional_wrappers.v",
+  "stdcell_model_strategy": "generated_functional_wrappers_from_gate_netlist",
+  "missing_stdcell_models": [],
+  "missing_stdcell_model_count": 0,
+  "unproven_points": 0,
+  "unproven_equiv_points": [],
+  "primary_status": "pass",
+  "primary_unproven_points": 0,
+  "primary_unproven_equiv_points": [],
+  "reset_sequence_repair": null,
+  "proof_strategy": "primary_equiv_induct",
+  "failure_reason": "equivalence_proven",
+  "generated_at": "2026-08-12T23:58:15.708060Z",
+  "artifacts": {
+    "script": "digital/lec/yosys_lec.ys",
+    "log": "digital/lec/logs/yosys_lec.log",
+    "summary": "digital/lec/lec_summary.json",
+    "report": "digital/lec/lec_report.md",
+    "reset_repair_script": null,
+    "reset_repair_log": null,
+    "generated_stdcell_model": "digital/lec/input/stdcell_functional_wrappers.v",
+    "cutpoint_synth_netlist": null,
+    "golden_macro_blackbox_stubs": []
+  }
+}

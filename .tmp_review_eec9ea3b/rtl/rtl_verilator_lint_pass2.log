@@ -1,0 +1,18 @@
+=== STDERR ===
+%Error-MODMISSING: pass2/sram_mbist_demo_controller.v:68:1: Cannot find file containing module: 'demo_sram_32x256_wrapper'
+   68 | demo_sram_32x256_wrapper u_sram (
+      | ^~~~~~~~~~~~~~~~~~~~~~~~
+                   ... For error description see https://verilator.org/warn/MODMISSING?v=5.047
+                   ... This may be because there's no search path specified with -I<dir>.
+                   ... Looked in:
+                        demo_sram_32x256_wrapper
+                        demo_sram_32x256_wrapper.v
+                        demo_sram_32x256_wrapper.sv
+                        obj_dir/demo_sram_32x256_wrapper
+                        obj_dir/demo_sram_32x256_wrapper.v
+                        obj_dir/demo_sram_32x256_wrapper.sv
+                   ... With current working directory '/root/chiploop-backend/backend/workflows/eec9ea3b-d01b-4917-9e01-8fbc6eda228e/rtl'
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1

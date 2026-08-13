@@ -1,0 +1,12 @@
+[2026-08-13T00:22:12.806543Z] Digital Synthesis Agent
+workflow_id=9f59a7be-304d-48ed-9788-639dc6ff33b1
+workflow_dir=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f59a7be-304d-48ed-9788-639dc6ff33b1/0cf23071-1cb5-4c40-ae9b-31a62f94bd9c/digital/arch2synthesis
+spec_json=/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f59a7be-304d-48ed-9788-639dc6ff33b1/0cf23071-1cb5-4c40-ae9b-31a62f94bd9c/digital/arch2synthesis/handoff/spec/digital_spec.json
+top_module=image_dma_pipeline
+rtl_count=1
+macro_lib_count=0
+status=blocked
+reason=inferred_memory_macro_requires_real_macro_collateral
+inferred_memory_arrays=[{"array": "linebuf0", "depth": 256, "estimated_bits": 2048, "file": "image_dma_pipeline.v", "module": "image_dma_pipeline", "path": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f59a7be-304d-48ed-9788-639dc6ff33b1/0cf23071-1cb5-4c40-ae9b-31a62f94bd9c/digital/arch2synthesis/digital/synth/rtl/image_dma_pipeline.v", "width_bits": 8}, {"array": "linebuf1", "depth": 256, "estimated_bits": 2048, "file": "image_dma_pipeline.v", "module": "image_dma_pipeline", "path": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f59a7be-304d-48ed-9788-639dc6ff33b1/0cf23071-1cb5-4c40-ae9b-31a62f94bd9c/digital/arch2synthesis/digital/synth/rtl/image_dma_pipeline.v", "width_bits": 8}, {"array": "linebuf2", "depth": 256, "estimated_bits": 2048, "file": "image_dma_pipeline.v", "module": "image_dma_pipeline", "path": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f59a7be-304d-48ed-9788-639dc6ff33b1/0cf23071-1cb5-4c40-ae9b-31a62f94bd9c/digital/arch2synthesis/digital/synth/rtl/image_dma_pipeline.v", "width_bits": 8}, {"array": "histogram_mem", "depth": 256, "estimated_bits": 4096, "file": "image_dma_pipeline.v", "module": "image_dma_pipeline", "path": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/9f59a7be-304d-48ed-9788-639dc6ff33b1/0cf23071-1cb5-4c40-ae9b-31a62f94bd9c/digital/arch2synthesis/digital/synth/rtl/image_dma_pipeline.v", "width_bits": 16}]
+flat_memory_registers=[]
+missing_macro_collateral=[]

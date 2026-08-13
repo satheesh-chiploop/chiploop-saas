@@ -1,0 +1,1 @@
+ValueError('inter_module_signals must be present and non-empty for hierarchical mode.')

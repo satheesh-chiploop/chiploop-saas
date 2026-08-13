@@ -380,9 +380,40 @@ export const UART_PRODUCT_INTENT = `Build a simulator-backed UART packet-engine 
 
 The dashboard should let a user configure baud divider and packet length, send a telemetry packet, view TX/RX FIFO levels, observe irq and IRQ_STATUS, run loopback/error scenarios, and preserve lineage back to the generated workflows.`;
 
-export const IMAGE_DMA_PIPELINE_ARCH2RTL_SPEC = `Design a large image processing pipeline with DMA and a memory-mapped control/status interface.
+export const IMAGE_DMA_PIPELINE_ARCH2RTL_SPEC = `Design a production-intent image processing pipeline with DMA and a memory-mapped control/status interface.
 
-This is a large demo design. Target roughly 25,000 flip-flops by using synthesizable register-based line buffers and visible control/state registers rather than inferred SRAM macros for the demo line-buffer storage.
+Bulk image storage must use qualified Sky130 SRAM macros. Do not implement line buffers or histogram storage as inferred reg arrays, individual registers, FPGA BRAM primitives, or flip-flop banks.
+
+Required ASIC memory macro instances:
+- memory_macros[0].name = sky130_sram_1kbyte_1rw1r_32x256_8
+- memory_macros[0].kind = prebuilt_sky130_sram
+- memory_macros[0].instance_name = u_linebuf0_sram
+- memory_macros[0].depth = 256
+- memory_macros[0].data_width = 32
+- memory_macros[0].addr_width = 8
+- memory_macros[0].requires_mbist = true
+- memory_macros[1].name = sky130_sram_1kbyte_1rw1r_32x256_8
+- memory_macros[1].kind = prebuilt_sky130_sram
+- memory_macros[1].instance_name = u_linebuf1_sram
+- memory_macros[1].depth = 256
+- memory_macros[1].data_width = 32
+- memory_macros[1].addr_width = 8
+- memory_macros[1].requires_mbist = true
+- memory_macros[2].name = sky130_sram_1kbyte_1rw1r_32x256_8
+- memory_macros[2].kind = prebuilt_sky130_sram
+- memory_macros[2].instance_name = u_linebuf2_sram
+- memory_macros[2].depth = 256
+- memory_macros[2].data_width = 32
+- memory_macros[2].addr_width = 8
+- memory_macros[2].requires_mbist = true
+- memory_macros[3].name = sky130_sram_1kbyte_1rw1r_32x256_8
+- memory_macros[3].kind = prebuilt_sky130_sram
+- memory_macros[3].instance_name = u_histogram_sram
+- memory_macros[3].depth = 256
+- memory_macros[3].data_width = 32
+- memory_macros[3].addr_width = 8
+- memory_macros[3].requires_mbist = true
+- For each macro, map canonical roles clk, csb, we, addr, din, and dout to the corresponding qualified macro ports. Drive write mask bits for the active byte lanes and safely tie unused secondary-port controls according to the macro contract.
 
 Top module:
 - image_dma_pipeline
@@ -443,18 +474,18 @@ Register map:
 Architecture requirements:
 - DMA read engine fetches packed 32-bit words from SRC_BASE using WIDTH, HEIGHT, and STRIDE.
 - Pixel unpacker converts each 32-bit DMA word into four 8-bit pixels.
-- Use three register-based 256-entry line buffers, each 8 bits wide, for 3x3 window generation. Do not infer SRAM for these line buffers in this demo.
+- Use three explicit u_linebuf*_sram instances for the 256-entry line buffers. Store each 8-bit pixel in the low byte of the 32-bit macro word and ignore the unused read-data bits.
 - Generate a valid 3x3 window after enough pixels and lines have arrived.
 - Pipeline stages: DMA read, pixel unpack, line-buffer/window, convolution, brightness/contrast, threshold, histogram update, output pack, DMA write.
 - Implement at least six visible pipeline valid registers and metadata registers for x/y coordinates.
 - 3x3 convolution uses programmable signed 8-bit kernel coefficients and saturation to 8-bit output.
 - Brightness/contrast stage applies signed offset and scale with saturation.
 - Threshold stage can force output to 0 or 255 when FILTER_MODE is threshold.
-- Histogram stage maintains 256 16-bit counters for processed output pixels.
+- Histogram stage uses u_histogram_sram for 256 16-bit counters, stored in the low half of each 32-bit macro word, with an explicit synchronous read-modify-write sequence.
 - DMA write engine writes packed 32-bit processed pixels to DST_BASE.
 - Interrupt controller asserts irq when frame_done, dma_done, histogram_done, or error events occur and IRQ_ENABLE is set.
 - STATUS.busy remains high from START until frame processing and DMA writeback complete.
-- SOFT_RESET clears internal state, line buffers, counters, histogram, sticky errors, and irq.
+- SOFT_RESET clears controller state, sticky errors, and irq. Clear SRAM contents through a bounded controller initialization sequence rather than a procedural reset loop.
 
 Verification and observability requirements:
 - Expose frame_active, frame_done, pixel_valid, pixel_out, histogram_bin, and histogram_count for simulation visibility.

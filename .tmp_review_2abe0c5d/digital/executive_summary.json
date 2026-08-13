@@ -1,0 +1,79 @@
+{
+  "workflow_id": "2abe0c5d-7ac4-43fe-8031-ae931b35b29f",
+  "digital_run_tag": "Digital_Arch2Tapeout_2abe0c5d-7ac4-43fe-8031-ae931b35b29f",
+  "digital_run_work_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/2abe0c5d-7ac4-43fe-8031-ae931b35b29f/b4a2d3ee-d6f5-41d7-8ee3-2683e506f826/digital/arch2tapeout/digital/run_work",
+  "cell_count": 81,
+  "area": 304.0416,
+  "flipflop_count": 0,
+  "latch_count": 0,
+  "sta_best_stage": "sta_postplace",
+  "worst_slack": 1000000000000000000000000000000000000000,
+  "tns": 0,
+  "drc_violations": null,
+  "drc_status": "failed",
+  "lvs_status": "failed",
+  "tapeout_status": "failed",
+  "tapeout_failure_reasons": [
+    "streamout_command_failed",
+    "drc_not_clean",
+    "lvs_not_clean",
+    "gds_not_produced"
+  ],
+  "tapeout_lec_status": "blocked",
+  "atpg_status": "not_applicable",
+  "sta_stages": {
+    "sta_preplace": {
+      "worst_slack": 1000000043329398900000000000000000000000,
+      "tns": 0
+    },
+    "sta_postplace": {
+      "worst_slack": 1000000000000000000000000000000000000000,
+      "tns": 0
+    },
+    "sta_postcts": {
+      "worst_slack": null,
+      "tns": null
+    },
+    "sta_postroute": {
+      "worst_slack": null,
+      "tns": null
+    },
+    "sta_postfill": {
+      "worst_slack": null,
+      "tns": null,
+      "setup_wns": null,
+      "setup_tns": null,
+      "hold_wns": null,
+      "hold_tns": null,
+      "setup_violations": null,
+      "hold_violations": null
+    }
+  },
+  "gds_paths": {
+    "klayout": null,
+    "magic": null
+  },
+  "artifact_map": {
+    "synth_metrics": "digital/synth/metrics.json",
+    "sta_preplace_metrics": "digital/sta_preplace/metrics.json",
+    "sta_postplace_metrics": "digital/sta_postplace/metrics.json",
+    "sta_postcts_metrics": null,
+    "sta_postroute_metrics": null,
+    "sta_postfill_metrics": null,
+    "drc_metrics": null,
+    "lvs_metrics": null,
+    "tapeout_metrics": null
+  },
+  "next_iteration_suggestions": [
+    "If worst_slack < 0: relax constraints or improve synthesis/placement/CTS/route parameters.",
+    "If DRC violations > 0: inspect DRC logs and rerun with adjusted floorplan/route settings.",
+    "If LVS not clean: check extraction/streamout mismatch and netlist naming."
+  ],
+  "blocking_issues": [
+    "tapeout:failed",
+    "drc:failed",
+    "lvs:failed",
+    "tapeout_lec:blocked"
+  ],
+  "status": "failed"
+}

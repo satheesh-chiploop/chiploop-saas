@@ -1,0 +1,24 @@
+{
+  "DESIGN_NAME": "smart_sensor_hub_mcu",
+  "VERILOG_FILES": [
+    "rtl/smart_sensor_hub_mcu.v"
+  ],
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 10.0,
+  "SYNTH_STRATEGY": "AREA 0",
+  "SYNTH_SDC_FILE": "constraints/smart_sensor_hub_mcu.sdc",
+  "PNR_SDC_FILE": "constraints/smart_sensor_hub_mcu.sdc",
+  "EXTRA_LIBS": [],
+  "EXTRA_LEFS": [],
+  "EXTRA_GDS_FILES": [],
+  "CHIPLOOP_WORKFLOW_ID": "2abe0c5d-7ac4-43fe-8031-ae931b35b29f",
+  "CHIPLOOP_GENERATED_BY": "Digital Synthesis Agent",
+  "CHIPLOOP_GENERATED_AT": "2026-08-12T23:58:07.778405Z",
+  "CHIPLOOP_MACRO_LIBS": [],
+  "CHIPLOOP_MACRO_LEFS": [],
+  "CHIPLOOP_MACRO_GDS": [],
+  "CHIPLOOP_MACRO_SPICE": [],
+  "CHIPLOOP_MACRO_VERILOG": [],
+  "CHIPLOOP_YOSYS_MACRO_LIB_SCRIPT": "yosys_macro_libs.ys",
+  "RUN_LINTER": false
+}

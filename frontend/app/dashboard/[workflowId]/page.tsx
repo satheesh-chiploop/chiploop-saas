@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import TopNav from "@/components/TopNav";
 import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
+import AskThisRunPanel from "@/components/AskThisRunPanel";
 import { createClientComponentClient } from "@/lib/platformClient";
 
 type DashboardStage = "physical_ai" | "arch2rtl" | "dqa" | "rtl_review" | "constraint_review" | "timing_debug" | "smoke" | "synthesis" | "tapeout" | "fpga" | "fpga_target_explorer" | "verification" | "embedded" | "software" | "validation" | "product";
@@ -164,6 +165,9 @@ export default function WorkflowDashboardPage() {
         </div>
 
         <WorkflowEvidenceDashboard workflowId={workflowId} status={workflowState.status} stage={stage} logs={workflowState.logs} />
+        <div className="mt-5">
+          <AskThisRunPanel workflowId={workflowId} />
+        </div>
       </div>
     </main>
   );

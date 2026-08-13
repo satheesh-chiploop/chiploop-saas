@@ -1,0 +1,14 @@
+{
+  "workflow_id": "2abe0c5d-7ac4-43fe-8031-ae931b35b29f",
+  "agent": "Digital CTS Agent",
+  "status": "ok",
+  "return_code": 0,
+  "outputs": {
+    "sdc": "digital/cts/constraints/smart_sensor_hub_mcu.sdc",
+    "metrics_json": "digital/cts/metrics.json",
+    "primary_def": "digital/cts/primary.def",
+    "cts_netlist": "digital/cts/netlist/smart_sensor_hub_mcu.nl.v",
+    "log": "digital/cts/logs/openlane_cts.log",
+    "openlane_run_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/2abe0c5d-7ac4-43fe-8031-ae931b35b29f/b4a2d3ee-d6f5-41d7-8ee3-2683e506f826/digital/arch2tapeout/digital/run_work/cts/runs/Digital_Arch2Tapeout_2abe0c5d-7ac4-43fe-8031-ae931b35b29f"
+  }
+}

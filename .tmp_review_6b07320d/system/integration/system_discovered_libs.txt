@@ -1,1 +1,0 @@
-analog/abstract/temp_sensor_adc_model.lib

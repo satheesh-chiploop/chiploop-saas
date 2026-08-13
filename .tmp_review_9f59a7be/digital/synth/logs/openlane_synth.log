@@ -1,0 +1,1 @@
+Large inferred memory arrays were found in RTL, but no macro Liberty collateral was available. Synthesis is blocked to avoid flattening SRAM/MBIST memories into standard-cell flops.
