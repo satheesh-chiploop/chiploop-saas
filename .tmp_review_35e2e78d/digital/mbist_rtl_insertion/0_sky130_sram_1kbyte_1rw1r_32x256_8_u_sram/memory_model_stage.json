@@ -1,0 +1,9 @@
+{
+  "status": "staged",
+  "source": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+  "targets": [
+    "/opt/chiploop-dft/lib/python3.13/site-packages/autombist/tests/hardware/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+  ],
+  "simulation_model_source": "detected_rtl_source",
+  "workflow_copy": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+}

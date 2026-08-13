@@ -1,0 +1,36 @@
+{
+  "workflow_id": "75353468-4063-4dba-985b-9f52fce5c333",
+  "agent": "Digital DQA Summary Agent",
+  "status": "failed",
+  "blocking_issues": [
+    "rtl_lint_failed",
+    "yosys_synthesis_errors"
+  ],
+  "warning_count": 0,
+  "rtl_file_count": 3,
+  "reports": {
+    "rtl_lint": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/75353468-4063-4dba-985b-9f52fce5c333/6fa89d8f-31f2-4bef-a686-8ab7fccd6f8c/digital/dqa/digital/rtl_lint_report.json",
+    "cdc": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/75353468-4063-4dba-985b-9f52fce5c333/6fa89d8f-31f2-4bef-a686-8ab7fccd6f8c/digital/dqa/digital/cdc_findings.json",
+    "reset_integrity": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/75353468-4063-4dba-985b-9f52fce5c333/6fa89d8f-31f2-4bef-a686-8ab7fccd6f8c/digital/dqa/digital/reset_integrity_findings.json",
+    "synthesis_readiness": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/75353468-4063-4dba-985b-9f52fce5c333/6fa89d8f-31f2-4bef-a686-8ab7fccd6f8c/digital/dqa/signoff/synthesis_readiness_findings.json"
+  },
+  "stages": {
+    "rtl_lint": {
+      "status": "fail",
+      "heuristic_issue_count": 0
+    },
+    "cdc": {
+      "status": "pass",
+      "findings": 0
+    },
+    "reset_integrity": {
+      "status": "pass",
+      "findings": 0
+    },
+    "synthesis_readiness": {
+      "status": "failed",
+      "score": 45,
+      "yosys_warning_count": 0
+    }
+  }
+}

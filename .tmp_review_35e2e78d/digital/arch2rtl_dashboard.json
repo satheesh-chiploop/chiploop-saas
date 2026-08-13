@@ -1,0 +1,2139 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "sram_mbist_demo_controller",
+  "rtl_file_count": 3,
+  "module_count": 3,
+  "modules": [
+    {
+      "name": "demo_sram_32x256_model",
+      "file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_model.v",
+      "input_count": 43,
+      "output_count": 32,
+      "inout_count": 0,
+      "input_port_count": 5,
+      "output_port_count": 1,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "csb",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "web",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "din",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "dout",
+          "direction": "output",
+          "width": "[31:0]"
+        }
+      ]
+    },
+    {
+      "name": "demo_sram_32x256_wrapper",
+      "file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_wrapper.v",
+      "input_count": 43,
+      "output_count": 32,
+      "inout_count": 0,
+      "input_port_count": 5,
+      "output_port_count": 1,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "csb",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "web",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "din",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "dout",
+          "direction": "output",
+          "width": "[31:0]"
+        }
+      ]
+    },
+    {
+      "name": "sram_mbist_demo_controller",
+      "file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v",
+      "input_count": 53,
+      "output_count": 36,
+      "inout_count": 0,
+      "input_port_count": 8,
+      "output_port_count": 5,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "wr_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "wr_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "wr_data",
+          "direction": "input",
+          "width": "[31:0]"
+        },
+        {
+          "name": "rd_en",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rd_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "bist_start",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "rd_data",
+          "direction": "output",
+          "width": "[31:0]"
+        },
+        {
+          "name": "ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "bist_done",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "bist_fail",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "irq",
+          "direction": "output",
+          "width": "1"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 53,
+    "output_count": 36,
+    "inout_count": 0,
+    "input_port_count": 8,
+    "output_port_count": 5,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "wr_en",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "wr_addr",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "wr_data",
+        "direction": "input",
+        "width": "[31:0]"
+      },
+      {
+        "name": "rd_en",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "rd_addr",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "bist_start",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "rd_data",
+        "direction": "output",
+        "width": "[31:0]"
+      },
+      {
+        "name": "ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "bist_done",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "bist_fail",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "irq",
+        "direction": "output",
+        "width": "1"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 251,
+    "latch_count": 0,
+    "memory_bit_count": 8192,
+    "memory_target_count": 1,
+    "storage_target_count": 22,
+    "latch_target_count": 0,
+    "sequential_blocks": 3,
+    "posedge_blocks": 2,
+    "negedge_blocks": 1,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "bist_addr_r",
+      "bist_control_reg",
+      "bist_done_r",
+      "bist_fail_r",
+      "bist_running_r",
+      "bist_status_reg",
+      "control_reg",
+      "dout_r",
+      "irq_r",
+      "irq_status_reg",
+      "last_fail_addr_r",
+      "mem_addr_reg",
+      "mem_control_reg",
+      "mem_rdata_reg",
+      "mem_wdata_reg",
+      "rd_data_r",
+      "ready_r",
+      "sram_addr_r",
+      "sram_csb_r",
+      "sram_din_r",
+      "sram_web_r",
+      "status_reg"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": [
+      "mem"
+    ]
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 1,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "warnings",
+    "scope": "complete_package",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 0,
+    "warning_count": 34,
+    "error_count": 0,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "sram_mbist_demo_controller",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/demo_sram_32x256_model.v",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/demo_sram_32x256_wrapper.v",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/input_demo_8x16_scn4m.v",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_algo.sv",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_fsm.sv",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_top.sv",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_raw_algo.sv",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_raw_fsm.sv",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_raw_top.sv",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_1rw.v",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v",
+      "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_model.sv"
+    ],
+    "stdout_tail": [
+      "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b",
+      "- Verilator: Built from 0.696 MB sources in 16 modules, into 0.053 MB in 3 C++ files needing 0.000 MB",
+      "- Verilator: Walltime 0.028 s (elab=0.004, cvt=0.008, bld=0.000); cpu 0.028 s on 1 threads; allocated 32.359 MB"
+    ],
+    "stderr_tail": [
+      "%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:72:15: Blocking assignment '=' in sequential logic process",
+      "                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'",
+      "                                                                                                                                                                   : ... Suggest using delayed assignment '<='",
+      "   72 |     addr1_reg = addr1;",
+      "      |               ^",
+      "%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:75:21: Blocking assignment '=' in sequential logic process",
+      "                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'",
+      "                                                                                                                                                                   : ... Suggest using delayed assignment '<='",
+      "   75 |     #(T_HOLD) dout1 = 32'bx;",
+      "      |                     ^",
+      "%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:88:37: Blocking assignment '=' in sequential logic process",
+      "                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'",
+      "                                                                                                                                                                   : ... Suggest using delayed assignment '<='",
+      "   88 |                 mem[addr0_reg][7:0] = din0_reg[7:0];",
+      "      |                                     ^",
+      "%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:90:38: Blocking assignment '=' in sequential logic process",
+      "                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'",
+      "                                                                                                                                                                   : ... Suggest using delayed assignment '<='",
+      "   90 |                 mem[addr0_reg][15:8] = din0_reg[15:8];",
+      "      |                                      ^",
+      "%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:92:39: Blocking assignment '=' in sequential logic process",
+      "                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'",
+      "                                                                                                                                                                   : ... Suggest using delayed assignment '<='",
+      "   92 |                 mem[addr0_reg][23:16] = din0_reg[23:16];",
+      "      |                                       ^",
+      "%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:94:39: Blocking assignment '=' in sequential logic process",
+      "                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'",
+      "                                                                                                                                                                   : ... Suggest using delayed assignment '<='",
+      "   94 |                 mem[addr0_reg][31:24] = din0_reg[31:24];",
+      "      |                                       ^",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:21:11: Signal is not used: 'rd_en'",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   21 |     input rd_en;",
+      "      |           ^~~~~",
+      "                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047",
+      "                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:22:17: Signal is not used: 'rd_addr'",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   22 |     input [7:0] rd_addr;",
+      "      |                 ^~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:36:15: Bits of signal are not used: 'control_reg'[1]",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   36 |     reg [2:0] control_reg;",
+      "      |               ^~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:37:16: Signal is not used: 'status_reg'",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   37 |     reg [31:0] status_reg;",
+      "      |                ^~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:40:16: Signal is not used: 'mem_rdata_reg'",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   40 |     reg [31:0] mem_rdata_reg;",
+      "      |                ^~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:41:15: Signal is not used: 'mem_control_reg'",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   41 |     reg [1:0] mem_control_reg;",
+      "      |               ^~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:42:15: Bits of signal are not used: 'bist_control_reg'[0]",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   42 |     reg [1:0] bist_control_reg;",
+      "      |               ^~~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:43:16: Signal is not used: 'bist_status_reg'",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   43 |     reg [10:0] bist_status_reg;",
+      "      |                ^~~~~~~~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:62:6: Signal is not driven, nor used: 'sram_csb'",
+      "                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'",
+      "   62 | wire sram_csb;",
+      "      |      ^~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:63:6: Signal is not driven, nor used: 'sram_web'",
+      "                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'",
+      "   63 | wire sram_web;",
+      "      |      ^~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:64:12: Signal is not driven, nor used: 'sram_addr'",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   64 | wire [7:0] sram_addr;",
+      "      |            ^~~~~~~~~",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:65:13: Signal is not driven, nor used: 'sram_din'",
+      "                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'",
+      "   65 | wire [31:0] sram_din;",
+      "      |             ^~~~~~~~"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "sram_mbist_demo_controller",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/demo_sram_32x256_model.v",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/demo_sram_32x256_wrapper.v",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/input_demo_8x16_scn4m.v",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_algo.sv",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_fsm.sv",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_top.sv",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_raw_algo.sv",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_raw_fsm.sv",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_raw_top.sv",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_1rw.v",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v",
+        "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_model.sv"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stdout": "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b\n- Verilator: Built from 0.696 MB sources in 16 modules, into 0.053 MB in 3 C++ files needing 0.000 MB\n- Verilator: Walltime 0.028 s (elab=0.004, cvt=0.008, bld=0.000); cpu 0.028 s on 1 threads; allocated 32.359 MB\n",
+      "stderr": "%Warning-PINCONNECTEMPTY: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/demo_sram_32x256_wrapper.v:27:10: Instance pin connected by name with empty reference: 'dout1'\n   27 |         .dout1()\n      |          ^~~~~\n                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047\n                          ... Use \"/* verilator lint_off PINCONNECTEMPTY */\" and lint_on around source to disable this message.\n%Warning-PINMISSING: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v:41:7: Instance has missing pin: 'wmask0'\n   41 |     ) u_sram (\n      |       ^~~~~~\n                     backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:12:20: ... Location of port declaration\n   12 |     clk0,csb0,web0,wmask0,addr0,din0,dout0,\n      |                    ^~~~~~\n                     ... For warning description see https://verilator.org/warn/PINMISSING?v=5.047\n                     ... Use \"/* verilator lint_off PINMISSING */\" and lint_on around source to disable this message.\n%Warning-PINMISSING: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v:41:7: Instance has missing pin: 'clk1'\n   41 |     ) u_sram (\n      |       ^~~~~~\n                     backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:14:5: ... Location of port declaration\n   14 |     clk1,csb1,addr1,dout1\n      |     ^~~~\n%Warning-PINMISSING: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v:41:7: Instance has missing pin: 'csb1'\n   41 |     ) u_sram (\n      |       ^~~~~~\n                     backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:14:10: ... Location of port declaration\n   14 |     clk1,csb1,addr1,dout1\n      |          ^~~~\n%Warning-PINMISSING: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v:41:7: Instance has missing pin: 'addr1'\n   41 |     ) u_sram (\n      |       ^~~~~~\n                     backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:14:15: ... Location of port declaration\n   14 |     clk1,csb1,addr1,dout1\n      |               ^~~~~\n%Warning-PINMISSING: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v:41:7: Instance has missing pin: 'dout1'\n   41 |     ) u_sram (\n      |       ^~~~~~\n                     backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:14:21: ... Location of port declaration\n   14 |     clk1,csb1,addr1,dout1\n      |                     ^~~~~\n%Warning-TIMESCALEMOD: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/demo_sram_32x256_model.v:1:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)\n    1 | module demo_sram_32x256_model (\n      |        ^~~~~~~~~~~~~~~~~~~~~~\n                       backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_algo.sv:3:8: ... Location of module with timescale\n    3 | module march_c_algo #(\n      |        ^~~~~~~~~~~~\n                       ... For warning description see https://verilator.org/warn/TIMESCALEMOD?v=5.047\n                       ... Use \"/* verilator lint_off TIMESCALEMOD */\" and lint_on around source to disable this message.\n%Warning-TIMESCALEMOD: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/demo_sram_32x256_wrapper.v:1:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)\n    1 | module demo_sram_32x256_wrapper (\n      |        ^~~~~~~~~~~~~~~~~~~~~~~~\n                       backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_algo.sv:3:8: ... Location of module with timescale\n    3 | module march_c_algo #(\n      |        ^~~~~~~~~~~~\n%Warning-TIMESCALEMOD: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/input_demo_8x16_scn4m.v:5:8: Timescale missing on this module as other modules have it (IEEE 1800-2023 3.14.2.3)\n    5 | module input_demo_8x16_scn4m(\n      |        ^~~~~~~~~~~~~~~~~~~~~\n                       backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_algo.sv:3:8: ... Location of module with timescale\n    3 | module march_c_algo #(\n      |        ^~~~~~~~~~~~\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:52:14: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   52 |     csb0_reg = csb0;\n      |              ^\n                 ... For warning description see https://verilator.org/warn/BLKSEQ?v=5.047\n                 ... Use \"/* verilator lint_off BLKSEQ */\" and lint_on around source to disable this message.\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:53:14: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   53 |     web0_reg = web0;\n      |              ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:54:16: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   54 |     wmask0_reg = wmask0;\n      |                ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:55:15: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   55 |     addr0_reg = addr0;\n      |               ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:56:14: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   56 |     din0_reg = din0;\n      |              ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:57:21: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   57 |     #(T_HOLD) dout0 = 32'bx;\n      |                     ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:71:14: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   71 |     csb1_reg = csb1;\n      |              ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:72:15: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   72 |     addr1_reg = addr1;\n      |               ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:75:21: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   75 |     #(T_HOLD) dout1 = 32'bx;\n      |                     ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:88:37: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   88 |                 mem[addr0_reg][7:0] = din0_reg[7:0];\n      |                                     ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:90:38: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   90 |                 mem[addr0_reg][15:8] = din0_reg[15:8];\n      |                                      ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:92:39: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   92 |                 mem[addr0_reg][23:16] = din0_reg[23:16];\n      |                                       ^\n%Warning-BLKSEQ: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v:94:39: Blocking assignment '=' in sequential logic process\n                                                                                                                                                                   : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'\n                                                                                                                                                                   : ... Suggest using delayed assignment '<='\n   94 |                 mem[addr0_reg][31:24] = din0_reg[31:24];\n      |                                       ^\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:21:11: Signal is not used: 'rd_en'\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   21 |     input rd_en;\n      |           ^~~~~\n                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047\n                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:22:17: Signal is not used: 'rd_addr'\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   22 |     input [7:0] rd_addr;\n      |                 ^~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:36:15: Bits of signal are not used: 'control_reg'[1]\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   36 |     reg [2:0] control_reg;\n      |               ^~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:37:16: Signal is not used: 'status_reg'\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   37 |     reg [31:0] status_reg;\n      |                ^~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:40:16: Signal is not used: 'mem_rdata_reg'\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   40 |     reg [31:0] mem_rdata_reg;\n      |                ^~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:41:15: Signal is not used: 'mem_control_reg'\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   41 |     reg [1:0] mem_control_reg;\n      |               ^~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:42:15: Bits of signal are not used: 'bist_control_reg'[0]\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   42 |     reg [1:0] bist_control_reg;\n      |               ^~~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:43:16: Signal is not used: 'bist_status_reg'\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   43 |     reg [10:0] bist_status_reg;\n      |                ^~~~~~~~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:62:6: Signal is not driven, nor used: 'sram_csb'\n                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'\n   62 | wire sram_csb;\n      |      ^~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:63:6: Signal is not driven, nor used: 'sram_web'\n                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'\n   63 | wire sram_web;\n      |      ^~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:64:12: Signal is not driven, nor used: 'sram_addr'\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   64 | wire [7:0] sram_addr;\n      |            ^~~~~~~~~\n%Warning-UNUSEDSIGNAL: backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v:65:13: Signal is not driven, nor used: 'sram_din'\n                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller'\n   65 | wire [31:0] sram_din;\n      |             ^~~~~~~~\n",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-13T20:20:19.461166+00:00",
+      "ended_at": "2026-08-13T20:20:19.591122+00:00",
+      "elapsed_ms": 129
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 3,
+      "module_count": 3,
+      "modules": [
+        {
+          "name": "demo_sram_32x256_model",
+          "file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_model.v",
+          "input_count": 43,
+          "output_count": 32,
+          "inout_count": 0,
+          "input_port_count": 5,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "web",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "din",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "dout",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "demo_sram_32x256_wrapper",
+          "file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_wrapper.v",
+          "input_count": 43,
+          "output_count": 32,
+          "inout_count": 0,
+          "input_port_count": 5,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "web",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "din",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "dout",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "sram_mbist_demo_controller",
+          "file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v",
+          "input_count": 53,
+          "output_count": 36,
+          "inout_count": 0,
+          "input_port_count": 8,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "bist_start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "bist_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "bist_fail",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 53,
+        "output_count": 36,
+        "inout_count": 0,
+        "input_port_count": 8,
+        "output_port_count": 5,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "wr_data",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rd_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "bist_start",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_data",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "bist_done",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "bist_fail",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "irq",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 251,
+        "latch_count": 0,
+        "memory_bit_count": 8192,
+        "memory_target_count": 1,
+        "storage_target_count": 22,
+        "latch_target_count": 0,
+        "sequential_blocks": 3,
+        "posedge_blocks": 2,
+        "negedge_blocks": 1,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "bist_addr_r",
+          "bist_control_reg",
+          "bist_done_r",
+          "bist_fail_r",
+          "bist_running_r",
+          "bist_status_reg",
+          "control_reg",
+          "dout_r",
+          "irq_r",
+          "irq_status_reg",
+          "last_fail_addr_r",
+          "mem_addr_reg",
+          "mem_control_reg",
+          "mem_rdata_reg",
+          "mem_wdata_reg",
+          "rd_data_r",
+          "ready_r",
+          "sram_addr_r",
+          "sram_csb_r",
+          "sram_din_r",
+          "sram_web_r",
+          "status_reg"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": [
+          "mem"
+        ]
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 1,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 15,
+      "module_count": 15,
+      "modules": [
+        {
+          "name": "demo_sram_32x256_model",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/demo_sram_32x256_model.v",
+          "input_count": 43,
+          "output_count": 32,
+          "inout_count": 0,
+          "input_port_count": 5,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "web",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "din",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "dout",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "demo_sram_32x256_wrapper",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/demo_sram_32x256_wrapper.v",
+          "input_count": 43,
+          "output_count": 32,
+          "inout_count": 0,
+          "input_port_count": 5,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "web",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "din",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "dout",
+              "direction": "output",
+              "width": "[31:0]"
+            }
+          ]
+        },
+        {
+          "name": "input_demo_8x16_scn4m",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/input_demo_8x16_scn4m.v",
+          "input_count": 5,
+          "output_count": 1,
+          "inout_count": 2,
+          "input_port_count": 5,
+          "output_port_count": 1,
+          "inout_port_count": 2,
+          "ports": [
+            {
+              "name": "vdd",
+              "direction": "inout",
+              "width": "1"
+            },
+            {
+              "name": "gnd",
+              "direction": "inout",
+              "width": "1"
+            },
+            {
+              "name": "clk0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "web0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr0",
+              "direction": "input",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "din0",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dout0",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            }
+          ]
+        },
+        {
+          "name": "march_c_algo",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_algo.sv",
+          "input_count": 5,
+          "output_count": 6,
+          "inout_count": 0,
+          "input_port_count": 2,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "phase",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "op_step",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "phase_dir_up",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "do_read",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "do_write",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "expected_data",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "write_data",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "last_step",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "march_c_fsm",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_fsm.sv",
+          "input_count": 4,
+          "output_count": 7,
+          "inout_count": 0,
+          "input_port_count": 4,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mem_rdata",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "mem_en",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mem_we",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mem_addr",
+              "direction": "output",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "mem_wdata",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fail",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "march_c_top",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_c_top.sv",
+          "input_count": 4,
+          "output_count": 8,
+          "inout_count": 0,
+          "input_port_count": 4,
+          "output_port_count": 8,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "bist_start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "bist_busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "bist_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "bist_fail",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sram_clk0",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sram_csb0",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sram_web0",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sram_addr0",
+              "direction": "output",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "sram_din0",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "sram_dout0",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            }
+          ]
+        },
+        {
+          "name": "march_raw_algo",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_raw_algo.sv",
+          "input_count": 5,
+          "output_count": 6,
+          "inout_count": 0,
+          "input_port_count": 2,
+          "output_port_count": 6,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "phase",
+              "direction": "input",
+              "width": "[2:0]"
+            },
+            {
+              "name": "op_step",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "phase_dir_up",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "do_read",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "do_write",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "expected_data",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "write_data",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "last_step",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "march_raw_fsm",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_raw_fsm.sv",
+          "input_count": 4,
+          "output_count": 7,
+          "inout_count": 0,
+          "input_port_count": 4,
+          "output_port_count": 7,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "mem_rdata",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "mem_en",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mem_we",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "mem_addr",
+              "direction": "output",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "mem_wdata",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fail",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "march_raw_top",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/march_raw_top.sv",
+          "input_count": 4,
+          "output_count": 8,
+          "inout_count": 0,
+          "input_port_count": 4,
+          "output_port_count": 8,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "bist_start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "bist_busy",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "bist_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "bist_fail",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sram_clk0",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sram_csb0",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sram_web0",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "sram_addr0",
+              "direction": "output",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "sram_din0",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "sram_dout0",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            }
+          ]
+        },
+        {
+          "name": "sky130_sram_1kbyte_1rw1r_32x256_8",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+          "input_count": 9,
+          "output_count": 2,
+          "inout_count": 2,
+          "input_port_count": 9,
+          "output_port_count": 2,
+          "inout_port_count": 2,
+          "ports": [
+            {
+              "name": "vccd1",
+              "direction": "inout",
+              "width": "1"
+            },
+            {
+              "name": "vssd1",
+              "direction": "inout",
+              "width": "1"
+            },
+            {
+              "name": "clk0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "web0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wmask0",
+              "direction": "input",
+              "width": "[NUM_WMASKS-1:0]"
+            },
+            {
+              "name": "addr0",
+              "direction": "input",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "din0",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dout0",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "clk1",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb1",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr1",
+              "direction": "input",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "dout1",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            }
+          ]
+        },
+        {
+          "name": "sky130_sram_1kbyte_1rw1r_32x256_8_mbist",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v",
+          "input_count": 8,
+          "output_count": 3,
+          "inout_count": 0,
+          "input_port_count": 8,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "test_mode",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "bist_start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "bist_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "bist_fail",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "func_csb",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "func_addr",
+              "direction": "input",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "func_din",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "func_we",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "func_dout",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            }
+          ]
+        },
+        {
+          "name": "sky130_sram_1kbyte_1rw1r_32x256_8_saboteur",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v",
+          "input_count": 5,
+          "output_count": 8,
+          "inout_count": 0,
+          "input_port_count": 5,
+          "output_port_count": 8,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "web0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr0",
+              "direction": "input",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "din0",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dout0",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dbg_actual_word",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dbg_fault_word",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dbg_intended_word",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dbg_prior_value",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dbg_attempted_write",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dbg_actual_read",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dbg_blocked_bits",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            }
+          ]
+        },
+        {
+          "name": "sram_1rw",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_1rw.v",
+          "input_count": 5,
+          "output_count": 1,
+          "inout_count": 0,
+          "input_port_count": 5,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr0",
+              "direction": "input",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "din0",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "we0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "dout0",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            }
+          ]
+        },
+        {
+          "name": "sram_mbist_demo_controller",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_mbist_demo_controller.v",
+          "input_count": 53,
+          "output_count": 36,
+          "inout_count": 0,
+          "input_port_count": 8,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "wr_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "wr_data",
+              "direction": "input",
+              "width": "[31:0]"
+            },
+            {
+              "name": "rd_en",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "bist_start",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "rd_data",
+              "direction": "output",
+              "width": "[31:0]"
+            },
+            {
+              "name": "ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "bist_done",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "bist_fail",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "irq",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "sram_model",
+          "file": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/handoff/sram_mbist_demo_controller_ip_package/rtl/sram_model.sv",
+          "input_count": 5,
+          "output_count": 1,
+          "inout_count": 0,
+          "input_port_count": 5,
+          "output_port_count": 1,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "csb0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "web0",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "addr0",
+              "direction": "input",
+              "width": "[ADDR_WIDTH-1:0]"
+            },
+            {
+              "name": "din0",
+              "direction": "input",
+              "width": "[DATA_WIDTH-1:0]"
+            },
+            {
+              "name": "dout0",
+              "direction": "output",
+              "width": "[DATA_WIDTH-1:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 53,
+        "output_count": 36,
+        "inout_count": 0,
+        "input_port_count": 8,
+        "output_port_count": 5,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "wr_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "wr_data",
+            "direction": "input",
+            "width": "[31:0]"
+          },
+          {
+            "name": "rd_en",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "bist_start",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "rd_data",
+            "direction": "output",
+            "width": "[31:0]"
+          },
+          {
+            "name": "ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "bist_done",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "bist_fail",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "irq",
+            "direction": "output",
+            "width": "1"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 269,
+        "latch_count": 0,
+        "memory_bit_count": 8192,
+        "memory_target_count": 1,
+        "storage_target_count": 37,
+        "latch_target_count": 0,
+        "sequential_blocks": 17,
+        "posedge_blocks": 9,
+        "negedge_blocks": 8,
+        "combinational_blocks": 2,
+        "sampled_flipflop_targets": [
+          "addr0_q",
+          "addr_q",
+          "bist_addr_r",
+          "bist_control_reg",
+          "bist_done_r",
+          "bist_fail_r",
+          "bist_running_r",
+          "bist_status_reg",
+          "control_reg",
+          "csb0_q",
+          "dout0",
+          "dout1",
+          "dout_r",
+          "expected_q",
+          "fail_q",
+          "irq_r",
+          "irq_status_reg",
+          "last_fail_addr_r",
+          "mem",
+          "mem_addr_reg",
+          "mem_control_reg",
+          "mem_rdata_reg",
+          "mem_wdata_reg",
+          "op_step_q",
+          "phase_q",
+          "rd_data_r",
+          "ready_r",
+          "sram_addr_r",
+          "sram_csb_r",
+          "sram_din_r",
+          "sram_web_r",
+          "state_q",
+          "status_reg",
+          "substep_q",
+          "wait_cnt_q",
+          "we0_q",
+          "web0_q"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": [
+          "mem"
+        ]
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 8,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 10,
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control register. Bit 0 enables controller operation, bit 1 requests a software soft reset action, and bit 2 enables interrupt generation.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "When set, enables normal controller operation and memory access sequencing."
+          },
+          {
+            "name": "SOFT_RESET",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-visible reset request. Clears controller-visible status and control state when serviced."
+          },
+          {
+            "name": "IRQ_ENABLE",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "When set, allows irq assertion on latched BIST completion or failure events."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "Status register reporting controller readiness and BIST outcome state.",
+        "fields": [
+          {
+            "name": "ready",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Controller ready indication."
+          },
+          {
+            "name": "bist_done",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched BIST completion status."
+          },
+          {
+            "name": "bist_fail",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched BIST failure status."
+          },
+          {
+            "name": "busy",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the controller is actively servicing a memory or BIST-related operation."
+          }
+        ]
+      },
+      {
+        "name": "MEM_ADDR",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Scratchpad memory address register. Only bits [7:0] are used.",
+        "fields": [
+          {
+            "name": "memory_address",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "8-bit word address for the 256x32 scratchpad memory."
+          }
+        ]
+      },
+      {
+        "name": "MEM_WDATA",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Scratchpad memory write data register.",
+        "fields": [
+          {
+            "name": "memory_write_data",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "32-bit data written into the scratchpad memory on a write request."
+          }
+        ]
+      },
+      {
+        "name": "MEM_RDATA",
+        "offset": "0x10",
+        "access": "RO",
+        "description": "Scratchpad memory read data register.",
+        "fields": [
+          {
+            "name": "memory_read_data",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most recently captured read data from the scratchpad memory."
+          }
+        ]
+      },
+      {
+        "name": "MEM_CONTROL",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Memory access control register. Requests are one-shot semantics and should be interpreted by firmware as a simple command interface.",
+        "fields": [
+          {
+            "name": "MEM_WRITE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Request a memory write using MEM_ADDR and MEM_WDATA."
+          },
+          {
+            "name": "MEM_READ",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Request a memory read using MEM_ADDR; read data is captured into MEM_RDATA."
+          }
+        ]
+      },
+      {
+        "name": "BIST_CONTROL",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "BIST control register.",
+        "fields": [
+          {
+            "name": "START",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software request to start a BIST operation, functionally equivalent to asserting bist_start."
+          },
+          {
+            "name": "CLEAR_RESULT",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Clears latched BIST result and related interrupt status."
+          }
+        ]
+      },
+      {
+        "name": "BIST_STATUS",
+        "offset": "0x1C",
+        "access": "RO",
+        "description": "BIST status register reporting result latch state and the last observed failure address.",
+        "fields": [
+          {
+            "name": "done",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "BIST done latch."
+          },
+          {
+            "name": "fail",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "BIST fail latch."
+          },
+          {
+            "name": "running",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates a BIST request is active or being serviced."
+          },
+          {
+            "name": "last_fail_addr",
+            "lsb": 3,
+            "msb": 10,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last failing memory address, if any, in bits [7:0]."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_STATUS",
+        "offset": "0x20",
+        "access": "RW1C",
+        "description": "Interrupt status register. Bits latch BIST events until cleared by software.",
+        "fields": [
+          {
+            "name": "bist_done",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Latched BIST done interrupt status. Write 1 to clear."
+          },
+          {
+            "name": "bist_fail",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Latched BIST fail interrupt status. Write 1 to clear."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_CLEAR",
+        "offset": "0x24",
+        "access": "WO",
+        "description": "Write-one-to-clear helper for IRQ status. Writing a 1 clears the corresponding IRQ_STATUS bits.",
+        "fields": [
+          {
+            "name": "clear",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write 1 to clear latched IRQ status bits."
+          }
+        ]
+      }
+    ]
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

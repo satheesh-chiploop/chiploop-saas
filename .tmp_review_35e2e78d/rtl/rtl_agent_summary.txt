@@ -1,0 +1,16 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: sram_mbist_demo_controller
+Expected files: ['sram_mbist_demo_controller.v', 'demo_sram_32x256_wrapper.v', 'demo_sram_32x256_model.v']
+Materialized files: ['demo_sram_32x256_model.v', 'demo_sram_32x256_wrapper.v', 'sram_mbist_demo_controller.v']
+External validation models: ['sky130_sram_1kbyte_1rw1r_32x256_8.v']
+Clock ports: ['clk']
+Reset ports: ['reset_n']
+Icarus compile: fail
+Verilator lint: fatal
+Issue count: 2
+
+Issues:
+- ❌ Icarus Verilog compile failed.
+- ❌ Verilator lint failed.

@@ -1,0 +1,615 @@
+{
+  "workflow_id": "35e2e78d-d764-4a04-be6c-e0d174aa908a",
+  "agent": "Digital MBIST RTL Insertion Agent",
+  "enabled": true,
+  "status": "mbist_rtl_generated_and_simulated",
+  "algorithm": "march-c",
+  "supported_algorithms": [
+    "march-c",
+    "march-raw"
+  ],
+  "memory_count": 1,
+  "ram_count": 1,
+  "detected_memory": {
+    "kind": "memory_instance",
+    "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+    "instance": "u_sram",
+    "source_file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/rtl/sram_mbist_demo_controller.v",
+    "parent_module": "sram_mbist_demo_controller",
+    "connections": {
+      "clk": "clk",
+      "csb": "sram_csb_r",
+      "web": "sram_web_r",
+      "addr": "sram_addr_r",
+      "din": "sram_din_r",
+      "dout": "sram_dout"
+    },
+    "ports": {
+      "clk": "clk0",
+      "csb": "csb0",
+      "we": "web0",
+      "addr": "addr0",
+      "din": "din0",
+      "dout": "dout0"
+    },
+    "addr_width": 8,
+    "data_width": 32,
+    "depth": 256,
+    "spec_memory_macro": {
+      "kind": "spec_memory_macro",
+      "macro_kind": "prebuilt_sky130_sram",
+      "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "openram_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "instance": "u_sram",
+      "source_file": null,
+      "connections": {},
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "addr_width": 8,
+      "data_width": 32,
+      "depth": 256,
+      "requires_mbist": true
+    },
+    "macro_kind": "prebuilt_sky130_sram",
+    "rtl_cell": "demo_sram_32x256_wrapper",
+    "openram_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+    "logical_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+    "logical_depth": 256,
+    "logical_addr_width": 8,
+    "openram_behavioral_model": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+  },
+  "detected_memories": [
+    {
+      "kind": "memory_instance",
+      "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "instance": "u_sram",
+      "source_file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/rtl/sram_mbist_demo_controller.v",
+      "parent_module": "sram_mbist_demo_controller",
+      "connections": {
+        "clk": "clk",
+        "csb": "sram_csb_r",
+        "web": "sram_web_r",
+        "addr": "sram_addr_r",
+        "din": "sram_din_r",
+        "dout": "sram_dout"
+      },
+      "ports": {
+        "clk": "clk0",
+        "csb": "csb0",
+        "we": "web0",
+        "addr": "addr0",
+        "din": "din0",
+        "dout": "dout0"
+      },
+      "addr_width": 8,
+      "data_width": 32,
+      "depth": 256,
+      "spec_memory_macro": {
+        "kind": "spec_memory_macro",
+        "macro_kind": "prebuilt_sky130_sram",
+        "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+        "openram_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+        "instance": "u_sram",
+        "source_file": null,
+        "connections": {},
+        "ports": {
+          "clk": "clk",
+          "csb": "csb",
+          "we": "web",
+          "addr": "addr",
+          "din": "din",
+          "dout": "dout"
+        },
+        "addr_width": 8,
+        "data_width": 32,
+        "depth": 256,
+        "requires_mbist": true
+      },
+      "macro_kind": "prebuilt_sky130_sram",
+      "rtl_cell": "demo_sram_32x256_wrapper",
+      "openram_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "logical_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "logical_depth": 256,
+      "logical_addr_width": 8,
+      "openram_behavioral_model": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+    }
+  ],
+  "detected_rtl_memories": [
+    {
+      "kind": "memory_instance",
+      "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "instance": "u_sram",
+      "source_file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/rtl/demo_sram_32x256_wrapper.v",
+      "parent_module": "demo_sram_32x256_wrapper",
+      "connections": {
+        "clk0": "clk",
+        "csb0": "csb",
+        "web0": "web",
+        "addr0": "addr",
+        "din0": "din",
+        "dout0": "dout_r",
+        "clk1": "clk",
+        "csb1": "csb",
+        "addr1": "addr"
+      },
+      "ports": {
+        "clk": "clk0",
+        "csb": "csb0",
+        "we": "web0",
+        "addr": "addr0",
+        "din": "din0",
+        "dout": "dout0"
+      },
+      "addr_width": 8,
+      "data_width": 8,
+      "depth": 256
+    },
+    {
+      "kind": "memory_instance",
+      "cell": "demo_sram_32x256_wrapper",
+      "instance": "u_sram",
+      "source_file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/rtl/sram_mbist_demo_controller.v",
+      "parent_module": "sram_mbist_demo_controller",
+      "connections": {
+        "clk": "clk",
+        "csb": "sram_csb_r",
+        "web": "sram_web_r",
+        "addr": "sram_addr_r",
+        "din": "sram_din_r",
+        "dout": "sram_dout"
+      },
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "addr_width": 8,
+      "data_width": 32,
+      "depth": 256
+    }
+  ],
+  "spec_memory_macros": [
+    {
+      "kind": "spec_memory_macro",
+      "macro_kind": "prebuilt_sky130_sram",
+      "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "openram_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "instance": "u_sram",
+      "source_file": null,
+      "connections": {},
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "addr_width": 8,
+      "data_width": 32,
+      "depth": 256,
+      "requires_mbist": true
+    }
+  ],
+  "autombist_executable": "/usr/local/bin/autombist",
+  "generated_at": "2026-08-13T20:20:11.418535Z",
+  "rtl_files_scanned": [
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/rtl/demo_sram_32x256_model.v",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/rtl/demo_sram_32x256_wrapper.v",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/rtl/sram_mbist_demo_controller.v"
+  ],
+  "allow_generated_sim_model": false,
+  "simulation_model_policy": "require_real_openram_behavioral_model",
+  "memory_results": [
+    {
+      "memory": {
+        "kind": "memory_instance",
+        "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+        "instance": "u_sram",
+        "source_file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/rtl/sram_mbist_demo_controller.v",
+        "parent_module": "sram_mbist_demo_controller",
+        "connections": {
+          "clk": "clk",
+          "csb": "sram_csb_r",
+          "web": "sram_web_r",
+          "addr": "sram_addr_r",
+          "din": "sram_din_r",
+          "dout": "sram_dout"
+        },
+        "ports": {
+          "clk": "clk0",
+          "csb": "csb0",
+          "we": "web0",
+          "addr": "addr0",
+          "din": "din0",
+          "dout": "dout0"
+        },
+        "addr_width": 8,
+        "data_width": 32,
+        "depth": 256,
+        "spec_memory_macro": {
+          "kind": "spec_memory_macro",
+          "macro_kind": "prebuilt_sky130_sram",
+          "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+          "openram_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+          "instance": "u_sram",
+          "source_file": null,
+          "connections": {},
+          "ports": {
+            "clk": "clk",
+            "csb": "csb",
+            "we": "web",
+            "addr": "addr",
+            "din": "din",
+            "dout": "dout"
+          },
+          "addr_width": 8,
+          "data_width": 32,
+          "depth": 256,
+          "requires_mbist": true
+        },
+        "macro_kind": "prebuilt_sky130_sram",
+        "rtl_cell": "demo_sram_32x256_wrapper",
+        "openram_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+        "logical_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+        "logical_depth": 256,
+        "logical_addr_width": 8,
+        "openram_behavioral_model": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+      },
+      "stage_dir": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram",
+      "openram_collateral_generation": {
+        "status": "validated",
+        "generator": "precompiled_sram_macro",
+        "requested": {
+          "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+          "data_width": 32,
+          "depth": 256,
+          "addr_width": 8
+        },
+        "selected": {
+          "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+          "data_width": 32,
+          "depth": 256,
+          "addr_width": 8,
+          "source": "precompiled_sram_macro",
+          "root": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros"
+        },
+        "collateral": {
+          "behavioral_model": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+          "lib": [
+            "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib",
+            "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib"
+          ],
+          "lef": [
+            "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_32x256_8.lef",
+            "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_32x256_8.lef"
+          ],
+          "gds": [
+            "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/gds/sky130_sram_1kbyte_1rw1r_32x256_8.gds",
+            "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/gds/sky130_sram_1kbyte_1rw1r_32x256_8.gds"
+          ],
+          "spice": [
+            "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/spice/sky130_sram_1kbyte_1rw1r_32x256_8.spice",
+            "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/spice/sky130_sram_1kbyte_1rw1r_32x256_8.spice"
+          ],
+          "verilog": [
+            "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+            "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+          ]
+        },
+        "validation": {
+          "status": "clean",
+          "missing": [],
+          "issues": [],
+          "required": [
+            "behavioral_model",
+            "lib",
+            "lef",
+            "gds"
+          ]
+        },
+        "actual_ports": {
+          "clk": "clk0",
+          "csb": "csb0",
+          "we": "web0",
+          "addr": "addr0",
+          "din": "din0",
+          "dout": "dout0"
+        },
+        "depth_match": true,
+        "selection_policy": "explicit_precompiled_sram_macro"
+      },
+      "memory_model_stage": {
+        "status": "staged",
+        "source": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+        "targets": [
+          "/opt/chiploop-dft/lib/python3.13/site-packages/autombist/tests/hardware/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+        ],
+        "simulation_model_source": "detected_rtl_source",
+        "workflow_copy": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+      },
+      "status": "simulated",
+      "simulation": {
+        "status": "pass",
+        "reports_dir": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/autombist_out/sky130_sram_1kbyte_1rw1r_32x256_8/reports",
+        "run_log": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/autombist_run.log"
+      },
+      "wrapper_module": "sky130_sram_1kbyte_1rw1r_32x256_8_mbist",
+      "wrapper_ports": [
+        "clk",
+        "rst_n",
+        "test_mode",
+        "bist_start",
+        "bist_done",
+        "bist_fail",
+        "func_csb",
+        "func_addr",
+        "func_din",
+        "func_we",
+        "func_dout"
+      ],
+      "generated_rtl": [
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/input_demo_8x16_scn4m.v",
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/march_c/march_c_algo.sv",
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/march_c/march_c_fsm.sv",
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/march_c/march_c_top.sv",
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/march_raw/march_raw_algo.sv",
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/march_raw/march_raw_fsm.sv",
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/march_raw/march_raw_top.sv",
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v",
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v",
+        "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/0_sky130_sram_1kbyte_1rw1r_32x256_8_u_sram/generated_rtl/sram_model.sv"
+      ]
+    }
+  ],
+  "processed_memory_count": 1,
+  "simulation": {
+    "status": "pass",
+    "memory_count": 1
+  },
+  "mbist_controller_count": 1,
+  "wrapper_module_count": 1,
+  "integration_status": "wrapper_replaced_memory_instance",
+  "integrated_rtl_lint": {
+    "status": "pass",
+    "rtl_files": [
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_model.v",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_wrapper.v",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/input_demo_8x16_scn4m.v",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_c_algo.sv",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_c_fsm.sv",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_c_top.sv",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_raw_algo.sv",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_raw_fsm.sv",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_raw_top.sv",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sram_model.sv"
+    ],
+    "tools": {
+      "compile": "iverilog",
+      "lint": "verilator",
+      "iverilog_path": "/usr/bin/iverilog",
+      "verilator_path": "/usr/local/bin/verilator"
+    },
+    "iverilog": {
+      "status": "pass",
+      "returncode": 0,
+      "log": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl_lint/mbist_integrated_rtl_iverilog.log",
+      "structural_width_warnings": false,
+      "stdout_tail": [
+        "warning: Found both default and explicit timescale based delays. Use",
+        "       : -Wtimescale to find the design element(s) with no explicit",
+        "       : timescale."
+      ]
+    },
+    "verilator": {
+      "status": "pass",
+      "returncode": 0,
+      "log": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl_lint/mbist_integrated_rtl_verilator.log",
+      "error_count": 0,
+      "warning_count": 57,
+      "stdout_tail": [
+        "      |                ^~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v:41:15: Signal is not used: 'mem_control_reg'",
+        "                                                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'",
+        "   41 |     reg [1:0] mem_control_reg;",
+        "      |               ^~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v:42:15: Bits of signal are not used: 'bist_control_reg'[0]",
+        "                                                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'",
+        "   42 |     reg [1:0] bist_control_reg;",
+        "      |               ^~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v:43:16: Signal is not used: 'bist_status_reg'",
+        "                                                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'",
+        "   43 |     reg [10:0] bist_status_reg;",
+        "      |                ^~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v:62:6: Signal is not driven, nor used: 'sram_csb'",
+        "                                                                                                                                                                                                : ... note: In instance 'sram_mbist_demo_controller'",
+        "   62 | wire sram_csb;",
+        "      |      ^~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v:63:6: Signal is not driven, nor used: 'sram_web'",
+        "                                                                                                                                                                                                : ... note: In instance 'sram_mbist_demo_controller'",
+        "   63 | wire sram_web;",
+        "      |      ^~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v:64:12: Signal is not driven, nor used: 'sram_addr'",
+        "                                                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'",
+        "   64 | wire [7:0] sram_addr;",
+        "      |            ^~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v:65:13: Signal is not driven, nor used: 'sram_din'",
+        "                                                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'",
+        "   65 | wire [31:0] sram_din;",
+        "      |             ^~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v:79:10: Signal is not used: 'mbist_u_sram_bist_done'",
+        "                                                                                                                                                                                                 : ... note: In instance 'sram_mbist_demo_controller'",
+        "   79 |     wire mbist_u_sram_bist_done;",
+        "      |          ^~~~~~~~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v:80:6: Signal is not used: 'mbist_u_sram_bist_fail'",
+        "                                                                                                                                                                                                : ... note: In instance 'sram_mbist_demo_controller'",
+        "   80 | wire mbist_u_sram_bist_fail;",
+        "      |      ^~~~~~~~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v:22:28: Signal is not used: 'mbist_busy'",
+        "                                                                                                                                                                                               : ... note: In instance 'sram_mbist_demo_controller.u_sram'",
+        "   22 |     logic                  mbist_busy;",
+        "      |                            ^~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v:32:28: Signal is not used: 'sram_dbg_actual_word'",
+        "                                                                                                                                                                                               : ... note: In instance 'sram_mbist_demo_controller.u_sram'",
+        "   32 |     logic [DATA_WIDTH-1:0] sram_dbg_actual_word;",
+        "      |                            ^~~~~~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v:33:28: Signal is not used: 'sram_dbg_fault_word'",
+        "                                                                                                                                                                                               : ... note: In instance 'sram_mbist_demo_controller.u_sram'",
+        "   33 |     logic [DATA_WIDTH-1:0] sram_dbg_fault_word;",
+        "      |                            ^~~~~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v:34:28: Signal is not used: 'sram_dbg_intended_word'",
+        "                                                                                                                                                                                               : ... note: In instance 'sram_mbist_demo_controller.u_sram'",
+        "   34 |     logic [DATA_WIDTH-1:0] sram_dbg_intended_word;",
+        "      |                            ^~~~~~~~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v:35:28: Signal is not used: 'sram_dbg_prior_value'",
+        "                                                                                                                                                                                               : ... note: In instance 'sram_mbist_demo_controller.u_sram'",
+        "   35 |     logic [DATA_WIDTH-1:0] sram_dbg_prior_value;",
+        "      |                            ^~~~~~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v:36:28: Signal is not used: 'sram_dbg_attempted_write'",
+        "                                                                                                                                                                                               : ... note: In instance 'sram_mbist_demo_controller.u_sram'",
+        "   36 |     logic [DATA_WIDTH-1:0] sram_dbg_attempted_write;",
+        "      |                            ^~~~~~~~~~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v:37:28: Signal is not used: 'sram_dbg_actual_read'",
+        "                                                                                                                                                                                               : ... note: In instance 'sram_mbist_demo_controller.u_sram'",
+        "   37 |     logic [DATA_WIDTH-1:0] sram_dbg_actual_read;",
+        "      |                            ^~~~~~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v:38:28: Signal is not used: 'sram_dbg_blocked_bits'",
+        "                                                                                                                                                                                               : ... note: In instance 'sram_mbist_demo_controller.u_sram'",
+        "   38 |     logic [DATA_WIDTH-1:0] sram_dbg_blocked_bits;",
+        "      |                            ^~~~~~~~~~~~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v:24:11: Signal is not used: 'write_cycle'",
+        "                                                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'",
+        "   24 |     logic write_cycle;",
+        "      |           ^~~~~~~~~~~",
+        "%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v:25:11: Signal is not used: 'read_cycle'",
+        "                                                                                                                                                                                                  : ... note: In instance 'sram_mbist_demo_controller.u_sram.u_sram'",
+        "   25 |     logic read_cycle;",
+        "      |           ^~~~~~~~~~",
+        "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b",
+        "- Verilator: Built from 0.677 MB sources in 15 modules, into 0.133 MB in 3 C++ files needing 0.000 MB",
+        "- Verilator: Walltime 0.046 s (elab=0.007, cvt=0.021, bld=0.000); cpu 0.045 s on 1 threads; allocated 33.355 MB"
+      ]
+    }
+  },
+  "wrapper_modules": [
+    "sky130_sram_1kbyte_1rw1r_32x256_8_mbist"
+  ],
+  "integration_targets": [
+    {
+      "memory": {
+        "kind": "memory_instance",
+        "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+        "instance": "u_sram",
+        "source_file": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/rtl/sram_mbist_demo_controller.v",
+        "parent_module": "sram_mbist_demo_controller",
+        "connections": {
+          "clk": "clk",
+          "csb": "sram_csb_r",
+          "web": "sram_web_r",
+          "addr": "sram_addr_r",
+          "din": "sram_din_r",
+          "dout": "sram_dout"
+        },
+        "ports": {
+          "clk": "clk0",
+          "csb": "csb0",
+          "we": "web0",
+          "addr": "addr0",
+          "din": "din0",
+          "dout": "dout0"
+        },
+        "addr_width": 8,
+        "data_width": 32,
+        "depth": 256,
+        "spec_memory_macro": {
+          "kind": "spec_memory_macro",
+          "macro_kind": "prebuilt_sky130_sram",
+          "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+          "openram_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+          "instance": "u_sram",
+          "source_file": null,
+          "connections": {},
+          "ports": {
+            "clk": "clk",
+            "csb": "csb",
+            "we": "web",
+            "addr": "addr",
+            "din": "din",
+            "dout": "dout"
+          },
+          "addr_width": 8,
+          "data_width": 32,
+          "depth": 256,
+          "requires_mbist": true
+        },
+        "macro_kind": "prebuilt_sky130_sram",
+        "rtl_cell": "demo_sram_32x256_wrapper",
+        "openram_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+        "logical_cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+        "logical_depth": 256,
+        "logical_addr_width": 8,
+        "openram_behavioral_model": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+      },
+      "wrapper_module": "sky130_sram_1kbyte_1rw1r_32x256_8_mbist",
+      "wrapper_ports": [
+        "clk",
+        "rst_n",
+        "test_mode",
+        "bist_start",
+        "bist_done",
+        "bist_fail",
+        "func_csb",
+        "func_addr",
+        "func_din",
+        "func_we",
+        "func_dout"
+      ]
+    }
+  ],
+  "skipped_nested_integration_targets": [],
+  "patched_sources": [
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v"
+  ],
+  "integrated_rtl_dir": "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl",
+  "final_rtl_files": [
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_model.v",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_wrapper.v",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/input_demo_8x16_scn4m.v",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_c_algo.sv",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_c_fsm.sv",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_c_top.sv",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_raw_algo.sv",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_raw_fsm.sv",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/march_raw_top.sv",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_mbist.v",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8_saboteur.v",
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sram_model.sv"
+  ],
+  "staged_behavioral_models": [
+    "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+  ],
+  "deduped_functional_rtl": {
+    "files": [
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_model.v",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/demo_sram_32x256_wrapper.v",
+      "/root/chiploop-backend/backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/digital/mbist_rtl_insertion/integrated_rtl/functional_rtl/sram_mbist_demo_controller.v"
+    ],
+    "removed": []
+  },
+  "integration_note": "AutoMBIST generated and simulated wrapper RTL for each detected OpenRAM/SRAM memory. The agent replaces detected instances when wrapper ports can be mapped; otherwise it fails later at synthesis rather than claiming a fake insertion."
+}

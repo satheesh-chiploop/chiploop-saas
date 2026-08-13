@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "compile_passed": true,
+  "lint_passed": true,
+  "final_pass": "pass2",
+  "issue_count": 0
+}

@@ -1,0 +1,151 @@
+=== STDERR ===
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'clk0'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:12:5: ... Location of port declaration
+   12 |     clk0,csb0,web0,wmask0,addr0,din0,dout0,
+      |     ^~~~
+                     ... For warning description see https://verilator.org/warn/PINMISSING?v=5.047
+                     ... Use "/* verilator lint_off PINMISSING */" and lint_on around source to disable this message.
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'csb0'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:12:10: ... Location of port declaration
+   12 |     clk0,csb0,web0,wmask0,addr0,din0,dout0,
+      |          ^~~~
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'web0'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:12:15: ... Location of port declaration
+   12 |     clk0,csb0,web0,wmask0,addr0,din0,dout0,
+      |               ^~~~
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'wmask0'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:12:20: ... Location of port declaration
+   12 |     clk0,csb0,web0,wmask0,addr0,din0,dout0,
+      |                    ^~~~~~
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'addr0'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:12:27: ... Location of port declaration
+   12 |     clk0,csb0,web0,wmask0,addr0,din0,dout0,
+      |                           ^~~~~
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'din0'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:12:33: ... Location of port declaration
+   12 |     clk0,csb0,web0,wmask0,addr0,din0,dout0,
+      |                                 ^~~~
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'dout0'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:12:38: ... Location of port declaration
+   12 |     clk0,csb0,web0,wmask0,addr0,din0,dout0,
+      |                                      ^~~~~
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'clk1'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:14:5: ... Location of port declaration
+   14 |     clk1,csb1,addr1,dout1
+      |     ^~~~
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'csb1'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:14:10: ... Location of port declaration
+   14 |     clk1,csb1,addr1,dout1
+      |          ^~~~
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'addr1'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:14:15: ... Location of port declaration
+   14 |     clk1,csb1,addr1,dout1
+      |               ^~~~~
+%Warning-PINMISSING: demo_sram_32x256_wrapper.v:18:39: Instance has missing pin: 'dout1'
+   18 |     sky130_sram_1kbyte_1rw1r_32x256_8 u_sram (
+      |                                       ^~~~~~
+                     _external_rtl_models/sky130_sram_1kbyte_1rw1r_32x256_8.v:14:21: ... Location of port declaration
+   14 |     clk1,csb1,addr1,dout1
+      |                     ^~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:21:11: Signal is not used: 'rd_en'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   21 |     input rd_en;
+      |           ^~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:22:17: Signal is not used: 'rd_addr'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   22 |     input [7:0] rd_addr;
+      |                 ^~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:36:15: Bits of signal are not used: 'control_reg'[1]
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   36 |     reg [2:0] control_reg;
+      |               ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:37:16: Signal is not used: 'status_reg'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   37 |     reg [31:0] status_reg;
+      |                ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:40:16: Signal is not used: 'mem_rdata_reg'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   40 |     reg [31:0] mem_rdata_reg;
+      |                ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:41:15: Signal is not used: 'mem_control_reg'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   41 |     reg [1:0] mem_control_reg;
+      |               ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:42:15: Bits of signal are not used: 'bist_control_reg'[0]
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   42 |     reg [1:0] bist_control_reg;
+      |               ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:43:16: Signal is not used: 'bist_status_reg'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   43 |     reg [10:0] bist_status_reg;
+      |                ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:46:9: Signal is not used: 'sram_csb_r'
+                                                        : ... note: In instance 'sram_mbist_demo_controller'
+   46 |     reg sram_csb_r;
+      |         ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:47:9: Signal is not used: 'sram_web_r'
+                                                        : ... note: In instance 'sram_mbist_demo_controller'
+   47 |     reg sram_web_r;
+      |         ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:48:15: Signal is not used: 'sram_addr_r'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   48 |     reg [7:0] sram_addr_r;
+      |               ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:49:16: Signal is not used: 'sram_din_r'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   49 |     reg [31:0] sram_din_r;
+      |                ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:70:6: Signal is not driven, nor used: 'sram_csb'
+                                                        : ... note: In instance 'sram_mbist_demo_controller'
+   70 | wire sram_csb;
+      |      ^~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:71:6: Signal is not driven, nor used: 'sram_web'
+                                                        : ... note: In instance 'sram_mbist_demo_controller'
+   71 | wire sram_web;
+      |      ^~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:72:12: Signal is not driven, nor used: 'sram_addr'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   72 | wire [7:0] sram_addr;
+      |            ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: sram_mbist_demo_controller.v:73:13: Signal is not driven, nor used: 'sram_din'
+                                                         : ... note: In instance 'sram_mbist_demo_controller'
+   73 | wire [31:0] sram_din;
+      |             ^~~~~~~~
+%Error: sram_mbist_demo_controller.v:61:22: Wire inputs its own output, creating circular logic (wire x=x)
+   61 |     assign sram_dout = sram_dout;
+      |                      ^
+        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.
+%Warning-UNOPTFLAT: sram_mbist_demo_controller.v:54:13: Signal unoptimizable: Circular combinational logic: 'sram_mbist_demo_controller.sram_dout'
+   54 | wire [31:0] sram_dout;
+      |             ^~~~~~~~~
+                    ... For warning description see https://verilator.org/warn/UNOPTFLAT?v=5.047
+                    ... Use "/* verilator lint_off UNOPTFLAT */" and lint_on around source to disable this message.
+                    sram_mbist_demo_controller.v:54:13:      Example path: sram_mbist_demo_controller.sram_dout
+                    sram_mbist_demo_controller.v:61:22:      Example path: ASSIGNW
+                    sram_mbist_demo_controller.v:54:13:      Example path: sram_mbist_demo_controller.sram_dout
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1

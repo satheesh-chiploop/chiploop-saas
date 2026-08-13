@@ -1,0 +1,62 @@
+{
+  "status": "validated",
+  "generator": "precompiled_sram_macro",
+  "requested": {
+    "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+    "data_width": 32,
+    "depth": 256,
+    "addr_width": 8
+  },
+  "selected": {
+    "cell": "sky130_sram_1kbyte_1rw1r_32x256_8",
+    "data_width": 32,
+    "depth": 256,
+    "addr_width": 8,
+    "source": "precompiled_sram_macro",
+    "root": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros"
+  },
+  "collateral": {
+    "behavioral_model": "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+    "lib": [
+      "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib",
+      "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib"
+    ],
+    "lef": [
+      "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_32x256_8.lef",
+      "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_32x256_8.lef"
+    ],
+    "gds": [
+      "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/gds/sky130_sram_1kbyte_1rw1r_32x256_8.gds",
+      "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/gds/sky130_sram_1kbyte_1rw1r_32x256_8.gds"
+    ],
+    "spice": [
+      "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/spice/sky130_sram_1kbyte_1rw1r_32x256_8.spice",
+      "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/spice/sky130_sram_1kbyte_1rw1r_32x256_8.spice"
+    ],
+    "verilog": [
+      "/root/chiploop-backend/backend/pdk/sky130A/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v",
+      "/root/chiploop-backend/backend/pdk/sky130B/libs.ref/sky130_sram_macros/verilog/sky130_sram_1kbyte_1rw1r_32x256_8.v"
+    ]
+  },
+  "validation": {
+    "status": "clean",
+    "missing": [],
+    "issues": [],
+    "required": [
+      "behavioral_model",
+      "lib",
+      "lef",
+      "gds"
+    ]
+  },
+  "actual_ports": {
+    "clk": "clk0",
+    "csb": "csb0",
+    "we": "web0",
+    "addr": "addr0",
+    "din": "din0",
+    "dout": "dout0"
+  },
+  "depth_match": true,
+  "selection_policy": "explicit_precompiled_sram_macro"
+}

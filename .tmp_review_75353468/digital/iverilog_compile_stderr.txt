@@ -1,0 +1,5 @@
+/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/75353468-4063-4dba-985b-9f52fce5c333/6fa89d8f-31f2-4bef-a686-8ab7fccd6f8c/digital/dqa/handoff/rtl/demo_sram_32x256_wrapper.v:16: error: Unknown module type: sky130_sram_1kbyte_1rw1r_32x256_8
+2 error(s) during elaboration.
+*** These modules were missing:
+        sky130_sram_1kbyte_1rw1r_32x256_8 referenced 1 times.
+***
