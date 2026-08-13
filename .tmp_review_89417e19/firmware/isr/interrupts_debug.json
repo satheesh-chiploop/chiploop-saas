@@ -1,0 +1,13 @@
+{
+  "agent": "Embedded Interrupt Mapping Agent",
+  "manifest_present": true,
+  "register_count": 7,
+  "source_count": 5,
+  "sources": [
+    "IRQ_ENABLE",
+    "sample_done",
+    "alert_pending",
+    "IRQ_STATUS",
+    "IRQ_CLEAR"
+  ]
+}

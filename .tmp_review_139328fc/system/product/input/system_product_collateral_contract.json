@@ -1,0 +1,3672 @@
+{
+  "type": "system_product_collateral_contract",
+  "version": "1.0",
+  "lineage": {
+    "generated_at": "2026-08-13T03:01:42.028131+00:00",
+    "arch2rtl_workflow_id": "b97a8c7a-13dd-4aab-9ceb-19af6d7b168b",
+    "verify_workflow_id": null,
+    "firmware_workflow_id": "494ec3de-e854-4f51-9538-8578a3996a77",
+    "software_workflow_id": "94d9dd8d-bd88-4b3a-9f76-7487491de0af",
+    "validation_workflow_id": "ea919845-9d0d-415e-b9ca-12f5ff8c1544",
+    "product_intent": "Build a simulator-backed product demo from the completed system workflow.",
+    "target_runtime": "simulated_device",
+    "app_type": "web_dashboard"
+  },
+  "workflow_checks": {
+    "arch2rtl_workflow_id": {
+      "id": "b97a8c7a-13dd-4aab-9ceb-19af6d7b168b",
+      "name": "HEM: Physical AI Arch2RTL",
+      "loop_type": "digital",
+      "status": "completed",
+      "phase": "done",
+      "updated_at": "2026-08-13T02:34:13.770933+00:00"
+    },
+    "firmware_workflow_id": {
+      "id": "494ec3de-e854-4f51-9538-8578a3996a77",
+      "name": "HEM: Physical AI Device Software",
+      "loop_type": "system",
+      "status": "completed",
+      "phase": "done",
+      "updated_at": "2026-08-13T02:59:54.155176+00:00"
+    },
+    "software_workflow_id": {
+      "id": "94d9dd8d-bd88-4b3a-9f76-7487491de0af",
+      "name": "HEM: System Software",
+      "loop_type": "system",
+      "status": "completed",
+      "phase": "done",
+      "updated_at": "2026-08-13T03:00:22.024058+00:00"
+    },
+    "validation_workflow_id": {
+      "id": "ea919845-9d0d-415e-b9ca-12f5ff8c1544",
+      "name": "HEM: Co-simulation / Validation",
+      "loop_type": "system",
+      "status": "completed",
+      "phase": "done",
+      "updated_at": "2026-08-13T03:01:34.688994+00:00"
+    }
+  },
+  "source_artifacts": {
+    "firmware_dashboard": {
+      "path": "backend/workflows/494ec3de-e854-4f51-9538-8578a3996a77/system/firmware/cosim/system_firmware_dashboard.json",
+      "data": {
+        "title": "System Firmware CoSim Dashboard",
+        "generated_at": "2026-08-13T02:59:48.586490",
+        "overall_status": "simulation_passed",
+        "readiness_status": "ready",
+        "ready_to_execute": true,
+        "required_inputs_present": 6,
+        "required_inputs_missing": 0,
+        "missing_inputs": [],
+        "present_inputs": [
+          "soc_top_sim_path",
+          "resolved_top_module",
+          "firmware_elf_path",
+          "makefile_path",
+          "test_paths",
+          "rtl_inputs"
+        ],
+        "planned_test_count": 2,
+        "executed_test_count": 1,
+        "passed_test_count": 1,
+        "failed_test_count": 0,
+        "firmware_elf_detected": true,
+        "firmware_elf_real": true,
+        "firmware_elf_placeholder": false,
+        "firmware_elf_path": "firmware/build/target/x86_64-unknown-linux-gnu/release/firmware_app.elf",
+        "soc_top_sim_path": "digital/rtl/adaptive_aero_control_top.v",
+        "makefile_path": "firmware/validate/Makefile",
+        "test_paths": [
+          "firmware/validate/test_firmware_smoke.py"
+        ],
+        "rtl_inputs": [
+          "digital/rtl/adaptive_aero_control_top.v",
+          "system/imported_rtl/adaptive_aero_control_top.v"
+        ],
+        "assertions_detected": false,
+        "coverage_model_detected": false,
+        "soc_top_module": "adaptive_aero_control_top",
+        "summary_path": "system/firmware/cosim/system_firmware_execution.md"
+      }
+    },
+    "firmware_register_map": {
+      "path": "backend/workflows/494ec3de-e854-4f51-9538-8578a3996a77/firmware/register_map.json",
+      "data": {
+        "block_name": "digital_subsystem",
+        "module_name": "digital_subsystem",
+        "base_address": "0x00000000",
+        "bus": "MINIMAL",
+        "registers": [
+          {
+            "name": "CONTROL",
+            "offset": "0x00000000",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Control and mode register. Writing ENABLE/ARM begins normal operation when operating-point inputs are valid. SOFT_RESET requests synchronous reinitialization. DIAGNOSTIC_BYPASS allows non-nominal diagnostic operation if supported by software policy. FALLBACK_SELECT selects fallback source behavior.",
+            "fields": [
+              {
+                "name": "ENABLE",
+                "bit_offset": 0,
+                "bit_width": 1,
+                "access": "RW",
+                "description": "1 enables request/response transaction management and actuator command generation."
+              },
+              {
+                "name": "SOFT_RESET",
+                "bit_offset": 1,
+                "bit_width": 1,
+                "access": "RW",
+                "description": "1 requests a synchronous software reset-equivalent clear of outstanding transaction state, sticky faults, and request output valid."
+              },
+              {
+                "name": "ARM",
+                "bit_offset": 2,
+                "bit_width": 1,
+                "access": "RW",
+                "description": "1 arms the controller to issue a request when ENABLE is asserted and the operating envelope is valid."
+              },
+              {
+                "name": "DIAGNOSTIC_BYPASS",
+                "bit_offset": 3,
+                "bit_width": 1,
+                "access": "RW",
+                "description": "1 permits diagnostic bypass behavior if implemented; normal safety checks remain authoritative unless explicitly overridden by design policy."
+              },
+              {
+                "name": "FALLBACK_SELECT",
+                "bit_offset": 4,
+                "bit_width": 1,
+                "access": "RW",
+                "description": "Selects fallback value source. 0 uses configured safe_actuator_value; 1 may select hold-last-safe behavior when combined with FALLBACK_HOLD_REVERT."
+              },
+              {
+                "name": "RESERVED",
+                "bit_offset": 5,
+                "bit_width": 3,
+                "access": "RO",
+                "description": "Reserved, read as zero."
+              }
+            ]
+          },
+          {
+            "name": "STATUS",
+            "offset": "0x00000001",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Live controller status and fault summary.",
+            "fields": [
+              {
+                "name": "BUSY",
+                "bit_offset": 0,
+                "bit_width": 1,
+                "access": "RO",
+                "description": "1 indicates the controller is active in a transaction or fallback handling path."
+              },
+              {
+                "name": "REQ_OUTSTANDING",
+                "bit_offset": 1,
+                "bit_width": 1,
+                "access": "RO",
+                "description": "1 indicates a request has been issued and not yet completed by handshake or abort path."
+              },
+              {
+                "name": "RSP_VALID_SEEN",
+                "bit_offset": 2,
+                "bit_width": 1,
+                "access": "RO",
+                "description": "1 indicates at least one response-valid event has been observed during the current transaction window."
+              },
+              {
+                "name": "TIMEOUT",
+                "bit_offset": 3,
+                "bit_width": 1,
+                "access": "RO",
+                "description": "1 indicates request or response timeout expiration."
+              },
+              {
+                "name": "STALE",
+                "bit_offset": 4,
+                "bit_width": 1,
+                "access": "RO",
+                "description": "1 indicates stale or late response rejection."
+              },
+              {
+                "name": "CLAMPED",
+                "bit_offset": 5,
+                "bit_width": 1,
+                "access": "RO",
+                "description": "1 indicates actuator command was clamped to configured limits."
+              },
+              {
+                "name": "FALLBACK_ACTIVE",
+                "bit_offset": 6,
+                "bit_width": 1,
+                "access": "RO",
+                "description": "1 indicates fallback command selection is active."
+              },
+              {
+                "name": "ENVELOPE_ERROR",
+                "bit_offset": 7,
+                "bit_width": 1,
+                "access": "RO",
+                "description": "1 indicates operating point rejected for violating envelope constraints, including velocity envelope."
+              }
+            ]
+          },
+          {
+            "name": "VEHICLE_META",
+            "offset": "0x00000002",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Compact vehicle/geometry metadata tag used to build the 64-bit request packet. This is an opaque identifier summary, not bulk geometry storage.",
+            "fields": [
+              {
+                "name": "GEOMETRY_PRESENT",
+                "bit_offset": 0,
+                "bit_width": 1,
+                "access": "RW",
+                "description": "1 indicates geometry metadata is present and valid in the software/host context."
+              },
+              {
+                "name": "GEOMETRY_ID",
+                "bit_offset": 1,
+                "bit_width": 4,
+                "access": "RW",
+                "description": "Lower nibble of geometry identifier summary."
+              },
+              {
+                "name": "GEOMETRY_TYPE",
+                "bit_offset": 5,
+                "bit_width": 3,
+                "access": "RW",
+                "description": "Upper bits of the geometry type summary. Full geometry_type input exists at the top level; this register reflects the compact CSR-visible tag."
+              }
+            ]
+          },
+          {
+            "name": "VEHICLE_META_ID",
+            "offset": "0x00000003",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Additional metadata byte for geometry identity and checksum packing.",
+            "fields": [
+              {
+                "name": "GEOMETRY_ID_EXT",
+                "bit_offset": 0,
+                "bit_width": 4,
+                "access": "RW",
+                "description": "Extended geometry identifier bits, if software uses more than four bits for the metadata tag."
+              },
+              {
+                "name": "CHECKSUM_HI",
+                "bit_offset": 4,
+                "bit_width": 4,
+                "access": "RW",
+                "description": "Upper nibble of metadata checksum."
+              }
+            ]
+          },
+          {
+            "name": "CHECKSUM_LO",
+            "offset": "0x00000004",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Lower byte of metadata checksum.",
+            "fields": [
+              {
+                "name": "CHECKSUM_LO",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Lower 8 bits of the 16-bit checksum tag."
+              }
+            ]
+          },
+          {
+            "name": "FLOW_COND_LO",
+            "offset": "0x00000005",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Velocity setpoint low byte. Fixed-point/integer representation; the controller enforces the 20 to 55 m/s operating envelope using the full 16-bit velocity_setpoint input.",
+            "fields": [
+              {
+                "name": "VELOCITY_SETPOINT_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Low 8 bits of velocity setpoint fixed-point/integer value."
+              }
+            ]
+          },
+          {
+            "name": "FLOW_COND_HI",
+            "offset": "0x00000006",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Velocity setpoint high byte.",
+            "fields": [
+              {
+                "name": "VELOCITY_SETPOINT_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "High 8 bits of velocity setpoint fixed-point/integer value."
+              }
+            ]
+          },
+          {
+            "name": "LIMITS_MIN_LO",
+            "offset": "0x00000007",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Actuator minimum limit low byte.",
+            "fields": [
+              {
+                "name": "ACTUATOR_MIN_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Low 8 bits of actuator minimum bound."
+              }
+            ]
+          },
+          {
+            "name": "LIMITS_MIN_HI",
+            "offset": "0x00000008",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Actuator minimum limit high byte.",
+            "fields": [
+              {
+                "name": "ACTUATOR_MIN_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "High 8 bits of actuator minimum bound."
+              }
+            ]
+          },
+          {
+            "name": "LIMITS_MAX_LO",
+            "offset": "0x00000009",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Actuator maximum limit low byte.",
+            "fields": [
+              {
+                "name": "ACTUATOR_MAX_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Low 8 bits of actuator maximum bound."
+              }
+            ]
+          },
+          {
+            "name": "LIMITS_MAX_HI",
+            "offset": "0x0000000A",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Actuator maximum limit high byte.",
+            "fields": [
+              {
+                "name": "ACTUATOR_MAX_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "High 8 bits of actuator maximum bound."
+              }
+            ]
+          },
+          {
+            "name": "LIMITS_RATE_LO",
+            "offset": "0x0000000B",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Rate limit low byte. Interpreted as fixed-point/integer limit on command step magnitude or update rate policy, as implemented by RTL.",
+            "fields": [
+              {
+                "name": "RATE_LIMIT_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Low 8 bits of rate limit."
+              }
+            ]
+          },
+          {
+            "name": "LIMITS_RATE_HI",
+            "offset": "0x0000000C",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Rate limit high byte.",
+            "fields": [
+              {
+                "name": "RATE_LIMIT_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "High 8 bits of rate limit."
+              }
+            ]
+          },
+          {
+            "name": "TIMEOUT_REQ_LO",
+            "offset": "0x0000000D",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Request timeout low byte.",
+            "fields": [
+              {
+                "name": "REQUEST_TIMEOUT_CYCLES_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Low 8 bits of request timeout cycle count."
+              }
+            ]
+          },
+          {
+            "name": "TIMEOUT_REQ_HI",
+            "offset": "0x0000000E",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Request timeout high byte.",
+            "fields": [
+              {
+                "name": "REQUEST_TIMEOUT_CYCLES_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "High 8 bits of request timeout cycle count."
+              }
+            ]
+          },
+          {
+            "name": "TIMEOUT_STALE_LO",
+            "offset": "0x0000000F",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Stale timeout low byte.",
+            "fields": [
+              {
+                "name": "STALE_TIMEOUT_CYCLES_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Low 8 bits of stale timeout cycle count."
+              }
+            ]
+          },
+          {
+            "name": "TIMEOUT_STALE_HI",
+            "offset": "0x00000010",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Stale timeout high byte.",
+            "fields": [
+              {
+                "name": "STALE_TIMEOUT_CYCLES_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "High 8 bits of stale timeout cycle count."
+              }
+            ]
+          },
+          {
+            "name": "SEQ_REQ",
+            "offset": "0x00000011",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Current request sequence tag.",
+            "fields": [
+              {
+                "name": "REQUEST_SEQ",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Sequence number included in outbound request packet."
+              }
+            ]
+          },
+          {
+            "name": "SEQ_RSP",
+            "offset": "0x00000012",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Expected response sequence tag.",
+            "fields": [
+              {
+                "name": "RESPONSE_SEQ",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Sequence number expected from inbound response packet."
+              }
+            ]
+          },
+          {
+            "name": "SEQ_LAST_ACCEPTED",
+            "offset": "0x00000013",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Last accepted response sequence tag.",
+            "fields": [
+              {
+                "name": "LAST_ACCEPTED_SEQ",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Most recent accepted response sequence number for auditability."
+              }
+            ]
+          },
+          {
+            "name": "RESULT_DRAG_LO",
+            "offset": "0x00000014",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Lower byte of compact drag summary metric captured from accepted response path.",
+            "fields": [
+              {
+                "name": "DRAG_METRIC_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RO",
+                "description": "Low 8 bits of drag metric."
+              }
+            ]
+          },
+          {
+            "name": "RESULT_DRAG_HI",
+            "offset": "0x00000015",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Upper byte of compact drag summary metric.",
+            "fields": [
+              {
+                "name": "DRAG_METRIC_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RO",
+                "description": "High 8 bits of drag metric."
+              }
+            ]
+          },
+          {
+            "name": "RESULT_LIFT_LO",
+            "offset": "0x00000016",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Lower byte of compact lift summary metric captured from accepted response path.",
+            "fields": [
+              {
+                "name": "LIFT_METRIC_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RO",
+                "description": "Low 8 bits of lift metric."
+              }
+            ]
+          },
+          {
+            "name": "RESULT_LIFT_HI",
+            "offset": "0x00000017",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Upper byte of compact lift summary metric.",
+            "fields": [
+              {
+                "name": "LIFT_METRIC_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RO",
+                "description": "High 8 bits of lift metric."
+              }
+            ]
+          },
+          {
+            "name": "RESULT_STATUS",
+            "offset": "0x00000018",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Response status summary from the accepted response path.",
+            "fields": [
+              {
+                "name": "RESPONSE_STATUS",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RO",
+                "description": "Compact response status code captured from inbound model response and validation logic."
+              }
+            ]
+          },
+          {
+            "name": "FALLBACK_LO",
+            "offset": "0x00000019",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Safe fallback actuator value low byte.",
+            "fields": [
+              {
+                "name": "SAFE_ACTUATOR_VALUE_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "Low 8 bits of deterministic safe actuator value."
+              }
+            ]
+          },
+          {
+            "name": "FALLBACK_HI",
+            "offset": "0x0000001A",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Safe fallback actuator value high byte and fallback policy control.",
+            "fields": [
+              {
+                "name": "SAFE_ACTUATOR_VALUE_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RW",
+                "description": "High 8 bits of deterministic safe actuator value."
+              }
+            ]
+          },
+          {
+            "name": "FALLBACK_POLICY",
+            "offset": "0x0000001B",
+            "address": null,
+            "access": "RW",
+            "reset": "0x00000000",
+            "description": "Fallback policy control byte.",
+            "fields": [
+              {
+                "name": "FALLBACK_HOLD_REVERT",
+                "bit_offset": 0,
+                "bit_width": 1,
+                "access": "RW",
+                "description": "0 forces configured safe_actuator_value during fallback; 1 allows hold-last-safe/revert behavior when supported."
+              },
+              {
+                "name": "RESERVED",
+                "bit_offset": 1,
+                "bit_width": 7,
+                "access": "RO",
+                "description": "Reserved, read as zero."
+              }
+            ]
+          },
+          {
+            "name": "VERSION_ID_LO",
+            "offset": "0x0000001C",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Design version low byte.",
+            "fields": [
+              {
+                "name": "DESIGN_VERSION_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RO",
+                "description": "Low 8 bits of design version identifier."
+              }
+            ]
+          },
+          {
+            "name": "VERSION_ID_HI",
+            "offset": "0x0000001D",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Design version high byte.",
+            "fields": [
+              {
+                "name": "DESIGN_VERSION_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RO",
+                "description": "High 8 bits of design version identifier."
+              }
+            ]
+          },
+          {
+            "name": "MODEL_ID_LO",
+            "offset": "0x0000001E",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Model ID tag low byte.",
+            "fields": [
+              {
+                "name": "MODEL_ID_TAG_7_0",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RO",
+                "description": "Low 8 bits of remote surrogate model identifier tag."
+              }
+            ]
+          },
+          {
+            "name": "MODEL_ID_HI",
+            "offset": "0x0000001F",
+            "address": null,
+            "access": "RO",
+            "reset": "0x00000000",
+            "description": "Model ID tag high byte.",
+            "fields": [
+              {
+                "name": "MODEL_ID_TAG_15_8",
+                "bit_offset": 0,
+                "bit_width": 8,
+                "access": "RO",
+                "description": "High 8 bits of remote surrogate model identifier tag."
+              }
+            ]
+          }
+        ],
+        "__source": {
+          "mode": "artifact_passthrough",
+          "path": "state.digital_regmap"
+        }
+      }
+    },
+    "software_handoff": {
+      "path": "backend/workflows/494ec3de-e854-4f51-9538-8578a3996a77/system/software_handoff/system_software_handoff.json",
+      "data": {
+        "package_type": "system_software_handoff",
+        "package_version": "2.0",
+        "generated_at": "2026-08-13T02:59:53.378796+00:00",
+        "source_workflow_id": "494ec3de-e854-4f51-9538-8578a3996a77",
+        "source_workflow_type": "System_Firmware",
+        "system_contract": {
+          "top_module": "adaptive_aero_control_top",
+          "soc_top_sim_path": "digital/rtl/adaptive_aero_control_top.v",
+          "system_integration_intent_path": "",
+          "rtl_filelist_path": "",
+          "rtl_file_entries": [
+            "digital/rtl/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/494ec3de-e854-4f51-9538-8578a3996a77/ed4b3c58-dd30-4671-8949-014fe7c8463f/system/digital/rtl/adaptive_aero_control_top.v"
+          ]
+        },
+        "firmware_contract": {
+          "firmware_manifest_path": "firmware/firmware_manifest.json",
+          "register_map_path": "firmware/register_map.json",
+          "register_map_format": "json",
+          "hal_path": "firmware/hal/registers.rs",
+          "hal_format": "rust_source",
+          "driver_path": "firmware/drivers/driver_scaffold.rs",
+          "driver_format": "rust_source",
+          "register_dump_path": "firmware/diagnostics/register_dump.rs",
+          "register_dump_format": "rust_source",
+          "interrupt_mapping_path": "firmware/isr/interrupt_map.json",
+          "interrupt_mapping_format": "json",
+          "dma_integration_path": "",
+          "dma_integration_format": "rust_source",
+          "boot_dependency_plan_path": "",
+          "boot_dependency_plan_format": "json",
+          "clock_config_path": "",
+          "clock_config_format": "rust_source",
+          "reset_sequence_path": "",
+          "reset_sequence_format": "rust_source",
+          "power_mode_path": "",
+          "power_mode_format": "markdown",
+          "elf_path": "firmware/build/target/x86_64-unknown-linux-gnu/release/firmware_app.elf",
+          "elf_exists": true,
+          "elf_placeholder": false,
+          "build_attempted": true,
+          "build_succeeded": true,
+          "target_triple": "x86_64-unknown-linux-gnu",
+          "bin_name": "firmware_app"
+        },
+        "verification_contract": {
+          "cocotb_makefile_path": "firmware/validate/Makefile",
+          "cocotb_test_paths": [
+            "firmware/validate/test_firmware_smoke.py"
+          ],
+          "cocotb_harness_path": "firmware/validate/cocotb_harness.py",
+          "execution_overall_status": "simulation_passed",
+          "execution_readiness": "ready",
+          "execution_attempted": true,
+          "executed_test_count": 1,
+          "coverage_available": false,
+          "functional_coverage_pct": null,
+          "rtl_coverage_pct": null,
+          "assertion_coverage_pct": null,
+          "validation_report_path": "firmware/validate/validation_report.md"
+        },
+        "software_inputs": {
+          "required_inputs": [
+            "register_map_path",
+            "hal_path",
+            "driver_path",
+            "firmware_manifest_path",
+            "system_integration_intent_path"
+          ],
+          "recommended_inputs": [
+            "register_dump_path",
+            "interrupt_mapping_path",
+            "dma_integration_path",
+            "boot_dependency_plan_path",
+            "clock_config_path",
+            "reset_sequence_path",
+            "power_mode_path",
+            "soc_top_sim_path",
+            "rtl_file_entries",
+            "cocotb_makefile_path",
+            "cocotb_test_paths",
+            "validation_report_path"
+          ],
+          "public_api_candidates": [
+            "firmware/firmware_manifest.json",
+            "firmware/register_map.json",
+            "firmware/register_map_debug.json",
+            "firmware/register_map_summary.json",
+            "firmware/src/hal/mod.rs",
+            "firmware/isr/interrupt_map.json",
+            "firmware/isr/interrupts.rs",
+            "firmware/isr/interrupts_debug.json",
+            "firmware/isr/interrupts_summary.json",
+            "firmware/handoff/digital_handoff_ingest.json",
+            "firmware/hal/register_validation.json",
+            "firmware/hal/register_validation.md",
+            "firmware/hal/register_validation_debug.json",
+            "firmware/hal/registers.rs",
+            "firmware/hal/registers_debug.json",
+            "firmware/hal/registers_summary.json",
+            "firmware/drivers/driver_scaffold.rs",
+            "firmware/drivers/driver_scaffold_debug.json",
+            "firmware/drivers/driver_scaffold_summary.json"
+          ]
+        },
+        "resolution_debug": {
+          "firmware_manifest_path": {
+            "declared_path": "firmware/firmware_manifest.json",
+            "exists": true,
+            "mode": "local",
+            "resolved_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/494ec3de-e854-4f51-9538-8578a3996a77/ed4b3c58-dd30-4671-8949-014fe7c8463f/system/firmware/firmware_manifest.json",
+            "bucket": ""
+          },
+          "register_map_path": {
+            "declared_path": "firmware/register_map.json",
+            "exists": true,
+            "mode": "local",
+            "resolved_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/494ec3de-e854-4f51-9538-8578a3996a77/ed4b3c58-dd30-4671-8949-014fe7c8463f/system/firmware/register_map.json",
+            "bucket": ""
+          },
+          "hal_path": {
+            "declared_path": "firmware/hal/registers.rs",
+            "exists": true,
+            "mode": "local",
+            "resolved_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/494ec3de-e854-4f51-9538-8578a3996a77/ed4b3c58-dd30-4671-8949-014fe7c8463f/system/firmware/hal/registers.rs",
+            "bucket": ""
+          },
+          "driver_path": {
+            "declared_path": "firmware/drivers/driver_scaffold.rs",
+            "exists": true,
+            "mode": "local",
+            "resolved_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/494ec3de-e854-4f51-9538-8578a3996a77/ed4b3c58-dd30-4671-8949-014fe7c8463f/system/firmware/drivers/driver_scaffold.rs",
+            "bucket": ""
+          }
+        },
+        "software_readiness": {
+          "ready_for_system_software": true,
+          "package_quality": "ready",
+          "blocking_gaps": [],
+          "assumptions": [
+            "system_integration_intent_missing"
+          ]
+        }
+      }
+    },
+    "software_api": {
+      "path": "backend/workflows/94d9dd8d-bd88-4b3a-9f76-7487491de0af/system/software/sdk/system_software_api_contract.json",
+      "data": {
+        "package_type": "system_software_api_contract",
+        "package_version": "1.0",
+        "generated_at": "2026-08-13T03:00:08.059975+00:00",
+        "source_workflow_id": "494ec3de-e854-4f51-9538-8578a3996a77",
+        "platform_identity": {
+          "top_module": "adaptive_aero_control_top",
+          "soc_top_sim_path": "digital/rtl/adaptive_aero_control_top.v",
+          "rtl_file_count": 2
+        },
+        "api_style": {
+          "public_api_language": "rust",
+          "error_model": "Result<T, SoftwareError>",
+          "config_model": "serde_structs_and_toml_or_json",
+          "package_style": "rust_crate"
+        },
+        "register_model_summary": {
+          "register_count": 32,
+          "bus": "MINIMAL",
+          "addr_width": null,
+          "data_width": null
+        },
+        "public_api_groups": [
+          {
+            "name": "register_access",
+            "visibility": "public",
+            "description": "Public register access wrapper over the firmware HAL/driver layer.",
+            "methods": [
+              {
+                "name": "read_register",
+                "inputs": [
+                  "register_name: &str"
+                ],
+                "returns": "u64"
+              },
+              {
+                "name": "write_register",
+                "inputs": [
+                  "register_name: &str",
+                  "value: u64"
+                ],
+                "returns": "Result<(), SoftwareError>"
+              }
+            ]
+          },
+          {
+            "name": "device_driver",
+            "visibility": "public",
+            "description": "Primary software-facing driver contract for device lifecycle and status.",
+            "methods": [
+              {
+                "name": "device_init",
+                "inputs": [
+                  "config: DeviceConfig"
+                ],
+                "returns": "Result<(), SoftwareError>"
+              },
+              {
+                "name": "device_shutdown",
+                "inputs": [],
+                "returns": "Result<(), SoftwareError>"
+              },
+              {
+                "name": "get_status",
+                "inputs": [],
+                "returns": "DeviceStatus"
+              }
+            ]
+          },
+          {
+            "name": "interrupts",
+            "visibility": "public",
+            "description": "Optional interrupt control/service layer.",
+            "methods": [
+              {
+                "name": "register_interrupt_handler",
+                "inputs": [
+                  "irq_name: &str",
+                  "callback: InterruptHandler"
+                ],
+                "returns": "Result<(), SoftwareError>"
+              },
+              {
+                "name": "enable_interrupt",
+                "inputs": [
+                  "irq_name: &str"
+                ],
+                "returns": "Result<(), SoftwareError>"
+              }
+            ]
+          },
+          {
+            "name": "handoff_candidates",
+            "visibility": "public",
+            "description": "Candidate APIs derived directly from the upstream handoff.",
+            "methods": [
+              {
+                "name": "firmware_firmware_manifest",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_register_map",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_register_map_debug",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_register_map_summary",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_src_hal_mod",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_isr_interrupt_map",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_isr_interrupts",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_isr_interrupts_debug",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_isr_interrupts_summary",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_handoff_digital_handoff_ingest",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_hal_register_validation",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_hal_register_validation_2",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_hal_register_validation_debug",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_hal_registers",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_hal_registers_debug",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_hal_registers_summary",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_drivers_driver_scaffold",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_drivers_driver_scaffold_debug",
+                "inputs": [],
+                "returns": "candidate"
+              },
+              {
+                "name": "firmware_drivers_driver_scaffold_summary",
+                "inputs": [],
+                "returns": "candidate"
+              }
+            ]
+          }
+        ],
+        "internal_api_groups": [
+          {
+            "name": "runtime_validation_internal",
+            "visibility": "internal",
+            "description": "Internal-only hooks for simulation/runtime validation; not intended for application developers.",
+            "methods": [
+              {
+                "name": "attach_runtime_backend",
+                "inputs": [
+                  "backend: RuntimeBackend"
+                ],
+                "returns": "Result<(), SoftwareError>"
+              },
+              {
+                "name": "inject_test_hook",
+                "inputs": [
+                  "hook_name: &str"
+                ],
+                "returns": "Result<(), SoftwareError>"
+              }
+            ]
+          }
+        ],
+        "constraints": {
+          "blocking_gaps": [],
+          "assumptions": [
+            "system_integration_intent_missing"
+          ],
+          "input_validation_errors": [
+            "system_integration_intent_path_missing"
+          ]
+        }
+      }
+    },
+    "software_package": {
+      "path": "backend/workflows/94d9dd8d-bd88-4b3a-9f76-7487491de0af/system/software/package/system_software_package.json",
+      "data": {
+        "package_type": "system_software_package",
+        "package_version": "1.0",
+        "generated_at": "2026-08-13T03:00:21.220164+00:00",
+        "source_workflow_id": "494ec3de-e854-4f51-9538-8578a3996a77",
+        "artifact_count": 27,
+        "files": [
+          "system/software/sdk/adaptive_aero_control/Cargo.toml",
+          "system/software/sdk/adaptive_aero_control/src/lib.rs",
+          "system/software/sdk/adaptive_aero_control/examples/basic.rs",
+          "system/software/sdk/adaptive_aero_control/src/bin/diag_cli.rs",
+          "system/software/sdk/adaptive_aero_control/config/default.toml",
+          "system/software/apps/control_service/src/main.rs",
+          "system/software/apps/control_service/Cargo.toml",
+          "system/software/apps/diagnostics/src/main.rs",
+          "system/software/apps/diagnostics/Cargo.toml",
+          "system/software/apps/demo_cli/src/main.rs",
+          "system/software/apps/demo_cli/Cargo.toml",
+          "system/software/Cargo.toml",
+          "system/software/Makefile",
+          "system/software/build_plan.json",
+          "system/software/adapter/adaptive_aero_control_adapter/src/adapter/register_adapter.rs",
+          "system/software/adapter/adaptive_aero_control_adapter/src/adapter/device_adapter.rs",
+          "system/software/adapter/adaptive_aero_control_adapter/src/error.rs",
+          "system/software/adapter/adaptive_aero_control_adapter/Cargo.toml",
+          "system/software/adapter/adaptive_aero_control_adapter/src/lib.rs",
+          "system/software/adapter/adaptive_aero_control_adapter/src/adapter/mod.rs",
+          "system/software/services/src/init_manager.rs",
+          "system/software/services/src/health_monitor.rs",
+          "system/software/services/src/control_service.rs",
+          "system/software/services/src/interrupt_service.rs",
+          "system/software/services/src/error.rs",
+          "system/software/services/Cargo.toml",
+          "system/software/services/src/lib.rs"
+        ],
+        "missing_required_files": [],
+        "package_status": "complete",
+        "entry": {
+          "app_name": "control_service",
+          "cargo_package": "ss_app_control_service",
+          "binary_name": "ss_app_control_service",
+          "command": [
+            "cargo",
+            "run",
+            "-p",
+            "ss_app_control_service"
+          ],
+          "working_dir": "system/software",
+          "command_source": "package_entry",
+          "entry_resolution_status": "resolved",
+          "native_binary_candidates": [
+            "target/debug/ss_app_control_service",
+            "target/release/ss_app_control_service"
+          ],
+          "workspace_members": [
+            "sdk/adaptive_aero_control",
+            "services",
+            "adapter/adaptive_aero_control_adapter",
+            "apps/control_service",
+            "apps/diagnostics",
+            "apps/demo_cli"
+          ]
+        }
+      }
+    },
+    "validation_summary": {
+      "path": "backend/workflows/ea919845-9d0d-415e-b9ca-12f5ff8c1544/system/software_validation/cosim/harness/system_cosim_harness_manifest.json",
+      "data": {
+        "package_type": "system_cosim_harness_manifest",
+        "package_version": "1.0",
+        "generated_at": "2026-08-13T03:01:00.650317+00:00",
+        "validation_scope": "l2_cosim",
+        "co_sim_enabled": true,
+        "l1_ready": null,
+        "harness_status": "ready",
+        "blocked_dependencies": [],
+        "software_assets": {
+          "l1_ready": null,
+          "software_root": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ea919845-9d0d-415e-b9ca-12f5ff8c1544/c798a8f5-60a8-4810-b707-612c1b637f21/system/restored_system_software",
+          "build_root": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ea919845-9d0d-415e-b9ca-12f5ff8c1544/c798a8f5-60a8-4810-b707-612c1b637f21/system/restored_system_software/system/software",
+          "package_manifest_path": "backend/workflows/94d9dd8d-bd88-4b3a-9f76-7487491de0af/system/software/package/system_software_package.json",
+          "api_contract_path": "backend/workflows/94d9dd8d-bd88-4b3a-9f76-7487491de0af/system/software/sdk/system_software_api_contract.json",
+          "input_contract_path": "backend/workflows/94d9dd8d-bd88-4b3a-9f76-7487491de0af/system/software/input/system_software_input_contract.json"
+        },
+        "software_entry": {
+          "app_name": "control_service",
+          "cargo_package": "ss_app_control_service",
+          "binary_name": "ss_app_control_service",
+          "command": [
+            "cargo",
+            "run",
+            "-p",
+            "ss_app_control_service"
+          ],
+          "working_dir": "system/software",
+          "command_source": "package_entry",
+          "entry_resolution_status": "resolved",
+          "native_binary_candidates": [
+            "target/debug/ss_app_control_service",
+            "target/release/ss_app_control_service"
+          ],
+          "workspace_members": [
+            "sdk/adaptive_aero_control",
+            "services",
+            "adapter/adaptive_aero_control_adapter",
+            "apps/control_service",
+            "apps/diagnostics",
+            "apps/demo_cli"
+          ]
+        },
+        "firmware_assets": {
+          "register_map_path": "firmware/register_map.json",
+          "register_map_json": {
+            "block_name": "digital_subsystem",
+            "module_name": "digital_subsystem",
+            "base_address": "0x00000000",
+            "bus": "MINIMAL",
+            "registers": [
+              {
+                "name": "CONTROL",
+                "offset": "0x00000000",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Control and mode register. Writing ENABLE/ARM begins normal operation when operating-point inputs are valid. SOFT_RESET requests synchronous reinitialization. DIAGNOSTIC_BYPASS allows non-nominal diagnostic operation if supported by software policy. FALLBACK_SELECT selects fallback source behavior.",
+                "fields": [
+                  {
+                    "name": "ENABLE",
+                    "bit_offset": 0,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 enables request/response transaction management and actuator command generation."
+                  },
+                  {
+                    "name": "SOFT_RESET",
+                    "bit_offset": 1,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 requests a synchronous software reset-equivalent clear of outstanding transaction state, sticky faults, and request output valid."
+                  },
+                  {
+                    "name": "ARM",
+                    "bit_offset": 2,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 arms the controller to issue a request when ENABLE is asserted and the operating envelope is valid."
+                  },
+                  {
+                    "name": "DIAGNOSTIC_BYPASS",
+                    "bit_offset": 3,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 permits diagnostic bypass behavior if implemented; normal safety checks remain authoritative unless explicitly overridden by design policy."
+                  },
+                  {
+                    "name": "FALLBACK_SELECT",
+                    "bit_offset": 4,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "Selects fallback value source. 0 uses configured safe_actuator_value; 1 may select hold-last-safe behavior when combined with FALLBACK_HOLD_REVERT."
+                  },
+                  {
+                    "name": "RESERVED",
+                    "bit_offset": 5,
+                    "bit_width": 3,
+                    "access": "RO",
+                    "description": "Reserved, read as zero."
+                  }
+                ]
+              },
+              {
+                "name": "STATUS",
+                "offset": "0x00000001",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Live controller status and fault summary.",
+                "fields": [
+                  {
+                    "name": "BUSY",
+                    "bit_offset": 0,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates the controller is active in a transaction or fallback handling path."
+                  },
+                  {
+                    "name": "REQ_OUTSTANDING",
+                    "bit_offset": 1,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates a request has been issued and not yet completed by handshake or abort path."
+                  },
+                  {
+                    "name": "RSP_VALID_SEEN",
+                    "bit_offset": 2,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates at least one response-valid event has been observed during the current transaction window."
+                  },
+                  {
+                    "name": "TIMEOUT",
+                    "bit_offset": 3,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates request or response timeout expiration."
+                  },
+                  {
+                    "name": "STALE",
+                    "bit_offset": 4,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates stale or late response rejection."
+                  },
+                  {
+                    "name": "CLAMPED",
+                    "bit_offset": 5,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates actuator command was clamped to configured limits."
+                  },
+                  {
+                    "name": "FALLBACK_ACTIVE",
+                    "bit_offset": 6,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates fallback command selection is active."
+                  },
+                  {
+                    "name": "ENVELOPE_ERROR",
+                    "bit_offset": 7,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates operating point rejected for violating envelope constraints, including velocity envelope."
+                  }
+                ]
+              },
+              {
+                "name": "VEHICLE_META",
+                "offset": "0x00000002",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Compact vehicle/geometry metadata tag used to build the 64-bit request packet. This is an opaque identifier summary, not bulk geometry storage.",
+                "fields": [
+                  {
+                    "name": "GEOMETRY_PRESENT",
+                    "bit_offset": 0,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 indicates geometry metadata is present and valid in the software/host context."
+                  },
+                  {
+                    "name": "GEOMETRY_ID",
+                    "bit_offset": 1,
+                    "bit_width": 4,
+                    "access": "RW",
+                    "description": "Lower nibble of geometry identifier summary."
+                  },
+                  {
+                    "name": "GEOMETRY_TYPE",
+                    "bit_offset": 5,
+                    "bit_width": 3,
+                    "access": "RW",
+                    "description": "Upper bits of the geometry type summary. Full geometry_type input exists at the top level; this register reflects the compact CSR-visible tag."
+                  }
+                ]
+              },
+              {
+                "name": "VEHICLE_META_ID",
+                "offset": "0x00000003",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Additional metadata byte for geometry identity and checksum packing.",
+                "fields": [
+                  {
+                    "name": "GEOMETRY_ID_EXT",
+                    "bit_offset": 0,
+                    "bit_width": 4,
+                    "access": "RW",
+                    "description": "Extended geometry identifier bits, if software uses more than four bits for the metadata tag."
+                  },
+                  {
+                    "name": "CHECKSUM_HI",
+                    "bit_offset": 4,
+                    "bit_width": 4,
+                    "access": "RW",
+                    "description": "Upper nibble of metadata checksum."
+                  }
+                ]
+              },
+              {
+                "name": "CHECKSUM_LO",
+                "offset": "0x00000004",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Lower byte of metadata checksum.",
+                "fields": [
+                  {
+                    "name": "CHECKSUM_LO",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Lower 8 bits of the 16-bit checksum tag."
+                  }
+                ]
+              },
+              {
+                "name": "FLOW_COND_LO",
+                "offset": "0x00000005",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Velocity setpoint low byte. Fixed-point/integer representation; the controller enforces the 20 to 55 m/s operating envelope using the full 16-bit velocity_setpoint input.",
+                "fields": [
+                  {
+                    "name": "VELOCITY_SETPOINT_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of velocity setpoint fixed-point/integer value."
+                  }
+                ]
+              },
+              {
+                "name": "FLOW_COND_HI",
+                "offset": "0x00000006",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Velocity setpoint high byte.",
+                "fields": [
+                  {
+                    "name": "VELOCITY_SETPOINT_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of velocity setpoint fixed-point/integer value."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_MIN_LO",
+                "offset": "0x00000007",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Actuator minimum limit low byte.",
+                "fields": [
+                  {
+                    "name": "ACTUATOR_MIN_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of actuator minimum bound."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_MIN_HI",
+                "offset": "0x00000008",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Actuator minimum limit high byte.",
+                "fields": [
+                  {
+                    "name": "ACTUATOR_MIN_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of actuator minimum bound."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_MAX_LO",
+                "offset": "0x00000009",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Actuator maximum limit low byte.",
+                "fields": [
+                  {
+                    "name": "ACTUATOR_MAX_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of actuator maximum bound."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_MAX_HI",
+                "offset": "0x0000000A",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Actuator maximum limit high byte.",
+                "fields": [
+                  {
+                    "name": "ACTUATOR_MAX_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of actuator maximum bound."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_RATE_LO",
+                "offset": "0x0000000B",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Rate limit low byte. Interpreted as fixed-point/integer limit on command step magnitude or update rate policy, as implemented by RTL.",
+                "fields": [
+                  {
+                    "name": "RATE_LIMIT_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of rate limit."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_RATE_HI",
+                "offset": "0x0000000C",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Rate limit high byte.",
+                "fields": [
+                  {
+                    "name": "RATE_LIMIT_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of rate limit."
+                  }
+                ]
+              },
+              {
+                "name": "TIMEOUT_REQ_LO",
+                "offset": "0x0000000D",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Request timeout low byte.",
+                "fields": [
+                  {
+                    "name": "REQUEST_TIMEOUT_CYCLES_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of request timeout cycle count."
+                  }
+                ]
+              },
+              {
+                "name": "TIMEOUT_REQ_HI",
+                "offset": "0x0000000E",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Request timeout high byte.",
+                "fields": [
+                  {
+                    "name": "REQUEST_TIMEOUT_CYCLES_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of request timeout cycle count."
+                  }
+                ]
+              },
+              {
+                "name": "TIMEOUT_STALE_LO",
+                "offset": "0x0000000F",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Stale timeout low byte.",
+                "fields": [
+                  {
+                    "name": "STALE_TIMEOUT_CYCLES_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of stale timeout cycle count."
+                  }
+                ]
+              },
+              {
+                "name": "TIMEOUT_STALE_HI",
+                "offset": "0x00000010",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Stale timeout high byte.",
+                "fields": [
+                  {
+                    "name": "STALE_TIMEOUT_CYCLES_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of stale timeout cycle count."
+                  }
+                ]
+              },
+              {
+                "name": "SEQ_REQ",
+                "offset": "0x00000011",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Current request sequence tag.",
+                "fields": [
+                  {
+                    "name": "REQUEST_SEQ",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Sequence number included in outbound request packet."
+                  }
+                ]
+              },
+              {
+                "name": "SEQ_RSP",
+                "offset": "0x00000012",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Expected response sequence tag.",
+                "fields": [
+                  {
+                    "name": "RESPONSE_SEQ",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Sequence number expected from inbound response packet."
+                  }
+                ]
+              },
+              {
+                "name": "SEQ_LAST_ACCEPTED",
+                "offset": "0x00000013",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Last accepted response sequence tag.",
+                "fields": [
+                  {
+                    "name": "LAST_ACCEPTED_SEQ",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Most recent accepted response sequence number for auditability."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_DRAG_LO",
+                "offset": "0x00000014",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Lower byte of compact drag summary metric captured from accepted response path.",
+                "fields": [
+                  {
+                    "name": "DRAG_METRIC_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Low 8 bits of drag metric."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_DRAG_HI",
+                "offset": "0x00000015",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Upper byte of compact drag summary metric.",
+                "fields": [
+                  {
+                    "name": "DRAG_METRIC_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "High 8 bits of drag metric."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_LIFT_LO",
+                "offset": "0x00000016",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Lower byte of compact lift summary metric captured from accepted response path.",
+                "fields": [
+                  {
+                    "name": "LIFT_METRIC_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Low 8 bits of lift metric."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_LIFT_HI",
+                "offset": "0x00000017",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Upper byte of compact lift summary metric.",
+                "fields": [
+                  {
+                    "name": "LIFT_METRIC_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "High 8 bits of lift metric."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_STATUS",
+                "offset": "0x00000018",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Response status summary from the accepted response path.",
+                "fields": [
+                  {
+                    "name": "RESPONSE_STATUS",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Compact response status code captured from inbound model response and validation logic."
+                  }
+                ]
+              },
+              {
+                "name": "FALLBACK_LO",
+                "offset": "0x00000019",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Safe fallback actuator value low byte.",
+                "fields": [
+                  {
+                    "name": "SAFE_ACTUATOR_VALUE_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of deterministic safe actuator value."
+                  }
+                ]
+              },
+              {
+                "name": "FALLBACK_HI",
+                "offset": "0x0000001A",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Safe fallback actuator value high byte and fallback policy control.",
+                "fields": [
+                  {
+                    "name": "SAFE_ACTUATOR_VALUE_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of deterministic safe actuator value."
+                  }
+                ]
+              },
+              {
+                "name": "FALLBACK_POLICY",
+                "offset": "0x0000001B",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Fallback policy control byte.",
+                "fields": [
+                  {
+                    "name": "FALLBACK_HOLD_REVERT",
+                    "bit_offset": 0,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "0 forces configured safe_actuator_value during fallback; 1 allows hold-last-safe/revert behavior when supported."
+                  },
+                  {
+                    "name": "RESERVED",
+                    "bit_offset": 1,
+                    "bit_width": 7,
+                    "access": "RO",
+                    "description": "Reserved, read as zero."
+                  }
+                ]
+              },
+              {
+                "name": "VERSION_ID_LO",
+                "offset": "0x0000001C",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Design version low byte.",
+                "fields": [
+                  {
+                    "name": "DESIGN_VERSION_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Low 8 bits of design version identifier."
+                  }
+                ]
+              },
+              {
+                "name": "VERSION_ID_HI",
+                "offset": "0x0000001D",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Design version high byte.",
+                "fields": [
+                  {
+                    "name": "DESIGN_VERSION_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "High 8 bits of design version identifier."
+                  }
+                ]
+              },
+              {
+                "name": "MODEL_ID_LO",
+                "offset": "0x0000001E",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Model ID tag low byte.",
+                "fields": [
+                  {
+                    "name": "MODEL_ID_TAG_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Low 8 bits of remote surrogate model identifier tag."
+                  }
+                ]
+              },
+              {
+                "name": "MODEL_ID_HI",
+                "offset": "0x0000001F",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Model ID tag high byte.",
+                "fields": [
+                  {
+                    "name": "MODEL_ID_TAG_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "High 8 bits of remote surrogate model identifier tag."
+                  }
+                ]
+              }
+            ],
+            "__source": {
+              "mode": "artifact_passthrough",
+              "path": "state.digital_regmap"
+            }
+          },
+          "hal_path": "",
+          "elf_path": "firmware/build/target/x86_64-unknown-linux-gnu/release/firmware_app.elf"
+        },
+        "rtl_assets": {
+          "sim_top_path": "adaptive_aero_control_top_spi_fpga_top",
+          "sim_harness_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ea919845-9d0d-415e-b9ca-12f5ff8c1544/c798a8f5-60a8-4810-b707-612c1b637f21/system/system/restored_rtl_sim/6b479cae-51b0-4c84-b35a-8d1190e6a59c/handoff/rtl/adaptive_aero_control_top.v",
+          "verilator_makefile_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ea919845-9d0d-415e-b9ca-12f5ff8c1544/c798a8f5-60a8-4810-b707-612c1b637f21/system/system/restored_rtl_sim/6b479cae-51b0-4c84-b35a-8d1190e6a59c/vv/tb/Makefile",
+          "waveform_root": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ea919845-9d0d-415e-b9ca-12f5ff8c1544/c798a8f5-60a8-4810-b707-612c1b637f21/system/system/restored_rtl_sim/6b479cae-51b0-4c84-b35a-8d1190e6a59c/vv/tb"
+        },
+        "semantic_assets": {
+          "digital_spec_json_path": "derived:rtl_package_and_register_map",
+          "digital_spec_json": {
+            "package_type": "derived_digital_spec_from_cosim_assets",
+            "source": "rtl_package_and_register_map",
+            "top_module": {
+              "name": "adaptive_aero_control_top_spi_fpga_top"
+            },
+            "registers": [
+              {
+                "name": "CONTROL",
+                "offset": "0x00000000",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Control and mode register. Writing ENABLE/ARM begins normal operation when operating-point inputs are valid. SOFT_RESET requests synchronous reinitialization. DIAGNOSTIC_BYPASS allows non-nominal diagnostic operation if supported by software policy. FALLBACK_SELECT selects fallback source behavior.",
+                "fields": [
+                  {
+                    "name": "ENABLE",
+                    "bit_offset": 0,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 enables request/response transaction management and actuator command generation."
+                  },
+                  {
+                    "name": "SOFT_RESET",
+                    "bit_offset": 1,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 requests a synchronous software reset-equivalent clear of outstanding transaction state, sticky faults, and request output valid."
+                  },
+                  {
+                    "name": "ARM",
+                    "bit_offset": 2,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 arms the controller to issue a request when ENABLE is asserted and the operating envelope is valid."
+                  },
+                  {
+                    "name": "DIAGNOSTIC_BYPASS",
+                    "bit_offset": 3,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 permits diagnostic bypass behavior if implemented; normal safety checks remain authoritative unless explicitly overridden by design policy."
+                  },
+                  {
+                    "name": "FALLBACK_SELECT",
+                    "bit_offset": 4,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "Selects fallback value source. 0 uses configured safe_actuator_value; 1 may select hold-last-safe behavior when combined with FALLBACK_HOLD_REVERT."
+                  },
+                  {
+                    "name": "RESERVED",
+                    "bit_offset": 5,
+                    "bit_width": 3,
+                    "access": "RO",
+                    "description": "Reserved, read as zero."
+                  }
+                ]
+              },
+              {
+                "name": "STATUS",
+                "offset": "0x00000001",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Live controller status and fault summary.",
+                "fields": [
+                  {
+                    "name": "BUSY",
+                    "bit_offset": 0,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates the controller is active in a transaction or fallback handling path."
+                  },
+                  {
+                    "name": "REQ_OUTSTANDING",
+                    "bit_offset": 1,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates a request has been issued and not yet completed by handshake or abort path."
+                  },
+                  {
+                    "name": "RSP_VALID_SEEN",
+                    "bit_offset": 2,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates at least one response-valid event has been observed during the current transaction window."
+                  },
+                  {
+                    "name": "TIMEOUT",
+                    "bit_offset": 3,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates request or response timeout expiration."
+                  },
+                  {
+                    "name": "STALE",
+                    "bit_offset": 4,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates stale or late response rejection."
+                  },
+                  {
+                    "name": "CLAMPED",
+                    "bit_offset": 5,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates actuator command was clamped to configured limits."
+                  },
+                  {
+                    "name": "FALLBACK_ACTIVE",
+                    "bit_offset": 6,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates fallback command selection is active."
+                  },
+                  {
+                    "name": "ENVELOPE_ERROR",
+                    "bit_offset": 7,
+                    "bit_width": 1,
+                    "access": "RO",
+                    "description": "1 indicates operating point rejected for violating envelope constraints, including velocity envelope."
+                  }
+                ]
+              },
+              {
+                "name": "VEHICLE_META",
+                "offset": "0x00000002",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Compact vehicle/geometry metadata tag used to build the 64-bit request packet. This is an opaque identifier summary, not bulk geometry storage.",
+                "fields": [
+                  {
+                    "name": "GEOMETRY_PRESENT",
+                    "bit_offset": 0,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "1 indicates geometry metadata is present and valid in the software/host context."
+                  },
+                  {
+                    "name": "GEOMETRY_ID",
+                    "bit_offset": 1,
+                    "bit_width": 4,
+                    "access": "RW",
+                    "description": "Lower nibble of geometry identifier summary."
+                  },
+                  {
+                    "name": "GEOMETRY_TYPE",
+                    "bit_offset": 5,
+                    "bit_width": 3,
+                    "access": "RW",
+                    "description": "Upper bits of the geometry type summary. Full geometry_type input exists at the top level; this register reflects the compact CSR-visible tag."
+                  }
+                ]
+              },
+              {
+                "name": "VEHICLE_META_ID",
+                "offset": "0x00000003",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Additional metadata byte for geometry identity and checksum packing.",
+                "fields": [
+                  {
+                    "name": "GEOMETRY_ID_EXT",
+                    "bit_offset": 0,
+                    "bit_width": 4,
+                    "access": "RW",
+                    "description": "Extended geometry identifier bits, if software uses more than four bits for the metadata tag."
+                  },
+                  {
+                    "name": "CHECKSUM_HI",
+                    "bit_offset": 4,
+                    "bit_width": 4,
+                    "access": "RW",
+                    "description": "Upper nibble of metadata checksum."
+                  }
+                ]
+              },
+              {
+                "name": "CHECKSUM_LO",
+                "offset": "0x00000004",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Lower byte of metadata checksum.",
+                "fields": [
+                  {
+                    "name": "CHECKSUM_LO",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Lower 8 bits of the 16-bit checksum tag."
+                  }
+                ]
+              },
+              {
+                "name": "FLOW_COND_LO",
+                "offset": "0x00000005",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Velocity setpoint low byte. Fixed-point/integer representation; the controller enforces the 20 to 55 m/s operating envelope using the full 16-bit velocity_setpoint input.",
+                "fields": [
+                  {
+                    "name": "VELOCITY_SETPOINT_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of velocity setpoint fixed-point/integer value."
+                  }
+                ]
+              },
+              {
+                "name": "FLOW_COND_HI",
+                "offset": "0x00000006",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Velocity setpoint high byte.",
+                "fields": [
+                  {
+                    "name": "VELOCITY_SETPOINT_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of velocity setpoint fixed-point/integer value."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_MIN_LO",
+                "offset": "0x00000007",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Actuator minimum limit low byte.",
+                "fields": [
+                  {
+                    "name": "ACTUATOR_MIN_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of actuator minimum bound."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_MIN_HI",
+                "offset": "0x00000008",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Actuator minimum limit high byte.",
+                "fields": [
+                  {
+                    "name": "ACTUATOR_MIN_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of actuator minimum bound."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_MAX_LO",
+                "offset": "0x00000009",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Actuator maximum limit low byte.",
+                "fields": [
+                  {
+                    "name": "ACTUATOR_MAX_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of actuator maximum bound."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_MAX_HI",
+                "offset": "0x0000000A",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Actuator maximum limit high byte.",
+                "fields": [
+                  {
+                    "name": "ACTUATOR_MAX_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of actuator maximum bound."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_RATE_LO",
+                "offset": "0x0000000B",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Rate limit low byte. Interpreted as fixed-point/integer limit on command step magnitude or update rate policy, as implemented by RTL.",
+                "fields": [
+                  {
+                    "name": "RATE_LIMIT_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of rate limit."
+                  }
+                ]
+              },
+              {
+                "name": "LIMITS_RATE_HI",
+                "offset": "0x0000000C",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Rate limit high byte.",
+                "fields": [
+                  {
+                    "name": "RATE_LIMIT_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of rate limit."
+                  }
+                ]
+              },
+              {
+                "name": "TIMEOUT_REQ_LO",
+                "offset": "0x0000000D",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Request timeout low byte.",
+                "fields": [
+                  {
+                    "name": "REQUEST_TIMEOUT_CYCLES_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of request timeout cycle count."
+                  }
+                ]
+              },
+              {
+                "name": "TIMEOUT_REQ_HI",
+                "offset": "0x0000000E",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Request timeout high byte.",
+                "fields": [
+                  {
+                    "name": "REQUEST_TIMEOUT_CYCLES_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of request timeout cycle count."
+                  }
+                ]
+              },
+              {
+                "name": "TIMEOUT_STALE_LO",
+                "offset": "0x0000000F",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Stale timeout low byte.",
+                "fields": [
+                  {
+                    "name": "STALE_TIMEOUT_CYCLES_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of stale timeout cycle count."
+                  }
+                ]
+              },
+              {
+                "name": "TIMEOUT_STALE_HI",
+                "offset": "0x00000010",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Stale timeout high byte.",
+                "fields": [
+                  {
+                    "name": "STALE_TIMEOUT_CYCLES_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of stale timeout cycle count."
+                  }
+                ]
+              },
+              {
+                "name": "SEQ_REQ",
+                "offset": "0x00000011",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Current request sequence tag.",
+                "fields": [
+                  {
+                    "name": "REQUEST_SEQ",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Sequence number included in outbound request packet."
+                  }
+                ]
+              },
+              {
+                "name": "SEQ_RSP",
+                "offset": "0x00000012",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Expected response sequence tag.",
+                "fields": [
+                  {
+                    "name": "RESPONSE_SEQ",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Sequence number expected from inbound response packet."
+                  }
+                ]
+              },
+              {
+                "name": "SEQ_LAST_ACCEPTED",
+                "offset": "0x00000013",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Last accepted response sequence tag.",
+                "fields": [
+                  {
+                    "name": "LAST_ACCEPTED_SEQ",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Most recent accepted response sequence number for auditability."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_DRAG_LO",
+                "offset": "0x00000014",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Lower byte of compact drag summary metric captured from accepted response path.",
+                "fields": [
+                  {
+                    "name": "DRAG_METRIC_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Low 8 bits of drag metric."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_DRAG_HI",
+                "offset": "0x00000015",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Upper byte of compact drag summary metric.",
+                "fields": [
+                  {
+                    "name": "DRAG_METRIC_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "High 8 bits of drag metric."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_LIFT_LO",
+                "offset": "0x00000016",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Lower byte of compact lift summary metric captured from accepted response path.",
+                "fields": [
+                  {
+                    "name": "LIFT_METRIC_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Low 8 bits of lift metric."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_LIFT_HI",
+                "offset": "0x00000017",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Upper byte of compact lift summary metric.",
+                "fields": [
+                  {
+                    "name": "LIFT_METRIC_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "High 8 bits of lift metric."
+                  }
+                ]
+              },
+              {
+                "name": "RESULT_STATUS",
+                "offset": "0x00000018",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Response status summary from the accepted response path.",
+                "fields": [
+                  {
+                    "name": "RESPONSE_STATUS",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Compact response status code captured from inbound model response and validation logic."
+                  }
+                ]
+              },
+              {
+                "name": "FALLBACK_LO",
+                "offset": "0x00000019",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Safe fallback actuator value low byte.",
+                "fields": [
+                  {
+                    "name": "SAFE_ACTUATOR_VALUE_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "Low 8 bits of deterministic safe actuator value."
+                  }
+                ]
+              },
+              {
+                "name": "FALLBACK_HI",
+                "offset": "0x0000001A",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Safe fallback actuator value high byte and fallback policy control.",
+                "fields": [
+                  {
+                    "name": "SAFE_ACTUATOR_VALUE_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RW",
+                    "description": "High 8 bits of deterministic safe actuator value."
+                  }
+                ]
+              },
+              {
+                "name": "FALLBACK_POLICY",
+                "offset": "0x0000001B",
+                "address": null,
+                "access": "RW",
+                "reset": "0x00000000",
+                "description": "Fallback policy control byte.",
+                "fields": [
+                  {
+                    "name": "FALLBACK_HOLD_REVERT",
+                    "bit_offset": 0,
+                    "bit_width": 1,
+                    "access": "RW",
+                    "description": "0 forces configured safe_actuator_value during fallback; 1 allows hold-last-safe/revert behavior when supported."
+                  },
+                  {
+                    "name": "RESERVED",
+                    "bit_offset": 1,
+                    "bit_width": 7,
+                    "access": "RO",
+                    "description": "Reserved, read as zero."
+                  }
+                ]
+              },
+              {
+                "name": "VERSION_ID_LO",
+                "offset": "0x0000001C",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Design version low byte.",
+                "fields": [
+                  {
+                    "name": "DESIGN_VERSION_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Low 8 bits of design version identifier."
+                  }
+                ]
+              },
+              {
+                "name": "VERSION_ID_HI",
+                "offset": "0x0000001D",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Design version high byte.",
+                "fields": [
+                  {
+                    "name": "DESIGN_VERSION_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "High 8 bits of design version identifier."
+                  }
+                ]
+              },
+              {
+                "name": "MODEL_ID_LO",
+                "offset": "0x0000001E",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Model ID tag low byte.",
+                "fields": [
+                  {
+                    "name": "MODEL_ID_TAG_7_0",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "Low 8 bits of remote surrogate model identifier tag."
+                  }
+                ]
+              },
+              {
+                "name": "MODEL_ID_HI",
+                "offset": "0x0000001F",
+                "address": null,
+                "access": "RO",
+                "reset": "0x00000000",
+                "description": "Model ID tag high byte.",
+                "fields": [
+                  {
+                    "name": "MODEL_ID_TAG_15_8",
+                    "bit_offset": 0,
+                    "bit_width": 8,
+                    "access": "RO",
+                    "description": "High 8 bits of remote surrogate model identifier tag."
+                  }
+                ]
+              }
+            ],
+            "register_map": {
+              "block_name": "digital_subsystem",
+              "module_name": "digital_subsystem",
+              "base_address": "0x00000000",
+              "bus": "MINIMAL",
+              "registers": [
+                {
+                  "name": "CONTROL",
+                  "offset": "0x00000000",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Control and mode register. Writing ENABLE/ARM begins normal operation when operating-point inputs are valid. SOFT_RESET requests synchronous reinitialization. DIAGNOSTIC_BYPASS allows non-nominal diagnostic operation if supported by software policy. FALLBACK_SELECT selects fallback source behavior.",
+                  "fields": [
+                    {
+                      "name": "ENABLE",
+                      "bit_offset": 0,
+                      "bit_width": 1,
+                      "access": "RW",
+                      "description": "1 enables request/response transaction management and actuator command generation."
+                    },
+                    {
+                      "name": "SOFT_RESET",
+                      "bit_offset": 1,
+                      "bit_width": 1,
+                      "access": "RW",
+                      "description": "1 requests a synchronous software reset-equivalent clear of outstanding transaction state, sticky faults, and request output valid."
+                    },
+                    {
+                      "name": "ARM",
+                      "bit_offset": 2,
+                      "bit_width": 1,
+                      "access": "RW",
+                      "description": "1 arms the controller to issue a request when ENABLE is asserted and the operating envelope is valid."
+                    },
+                    {
+                      "name": "DIAGNOSTIC_BYPASS",
+                      "bit_offset": 3,
+                      "bit_width": 1,
+                      "access": "RW",
+                      "description": "1 permits diagnostic bypass behavior if implemented; normal safety checks remain authoritative unless explicitly overridden by design policy."
+                    },
+                    {
+                      "name": "FALLBACK_SELECT",
+                      "bit_offset": 4,
+                      "bit_width": 1,
+                      "access": "RW",
+                      "description": "Selects fallback value source. 0 uses configured safe_actuator_value; 1 may select hold-last-safe behavior when combined with FALLBACK_HOLD_REVERT."
+                    },
+                    {
+                      "name": "RESERVED",
+                      "bit_offset": 5,
+                      "bit_width": 3,
+                      "access": "RO",
+                      "description": "Reserved, read as zero."
+                    }
+                  ]
+                },
+                {
+                  "name": "STATUS",
+                  "offset": "0x00000001",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Live controller status and fault summary.",
+                  "fields": [
+                    {
+                      "name": "BUSY",
+                      "bit_offset": 0,
+                      "bit_width": 1,
+                      "access": "RO",
+                      "description": "1 indicates the controller is active in a transaction or fallback handling path."
+                    },
+                    {
+                      "name": "REQ_OUTSTANDING",
+                      "bit_offset": 1,
+                      "bit_width": 1,
+                      "access": "RO",
+                      "description": "1 indicates a request has been issued and not yet completed by handshake or abort path."
+                    },
+                    {
+                      "name": "RSP_VALID_SEEN",
+                      "bit_offset": 2,
+                      "bit_width": 1,
+                      "access": "RO",
+                      "description": "1 indicates at least one response-valid event has been observed during the current transaction window."
+                    },
+                    {
+                      "name": "TIMEOUT",
+                      "bit_offset": 3,
+                      "bit_width": 1,
+                      "access": "RO",
+                      "description": "1 indicates request or response timeout expiration."
+                    },
+                    {
+                      "name": "STALE",
+                      "bit_offset": 4,
+                      "bit_width": 1,
+                      "access": "RO",
+                      "description": "1 indicates stale or late response rejection."
+                    },
+                    {
+                      "name": "CLAMPED",
+                      "bit_offset": 5,
+                      "bit_width": 1,
+                      "access": "RO",
+                      "description": "1 indicates actuator command was clamped to configured limits."
+                    },
+                    {
+                      "name": "FALLBACK_ACTIVE",
+                      "bit_offset": 6,
+                      "bit_width": 1,
+                      "access": "RO",
+                      "description": "1 indicates fallback command selection is active."
+                    },
+                    {
+                      "name": "ENVELOPE_ERROR",
+                      "bit_offset": 7,
+                      "bit_width": 1,
+                      "access": "RO",
+                      "description": "1 indicates operating point rejected for violating envelope constraints, including velocity envelope."
+                    }
+                  ]
+                },
+                {
+                  "name": "VEHICLE_META",
+                  "offset": "0x00000002",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Compact vehicle/geometry metadata tag used to build the 64-bit request packet. This is an opaque identifier summary, not bulk geometry storage.",
+                  "fields": [
+                    {
+                      "name": "GEOMETRY_PRESENT",
+                      "bit_offset": 0,
+                      "bit_width": 1,
+                      "access": "RW",
+                      "description": "1 indicates geometry metadata is present and valid in the software/host context."
+                    },
+                    {
+                      "name": "GEOMETRY_ID",
+                      "bit_offset": 1,
+                      "bit_width": 4,
+                      "access": "RW",
+                      "description": "Lower nibble of geometry identifier summary."
+                    },
+                    {
+                      "name": "GEOMETRY_TYPE",
+                      "bit_offset": 5,
+                      "bit_width": 3,
+                      "access": "RW",
+                      "description": "Upper bits of the geometry type summary. Full geometry_type input exists at the top level; this register reflects the compact CSR-visible tag."
+                    }
+                  ]
+                },
+                {
+                  "name": "VEHICLE_META_ID",
+                  "offset": "0x00000003",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Additional metadata byte for geometry identity and checksum packing.",
+                  "fields": [
+                    {
+                      "name": "GEOMETRY_ID_EXT",
+                      "bit_offset": 0,
+                      "bit_width": 4,
+                      "access": "RW",
+                      "description": "Extended geometry identifier bits, if software uses more than four bits for the metadata tag."
+                    },
+                    {
+                      "name": "CHECKSUM_HI",
+                      "bit_offset": 4,
+                      "bit_width": 4,
+                      "access": "RW",
+                      "description": "Upper nibble of metadata checksum."
+                    }
+                  ]
+                },
+                {
+                  "name": "CHECKSUM_LO",
+                  "offset": "0x00000004",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Lower byte of metadata checksum.",
+                  "fields": [
+                    {
+                      "name": "CHECKSUM_LO",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Lower 8 bits of the 16-bit checksum tag."
+                    }
+                  ]
+                },
+                {
+                  "name": "FLOW_COND_LO",
+                  "offset": "0x00000005",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Velocity setpoint low byte. Fixed-point/integer representation; the controller enforces the 20 to 55 m/s operating envelope using the full 16-bit velocity_setpoint input.",
+                  "fields": [
+                    {
+                      "name": "VELOCITY_SETPOINT_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Low 8 bits of velocity setpoint fixed-point/integer value."
+                    }
+                  ]
+                },
+                {
+                  "name": "FLOW_COND_HI",
+                  "offset": "0x00000006",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Velocity setpoint high byte.",
+                  "fields": [
+                    {
+                      "name": "VELOCITY_SETPOINT_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "High 8 bits of velocity setpoint fixed-point/integer value."
+                    }
+                  ]
+                },
+                {
+                  "name": "LIMITS_MIN_LO",
+                  "offset": "0x00000007",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Actuator minimum limit low byte.",
+                  "fields": [
+                    {
+                      "name": "ACTUATOR_MIN_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Low 8 bits of actuator minimum bound."
+                    }
+                  ]
+                },
+                {
+                  "name": "LIMITS_MIN_HI",
+                  "offset": "0x00000008",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Actuator minimum limit high byte.",
+                  "fields": [
+                    {
+                      "name": "ACTUATOR_MIN_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "High 8 bits of actuator minimum bound."
+                    }
+                  ]
+                },
+                {
+                  "name": "LIMITS_MAX_LO",
+                  "offset": "0x00000009",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Actuator maximum limit low byte.",
+                  "fields": [
+                    {
+                      "name": "ACTUATOR_MAX_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Low 8 bits of actuator maximum bound."
+                    }
+                  ]
+                },
+                {
+                  "name": "LIMITS_MAX_HI",
+                  "offset": "0x0000000A",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Actuator maximum limit high byte.",
+                  "fields": [
+                    {
+                      "name": "ACTUATOR_MAX_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "High 8 bits of actuator maximum bound."
+                    }
+                  ]
+                },
+                {
+                  "name": "LIMITS_RATE_LO",
+                  "offset": "0x0000000B",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Rate limit low byte. Interpreted as fixed-point/integer limit on command step magnitude or update rate policy, as implemented by RTL.",
+                  "fields": [
+                    {
+                      "name": "RATE_LIMIT_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Low 8 bits of rate limit."
+                    }
+                  ]
+                },
+                {
+                  "name": "LIMITS_RATE_HI",
+                  "offset": "0x0000000C",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Rate limit high byte.",
+                  "fields": [
+                    {
+                      "name": "RATE_LIMIT_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "High 8 bits of rate limit."
+                    }
+                  ]
+                },
+                {
+                  "name": "TIMEOUT_REQ_LO",
+                  "offset": "0x0000000D",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Request timeout low byte.",
+                  "fields": [
+                    {
+                      "name": "REQUEST_TIMEOUT_CYCLES_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Low 8 bits of request timeout cycle count."
+                    }
+                  ]
+                },
+                {
+                  "name": "TIMEOUT_REQ_HI",
+                  "offset": "0x0000000E",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Request timeout high byte.",
+                  "fields": [
+                    {
+                      "name": "REQUEST_TIMEOUT_CYCLES_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "High 8 bits of request timeout cycle count."
+                    }
+                  ]
+                },
+                {
+                  "name": "TIMEOUT_STALE_LO",
+                  "offset": "0x0000000F",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Stale timeout low byte.",
+                  "fields": [
+                    {
+                      "name": "STALE_TIMEOUT_CYCLES_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Low 8 bits of stale timeout cycle count."
+                    }
+                  ]
+                },
+                {
+                  "name": "TIMEOUT_STALE_HI",
+                  "offset": "0x00000010",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Stale timeout high byte.",
+                  "fields": [
+                    {
+                      "name": "STALE_TIMEOUT_CYCLES_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "High 8 bits of stale timeout cycle count."
+                    }
+                  ]
+                },
+                {
+                  "name": "SEQ_REQ",
+                  "offset": "0x00000011",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Current request sequence tag.",
+                  "fields": [
+                    {
+                      "name": "REQUEST_SEQ",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Sequence number included in outbound request packet."
+                    }
+                  ]
+                },
+                {
+                  "name": "SEQ_RSP",
+                  "offset": "0x00000012",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Expected response sequence tag.",
+                  "fields": [
+                    {
+                      "name": "RESPONSE_SEQ",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Sequence number expected from inbound response packet."
+                    }
+                  ]
+                },
+                {
+                  "name": "SEQ_LAST_ACCEPTED",
+                  "offset": "0x00000013",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Last accepted response sequence tag.",
+                  "fields": [
+                    {
+                      "name": "LAST_ACCEPTED_SEQ",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Most recent accepted response sequence number for auditability."
+                    }
+                  ]
+                },
+                {
+                  "name": "RESULT_DRAG_LO",
+                  "offset": "0x00000014",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Lower byte of compact drag summary metric captured from accepted response path.",
+                  "fields": [
+                    {
+                      "name": "DRAG_METRIC_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RO",
+                      "description": "Low 8 bits of drag metric."
+                    }
+                  ]
+                },
+                {
+                  "name": "RESULT_DRAG_HI",
+                  "offset": "0x00000015",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Upper byte of compact drag summary metric.",
+                  "fields": [
+                    {
+                      "name": "DRAG_METRIC_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RO",
+                      "description": "High 8 bits of drag metric."
+                    }
+                  ]
+                },
+                {
+                  "name": "RESULT_LIFT_LO",
+                  "offset": "0x00000016",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Lower byte of compact lift summary metric captured from accepted response path.",
+                  "fields": [
+                    {
+                      "name": "LIFT_METRIC_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RO",
+                      "description": "Low 8 bits of lift metric."
+                    }
+                  ]
+                },
+                {
+                  "name": "RESULT_LIFT_HI",
+                  "offset": "0x00000017",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Upper byte of compact lift summary metric.",
+                  "fields": [
+                    {
+                      "name": "LIFT_METRIC_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RO",
+                      "description": "High 8 bits of lift metric."
+                    }
+                  ]
+                },
+                {
+                  "name": "RESULT_STATUS",
+                  "offset": "0x00000018",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Response status summary from the accepted response path.",
+                  "fields": [
+                    {
+                      "name": "RESPONSE_STATUS",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RO",
+                      "description": "Compact response status code captured from inbound model response and validation logic."
+                    }
+                  ]
+                },
+                {
+                  "name": "FALLBACK_LO",
+                  "offset": "0x00000019",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Safe fallback actuator value low byte.",
+                  "fields": [
+                    {
+                      "name": "SAFE_ACTUATOR_VALUE_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "Low 8 bits of deterministic safe actuator value."
+                    }
+                  ]
+                },
+                {
+                  "name": "FALLBACK_HI",
+                  "offset": "0x0000001A",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Safe fallback actuator value high byte and fallback policy control.",
+                  "fields": [
+                    {
+                      "name": "SAFE_ACTUATOR_VALUE_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RW",
+                      "description": "High 8 bits of deterministic safe actuator value."
+                    }
+                  ]
+                },
+                {
+                  "name": "FALLBACK_POLICY",
+                  "offset": "0x0000001B",
+                  "address": null,
+                  "access": "RW",
+                  "reset": "0x00000000",
+                  "description": "Fallback policy control byte.",
+                  "fields": [
+                    {
+                      "name": "FALLBACK_HOLD_REVERT",
+                      "bit_offset": 0,
+                      "bit_width": 1,
+                      "access": "RW",
+                      "description": "0 forces configured safe_actuator_value during fallback; 1 allows hold-last-safe/revert behavior when supported."
+                    },
+                    {
+                      "name": "RESERVED",
+                      "bit_offset": 1,
+                      "bit_width": 7,
+                      "access": "RO",
+                      "description": "Reserved, read as zero."
+                    }
+                  ]
+                },
+                {
+                  "name": "VERSION_ID_LO",
+                  "offset": "0x0000001C",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Design version low byte.",
+                  "fields": [
+                    {
+                      "name": "DESIGN_VERSION_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RO",
+                      "description": "Low 8 bits of design version identifier."
+                    }
+                  ]
+                },
+                {
+                  "name": "VERSION_ID_HI",
+                  "offset": "0x0000001D",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Design version high byte.",
+                  "fields": [
+                    {
+                      "name": "DESIGN_VERSION_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RO",
+                      "description": "High 8 bits of design version identifier."
+                    }
+                  ]
+                },
+                {
+                  "name": "MODEL_ID_LO",
+                  "offset": "0x0000001E",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Model ID tag low byte.",
+                  "fields": [
+                    {
+                      "name": "MODEL_ID_TAG_7_0",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RO",
+                      "description": "Low 8 bits of remote surrogate model identifier tag."
+                    }
+                  ]
+                },
+                {
+                  "name": "MODEL_ID_HI",
+                  "offset": "0x0000001F",
+                  "address": null,
+                  "access": "RO",
+                  "reset": "0x00000000",
+                  "description": "Model ID tag high byte.",
+                  "fields": [
+                    {
+                      "name": "MODEL_ID_TAG_15_8",
+                      "bit_offset": 0,
+                      "bit_width": 8,
+                      "access": "RO",
+                      "description": "High 8 bits of remote surrogate model identifier tag."
+                    }
+                  ]
+                }
+              ],
+              "__source": {
+                "mode": "artifact_passthrough",
+                "path": "state.digital_regmap"
+              }
+            },
+            "notes": [
+              "Derived because upstream RTL package did not include an explicit digital spec JSON.",
+              "Uses actual RTL package top/filelist and firmware register map evidence."
+            ]
+          },
+          "integration_intent_path": "derived:rtl_package",
+          "integration_intent_json": {
+            "package_type": "derived_integration_intent_from_cosim_assets",
+            "source": "rtl_package",
+            "top": {
+              "sim_module": "adaptive_aero_control_top_spi_fpga_top",
+              "phys_module": "adaptive_aero_control_top_spi_fpga_top"
+            },
+            "instances": [
+              {
+                "name": "adaptive_aero_control_top_spi_fpga_top",
+                "module": "adaptive_aero_control_top_spi_fpga_top"
+              }
+            ],
+            "connections": [],
+            "rtl_file_count": 2,
+            "notes": [
+              "Derived single-boundary integration intent from exported RTL package for L2 validation.",
+              "No invented connectivity is added when explicit System RTL integration intent is unavailable."
+            ]
+          }
+        },
+        "tool_availability": {
+          "python": true,
+          "python3": true,
+          "make": true,
+          "verilator": true
+        },
+        "scenario_count": 9,
+        "scenarios": [
+          {
+            "id": "control_service_boot_smoke",
+            "class": "boot",
+            "enabled": true,
+            "software_target": {
+              "app_name": "control_service",
+              "binary_name": "ss_app_control_service",
+              "cargo_package": "ss_app_control_service"
+            },
+            "deterministic_seed": 101,
+            "description": "Boot the firmware ELF on the RTL sim top and verify reset release and first observable software activity.",
+            "expected_events": [
+              "app=control_service",
+              "scenario=control_service_boot_smoke"
+            ],
+            "expected_registers": {},
+            "expected_interrupts": [],
+            "expected_signals": [
+              "reset_released"
+            ],
+            "expected_observations": [
+              "firmware ELF is loaded",
+              "reset is released",
+              "simulation reaches first software-visible activity"
+            ],
+            "scenario_id": "control_service_boot_smoke"
+          },
+          {
+            "id": "control_service_register_rw_basic",
+            "class": "register_read_write",
+            "enabled": true,
+            "software_target": {
+              "app_name": "control_service",
+              "binary_name": "ss_app_control_service",
+              "cargo_package": "ss_app_control_service"
+            },
+            "deterministic_seed": 202,
+            "description": "Perform deterministic register write/readback against known register map content.",
+            "expected_events": [
+              "app=control_service",
+              "scenario=control_service_register_rw_basic",
+              "register_write="
+            ],
+            "expected_registers": {
+              "CONTROL": "0x10"
+            },
+            "expected_interrupts": [],
+            "expected_signals": [],
+            "expected_observations": [
+              "write transaction issued",
+              "readback matches expected value",
+              "no unexpected fault/timeout"
+            ],
+            "scenario_id": "control_service_register_rw_basic"
+          },
+          {
+            "id": "control_service_interrupt_propagation_basic",
+            "class": "interrupt_propagation",
+            "enabled": false,
+            "software_target": {
+              "app_name": "control_service",
+              "binary_name": "ss_app_control_service",
+              "cargo_package": "ss_app_control_service"
+            },
+            "deterministic_seed": 303,
+            "description": "Trigger an interrupt source and validate propagation from RTL event to firmware/software observable handling.",
+            "expected_events": [
+              "app=control_service",
+              "scenario=control_service_interrupt_propagation_basic",
+              "interrupt_triggered=1"
+            ],
+            "expected_registers": {},
+            "expected_interrupts": [],
+            "expected_signals": [],
+            "expected_observations": [
+              "interrupt source event occurs",
+              "interrupt line/state becomes observable",
+              "firmware handler executes"
+            ],
+            "interrupt_targets": [],
+            "scenario_id": "control_service_interrupt_propagation_basic"
+          },
+          {
+            "id": "diagnostics_boot_smoke",
+            "class": "boot",
+            "enabled": true,
+            "software_target": {
+              "app_name": "diagnostics",
+              "binary_name": "ss_app_diagnostics",
+              "cargo_package": "ss_app_diagnostics"
+            },
+            "deterministic_seed": 101,
+            "description": "Boot the firmware ELF on the RTL sim top and verify reset release and first observable software activity.",
+            "expected_events": [
+              "app=diagnostics",
+              "scenario=diagnostics_boot_smoke"
+            ],
+            "expected_registers": {},
+            "expected_interrupts": [],
+            "expected_signals": [
+              "reset_released"
+            ],
+            "expected_observations": [
+              "firmware ELF is loaded",
+              "reset is released",
+              "simulation reaches first software-visible activity"
+            ],
+            "scenario_id": "diagnostics_boot_smoke"
+          },
+          {
+            "id": "diagnostics_register_rw_basic",
+            "class": "register_read_write",
+            "enabled": true,
+            "software_target": {
+              "app_name": "diagnostics",
+              "binary_name": "ss_app_diagnostics",
+              "cargo_package": "ss_app_diagnostics"
+            },
+            "deterministic_seed": 202,
+            "description": "Perform deterministic register write/readback against known register map content.",
+            "expected_events": [
+              "app=diagnostics",
+              "scenario=diagnostics_register_rw_basic",
+              "register_write="
+            ],
+            "expected_registers": {
+              "CONTROL": "0x10"
+            },
+            "expected_interrupts": [],
+            "expected_signals": [],
+            "expected_observations": [
+              "write transaction issued",
+              "readback matches expected value",
+              "no unexpected fault/timeout"
+            ],
+            "scenario_id": "diagnostics_register_rw_basic"
+          },
+          {
+            "id": "diagnostics_interrupt_propagation_basic",
+            "class": "interrupt_propagation",
+            "enabled": false,
+            "software_target": {
+              "app_name": "diagnostics",
+              "binary_name": "ss_app_diagnostics",
+              "cargo_package": "ss_app_diagnostics"
+            },
+            "deterministic_seed": 303,
+            "description": "Trigger an interrupt source and validate propagation from RTL event to firmware/software observable handling.",
+            "expected_events": [
+              "app=diagnostics",
+              "scenario=diagnostics_interrupt_propagation_basic",
+              "interrupt_triggered=1"
+            ],
+            "expected_registers": {},
+            "expected_interrupts": [],
+            "expected_signals": [],
+            "expected_observations": [
+              "interrupt source event occurs",
+              "interrupt line/state becomes observable",
+              "firmware handler executes"
+            ],
+            "interrupt_targets": [],
+            "scenario_id": "diagnostics_interrupt_propagation_basic"
+          },
+          {
+            "id": "demo_cli_boot_smoke",
+            "class": "boot",
+            "enabled": true,
+            "software_target": {
+              "app_name": "demo_cli",
+              "binary_name": "ss_app_demo_cli",
+              "cargo_package": "ss_app_demo_cli"
+            },
+            "deterministic_seed": 101,
+            "description": "Boot the firmware ELF on the RTL sim top and verify reset release and first observable software activity.",
+            "expected_events": [
+              "app=demo_cli",
+              "scenario=demo_cli_boot_smoke"
+            ],
+            "expected_registers": {},
+            "expected_interrupts": [],
+            "expected_signals": [
+              "reset_released"
+            ],
+            "expected_observations": [
+              "firmware ELF is loaded",
+              "reset is released",
+              "simulation reaches first software-visible activity"
+            ],
+            "scenario_id": "demo_cli_boot_smoke"
+          },
+          {
+            "id": "demo_cli_register_rw_basic",
+            "class": "register_read_write",
+            "enabled": true,
+            "software_target": {
+              "app_name": "demo_cli",
+              "binary_name": "ss_app_demo_cli",
+              "cargo_package": "ss_app_demo_cli"
+            },
+            "deterministic_seed": 202,
+            "description": "Perform deterministic register write/readback against known register map content.",
+            "expected_events": [
+              "app=demo_cli",
+              "scenario=demo_cli_register_rw_basic",
+              "register_write="
+            ],
+            "expected_registers": {
+              "CONTROL": "0x10"
+            },
+            "expected_interrupts": [],
+            "expected_signals": [],
+            "expected_observations": [
+              "write transaction issued",
+              "readback matches expected value",
+              "no unexpected fault/timeout"
+            ],
+            "scenario_id": "demo_cli_register_rw_basic"
+          },
+          {
+            "id": "demo_cli_interrupt_propagation_basic",
+            "class": "interrupt_propagation",
+            "enabled": false,
+            "software_target": {
+              "app_name": "demo_cli",
+              "binary_name": "ss_app_demo_cli",
+              "cargo_package": "ss_app_demo_cli"
+            },
+            "deterministic_seed": 303,
+            "description": "Trigger an interrupt source and validate propagation from RTL event to firmware/software observable handling.",
+            "expected_events": [
+              "app=demo_cli",
+              "scenario=demo_cli_interrupt_propagation_basic",
+              "interrupt_triggered=1"
+            ],
+            "expected_registers": {},
+            "expected_interrupts": [],
+            "expected_signals": [],
+            "expected_observations": [
+              "interrupt source event occurs",
+              "interrupt line/state becomes observable",
+              "firmware handler executes"
+            ],
+            "interrupt_targets": [],
+            "scenario_id": "demo_cli_interrupt_propagation_basic"
+          }
+        ],
+        "resolved_commands": [
+          {
+            "scenario_id": "control_service_boot_smoke",
+            "command_id": "verified_rtl_regression",
+            "command": [
+              "make",
+              "-C",
+              "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ea919845-9d0d-415e-b9ca-12f5ff8c1544/c798a8f5-60a8-4810-b707-612c1b637f21/system/system/restored_rtl_sim/6b479cae-51b0-4c84-b35a-8d1190e6a59c/vv/tb"
+            ],
+            "cwd": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ea919845-9d0d-415e-b9ca-12f5ff8c1544/c798a8f5-60a8-4810-b707-612c1b637f21/system/system/restored_rtl_sim/6b479cae-51b0-4c84-b35a-8d1190e6a59c/vv/tb",
+            "source": "scenario.runner:verilator",
+            "execution_layers": [
+              "rtl"
+            ],
+            "exercises_rtl": true
+          },
+          {
+            "scenario_id": "control_service_boot_smoke",
+            "command_id": "control_service_boot_smoke_software_entry",
+            "command": [
+              "cargo",
+              "run",
+              "-p",
+              "ss_app_control_service",
+              "--",
+              "--scenario",
+              "control_service_boot_smoke"
+            ],
+            "source": "software.target.command",
+            "entry_app_name": "control_service",
+            "cargo_package": "ss_app_control_service"
+          },
+          {
+            "scenario_id": "control_service_register_rw_basic",
+            "command_id": "control_service_register_rw_basic_software_entry",
+            "command": [
+              "cargo",
+              "run",
+              "-p",
+              "ss_app_control_service",
+              "--",
+              "--scenario",
+              "control_service_register_rw_basic"
+            ],
+            "source": "software.target.command",
+            "entry_app_name": "control_service",
+            "cargo_package": "ss_app_control_service"
+          },
+          {
+            "scenario_id": "diagnostics_boot_smoke",
+            "command_id": "diagnostics_boot_smoke_software_entry",
+            "command": [
+              "cargo",
+              "run",
+              "-p",
+              "ss_app_diagnostics",
+              "--",
+              "--scenario",
+              "diagnostics_boot_smoke"
+            ],
+            "source": "software.target.command",
+            "entry_app_name": "diagnostics",
+            "cargo_package": "ss_app_diagnostics"
+          },
+          {
+            "scenario_id": "diagnostics_register_rw_basic",
+            "command_id": "diagnostics_register_rw_basic_software_entry",
+            "command": [
+              "cargo",
+              "run",
+              "-p",
+              "ss_app_diagnostics",
+              "--",
+              "--scenario",
+              "diagnostics_register_rw_basic"
+            ],
+            "source": "software.target.command",
+            "entry_app_name": "diagnostics",
+            "cargo_package": "ss_app_diagnostics"
+          },
+          {
+            "scenario_id": "demo_cli_boot_smoke",
+            "command_id": "demo_cli_boot_smoke_software_entry",
+            "command": [
+              "cargo",
+              "run",
+              "-p",
+              "ss_app_demo_cli",
+              "--",
+              "--scenario",
+              "demo_cli_boot_smoke"
+            ],
+            "source": "software.target.command",
+            "entry_app_name": "demo_cli",
+            "cargo_package": "ss_app_demo_cli"
+          },
+          {
+            "scenario_id": "demo_cli_register_rw_basic",
+            "command_id": "demo_cli_register_rw_basic_software_entry",
+            "command": [
+              "cargo",
+              "run",
+              "-p",
+              "ss_app_demo_cli",
+              "--",
+              "--scenario",
+              "demo_cli_register_rw_basic"
+            ],
+            "source": "software.target.command",
+            "entry_app_name": "demo_cli",
+            "cargo_package": "ss_app_demo_cli"
+          }
+        ]
+      }
+    }
+  },
+  "upstream_signoff": {
+    "status": "fail",
+    "issues": [
+      "validation verdict is missing, expected pass"
+    ],
+    "validation_verdict": null
+  },
+  "hardware_replacement_path": "The generated simulator adapter can later be replaced by a board/silicon transport while preserving the app API."
+}

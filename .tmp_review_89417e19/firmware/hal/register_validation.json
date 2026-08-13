@@ -1,0 +1,26 @@
+{
+  "agent": "Embedded Register Validation Agent",
+  "phase": "reg_validate",
+  "register_count": 7,
+  "driver_present": false,
+  "error_count": 0,
+  "warning_count": 3,
+  "status": "pass",
+  "findings": [
+    {
+      "severity": "warning",
+      "category": "hal",
+      "message": "RO register STATUS exposes HAL write helper write_status"
+    },
+    {
+      "severity": "warning",
+      "category": "hal",
+      "message": "RO register LATEST_TEMP exposes HAL write helper write_latest_temp"
+    },
+    {
+      "severity": "warning",
+      "category": "hal",
+      "message": "RO register IRQ_STATUS exposes HAL write helper write_irq_status"
+    }
+  ]
+}

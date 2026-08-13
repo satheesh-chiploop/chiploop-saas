@@ -1,0 +1,89 @@
+{
+  "workflow_dir": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system",
+  "candidate_paths": [
+    "digital/digital_regmap.json",
+    "digital_regmap.json",
+    "digital/regmap.json",
+    "digital/register_map.json",
+    "regmap.json"
+  ],
+  "candidate_roots": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system/digital",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/5a571fe6-711e-4a24-a0cb-00c7eaf92852/770ff153-f9ee-4fa4-a1f9-b7c585a2b979/system",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/5a571fe6-711e-4a24-a0cb-00c7eaf92852/770ff153-f9ee-4fa4-a1f9-b7c585a2b979",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/5a571fe6-711e-4a24-a0cb-00c7eaf92852/770ff153-f9ee-4fa4-a1f9-b7c585a2b979/system/digital",
+    "/root/chiploop-backend/backend/workflows/5a571fe6-711e-4a24-a0cb-00c7eaf92852",
+    "/root/chiploop-backend/backend/workflows",
+    "/root/chiploop-backend/backend/workflows/5a571fe6-711e-4a24-a0cb-00c7eaf92852/digital"
+  ],
+  "candidate_probe": [
+    {
+      "rel": "digital/digital_regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system/digital/digital_regmap.json",
+      "exists": true
+    },
+    {
+      "rel": "digital_regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system/digital_regmap.json",
+      "exists": false
+    },
+    {
+      "rel": "digital/regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system/digital/regmap.json",
+      "exists": false
+    },
+    {
+      "rel": "digital/register_map.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system/digital/register_map.json",
+      "exists": false
+    },
+    {
+      "rel": "regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system/regmap.json",
+      "exists": false
+    }
+  ],
+  "state_digital_regmap_present": true,
+  "state_digital_regmap_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system/digital/digital_regmap.json",
+  "state_digital_register_map_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/89417e19-57aa-4064-8e40-bdafb1c1be5e/374a0ea3-cf3d-47d3-9287-cc77fc2f76f7/system/digital/digital_regmap.json",
+  "state_digital_block_keys": [
+    "digital_regmap",
+    "regmap",
+    "digital_regmap_path",
+    "register_map_path",
+    "macro_lefs",
+    "macro_libs",
+    "macro_blackbox_mode",
+    "macro_blackboxes",
+    "rtl_files",
+    "clock_intent"
+  ],
+  "selected_regmap_path": "state.digital_regmap",
+  "source_workflow_ids": [
+    "5a571fe6-711e-4a24-a0cb-00c7eaf92852"
+  ],
+  "upstream_regmap_type": "dict",
+  "passthrough_taken": true,
+  "normalization_taken": false,
+  "candidate_regs_count": 7,
+  "goal_present": false,
+  "toolchain_keys": [
+    "language"
+  ],
+  "toggle_keys": [
+    "enable_cosim",
+    "validate_registers"
+  ],
+  "mode": "artifact_passthrough",
+  "register_names_preview": [
+    "CONTROL",
+    "STATUS",
+    "THRESHOLD",
+    "LATEST_TEMP",
+    "SAMPLE_COUNT",
+    "IRQ_STATUS",
+    "IRQ_CLEAR"
+  ]
+}
